@@ -271,29 +271,41 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
 
             <div className="space-y-2">
               <Label htmlFor="parent_id">Entidade Pai</Label>
-              <Select
-                value={formData.parent_id}
-                onValueChange={(value) => setFormData({ ...formData, parent_id: value })}
-                disabled={!formData.type || loadingParents || formData.type === "company"}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={
-                    formData.type === "company" 
-                      ? "Empresas não têm pai" 
-                      : loadingParents 
-                      ? "Carregando..." 
-                      : "Selecione a entidade pai"
-                  } />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
-                  {parentOptions.map((option) => (
-                    <SelectItem key={option.id} value={option.id}>
-                      {option.name} ({getTypeLabel(option.type)})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2">
+                <Select
+                  value={formData.parent_id || undefined}
+                  onValueChange={(value) => setFormData({ ...formData, parent_id: value })}
+                  disabled={!formData.type || loadingParents || formData.type === "company"}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder={
+                      formData.type === "company" 
+                        ? "Empresas não têm pai" 
+                        : loadingParents 
+                        ? "Carregando..." 
+                        : "Selecione a entidade pai"
+                    } />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {parentOptions.map((option) => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.name} ({getTypeLabel(option.type)})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {formData.parent_id && formData.type !== "company" && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setFormData({ ...formData, parent_id: "" })}
+                    disabled={loading}
+                  >
+                    ×
+                  </Button>
+                )}
+              </div>
               {formData.type && formData.type !== "company" && (
                 <p className="text-xs text-muted-foreground">
                   {formData.type === "branch" && "Filiais devem ter uma Empresa como pai"}
