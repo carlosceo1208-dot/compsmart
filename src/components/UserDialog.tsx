@@ -179,17 +179,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (updateError) throw updateError;
 
-        // Update roles
-        await supabase.from("user_roles").delete().eq("user_id", userId);
-        
-        const roleInserts = formData.roles.map(role => ({
-          user_id: userId,
-          role: role as Database["public"]["Enums"]["app_role"],
-        }));
-        
-        const { error: rolesError } = await supabase
-          .from("user_roles")
-          .insert(roleInserts);
+        // Update roles using secure function
+        const { error: rolesError } = await supabase.rpc('manage_user_roles', {
+          p_user_id: userId,
+          p_roles: formData.roles as Database["public"]["Enums"]["app_role"][]
+        });
 
         if (rolesError) throw rolesError;
 
@@ -228,17 +222,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (profileError) throw profileError;
 
-        // Assign roles
-        await supabase.from("user_roles").delete().eq("user_id", authData.user.id);
-        
-        const roleInserts = formData.roles.map(role => ({
-          user_id: authData.user.id,
-          role: role as Database["public"]["Enums"]["app_role"],
-        }));
-        
-        const { error: rolesError } = await supabase
-          .from("user_roles")
-          .insert(roleInserts);
+        // Assign roles using secure function
+        const { error: rolesError } = await supabase.rpc('manage_user_roles', {
+          p_user_id: authData.user.id,
+          p_roles: formData.roles as Database["public"]["Enums"]["app_role"][]
+        });
 
         if (rolesError) throw rolesError;
 
