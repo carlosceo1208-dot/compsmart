@@ -229,6 +229,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      manage_user_roles: {
+        Args: {
+          p_roles: Database["public"]["Enums"]["app_role"][]
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
     Enums: {
