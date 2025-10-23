@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, UserPlus, Mail, Calendar, MoreVertical, Edit, UserX, Upload } from "lucide-react";
+import { Search, UserPlus, Mail, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -51,6 +51,7 @@ const Users = () => {
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [inactivateUserId, setInactivateUserId] = useState<string | null>(null);
+  const [reactivateUserId, setReactivateUserId] = useState<string | null>(null);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
 
   useEffect(() => {
@@ -125,6 +126,27 @@ const Users = () => {
       console.error(error);
     } finally {
       setInactivateUserId(null);
+    }
+  };
+
+  const handleReactivateUser = async () => {
+    if (!reactivateUserId) return;
+
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ status: "active" })
+        .eq("id", reactivateUserId);
+
+      if (error) throw error;
+
+      toast.success("Usuário reativado com sucesso");
+      fetchProfiles();
+    } catch (error: any) {
+      toast.error("Erro ao reativar usuário");
+      console.error(error);
+    } finally {
+      setReactivateUserId(null);
     }
   };
 
@@ -330,13 +352,21 @@ const Users = () => {
                               <Edit className="w-4 h-4 mr-2" />
                               Editar
                             </DropdownMenuItem>
-                            {profile.status === "active" && (
+                            {profile.status === "active" ? (
                               <DropdownMenuItem
                                 onClick={() => setInactivateUserId(profile.id)}
                                 className="text-destructive"
                               >
                                 <UserX className="w-4 h-4 mr-2" />
                                 Inativar
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                onClick={() => setReactivateUserId(profile.id)}
+                                className="text-success"
+                              >
+                                <UserCheck className="w-4 h-4 mr-2" />
+                                Reativar
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
@@ -370,6 +400,23 @@ const Users = () => {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleInactivateUser} className="bg-destructive hover:bg-destructive/90">
               Inativar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!reactivateUserId} onOpenChange={() => setReactivateUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Reativação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja reativar este usuário? Ele poderá acessar o sistema novamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReactivateUser} className="bg-success hover:bg-success/90">
+              Reativar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
