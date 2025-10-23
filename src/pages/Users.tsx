@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, UserPlus, Mail, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2 } from "lucide-react";
+import { Search, UserPlus, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -41,6 +41,11 @@ interface Profile {
   phone: string | null;
   status: string;
   created_at: string;
+  job_title: string | null;
+  grade: string | null;
+  salary: number | null;
+  salary_range_percentage: number | null;
+  performance_rating: number | null;
   user_roles: Array<{ role: string }>;
 }
 
@@ -93,7 +98,7 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, status, created_at")
+        .select("id, full_name, email, phone, status, created_at, job_title, grade, salary, salary_range_percentage, performance_rating")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -322,10 +327,14 @@ const Users = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead>Cargo</TableHead>
+                    <TableHead>Grade</TableHead>
+                    <TableHead>Salário</TableHead>
+                    <TableHead>% Faixa</TableHead>
+                    <TableHead>Nota</TableHead>
                     <TableHead>Perfil</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Data de Cadastro</TableHead>
+                    <TableHead>Data de Admissão</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -336,10 +345,31 @@ const Users = () => {
                         {profile.full_name}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-muted-foreground" />
-                          {profile.email}
-                        </div>
+                        <span className="text-sm">{profile.job_title || "-"}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{profile.grade || "-"}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium">
+                          {profile.salary 
+                            ? `R$ ${profile.salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+                            : "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">
+                          {profile.salary_range_percentage 
+                            ? `${profile.salary_range_percentage.toFixed(1)}%` 
+                            : "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">
+                          {profile.performance_rating 
+                            ? profile.performance_rating.toFixed(1) 
+                            : "-"}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1 flex-wrap">
