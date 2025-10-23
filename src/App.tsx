@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
+import Organization from "./pages/Organization";
+import Roles from "./pages/Roles";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "./components/DashboardLayout";
 
@@ -24,6 +26,8 @@ const App = () => (
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/users" element={<Users />} />
+            <Route path="/organization" element={<Organization />} />
+            <Route path="/roles" element={<Roles />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
