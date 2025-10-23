@@ -28,7 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, UserPlus, Mail, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck } from "lucide-react";
+import { Search, UserPlus, Mail, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -53,22 +53,36 @@ const Users = () => {
   const [inactivateUserId, setInactivateUserId] = useState<string | null>(null);
   const [reactivateUserId, setReactivateUserId] = useState<string | null>(null);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
+  const [permissionsLoading, setPermissionsLoading] = useState(true);
 
   useEffect(() => {
     checkUserPermissions();
     fetchProfiles();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        checkUserPermissions();
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const checkUserPermissions = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    setPermissionsLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setPermissionsLoading(false);
+      return;
+    }
 
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", user.id);
+      .eq("user_id", session.user.id);
 
-    setCurrentUserRoles(roles?.map(r => r.role) || []);
+    setCurrentUserRoles(roles?.map((r: any) => r.role) || []);
+    setPermissionsLoading(false);
   };
 
   const hasPermission = () => {
@@ -188,6 +202,18 @@ const Users = () => {
       </Badge>
     ));
   };
+
+  if (permissionsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (!hasPermission()) {
     return (
