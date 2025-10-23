@@ -62,7 +62,6 @@ const Users = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // @ts-expect-error - Database types will be auto-regenerated after migration
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
@@ -77,7 +76,6 @@ const Users = () => {
 
   const fetchProfiles = async () => {
     try {
-      // @ts-expect-error - Database types will be auto-regenerated after migration
       const { data, error } = await supabase
         .from("profiles")
         .select(`
@@ -107,7 +105,6 @@ const Users = () => {
     if (!inactivateUserId) return;
 
     try {
-      // @ts-expect-error - Database types will be auto-regenerated after migration
       const { error } = await supabase
         .from("profiles")
         .update({ status: "inactive" })

@@ -34,7 +34,6 @@ export const DashboardLayout = () => {
       }
 
       const { data, error } = await supabase
-        // @ts-expect-error - Database types will be auto-regenerated after migration
         .from("profiles")
         .select("full_name, email")
         .eq("id", session.user.id)
