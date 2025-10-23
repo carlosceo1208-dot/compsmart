@@ -14,210 +14,16 @@ export type Database = {
   }
   public: {
     Tables: {
-      audit_logs: {
-        Row: {
-          action: string
-          created_at: string
-          id: string
-          new_data: Json | null
-          old_data: Json | null
-          record_id: string | null
-          table_name: string
-          user_id: string | null
-        }
-        Insert: {
-          action: string
-          created_at?: string
-          id?: string
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string | null
-          table_name: string
-          user_id?: string | null
-        }
-        Update: {
-          action?: string
-          created_at?: string
-          id?: string
-          new_data?: Json | null
-          old_data?: Json | null
-          record_id?: string | null
-          table_name?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      organizational_structure: {
-        Row: {
-          code: string | null
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-          parent_id: string | null
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          code?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-          parent_id?: string | null
-          type: string
-          updated_at?: string
-        }
-        Update: {
-          code?: string | null
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-          parent_id?: string | null
-          type?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "organizational_structure_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "organizational_structure"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      permissions: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          birth_date: string | null
-          cpf: string | null
-          created_at: string
-          email: string
-          full_name: string
-          id: string
-          phone: string | null
-          status: Database["public"]["Enums"]["user_status"]
-          updated_at: string
-        }
-        Insert: {
-          birth_date?: string | null
-          cpf?: string | null
-          created_at?: string
-          email: string
-          full_name: string
-          id: string
-          phone?: string | null
-          status?: Database["public"]["Enums"]["user_status"]
-          updated_at?: string
-        }
-        Update: {
-          birth_date?: string | null
-          cpf?: string | null
-          created_at?: string
-          email?: string
-          full_name?: string
-          id?: string
-          phone?: string | null
-          status?: Database["public"]["Enums"]["user_status"]
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      role_permissions: {
-        Row: {
-          created_at: string
-          id: string
-          permission_id: string
-          role: Database["public"]["Enums"]["app_role"]
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          permission_id: string
-          role: Database["public"]["Enums"]["app_role"]
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          permission_id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "role_permissions_permission_id_fkey"
-            columns: ["permission_id"]
-            isOneToOne: false
-            referencedRelation: "permissions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_any_role: {
-        Args: {
-          _roles: Database["public"]["Enums"]["app_role"][]
-          _user_id: string
-        }
-        Returns: boolean
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "hr_manager" | "manager" | "employee"
-      user_status: "active" | "inactive"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -344,9 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "hr_manager", "manager", "employee"],
-      user_status: ["active", "inactive"],
-    },
+    Enums: {},
   },
 } as const
