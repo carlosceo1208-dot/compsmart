@@ -15,13 +15,31 @@ const userSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").optional(),
   phone: z.string().optional(),
-  cpf: z.string().optional(),
+  cpf: z.string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === "") return true;
+      // Valida formato: apenas dígitos (11) ou formato xxx.xxx.xxx-xx
+      return /^\d{11}$/.test(val) || /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(val);
+    }, { message: "CPF deve ter 11 dígitos (xxxxxxxxxxx) ou formato xxx.xxx.xxx-xx" }),
   birth_date: z.string().optional(),
   job_title: z.string().optional(),
   grade: z.string().optional(),
   salary: z.string().optional(),
-  salary_range_percentage: z.string().optional(),
-  performance_rating: z.string().optional(),
+  salary_range_percentage: z.string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === "") return true;
+      const num = parseFloat(val);
+      return num >= 0 && num <= 100;
+    }, { message: "Porcentagem deve estar entre 0 e 100" }),
+  performance_rating: z.string()
+    .optional()
+    .refine((val) => {
+      if (!val || val === "") return true;
+      const num = parseFloat(val);
+      return num >= 0 && num <= 10;
+    }, { message: "Nota deve estar entre 0 e 10" }),
 });
 
 interface UserDialogProps {
