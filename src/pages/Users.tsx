@@ -11,11 +11,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Search, UserPlus, Mail, Calendar, Shield } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Search, UserPlus, Mail, Calendar, MoreVertical, Edit, UserX, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { UserDialog } from "@/components/UserDialog";
 
 interface Profile {
   id: string;
@@ -31,15 +48,37 @@ const Users = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [inactivateUserId, setInactivateUserId] = useState<string | null>(null);
+  const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
 
   useEffect(() => {
+    checkUserPermissions();
     fetchProfiles();
   }, []);
 
+  const checkUserPermissions = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // @ts-expect-error - Database types will be auto-regenerated after migration
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    setCurrentUserRoles(roles?.map(r => r.role) || []);
+  };
+
+  const hasPermission = () => {
+    return currentUserRoles.includes("admin") || currentUserRoles.includes("hr_manager");
+  };
+
   const fetchProfiles = async () => {
     try {
+      // @ts-expect-error - Database types will be auto-regenerated after migration
       const { data, error } = await supabase
-        // @ts-expect-error - Database types will be auto-regenerated after migration
         .from("profiles")
         .select(`
           id,
@@ -62,6 +101,38 @@ const Users = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInactivateUser = async () => {
+    if (!inactivateUserId) return;
+
+    try {
+      // @ts-expect-error - Database types will be auto-regenerated after migration
+      const { error } = await supabase
+        .from("profiles")
+        .update({ status: "inactive" })
+        .eq("id", inactivateUserId);
+
+      if (error) throw error;
+
+      toast.success("Usuário inativado com sucesso");
+      fetchProfiles();
+    } catch (error: any) {
+      toast.error("Erro ao inativar usuário");
+      console.error(error);
+    } finally {
+      setInactivateUserId(null);
+    }
+  };
+
+  const handleEditUser = (userId: string) => {
+    setSelectedUserId(userId);
+    setUserDialogOpen(true);
+  };
+
+  const handleNewUser = () => {
+    setSelectedUserId(null);
+    setUserDialogOpen(true);
   };
 
   const filteredProfiles = profiles.filter((profile) =>
@@ -93,6 +164,20 @@ const Users = () => {
     ));
   };
 
+  if (!hasPermission()) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md">
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">
+              Você não tem permissão para acessar esta página.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -103,10 +188,16 @@ const Users = () => {
             Gerencie usuários, perfis e permissões do sistema
           </p>
         </div>
-        <Button className="bg-gradient-primary hover:opacity-90">
-          <UserPlus className="w-4 h-4 mr-2" />
-          Novo Usuário
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="gap-2">
+            <Upload className="w-4 h-4" />
+            Importar Funcionários
+          </Button>
+          <Button onClick={handleNewUser} className="bg-gradient-primary hover:opacity-90 gap-2">
+            <UserPlus className="w-4 h-4" />
+            Novo Usuário
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -181,6 +272,7 @@ const Users = () => {
                     <TableHead>Perfil</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Data de Cadastro</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -196,7 +288,7 @@ const Users = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 flex-wrap">
                           {getRoleBadge(profile.user_roles)}
                         </div>
                       </TableCell>
@@ -220,6 +312,30 @@ const Users = () => {
                           })}
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditUser(profile.id)}>
+                              <Edit className="w-4 h-4 mr-2" />
+                              Editar
+                            </DropdownMenuItem>
+                            {profile.status === "active" && (
+                              <DropdownMenuItem
+                                onClick={() => setInactivateUserId(profile.id)}
+                                className="text-destructive"
+                              >
+                                <UserX className="w-4 h-4 mr-2" />
+                                Inativar
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -228,6 +344,30 @@ const Users = () => {
           )}
         </CardContent>
       </Card>
+
+      <UserDialog
+        open={userDialogOpen}
+        onOpenChange={setUserDialogOpen}
+        userId={selectedUserId}
+        onSuccess={fetchProfiles}
+      />
+
+      <AlertDialog open={!!inactivateUserId} onOpenChange={() => setInactivateUserId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Inativação</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja inativar este usuário? Ele não poderá mais acessar o sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleInactivateUser} className="bg-destructive hover:bg-destructive/90">
+              Inativar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
