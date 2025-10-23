@@ -62,7 +62,6 @@ const Users = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    // @ts-expect-error - Database types will be auto-regenerated after migration
     const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
@@ -77,24 +76,27 @@ const Users = () => {
 
   const fetchProfiles = async () => {
     try {
-      // @ts-expect-error - Database types will be auto-regenerated after migration
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select(`
-          id,
-          full_name,
-          email,
-          phone,
-          status,
-          created_at,
-          user_roles (
-            role
-          )
-        `)
+        .select("id, full_name, email, phone, status, created_at")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setProfiles(data || []);
+      if (profilesError) throw profilesError;
+
+      // Fetch user roles separately
+      const { data: userRolesData, error: rolesError } = await supabase
+        .from("user_roles")
+        .select("user_id, role");
+
+      if (rolesError) throw rolesError;
+
+      // Combine the data
+      const combinedData = profilesData?.map(profile => ({
+        ...profile,
+        user_roles: userRolesData?.filter(ur => ur.user_id === profile.id).map(ur => ({ role: ur.role })) || [],
+      })) || [];
+
+      setProfiles(combinedData);
     } catch (error: any) {
       toast.error("Erro ao carregar usuários");
       console.error("Error fetching profiles:", error);
@@ -107,7 +109,6 @@ const Users = () => {
     if (!inactivateUserId) return;
 
     try {
-      // @ts-expect-error - Database types will be auto-regenerated after migration
       const { error } = await supabase
         .from("profiles")
         .update({ status: "inactive" })
