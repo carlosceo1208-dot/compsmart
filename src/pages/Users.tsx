@@ -327,11 +327,13 @@ const Users = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead># Registro</TableHead>
                     <TableHead>Nome</TableHead>
                     <TableHead>Cargo</TableHead>
                     <TableHead>Grade</TableHead>
                     <TableHead>Salário Fixo (R$)</TableHead>
                     <TableHead>Salário Variável (R$)</TableHead>
+                    <TableHead>Total Cash (R$)</TableHead>
                     <TableHead>% Faixa</TableHead>
                     <TableHead>Nota</TableHead>
                     <TableHead>Perfil</TableHead>
@@ -341,8 +343,11 @@ const Users = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProfiles.map((profile) => (
+                  {filteredProfiles.map((profile, index) => (
                     <TableRow key={profile.id} className="hover:bg-muted/50">
+                      <TableCell className="text-sm text-muted-foreground">
+                        {index + 1}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {profile.full_name}
                       </TableCell>
@@ -363,6 +368,13 @@ const Users = () => {
                         <span className="text-sm font-medium">
                           {profile.variable_salary 
                             ? profile.variable_salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                            : "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium">
+                          {(profile.salary || profile.variable_salary)
+                            ? ((profile.salary || 0) + (profile.variable_salary || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             : "-"}
                         </span>
                       </TableCell>
