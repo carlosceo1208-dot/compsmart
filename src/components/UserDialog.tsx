@@ -118,7 +118,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       setFormData({
         ...profile,
         password: "",
-        salary: profile.salary?.toString() || "",
+        salary: profile.salary 
+          ? profile.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : "",
         salary_range_percentage: profile.salary_range_percentage?.toString() || "",
         performance_rating: profile.performance_rating?.toString() || "",
         roles: userRoles.map((r: any) => r.role),
@@ -160,6 +162,15 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     setLoading(true);
 
     try {
+      // Helper function to parse Brazilian currency format to number
+      const parseBRCurrency = (value: string | undefined): number | null => {
+        if (!value) return null;
+        // Remove dots (thousand separators) and replace comma with dot
+        const cleaned = value.replace(/\./g, '').replace(',', '.');
+        const parsed = parseFloat(cleaned);
+        return isNaN(parsed) ? null : parsed;
+      };
+
       if (userId) {
         // Update existing user
         const { error: updateError } = await supabase
@@ -171,7 +182,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             birth_date: formData.birth_date || null,
             job_title: formData.job_title || null,
             grade: formData.grade || null,
-            salary: formData.salary ? parseFloat(formData.salary) : null,
+            salary: parseBRCurrency(formData.salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
           })
@@ -214,7 +225,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             birth_date: formData.birth_date || null,
             job_title: formData.job_title || null,
             grade: formData.grade || null,
-            salary: formData.salary ? parseFloat(formData.salary) : null,
+            salary: parseBRCurrency(formData.salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
           })
@@ -352,13 +363,38 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 <Label htmlFor="salary">Salário (R$)</Label>
                 <Input
                   id="salary"
-                  type="number"
-                  step="0.01"
+                  type="text"
                   value={formData.salary}
-                  onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                  onChange={(e) => {
+                    // Remove tudo exceto números e vírgula
+                    let value = e.target.value.replace(/[^\d,]/g, '');
+                    // Permite apenas uma vírgula
+                    const parts = value.split(',');
+                    if (parts.length > 2) {
+                      value = parts[0] + ',' + parts.slice(1).join('');
+                    }
+                    setFormData({ ...formData, salary: value });
+                  }}
+                  onBlur={(e) => {
+                    // Formata o valor ao sair do campo
+                    const value = e.target.value.replace(/[^\d,]/g, '');
+                    if (value) {
+                      const numericValue = parseFloat(value.replace(',', '.'));
+                      if (!isNaN(numericValue)) {
+                        const formatted = numericValue.toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        });
+                        setFormData({ ...formData, salary: formatted });
+                      }
+                    }
+                  }}
                   disabled={loading}
-                  placeholder="0.00"
+                  placeholder="Ex: 20.000,00"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Use vírgula para centavos (Ex: 20000,00)
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="salary_range_percentage">% da Faixa</Label>
