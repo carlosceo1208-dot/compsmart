@@ -329,7 +329,7 @@ const Users = () => {
                     <TableHead>Nome</TableHead>
                     <TableHead>Cargo</TableHead>
                     <TableHead>Grade</TableHead>
-                    <TableHead>Salário</TableHead>
+                    <TableHead>Salário (R$)</TableHead>
                     <TableHead>% Faixa</TableHead>
                     <TableHead>Nota</TableHead>
                     <TableHead>Perfil</TableHead>
@@ -353,7 +353,7 @@ const Users = () => {
                       <TableCell>
                         <span className="text-sm font-medium">
                           {profile.salary 
-                            ? `R$ ${profile.salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+                            ? profile.salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             : "-"}
                         </span>
                       </TableCell>
