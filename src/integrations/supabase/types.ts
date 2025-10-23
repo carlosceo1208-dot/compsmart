@@ -116,8 +116,13 @@ export type Database = {
           created_at: string
           email: string
           full_name: string
+          grade: string | null
           id: string
+          job_title: string | null
+          performance_rating: number | null
           phone: string | null
+          salary: number | null
+          salary_range_percentage: number | null
           status: Database["public"]["Enums"]["user_status"]
           updated_at: string
         }
@@ -127,8 +132,13 @@ export type Database = {
           created_at?: string
           email: string
           full_name: string
+          grade?: string | null
           id: string
+          job_title?: string | null
+          performance_rating?: number | null
           phone?: string | null
+          salary?: number | null
+          salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
         }
@@ -138,8 +148,13 @@ export type Database = {
           created_at?: string
           email?: string
           full_name?: string
+          grade?: string | null
           id?: string
+          job_title?: string | null
+          performance_rating?: number | null
           phone?: string | null
+          salary?: number | null
+          salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
         }

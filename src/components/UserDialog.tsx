@@ -17,6 +17,11 @@ const userSchema = z.object({
   phone: z.string().optional(),
   cpf: z.string().optional(),
   birth_date: z.string().optional(),
+  job_title: z.string().optional(),
+  grade: z.string().optional(),
+  salary: z.string().optional(),
+  salary_range_percentage: z.string().optional(),
+  performance_rating: z.string().optional(),
 });
 
 interface UserDialogProps {
@@ -33,6 +38,11 @@ interface UserData {
   phone?: string;
   cpf?: string;
   birth_date?: string;
+  job_title?: string;
+  grade?: string;
+  salary?: string;
+  salary_range_percentage?: string;
+  performance_rating?: string;
   roles: string[];
 }
 
@@ -52,6 +62,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     phone: "",
     cpf: "",
     birth_date: "",
+    job_title: "",
+    grade: "",
+    salary: "",
+    salary_range_percentage: "",
+    performance_rating: "",
     roles: ["employee"],
   });
 
@@ -69,7 +84,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, phone, cpf, birth_date")
+        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, salary_range_percentage, performance_rating")
         .eq("id", userId)
         .single();
 
@@ -85,6 +100,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       setFormData({
         ...profile,
         password: "",
+        salary: profile.salary?.toString() || "",
+        salary_range_percentage: profile.salary_range_percentage?.toString() || "",
+        performance_rating: profile.performance_rating?.toString() || "",
         roles: userRoles.map((r: any) => r.role),
       });
     } catch (error: any) {
@@ -101,6 +119,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       phone: "",
       cpf: "",
       birth_date: "",
+      job_title: "",
+      grade: "",
+      salary: "",
+      salary_range_percentage: "",
+      performance_rating: "",
       roles: ["employee"],
     });
   };
@@ -128,6 +151,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             phone: formData.phone || null,
             cpf: formData.cpf || null,
             birth_date: formData.birth_date || null,
+            job_title: formData.job_title || null,
+            grade: formData.grade || null,
+            salary: formData.salary ? parseFloat(formData.salary) : null,
+            salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
+            performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
           })
           .eq("id", userId);
 
@@ -172,6 +200,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             phone: formData.phone || null,
             cpf: formData.cpf || null,
             birth_date: formData.birth_date || null,
+            job_title: formData.job_title || null,
+            grade: formData.grade || null,
+            salary: formData.salary ? parseFloat(formData.salary) : null,
+            salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
+            performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
           })
           .eq("id", authData.user.id);
 
@@ -286,7 +319,73 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="pt-4 border-t">
+            <h3 className="text-sm font-semibold mb-4 text-foreground">Informações de Cargo e Remuneração</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="job_title">Título do Cargo</Label>
+                <Input
+                  id="job_title"
+                  value={formData.job_title}
+                  onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
+                  disabled={loading}
+                  placeholder="Ex: Analista de RH"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="grade">Grade</Label>
+                <Input
+                  id="grade"
+                  value={formData.grade}
+                  onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
+                  disabled={loading}
+                  placeholder="Ex: A1, B2, C3"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="salary">Salário (R$)</Label>
+                <Input
+                  id="salary"
+                  type="number"
+                  step="0.01"
+                  value={formData.salary}
+                  onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
+                  disabled={loading}
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="salary_range_percentage">% da Faixa</Label>
+                <Input
+                  id="salary_range_percentage"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.salary_range_percentage}
+                  onChange={(e) => setFormData({ ...formData, salary_range_percentage: e.target.value })}
+                  disabled={loading}
+                  placeholder="0-100%"
+                />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="performance_rating">Nota Avaliação de Desempenho</Label>
+                <Input
+                  id="performance_rating"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="10"
+                  value={formData.performance_rating}
+                  onChange={(e) => setFormData({ ...formData, performance_rating: e.target.value })}
+                  disabled={loading}
+                  placeholder="0.00 - 10.00"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3 pt-4 border-t">
             <Label>Perfis de Acesso *</Label>
             <div className="space-y-2">
               {roleOptions.map((role) => (
