@@ -63,6 +63,8 @@ interface UserData {
   variable_salary?: string;
   salary_range_percentage?: string;
   performance_rating?: string;
+  position_id?: string;
+  manager_id?: string;
   roles: string[];
 }
 
@@ -88,16 +90,54 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     variable_salary: "",
     salary_range_percentage: "",
     performance_rating: "",
+    position_id: "",
+    manager_id: "",
     roles: ["employee"],
   });
+  const [positions, setPositions] = useState<Array<{ id: string; name: string }>>([]);
+  const [managers, setManagers] = useState<Array<{ id: string; full_name: string }>>([]);
 
   useEffect(() => {
-    if (userId && open) {
-      fetchUserData();
-    } else if (!open) {
-      resetForm();
+    if (open) {
+      fetchPositions();
+      fetchManagers();
+      if (userId) {
+        fetchUserData();
+      } else {
+        resetForm();
+      }
     }
   }, [userId, open]);
+
+  const fetchPositions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("organizational_structure")
+        .select("id, name")
+        .eq("type", "position")
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+      setPositions(data || []);
+    } catch (error: any) {
+      console.error("Error fetching positions:", error);
+    }
+  };
+
+  const fetchManagers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .eq("status", "active")
+        .order("full_name", { ascending: true });
+
+      if (error) throw error;
+      setManagers(data || []);
+    } catch (error: any) {
+      console.error("Error fetching managers:", error);
+    }
+  };
 
   const fetchUserData = async () => {
     if (!userId) return;
@@ -105,7 +145,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating")
+        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, position_id, manager_id")
         .eq("id", userId)
         .single();
 
@@ -129,6 +169,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           : "",
         salary_range_percentage: profile.salary_range_percentage?.toString() || "",
         performance_rating: profile.performance_rating?.toString() || "",
+        position_id: profile.position_id || "",
+        manager_id: profile.manager_id || "",
         roles: userRoles.map((r: any) => r.role),
       });
     } catch (error: any) {
@@ -151,6 +193,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       variable_salary: "",
       salary_range_percentage: "",
       performance_rating: "",
+      position_id: "",
+      manager_id: "",
       roles: ["employee"],
     });
   };
@@ -193,6 +237,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
+            position_id: formData.position_id || null,
+            manager_id: formData.manager_id || null,
           })
           .eq("id", userId);
 
@@ -237,6 +283,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
+            position_id: formData.position_id || null,
+            manager_id: formData.manager_id || null,
           })
           .eq("id", authData.user.id);
 
@@ -469,6 +517,54 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   disabled={loading}
                   placeholder="0.00 - 10.00"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t">
+            <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="position_id">Cargo</Label>
+                <select
+                  id="position_id"
+                  value={formData.position_id}
+                  onChange={(e) => setFormData({ ...formData, position_id: e.target.value })}
+                  disabled={loading}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Selecione um cargo</option>
+                  {positions.map((position) => (
+                    <option key={position.id} value={position.id}>
+                      {position.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  Vincule o usuário a um cargo da estrutura organizacional
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="manager_id">Gestor Direto</Label>
+                <select
+                  id="manager_id"
+                  value={formData.manager_id}
+                  onChange={(e) => setFormData({ ...formData, manager_id: e.target.value })}
+                  disabled={loading}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Selecione um gestor</option>
+                  {managers
+                    .filter(m => m.id !== userId) // Don't allow selecting self as manager
+                    .map((manager) => (
+                      <option key={manager.id} value={manager.id}>
+                        {manager.full_name}
+                      </option>
+                    ))}
+                </select>
+                <p className="text-xs text-muted-foreground">
+                  Defina quem é o gestor direto deste colaborador
+                </p>
               </div>
             </div>
           </div>

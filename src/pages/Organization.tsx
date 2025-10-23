@@ -1,41 +1,467 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Search, Plus, MoreVertical, Edit, Trash2, Building2, Loader2, Network } from "lucide-react";
+import { toast } from "sonner";
+import { OrganizationDialog } from "@/components/OrganizationDialog";
+import { OrganizationTree } from "@/components/OrganizationTree";
 
-const useSEO = (title: string, description: string) => {
+interface OrgEntity {
+  id: string;
+  name: string;
+  code: string | null;
+  type: string;
+  description: string | null;
+  parent_id: string | null;
+  created_at: string;
+  updated_at: string;
+  parent?: { name: string } | null;
+}
+
+const Organization = () => {
+  const [entities, setEntities] = useState<OrgEntity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
+  const [deleteEntityId, setDeleteEntityId] = useState<string | null>(null);
+  const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
+  const [permissionsLoading, setPermissionsLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("list");
+
   useEffect(() => {
-    document.title = title;
-    const meta = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-    if (meta) {
-      meta.setAttribute("content", description);
-    } else {
-      const m = document.createElement("meta");
-      m.setAttribute("name", "description");
-      m.setAttribute("content", description);
-      document.head.appendChild(m);
-    }
-  }, [title, description]);
-};
+    checkUserPermissions();
+    fetchEntities();
 
-export default function Organization() {
-  useSEO(
-    "CompSmart • Estrutura Organizacional",
-    "Módulo de Estrutura Organizacional: filiais, departamentos, áreas e cargos."
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        checkUserPermissions();
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkUserPermissions = async () => {
+    setPermissionsLoading(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setPermissionsLoading(false);
+      return;
+    }
+
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id);
+
+    setCurrentUserRoles(roles?.map((r: any) => r.role) || []);
+    setPermissionsLoading(false);
+  };
+
+  const hasPermission = () => {
+    return currentUserRoles.includes("admin") || currentUserRoles.includes("hr_manager");
+  };
+
+  const fetchEntities = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("organizational_structure")
+        .select(`
+          *,
+          parent:organizational_structure!organizational_structure_parent_id_fkey(name)
+        `)
+        .order("type", { ascending: true })
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+      
+      // Transform parent from array to single object
+      const transformedData = data?.map(entity => ({
+        ...entity,
+        parent: Array.isArray(entity.parent) ? entity.parent[0] : entity.parent
+      })) || [];
+      
+      setEntities(transformedData);
+    } catch (error: any) {
+      toast.error("Erro ao carregar estrutura organizacional");
+      console.error("Error fetching entities:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteEntity = async () => {
+    if (!deleteEntityId) return;
+
+    try {
+      // Check if entity has children
+      const { data: children } = await supabase
+        .from("organizational_structure")
+        .select("id")
+        .eq("parent_id", deleteEntityId);
+
+      if (children && children.length > 0) {
+        toast.error("Não é possível excluir uma entidade que possui filhos. Reatribua ou exclua os filhos primeiro.");
+        setDeleteEntityId(null);
+        return;
+      }
+
+      const { error } = await supabase
+        .from("organizational_structure")
+        .delete()
+        .eq("id", deleteEntityId);
+
+      if (error) throw error;
+
+      toast.success("Entidade excluída com sucesso");
+      fetchEntities();
+    } catch (error: any) {
+      toast.error("Erro ao excluir entidade");
+      console.error(error);
+    } finally {
+      setDeleteEntityId(null);
+    }
+  };
+
+  const handleEditEntity = (entityId: string) => {
+    setSelectedEntityId(entityId);
+    setDialogOpen(true);
+  };
+
+  const handleNewEntity = () => {
+    setSelectedEntityId(null);
+    setDialogOpen(true);
+  };
+
+  const filteredEntities = entities.filter((entity) =>
+    entity.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    entity.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    entity.type.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const getTypeBadge = (type: string) => {
+    const typeColors: Record<string, string> = {
+      company: "bg-primary/10 text-primary border-primary/20",
+      branch: "bg-info/10 text-info border-info/20",
+      department: "bg-success/10 text-success border-success/20",
+      area: "bg-warning/10 text-warning border-warning/20",
+      position: "bg-muted text-muted-foreground border-muted",
+    };
+
+    const typeLabels: Record<string, string> = {
+      company: "Empresa",
+      branch: "Filial",
+      department: "Departamento",
+      area: "Área",
+      position: "Cargo",
+    };
+
+    return (
+      <Badge variant="outline" className={typeColors[type] || ""}>
+        {typeLabels[type] || type}
+      </Badge>
+    );
+  };
+
+  const getStats = () => {
+    return {
+      total: entities.length,
+      companies: entities.filter(e => e.type === 'company').length,
+      branches: entities.filter(e => e.type === 'branch').length,
+      departments: entities.filter(e => e.type === 'department').length,
+      areas: entities.filter(e => e.type === 'area').length,
+      positions: entities.filter(e => e.type === 'position').length,
+    };
+  };
+
+  const stats = getStats();
+
+  if (permissionsLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!hasPermission()) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 space-y-4">
+            <p className="text-center text-muted-foreground">
+              Você não tem permissão para acessar esta página.
+            </p>
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={checkUserPermissions}>Atualizar permissões</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <header className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Estrutura Organizacional</h1>
-        <p className="text-muted-foreground mt-2">
-          Cadastre filiais, departamentos, áreas e cargos. Em breve: organograma em árvore e validações de vínculos.
-        </p>
-      </header>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Estrutura Organizacional</h1>
+          <p className="text-muted-foreground mt-1">
+            Gerencie empresas, filiais, departamentos, áreas e cargos
+          </p>
+        </div>
+        <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
+          <Plus className="w-4 h-4" />
+          Nova Entidade
+        </Button>
+      </div>
 
-      <section className="rounded-lg border bg-card text-card-foreground p-6">
-        <h2 className="text-xl font-semibold mb-2">Em construção</h2>
-        <p className="text-sm text-muted-foreground">
-          Esta página é um placeholder para evitar erros 404 enquanto implementamos as funcionalidades completas do módulo.
-        </p>
-      </section>
-    </main>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.total}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Empresas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary">{stats.companies}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Filiais
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-info">{stats.branches}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Departamentos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-success">{stats.departments}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Áreas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-warning">{stats.areas}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Cargos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-muted-foreground">{stats.positions}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="list" className="gap-2">
+            <Building2 className="w-4 h-4" />
+            Lista
+          </TabsTrigger>
+          <TabsTrigger value="tree" className="gap-2">
+            <Network className="w-4 h-4" />
+            Organograma
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="list" className="mt-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Buscar por nome, código ou tipo..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Carregando estrutura organizacional...
+                </div>
+              ) : filteredEntities.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Nenhuma entidade encontrada
+                </div>
+              ) : (
+                <div className="border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Código</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Pai</TableHead>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead className="w-[50px]"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredEntities.map((entity) => (
+                        <TableRow key={entity.id} className="hover:bg-muted/50">
+                          <TableCell className="font-medium">
+                            {entity.name}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">
+                              {entity.code || "-"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {getTypeBadge(entity.type)}
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">
+                              {entity.parent?.name || "-"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">
+                              {entity.description || "-"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleEditEntity(entity.id)}>
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  Editar
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => setDeleteEntityId(entity.id)}
+                                  className="text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Excluir
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tree" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Organograma Hierárquico</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <OrganizationTree entities={entities} onEdit={handleEditEntity} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      <OrganizationDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        entityId={selectedEntityId}
+        onSuccess={fetchEntities}
+      />
+
+      <AlertDialog open={!!deleteEntityId} onOpenChange={() => setDeleteEntityId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir esta entidade? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEntity} className="bg-destructive hover:bg-destructive/90">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
-}
+};
+
+export default Organization;

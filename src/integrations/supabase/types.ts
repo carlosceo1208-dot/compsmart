@@ -119,8 +119,10 @@ export type Database = {
           grade: string | null
           id: string
           job_title: string | null
+          manager_id: string | null
           performance_rating: number | null
           phone: string | null
+          position_id: string | null
           salary: number | null
           salary_range_percentage: number | null
           status: Database["public"]["Enums"]["user_status"]
@@ -136,8 +138,10 @@ export type Database = {
           grade?: string | null
           id: string
           job_title?: string | null
+          manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
+          position_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
@@ -153,15 +157,32 @@ export type Database = {
           grade?: string | null
           id?: string
           job_title?: string | null
+          manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
+          position_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
           variable_salary?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       role_permissions: {
         Row: {

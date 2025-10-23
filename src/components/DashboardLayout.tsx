@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, LogOut, User, Settings, Home } from "lucide-react";
+import { Building2, LogOut, User, Settings, Home, Users as UsersIcon, Network } from "lucide-react";
 import { toast } from "sonner";
 
 interface UserProfile {
@@ -108,6 +108,24 @@ export const DashboardLayout = () => {
             >
               <Home className="w-4 h-4 mr-2" />
               Dashboard
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/users")}
+              className="hidden md:flex items-center"
+            >
+              <UsersIcon className="w-4 h-4 mr-2" />
+              Usuários
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/organization")}
+              className="hidden md:flex items-center"
+            >
+              <Network className="w-4 h-4 mr-2" />
+              Estrutura
             </Button>
 
             <DropdownMenu>
