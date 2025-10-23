@@ -171,10 +171,13 @@ const Users = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card className="max-w-md">
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 space-y-4">
             <p className="text-center text-muted-foreground">
               Você não tem permissão para acessar esta página.
             </p>
+            <div className="flex justify-center">
+              <Button variant="outline" onClick={checkUserPermissions}>Atualizar permissões</Button>
+            </div>
           </CardContent>
         </Card>
       </div>
