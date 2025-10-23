@@ -100,22 +100,32 @@ const Organization = () => {
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select(`
-          *,
-          parent:organizational_structure!organizational_structure_parent_id_fkey(name)
-        `)
+        .select("*")
         .order("type", { ascending: true })
         .order("name", { ascending: true });
 
       if (error) throw error;
       
-      // Transform parent from array to single object
-      const transformedData = data?.map(entity => ({
-        ...entity,
-        parent: Array.isArray(entity.parent) ? entity.parent[0] : entity.parent
-      })) || [];
+      // Fetch parent names separately for each entity
+      const entitiesWithParents = await Promise.all(
+        (data || []).map(async (entity) => {
+          if (entity.parent_id) {
+            const { data: parentData } = await supabase
+              .from("organizational_structure")
+              .select("name")
+              .eq("id", entity.parent_id)
+              .single();
+            
+            return {
+              ...entity,
+              parent: parentData ? { name: parentData.name } : null
+            };
+          }
+          return { ...entity, parent: null };
+        })
+      );
       
-      setEntities(transformedData);
+      setEntities(entitiesWithParents);
     } catch (error: any) {
       toast.error("Erro ao carregar estrutura organizacional");
       console.error("Error fetching entities:", error);
