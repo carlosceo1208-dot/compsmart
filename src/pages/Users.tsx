@@ -76,23 +76,29 @@ const Users = () => {
 
   const fetchProfiles = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select(`
-          id,
-          full_name,
-          email,
-          phone,
-          status,
-          created_at,
-          user_roles (
-            role
-          )
-        `)
+        .select("id, full_name, email, phone, status, created_at")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setProfiles(data || []);
+      if (profilesError) throw profilesError;
+
+      // Fetch roles separately for each profile
+      const profilesWithRoles = await Promise.all(
+        (profilesData || []).map(async (profile) => {
+          const { data: rolesData } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", profile.id);
+
+          return {
+            ...profile,
+            user_roles: rolesData || [],
+          };
+        })
+      );
+
+      setProfiles(profilesWithRoles);
     } catch (error: any) {
       toast.error("Erro ao carregar usuários");
       console.error("Error fetching profiles:", error);
@@ -188,7 +194,7 @@ const Users = () => {
         <div className="flex gap-2">
           <Button variant="outline" className="gap-2">
             <Upload className="w-4 h-4" />
-            Importar Funcionários
+            Atualizar Funcionários
           </Button>
           <Button onClick={handleNewUser} className="bg-gradient-primary hover:opacity-90 gap-2">
             <UserPlus className="w-4 h-4" />

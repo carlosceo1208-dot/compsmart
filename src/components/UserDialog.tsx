@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -137,7 +138,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         
         const roleInserts = formData.roles.map(role => ({
           user_id: userId,
-          role,
+          role: role as Database["public"]["Enums"]["app_role"],
         }));
         
         const { error: rolesError } = await supabase
@@ -181,7 +182,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         
         const roleInserts = formData.roles.map(role => ({
           user_id: authData.user.id,
-          role,
+          role: role as Database["public"]["Enums"]["app_role"],
         }));
         
         const { error: rolesError } = await supabase

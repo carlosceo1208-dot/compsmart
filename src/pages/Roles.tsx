@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,7 +16,7 @@ interface Permission {
 }
 
 interface RolePermission {
-  role: string;
+  role: Database["public"]["Enums"]["app_role"];
   permission_id: string;
 }
 
@@ -108,7 +109,7 @@ const Roles = () => {
         )
       );
     } else {
-      setRolePermissions([...rolePermissions, { role, permission_id: permissionId }]);
+      setRolePermissions([...rolePermissions, { role: role as Database["public"]["Enums"]["app_role"], permission_id: permissionId }]);
     }
   };
 
@@ -124,7 +125,7 @@ const Roles = () => {
       const { error: deleteError } = await supabase
         .from("role_permissions")
         .delete()
-        .neq("role", "");
+        .neq("id", "00000000-0000-0000-0000-000000000000");
 
       if (deleteError) throw deleteError;
 
