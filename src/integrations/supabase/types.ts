@@ -125,6 +125,7 @@ export type Database = {
           salary_range_percentage: number | null
           status: Database["public"]["Enums"]["user_status"]
           updated_at: string
+          variable_salary: number | null
         }
         Insert: {
           birth_date?: string | null
@@ -141,6 +142,7 @@ export type Database = {
           salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
+          variable_salary?: number | null
         }
         Update: {
           birth_date?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           updated_at?: string
+          variable_salary?: number | null
         }
         Relationships: []
       }

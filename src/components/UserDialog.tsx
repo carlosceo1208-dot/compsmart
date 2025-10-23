@@ -26,6 +26,7 @@ const userSchema = z.object({
   job_title: z.string().optional(),
   grade: z.string().optional(),
   salary: z.string().optional(),
+  variable_salary: z.string().optional(),
   salary_range_percentage: z.string()
     .optional()
     .refine((val) => {
@@ -59,6 +60,7 @@ interface UserData {
   job_title?: string;
   grade?: string;
   salary?: string;
+  variable_salary?: string;
   salary_range_percentage?: string;
   performance_rating?: string;
   roles: string[];
@@ -83,6 +85,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     job_title: "",
     grade: "",
     salary: "",
+    variable_salary: "",
     salary_range_percentage: "",
     performance_rating: "",
     roles: ["employee"],
@@ -102,7 +105,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, salary_range_percentage, performance_rating")
+        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating")
         .eq("id", userId)
         .single();
 
@@ -120,6 +123,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         password: "",
         salary: profile.salary 
           ? profile.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+          : "",
+        variable_salary: profile.variable_salary 
+          ? profile.variable_salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : "",
         salary_range_percentage: profile.salary_range_percentage?.toString() || "",
         performance_rating: profile.performance_rating?.toString() || "",
@@ -142,6 +148,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       job_title: "",
       grade: "",
       salary: "",
+      variable_salary: "",
       salary_range_percentage: "",
       performance_rating: "",
       roles: ["employee"],
@@ -183,6 +190,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             job_title: formData.job_title || null,
             grade: formData.grade || null,
             salary: parseBRCurrency(formData.salary),
+            variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
           })
@@ -226,6 +234,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             job_title: formData.job_title || null,
             grade: formData.grade || null,
             salary: parseBRCurrency(formData.salary),
+            variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
           })
@@ -360,7 +369,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="salary">Salário (R$)</Label>
+                <Label htmlFor="salary">Salário Fixo (R$)</Label>
                 <Input
                   id="salary"
                   type="text"
@@ -397,6 +406,43 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 </p>
               </div>
               <div className="space-y-2">
+                <Label htmlFor="variable_salary">Salário Variável (R$)</Label>
+                <Input
+                  id="variable_salary"
+                  type="text"
+                  value={formData.variable_salary}
+                  onChange={(e) => {
+                    // Remove tudo exceto números e vírgula
+                    let value = e.target.value.replace(/[^\d,]/g, '');
+                    // Permite apenas uma vírgula
+                    const parts = value.split(',');
+                    if (parts.length > 2) {
+                      value = parts[0] + ',' + parts.slice(1).join('');
+                    }
+                    setFormData({ ...formData, variable_salary: value });
+                  }}
+                  onBlur={(e) => {
+                    // Formata o valor ao sair do campo
+                    const value = e.target.value.replace(/[^\d,]/g, '');
+                    if (value) {
+                      const numericValue = parseFloat(value.replace(',', '.'));
+                      if (!isNaN(numericValue)) {
+                        const formatted = numericValue.toLocaleString('pt-BR', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        });
+                        setFormData({ ...formData, variable_salary: formatted });
+                      }
+                    }
+                  }}
+                  disabled={loading}
+                  placeholder="Ex: 5.000,00"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Use vírgula para centavos (Ex: 5000,00)
+                </p>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="salary_range_percentage">% da Faixa</Label>
                 <Input
                   id="salary_range_percentage"
@@ -410,7 +456,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   placeholder="0-100%"
                 />
               </div>
-              <div className="col-span-2 space-y-2">
+              <div className="space-y-2">
                 <Label htmlFor="performance_rating">Nota Avaliação de Desempenho</Label>
                 <Input
                   id="performance_rating"
