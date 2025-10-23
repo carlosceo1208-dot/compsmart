@@ -229,6 +229,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "hr_manager" | "manager" | "employee"
