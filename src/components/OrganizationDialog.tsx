@@ -399,7 +399,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                         : "Selecione a entidade pai"
                     } />
                   </SelectTrigger>
-                  <SelectContent className="bg-background z-50">
+                  <SelectContent>
                     {parentOptions.length === 0 && formData.type && formData.type !== "company" ? (
                       <div className="px-2 py-6 text-center text-sm text-muted-foreground">
                         <p>⚠️ Nenhuma entidade pai disponível</p>
