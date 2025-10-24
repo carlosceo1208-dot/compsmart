@@ -144,6 +144,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
 
   const fetchParentOptions = async () => {
     try {
+      setLoadingParents(true);
       const { data, error } = await supabase
         .from("organizational_structure")
         .select("id, name, code, type")
@@ -169,9 +170,23 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
         filtered = filtered.filter((e) => e.id !== entityId);
       }
 
+      // Sort numerically by code, fallback to name
+      const extractNum = (code?: string) => {
+        const m = code?.match(/\d+/)?.[0];
+        return m ? parseInt(m, 10) : Number.MAX_SAFE_INTEGER;
+      };
+      filtered.sort((a, b) => {
+        const an = extractNum(a.code);
+        const bn = extractNum(b.code);
+        if (an !== bn) return an - bn;
+        return (a.name || "").localeCompare(b.name || "");
+      });
+
       setParentOptions(filtered);
     } catch (error) {
       console.error("Error fetching parent options:", error);
+    } finally {
+      setLoadingParents(false);
     }
   };
 
