@@ -193,6 +193,26 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       return;
     }
 
+    // Validar correspondência entre código e tipo
+    if (formData.code) {
+      const codePrefix = formData.code.substring(0, 3);
+      const expectedPrefix: Record<string, string> = {
+        'company': 'EMP',
+        'headquarters': 'MTZ',
+        'branch': 'FIL',
+        'area': 'ARE',
+        'department': 'DEP',
+        'sector': 'SET',
+        'project': 'PRJ'
+      };
+
+      const expected = expectedPrefix[formData.type];
+      if (codePrefix !== expected) {
+        toast.error(`Código inválido! Para tipo "${getTypeLabel(formData.type)}", o código deve começar com "${expected}-"`);
+        return;
+      }
+    }
+
     try {
       setLoading(true);
 
@@ -281,8 +301,23 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                 id="code"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                placeholder="Ex: EMP-001, MTZ-001, ARE-010"
+                placeholder={
+                  formData.type
+                    ? `Ex: ${
+                        {
+                          company: "EMP-001",
+                          headquarters: "MTZ-001",
+                          branch: "FIL-001",
+                          area: "ARE-010",
+                          department: "DEP-001",
+                          sector: "SET-001",
+                          project: "PRJ-001",
+                        }[formData.type] || "Ex: EMP-001"
+                      }`
+                    : "Ex: EMP-001, MTZ-001, ARE-010"
+                }
                 title="Código identificador único dentro do mesmo nível hierárquico"
+                className="font-mono"
               />
               <p className="text-xs text-muted-foreground">
                 Código é opcional mas recomendado para ordenação
