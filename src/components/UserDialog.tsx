@@ -281,13 +281,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     setLoading(true);
 
     try {
-      // Validação obrigatória da unidade organizacional
-      if (!formData.unit_id) {
-        toast.error("Selecione a Unidade Organizacional (Setor ou Projeto)");
-        setLoading(false);
-        return;
-      }
-
       // Helper function to parse Brazilian currency format to number
       const parseBRCurrency = (value: string | undefined): number | null => {
         if (!value) return null;
@@ -328,7 +321,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (rolesError) throw rolesError;
 
-        toast.success("Usuário atualizado com sucesso!");
+        if (!formData.unit_id) {
+          toast.info("Usuário atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Usuário ou na Estrutura Organizacional.");
+        } else {
+          toast.success("Usuário atualizado com sucesso!");
+        }
       } else {
         // Create new user
         const validation = userSchema.parse(formData);
@@ -375,7 +372,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (rolesError) throw rolesError;
 
-        toast.success("Usuário criado com sucesso!");
+        if (!formData.unit_id) {
+          toast.info("Usuário criado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Usuário ou na Estrutura Organizacional.");
+        } else {
+          toast.success("Usuário criado com sucesso!");
+        }
       }
 
       onSuccess();
@@ -606,7 +607,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="unit_id">Unidade Organizacional (Setor/Projeto) *</Label>
+                <Label htmlFor="unit_id">Unidade Organizacional (Setor/Projeto)</Label>
                 <select
                   id="unit_id"
                   value={formData.unit_id}
@@ -626,11 +627,18 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   Selecione o Setor ou Projeto onde o colaborador está alocado
                 </p>
                 {positions.length === 0 && (
-                  <p className="text-sm text-muted-foreground mt-2 bg-amber-50 dark:bg-amber-950 p-2 rounded border border-amber-200 dark:border-amber-800">
-                    ⚠️ Nenhum Setor ou Projeto cadastrado. Para vincular um colaborador, 
-                    você precisa primeiro criar Setores dentro dos Departamentos ou Projetos 
-                    dentro dos Setores na estrutura organizacional.
-                  </p>
+                  <div className="text-sm text-muted-foreground mt-2 bg-amber-50 dark:bg-amber-950 p-3 rounded border border-amber-200 dark:border-amber-800 space-y-2">
+                    <p>⚠️ Nenhum Setor ou Projeto cadastrado.</p>
+                    <p className="text-xs">O cadastro pode ser feito sem vínculo. Você pode vincular depois.</p>
+                    <a 
+                      href="/organization" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Abrir Estrutura Organizacional →
+                    </a>
+                  </div>
                 )}
                 {loadingBreadcrumb && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
