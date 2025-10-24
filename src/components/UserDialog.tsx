@@ -107,7 +107,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     job_title_id: "",
     roles: ["employee"],
   });
-  const [positions, setPositions] = useState<Array<{ id: string; name: string; code: string; type: string }>>([]);
+  const [positions, setPositions] = useState<Array<{ id: string; name: string; code: string; type: string; description: string | null }>>([]);
   const [managers, setManagers] = useState<Array<{ id: string; full_name: string }>>([]);
   const [jobTitles, setJobTitles] = useState<JobTitle[]>([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState<JobTitle | null>(null);
@@ -140,7 +140,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name, code, type")
+        .select("id, name, code, type, description")
         .in("type", ["area", "department", "sector", "project"])
         .order("type", { ascending: true })
         .order("code", { ascending: true, nullsFirst: true })
@@ -303,7 +303,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
   const selectedUnit = positions.find(p => p.id === formData.unit_id) || null;
   const selectedUnitLabel = selectedUnit
-    ? `${selectedUnit.code ? `${selectedUnit.code} - ` : ""}${selectedUnit.name}`
+    ? `${selectedUnit.code ? `${selectedUnit.code} - ` : ""}${selectedUnit.description || selectedUnit.name}`
     : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -664,7 +664,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                               {grouped[t].map((u) => (
                                 <CommandItem
                                   key={u.id}
-                                  value={`${u.code || ""} ${u.name}`}
+                                  value={`${u.code || ""} ${u.description || u.name}`}
                                   onSelect={() => {
                                     handleUnitChange(u.id);
                                     setOpenUnits(false);
@@ -673,7 +673,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                                   <div className="flex flex-col">
                                     <span className="text-sm">
                                       {u.code ? <span className="font-mono mr-1">{u.code}</span> : null}
-                                      {u.name}
+                                      {u.description || u.name}
                                     </span>
                                     <span className="text-xs text-muted-foreground">
                                       {typeLabelMap[u.type] || u.type}
