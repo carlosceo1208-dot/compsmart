@@ -65,7 +65,16 @@ interface UserData {
   performance_rating?: string;
   position_id?: string;
   manager_id?: string;
+  job_title_id?: string;
   roles: string[];
+}
+
+interface JobTitle {
+  id: string;
+  code: string;
+  title: string;
+  grade: string;
+  median_points: number;
 }
 
 const roleOptions = [
@@ -96,11 +105,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
   });
   const [positions, setPositions] = useState<Array<{ id: string; name: string }>>([]);
   const [managers, setManagers] = useState<Array<{ id: string; full_name: string }>>([]);
+  const [jobTitles, setJobTitles] = useState<JobTitle[]>([]);
+  const [selectedJobTitle, setSelectedJobTitle] = useState<JobTitle | null>(null);
 
   useEffect(() => {
     if (open) {
       fetchPositions();
       fetchManagers();
+      fetchJobTitles();
       if (userId) {
         fetchUserData();
       } else {
@@ -109,18 +121,41 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     }
   }, [userId, open]);
 
+  useEffect(() => {
+    if (formData.job_title_id) {
+      const jobTitle = jobTitles.find(jt => jt.id === formData.job_title_id);
+      setSelectedJobTitle(jobTitle || null);
+    } else {
+      setSelectedJobTitle(null);
+    }
+  }, [formData.job_title_id, jobTitles]);
+
   const fetchPositions = async () => {
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name")
-        .eq("type", "position")
+        .select("id, name, type")
+        .in("type", ["sector", "project"])
         .order("name", { ascending: true });
 
       if (error) throw error;
       setPositions(data || []);
     } catch (error: any) {
       console.error("Error fetching positions:", error);
+    }
+  };
+
+  const fetchJobTitles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("job_titles")
+        .select("id, code, title, grade, median_points")
+        .order("title", { ascending: true });
+
+      if (error) throw error;
+      setJobTitles(data || []);
+    } catch (error: any) {
+      console.error("Error fetching job titles:", error);
     }
   };
 
@@ -145,7 +180,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, position_id, manager_id")
+        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, position_id, manager_id, job_title_id")
         .eq("id", userId)
         .single();
 
@@ -171,6 +206,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         performance_rating: profile.performance_rating?.toString() || "",
         position_id: profile.position_id || "",
         manager_id: profile.manager_id || "",
+        job_title_id: profile.job_title_id || "",
         roles: userRoles.map((r: any) => r.role),
       });
     } catch (error: any) {
@@ -195,6 +231,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       performance_rating: "",
       position_id: "",
       manager_id: "",
+      job_title_id: "",
       roles: ["employee"],
     });
   };
@@ -239,6 +276,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
             position_id: formData.position_id || null,
             manager_id: formData.manager_id || null,
+            job_title_id: formData.job_title_id || null,
           })
           .eq("id", userId);
 
@@ -285,6 +323,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
             position_id: formData.position_id || null,
             manager_id: formData.manager_id || null,
+            job_title_id: formData.job_title_id || null,
           })
           .eq("id", authData.user.id);
 
@@ -525,7 +564,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="position_id">Cargo</Label>
+                <Label htmlFor="position_id">Unidade Organizacional (Setor/Projeto)</Label>
                 <select
                   id="position_id"
                   value={formData.position_id}
@@ -533,7 +572,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   disabled={loading}
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="">Selecione um cargo</option>
+                  <option value="">Selecione uma unidade</option>
                   {positions.map((position) => (
                     <option key={position.id} value={position.id}>
                       {position.name}
@@ -541,8 +580,33 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   ))}
                 </select>
                 <p className="text-xs text-muted-foreground">
-                  Vincule o usuário a um cargo da estrutura organizacional
+                  Vincule o usuário a um Setor ou Projeto
                 </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="job_title_id">Cargo (Plano de Cargos)</Label>
+                <select
+                  id="job_title_id"
+                  value={formData.job_title_id}
+                  onChange={(e) => setFormData({ ...formData, job_title_id: e.target.value })}
+                  disabled={loading}
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Selecione um cargo</option>
+                  {jobTitles.map((jobTitle) => (
+                    <option key={jobTitle.id} value={jobTitle.id}>
+                      {jobTitle.title}
+                    </option>
+                  ))}
+                </select>
+                {selectedJobTitle && (
+                  <div className="mt-2 p-3 bg-muted rounded-md space-y-1">
+                    <p className="text-xs font-medium">Informações do Cargo:</p>
+                    <p className="text-xs"><span className="font-medium">Código:</span> {selectedJobTitle.code}</p>
+                    <p className="text-xs"><span className="font-medium">Grade:</span> {selectedJobTitle.grade}</p>
+                    <p className="text-xs"><span className="font-medium">Pontos Medianos:</span> {selectedJobTitle.median_points.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="manager_id">Gestor Direto</Label>

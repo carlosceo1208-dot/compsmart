@@ -186,18 +186,22 @@ const Organization = () => {
   const getTypeBadge = (type: string) => {
     const typeColors: Record<string, string> = {
       company: "bg-primary/10 text-primary border-primary/20",
+      headquarters: "bg-primary/10 text-primary border-primary/20",
       branch: "bg-info/10 text-info border-info/20",
-      department: "bg-success/10 text-success border-success/20",
       area: "bg-warning/10 text-warning border-warning/20",
-      position: "bg-muted text-muted-foreground border-muted",
+      department: "bg-success/10 text-success border-success/20",
+      sector: "bg-accent/10 text-accent-foreground border-accent/20",
+      project: "bg-muted text-muted-foreground border-muted",
     };
 
     const typeLabels: Record<string, string> = {
       company: "Empresa",
+      headquarters: "Matriz",
       branch: "Filial",
-      department: "Departamento",
       area: "Área",
-      position: "Cargo",
+      department: "Departamento",
+      sector: "Setor",
+      project: "Projeto",
     };
 
     return (
@@ -211,10 +215,12 @@ const Organization = () => {
     return {
       total: entities.length,
       companies: entities.filter(e => e.type === 'company').length,
+      headquarters: entities.filter(e => e.type === 'headquarters').length,
       branches: entities.filter(e => e.type === 'branch').length,
-      departments: entities.filter(e => e.type === 'department').length,
       areas: entities.filter(e => e.type === 'area').length,
-      positions: entities.filter(e => e.type === 'position').length,
+      departments: entities.filter(e => e.type === 'department').length,
+      sectors: entities.filter(e => e.type === 'sector').length,
+      projects: entities.filter(e => e.type === 'project').length,
     };
   };
 
@@ -256,7 +262,7 @@ const Organization = () => {
         <div>
           <h1 className="text-3xl font-bold">Estrutura Organizacional</h1>
           <p className="text-muted-foreground mt-1">
-            Gerencie empresas, filiais, departamentos, áreas e cargos
+            Gerencie a hierarquia organizacional da empresa
           </p>
         </div>
         <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
@@ -266,7 +272,7 @@ const Organization = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -290,21 +296,21 @@ const Organization = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Filiais
+              Matrizes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-info">{stats.branches}</div>
+            <div className="text-2xl font-bold text-primary">{stats.headquarters}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Departamentos
+              Filiais
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-success">{stats.departments}</div>
+            <div className="text-2xl font-bold text-info">{stats.branches}</div>
           </CardContent>
         </Card>
         <Card>
@@ -320,11 +326,31 @@ const Organization = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Cargos
+              Departamentos
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-muted-foreground">{stats.positions}</div>
+            <div className="text-2xl font-bold text-success">{stats.departments}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Setores
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-accent-foreground">{stats.sectors}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Projetos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-muted-foreground">{stats.projects}</div>
           </CardContent>
         </Card>
       </div>

@@ -47,6 +47,36 @@ export type Database = {
         }
         Relationships: []
       }
+      job_titles: {
+        Row: {
+          code: string
+          created_at: string
+          grade: string
+          id: string
+          median_points: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          grade: string
+          id?: string
+          median_points: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          grade?: string
+          id?: string
+          median_points?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizational_structure: {
         Row: {
           code: string | null
@@ -119,6 +149,7 @@ export type Database = {
           grade: string | null
           id: string
           job_title: string | null
+          job_title_id: string | null
           manager_id: string | null
           performance_rating: number | null
           phone: string | null
@@ -138,6 +169,7 @@ export type Database = {
           grade?: string | null
           id: string
           job_title?: string | null
+          job_title_id?: string | null
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
@@ -157,6 +189,7 @@ export type Database = {
           grade?: string | null
           id?: string
           job_title?: string | null
+          job_title_id?: string | null
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
@@ -168,6 +201,13 @@ export type Database = {
           variable_salary?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_job_title_id_fkey"
+            columns: ["job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_manager_id_fkey"
             columns: ["manager_id"]

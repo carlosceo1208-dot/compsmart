@@ -29,18 +29,22 @@ interface TreeNodeProps {
 const getTypeBadge = (type: string) => {
   const typeColors: Record<string, string> = {
     company: "bg-primary/10 text-primary border-primary/20",
+    headquarters: "bg-primary/10 text-primary border-primary/20",
     branch: "bg-info/10 text-info border-info/20",
-    department: "bg-success/10 text-success border-success/20",
     area: "bg-warning/10 text-warning border-warning/20",
-    position: "bg-muted text-muted-foreground border-muted",
+    department: "bg-success/10 text-success border-success/20",
+    sector: "bg-accent/10 text-accent-foreground border-accent/20",
+    project: "bg-muted text-muted-foreground border-muted",
   };
 
   const typeLabels: Record<string, string> = {
     company: "Empresa",
+    headquarters: "Matriz",
     branch: "Filial",
-    department: "Departamento",
     area: "Área",
-    position: "Cargo",
+    department: "Departamento",
+    sector: "Setor",
+    project: "Projeto",
   };
 
   return (

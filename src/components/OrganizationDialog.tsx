@@ -45,11 +45,35 @@ interface ParentOption {
 
 const ORG_TYPES = [
   { value: "company", label: "Empresa" },
+  { value: "headquarters", label: "Matriz" },
   { value: "branch", label: "Filial" },
-  { value: "department", label: "Departamento" },
   { value: "area", label: "Área" },
-  { value: "position", label: "Cargo" },
+  { value: "department", label: "Departamento" },
+  { value: "sector", label: "Setor" },
+  { value: "project", label: "Projeto" },
 ];
+
+// Hierarchy rules: defines what types can be parents of each type
+const HIERARCHY_RULES: Record<string, string[]> = {
+  company: [], // No parent (root)
+  headquarters: ["company"], // Only Company
+  branch: ["company"], // Only Company
+  area: ["headquarters", "branch"], // Only Headquarters or Branch
+  department: ["area"], // Only Area
+  sector: ["department"], // Only Department
+  project: ["sector"], // Only Sector
+};
+
+// Defines what types can be children of each type
+const VALID_CHILDREN: Record<string, string[]> = {
+  company: ["headquarters", "branch"],
+  headquarters: ["area"],
+  branch: ["area"],
+  area: ["department"],
+  department: ["sector"],
+  sector: ["project"],
+  project: [], // No children (leaf node)
+};
 
 export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: OrganizationDialogProps) {
   const [loading, setLoading] = useState(false);
@@ -112,36 +136,34 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
 
   const fetchParentOptions = async () => {
     try {
-      setLoadingParents(true);
-      let query = supabase
+      const { data, error } = await supabase
         .from("organizational_structure")
         .select("id, name, type")
-        .order("name", { ascending: true });
-
-      // Filter valid parent types based on selected type
-      if (formData.type === "branch") {
-        query = query.eq("type", "company");
-      } else if (formData.type === "department") {
-        query = query.in("type", ["company", "branch"]);
-      } else if (formData.type === "area") {
-        query = query.in("type", ["company", "branch", "department"]);
-      } else if (formData.type === "position") {
-        query = query.in("type", ["department", "area"]);
-      }
-
-      // Exclude current entity from parent options when editing
-      if (entityId) {
-        query = query.neq("id", entityId);
-      }
-
-      const { data, error } = await query;
+        .order("name");
 
       if (error) throw error;
-      setParentOptions(data || []);
-    } catch (error: any) {
+
+      // Filter based on hierarchy rules
+      let filtered = data || [];
+      
+      const validParentTypes = HIERARCHY_RULES[formData.type] || [];
+      
+      if (validParentTypes.length === 0) {
+        // No valid parents (e.g., company is root)
+        filtered = [];
+      } else {
+        // Filter to only show valid parent types
+        filtered = filtered.filter((e) => validParentTypes.includes(e.type));
+      }
+
+      // Exclude current entity when editing
+      if (entityId) {
+        filtered = filtered.filter((e) => e.id !== entityId);
+      }
+
+      setParentOptions(filtered);
+    } catch (error) {
       console.error("Error fetching parent options:", error);
-    } finally {
-      setLoadingParents(false);
     }
   };
 
