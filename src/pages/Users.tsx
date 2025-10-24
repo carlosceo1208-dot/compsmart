@@ -47,10 +47,22 @@ interface Profile {
   variable_salary: number | null;
   salary_range_percentage: number | null;
   performance_rating: number | null;
-  unit: { id: string; name: string; code: string; type: string } | null;
+  unit: { id: string; name: string; code: string; type: string; description: string | null } | null;
   org_breadcrumb: string;
+  org_label: string;
   user_roles: Array<{ role: string }>;
 }
+
+// Utility function to normalize labels
+const normalizeLabel = (value?: string | null): string => {
+  if (!value) return '';
+  const s = value.replace(/\s+/g, ' ').trim();
+  // If it's an acronym with letters separated by spaces (e.g., "R H"), join them
+  if (/^(?:[A-Za-z]\s)+[A-Za-z]$/.test(s)) {
+    return s.replace(/\s/g, '');
+  }
+  return s;
+};
 
 const Users = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -128,10 +140,16 @@ const Users = () => {
             }
           }
 
+          // Generate org_label (just the unit description)
+          const orgLabel = normalizeLabel(
+            profile.unit?.description || profile.unit?.name || profile.unit?.code || ''
+          );
+
           return {
             ...profile,
             user_roles: rolesData || [],
             org_breadcrumb: orgBreadcrumb,
+            org_label: orgLabel,
           };
         })
       );
@@ -200,7 +218,8 @@ const Users = () => {
   const filteredProfiles = profiles.filter((profile) =>
     profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase()))
+    (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (profile.org_label && profile.org_label.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getRoleBadge = (roles: Array<{ role: string }>) => {
@@ -371,13 +390,12 @@ const Users = () => {
                         {profile.full_name}
                       </TableCell>
                       <TableCell>
-                        {profile.org_breadcrumb ? (
-                          <span className="font-mono text-xs bg-muted px-2 py-1 rounded inline-block">
-                            {profile.org_breadcrumb}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground text-xs">Não vinculado</span>
-                        )}
+                        <span 
+                          className="text-sm" 
+                          title={profile.org_breadcrumb || undefined}
+                        >
+                          {profile.org_label || 'Não vinculado'}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm">{profile.job_title || "-"}</span>
