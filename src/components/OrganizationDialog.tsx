@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -19,8 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, HelpCircle } from "lucide-react";
 
 interface OrganizationDialogProps {
   open: boolean;
@@ -40,6 +47,7 @@ interface EntityData {
 interface ParentOption {
   id: string;
   name: string;
+  code: string;
   type: string;
 }
 
@@ -138,8 +146,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name, type")
-        .order("name");
+        .select("id, name, code, type")
+        .order("code");
 
       if (error) throw error;
 
@@ -284,8 +292,20 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="type">
+              <Label htmlFor="type" className="flex items-center gap-1">
                 Tipo <span className="text-destructive">*</span>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">
+                        Hierarquia: Empresa → Matriz/Filial → Área → Departamento → Setor → Projeto
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </Label>
               <Select
                 value={formData.type}
@@ -303,6 +323,13 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                   ))}
                 </SelectContent>
               </Select>
+              {formData.type && HIERARCHY_RULES[formData.type].length > 0 && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  📌 Pais aceitos: {HIERARCHY_RULES[formData.type]
+                    .map(t => ORG_TYPES.find(o => o.value === t)?.label)
+                    .join(', ')}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -325,20 +352,28 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                   <SelectContent className="bg-background z-50">
                     {parentOptions.length === 0 && formData.type && formData.type !== "company" ? (
                       <div className="px-2 py-6 text-center text-sm text-muted-foreground">
-                        <p>Nenhuma entidade válida encontrada</p>
+                        <p>⚠️ Nenhuma entidade pai disponível</p>
                         <p className="text-xs mt-1">
-                          {formData.type === "headquarters" && "Crie uma Empresa primeiro"}
-                          {formData.type === "branch" && "Crie uma Empresa primeiro"}
-                          {formData.type === "area" && "Crie uma Matriz ou Filial primeiro"}
-                          {formData.type === "department" && "Crie uma Área primeiro"}
-                          {formData.type === "sector" && "Crie um Departamento primeiro"}
-                          {formData.type === "project" && "Crie um Setor primeiro"}
+                          {formData.type === "headquarters" && "Certifique-se de ter Empresas cadastradas."}
+                          {formData.type === "branch" && "Certifique-se de ter Empresas cadastradas."}
+                          {formData.type === "area" && "Certifique-se de ter Matrizes ou Filiais cadastradas."}
+                          {formData.type === "department" && "Certifique-se de ter Áreas cadastradas."}
+                          {formData.type === "sector" && "Certifique-se de ter Departamentos cadastrados."}
+                          {formData.type === "project" && "Certifique-se de ter Setores cadastrados."}
                         </p>
                       </div>
                     ) : (
                       parentOptions.map((option) => (
                         <SelectItem key={option.id} value={option.id}>
-                          {option.name} ({getTypeLabel(option.type)})
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-xs font-mono">
+                              {option.code}
+                            </Badge>
+                            <span>{option.name}</span>
+                            <span className="text-muted-foreground text-xs">
+                              ({getTypeLabel(option.type)})
+                            </span>
+                          </div>
                         </SelectItem>
                       ))
                     )}
