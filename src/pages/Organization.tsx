@@ -398,9 +398,7 @@ const Organization = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Código</TableHead>
-                        <TableHead>Nome</TableHead>
                         <TableHead>Tipo</TableHead>
-                        <TableHead>Pai</TableHead>
                         <TableHead>Descrição</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
@@ -410,23 +408,18 @@ const Organization = () => {
                         <TableRow key={entity.id} className="hover:bg-muted/50">
                           <TableCell>
                             {entity.code ? (
-                              <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
-                                {entity.code}
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
+                                  {entity.code}
+                                </span>
+                                <span className="font-medium">{entity.name}</span>
+                              </div>
                             ) : (
                               <span className="text-muted-foreground">-</span>
                             )}
                           </TableCell>
-                          <TableCell className="font-medium">
-                            {entity.name}
-                          </TableCell>
                           <TableCell>
                             {getTypeBadge(entity.type)}
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {entity.parent?.name || "-"}
-                            </span>
                           </TableCell>
                           <TableCell>
                             <span className="text-sm text-muted-foreground">
