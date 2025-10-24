@@ -153,10 +153,10 @@ export type Database = {
           manager_id: string | null
           performance_rating: number | null
           phone: string | null
-          position_id: string | null
           salary: number | null
           salary_range_percentage: number | null
           status: Database["public"]["Enums"]["user_status"]
+          unit_id: string | null
           updated_at: string
           variable_salary: number | null
         }
@@ -173,10 +173,10 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
-          position_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
+          unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
         }
@@ -193,10 +193,10 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
-          position_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
           status?: Database["public"]["Enums"]["user_status"]
+          unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
         }
@@ -217,7 +217,7 @@ export type Database = {
           },
           {
             foreignKeyName: "profiles_position_id_fkey"
-            columns: ["position_id"]
+            columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
@@ -279,6 +279,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]

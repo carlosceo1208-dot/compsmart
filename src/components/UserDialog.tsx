@@ -63,7 +63,7 @@ interface UserData {
   variable_salary?: string;
   salary_range_percentage?: string;
   performance_rating?: string;
-  position_id?: string;
+  unit_id?: string;
   manager_id?: string;
   job_title_id?: string;
   roles: string[];
@@ -99,14 +99,17 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     variable_salary: "",
     salary_range_percentage: "",
     performance_rating: "",
-    position_id: "",
+    unit_id: "",
     manager_id: "",
+    job_title_id: "",
     roles: ["employee"],
   });
-  const [positions, setPositions] = useState<Array<{ id: string; name: string }>>([]);
+  const [positions, setPositions] = useState<Array<{ id: string; name: string; code: string; type: string }>>([]);
   const [managers, setManagers] = useState<Array<{ id: string; full_name: string }>>([]);
   const [jobTitles, setJobTitles] = useState<JobTitle[]>([]);
   const [selectedJobTitle, setSelectedJobTitle] = useState<JobTitle | null>(null);
+  const [selectedUnitBreadcrumb, setSelectedUnitBreadcrumb] = useState("");
+  const [loadingBreadcrumb, setLoadingBreadcrumb] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -181,7 +184,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, position_id, manager_id, job_title_id")
+        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
         .eq("id", userId)
         .single();
 
@@ -205,11 +208,19 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           : "",
         salary_range_percentage: profile.salary_range_percentage?.toString() || "",
         performance_rating: profile.performance_rating?.toString() || "",
-        position_id: profile.position_id || "",
+        unit_id: profile.unit_id || "",
         manager_id: profile.manager_id || "",
         job_title_id: profile.job_title_id || "",
         roles: userRoles.map((r: any) => r.role),
       });
+
+      // Buscar breadcrumb se tiver unit_id
+      if (profile.unit_id) {
+        const { data: breadcrumbData } = await supabase.rpc('get_org_breadcrumb', { 
+          entity_id: profile.unit_id 
+        });
+        setSelectedUnitBreadcrumb(breadcrumbData || '');
+      }
     } catch (error: any) {
       toast.error("Erro ao carregar dados do usuário");
       console.error(error);
@@ -230,11 +241,12 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       variable_salary: "",
       salary_range_percentage: "",
       performance_rating: "",
-      position_id: "",
+      unit_id: "",
       manager_id: "",
       job_title_id: "",
       roles: ["employee"],
     });
+    setSelectedUnitBreadcrumb("");
   };
 
   const handleRoleToggle = (role: string) => {
@@ -246,11 +258,36 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     }));
   };
 
+  const handleUnitChange = async (unitId: string) => {
+    setFormData({ ...formData, unit_id: unitId });
+    
+    if (unitId) {
+      setLoadingBreadcrumb(true);
+      try {
+        const { data } = await supabase.rpc('get_org_breadcrumb', { entity_id: unitId });
+        setSelectedUnitBreadcrumb(data || '');
+      } catch (error) {
+        console.error("Error fetching breadcrumb:", error);
+      } finally {
+        setLoadingBreadcrumb(false);
+      }
+    } else {
+      setSelectedUnitBreadcrumb('');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Validação obrigatória da unidade organizacional
+      if (!formData.unit_id) {
+        toast.error("Selecione a Unidade Organizacional (Setor ou Projeto)");
+        setLoading(false);
+        return;
+      }
+
       // Helper function to parse Brazilian currency format to number
       const parseBRCurrency = (value: string | undefined): number | null => {
         if (!value) return null;
@@ -275,7 +312,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
-            position_id: formData.position_id || null,
+            unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
             job_title_id: formData.job_title_id || null,
           })
@@ -322,7 +359,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
-            position_id: formData.position_id || null,
+            unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
             job_title_id: formData.job_title_id || null,
           })
@@ -346,6 +383,10 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
+      } else if (error.message?.includes('deve ser um Setor ou Projeto')) {
+        toast.error("A unidade selecionada deve ser um Setor ou Projeto válido");
+      } else if (error.code === '23503') {
+        toast.error("Unidade organizacional não encontrada. Ela pode ter sido excluída.");
       } else {
         toast.error(error.message || "Erro ao salvar usuário");
       }
@@ -565,24 +606,43 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="position_id">Unidade Organizacional (Setor/Projeto)</Label>
+                <Label htmlFor="unit_id">Unidade Organizacional (Setor/Projeto) *</Label>
                 <select
-                  id="position_id"
-                  value={formData.position_id}
-                  onChange={(e) => setFormData({ ...formData, position_id: e.target.value })}
+                  id="unit_id"
+                  value={formData.unit_id}
+                  onChange={(e) => handleUnitChange(e.target.value)}
                   disabled={loading}
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <option value="">Selecione uma unidade</option>
+                  <option value="">Selecione um Setor ou Projeto</option>
                   {positions.map((position: any) => (
                     <option key={position.id} value={position.id}>
+                      {position.type === 'sector' ? '[Setor] ' : '[Projeto] '}
                       {position.code ? `${position.code} - ${position.name}` : position.name}
                     </option>
                   ))}
                 </select>
                 <p className="text-xs text-muted-foreground">
-                  Vincule o usuário a um Setor ou Projeto
+                  Selecione o Setor ou Projeto onde o colaborador está alocado
                 </p>
+                {positions.length === 0 && (
+                  <p className="text-sm text-muted-foreground mt-2 bg-amber-50 dark:bg-amber-950 p-2 rounded border border-amber-200 dark:border-amber-800">
+                    ⚠️ Nenhum Setor ou Projeto cadastrado. Para vincular um colaborador, 
+                    você precisa primeiro criar Setores dentro dos Departamentos ou Projetos 
+                    dentro dos Setores na estrutura organizacional.
+                  </p>
+                )}
+                {loadingBreadcrumb && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Carregando hierarquia...
+                  </div>
+                )}
+                {selectedUnitBreadcrumb && !loadingBreadcrumb && (
+                  <div className="text-xs font-mono bg-muted p-2 rounded mt-2">
+                    📍 {selectedUnitBreadcrumb}
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="job_title_id">Cargo (Plano de Cargos)</Label>

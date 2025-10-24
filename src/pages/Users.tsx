@@ -47,6 +47,8 @@ interface Profile {
   variable_salary: number | null;
   salary_range_percentage: number | null;
   performance_rating: number | null;
+  unit: { id: string; name: string; code: string; type: string } | null;
+  org_breadcrumb: string;
   user_roles: Array<{ role: string }>;
 }
 
@@ -99,12 +101,12 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating")
+        .select("id, full_name, email, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit:unit_id(id, name, code, type)")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
 
-      // Fetch roles separately for each profile
+      // Fetch roles and breadcrumb for each profile
       const profilesWithRoles = await Promise.all(
         (profilesData || []).map(async (profile) => {
           const { data: rolesData } = await supabase
@@ -112,9 +114,24 @@ const Users = () => {
             .select("role")
             .eq("user_id", profile.id);
 
+          // Buscar breadcrumb hierárquico
+          let orgBreadcrumb = '';
+          if (profile.unit?.id) {
+            try {
+              const { data: breadcrumbData } = await supabase.rpc('get_org_breadcrumb', { 
+                entity_id: profile.unit.id 
+              });
+              orgBreadcrumb = breadcrumbData || profile.unit.code || profile.unit.name;
+            } catch (error) {
+              console.error("Error fetching breadcrumb:", error);
+              orgBreadcrumb = profile.unit.code || profile.unit.name;
+            }
+          }
+
           return {
             ...profile,
             user_roles: rolesData || [],
+            org_breadcrumb: orgBreadcrumb,
           };
         })
       );
@@ -182,7 +199,8 @@ const Users = () => {
 
   const filteredProfiles = profiles.filter((profile) =>
     profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.email.toLowerCase().includes(searchTerm.toLowerCase())
+    profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const getRoleBadge = (roles: Array<{ role: string }>) => {
@@ -329,6 +347,7 @@ const Users = () => {
                   <TableRow>
                     <TableHead># Registro</TableHead>
                     <TableHead>Nome</TableHead>
+                    <TableHead>Estrutura Organizacional</TableHead>
                     <TableHead>Cargo</TableHead>
                     <TableHead>Grade</TableHead>
                     <TableHead>Salário Fixo (R$)</TableHead>
@@ -350,6 +369,15 @@ const Users = () => {
                       </TableCell>
                       <TableCell className="font-medium">
                         {profile.full_name}
+                      </TableCell>
+                      <TableCell>
+                        {profile.org_breadcrumb ? (
+                          <span className="font-mono text-xs bg-muted px-2 py-1 rounded inline-block">
+                            {profile.org_breadcrumb}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">Não vinculado</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <span className="text-sm">{profile.job_title || "-"}</span>
