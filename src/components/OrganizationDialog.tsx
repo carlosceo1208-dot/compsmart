@@ -295,7 +295,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
               <Label htmlFor="parent_id">Entidade Pai</Label>
               <div className="flex gap-2">
                 <Select
-                  value={formData.parent_id || undefined}
+                  value={formData.parent_id || ""}
                   onValueChange={(value) => setFormData({ ...formData, parent_id: value })}
                   disabled={!formData.type || loadingParents || formData.type === "company"}
                 >
