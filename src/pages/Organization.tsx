@@ -101,7 +101,7 @@ const Organization = () => {
       const { data, error } = await supabase
         .from("organizational_structure")
         .select("*")
-        .order("type", { ascending: true })
+        .order("code", { ascending: true, nullsFirst: false })
         .order("name", { ascending: true });
 
       if (error) throw error;
@@ -397,8 +397,8 @@ const Organization = () => {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Nome</TableHead>
                         <TableHead>Código</TableHead>
+                        <TableHead>Nome</TableHead>
                         <TableHead>Tipo</TableHead>
                         <TableHead>Pai</TableHead>
                         <TableHead>Descrição</TableHead>
@@ -408,13 +408,17 @@ const Organization = () => {
                     <TableBody>
                       {filteredEntities.map((entity) => (
                         <TableRow key={entity.id} className="hover:bg-muted/50">
+                          <TableCell>
+                            {entity.code ? (
+                              <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
+                                {entity.code}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
                           <TableCell className="font-medium">
                             {entity.name}
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {entity.code || "-"}
-                            </span>
                           </TableCell>
                           <TableCell>
                             {getTypeBadge(entity.type)}

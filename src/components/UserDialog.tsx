@@ -134,8 +134,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name, type")
+        .select("id, name, code, type")
         .in("type", ["sector", "project"])
+        .order("code", { ascending: true, nullsFirst: false })
         .order("name", { ascending: true });
 
       if (error) throw error;
@@ -573,9 +574,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <option value="">Selecione uma unidade</option>
-                  {positions.map((position) => (
+                  {positions.map((position: any) => (
                     <option key={position.id} value={position.id}>
-                      {position.name}
+                      {position.code ? `${position.code} - ${position.name}` : position.name}
                     </option>
                   ))}
                 </select>

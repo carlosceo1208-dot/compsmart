@@ -217,7 +217,17 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       onOpenChange(false);
       resetForm();
     } catch (error: any) {
-      toast.error("Erro ao salvar entidade");
+      // Erro 23505 = unique violation (código duplicado entre irmãos)
+      if (error.code === '23505' && error.message.includes('idx_org_structure_sibling_code')) {
+        toast.error("Código já em uso no mesmo nível hierárquico. Escolha outro código.");
+      } 
+      // Erros de hierarquia do trigger
+      else if (error.message.includes('não pode ter pai do tipo')) {
+        toast.error(error.message);
+      } 
+      else {
+        toast.error("Erro ao salvar entidade");
+      }
       console.error(error);
     } finally {
       setLoading(false);
@@ -263,8 +273,12 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                 id="code"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                placeholder="Código identificador"
+                placeholder="Ex: EMP-001, MTZ-001, ARE-010"
+                title="Código identificador único dentro do mesmo nível hierárquico"
               />
+              <p className="text-xs text-muted-foreground">
+                Código é opcional mas recomendado para ordenação
+              </p>
             </div>
           </div>
 
@@ -308,12 +322,26 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                         : "Selecione a entidade pai"
                     } />
                   </SelectTrigger>
-                  <SelectContent>
-                    {parentOptions.map((option) => (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.name} ({getTypeLabel(option.type)})
-                      </SelectItem>
-                    ))}
+                  <SelectContent className="bg-background z-50">
+                    {parentOptions.length === 0 && formData.type && formData.type !== "company" ? (
+                      <div className="px-2 py-6 text-center text-sm text-muted-foreground">
+                        <p>Nenhuma entidade válida encontrada</p>
+                        <p className="text-xs mt-1">
+                          {formData.type === "headquarters" && "Crie uma Empresa primeiro"}
+                          {formData.type === "branch" && "Crie uma Empresa primeiro"}
+                          {formData.type === "area" && "Crie uma Matriz ou Filial primeiro"}
+                          {formData.type === "department" && "Crie uma Área primeiro"}
+                          {formData.type === "sector" && "Crie um Departamento primeiro"}
+                          {formData.type === "project" && "Crie um Setor primeiro"}
+                        </p>
+                      </div>
+                    ) : (
+                      parentOptions.map((option) => (
+                        <SelectItem key={option.id} value={option.id}>
+                          {option.name} ({getTypeLabel(option.type)})
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
                 {formData.parent_id && formData.type !== "company" && (
@@ -330,10 +358,12 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
               </div>
               {formData.type && formData.type !== "company" && (
                 <p className="text-xs text-muted-foreground">
+                  {formData.type === "headquarters" && "Matrizes devem ter uma Empresa como pai"}
                   {formData.type === "branch" && "Filiais devem ter uma Empresa como pai"}
-                  {formData.type === "department" && "Departamentos devem ter uma Empresa ou Filial como pai"}
-                  {formData.type === "area" && "Áreas devem ter uma Empresa, Filial ou Departamento como pai"}
-                  {formData.type === "position" && "Cargos devem ter um Departamento ou Área como pai"}
+                  {formData.type === "area" && "Áreas devem ter uma Matriz ou Filial como pai"}
+                  {formData.type === "department" && "Departamentos devem ter uma Área como pai"}
+                  {formData.type === "sector" && "Setores devem ter um Departamento como pai"}
+                  {formData.type === "project" && "Projetos devem ter um Setor como pai"}
                 </p>
               )}
             </div>

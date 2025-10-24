@@ -87,10 +87,12 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
         )}
 
         <div className="flex-1 flex items-center gap-3">
-          <span className="font-medium">{entity.name}</span>
           {entity.code && (
-            <span className="text-xs text-muted-foreground">({entity.code})</span>
+            <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
+              {entity.code}
+            </span>
           )}
+          <span className="font-medium">{entity.name}</span>
           {getTypeBadge(entity.type)}
           {entity.description && (
             <span className="text-xs text-muted-foreground italic truncate max-w-md">
@@ -111,19 +113,31 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
 
       {expanded && hasChildren && (
         <div className="border-l-2 border-muted ml-3">
-          {children.map((child) => {
-            const grandChildren = allEntities.filter((e) => e.parent_id === child.id);
-            return (
-              <TreeNode
-                key={child.id}
-                entity={child}
-                children={grandChildren}
-                allEntities={allEntities}
-                onEdit={onEdit}
-                level={level + 1}
-              />
-            );
-          })}
+          {children
+            .sort((a, b) => {
+              // Priorizar ordenação por código se ambos tiverem
+              if (a.code && b.code) {
+                return a.code.localeCompare(b.code, undefined, { numeric: true });
+              }
+              // Se apenas um tem código, ele vem primeiro
+              if (a.code) return -1;
+              if (b.code) return 1;
+              // Fallback para nome
+              return a.name.localeCompare(b.name);
+            })
+            .map((child) => {
+              const grandChildren = allEntities.filter((e) => e.parent_id === child.id);
+              return (
+                <TreeNode
+                  key={child.id}
+                  entity={child}
+                  children={grandChildren}
+                  allEntities={allEntities}
+                  onEdit={onEdit}
+                  level={level + 1}
+                />
+              );
+            })}
         </div>
       )}
     </div>
@@ -154,19 +168,26 @@ export function OrganizationTree({ entities, onEdit }: OrganizationTreeProps) {
 
   return (
     <div className="space-y-2">
-      {rootEntities.map((root) => {
-        const children = entities.filter((e) => e.parent_id === root.id);
-        return (
-          <TreeNode
-            key={root.id}
-            entity={root}
-            children={children}
-            allEntities={entities}
-            onEdit={onEdit}
-            level={0}
-          />
-        );
-      })}
+      {rootEntities
+        .sort((a, b) => {
+          if (a.code && b.code) return a.code.localeCompare(b.code, undefined, { numeric: true });
+          if (a.code) return -1;
+          if (b.code) return 1;
+          return a.name.localeCompare(b.name);
+        })
+        .map((root) => {
+          const children = entities.filter((e) => e.parent_id === root.id);
+          return (
+            <TreeNode
+              key={root.id}
+              entity={root}
+              children={children}
+              allEntities={entities}
+              onEdit={onEdit}
+              level={0}
+            />
+          );
+        })}
     </div>
   );
 }
