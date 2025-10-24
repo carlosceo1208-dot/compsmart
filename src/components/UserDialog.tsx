@@ -403,7 +403,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         if (rolesError) throw rolesError;
 
         if (!formData.unit_id) {
-          toast.info("Usuário criado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Usuário ou na Estrutura Organizacional.");
+          toast.info("Usuário criado sem vínculo organizacional. Você pode vincular a uma Área/Departamento/Setor/Projeto depois em Editar Usuário ou na Estrutura Organizacional.");
         } else {
           toast.success("Usuário criado com sucesso!");
         }
@@ -414,8 +414,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
-      } else if (error.message?.includes('deve ser um Setor ou Projeto')) {
-        toast.error("A unidade selecionada deve ser um Setor ou Projeto válido");
+      } else if (error.message?.includes('deve ser um')) {
+        toast.error("A unidade selecionada deve ser uma Área, Departamento, Setor ou Projeto válido");
       } else if (error.code === '23503') {
         toast.error("Unidade organizacional não encontrada. Ela pode ter sido excluída.");
       } else {
