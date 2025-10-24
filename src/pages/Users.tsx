@@ -101,7 +101,7 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit:unit_id(id, name, code, type)")
+        .select("id, full_name, email, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit:unit_id(id, name, code, type, description)")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -118,13 +118,13 @@ const Users = () => {
           let orgBreadcrumb = '';
           if (profile.unit?.id) {
             try {
-              const { data: breadcrumbData } = await supabase.rpc('get_org_breadcrumb', { 
+              const { data: breadcrumbData } = await supabase.rpc('get_org_breadcrumb_friendly', { 
                 entity_id: profile.unit.id 
               });
-              orgBreadcrumb = breadcrumbData || profile.unit.code || profile.unit.name;
+              orgBreadcrumb = breadcrumbData || profile.unit.description || profile.unit.code || profile.unit.name;
             } catch (error) {
               console.error("Error fetching breadcrumb:", error);
-              orgBreadcrumb = profile.unit.code || profile.unit.name;
+              orgBreadcrumb = profile.unit.description || profile.unit.code || profile.unit.name;
             }
           }
 

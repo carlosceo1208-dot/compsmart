@@ -280,6 +280,10 @@ export type Database = {
     }
     Functions: {
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
+      get_org_breadcrumb_friendly: {
+        Args: { entity_id: string }
+        Returns: string
+      }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]
