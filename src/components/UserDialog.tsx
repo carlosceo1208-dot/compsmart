@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronsUpDown } from "lucide-react";
 import { z } from "zod";
 
 const userSchema = z.object({
@@ -86,6 +88,7 @@ const roleOptions = [
 
 export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialogProps) => {
   const [loading, setLoading] = useState(false);
+  const [openUnits, setOpenUnits] = useState(false);
   const [formData, setFormData] = useState<UserData>({
     full_name: "",
     email: "",
@@ -138,8 +141,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       const { data, error } = await supabase
         .from("organizational_structure")
         .select("id, name, code, type")
-        .in("type", ["sector", "project"])
-        .order("code", { ascending: true, nullsFirst: false })
+        .in("type", ["area", "department", "sector", "project"])
+        .order("type", { ascending: true })
+        .order("code", { ascending: true, nullsFirst: true })
         .order("name", { ascending: true });
 
       if (error) throw error;
@@ -275,6 +279,32 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       setSelectedUnitBreadcrumb('');
     }
   };
+
+  // Helper maps and grouping for ComboBox
+  const typeLabelMap: Record<string, string> = {
+    area: "Área",
+    department: "Departamento",
+    sector: "Setor",
+    project: "Projeto",
+  };
+
+  const grouped = {
+    area: [] as typeof positions,
+    department: [] as typeof positions,
+    sector: [] as typeof positions,
+    project: [] as typeof positions,
+  };
+  
+  positions.forEach((p) => {
+    if (grouped[p.type as keyof typeof grouped]) {
+      grouped[p.type as keyof typeof grouped].push(p);
+    }
+  });
+
+  const selectedUnit = positions.find(p => p.id === formData.unit_id) || null;
+  const selectedUnitLabel = selectedUnit
+    ? `${selectedUnit.code ? `${selectedUnit.code} - ` : ""}${selectedUnit.name}`
+    : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -607,28 +637,75 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="unit_id">Unidade Organizacional (Setor/Projeto)</Label>
-                <select
-                  id="unit_id"
-                  value={formData.unit_id}
-                  onChange={(e) => handleUnitChange(e.target.value)}
-                  disabled={loading}
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Selecione um Setor ou Projeto</option>
-                  {positions.map((position: any) => (
-                    <option key={position.id} value={position.id}>
-                      {position.type === 'sector' ? '[Setor] ' : '[Projeto] '}
-                      {position.code ? `${position.code} - ${position.name}` : position.name}
-                    </option>
-                  ))}
-                </select>
+                <Label htmlFor="unit_id">Unidade Organizacional</Label>
+                <Popover open={openUnits} onOpenChange={setOpenUnits}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openUnits}
+                      className="w-full justify-between"
+                      type="button"
+                      disabled={loading}
+                    >
+                      {selectedUnitLabel || "Selecionar Área/Depto/Setor/Projeto"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0 z-[1000] w-[480px]">
+                    <Command>
+                      <CommandInput placeholder="Digite código ou nome..." />
+                      <CommandList className="max-h-[60vh]">
+                        <CommandEmpty>Nenhuma unidade encontrada.</CommandEmpty>
+
+                        {(["area", "department", "sector", "project"] as const).map((t) => (
+                          grouped[t].length > 0 && (
+                            <CommandGroup key={t} heading={typeLabelMap[t]}>
+                              {grouped[t].map((u) => (
+                                <CommandItem
+                                  key={u.id}
+                                  value={`${u.code || ""} ${u.name}`}
+                                  onSelect={() => {
+                                    handleUnitChange(u.id);
+                                    setOpenUnits(false);
+                                  }}
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-sm">
+                                      {u.code ? <span className="font-mono mr-1">{u.code}</span> : null}
+                                      {u.name}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {typeLabelMap[u.type] || u.type}
+                                    </span>
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )
+                        ))}
+
+                        <CommandGroup heading="Ações">
+                          <CommandItem
+                            value="limpar"
+                            onSelect={() => {
+                              handleUnitChange("");
+                              setOpenUnits(false);
+                            }}
+                          >
+                            Limpar seleção
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <p className="text-xs text-muted-foreground">
-                  Selecione o Setor ou Projeto onde o colaborador está alocado
+                  Selecione a unidade onde o colaborador está alocado (Área, Departamento, Setor, Projeto)
                 </p>
                 {positions.length === 0 && (
                   <div className="text-sm text-muted-foreground mt-2 bg-amber-50 dark:bg-amber-950 p-3 rounded border border-amber-200 dark:border-amber-800 space-y-2">
-                    <p>⚠️ Nenhum Setor ou Projeto cadastrado.</p>
+                    <p>⚠️ Nenhuma Unidade Organizacional cadastrada (Área/Departamento/Setor/Projeto).</p>
                     <p className="text-xs">O cadastro pode ser feito sem vínculo. Você pode vincular depois.</p>
                     <a 
                       href="/organization" 
