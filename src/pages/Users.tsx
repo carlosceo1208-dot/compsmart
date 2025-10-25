@@ -28,11 +28,30 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, UserPlus, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2 } from "lucide-react";
+import { 
+  Search, UserPlus, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2,
+  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, ChevronDown
+} from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { UserDialog } from "@/components/UserDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Profile {
   id: string;
@@ -74,6 +93,14 @@ const Users = () => {
   const [reactivateUserId, setReactivateUserId] = useState<string | null>(null);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
   const [permissionsLoading, setPermissionsLoading] = useState(true);
+  
+  // Filtros e paginação
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterGrade, setFilterGrade] = useState<string>("all");
+  const [filterUnit, setFilterUnit] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     checkUserPermissions();
@@ -215,12 +242,39 @@ const Users = () => {
     setUserDialogOpen(true);
   };
 
-  const filteredProfiles = profiles.filter((profile) =>
-    profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (profile.org_label && profile.org_label.toLowerCase().includes(searchTerm.toLowerCase()))
+  // Filtros e paginação
+  const filteredProfiles = profiles.filter((profile) => {
+    const matchesSearch = profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (profile.org_label && profile.org_label.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesStatus = filterStatus === "all" || profile.status === filterStatus;
+    const matchesGrade = filterGrade === "all" || profile.grade === filterGrade;
+    const matchesUnit = filterUnit === "all" || profile.unit?.id === filterUnit;
+    
+    return matchesSearch && matchesStatus && matchesGrade && matchesUnit;
+  });
+
+  // Paginação
+  const totalPages = Math.ceil(filteredProfiles.length / itemsPerPage);
+  const paginatedProfiles = filteredProfiles.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
+
+  // Resetar para página 1 quando filtros mudarem
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, filterGrade, filterUnit]);
+
+  // Obter valores únicos para filtros
+  const uniqueGrades = Array.from(new Set(profiles.map(p => p.grade).filter(Boolean)));
+  const uniqueUnits = Array.from(new Set(profiles.map(p => p.unit).filter(Boolean)));
+  
+  const totalProfiles = profiles.length;
+  const activeProfiles = profiles.filter(p => p.status === "active").length;
+  const inactiveProfiles = profiles.filter(p => p.status === "inactive").length;
 
   const getRoleBadge = (roles: Array<{ role: string }>) => {
     if (!roles || roles.length === 0) return null;
@@ -299,38 +353,62 @@ const Users = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="transition-all hover:shadow-lg hover:shadow-primary/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total de Usuários
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total de Usuários
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-primary/10">
+                <UsersIcon className="w-4 h-4 text-primary" />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{profiles.length}</div>
+            <div className="text-3xl font-bold">{totalProfiles}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Cadastrados no sistema
+            </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="transition-all hover:shadow-lg hover:shadow-success/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Usuários Ativos
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Usuários Ativos
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-success/10">
+                <UserCheck2 className="w-4 h-4 text-success" />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-success">
-              {profiles.filter(p => p.status === "active").length}
+              {activeProfiles}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {totalProfiles > 0 ? `${((activeProfiles / totalProfiles) * 100).toFixed(0)}% do total` : '0% do total'}
+            </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="transition-all hover:shadow-lg hover:shadow-muted/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Usuários Inativos
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Usuários Inativos
+              </CardTitle>
+              <div className="p-2 rounded-lg bg-muted">
+                <UserMinus className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-muted-foreground">
-              {profiles.filter(p => p.status === "inactive").length}
+              {inactiveProfiles}
             </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {totalProfiles > 0 ? `${((inactiveProfiles / totalProfiles) * 100).toFixed(0)}% do total` : '0% do total'}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -338,15 +416,73 @@ const Users = () => {
       {/* Search and Filter */}
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Buscar por nome ou email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Buscar por nome ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setViewMode(viewMode === "compact" ? "detailed" : "compact")}
+                title={viewMode === "compact" ? "Modo Detalhado" : "Modo Compacto"}
+              >
+                {viewMode === "compact" ? <LayoutList className="w-4 h-4" /> : <LayoutGrid className="w-4 h-4" />}
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Status</SelectItem>
+                  <SelectItem value="active">Ativos</SelectItem>
+                  <SelectItem value="inactive">Inativos</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={filterGrade} onValueChange={setFilterGrade}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por Grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Grades</SelectItem>
+                  {uniqueGrades.map((grade) => (
+                    <SelectItem key={grade} value={grade!}>
+                      {grade}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filterUnit} onValueChange={setFilterUnit}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Filtrar por Unidade" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas as Unidades</SelectItem>
+                  {uniqueUnits.map((unit) => (
+                    <SelectItem key={unit!.id} value={unit!.id}>
+                      {unit!.description || unit!.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span>
+                Exibindo {paginatedProfiles.length} de {filteredProfiles.length} usuário(s)
+                {filteredProfiles.length !== totalProfiles && ` (${totalProfiles} total)`}
+              </span>
             </div>
           </div>
         </CardHeader>
@@ -367,27 +503,42 @@ const Users = () => {
                     <TableHead># Registro</TableHead>
                     <TableHead>Nome</TableHead>
                     <TableHead>Estrutura Organizacional</TableHead>
-                    <TableHead>Cargo</TableHead>
-                    <TableHead>Grade</TableHead>
-                    <TableHead>Salário Fixo (R$)</TableHead>
-                    <TableHead>Salário Variável (R$)</TableHead>
+                    {viewMode === "detailed" && (
+                      <>
+                        <TableHead>Cargo</TableHead>
+                        <TableHead>Grade</TableHead>
+                        <TableHead>Salário Fixo (R$)</TableHead>
+                        <TableHead>Salário Variável (R$)</TableHead>
+                      </>
+                    )}
                     <TableHead>Total Cash (R$)</TableHead>
-                    <TableHead>% Faixa</TableHead>
-                    <TableHead>Nota</TableHead>
-                    <TableHead>Perfil</TableHead>
+                    {viewMode === "detailed" && (
+                      <>
+                        <TableHead>% Faixa</TableHead>
+                        <TableHead>Nota</TableHead>
+                        <TableHead>Perfil</TableHead>
+                      </>
+                    )}
                     <TableHead>Status</TableHead>
-                    <TableHead>Data de Admissão</TableHead>
+                    {viewMode === "detailed" && <TableHead>Data de Admissão</TableHead>}
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredProfiles.map((profile, index) => (
+                  {paginatedProfiles.map((profile, index) => (
                     <TableRow key={profile.id} className="hover:bg-muted/50">
                       <TableCell className="text-sm text-muted-foreground">
-                        {index + 1}
+                        {(currentPage - 1) * itemsPerPage + index + 1}
                       </TableCell>
                       <TableCell className="font-medium">
-                        {profile.full_name}
+                        <div>
+                          <div>{profile.full_name}</div>
+                          {viewMode === "compact" && (
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {profile.job_title || "-"} • {profile.grade || "-"}
+                            </div>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <span 
@@ -397,52 +548,60 @@ const Users = () => {
                           {profile.org_label || 'Não vinculado'}
                         </span>
                       </TableCell>
+                      {viewMode === "detailed" && (
+                        <>
+                          <TableCell>
+                            <span className="text-sm">{profile.job_title || "-"}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">{profile.grade || "-"}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm font-medium">
+                              {profile.salary 
+                                ? profile.salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : "-"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm font-medium">
+                              {profile.variable_salary 
+                                ? profile.variable_salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : "-"}
+                            </span>
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell>
-                        <span className="text-sm">{profile.job_title || "-"}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">{profile.grade || "-"}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">
-                          {profile.salary 
-                            ? profile.salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                            : "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">
-                          {profile.variable_salary 
-                            ? profile.variable_salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                            : "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">
+                        <span className="text-sm font-bold">
                           {(profile.salary || profile.variable_salary)
                             ? ((profile.salary || 0) + (profile.variable_salary || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                             : "-"}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <span className="text-sm">
-                          {profile.salary_range_percentage 
-                            ? `${profile.salary_range_percentage.toFixed(1)}%` 
-                            : "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm">
-                          {profile.performance_rating 
-                            ? profile.performance_rating.toFixed(1) 
-                            : "-"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1 flex-wrap">
-                          {getRoleBadge(profile.user_roles)}
-                        </div>
-                      </TableCell>
+                      {viewMode === "detailed" && (
+                        <>
+                          <TableCell>
+                            <span className="text-sm">
+                              {profile.salary_range_percentage 
+                                ? `${profile.salary_range_percentage.toFixed(1)}%` 
+                                : "-"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm">
+                              {profile.performance_rating 
+                                ? profile.performance_rating.toFixed(1) 
+                                : "-"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1 flex-wrap">
+                              {getRoleBadge(profile.user_roles)}
+                            </div>
+                          </TableCell>
+                        </>
+                      )}
                       <TableCell>
                         <Badge
                           variant="outline"
@@ -455,14 +614,16 @@ const Users = () => {
                           {profile.status === "active" ? "Ativo" : "Inativo"}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4" />
-                          {format(new Date(profile.created_at), "dd/MM/yyyy", {
-                            locale: ptBR,
-                          })}
-                        </div>
-                      </TableCell>
+                      {viewMode === "detailed" && (
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Calendar className="w-4 h-4" />
+                            {format(new Date(profile.created_at), "dd/MM/yyyy", {
+                              locale: ptBR,
+                            })}
+                          </div>
+                        </TableCell>
+                      )}
                       <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -502,6 +663,60 @@ const Users = () => {
             </div>
           )}
         </CardContent>
+        
+        {/* Paginação */}
+        {totalPages > 1 && (
+          <CardContent className="pt-0">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <PaginationItem key={pageNum}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(pageNum)}
+                        isActive={currentPage === pageNum}
+                        className="cursor-pointer"
+                      >
+                        {pageNum}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                
+                {totalPages > 5 && currentPage < totalPages - 2 && (
+                  <PaginationItem>
+                    <PaginationEllipsis />
+                  </PaginationItem>
+                )}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </CardContent>
+        )}
       </Card>
 
       <UserDialog
