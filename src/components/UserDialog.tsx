@@ -79,6 +79,24 @@ interface JobTitle {
   median_points: number;
 }
 
+interface Profile {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  cpf: string | null;
+  birth_date: string | null;
+  job_title: string | null;
+  grade: string | null;
+  salary: number | null;
+  variable_salary: number | null;
+  salary_range_percentage: number | null;
+  performance_rating: number | null;
+  unit_id: string | null;
+  manager_id: string | null;
+  job_title_id: string | null;
+}
+
 const roleOptions = [
   { value: "admin", label: "Administrador" },
   { value: "hr_manager", label: "Gestor de RH" },
@@ -113,12 +131,16 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
   const [selectedJobTitle, setSelectedJobTitle] = useState<JobTitle | null>(null);
   const [selectedUnitBreadcrumb, setSelectedUnitBreadcrumb] = useState("");
   const [loadingBreadcrumb, setLoadingBreadcrumb] = useState(false);
+  const [employees, setEmployees] = useState<Profile[]>([]);
+  const [openEmployees, setOpenEmployees] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Profile | null>(null);
 
   useEffect(() => {
     if (open) {
       fetchPositions();
       fetchManagers();
       fetchJobTitles();
+      fetchEmployees();
       if (userId) {
         fetchUserData();
       } else {
@@ -180,6 +202,62 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     } catch (error: any) {
       console.error("Error fetching managers:", error);
     }
+  };
+
+  const fetchEmployees = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .eq("status", "active")
+        .order("full_name", { ascending: true });
+
+      if (error) throw error;
+      setEmployees(data || []);
+    } catch (error: any) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
+  const handleEmployeeSelect = async (employee: Profile) => {
+    setSelectedEmployee(employee);
+    
+    // Buscar breadcrumb se tiver unit_id
+    let breadcrumb = '';
+    if (employee.unit_id) {
+      try {
+        const { data } = await supabase.rpc('get_org_breadcrumb_friendly', { 
+          entity_id: employee.unit_id 
+        });
+        breadcrumb = data || '';
+      } catch (error) {
+        console.error("Error fetching breadcrumb:", error);
+      }
+    }
+    
+    setFormData({
+      ...formData,
+      full_name: employee.full_name,
+      email: employee.email || formData.email,
+      phone: employee.phone || "",
+      cpf: employee.cpf || "",
+      birth_date: employee.birth_date || "",
+      job_title: employee.job_title || "",
+      grade: employee.grade || "",
+      salary: employee.salary 
+        ? employee.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : "",
+      variable_salary: employee.variable_salary 
+        ? employee.variable_salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : "",
+      salary_range_percentage: employee.salary_range_percentage?.toString() || "",
+      performance_rating: employee.performance_rating?.toString() || "",
+      unit_id: employee.unit_id || "",
+      manager_id: employee.manager_id || "",
+      job_title_id: employee.job_title_id || "",
+    });
+    
+    setSelectedUnitBreadcrumb(breadcrumb);
   };
 
   const fetchUserData = async () => {
@@ -251,6 +329,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       roles: ["employee"],
     });
     setSelectedUnitBreadcrumb("");
+    setSelectedEmployee(null);
   };
 
   const handleRoleToggle = (role: string) => {
@@ -440,13 +519,91 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 space-y-2">
               <Label htmlFor="full_name">Nome Completo *</Label>
-              <Input
-                id="full_name"
-                value={formData.full_name}
-                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                required
-                disabled={loading}
-              />
+              <Popover open={openEmployees} onOpenChange={setOpenEmployees}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openEmployees}
+                    className="w-full justify-between"
+                    type="button"
+                    disabled={loading}
+                  >
+                    {formData.full_name || "Buscar funcionário ou digitar novo nome"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 z-[1000] w-full">
+                  <Command>
+                    <CommandInput 
+                      placeholder="Digite o nome do funcionário..." 
+                      value={formData.full_name}
+                      onValueChange={(value) => {
+                        setFormData({ ...formData, full_name: value });
+                        if (!value) setSelectedEmployee(null);
+                      }}
+                    />
+                    <CommandList className="max-h-[300px]">
+                      <CommandEmpty>
+                        <div className="p-2 text-sm text-muted-foreground">
+                          {formData.full_name ? `Nenhum funcionário encontrado. Use "${formData.full_name}" para novo cadastro` : "Digite para buscar"}
+                        </div>
+                      </CommandEmpty>
+                      
+                      {employees.filter(emp => 
+                        emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase())
+                      ).length > 0 && (
+                        <CommandGroup heading="Funcionários Cadastrados">
+                          {employees
+                            .filter(emp => emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase()))
+                            .slice(0, 10)
+                            .map((emp) => (
+                              <CommandItem
+                                key={emp.id}
+                                value={emp.full_name}
+                                onSelect={() => {
+                                  handleEmployeeSelect(emp);
+                                  setOpenEmployees(false);
+                                }}
+                              >
+                                <div className="flex flex-col w-full">
+                                  <div className="flex justify-between items-center">
+                                    <span className="font-medium">{emp.full_name}</span>
+                                    <span className="text-xs text-muted-foreground">#{emp.email}</span>
+                                  </div>
+                                  <div className="flex gap-4 text-xs text-muted-foreground mt-1">
+                                    {emp.job_title && <span>Cargo: {emp.job_title}</span>}
+                                    {emp.grade && <span>Grade: {emp.grade}</span>}
+                                    {emp.salary && (
+                                      <span>
+                                        Salário: R$ {emp.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </CommandItem>
+                            ))}
+                        </CommandGroup>
+                      )}
+                      
+                      <CommandGroup heading="Ações">
+                        <CommandItem
+                          onSelect={() => {
+                            setOpenEmployees(false);
+                          }}
+                        >
+                          {formData.full_name ? `Usar "${formData.full_name}" (novo cadastro)` : "Fechar"}
+                        </CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs text-muted-foreground">
+                {selectedEmployee 
+                  ? `✅ Dados importados de: ${selectedEmployee.full_name}` 
+                  : "Digite para buscar funcionário existente ou criar novo"}
+              </p>
             </div>
             <div className="col-span-2 space-y-2">
               <Label htmlFor="email">Email *</Label>
