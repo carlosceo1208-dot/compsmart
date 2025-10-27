@@ -1,1 +1,4 @@
 project_id = "fpkjkqdfufhhicxkyqdw"
+
+[functions.suggest-job-competencies]
+verify_jwt = false

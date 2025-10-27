@@ -137,3 +137,85 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  /* Organization Tree Styles */
+  .org-node-wrapper {
+    @apply flex flex-col items-center relative;
+  }
+
+  .org-node-wrapper::before {
+    content: '';
+    @apply absolute w-0.5 h-6 bg-border;
+    top: -24px;
+    left: 50%;
+  }
+
+  /* Hide connector for root nodes */
+  .org-node-wrapper:first-child::before {
+    @apply hidden;
+  }
+
+  .org-children {
+    @apply flex gap-8 mt-12 relative flex-wrap justify-center;
+  }
+
+  /* Horizontal connector line between siblings */
+  .org-children::before {
+    content: '';
+    @apply absolute h-0.5 bg-border;
+    top: -24px;
+    left: 10%;
+    right: 10%;
+  }
+
+  /* Hide horizontal line if only one child */
+  .org-children:has(> .org-node-wrapper:only-child)::before {
+    @apply hidden;
+  }
+
+  /* Show vertical connector for single child */
+  .org-children > .org-node-wrapper:only-child::before {
+    @apply block;
+  }
+
+  /* Mobile responsive: stack vertically */
+  @media (max-width: 768px) {
+    .org-children {
+      @apply flex-col items-center gap-12;
+    }
+
+    .org-children::before {
+      @apply hidden;
+    }
+
+    .org-children > .org-node-wrapper::before {
+      @apply block;
+    }
+  }
+
+  /* Info color for branch entities */
+  .bg-info\/10 {
+    background-color: hsl(200 95% 50% / 0.1);
+  }
+  
+  .text-info {
+    color: hsl(200 95% 50%);
+  }
+  
+  .border-info\/20 {
+    border-color: hsl(200 95% 50% / 0.2);
+  }
+  
+  .border-info\/40 {
+    border-color: hsl(200 95% 50% / 0.4);
+  }
+  
+  .bg-info\/5 {
+    background-color: hsl(200 95% 50% / 0.05);
+  }
+  
+  .hover\:bg-info\/10:hover {
+    background-color: hsl(200 95% 50% / 0.1);
+  }
+}
