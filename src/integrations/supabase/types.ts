@@ -47,6 +47,78 @@ export type Database = {
         }
         Relationships: []
       }
+      competencies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      job_title_competencies: {
+        Row: {
+          competency_id: string
+          created_at: string
+          id: string
+          is_required: boolean
+          job_title_id: string
+          required_level: Database["public"]["Enums"]["proficiency_level"]
+          updated_at: string
+        }
+        Insert: {
+          competency_id: string
+          created_at?: string
+          id?: string
+          is_required?: boolean
+          job_title_id: string
+          required_level?: Database["public"]["Enums"]["proficiency_level"]
+          updated_at?: string
+        }
+        Update: {
+          competency_id?: string
+          created_at?: string
+          id?: string
+          is_required?: boolean
+          job_title_id?: string
+          required_level?: Database["public"]["Enums"]["proficiency_level"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_title_competencies_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_title_competencies_job_title_id_fkey"
+            columns: ["job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_titles: {
         Row: {
           code: string
@@ -147,6 +219,7 @@ export type Database = {
           email: string
           full_name: string
           grade: string | null
+          has_system_access: boolean | null
           id: string
           job_title: string | null
           job_title_id: string | null
@@ -167,6 +240,7 @@ export type Database = {
           email: string
           full_name: string
           grade?: string | null
+          has_system_access?: boolean | null
           id: string
           job_title?: string | null
           job_title_id?: string | null
@@ -187,6 +261,7 @@ export type Database = {
           email?: string
           full_name?: string
           grade?: string | null
+          has_system_access?: boolean | null
           id?: string
           job_title?: string | null
           job_title_id?: string | null
@@ -253,6 +328,81 @@ export type Database = {
           },
         ]
       }
+      salary_ranges: {
+        Row: {
+          calculation_mode: Database["public"]["Enums"]["calculation_mode"]
+          created_at: string
+          grade: string
+          id: string
+          input_amplitude: number | null
+          input_median: number | null
+          max_value: number
+          median_value: number
+          min_value: number
+          q1_value: number
+          q3_value: number
+          updated_at: string
+        }
+        Insert: {
+          calculation_mode?: Database["public"]["Enums"]["calculation_mode"]
+          created_at?: string
+          grade: string
+          id?: string
+          input_amplitude?: number | null
+          input_median?: number | null
+          max_value: number
+          median_value: number
+          min_value: number
+          q1_value: number
+          q3_value: number
+          updated_at?: string
+        }
+        Update: {
+          calculation_mode?: Database["public"]["Enums"]["calculation_mode"]
+          created_at?: string
+          grade?: string
+          id?: string
+          input_amplitude?: number | null
+          input_median?: number | null
+          max_value?: number
+          median_value?: number
+          min_value?: number
+          q1_value?: number
+          q3_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      system_labels: {
+        Row: {
+          created_at: string
+          custom_label: string | null
+          default_label: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          custom_label?: string | null
+          default_label: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          custom_label?: string | null
+          default_label?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -279,6 +429,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_salary_range: {
+        Args: { p_amplitude: number; p_median: number }
+        Returns: {
+          max_value: number
+          median_value: number
+          min_value: number
+          q1_value: number
+          q3_value: number
+        }[]
+      }
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
       get_org_breadcrumb_friendly: {
         Args: { entity_id: string }
@@ -309,6 +469,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "hr_manager" | "manager" | "employee"
+      calculation_mode: "manual" | "automatic"
+      proficiency_level: "basic" | "intermediate" | "advanced" | "expert"
       user_status: "active" | "inactive"
     }
     CompositeTypes: {
@@ -438,6 +600,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "hr_manager", "manager", "employee"],
+      calculation_mode: ["manual", "automatic"],
+      proficiency_level: ["basic", "intermediate", "advanced", "expert"],
       user_status: ["active", "inactive"],
     },
   },

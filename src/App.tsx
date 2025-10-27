@@ -8,35 +8,46 @@ import Auth from "./pages/Auth";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
+import Employees from "./pages/Employees";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "./components/DashboardLayout";
 import Organization from "./pages/Organization";
 import Roles from "./pages/Roles";
+import AccessControl from "./pages/AccessControl";
+import MyProfile from "./pages/MyProfile";
+import SalaryRanges from "./pages/SalaryRanges";
+import Settings from "./pages/Settings";
+import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/organization" element={<Organization />} />
-            <Route path="/roles" element={<Roles />} />
-          </Route>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <LabelsProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/employees" element={<Employees />} />
+              <Route path="/organization" element={<Organization />} />
+              <Route path="/roles" element={<Roles />} />
+              <Route path="/access-control" element={<AccessControl />} />
+              <Route path="/my-profile" element={<MyProfile />} />
+              <Route path="/salary-ranges" element={<SalaryRanges />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </LabelsProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

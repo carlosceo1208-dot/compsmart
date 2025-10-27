@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, LogOut, User, Settings, Home, Users as UsersIcon, Network } from "lucide-react";
+import { Building2, LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck } from "lucide-react";
+import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 
 interface UserProfile {
@@ -21,6 +22,7 @@ interface UserProfile {
 
 export const DashboardLayout = () => {
   const navigate = useNavigate();
+  const { getLabel } = useLabels();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -112,11 +114,20 @@ export const DashboardLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/users")}
+              onClick={() => navigate("/employees")}
               className="hidden md:flex items-center"
             >
               <UsersIcon className="w-4 h-4 mr-2" />
-              Usuários
+              {getLabel('employee')}s
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/salary-ranges")}
+              className="hidden md:flex items-center"
+            >
+              <DollarSign className="w-4 h-4 mr-2" />
+              Tabela Salarial
             </Button>
             <Button
               variant="ghost"
@@ -154,9 +165,13 @@ export const DashboardLayout = () => {
                   <Home className="mr-2 h-4 w-4" />
                   <span>Dashboard</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <DropdownMenuItem onClick={() => navigate("/my-profile")}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Meu Perfil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/access-control")}>
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  <span>Controle de Acesso</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/settings")}>
                   <Settings className="mr-2 h-4 w-4" />
