@@ -23,7 +23,7 @@ const Dashboard = () => {
       title: "Cadastro de Usuários",
       description: "Gerencie usuários, perfis de acesso e permissões do sistema",
       icon: Users,
-      path: "/users",
+      path: "/employees",
       status: "active" as const,
       category: "management" as const,
     },
