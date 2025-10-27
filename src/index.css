@@ -146,8 +146,8 @@ All colors MUST be HSL.
 
   .org-node-wrapper::before {
     content: '';
-    @apply absolute w-0.5 h-6 bg-border;
-    top: -24px;
+    @apply absolute w-0.5 h-4 bg-border;
+    top: -16px;
     left: 50%;
   }
 
@@ -156,15 +156,15 @@ All colors MUST be HSL.
     @apply hidden;
   }
 
-  .org-children {
-    @apply flex gap-8 mt-12 relative flex-wrap justify-center;
-  }
+.org-children {
+  @apply flex gap-4 mt-8 relative flex-wrap justify-center;
+}
 
   /* Horizontal connector line between siblings */
   .org-children::before {
     content: '';
     @apply absolute h-0.5 bg-border;
-    top: -24px;
+    top: -16px;
     left: 10%;
     right: 10%;
   }

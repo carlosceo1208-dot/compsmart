@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronRight, Edit, Building2, Home, GitBranch, Layers, Users, FolderKanban, Briefcase } from "lucide-react";
+import { ChevronDown, ChevronRight, Edit, Building2, Home, GitBranch, Layers, Users, FolderKanban, Briefcase, ZoomIn, ZoomOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OrgEntity {
@@ -27,7 +27,7 @@ interface TreeNodeProps {
 }
 
 const getTypeIcon = (type: string) => {
-  const iconClass = "w-4 h-4";
+  const iconClass = "w-3 h-3";
   switch (type) {
     case "company":
       return <Building2 className={iconClass} />;
@@ -70,7 +70,7 @@ const getTypeBadge = (type: string) => {
   };
 
   return (
-    <Badge variant="outline" className={cn("text-xs", typeColors[type] || "")}>
+    <Badge variant="outline" className={cn("text-[10px]", typeColors[type] || "")}>
       {typeLabels[type] || type}
     </Badge>
   );
@@ -106,7 +106,7 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
     <div className="org-node-wrapper">
       <div
         className={cn(
-          "org-card border-2 rounded-lg p-4 min-w-[280px] max-w-[320px] transition-all duration-200 shadow-sm group relative",
+          "org-card border rounded-md p-2 min-w-[160px] max-w-[200px] transition-all duration-200 shadow-sm group relative",
           getTypeCardColor(entity.type)
         )}
       >
@@ -114,41 +114,41 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
           <div className="flex-shrink-0 mt-1">{getTypeIcon(entity.type)}</div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-1 mb-1">
               {entity.code && (
-                <span className="font-mono font-semibold text-xs bg-background/80 px-2 py-1 rounded border border-border/50">
+                <span className="font-mono font-semibold text-[10px] bg-background/80 px-1 py-0.5 rounded border border-border/50">
                   {entity.code}
                 </span>
               )}
               {getTypeBadge(entity.type)}
             </div>
             
-            <h3 className="font-semibold text-sm mb-1 line-clamp-2">{entity.name}</h3>
+            <h3 className="font-semibold text-xs mb-0.5 line-clamp-2">{entity.name}</h3>
             
             {entity.description && (
-              <p className="text-xs text-muted-foreground line-clamp-2 italic">
+              <p className="text-[10px] text-muted-foreground line-clamp-2 italic">
                 {entity.description}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
           {hasChildren && (
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 text-xs"
+              className="h-6 px-1.5 text-[10px]"
               onClick={() => setExpanded(!expanded)}
             >
               {expanded ? (
                 <>
-                  <ChevronDown className="w-3 h-3 mr-1" />
+                  <ChevronDown className="w-2.5 h-2.5 mr-0.5" />
                   Ocultar {children.length}
                 </>
               ) : (
                 <>
-                  <ChevronRight className="w-3 h-3 mr-1" />
+                  <ChevronRight className="w-2.5 h-2.5 mr-0.5" />
                   Mostrar {children.length}
                 </>
               )}
@@ -160,10 +160,10 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={() => onEdit(entity.id)}
           >
-            <Edit className="w-3 h-3" />
+            <Edit className="w-2.5 h-2.5" />
           </Button>
         </div>
       </div>
@@ -190,6 +190,7 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
 }
 
 export function OrganizationTree({ entities, onEdit }: OrganizationTreeProps) {
+  const [zoom, setZoom] = useState(0.8);
   const rootEntities = entities.filter((e) => !e.parent_id);
 
   if (entities.length === 0) {
@@ -220,21 +221,58 @@ export function OrganizationTree({ entities, onEdit }: OrganizationTreeProps) {
   });
 
   return (
-    <div className="w-full overflow-x-auto pb-8 px-4 py-8">
-      <div className="flex flex-col items-center gap-12 min-w-max mx-auto">
-        {sortedRoots.map((root) => {
-          const children = entities.filter((e) => e.parent_id === root.id);
-          return (
-            <TreeNode
-              key={root.id}
-              entity={root}
-              children={children}
-              allEntities={entities}
-              onEdit={onEdit}
-              level={0}
-            />
-          );
-        })}
+    <div className="w-full h-full flex flex-col">
+      <div className="sticky top-0 z-10 flex gap-2 mb-4 justify-end bg-background/80 backdrop-blur-sm p-2 border-b">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setZoom(z => Math.min(z + 0.1, 1.5))}
+        >
+          <ZoomIn className="w-3 h-3 mr-1" />
+          Zoom +
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setZoom(z => Math.max(z - 0.1, 0.4))}
+        >
+          <ZoomOut className="w-3 h-3 mr-1" />
+          Zoom -
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => setZoom(0.8)}
+        >
+          Ajustar
+        </Button>
+        <span className="text-xs text-muted-foreground self-center min-w-[50px] text-center">
+          {Math.round(zoom * 100)}%
+        </span>
+      </div>
+      
+      <div className="w-full overflow-auto pb-8 px-4 flex-1">
+        <div 
+          className="flex flex-col items-center gap-8 min-w-max mx-auto transition-transform duration-200"
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top center'
+          }}
+        >
+          {sortedRoots.map((root) => {
+            const children = entities.filter((e) => e.parent_id === root.id);
+            return (
+              <TreeNode
+                key={root.id}
+                entity={root}
+                children={children}
+                allEntities={entities}
+                onEdit={onEdit}
+                level={0}
+              />
+            );
+          })}
+        </div>
       </div>
     </div>
   );
