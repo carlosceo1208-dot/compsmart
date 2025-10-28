@@ -414,6 +414,101 @@ export type Database = {
         }
         Relationships: []
       }
+      survey_data: {
+        Row: {
+          calculation_mode: Database["public"]["Enums"]["calculation_mode"]
+          created_at: string
+          grade: string
+          id: string
+          input_amplitude: number | null
+          input_median: number | null
+          job_code: string
+          job_title: string
+          max_value: number
+          median_value: number
+          min_value: number
+          q1_value: number
+          q3_value: number
+          survey_table_id: string
+          updated_at: string
+        }
+        Insert: {
+          calculation_mode?: Database["public"]["Enums"]["calculation_mode"]
+          created_at?: string
+          grade: string
+          id?: string
+          input_amplitude?: number | null
+          input_median?: number | null
+          job_code: string
+          job_title: string
+          max_value: number
+          median_value: number
+          min_value: number
+          q1_value: number
+          q3_value: number
+          survey_table_id: string
+          updated_at?: string
+        }
+        Update: {
+          calculation_mode?: Database["public"]["Enums"]["calculation_mode"]
+          created_at?: string
+          grade?: string
+          id?: string
+          input_amplitude?: number | null
+          input_median?: number | null
+          job_code?: string
+          job_title?: string
+          max_value?: number
+          median_value?: number
+          min_value?: number
+          q1_value?: number
+          q3_value?: number
+          survey_table_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_data_survey_table_id_fkey"
+            columns: ["survey_table_id"]
+            isOneToOne: false
+            referencedRelation: "survey_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      survey_tables: {
+        Row: {
+          created_at: string
+          default_amplitude: number | null
+          effective_month: number
+          effective_year: number
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          default_amplitude?: number | null
+          effective_month: number
+          effective_year: number
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          default_amplitude?: number | null
+          effective_month?: number
+          effective_year?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       system_labels: {
         Row: {
           created_at: string

@@ -13,6 +13,7 @@ import {
   Settings,
   Shield,
   Building,
+  ArrowLeftRight,
 } from "lucide-react";
 
 const Dashboard = () => {
@@ -53,11 +54,19 @@ const Dashboard = () => {
     },
     {
       title: "Pesquisa Salarial",
-      description: "Compare remunerações com o mercado e concorrentes",
+      description: "Importe e compare dados de mercado",
       icon: TrendingUp,
-      path: "/market-research",
-      status: "coming-soon" as const,
-      category: "consultation" as const,
+      path: "/survey-data",
+      status: "active" as const,
+      category: "management" as const,
+    },
+    {
+      title: "Comparação Salarial",
+      description: "Compare tabelas internas vs mercado",
+      icon: ArrowLeftRight,
+      path: "/salary-comparison",
+      status: "active" as const,
+      category: "management" as const,
     },
     {
       title: "Plano de Cargos e Salários",
