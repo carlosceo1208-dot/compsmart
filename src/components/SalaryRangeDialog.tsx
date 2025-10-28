@@ -14,6 +14,7 @@ interface SalaryRangeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   grade?: string | null;
+  salaryTableId: string | null;
   onSuccess: () => void;
 }
 
@@ -27,7 +28,7 @@ interface SalaryValues {
   max: string;
 }
 
-export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: SalaryRangeDialogProps) => {
+export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, onSuccess }: SalaryRangeDialogProps) => {
   const { getLabel } = useLabels();
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<CalculationMode>('manual');
@@ -42,7 +43,6 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
   });
   
   const [autoMedian, setAutoMedian] = useState('');
-  const [autoAmplitude, setAutoAmplitude] = useState('40');
   const [calculatedValues, setCalculatedValues] = useState<SalaryValues | null>(null);
 
   useEffect(() => {
@@ -54,13 +54,14 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
   }, [open, grade]);
 
   const fetchExistingRange = async () => {
-    if (!grade) return;
+    if (!grade || !salaryTableId) return;
     
     try {
       const { data, error } = await supabase
         .from('salary_ranges')
         .select('*')
         .eq('grade', grade)
+        .eq('salary_table_id', salaryTableId)
         .single();
 
       if (error) throw error;
@@ -78,7 +79,6 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
         
         if (data.calculation_mode === 'automatic') {
           setAutoMedian(data.input_median?.toString() || '');
-          setAutoAmplitude(data.input_amplitude?.toString() || '40');
         }
       }
     } catch (error) {
@@ -91,20 +91,18 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
     setMode('manual');
     setManualValues({ min: '', q1: '', median: '', q3: '', max: '' });
     setAutoMedian('');
-    setAutoAmplitude('40');
     setCalculatedValues(null);
   };
 
   const handleCalculateAuto = async () => {
-    if (!autoMedian || !autoAmplitude) {
-      toast.error('Preencha o ponto médio e amplitude');
+    if (!autoMedian) {
+      toast.error('Preencha o ponto médio');
       return;
     }
 
     try {
-      const { data, error } = await supabase.rpc('calculate_salary_range', {
+      const { data, error } = await supabase.rpc('calculate_salary_range_fixed', {
         p_median: parseFloat(autoMedian),
-        p_amplitude: parseFloat(autoAmplitude),
       });
 
       if (error) throw error;
@@ -118,7 +116,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
           q3: result.q3_value.toFixed(2),
           max: result.max_value.toFixed(2),
         });
-        toast.success('Faixa calculada com sucesso!');
+        toast.success('Faixa calculada com sucesso! (-20% / +25%)');
       }
     } catch (error) {
       console.error('Error calculating range:', error);
@@ -140,6 +138,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
       }
 
       const dataToSave = {
+        salary_table_id: salaryTableId,
         grade: gradeInput || grade,
         calculation_mode: mode,
         min_value: parseFloat(values.min),
@@ -148,12 +147,15 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
         q3_value: parseFloat(values.q3),
         max_value: parseFloat(values.max),
         input_median: mode === 'automatic' ? parseFloat(autoMedian) : null,
-        input_amplitude: mode === 'automatic' ? parseFloat(autoAmplitude) : null,
+        input_amplitude: null,
       };
 
       const { error } = await supabase
         .from('salary_ranges')
-        .upsert(dataToSave, { onConflict: 'grade' });
+        .upsert(dataToSave, { 
+          onConflict: 'salary_table_id,grade',
+          ignoreDuplicates: false 
+        });
 
       if (error) throw error;
 
@@ -278,35 +280,19 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, onSuccess }: Sala
             <div className="space-y-4">
               <Card>
                 <CardContent className="pt-6 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Ponto Médio (R$)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={autoMedian}
-                        onChange={(e) => setAutoMedian(e.target.value)}
-                        placeholder="Ex: 7000"
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Salário médio da faixa
-                      </p>
-                    </div>
-                    <div>
-                      <Label>Amplitude (%)</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={autoAmplitude}
-                        onChange={(e) => setAutoAmplitude(e.target.value)}
-                        placeholder="Ex: 40 (±20%)"
-                        required
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Variação total (ex: 40% = ±20%)
-                      </p>
-                    </div>
+                  <div>
+                    <Label>Ponto Médio (R$)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={autoMedian}
+                      onChange={(e) => setAutoMedian(e.target.value)}
+                      placeholder="Ex: 7000"
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      O sistema calculará automaticamente: Mínimo (-20%) e Máximo (+25%)
+                    </p>
                   </div>
 
                   <Button

@@ -4,8 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Calculator, TrendingUp } from 'lucide-react';
+import { Plus, Edit, Calculator, TrendingUp, Upload, Settings } from 'lucide-react';
 import { SalaryRangeDialog } from '@/components/SalaryRangeDialog';
+import { SalaryTableDialog } from '@/components/SalaryTableDialog';
+import { SalaryTableSelector } from '@/components/SalaryTableSelector';
+import { SalaryBulkImport } from '@/components/SalaryBulkImport';
 import { useLabels } from '@/contexts/LabelsContext';
 
 interface SalaryRange {
@@ -25,16 +28,26 @@ export default function SalaryRanges() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
+  const [tableDialogOpen, setTableDialogOpen] = useState(false);
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
 
   useEffect(() => {
     fetchRanges();
-  }, []);
+  }, [selectedTableId]);
 
   const fetchRanges = async () => {
+    if (!selectedTableId) {
+      setRanges([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('salary_ranges')
         .select('*')
+        .eq('salary_table_id', selectedTableId)
         .order('grade');
 
       if (error) throw error;
@@ -62,24 +75,50 @@ export default function SalaryRanges() {
             </p>
           </div>
         </div>
-        <Button onClick={() => { setSelectedGrade(null); setDialogOpen(true); }}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nova {getLabel('salary_range')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setTableDialogOpen(true)}>
+            <Settings className="w-4 h-4 mr-2" />
+            Gerenciar Tabelas
+          </Button>
+          <Button variant="outline" onClick={() => setBulkImportOpen(true)} disabled={!selectedTableId}>
+            <Upload className="w-4 h-4 mr-2" />
+            Importação em Massa
+          </Button>
+          <Button onClick={() => { setSelectedGrade(null); setDialogOpen(true); }} disabled={!selectedTableId}>
+            <Plus className="w-4 h-4 mr-2" />
+            Nova {getLabel('salary_range')}
+          </Button>
+        </div>
       </div>
+
+      <Card className="bg-muted/50">
+        <CardContent className="pt-6">
+          <SalaryTableSelector value={selectedTableId} onChange={setSelectedTableId} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="pt-6">
-          {loading ? (
+          {!selectedTableId ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">
+                Selecione uma tabela salarial para visualizar as faixas
+              </p>
+              <Button onClick={() => setTableDialogOpen(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Primeira Tabela
+              </Button>
+            </div>
+          ) : loading ? (
             <p className="text-center text-muted-foreground py-8">Carregando...</p>
           ) : ranges.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground mb-4">
-                Nenhuma faixa salarial cadastrada ainda
+                Nenhuma faixa salarial cadastrada nesta tabela
               </p>
-              <Button onClick={() => { setSelectedGrade(null); setDialogOpen(true); }}>
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Primeira Faixa
+              <Button onClick={() => setBulkImportOpen(true)}>
+                <Upload className="w-4 h-4 mr-2" />
+                Importar Faixas em Massa
               </Button>
             </div>
           ) : (
@@ -142,6 +181,24 @@ export default function SalaryRanges() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         grade={selectedGrade}
+        salaryTableId={selectedTableId}
+        onSuccess={fetchRanges}
+      />
+
+      <SalaryTableDialog
+        open={tableDialogOpen}
+        onOpenChange={setTableDialogOpen}
+        onSuccess={() => {
+          // Atualizar seletor (forçar re-render)
+          setSelectedTableId(null);
+          setTimeout(() => fetchRanges(), 100);
+        }}
+      />
+
+      <SalaryBulkImport
+        open={bulkImportOpen}
+        onOpenChange={setBulkImportOpen}
+        salaryTableId={selectedTableId || ''}
         onSuccess={fetchRanges}
       />
     </div>
