@@ -47,8 +47,8 @@ const Dashboard = () => {
       title: "Tabela Salarial",
       description: "Defina e gerencie tabelas salariais por cargo e nível",
       icon: DollarSign,
-      path: "/salary-tables",
-      status: "coming-soon" as const,
+      path: "/salary-ranges",
+      status: "active" as const,
       category: "management" as const,
     },
     {
