@@ -422,7 +422,7 @@ export type Database = {
           id: string
           input_amplitude: number | null
           input_median: number | null
-          job_code: string
+          job_code: string | null
           job_title: string
           max_value: number
           median_value: number
@@ -439,7 +439,7 @@ export type Database = {
           id?: string
           input_amplitude?: number | null
           input_median?: number | null
-          job_code: string
+          job_code?: string | null
           job_title: string
           max_value: number
           median_value: number
@@ -456,7 +456,7 @@ export type Database = {
           id?: string
           input_amplitude?: number | null
           input_median?: number | null
-          job_code?: string
+          job_code?: string | null
           job_title?: string
           max_value?: number
           median_value?: number
