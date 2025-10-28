@@ -15,7 +15,7 @@ interface SurveyDataDialogProps {
   defaultAmplitude?: number | null;
   surveyData?: {
     id: string;
-    job_code: string;
+    job_code: string | null;
     job_title: string;
     grade: string;
     calculation_mode: string;
@@ -74,7 +74,7 @@ export function SurveyDataDialog({
 
   useEffect(() => {
     if (surveyData) {
-      setJobCode(surveyData.job_code);
+      setJobCode(surveyData.job_code || "");
       setJobTitle(surveyData.job_title);
       setGrade(surveyData.grade);
       setMode(surveyData.calculation_mode as "manual" | "automatic");
@@ -148,10 +148,10 @@ export function SurveyDataDialog({
   };
 
   const handleSubmit = async () => {
-    if (!jobCode.trim() || !jobTitle.trim() || !grade.trim()) {
+    if (!jobTitle.trim() || !grade.trim()) {
       toast({
         title: "Erro",
-        description: "Preencha todos os campos obrigatórios",
+        description: "Preencha título e grade (código é opcional)",
         variant: "destructive",
       });
       return;
@@ -159,7 +159,7 @@ export function SurveyDataDialog({
 
     let dataToSave: any = {
       survey_table_id: surveyTableId,
-      job_code: jobCode.trim(),
+      job_code: jobCode.trim() || null,
       job_title: jobTitle.trim(),
       grade: grade.trim(),
       calculation_mode: mode,
@@ -256,12 +256,14 @@ export function SurveyDataDialog({
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="code">Código do Cargo</Label>
+              <Label htmlFor="code">
+                Código do Cargo <span className="text-muted-foreground text-xs">(opcional)</span>
+              </Label>
               <Input
                 id="code"
                 value={jobCode}
                 onChange={(e) => setJobCode(e.target.value)}
-                placeholder="Ex: ANA-01"
+                placeholder="Ex: ANA-01 (deixe vazio se não disponível)"
               />
             </div>
             <div className="col-span-2">

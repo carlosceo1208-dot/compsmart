@@ -223,9 +223,11 @@ export function SurveyBulkImport({
         ...row,
       }));
 
-      const withCode = dataToInsert.filter(r => r.job_code !== null);
-      const withoutCode = dataToInsert.filter(r => r.job_code === null);
-
+      // ========================================
+      // GRUPO 1: Dados COM código (usar upsert)
+      // ========================================
+      const withCode = dataToInsert.filter(r => r.job_code !== null && r.job_code.trim() !== '');
+      
       if (withCode.length > 0) {
         const { error } = await supabase
           .from("survey_data")
@@ -235,13 +237,38 @@ export function SurveyBulkImport({
         if (error) throw error;
       }
 
-      if (withoutCode.length > 0) {
-        const { error } = await supabase
+      // ========================================
+      // GRUPO 2: Dados SEM código (verificação manual)
+      // ========================================
+      const withoutCode = dataToInsert.filter(r => r.job_code === null || r.job_code.trim() === '');
+      
+      for (const row of withoutCode) {
+        // Verificar se já existe baseado em (survey_table_id, job_title, grade)
+        const { data: existing, error: selectError } = await supabase
           .from("survey_data")
-          .upsert(withoutCode, {
-            onConflict: "survey_table_id,job_title,grade",
-          });
-        if (error) throw error;
+          .select("id")
+          .eq("survey_table_id", row.survey_table_id)
+          .eq("job_title", row.job_title)
+          .eq("grade", row.grade)
+          .is("job_code", null)
+          .maybeSingle();
+
+        if (selectError) throw selectError;
+
+        if (existing) {
+          // Atualizar registro existente
+          const { error: updateError } = await supabase
+            .from("survey_data")
+            .update(row)
+            .eq("id", existing.id);
+          if (updateError) throw updateError;
+        } else {
+          // Inserir novo registro
+          const { error: insertError } = await supabase
+            .from("survey_data")
+            .insert(row);
+          if (insertError) throw insertError;
+        }
       }
 
       toast({
