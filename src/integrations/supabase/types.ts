@@ -341,6 +341,7 @@ export type Database = {
           min_value: number
           q1_value: number
           q3_value: number
+          salary_table_id: string | null
           updated_at: string
         }
         Insert: {
@@ -355,6 +356,7 @@ export type Database = {
           min_value: number
           q1_value: number
           q3_value: number
+          salary_table_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -369,6 +371,45 @@ export type Database = {
           min_value?: number
           q1_value?: number
           q3_value?: number
+          salary_table_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salary_ranges_salary_table_id_fkey"
+            columns: ["salary_table_id"]
+            isOneToOne: false
+            referencedRelation: "salary_tables"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      salary_tables: {
+        Row: {
+          created_at: string
+          effective_month: number
+          effective_year: number
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          effective_month: number
+          effective_year: number
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          effective_month?: number
+          effective_year?: number
+          id?: string
+          is_active?: boolean
+          name?: string
           updated_at?: string
         }
         Relationships: []
@@ -431,6 +472,16 @@ export type Database = {
     Functions: {
       calculate_salary_range: {
         Args: { p_amplitude: number; p_median: number }
+        Returns: {
+          max_value: number
+          median_value: number
+          min_value: number
+          q1_value: number
+          q3_value: number
+        }[]
+      }
+      calculate_salary_range_fixed: {
+        Args: { p_median: number }
         Returns: {
           max_value: number
           median_value: number
