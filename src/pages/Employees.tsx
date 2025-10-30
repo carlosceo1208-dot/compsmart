@@ -205,7 +205,7 @@ const Users = () => {
 
       setProfiles(profilesWithRoles);
     } catch (error: any) {
-      toast.error("Erro ao carregar usuários");
+      toast.error("Erro ao carregar funcionários");
       console.error("Error fetching profiles:", error);
     } finally {
       setLoading(false);
@@ -223,10 +223,10 @@ const Users = () => {
 
       if (error) throw error;
 
-      toast.success("Usuário inativado com sucesso");
+      toast.success("Funcionário inativado com sucesso");
       fetchProfiles();
     } catch (error: any) {
-      toast.error("Erro ao inativar usuário");
+      toast.error("Erro ao inativar funcionário");
       console.error(error);
     } finally {
       setInactivateUserId(null);
@@ -244,10 +244,10 @@ const Users = () => {
 
       if (error) throw error;
 
-      toast.success("Usuário reativado com sucesso");
+      toast.success("Funcionário reativado com sucesso");
       fetchProfiles();
     } catch (error: any) {
-      toast.error("Erro ao reativar usuário");
+      toast.error("Erro ao reativar funcionário");
       console.error(error);
     } finally {
       setReactivateUserId(null);
@@ -388,7 +388,7 @@ const Users = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total de Usuários
+                Total de Funcionários
               </CardTitle>
               <div className="p-2 rounded-lg bg-primary/10">
                 <UsersIcon className="w-4 h-4 text-primary" />
@@ -406,7 +406,7 @@ const Users = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Usuários Ativos
+                Funcionários Ativos
               </CardTitle>
               <div className="p-2 rounded-lg bg-success/10">
                 <UserCheck2 className="w-4 h-4 text-success" />
@@ -426,7 +426,7 @@ const Users = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Usuários Inativos
+                Funcionários Inativos
               </CardTitle>
               <div className="p-2 rounded-lg bg-muted">
                 <UserMinus className="w-4 h-4 text-muted-foreground" />
