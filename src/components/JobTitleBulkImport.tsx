@@ -202,7 +202,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
             onConflict: 'code',
             ignoreDuplicates: false
           })
-          .select();
+          .select('id, code, title, grade, cbo, is_active');
 
         if (upsertError) throw upsertError;
         if (upsertedData) insertedCount += upsertedData.length;
