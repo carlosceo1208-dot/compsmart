@@ -121,33 +121,77 @@ export type Database = {
       }
       job_titles: {
         Row: {
+          cbo: string
           code: string
           created_at: string
           grade: string
+          hard_skills: string | null
           id: string
+          is_active: boolean
+          job_family: string
+          job_impact: string | null
+          key_factors: string | null
+          main_responsibilities: string | null
           median_points: number
+          required_education: string | null
+          required_experience: string | null
+          salary_range_id: string | null
+          soft_skills: string | null
+          summary: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          cbo: string
           code: string
           created_at?: string
           grade: string
+          hard_skills?: string | null
           id?: string
+          is_active?: boolean
+          job_family: string
+          job_impact?: string | null
+          key_factors?: string | null
+          main_responsibilities?: string | null
           median_points: number
+          required_education?: string | null
+          required_experience?: string | null
+          salary_range_id?: string | null
+          soft_skills?: string | null
+          summary?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          cbo?: string
           code?: string
           created_at?: string
           grade?: string
+          hard_skills?: string | null
           id?: string
+          is_active?: boolean
+          job_family?: string
+          job_impact?: string | null
+          key_factors?: string | null
+          main_responsibilities?: string | null
           median_points?: number
+          required_education?: string | null
+          required_experience?: string | null
+          salary_range_id?: string | null
+          soft_skills?: string | null
+          summary?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "job_titles_salary_range_id_fkey"
+            columns: ["salary_range_id"]
+            isOneToOne: false
+            referencedRelation: "salary_ranges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organizational_structure: {
         Row: {
