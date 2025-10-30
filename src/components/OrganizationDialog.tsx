@@ -42,6 +42,11 @@ interface EntityData {
   type: string;
   description: string;
   parent_id: string;
+  fantasy_name: string;
+  cnpj: string;
+  address: string;
+  union_name: string;
+  base_date: string;
 }
 
 interface ParentOption {
@@ -91,6 +96,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     type: "",
     description: "",
     parent_id: "",
+    fantasy_name: "",
+    cnpj: "",
+    address: "",
+    union_name: "",
+    base_date: "",
   });
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
@@ -132,6 +142,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
           type: data.type || "",
           description: data.description || "",
           parent_id: data.parent_id || "",
+          fantasy_name: data.fantasy_name || "",
+          cnpj: data.cnpj || "",
+          address: data.address || "",
+          union_name: data.union_name || "",
+          base_date: data.base_date || "",
         });
       }
     } catch (error: any) {
@@ -197,7 +212,46 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       type: "",
       description: "",
       parent_id: "",
+      fantasy_name: "",
+      cnpj: "",
+      address: "",
+      union_name: "",
+      base_date: "",
     });
+  };
+
+  // Formatar CNPJ: 00.000.000/0000-00
+  const formatCNPJ = (value: string): string => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 14) {
+      return numbers
+        .replace(/^(\d{2})(\d)/, '$1.$2')
+        .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/\.(\d{3})(\d)/, '.$1/$2')
+        .replace(/(\d{4})(\d)/, '$1-$2');
+    }
+    return value;
+  };
+
+  // Validar CNPJ
+  const validateCNPJ = (cnpj: string): boolean => {
+    const numbers = cnpj.replace(/\D/g, '');
+    return numbers.length === 14;
+  };
+
+  // Formatar Data Base: MM/DD
+  const formatBaseDate = (value: string): string => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length <= 4) {
+      return numbers.replace(/^(\d{2})(\d)/, '$1/$2');
+    }
+    return value;
+  };
+
+  // Validar Data Base
+  const validateBaseDate = (date: string): boolean => {
+    const regex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])$/;
+    return regex.test(date);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -206,6 +260,25 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     if (!formData.name || !formData.type) {
       toast.error("Por favor, preencha os campos obrigatórios");
       return;
+    }
+
+    // Validações específicas COMPSMART
+    const isCompanyType = ['company', 'headquarters', 'branch'].includes(formData.type);
+    if (isCompanyType) {
+      if (!formData.cnpj) {
+        toast.error("CNPJ é obrigatório para empresas, matrizes e filiais");
+        return;
+      }
+      
+      if (!validateCNPJ(formData.cnpj)) {
+        toast.error("CNPJ inválido - deve conter 14 dígitos");
+        return;
+      }
+      
+      if (formData.base_date && !validateBaseDate(formData.base_date)) {
+        toast.error("Data base inválida (use formato MM/DD)");
+        return;
+      }
     }
 
     // Validar correspondência entre código e tipo
@@ -231,12 +304,19 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     try {
       setLoading(true);
 
+      const isCompanyType = ['company', 'headquarters', 'branch'].includes(formData.type);
+      
       const dataToSave = {
         name: formData.name,
         code: formData.code || null,
         type: formData.type,
         description: formData.description || null,
         parent_id: formData.parent_id || null,
+        fantasy_name: isCompanyType ? (formData.fantasy_name || null) : null,
+        cnpj: isCompanyType ? (formData.cnpj || null) : null,
+        address: isCompanyType ? (formData.address || null) : null,
+        union_name: isCompanyType ? (formData.union_name || null) : null,
+        base_date: isCompanyType ? (formData.base_date || null) : null,
       };
 
       if (entityId) {
@@ -260,10 +340,16 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       onOpenChange(false);
       resetForm();
     } catch (error: any) {
-      // Erro 23505 = unique violation (código duplicado entre irmãos)
-      if (error.code === '23505' && error.message.includes('idx_org_structure_sibling_code')) {
-        toast.error("Código já em uso no mesmo nível hierárquico. Escolha outro código.");
-      } 
+      // Erro 23505 = unique violation
+      if (error.code === '23505') {
+        if (error.message.includes('idx_org_structure_sibling_code')) {
+          toast.error("Código já em uso no mesmo nível hierárquico. Escolha outro código.");
+        } else if (error.message.includes('idx_org_structure_cnpj')) {
+          toast.error("CNPJ já cadastrado. Cada empresa deve ter CNPJ único.");
+        } else {
+          toast.error("Erro ao salvar: registro duplicado");
+        }
+      }
       // Erros de hierarquia do trigger
       else if (error.message.includes('não pode ter pai do tipo')) {
         toast.error(error.message);
@@ -299,13 +385,21 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">
-                Nome <span className="text-destructive">*</span>
+                {formData.type === 'company' ? 'Razão Social' : 
+                 formData.type === 'headquarters' ? 'Nome da Matriz' :
+                 formData.type === 'branch' ? 'Nome da Filial' : 
+                 'Nome'} <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nome da entidade"
+                placeholder={
+                  formData.type === 'company' ? 'Razão social da empresa' :
+                  formData.type === 'headquarters' ? 'Nome da matriz' :
+                  formData.type === 'branch' ? 'Nome da filial' :
+                  'Nome da entidade'
+                }
                 required
               />
             </div>
@@ -453,6 +547,95 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
               )}
             </div>
           </div>
+
+          {/* Campos específicos COMPSMART */}
+          {(formData.type === 'company' || formData.type === 'headquarters' || formData.type === 'branch') && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="fantasy_name">Nome Fantasia</Label>
+                <Input
+                  id="fantasy_name"
+                  value={formData.fantasy_name}
+                  onChange={(e) => setFormData({ ...formData, fantasy_name: e.target.value })}
+                  placeholder="Nome popular da empresa"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cnpj">
+                  CNPJ <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="cnpj"
+                  value={formData.cnpj}
+                  onChange={(e) => {
+                    const formatted = formatCNPJ(e.target.value);
+                    setFormData({ ...formData, cnpj: formatted });
+                  }}
+                  placeholder="00.000.000/0000-00"
+                  maxLength={18}
+                  className="font-mono"
+                  required={formData.type === 'company' || formData.type === 'headquarters' || formData.type === 'branch'}
+                />
+                {formData.cnpj && !validateCNPJ(formData.cnpj) && (
+                  <p className="text-xs text-destructive">CNPJ inválido - deve conter 14 dígitos</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="address">Endereço Completo</Label>
+                <Textarea
+                  id="address"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  placeholder="Rua, número, complemento, bairro, cidade - UF, CEP"
+                  rows={2}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="union_name">Sindicato</Label>
+                  <Input
+                    id="union_name"
+                    value={formData.union_name}
+                    onChange={(e) => setFormData({ ...formData, union_name: e.target.value })}
+                    placeholder="Nome do sindicato"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="base_date" className="flex items-center gap-1">
+                    Data Base
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">Data base sindical no formato Mês/Dia (ex: 05/01 para 1º de maio)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </Label>
+                  <Input
+                    id="base_date"
+                    value={formData.base_date}
+                    onChange={(e) => {
+                      const formatted = formatBaseDate(e.target.value);
+                      setFormData({ ...formData, base_date: formatted });
+                    }}
+                    placeholder="MM/DD"
+                    maxLength={5}
+                    className="font-mono"
+                  />
+                  {formData.base_date && !validateBaseDate(formData.base_date) && (
+                    <p className="text-xs text-destructive">Formato inválido (use MM/DD)</p>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>

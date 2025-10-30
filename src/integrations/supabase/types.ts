@@ -151,33 +151,48 @@ export type Database = {
       }
       organizational_structure: {
         Row: {
+          address: string | null
+          base_date: string | null
+          cnpj: string | null
           code: string | null
           created_at: string
           description: string | null
+          fantasy_name: string | null
           id: string
           name: string
           parent_id: string | null
           type: string
+          union_name: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          base_date?: string | null
+          cnpj?: string | null
           code?: string | null
           created_at?: string
           description?: string | null
+          fantasy_name?: string | null
           id?: string
           name: string
           parent_id?: string | null
           type: string
+          union_name?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          base_date?: string | null
+          cnpj?: string | null
           code?: string | null
           created_at?: string
           description?: string | null
+          fantasy_name?: string | null
           id?: string
           name?: string
           parent_id?: string | null
           type?: string
+          union_name?: string | null
           updated_at?: string
         }
         Relationships: [

@@ -49,6 +49,11 @@ interface OrgEntity {
   created_at: string;
   updated_at: string;
   parent?: { name: string } | null;
+  fantasy_name?: string | null;
+  cnpj?: string | null;
+  address?: string | null;
+  union_name?: string | null;
+  base_date?: string | null;
 }
 
 const Organization = () => {
@@ -408,14 +413,38 @@ const Organization = () => {
                         <TableRow key={entity.id} className="hover:bg-muted/50">
                           <TableCell>
                             {entity.code ? (
-                              <div className="flex items-center gap-2">
-                                <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
-                                  {entity.code}
-                                </span>
-                                <span className="font-medium">{entity.name}</span>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
+                                    {entity.code}
+                                  </span>
+                                  <span className="font-medium">{entity.name}</span>
+                                </div>
+                                {entity.fantasy_name && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {entity.fantasy_name}
+                                  </p>
+                                )}
+                                {entity.cnpj && (
+                                  <p className="text-xs text-muted-foreground font-mono">
+                                    CNPJ: {entity.cnpj}
+                                  </p>
+                                )}
                               </div>
                             ) : (
-                              <span className="text-muted-foreground">-</span>
+                              <div className="space-y-1">
+                                <span className="font-medium">{entity.name}</span>
+                                {entity.fantasy_name && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {entity.fantasy_name}
+                                  </p>
+                                )}
+                                {entity.cnpj && (
+                                  <p className="text-xs text-muted-foreground font-mono">
+                                    CNPJ: {entity.cnpj}
+                                  </p>
+                                )}
+                              </div>
                             )}
                           </TableCell>
                           <TableCell>
