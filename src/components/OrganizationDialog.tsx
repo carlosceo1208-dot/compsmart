@@ -209,7 +209,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     setFormData({
       name: "",
       code: "",
-      type: "",
+      type: "company",
       description: "",
       parent_id: "",
       fantasy_name: "",
@@ -474,6 +474,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                     .join(', ')}
                 </p>
               )}
+              {formData.type && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  💡 Campos adicionais (Nome Fantasia, CNPJ, Endereço, Sindicato, Data Base) aparecem para Empresa, Matriz e Filial.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -551,6 +556,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
           {/* Campos específicos COMPSMART */}
           {(formData.type === 'company' || formData.type === 'headquarters' || formData.type === 'branch') && (
             <>
+              <div className="pt-4 pb-2 border-t">
+                <h3 className="text-sm font-semibold text-foreground">Informações da Empresa/Unidade</h3>
+                <p className="text-xs text-muted-foreground mt-1">Campos específicos para empresas, matrizes e filiais</p>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="fantasy_name">Nome Fantasia</Label>
                 <Input
