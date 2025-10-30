@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { UserDialog } from "@/components/UserDialog";
+import { EmployeeBulkImport } from "@/components/EmployeeBulkImport";
 import {
   Select,
   SelectContent,
@@ -98,6 +99,8 @@ const Users = () => {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterGrade, setFilterGrade] = useState<string>("all");
   const [filterUnit, setFilterUnit] = useState<string>("all");
+  const [baseDataDate, setBaseDataDate] = useState<string>("");
+  const [bulkImportOpen, setBulkImportOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
@@ -114,6 +117,25 @@ const Users = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (profiles.length > 0) {
+      const fetchBaseDate = async () => {
+        const { data } = await supabase
+          .from("profiles")
+          .select("updated_at")
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        if (data?.updated_at) {
+          const date = new Date(data.updated_at);
+          setBaseDataDate(format(date, "MM/yyyy", { locale: ptBR }));
+        }
+      };
+      fetchBaseDate();
+    }
+  }, [profiles]);
 
   const checkUserPermissions = async () => {
     setPermissionsLoading(true);
@@ -334,19 +356,28 @@ const Users = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Gestão de Usuários</h1>
+          <h1 className="text-3xl font-bold">Gestão de Funcionários</h1>
           <p className="text-muted-foreground mt-1">
-            Gerencie usuários, perfis e permissões do sistema
+            Gerencie informações de funcionários, cargos e vínculos empregatícios
+            {baseDataDate && (
+              <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">
+                Base: {baseDataDate}
+              </span>
+            )}
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button 
+            variant="outline" 
+            className="gap-2"
+            onClick={() => setBulkImportOpen(true)}
+          >
             <Upload className="w-4 h-4" />
             Atualizar Funcionários
           </Button>
-          <Button onClick={handleNewUser} className="bg-gradient-primary hover:opacity-90 gap-2">
+          <Button onClick={handleNewUser} className="bg-primary hover:bg-primary-hover gap-2 shadow-sm hover:shadow-md">
             <UserPlus className="w-4 h-4" />
-            Novo Usuário
+            Novo Funcionário
           </Button>
         </div>
       </div>
@@ -723,6 +754,12 @@ const Users = () => {
         open={userDialogOpen}
         onOpenChange={setUserDialogOpen}
         userId={selectedUserId}
+        onSuccess={fetchProfiles}
+      />
+
+      <EmployeeBulkImport
+        open={bulkImportOpen}
+        onOpenChange={setBulkImportOpen}
         onSuccess={fetchProfiles}
       />
 

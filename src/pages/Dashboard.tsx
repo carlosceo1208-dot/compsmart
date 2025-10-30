@@ -21,8 +21,8 @@ const Dashboard = () => {
 
   const modules = [
     {
-      title: "Cadastro de Usuários",
-      description: "Gerencie usuários, perfis de acesso e permissões do sistema",
+      title: "Cadastro de Funcionários",
+      description: "Gerencie informações de funcionários, cargos e vínculos empregatícios",
       icon: Users,
       path: "/employees",
       status: "active" as const,

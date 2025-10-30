@@ -9,7 +9,13 @@ import { SurveyTableSelector } from "@/components/SurveyTableSelector";
 import { SurveyTableDialog } from "@/components/SurveyTableDialog";
 import { SurveyDataDialog } from "@/components/SurveyDataDialog";
 import { SurveyBulkImport } from "@/components/SurveyBulkImport";
-import { Settings, Plus, Upload, Pencil } from "lucide-react";
+import { Settings, Plus, Upload, Pencil, ArrowUp, ArrowDown, ChevronDown, Edit } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface SurveyData {
   id: string;
@@ -29,6 +35,9 @@ interface SurveyData {
 interface SurveyTable {
   id: string;
   name: string;
+  effective_month: number;
+  effective_year: number;
+  is_active: boolean;
   default_amplitude: number | null;
 }
 
@@ -49,6 +58,55 @@ export default function SurveyDataPage() {
   const [dataDialogOpen, setDataDialogOpen] = useState(false);
   const [bulkImportOpen, setBulkImportOpen] = useState(false);
   const [editingData, setEditingData] = useState<SurveyData | undefined>();
+  const [editingTable, setEditingTable] = useState<SurveyTable | null>(null);
+  const [tableDialogMode, setTableDialogMode] = useState<"create" | "edit">("create");
+  
+  // Ordenação
+  type SortField = "job_title" | "grade" | null;
+  type SortDirection = "asc" | "desc" | null;
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+
+  const normalizeGrade = (grade: string): string => {
+    const cleaned = grade.trim().toUpperCase();
+    const numericMatch = cleaned.match(/^0*(\d+)$/);
+    if (numericMatch) return numericMatch[1];
+    const alphanumericMatch = cleaned.match(/^([A-Z]+)0*(\d+)$/);
+    if (alphanumericMatch) return `${alphanumericMatch[1]}${alphanumericMatch[2]}`;
+    return cleaned;
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDirection === "asc") setSortDirection("desc");
+      else if (sortDirection === "desc") {
+        setSortField(null);
+        setSortDirection(null);
+      }
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedData = [...surveyData].sort((a, b) => {
+    if (!sortField || !sortDirection) return 0;
+    
+    let aVal = sortField === "job_title" ? a.job_title : normalizeGrade(a.grade);
+    let bVal = sortField === "job_title" ? b.job_title : normalizeGrade(b.grade);
+    
+    if (sortField === "grade") {
+      const aNum = parseFloat(aVal);
+      const bNum = parseFloat(bVal);
+      if (!isNaN(aNum) && !isNaN(bNum)) {
+        return sortDirection === "asc" ? aNum - bNum : bNum - aNum;
+      }
+    }
+    
+    return sortDirection === "asc" 
+      ? aVal.localeCompare(bVal)
+      : bVal.localeCompare(aVal);
+  });
 
   useEffect(() => {
     if (selectedTableId) {
@@ -63,7 +121,7 @@ export default function SurveyDataPage() {
     try {
       const { data, error } = await supabase
         .from("survey_tables")
-        .select("id, name, default_amplitude")
+        .select("id, name, effective_month, effective_year, is_active, default_amplitude")
         .eq("id", selectedTableId)
         .single();
 
@@ -119,10 +177,36 @@ export default function SurveyDataPage() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button onClick={() => setTableDialogOpen(true)} variant="outline">
-          <Settings className="h-4 w-4 mr-2" />
-          Gerenciar Pesquisas
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Settings className="h-4 w-4" />
+              Gerenciar Pesquisas
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => {
+              setTableDialogMode("create");
+              setEditingTable(null);
+              setTableDialogOpen(true);
+            }}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Pesquisa
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => {
+                setTableDialogMode("edit");
+                setEditingTable(selectedTable);
+                setTableDialogOpen(true);
+              }}
+              disabled={!selectedTable}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Editar Pesquisa Atual
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {selectedTableId && (
           <>
             <Button onClick={() => setBulkImportOpen(true)} variant="outline">
@@ -177,10 +261,34 @@ export default function SurveyDataPage() {
               <div className="border rounded-lg overflow-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-muted/50">
                       <TableHead>Código</TableHead>
-                      <TableHead>Título do Cargo</TableHead>
-                      <TableHead>Grade</TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-muted/70 select-none"
+                        onClick={() => handleSort("job_title")}
+                      >
+                        <div className="flex items-center gap-2">
+                          Título do Cargo
+                          {sortField === "job_title" && (
+                            sortDirection === "asc" ? 
+                            <ArrowUp className="w-4 h-4" /> : 
+                            <ArrowDown className="w-4 h-4" />
+                          )}
+                        </div>
+                      </TableHead>
+                      <TableHead 
+                        className="cursor-pointer hover:bg-muted/70 select-none"
+                        onClick={() => handleSort("grade")}
+                      >
+                        <div className="flex items-center gap-2">
+                          Grade
+                          {sortField === "grade" && (
+                            sortDirection === "asc" ? 
+                            <ArrowUp className="w-4 h-4" /> : 
+                            <ArrowDown className="w-4 h-4" />
+                          )}
+                        </div>
+                      </TableHead>
                       <TableHead className="text-right">Mínimo</TableHead>
                       <TableHead className="text-right">1º Quartil</TableHead>
                       <TableHead className="text-right">Média</TableHead>
@@ -191,8 +299,8 @@ export default function SurveyDataPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {surveyData.map((data) => (
-                      <TableRow key={data.id}>
+                    {sortedData.map((data) => (
+                      <TableRow key={data.id} className="hover:bg-primary/5 transition-colors">
                         <TableCell className="font-mono text-xs">{data.job_code}</TableCell>
                         <TableCell>{data.job_title}</TableCell>
                         <TableCell className="font-semibold">{data.grade}</TableCell>
@@ -228,6 +336,7 @@ export default function SurveyDataPage() {
       <SurveyTableDialog
         open={tableDialogOpen}
         onOpenChange={setTableDialogOpen}
+        surveyTable={tableDialogMode === "edit" ? editingTable : undefined}
         onSuccess={() => {
           fetchSurveyData();
           fetchSelectedTable();

@@ -8,123 +8,150 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* CompSmart Professional Design System */
-    --background: 210 20% 98%;
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
-
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-
-    /* Corporate Blue - Primary Brand Color */
-    --primary: 217 91% 60%;
+    
+    /* Primary - Azul elétrico vibrante */
+    --primary: 214 95% 56%;
+    --primary-hover: 214 95% 48%;
+    --primary-light: 214 100% 94%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 50%;
-    --primary-light: 217 91% 95%;
     
-    /* Success Green */
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    --success-light: 142 76% 95%;
-    
-    /* Warning Orange */
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --warning-light: 38 92% 95%;
-
-    /* Professional Gray Scale */
-    --secondary: 215 20% 65%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 210 20% 96%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
-
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-
+    
+    /* Success - Verde vivo */
+    --success: 142 86% 42%;
+    --success-light: 142 86% 93%;
+    --success-foreground: 0 0% 100%;
+    
+    /* Warning - Laranja energético */
+    --warning: 32 95% 58%;
+    --warning-light: 32 95% 93%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Accent - Roxo vibrante */
+    --accent: 262 83% 58%;
+    --accent-light: 262 83% 94%;
+    --accent-foreground: 0 0% 100%;
+    
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
+    --destructive-foreground: 0 0% 98%;
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 217 91% 60%;
-
-    --radius: 0.75rem;
-
-    /* Sidebar Professional Theme */
-    --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 28% 17%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 215 28% 17%;
-    --sidebar-ring: 217 91% 60%;
-
-    /* Professional Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(142 76% 30%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 60%) 0%, hsl(217 91% 40%) 100%);
+    --ring: 214 95% 56%;
+    --radius: 0.5rem;
     
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(222 47% 11% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(222 47% 11% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(222 47% 11% / 0.1);
-    --shadow-xl: 0 20px 25px -5px hsl(222 47% 11% / 0.1);
+    --chart-1: 214 95% 56%;
+    --chart-2: 142 86% 42%;
+    --chart-3: 32 95% 58%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 210 98% 78%;
     
-    /* Transitions */
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Gradientes dinâmicos */
+    --gradient-primary: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(262 83% 58%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(214 95% 40%) 50%, hsl(262 83% 58%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(214 100% 99%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(142 86% 32%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(32 95% 58%) 0%, hsl(32 95% 48%) 100%);
+    
+    /* Sombras pronunciadas */
+    --shadow-sm: 0 2px 4px hsl(222 47% 11% / 0.08);
+    --shadow-md: 0 8px 16px -4px hsl(222 47% 11% / 0.12);
+    --shadow-lg: 0 16px 24px -6px hsl(222 47% 11% / 0.15);
+    --shadow-xl: 0 24px 48px -8px hsl(222 47% 11% / 0.20);
+    --shadow-primary: 0 8px 24px -4px hsl(214 95% 56% / 0.25);
+    --shadow-success: 0 8px 24px -4px hsl(142 86% 42% / 0.25);
+    --shadow-warning: 0 8px 24px -4px hsl(32 95% 58% / 0.25);
+    --shadow-accent: 0 8px 24px -4px hsl(262 83% 58% / 0.25);
+    
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 240 6% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 214 95% 56%;
   }
 
   .dark {
     --background: 222 47% 11%;
-    --foreground: 210 20% 98%;
-
-    --card: 215 28% 17%;
-    --card-foreground: 210 20% 98%;
-
-    --popover: 215 28% 17%;
-    --popover-foreground: 210 20% 98%;
-
-    --primary: 217 91% 60%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    
+    /* Primary - Azul elétrico vibrante */
+    --primary: 214 95% 56%;
+    --primary-hover: 214 95% 64%;
+    --primary-light: 214 100% 20%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 70%;
-    --primary-light: 217 91% 20%;
-
-    --success: 142 76% 40%;
-    --success-foreground: 0 0% 100%;
-    --success-light: 142 76% 15%;
-
-    --warning: 38 92% 55%;
-    --warning-foreground: 0 0% 100%;
-    --warning-light: 38 92% 15%;
-
-    --secondary: 215 20% 35%;
-    --secondary-foreground: 210 20% 98%;
-
-    --muted: 215 28% 17%;
+    
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
-
-    --accent: 215 28% 22%;
-    --accent-foreground: 210 20% 98%;
-
+    
+    /* Success - Verde vivo */
+    --success: 142 86% 42%;
+    --success-light: 142 86% 20%;
+    --success-foreground: 0 0% 100%;
+    
+    /* Warning - Laranja energético */
+    --warning: 32 95% 58%;
+    --warning-light: 32 95% 20%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Accent - Roxo vibrante */
+    --accent: 262 83% 58%;
+    --accent-light: 262 83% 20%;
+    --accent-foreground: 0 0% 100%;
+    
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 215 28% 22%;
-    --input: 215 28% 22%;
-    --ring: 217 91% 60%;
-
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 214 95% 56%;
+    
+    --chart-1: 214 95% 56%;
+    --chart-2: 142 86% 42%;
+    --chart-3: 32 95% 58%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 340 75% 55%;
+    
+    /* Gradientes dinâmicos */
+    --gradient-primary: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(262 83% 58%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(214 95% 40%) 50%, hsl(262 83% 58%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(222 47% 11%) 0%, hsl(217 33% 15%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(142 86% 32%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(32 95% 58%) 0%, hsl(32 95% 48%) 100%);
+    
+    /* Sombras pronunciadas */
+    --shadow-sm: 0 2px 4px hsl(0 0% 0% / 0.3);
+    --shadow-md: 0 8px 16px -4px hsl(0 0% 0% / 0.4);
+    --shadow-lg: 0 16px 24px -6px hsl(0 0% 0% / 0.5);
+    --shadow-xl: 0 24px 48px -8px hsl(0 0% 0% / 0.6);
+    --shadow-primary: 0 8px 24px -4px hsl(214 95% 56% / 0.4);
+    --shadow-success: 0 8px 24px -4px hsl(142 86% 42% / 0.4);
+    --shadow-warning: 0 8px 24px -4px hsl(32 95% 58% / 0.4);
+    --shadow-accent: 0 8px 24px -4px hsl(262 83% 58% / 0.4);
+    
     --sidebar-background: 222 47% 11%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 217 91% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 28% 17%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 215 28% 17%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 210 40% 98%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 214 95% 56%;
   }
 }
 

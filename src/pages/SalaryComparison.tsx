@@ -26,6 +26,24 @@ const formatPercent = (value: number) => {
   return `${value > 0 ? "+" : ""}${value.toFixed(2)}%`;
 };
 
+const normalizeGrade = (grade: string): string => {
+  const cleaned = grade.trim().toUpperCase();
+  
+  // Tenta extrair número puro (001, 01, 1 → "1")
+  const numericMatch = cleaned.match(/^0*(\d+)$/);
+  if (numericMatch) {
+    return numericMatch[1];
+  }
+  
+  // Se tiver letras (A1, B02), normaliza zeros à esquerda
+  const alphanumericMatch = cleaned.match(/^([A-Z]+)0*(\d+)$/);
+  if (alphanumericMatch) {
+    return `${alphanumericMatch[1]}${alphanumericMatch[2]}`;
+  }
+  
+  return cleaned;
+};
+
 export default function SalaryComparison() {
   const { toast } = useToast();
   const [salaryTableId, setSalaryTableId] = useState<string | undefined>();
@@ -62,16 +80,24 @@ export default function SalaryComparison() {
 
       if (surveyError) throw surveyError;
 
-      // Combine data by grade
-      const salaryMap = new Map(salaryData?.map((s) => [s.grade, s.median_value]) || []);
-      const surveyMap = new Map(surveyData?.map((s) => [s.grade, s.median_value]) || []);
+      // Combine data by grade (normalized for comparison)
+      const salaryMap = new Map(
+        salaryData?.map((s) => [normalizeGrade(s.grade), { grade: s.grade, median: s.median_value }]) || []
+      );
+      const surveyMap = new Map(
+        surveyData?.map((s) => [normalizeGrade(s.grade), { grade: s.grade, median: s.median_value }]) || []
+      );
 
-      const allGrades = new Set([...salaryMap.keys(), ...surveyMap.keys()]);
+      const allNormalizedGrades = new Set([...salaryMap.keys(), ...surveyMap.keys()]);
       const comparison: ComparisonRow[] = [];
 
-      allGrades.forEach((grade) => {
-        const internalMedian = salaryMap.get(grade) || null;
-        const surveyMedian = surveyMap.get(grade) || null;
+      allNormalizedGrades.forEach((normalizedGrade) => {
+        const salaryEntry = salaryMap.get(normalizedGrade);
+        const surveyEntry = surveyMap.get(normalizedGrade);
+        
+        const internalMedian = salaryEntry?.median || null;
+        const surveyMedian = surveyEntry?.median || null;
+        const displayGrade = salaryEntry?.grade || surveyEntry?.grade || normalizedGrade;
 
         let differencePercent = null;
         if (internalMedian && surveyMedian && surveyMedian !== 0) {
@@ -79,7 +105,7 @@ export default function SalaryComparison() {
         }
 
         comparison.push({
-          grade,
+          grade: displayGrade,
           internal_median: internalMedian,
           survey_median: surveyMedian,
           difference_percent: differencePercent,
