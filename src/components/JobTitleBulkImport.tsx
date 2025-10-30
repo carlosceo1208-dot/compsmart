@@ -93,13 +93,39 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
         let title: string;
         let grade: string;
         let cbo: string;
-        let is_active_str: string;
+        let is_active = true; // Default to active
 
-        // Check if has 6 columns (with code) or 5 columns (without code)
+        // Detect format based on column count and content
         if (parts.length >= 6) {
-          [code, job_family, title, grade, cbo, is_active_str] = parts.map(p => p.trim());
-        } else {
-          [job_family, title, grade, cbo, is_active_str] = parts.map(p => p.trim());
+          // 6 columns: Código | Família | Título | Grade | CBO | Ativo
+          const [codeCol, familyCol, titleCol, gradeCol, cboCol, activeCol] = parts.map(p => p.trim());
+          code = codeCol;
+          job_family = familyCol;
+          title = titleCol;
+          grade = gradeCol;
+          cbo = cboCol;
+          is_active = ['sim', 'ativo', 's', 'true', '1'].includes(activeCol.toLowerCase());
+        } else if (parts.length === 5) {
+          // Check if 2nd column is numeric (code) or if 5th is status text
+          const secondCol = parts[1].trim();
+          const fifthCol = parts[4].trim();
+          
+          const isSecondColNumeric = /^\d+$/.test(secondCol);
+          const isFifthColStatus = /^(sim|não|ativo|inativo|s|n|true|false|1|0)$/i.test(fifthCol);
+          
+          if (isSecondColNumeric && !isFifthColStatus) {
+            // Format: Família | Código | Título | Grade | CBO (without status)
+            [job_family, code, title, grade, cbo] = parts.map(p => p.trim());
+            is_active = true; // Default to active
+          } else {
+            // Format: Família | Título | Grade | CBO | Ativo
+            const [familyCol, titleCol, gradeCol, cboCol, activeCol] = parts.map(p => p.trim());
+            job_family = familyCol;
+            title = titleCol;
+            grade = gradeCol;
+            cbo = cboCol;
+            is_active = ['sim', 'ativo', 's', 'true', '1'].includes(activeCol.toLowerCase());
+          }
         }
 
         // Validate job_family
@@ -113,9 +139,6 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           setError(`Linha ${i + 1}: CBO "${cbo}" inválido. Formato esperado: XXXX-XX`);
           return;
         }
-
-        // Convert is_active
-        const is_active = ['sim', 'ativo', 's', 'true', '1'].includes(is_active_str.toLowerCase());
 
         parsed.push({
           code: code || null,
@@ -224,8 +247,10 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
         <DialogHeader>
           <DialogTitle>Importação em Massa de Cargos</DialogTitle>
           <DialogDescription>
-            Cole os dados do Excel com as colunas: <strong>Família | Título | Grade | CBO | Ativo</strong><br />
-            Ou com código: <strong>Código | Família | Título | Grade | CBO | Ativo</strong>
+            Cole os dados do Excel com as colunas:<br />
+            • <strong>Família | Código | Título | Grade | CBO</strong> (status padrão: Ativo)<br />
+            • <strong>Família | Título | Grade | CBO | Ativo</strong><br />
+            • <strong>Código | Família | Título | Grade | CBO | Ativo</strong>
           </DialogDescription>
         </DialogHeader>
 
@@ -234,7 +259,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
             <Textarea
               value={rawData}
               onChange={(e) => setRawData(e.target.value)}
-              placeholder="Cole aqui os dados do Excel (ex: Analistas	Analista de RH Júnior	3	2521-05	Sim)"
+              placeholder="Cole aqui os dados do Excel (ex: Analistas	009	Analista Agrícola	3	2132-10)"
               className="min-h-[150px] font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground mt-2">
