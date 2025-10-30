@@ -311,7 +311,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
                       <TableHead>Família</TableHead>
                       <TableHead>Título</TableHead>
                       <TableHead>Grade</TableHead>
-                      <TableHead>CBO</TableHead>
+                      <TableHead className="whitespace-nowrap">CBO</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -328,7 +328,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
                         </TableCell>
                         <TableCell className="font-medium">{row.title}</TableCell>
                         <TableCell>{row.grade}</TableCell>
-                        <TableCell className="font-mono text-xs">{row.cbo}</TableCell>
+                        <TableCell className="font-mono text-xs whitespace-nowrap">{row.cbo}</TableCell>
                         <TableCell>
                           <Badge variant={row.is_active ? "success" : "destructive"}>
                             {row.is_active ? "Ativo" : "Inativo"}

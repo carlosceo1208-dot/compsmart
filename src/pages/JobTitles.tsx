@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { JobTitleDialog } from "@/components/JobTitleDialog";
@@ -104,6 +105,10 @@ export default function JobTitlesPage() {
 
   // Grouping
   const [groupBy, setGroupBy] = useState<"family" | "alphabetic" | "grade">("family");
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(30);
 
   // Alert for inactivation
   const [inactivateAlert, setInactivateAlert] = useState<{ id: string; title: string; linkedCount: number } | null>(null);
@@ -339,17 +344,17 @@ export default function JobTitlesPage() {
     return { "Todos": sortedData };
   };
 
-  const renderJobRow = (job: any) => (
-    <TableRow key={job.id}>
-      <TableCell>
+  const renderJobRow = (job: any, index: number) => (
+    <TableRow key={job.id} className={index % 2 === 0 ? "" : "bg-muted/40"}>
+      <TableCell className="py-2">
         <Badge variant="outline" className={familyColors[job.job_family]}>
           {job.job_family}
         </Badge>
       </TableCell>
-      <TableCell className="font-mono text-xs text-muted-foreground">
+      <TableCell className="font-mono text-xs text-muted-foreground py-2">
         {job.code || "-"}
       </TableCell>
-      <TableCell>
+      <TableCell className="py-2">
         <JobTitlePreview
           jobTitle={job.title}
           summary={job.summary}
@@ -360,9 +365,9 @@ export default function JobTitlesPage() {
           onViewDetails={() => handleEdit(job.id)}
         />
       </TableCell>
-      <TableCell className="text-center">{job.grade}</TableCell>
-      <TableCell className="font-mono text-xs">{job.cbo}</TableCell>
-      <TableCell>
+      <TableCell className="text-center py-2">{job.grade}</TableCell>
+      <TableCell className="font-mono text-xs whitespace-nowrap py-2">{job.cbo}</TableCell>
+      <TableCell className="py-2">
         {job.salary_ranges ? (
           <span className="text-sm">
             {formatCurrency(job.salary_ranges.min_value)} - {formatCurrency(job.salary_ranges.max_value)}
@@ -371,13 +376,13 @@ export default function JobTitlesPage() {
           <span className="text-xs text-muted-foreground">N/A</span>
         )}
       </TableCell>
-      <TableCell>
+      <TableCell className="py-2">
         <Badge variant={job.is_active ? "success" : "destructive"}>
           {job.is_active ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
           {job.is_active ? "Ativo" : "Inativo"}
         </Badge>
       </TableCell>
-      <TableCell>
+      <TableCell className="py-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">⋮</Button>
@@ -561,9 +566,182 @@ export default function JobTitlesPage() {
         </TabsList>
 
         <TabsContent value={groupBy} className="space-y-4">
-          {Object.entries(groupedData()).map(([group, jobs]) => (
-            <Card key={group}>
-              {groupBy !== "alphabetic" && (
+          {groupBy === "alphabetic" ? (() => {
+            const totalItems = sortedData.length;
+            const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+            
+            // Reset page if out of bounds when filters change
+            if (page > totalPages) {
+              setTimeout(() => setPage(1), 0);
+            }
+            
+            const startIndex = (page - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageItems = sortedData.slice(startIndex, endIndex);
+
+            return (
+              <Card>
+                <div className="p-4 border-b bg-muted/50 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-muted-foreground">
+                      Mostrando {startIndex + 1}–{Math.min(endIndex, totalItems)} de {totalItems}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-sm">Linhas por página:</Label>
+                      <Select 
+                        value={pageSize.toString()} 
+                        onValueChange={(v) => {
+                          setPageSize(parseInt(v));
+                          setPage(1);
+                        }}
+                      >
+                        <SelectTrigger className="w-20">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="25">25</SelectItem>
+                          <SelectItem value="30">30</SelectItem>
+                          <SelectItem value="50">50</SelectItem>
+                          <SelectItem value="100">100</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Família</TableHead>
+                        <TableHead>Código</TableHead>
+                        <TableHead className="cursor-pointer" onClick={() => handleSort("title")}>
+                          Título do Cargo
+                          {sortField === "title" && (
+                            sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
+                          )}
+                        </TableHead>
+                        <TableHead className="cursor-pointer text-center" onClick={() => handleSort("grade")}>
+                          Grade
+                          {sortField === "grade" && (
+                            sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
+                          )}
+                        </TableHead>
+                        <TableHead className="whitespace-nowrap">CBO</TableHead>
+                        <TableHead>Faixa Salarial</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pageItems.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center text-muted-foreground">
+                            Nenhum cargo encontrado
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        pageItems.map((job, idx) => renderJobRow(job, idx))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                {totalPages > 1 && (
+                  <div className="p-4 border-t">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                        
+                        {/* First page */}
+                        {totalPages > 0 && (
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => setPage(1)}
+                              isActive={page === 1}
+                              className="cursor-pointer"
+                            >
+                              1
+                            </PaginationLink>
+                          </PaginationItem>
+                        )}
+                        
+                        {/* Ellipsis before current */}
+                        {page > 3 && (
+                          <PaginationItem>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        )}
+                        
+                        {/* Pages around current */}
+                        {page > 2 && (
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => setPage(page - 1)}
+                              className="cursor-pointer"
+                            >
+                              {page - 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )}
+                        
+                        {page !== 1 && page !== totalPages && (
+                          <PaginationItem>
+                            <PaginationLink isActive className="cursor-pointer">
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )}
+                        
+                        {page < totalPages - 1 && (
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => setPage(page + 1)}
+                              className="cursor-pointer"
+                            >
+                              {page + 1}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )}
+                        
+                        {/* Ellipsis after current */}
+                        {page < totalPages - 2 && (
+                          <PaginationItem>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        )}
+                        
+                        {/* Last page */}
+                        {totalPages > 1 && (
+                          <PaginationItem>
+                            <PaginationLink
+                              onClick={() => setPage(totalPages)}
+                              isActive={page === totalPages}
+                              className="cursor-pointer"
+                            >
+                              {totalPages}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
+              </Card>
+            );
+          })() : (
+            Object.entries(groupedData()).map(([group, jobs]) => (
+              <Card key={group}>
                 <div className="p-4 border-b bg-muted/50">
                   <h3 className="font-semibold flex items-center gap-2">
                     {groupBy === "family" && (
@@ -575,46 +753,46 @@ export default function JobTitlesPage() {
                     <span className="text-sm text-muted-foreground">({jobs.length})</span>
                   </h3>
                 </div>
-              )}
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Família</TableHead>
-                      <TableHead>Código</TableHead>
-                      <TableHead className="cursor-pointer" onClick={() => handleSort("title")}>
-                        Título do Cargo
-                        {sortField === "title" && (
-                          sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
-                        )}
-                      </TableHead>
-                      <TableHead className="cursor-pointer text-center" onClick={() => handleSort("grade")}>
-                        Grade
-                        {sortField === "grade" && (
-                          sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
-                        )}
-                      </TableHead>
-                      <TableHead>CBO</TableHead>
-                      <TableHead>Faixa Salarial</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {jobs.length === 0 ? (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center text-muted-foreground">
-                          Nenhum cargo encontrado
-                        </TableCell>
+                        <TableHead>Família</TableHead>
+                        <TableHead>Código</TableHead>
+                        <TableHead className="cursor-pointer" onClick={() => handleSort("title")}>
+                          Título do Cargo
+                          {sortField === "title" && (
+                            sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
+                          )}
+                        </TableHead>
+                        <TableHead className="cursor-pointer text-center" onClick={() => handleSort("grade")}>
+                          Grade
+                          {sortField === "grade" && (
+                            sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
+                          )}
+                        </TableHead>
+                        <TableHead className="whitespace-nowrap">CBO</TableHead>
+                        <TableHead>Faixa Salarial</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
-                    ) : (
-                      jobs.map(renderJobRow)
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </Card>
-          ))}
+                    </TableHeader>
+                    <TableBody>
+                      {jobs.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center text-muted-foreground">
+                            Nenhum cargo encontrado
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        jobs.map((job, idx) => renderJobRow(job, idx))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </Card>
+            ))
+          )}
         </TabsContent>
       </Tabs>
 
