@@ -72,8 +72,8 @@ const Dashboard = () => {
       title: "Plano de Cargos e Salários",
       description: "Configure estrutura de cargos, faixas salariais e progressão",
       icon: Briefcase,
-      path: "/career-plan",
-      status: "coming-soon" as const,
+      path: "/job-titles",
+      status: "active" as const,
       category: "management" as const,
     },
     {

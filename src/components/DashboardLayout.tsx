@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck } from "lucide-react";
+import { Building2, LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck, Briefcase } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 
@@ -137,6 +137,15 @@ export const DashboardLayout = () => {
             >
               <Network className="w-4 h-4 mr-2" />
               Estrutura
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/job-titles")}
+              className="hidden md:flex items-center"
+            >
+              <Briefcase className="w-4 h-4 mr-2" />
+              Cargos & Salários
             </Button>
 
             <DropdownMenu>
