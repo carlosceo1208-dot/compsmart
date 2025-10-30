@@ -161,6 +161,7 @@ export type Database = {
           id: string
           name: string
           parent_id: string | null
+          root_company_id: string | null
           type: string
           union_name: string | null
           updated_at: string
@@ -176,6 +177,7 @@ export type Database = {
           id?: string
           name: string
           parent_id?: string | null
+          root_company_id?: string | null
           type: string
           union_name?: string | null
           updated_at?: string
@@ -191,6 +193,7 @@ export type Database = {
           id?: string
           name?: string
           parent_id?: string | null
+          root_company_id?: string | null
           type?: string
           union_name?: string | null
           updated_at?: string
@@ -199,6 +202,13 @@ export type Database = {
           {
             foreignKeyName: "organizational_structure_parent_id_fkey"
             columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_root_company_id_fkey"
+            columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]

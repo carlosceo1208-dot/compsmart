@@ -18,6 +18,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -54,10 +61,20 @@ interface OrgEntity {
   address?: string | null;
   union_name?: string | null;
   base_date?: string | null;
+  root_company_id?: string | null;
+}
+
+interface Company {
+  id: string;
+  name: string;
+  fantasy_name?: string | null;
+  cnpj?: string | null;
 }
 
 const Organization = () => {
   const [entities, setEntities] = useState<OrgEntity[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("all");
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -69,6 +86,7 @@ const Organization = () => {
 
   useEffect(() => {
     checkUserPermissions();
+    fetchCompanies();
     fetchEntities();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -79,6 +97,10 @@ const Organization = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    fetchEntities();
+  }, [selectedCompanyId]);
 
   const checkUserPermissions = async () => {
     setPermissionsLoading(true);
@@ -101,11 +123,34 @@ const Organization = () => {
     return currentUserRoles.includes("admin") || currentUserRoles.includes("hr_manager");
   };
 
-  const fetchEntities = async () => {
+  const fetchCompanies = async () => {
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("*")
+        .select("id, name, fantasy_name, cnpj")
+        .eq("type", "company")
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+      setCompanies(data || []);
+    } catch (error: any) {
+      toast.error("Erro ao carregar empresas");
+      console.error("Error fetching companies:", error);
+    }
+  };
+
+  const fetchEntities = async () => {
+    try {
+      let query = supabase
+        .from("organizational_structure")
+        .select("*");
+
+      // Filtrar por empresa selecionada
+      if (selectedCompanyId !== "all") {
+        query = query.eq("root_company_id", selectedCompanyId);
+      }
+
+      const { data, error } = await query
         .order("code", { ascending: true, nullsFirst: false })
         .order("name", { ascending: true });
 
@@ -276,6 +321,51 @@ const Organization = () => {
         </Button>
       </div>
 
+      {/* Company Selector */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <Building2 className="w-4 h-4" />
+            Selecionar Empresa
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione uma empresa" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Todas as Empresas</span>
+                </div>
+              </SelectItem>
+              {companies.map((company) => (
+                <SelectItem key={company.id} value={company.id}>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {company.fantasy_name || company.name}
+                      </span>
+                      {company.fantasy_name && (
+                        <span className="text-xs text-muted-foreground">
+                          ({company.name})
+                        </span>
+                      )}
+                    </div>
+                    {company.cnpj && (
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {company.cnpj}
+                      </span>
+                    )}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
         <Card>
@@ -410,50 +500,34 @@ const Organization = () => {
                     </TableHeader>
                     <TableBody>
                       {filteredEntities.map((entity) => (
-                        <TableRow key={entity.id} className="hover:bg-muted/50">
+                       <TableRow key={entity.id} className="hover:bg-muted/50">
                           <TableCell>
-                            {entity.code ? (
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono font-semibold text-sm bg-muted px-2 py-0.5 rounded">
-                                    {entity.code}
-                                  </span>
-                                  <span className="font-medium">{entity.name}</span>
-                                </div>
-                                {entity.fantasy_name && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {entity.fantasy_name}
-                                  </p>
-                                )}
-                                {entity.cnpj && (
-                                  <p className="text-xs text-muted-foreground font-mono">
-                                    CNPJ: {entity.cnpj}
-                                  </p>
-                                )}
-                              </div>
-                            ) : (
-                              <div className="space-y-1">
-                                <span className="font-medium">{entity.name}</span>
-                                {entity.fantasy_name && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {entity.fantasy_name}
-                                  </p>
-                                )}
-                                {entity.cnpj && (
-                                  <p className="text-xs text-muted-foreground font-mono">
-                                    CNPJ: {entity.cnpj}
-                                  </p>
-                                )}
-                              </div>
-                            )}
+                            <span className="font-mono font-semibold text-base">
+                              {entity.code || "-"}
+                            </span>
                           </TableCell>
                           <TableCell>
                             {getTypeBadge(entity.type)}
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {entity.description || "-"}
-                            </span>
+                            <div className="space-y-1">
+                              <span className="font-medium">{entity.name}</span>
+                              {entity.description && (
+                                <p className="text-xs text-muted-foreground">
+                                  {entity.description}
+                                </p>
+                              )}
+                              {entity.fantasy_name && (
+                                <p className="text-xs text-muted-foreground">
+                                  Nome Fantasia: {entity.fantasy_name}
+                                </p>
+                              )}
+                              {entity.cnpj && (
+                                <p className="text-xs text-muted-foreground font-mono">
+                                  CNPJ: {entity.cnpj}
+                                </p>
+                              )}
+                            </div>
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
