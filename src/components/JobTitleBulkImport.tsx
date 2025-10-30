@@ -212,7 +212,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
       for (const row of rowsWithoutCode) {
         const { data: existing, error: searchError } = await supabase
           .from('job_titles')
-          .select('id')
+          .select('id, code, title, grade, cbo, is_active')
           .eq('title', row.title)
           .eq('grade', row.grade)
           .maybeSingle();
