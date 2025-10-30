@@ -20,17 +20,7 @@ interface JobTitleDialogProps {
   onSuccess: () => void;
 }
 
-const VALID_FAMILIES = [
-  'Analistas', 
-  'Profissionais', 
-  'Consultores', 
-  'Especialistas', 
-  'Coordenadores', 
-  'Supervisores', 
-  'Gerentes', 
-  'Executivos - Diretores', 
-  'Lideres-Projetos'
-];
+// Job families are now loaded dynamically from the database
 
 interface JobTitleData {
   code: string;
@@ -53,6 +43,7 @@ interface JobTitleData {
 export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: JobTitleDialogProps) {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [jobFamilies, setJobFamilies] = useState<string[]>([]);
   const [formData, setFormData] = useState<JobTitleData>({
     code: "",
     job_family: "Profissionais",
@@ -74,6 +65,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
 
   useEffect(() => {
     if (open) {
+      fetchJobFamilies();
       if (jobTitleId) {
         fetchJobTitleData();
       } else {
@@ -81,6 +73,18 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
       }
     }
   }, [jobTitleId, open]);
+
+  const fetchJobFamilies = async () => {
+    const { data } = await supabase
+      .from('job_families')
+      .select('name')
+      .eq('is_active', true)
+      .order('name');
+    
+    if (data) {
+      setJobFamilies(data.map(f => f.name));
+    }
+  };
 
   useEffect(() => {
     if (formData.grade) {
@@ -269,7 +273,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {VALID_FAMILIES.map((family) => (
+                    {jobFamilies.map((family) => (
                       <SelectItem key={family} value={family}>{family}</SelectItem>
                     ))}
                   </SelectContent>

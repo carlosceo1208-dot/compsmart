@@ -25,17 +25,7 @@ interface ParsedRow {
   median_points: number;
 }
 
-const VALID_FAMILIES = [
-  'Analistas', 
-  'Profissionais', 
-  'Consultores', 
-  'Especialistas', 
-  'Coordenadores', 
-  'Supervisores', 
-  'Gerentes', 
-  'Executivos - Diretores', 
-  'Lideres-Projetos'
-];
+// Job families are now managed dynamically in the database
 
 const familyColors: Record<string, string> = {
   'Analistas': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -128,11 +118,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           }
         }
 
-        // Validate job_family
-        if (!VALID_FAMILIES.includes(job_family)) {
-          setError(`Linha ${i + 1}: Família inválida "${job_family}". Deve ser uma das: ${VALID_FAMILIES.join(', ')}`);
-          return;
-        }
+        // Job family validation removed - will be created automatically if doesn't exist
 
         // Validate CBO format (XXXX-XX)
         if (!/^\d{4}-\d{2}$/.test(cbo)) {
@@ -167,6 +153,40 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
 
     setLoading(true);
     try {
+      // First, ensure all job families exist
+      const uniqueFamilies = [...new Set(parsedRows.map(row => row.job_family))];
+      
+      const { data: existingFamilies } = await supabase
+        .from('job_families')
+        .select('name');
+      
+      const existingFamilyNames = existingFamilies?.map(f => f.name) || [];
+      const newFamilies = uniqueFamilies.filter(f => !existingFamilyNames.includes(f));
+      
+      if (newFamilies.length > 0) {
+        const { error: familyError } = await supabase
+          .from('job_families')
+          .insert(
+            newFamilies.map((name, index) => ({
+              name,
+              color_class: [
+                'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+              ][index % 3]
+            }))
+          );
+        
+        if (familyError) {
+          console.error('Erro ao criar famílias:', familyError);
+          toast.error('Erro ao criar novas famílias de cargos');
+          setLoading(false);
+          return;
+        }
+        
+        toast.success(`${newFamilies.length} nova(s) família(s) criada(s): ${newFamilies.join(', ')}`);
+      }
+
       // Separate rows with code and without code
       const rowsWithCode = parsedRows.filter(row => row.code);
       const rowsWithoutCode = parsedRows.filter(row => !row.code);
@@ -263,7 +283,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
               className="min-h-[150px] font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              Formato CBO: XXXX-XX | Famílias: {VALID_FAMILIES.join(', ')}
+              Formato CBO: XXXX-XX | Novas famílias serão criadas automaticamente
             </p>
           </div>
 

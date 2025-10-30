@@ -13,7 +13,8 @@ import { toast } from "sonner";
 import { JobTitleDialog } from "@/components/JobTitleDialog";
 import { JobTitleBulkImport } from "@/components/JobTitleBulkImport";
 import { JobTitlePreview } from "@/components/JobTitlePreview";
-import { 
+import { JobFamilyManager } from "@/components/JobFamilyManager";
+import {
   Plus, 
   Upload, 
   ArrowUp, 
@@ -24,7 +25,8 @@ import {
   CheckCircle2,
   XCircle,
   Briefcase,
-  Building2
+  Building2,
+  Settings
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -35,17 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
-const VALID_FAMILIES = [
-  'Analistas', 
-  'Profissionais', 
-  'Consultores', 
-  'Especialistas', 
-  'Coordenadores', 
-  'Supervisores', 
-  'Gerentes', 
-  'Executivos - Diretores', 
-  'Lideres-Projetos'
-];
+// Job families are now loaded dynamically from the database
 
 const familyColors: Record<string, string> = {
   'Analistas': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -84,9 +76,11 @@ const formatCurrency = (value: number) => {
 
 export default function JobTitlesPage() {
   const [jobTitles, setJobTitles] = useState<any[]>([]);
+  const [jobFamilies, setJobFamilies] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [bulkImportOpen, setBulkImportOpen] = useState(false);
+  const [familyManagerOpen, setFamilyManagerOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   
   // Filters
@@ -116,7 +110,20 @@ export default function JobTitlesPage() {
 
   useEffect(() => {
     fetchJobTitles();
+    fetchJobFamilies();
   }, []);
+
+  const fetchJobFamilies = async () => {
+    const { data } = await supabase
+      .from('job_families')
+      .select('name')
+      .eq('is_active', true)
+      .order('name');
+    
+    if (data) {
+      setJobFamilies(data.map(f => f.name));
+    }
+  };
 
   useEffect(() => {
     calculateStats();
@@ -488,7 +495,7 @@ export default function JobTitlesPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas</SelectItem>
-                  {VALID_FAMILIES.map(family => (
+                  {jobFamilies.map(family => (
                     <SelectItem key={family} value={family}>{family}</SelectItem>
                   ))}
                 </SelectContent>
@@ -538,6 +545,10 @@ export default function JobTitlesPage() {
         <Button variant="outline" onClick={() => setBulkImportOpen(true)}>
           <Upload className="w-4 h-4 mr-2" />
           Importação em Massa
+        </Button>
+        <Button variant="outline" onClick={() => setFamilyManagerOpen(true)}>
+          <Settings className="w-4 h-4 mr-2" />
+          Gerenciar Famílias
         </Button>
       </div>
 
@@ -647,6 +658,17 @@ export default function JobTitlesPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <JobFamilyManager
+        open={familyManagerOpen}
+        onOpenChange={(open) => {
+          setFamilyManagerOpen(open);
+          if (!open) {
+            fetchJobFamilies();
+            fetchJobTitles();
+          }
+        }}
+      />
     </div>
   );
 }
