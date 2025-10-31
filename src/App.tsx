@@ -20,6 +20,7 @@ import Settings from "./pages/Settings";
 import SurveyData from "./pages/SurveyData";
 import SalaryComparison from "./pages/SalaryComparison";
 import JobTitles from "./pages/JobTitles";
+import PeopleAnalytics from "./pages/PeopleAnalytics";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/survey-data" element={<SurveyData />} />
               <Route path="/salary-comparison" element={<SalaryComparison />} />
               <Route path="/job-titles" element={<JobTitles />} />
+              <Route path="/people-analytics" element={<PeopleAnalytics />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

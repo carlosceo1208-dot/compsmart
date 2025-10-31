@@ -77,6 +77,14 @@ const Dashboard = () => {
       category: "management" as const,
     },
     {
+      title: "People Analytics",
+      description: "KPIs de remuneração, diversidade e estrutura organizacional",
+      icon: BarChart3,
+      path: "/people-analytics",
+      status: "active" as const,
+      category: "consultation" as const,
+    },
+    {
       title: "Simulador de Reajuste",
       description: "Simule impactos financeiros de reajustes salariais",
       icon: Calculator,
