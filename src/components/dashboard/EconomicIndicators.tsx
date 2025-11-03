@@ -43,10 +43,10 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
               <DollarSign className="h-4 w-4" />
               <span>Dólar (USD/BRL)</span>
             </div>
-            {economicData.isLoading ? (
+            {!economicData.usd && economicData.isLoading ? (
               <Skeleton className="h-8 w-24" />
             ) : economicData.usd ? (
-              <>
+              <div className="relative">
                 <p className="text-2xl font-bold">{formatCurrencyCustom(economicData.usd.value, 'BRL')}</p>
                 <div className="flex items-center gap-1 text-sm">
                   {economicData.usd.percentChange >= 0 ? (
@@ -61,9 +61,19 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
                 <p className="text-xs text-muted-foreground">
                   Atualizado: {economicData.usd.lastUpdate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                 </p>
-              </>
+              </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Erro ao carregar</p>
+              <div className="space-y-2">
+                <p className="text-sm text-amber-600">⚠️ Cotação indisponível</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRefresh}
+                  className="text-xs h-7"
+                >
+                  Recarregar
+                </Button>
+              </div>
             )}
           </div>
 
@@ -73,7 +83,7 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
               <TrendingUp className="h-4 w-4" />
               <span>INPC</span>
             </div>
-            {economicData.isLoading ? (
+            {!economicData.inpc && economicData.isLoading ? (
               <Skeleton className="h-8 w-24" />
             ) : economicData.inpc ? (
               <>
@@ -82,11 +92,21 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
                   Acumulado ({inpcPeriod}m): <span className="font-semibold">{economicData.inpc.accumulated.toFixed(2)}%</span>
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Ref: {economicData.inpc.referenceMonth}
+                  {economicData.inpc.referenceMonth}
                 </p>
               </>
             ) : (
-              <p className="text-sm text-muted-foreground">Erro ao carregar</p>
+              <div className="space-y-2">
+                <p className="text-sm text-amber-600">⚠️ Dados indisponíveis</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRefresh}
+                  className="text-xs h-7"
+                >
+                  Recarregar
+                </Button>
+              </div>
             )}
           </div>
 
