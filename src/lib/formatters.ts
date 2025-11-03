@@ -43,3 +43,27 @@ export const formatPercentage = (value: number | null | undefined): string => {
     maximumFractionDigits: 1,
   }).format(value / 100);
 };
+
+export const convertCurrency = (
+  value: number, 
+  from: 'BRL' | 'USD', 
+  to: 'BRL' | 'USD', 
+  rate: number
+): number => {
+  if (from === to) return value;
+  return from === 'BRL' ? value / rate : value * rate;
+};
+
+export const formatCurrencyCustom = (
+  value: number | null | undefined, 
+  currency: 'BRL' | 'USD'
+): string => {
+  if (value === null || value === undefined) return currency === 'BRL' ? 'R$ 0,00' : '$ 0.00';
+  
+  return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+};
