@@ -18,7 +18,8 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
   const economicData = useEconomicData(inpcPeriod);
 
   const handleRefresh = () => {
-    window.location.reload();
+    economicData.refetchUsd();
+    economicData.refetchInpc();
   };
 
   return (

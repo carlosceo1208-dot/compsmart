@@ -3,8 +3,9 @@ import { EconomicData, USDData, INPCData } from '@/types/economic';
 
 const fetchUSDRate = async (): Promise<USDData> => {
   try {
+    // Tentar AwesomeAPI primeiro
     const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
-    if (!response.ok) throw new Error('Failed to fetch USD rate');
+    if (!response.ok) throw new Error('AwesomeAPI indisponível');
     
     const data = await response.json();
     const usdData = data.USDBRL;
@@ -22,6 +23,8 @@ const fetchUSDRate = async (): Promise<USDData> => {
     
     return result;
   } catch (error) {
+    console.warn('AwesomeAPI falhou, verificando cache...');
+    
     // Tentar usar cache (máximo 1 hora de idade)
     const cached = localStorage.getItem('usd-cache');
     const cacheTime = localStorage.getItem('usd-cache-time');
@@ -29,12 +32,46 @@ const fetchUSDRate = async (): Promise<USDData> => {
     if (cached && cacheTime) {
       const age = Date.now() - parseInt(cacheTime);
       if (age < 60 * 60 * 1000) { // 1 hora
-        console.warn('Usando cache do USD (API indisponível)');
+        console.info('Usando cache do USD');
         return JSON.parse(cached);
       }
     }
     
-    throw new Error('Nenhuma cotação disponível');
+    // Fallback: API do Banco Central
+    try {
+      console.warn('Cache expirado, tentando Banco Central...');
+      const today = new Date();
+      const dateStr = `${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}-${today.getFullYear()}`;
+      
+      const bcResponse = await fetch(
+        `https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao='${dateStr}'&$format=json`
+      );
+      
+      if (!bcResponse.ok) throw new Error('Banco Central indisponível');
+      
+      const bcData = await bcResponse.json();
+      
+      if (!bcData.value || bcData.value.length === 0) {
+        throw new Error('Sem dados do Banco Central');
+      }
+      
+      const result = {
+        value: parseFloat(bcData.value[0].cotacaoVenda),
+        variation: 0,
+        percentChange: 0,
+        lastUpdate: new Date(bcData.value[0].dataHoraCotacao || Date.now()),
+      };
+      
+      // Salvar no cache
+      localStorage.setItem('usd-cache', JSON.stringify(result));
+      localStorage.setItem('usd-cache-time', Date.now().toString());
+      
+      console.info('Usando dados do Banco Central');
+      return result;
+    } catch (bcError) {
+      console.error('Todas as fontes de cotação falharam:', bcError);
+      throw new Error('Cotação do dólar indisponível');
+    }
   }
 };
 
@@ -87,25 +124,32 @@ export const useEconomicData = (inpcMonths: number = 12) => {
     queryFn: fetchUSDRate,
     staleTime: 5 * 60 * 1000, // 5 minutos
     refetchInterval: (query) => {
-      // Se teve erro, esperar 30min antes de tentar de novo (circuit breaker)
-      return query.state.error ? 30 * 60 * 1000 : 5 * 60 * 1000;
+      // Circuit breaker: parar polling automático em caso de erro
+      return query.state.error ? false : 5 * 60 * 1000;
     },
     retry: 2,
-    refetchOnWindowFocus: false, // Não refetch ao voltar pro tab
+    refetchOnWindowFocus: false,
   });
 
   const inpcQuery = useQuery({
     queryKey: ['inpc-data', inpcMonths],
     queryFn: () => fetchINPCData(inpcMonths),
     staleTime: 24 * 60 * 60 * 1000, // 24 horas
+    refetchInterval: (query) => {
+      return query.state.error ? false : 24 * 60 * 60 * 1000;
+    },
     retry: 2,
+    refetchOnWindowFocus: false,
   });
 
   const economicData: EconomicData = {
     usd: usdQuery.data || null,
     inpc: inpcQuery.data || null,
     isLoading: usdQuery.isLoading || inpcQuery.isLoading,
+    isRefreshing: usdQuery.isFetching || inpcQuery.isFetching,
     error: usdQuery.error || inpcQuery.error || null,
+    refetchUsd: () => usdQuery.refetch(),
+    refetchInpc: () => inpcQuery.refetch(),
   };
 
   return economicData;

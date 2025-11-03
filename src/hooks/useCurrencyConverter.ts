@@ -17,11 +17,12 @@ export const useCurrencyConverter = (): CurrencyConverter => {
   });
 
   const { data: exchangeRate } = useQuery({
-    queryKey: ['exchange-rate'],
+    queryKey: ['usd-rate'], // Usar mesma queryKey para compartilhar cache
     queryFn: fetchExchangeRate,
     staleTime: 60 * 60 * 1000, // 1 hora
-    refetchInterval: 60 * 60 * 1000,
+    refetchInterval: false, // Não fazer polling (deixar useEconomicData gerenciar)
     retry: 2,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

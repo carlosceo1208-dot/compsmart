@@ -16,7 +16,10 @@ export interface EconomicData {
   usd: USDData | null;
   inpc: INPCData | null;
   isLoading: boolean;
+  isRefreshing: boolean;
   error: Error | null;
+  refetchUsd: () => void;
+  refetchInpc: () => void;
 }
 
 export type Currency = 'BRL' | 'USD';
