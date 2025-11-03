@@ -2,6 +2,7 @@ import { EconomicIndicators } from "@/components/dashboard/EconomicIndicators";
 import { KPIDashboard } from "@/components/dashboard/KPIDashboard";
 import { AlphabeticalNav } from "@/components/dashboard/AlphabeticalNav";
 import { ModuleGrid } from "@/components/dashboard/ModuleGrid";
+import { DateTimeDisplay } from "@/components/dashboard/DateTimeDisplay";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
@@ -13,10 +14,15 @@ const Dashboard = () => {
         {/* Coluna Esquerda: KPIs */}
         <div className="space-y-4">
           <div className="rounded-lg bg-gradient-to-br from-primary/10 via-primary/5 to-background p-6 border border-primary/20">
-            <h1 className="text-2xl font-bold mb-1">CompSmart</h1>
-            <p className="text-sm text-muted-foreground">
-              Dashboard Executivo
-            </p>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-bold mb-1">CompSmart</h1>
+                <p className="text-sm text-muted-foreground">
+                  Dashboard Executivo
+                </p>
+              </div>
+              <DateTimeDisplay />
+            </div>
           </div>
           
           <KPIDashboard currency={currency} />
@@ -31,7 +37,7 @@ const Dashboard = () => {
           
           <AlphabeticalNav />
           
-          <ModuleGrid maxVisible={9} />
+          <ModuleGrid />
         </div>
       </div>
     </div>
