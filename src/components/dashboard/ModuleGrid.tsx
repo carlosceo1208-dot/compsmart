@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   UserCircle,
   Scale,
+  FileBarChart,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -111,6 +112,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       status: 'active' as const,
       category: 'consultation' as const,
       requiredPlan: 'pro' as const,
+    },
+    {
+      title: 'Análise Salarial',
+      description: 'Relatório de posicionamento salarial',
+      icon: FileBarChart,
+      path: '/salary-analysis-report',
+      status: 'active' as const,
+      category: 'consultation' as const,
     },
     {
       title: 'Configurações',
