@@ -1,6 +1,9 @@
-import { LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { LucideIcon, Lock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useFeatureAccess, PlanType } from "@/hooks/useFeatureAccess";
+import { UpgradePlanModal } from "@/components/UpgradePlanModal";
 
 interface ModuleCardProps {
   title: string;
@@ -9,6 +12,7 @@ interface ModuleCardProps {
   onClick?: () => void;
   status?: "active" | "coming-soon" | "beta";
   category?: "management" | "simulation" | "consultation" | "export";
+  requiredPlan?: PlanType;
 }
 
 const categoryColors = {
@@ -30,40 +34,68 @@ export const ModuleCard = ({
   icon: Icon, 
   onClick, 
   status = "active",
-  category = "management" 
+  category = "management",
+  requiredPlan
 }: ModuleCardProps) => {
-  const isClickable = status === "active" && onClick;
+  const { hasAccess } = useFeatureAccess();
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const hasFeatureAccess = !requiredPlan || hasAccess(`${title.toLowerCase().replace(/\s+/g, '_')}`);
+  const isClickable = status === "active" && onClick && hasFeatureAccess;
+  
+  const handleClick = () => {
+    if (!hasFeatureAccess && requiredPlan) {
+      setShowUpgradeModal(true);
+    } else if (onClick) {
+      onClick();
+    }
+  };
   
   return (
-    <Card
-      className={`
-        group transition-all duration-300 h-full
-        ${isClickable 
-          ? "cursor-pointer hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02]" 
-          : "opacity-60 cursor-not-allowed"
-        }
-        ${categoryColors[category]} border-2
-      `}
-      onClick={isClickable ? onClick : undefined}
-    >
-      <CardHeader className="space-y-3">
-        <div className="flex items-start justify-between">
-          <div className={`
-            w-12 h-12 rounded-lg flex items-center justify-center
-            transition-transform duration-300
-            ${isClickable ? "group-hover:scale-110" : ""}
-          `}>
-            <Icon className="w-6 h-6" />
+    <>
+      <Card
+        className={`
+          group transition-all duration-300 h-full relative
+          ${(isClickable || (!hasFeatureAccess && requiredPlan))
+            ? "cursor-pointer hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02]" 
+            : "opacity-60 cursor-not-allowed"
+          }
+          ${categoryColors[category]} border-2
+        `}
+        onClick={hasFeatureAccess ? (isClickable ? onClick : undefined) : handleClick}
+      >
+        {requiredPlan && !hasFeatureAccess && (
+          <div className="absolute top-3 right-3 z-10">
+            <div className="bg-background/90 backdrop-blur-sm rounded-full p-2 shadow-md">
+              <Lock className="w-4 h-4 text-muted-foreground" />
+            </div>
           </div>
-          {statusBadges[status]}
-        </div>
-        <CardTitle className="text-lg leading-tight">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <CardDescription className="text-sm leading-relaxed">
-          {description}
-        </CardDescription>
-      </CardContent>
-    </Card>
+        )}
+        <CardHeader className="space-y-3">
+          <div className="flex items-start justify-between">
+            <div className={`
+              w-12 h-12 rounded-lg flex items-center justify-center
+              transition-transform duration-300
+              ${isClickable ? "group-hover:scale-110" : ""}
+            `}>
+              <Icon className="w-6 h-6" />
+            </div>
+            {statusBadges[status]}
+          </div>
+          <CardTitle className="text-lg leading-tight">{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CardDescription className="text-sm leading-relaxed">
+            {description}
+          </CardDescription>
+        </CardContent>
+      </Card>
+      
+      <UpgradePlanModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        feature={title}
+        requiredPlan={requiredPlan || 'pro'}
+      />
+    </>
   );
 };

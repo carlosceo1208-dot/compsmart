@@ -42,7 +42,7 @@ const Index = () => {
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-center hover:opacity-80 hover:scale-105 transition-all">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-32 md:w-40 md:h-40 object-contain" />
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 object-contain" />
           </div>
           <Button 
             variant="outline"

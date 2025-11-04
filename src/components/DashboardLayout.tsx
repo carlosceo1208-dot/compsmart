@@ -80,7 +80,7 @@ export const DashboardLayout = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <img src={compsmartLogo} alt="CompSmart Logo" className="w-20 h-20 mx-auto animate-pulse object-contain" />
+          <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-32 md:w-40 md:h-40 mx-auto animate-pulse object-contain" />
           <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
@@ -93,7 +93,7 @@ export const DashboardLayout = () => {
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-16 items-center justify-between px-4">
           <Link to="/dashboard" className="flex items-center justify-center hover:opacity-80 hover:scale-105 transition-all">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-20 h-20 object-contain" />
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 object-contain" />
           </Link>
 
           <div className="flex items-center space-x-4">

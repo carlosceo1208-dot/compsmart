@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.generate-job-description]
 verify_jwt = false
+
+[functions.legal-assistant]
+verify_jwt = true

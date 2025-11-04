@@ -12,6 +12,7 @@ import {
   Settings,
   ShieldCheck,
   UserCircle,
+  Scale,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -103,6 +104,15 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       category: 'management' as const,
     },
     {
+      title: 'Assistente Jurídico',
+      description: 'Consultoria trabalhista e previdenciária com IA',
+      icon: Scale,
+      path: '/legal-assistant',
+      status: 'active' as const,
+      category: 'consultation' as const,
+      requiredPlan: 'pro' as const,
+    },
+    {
       title: 'Configurações',
       description: 'Parametrize o sistema',
       icon: Settings,
@@ -126,6 +136,7 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
             icon={module.icon}
             status={module.status}
             category={module.category}
+            requiredPlan={module.requiredPlan}
             onClick={() => navigate(module.path)}
           />
         ))}

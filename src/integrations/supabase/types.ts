@@ -223,6 +223,39 @@ export type Database = {
           },
         ]
       }
+      legal_assistant_conversations: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          legal_references: Json | null
+          question: string
+          response_time_ms: number | null
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          legal_references?: Json | null
+          question: string
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          legal_references?: Json | null
+          question?: string
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       organizational_structure: {
         Row: {
           address: string | null
@@ -655,6 +688,33 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          plan_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          plan_type?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

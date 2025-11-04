@@ -60,7 +60,7 @@ const ResetPassword = () => {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="flex flex-col items-center mb-2">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-24 h-24 object-contain" />
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-32 md:w-36 md:h-36 object-contain" />
           </div>
           <div>
             <CardTitle className="text-3xl font-bold">Nova Senha</CardTitle>
