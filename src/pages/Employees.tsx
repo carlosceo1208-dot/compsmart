@@ -58,6 +58,7 @@ interface Profile {
   id: string;
   full_name: string;
   email: string;
+  employee_number: string | null;
   phone: string | null;
   status: string;
   created_at: string;
@@ -162,7 +163,7 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit:unit_id(id, name, code, type, description)")
+        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit:unit_id(id, name, code, type, description)")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -264,10 +265,27 @@ const Users = () => {
     setUserDialogOpen(true);
   };
 
+  // Função para formatar % da faixa com cores
+  const formatSalaryRangePercentage = (percentage: number | null) => {
+    if (percentage === null) return '-';
+    
+    const formatted = `${percentage.toFixed(1)}%`;
+    
+    // Cores baseadas no valor
+    if (percentage < 0) {
+      return <span className="text-red-600 font-bold">{formatted} ⚠️</span>;
+    } else if (percentage >= 0 && percentage < 50) {
+      return <span className="text-yellow-600 font-semibold">{formatted}</span>;
+    } else {
+      return <span className="text-green-600 font-semibold">{formatted}</span>;
+    }
+  };
+
   // Filtros e paginação
   const filteredProfiles = profiles.filter((profile) => {
     const matchesSearch = profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (profile.employee_number && profile.employee_number.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (profile.org_label && profile.org_label.toLowerCase().includes(searchTerm.toLowerCase()));
     
@@ -452,7 +470,7 @@ const Users = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
-                  placeholder="Buscar por nome ou email..."
+                  placeholder="Buscar por nome, email ou número de registro (RE)..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -558,8 +576,8 @@ const Users = () => {
                 <TableBody>
                   {paginatedProfiles.map((profile, index) => (
                     <TableRow key={profile.id} className="hover:bg-muted/50">
-                      <TableCell className="text-sm text-muted-foreground">
-                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      <TableCell className="font-mono font-bold text-primary">
+                        {profile.employee_number || '-'}
                       </TableCell>
                       <TableCell className="font-medium">
                         <div>
@@ -613,11 +631,7 @@ const Users = () => {
                       {viewMode === "detailed" && (
                         <>
                           <TableCell>
-                            <span className="text-sm">
-                              {profile.salary_range_percentage 
-                                ? `${profile.salary_range_percentage.toFixed(1)}%` 
-                                : "-"}
-                            </span>
+                            {formatSalaryRangePercentage(profile.salary_range_percentage)}
                           </TableCell>
                           <TableCell>
                             <span className="text-sm">

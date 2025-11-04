@@ -15,6 +15,7 @@ import { z } from "zod";
 const userSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
   email: z.string().email("Email inválido"),
+  employee_number: z.string().min(1, "Número de Registro é obrigatório"),
   password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").optional(),
   phone: z.string().optional(),
   cpf: z.string()
@@ -34,8 +35,8 @@ const userSchema = z.object({
     .refine((val) => {
       if (!val || val === "") return true;
       const num = parseFloat(val);
-      return num >= 0 && num <= 100;
-    }, { message: "Porcentagem deve estar entre 0 e 100" }),
+      return num >= -100 && num <= 100;
+    }, { message: "Porcentagem deve estar entre -100% e 100%" }),
   performance_rating: z.string()
     .optional()
     .refine((val) => {
@@ -55,6 +56,7 @@ interface UserDialogProps {
 interface UserData {
   full_name: string;
   email: string;
+  employee_number: string;
   password?: string;
   phone?: string;
   cpf?: string;
@@ -83,6 +85,7 @@ interface Profile {
   id: string;
   full_name: string;
   email: string;
+  employee_number: string | null;
   phone: string | null;
   cpf: string | null;
   birth_date: string | null;
@@ -110,6 +113,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
   const [formData, setFormData] = useState<UserData>({
     full_name: "",
     email: "",
+    employee_number: "",
     password: "",
     phone: "",
     cpf: "",
@@ -208,7 +212,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .select("id, full_name, email, employee_number, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
         .eq("status", "active")
         .order("full_name", { ascending: true });
 
@@ -239,6 +243,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       ...formData,
       full_name: employee.full_name,
       email: employee.email || formData.email,
+      employee_number: employee.employee_number || "",
       phone: employee.phone || "",
       cpf: employee.cpf || "",
       birth_date: employee.birth_date || "",
@@ -266,7 +271,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .select("full_name, email, employee_number, phone, cpf, birth_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
         .eq("id", userId)
         .single();
 
@@ -281,6 +286,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
       setFormData({
         ...profile,
+        employee_number: profile.employee_number || "",
         password: "",
         salary: profile.salary 
           ? profile.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -313,6 +319,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     setFormData({
       full_name: "",
       email: "",
+      employee_number: "",
       password: "",
       phone: "",
       cpf: "",
@@ -390,7 +397,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     setLoading(true);
 
     try {
-      // Helper function to parse Brazilian currency format to number
       const parseBRCurrency = (value: string | undefined): number | null => {
         if (!value) return null;
         // Remove dots (thousand separators) and replace comma with dot
@@ -399,12 +405,31 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         return isNaN(parsed) ? null : parsed;
       };
 
+      // Validar unicidade do número de registro
+      if (formData.employee_number) {
+        const { data: existingEmployee } = await supabase
+          .from('profiles')
+          .select('id, full_name')
+          .eq('employee_number', formData.employee_number)
+          .neq('id', userId || '00000000-0000-0000-0000-000000000000')
+          .maybeSingle();
+        
+        if (existingEmployee) {
+          toast.error(
+            `❌ Número de Registro "${formData.employee_number}" já está em uso por ${existingEmployee.full_name}`
+          );
+          setLoading(false);
+          return;
+        }
+      }
+
       if (userId) {
         // Update existing user
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
             full_name: formData.full_name,
+            employee_number: formData.employee_number,
             phone: formData.phone || null,
             cpf: formData.cpf || null,
             birth_date: formData.birth_date || null,
@@ -456,6 +481,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         const { error: profileError } = await supabase
           .from("profiles")
           .update({
+            employee_number: formData.employee_number,
             phone: formData.phone || null,
             cpf: formData.cpf || null,
             birth_date: formData.birth_date || null,
@@ -651,6 +677,28 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="employee_number" className="flex items-center gap-1">
+                Número de Registro (RE)
+                <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="employee_number"
+                value={formData.employee_number}
+                onChange={(e) => {
+                  const value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+                  setFormData({ ...formData, employee_number: value });
+                }}
+                disabled={loading}
+                placeholder="Ex: 2025005, FUNC-001, RE-123"
+                maxLength={50}
+                required
+                className="font-mono"
+              />
+              <p className="text-xs text-muted-foreground">
+                📋 Matrícula ou número de registro interno da empresa
+              </p>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="birth_date">Data de Nascimento</Label>
               <Input
                 id="birth_date"
@@ -765,13 +813,16 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   id="salary_range_percentage"
                   type="number"
                   step="0.01"
-                  min="0"
+                  min="-100"
                   max="100"
                   value={formData.salary_range_percentage}
                   onChange={(e) => setFormData({ ...formData, salary_range_percentage: e.target.value })}
                   disabled={loading}
                   placeholder="0-100%"
                 />
+                <p className="text-xs text-muted-foreground">
+                  💡 Valores negativos indicam salário abaixo da faixa mínima
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="performance_rating">Nota Avaliação de Desempenho</Label>

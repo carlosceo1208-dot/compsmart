@@ -18,6 +18,7 @@ interface EmployeeBulkImportProps {
 interface ParsedEmployee {
   full_name: string;
   email: string;
+  employee_number?: string;
   phone?: string;
   cpf?: string;
   birth_date?: string;

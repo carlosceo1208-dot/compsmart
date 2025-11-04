@@ -349,6 +349,7 @@ export type Database = {
           cpf: string | null
           created_at: string
           email: string
+          employee_number: string | null
           full_name: string
           grade: string | null
           has_system_access: boolean | null
@@ -370,6 +371,7 @@ export type Database = {
           cpf?: string | null
           created_at?: string
           email: string
+          employee_number?: string | null
           full_name: string
           grade?: string | null
           has_system_access?: boolean | null
@@ -391,6 +393,7 @@ export type Database = {
           cpf?: string | null
           created_at?: string
           email?: string
+          employee_number?: string | null
           full_name?: string
           grade?: string | null
           has_system_access?: boolean | null
@@ -770,6 +773,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      suggest_next_employee_number: { Args: never; Returns: string }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
     Enums: {
