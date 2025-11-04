@@ -111,14 +111,8 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary-light/10 to-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 rounded-xl flex items-center justify-center">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-16 h-16 object-contain" />
-          </div>
-          <div>
-            <CardTitle className="text-3xl font-bold">CompSmart</CardTitle>
-            <CardDescription className="text-base mt-2">
-              Sistema de Gestão de Remuneração
-            </CardDescription>
+          <div className="flex flex-col items-center">
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-32 object-contain" />
           </div>
         </CardHeader>
         <CardContent>

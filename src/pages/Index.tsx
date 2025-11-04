@@ -41,14 +41,8 @@ const Index = () => {
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center">
-              <img src={compsmartLogo} alt="CompSmart Logo" className="w-12 h-12 object-contain" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">CompSmart</h1>
-              <p className="text-xs text-muted-foreground">Sistema de Gestão de Remuneração</p>
-            </div>
+          <div className="flex items-center justify-center hover:opacity-80 hover:scale-105 transition-all">
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-32 md:w-40 md:h-40 object-contain" />
           </div>
           <Button 
             variant="outline"
