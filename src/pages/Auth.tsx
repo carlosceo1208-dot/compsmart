@@ -112,7 +112,7 @@ const Auth = () => {
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="flex flex-col items-center">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-40 h-40 md:w-48 md:h-48 object-contain" />
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-40 h-auto md:w-48 object-contain" />
           </div>
         </CardHeader>
         <CardContent>
