@@ -304,7 +304,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         setSelectedUnitBreadcrumb(breadcrumbData || '');
       }
     } catch (error: any) {
-      toast.error("Erro ao carregar dados do usuário");
+      toast.error("Erro ao carregar dados do funcionário");
       console.error(error);
     }
   };
@@ -431,9 +431,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         if (rolesError) throw rolesError;
 
         if (!formData.unit_id) {
-          toast.info("Usuário atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Usuário ou na Estrutura Organizacional.");
+          toast.info("Funcionário atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
         } else {
-          toast.success("Usuário atualizado com sucesso!");
+          toast.success("Funcionário atualizado com sucesso!");
         }
       } else {
         // Create new user
@@ -482,9 +482,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         if (rolesError) throw rolesError;
 
         if (!formData.unit_id) {
-          toast.info("Usuário criado sem vínculo organizacional. Você pode vincular a uma Área/Departamento/Setor/Projeto depois em Editar Usuário ou na Estrutura Organizacional.");
+          toast.info("Funcionário criado sem vínculo organizacional. Você pode vincular a uma Área/Departamento/Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
         } else {
-          toast.success("Usuário criado com sucesso!");
+          toast.success("Funcionário criado com sucesso!");
         }
       }
 
@@ -498,7 +498,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       } else if (error.code === '23503') {
         toast.error("Unidade organizacional não encontrada. Ela pode ter sido excluída.");
       } else {
-        toast.error(error.message || "Erro ao salvar usuário");
+        toast.error(error.message || "Erro ao salvar funcionário");
       }
       console.error(error);
     } finally {
@@ -510,9 +510,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{userId ? "Editar Usuário" : "Novo Usuário"}</DialogTitle>
+          <DialogTitle>{userId ? "Editar Funcionário" : "Novo Funcionário"}</DialogTitle>
           <DialogDescription>
-            {userId ? "Atualize as informações do usuário e suas permissões" : "Preencha os dados para criar um novo usuário"}
+            {userId ? "Atualize as informações do funcionário e suas permissões" : "Preencha os dados para criar um novo funcionário"}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
