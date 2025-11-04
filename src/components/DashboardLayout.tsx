@@ -11,9 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck, Briefcase } from "lucide-react";
+import { LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck, Briefcase } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
+import compsmartLogo from "@/assets/compsmart-logo.png";
 
 interface UserProfile {
   full_name: string;
@@ -79,7 +80,7 @@ export const DashboardLayout = () => {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Building2 className="w-12 h-12 text-primary mx-auto animate-pulse" />
+          <img src={compsmartLogo} alt="CompSmart Logo" className="w-12 h-12 mx-auto animate-pulse object-contain" />
           <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
@@ -92,8 +93,8 @@ export const DashboardLayout = () => {
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-16 items-center justify-between px-4">
           <Link to="/dashboard" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md">
-              <Building2 className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+              <img src={compsmartLogo} alt="CompSmart Logo" className="w-10 h-10 object-contain" />
             </div>
             <div>
               <h1 className="text-xl font-bold">CompSmart</h1>

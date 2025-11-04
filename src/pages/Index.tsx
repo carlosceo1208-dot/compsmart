@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Building2, ArrowRight, CheckCircle2, Shield, Zap, BarChart3 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Shield, Zap, BarChart3 } from "lucide-react";
+import compsmartLogo from "@/assets/compsmart-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -41,8 +42,8 @@ const Index = () => {
       <header className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-              <Building2 className="w-6 h-6 text-white" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center">
+              <img src={compsmartLogo} alt="CompSmart Logo" className="w-12 h-12 object-contain" />
             </div>
             <div>
               <h1 className="text-2xl font-bold">CompSmart</h1>

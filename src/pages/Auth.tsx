@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Building2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { z } from "zod";
+import compsmartLogo from "@/assets/compsmart-logo.png";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -110,8 +111,8 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary-light/10 to-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-xl flex items-center justify-center shadow-lg">
-            <Building2 className="w-8 h-8 text-white" />
+          <div className="mx-auto w-16 h-16 rounded-xl flex items-center justify-center">
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-16 h-16 object-contain" />
           </div>
           <div>
             <CardTitle className="text-3xl font-bold">CompSmart</CardTitle>
