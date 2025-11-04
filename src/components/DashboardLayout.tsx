@@ -91,9 +91,9 @@ export const DashboardLayout = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="container flex h-16 items-center justify-between px-4">
+        <div className="container flex h-20 items-center justify-between px-4">
           <Link to="/dashboard" className="flex items-center justify-center hover:opacity-80 hover:scale-105 transition-all">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-auto md:w-36 lg:w-40 object-contain" />
+            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-full max-h-16 md:w-36 md:max-h-18 lg:w-40 lg:max-h-20 object-contain py-2" />
           </Link>
 
           <div className="flex items-center space-x-4">
