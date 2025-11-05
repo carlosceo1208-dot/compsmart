@@ -94,6 +94,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
         const [
           full_name,
           email,
+          employee_number,
           phone,
           cpf,
           birth_date,
@@ -118,9 +119,24 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           continue;
         }
 
+        // Validar employee_number único se fornecido
+        if (employee_number) {
+          const { data: existingRE } = await supabase
+            .from("profiles")
+            .select("id, email")
+            .eq("employee_number", employee_number)
+            .maybeSingle();
+          
+          if (existingRE && existingRE.email !== email) {
+            parseErrors.push(`Linha ${i + 1}: Número de Registro ${employee_number} já está em uso por ${existingRE.email}`);
+            continue;
+          }
+        }
+
         parsed.push({
           full_name,
           email,
+          employee_number: employee_number || undefined,
           phone: phone || undefined,
           cpf: cpf || undefined,
           birth_date: birth_date || undefined,
@@ -197,23 +213,24 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
 
           if (existing) {
             // Atualizar existente
-            const { error } = await supabase
-              .from("profiles")
-              .update({
-                full_name: row.full_name,
-                phone: row.phone || null,
-                cpf: row.cpf || null,
-                birth_date: row.birth_date || null,
-                job_title: row.job_title || null,
-                grade: row.grade || null,
-                salary: row.salary || null,
-                variable_salary: row.variable_salary || null,
-                salary_range_percentage: row.salary_range_percentage || null,
-                performance_rating: row.performance_rating || null,
-                unit_id: row.unit_id || null,
-                manager_id: row.manager_id || null,
-              })
-              .eq("id", existing.id);
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            full_name: row.full_name,
+            employee_number: row.employee_number || null,
+            phone: row.phone || null,
+            cpf: row.cpf || null,
+            birth_date: row.birth_date || null,
+            job_title: row.job_title || null,
+            grade: row.grade || null,
+            salary: row.salary || null,
+            variable_salary: row.variable_salary || null,
+            salary_range_percentage: row.salary_range_percentage || null,
+            performance_rating: row.performance_rating || null,
+            unit_id: row.unit_id || null,
+            manager_id: row.manager_id || null,
+          })
+          .eq("id", existing.id);
 
             if (error) throw error;
             results.updated++;
@@ -228,23 +245,24 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
 
             if (authError) throw authError;
 
-            const { error: profileError } = await supabase
-              .from("profiles")
-              .update({
-                full_name: row.full_name,
-                phone: row.phone || null,
-                cpf: row.cpf || null,
-                birth_date: row.birth_date || null,
-                job_title: row.job_title || null,
-                grade: row.grade || null,
-                salary: row.salary || null,
-                variable_salary: row.variable_salary || null,
-                salary_range_percentage: row.salary_range_percentage || null,
-                performance_rating: row.performance_rating || null,
-                unit_id: row.unit_id || null,
-                manager_id: row.manager_id || null,
-              })
-              .eq("id", authData.user.id);
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({
+            full_name: row.full_name,
+            employee_number: row.employee_number || null,
+            phone: row.phone || null,
+            cpf: row.cpf || null,
+            birth_date: row.birth_date || null,
+            job_title: row.job_title || null,
+            grade: row.grade || null,
+            salary: row.salary || null,
+            variable_salary: row.variable_salary || null,
+            salary_range_percentage: row.salary_range_percentage || null,
+            performance_rating: row.performance_rating || null,
+            unit_id: row.unit_id || null,
+            manager_id: row.manager_id || null,
+          })
+          .eq("id", authData.user.id);
 
             if (profileError) throw profileError;
             results.created++;
@@ -295,7 +313,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               <strong>Formato Mínimo (3 colunas):</strong> Nome Completo, Email, Código Unidade<br />
-              <strong>Formato Completo (13 colunas):</strong> Nome, Email, Telefone, CPF, Data Nascimento, Cargo, Grade, Salário Fixo, Salário Variável, % Faixa, Nota Desempenho, Unidade, Email Gestor<br />
+              <strong>Formato Completo (14 colunas):</strong> Nome, Email, # Registro, Telefone, CPF, Data Nascimento, Cargo, Grade, Salário Fixo, Salário Variável, % Faixa, Nota Desempenho, Unidade, Email Gestor<br />
               <em>Separadores aceitos: TAB, ponto-e-vírgula (;) ou vírgula (,)</em>
             </AlertDescription>
           </Alert>
@@ -349,6 +367,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
                     <TableRow>
                       <TableHead>Nome</TableHead>
                       <TableHead>Email</TableHead>
+                      <TableHead># Registro</TableHead>
                       <TableHead>Cargo</TableHead>
                       <TableHead>Grade</TableHead>
                       <TableHead>Unidade</TableHead>
@@ -359,6 +378,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
                       <TableRow key={i}>
                         <TableCell>{row.full_name}</TableCell>
                         <TableCell>{row.email}</TableCell>
+                        <TableCell className="font-mono text-sm">{row.employee_number || "-"}</TableCell>
                         <TableCell>{row.job_title || "-"}</TableCell>
                         <TableCell>{row.grade || "-"}</TableCell>
                         <TableCell>
