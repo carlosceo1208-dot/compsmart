@@ -56,7 +56,7 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
                     <TrendingDown className="h-3 w-3 text-red-500" />
                   )}
                   <span className={economicData.usd.percentChange >= 0 ? 'text-green-500' : 'text-red-500'}>
-                    {economicData.usd.percentChange > 0 ? '+' : ''}{economicData.usd.percentChange.toFixed(2)}%
+                    {economicData.usd.percentChange > 0 ? '+' : ''}{(economicData.usd.percentChange ?? 0).toFixed(2)}%
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -88,9 +88,9 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
               <Skeleton className="h-8 w-24" />
             ) : economicData.inpc ? (
               <>
-                <p className="text-2xl font-bold">{economicData.inpc.monthly.toFixed(2)}%</p>
+                <p className="text-2xl font-bold">{(economicData.inpc.monthly ?? 0).toFixed(2)}%</p>
                 <p className="text-sm text-muted-foreground">
-                  Acumulado ({inpcPeriod}m): <span className="font-semibold">{economicData.inpc.accumulated.toFixed(2)}%</span>
+                  Acumulado ({inpcPeriod}m): <span className="font-semibold">{(economicData.inpc.accumulated ?? 0).toFixed(2)}%</span>
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {economicData.inpc.referenceMonth}
