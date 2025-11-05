@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, AlertCircle, CheckCircle2 } from "lucide-react";
+import { calculateSalaryRangePercentage } from "@/lib/salaryCalculations";
 
 interface EmployeeBulkImportProps {
   open: boolean;
@@ -32,6 +33,7 @@ interface ParsedEmployee {
   manager_email?: string;
   unit_id?: string | null;
   manager_id?: string | null;
+  job_title_id?: string | null;
 }
 
 export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBulkImportProps) {
@@ -98,8 +100,8 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           phone,
           cpf,
           birth_date,
-          job_title,
-          grade,
+          job_input,
+          grade_input,
           salary_str,
           variable_salary_str,
           salary_range_percentage_str,
@@ -133,6 +135,58 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           }
         }
 
+        // Buscar cargo por código OU nome
+        let matchedJob = null;
+        let calculatedPercentage = null;
+        
+        if (job_input) {
+          const { data: jobData } = await supabase
+            .from("job_titles")
+            .select("id, title, code, grade")
+            .or(`code.eq.${job_input},title.ilike.%${job_input}%`)
+            .limit(1)
+            .maybeSingle();
+          
+          if (!jobData) {
+            parseErrors.push(`⚠️ Linha ${i + 1}: Cargo "${job_input}" não encontrado. Funcionário "${full_name}" será importado sem cargo.`);
+          } else {
+            matchedJob = jobData;
+            
+            // Validar grade informado com o grade do cargo
+            if (grade_input && grade_input !== jobData.grade) {
+              parseErrors.push(`⚠️ Linha ${i + 1}: Grade informado "${grade_input}" não corresponde ao Grade "${jobData.grade}" do cargo "${jobData.title}". Será usado o Grade do cargo.`);
+            }
+            
+            // Calcular salary_range_percentage se tiver salário
+            const salary = parseMonetaryValue(salary_str);
+            if (salary) {
+              const paddedGrade = jobData.grade.toString().padStart(3, '0');
+              
+              // Buscar tabela salarial ativa
+              const { data: activeTable } = await supabase
+                .from('salary_tables')
+                .select('id')
+                .eq('is_active', true)
+                .maybeSingle();
+              
+              if (activeTable) {
+                const { data: salaryRange } = await supabase
+                  .from('salary_ranges')
+                  .select('min_value, median_value, max_value')
+                  .eq('grade', paddedGrade)
+                  .eq('salary_table_id', activeTable.id)
+                  .maybeSingle();
+                
+                if (salaryRange) {
+                  calculatedPercentage = calculateSalaryRangePercentage(salary, salaryRange);
+                } else {
+                  parseErrors.push(`⚠️ Linha ${i + 1}: Faixa salarial não encontrada para Grade ${jobData.grade}. Percentual não será calculado para "${full_name}".`);
+                }
+              }
+            }
+          }
+        }
+
         parsed.push({
           full_name,
           email,
@@ -140,11 +194,12 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           phone: phone || undefined,
           cpf: cpf || undefined,
           birth_date: birth_date || undefined,
-          job_title: job_title || undefined,
-          grade: grade || undefined,
+          job_title: matchedJob?.title || undefined,
+          grade: matchedJob?.grade || undefined,
+          job_title_id: matchedJob?.id || undefined,
           salary: parseMonetaryValue(salary_str),
           variable_salary: parseMonetaryValue(variable_salary_str),
-          salary_range_percentage: parseMonetaryValue(salary_range_percentage_str),
+          salary_range_percentage: calculatedPercentage || undefined,
           performance_rating: parseMonetaryValue(performance_rating_str),
           unit_code: unit_code || undefined,
           manager_email: manager_email || undefined,
@@ -223,6 +278,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             birth_date: row.birth_date || null,
             job_title: row.job_title || null,
             grade: row.grade || null,
+            job_title_id: row.job_title_id || null,
             salary: row.salary || null,
             variable_salary: row.variable_salary || null,
             salary_range_percentage: row.salary_range_percentage || null,
@@ -255,6 +311,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             birth_date: row.birth_date || null,
             job_title: row.job_title || null,
             grade: row.grade || null,
+            job_title_id: row.job_title_id || null,
             salary: row.salary || null,
             variable_salary: row.variable_salary || null,
             salary_range_percentage: row.salary_range_percentage || null,
@@ -313,8 +370,9 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               <strong>Formato Mínimo (3 colunas):</strong> Nome Completo, Email, Código Unidade<br />
-              <strong>Formato Completo (14 colunas):</strong> Nome, Email, # Registro, Telefone, CPF, Data Nascimento, Cargo, Grade, Salário Fixo, Salário Variável, % Faixa, Nota Desempenho, Unidade, Email Gestor<br />
-              <em>Separadores aceitos: TAB, ponto-e-vírgula (;) ou vírgula (,)</em>
+              <strong>Formato Completo (14 colunas):</strong> Nome, Email, # Registro, Telefone, CPF, Data Nascimento, <strong>Código ou Nome do Cargo</strong>, Grade (validado automaticamente), Salário Fixo, Salário Variável, % Faixa (calculado automaticamente), Nota Desempenho, Código Unidade, Email Gestor<br />
+              <em>Separadores aceitos: TAB, ponto-e-vírgula (;) ou vírgula (,)</em><br />
+              <em className="text-xs">💡 O cargo pode ser informado pelo código OU nome. O Grade e % da Faixa são calculados automaticamente.</em>
             </AlertDescription>
           </Alert>
 

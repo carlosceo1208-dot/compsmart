@@ -10,6 +10,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { toast } from "sonner";
 import { Loader2, ChevronsUpDown } from "lucide-react";
+import { calculateSalaryRangePercentage, formatSalaryPercentage, getSalaryStatusBadge } from "@/lib/salaryCalculations";
 import { z } from "zod";
 
 const userSchema = z.object({
@@ -157,10 +158,64 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     if (formData.job_title_id) {
       const jobTitle = jobTitles.find(jt => jt.id === formData.job_title_id);
       setSelectedJobTitle(jobTitle || null);
+      
+      // Auto-preencher job_title e grade
+      if (jobTitle) {
+        setFormData(prev => ({
+          ...prev,
+          job_title: jobTitle.title,
+          grade: jobTitle.grade
+        }));
+      }
     } else {
       setSelectedJobTitle(null);
     }
   }, [formData.job_title_id, jobTitles]);
+
+  // Calcular salary_range_percentage automaticamente
+  useEffect(() => {
+    const calculatePercentage = async () => {
+      if (!formData.job_title_id || !formData.salary) return;
+      
+      const selectedJob = jobTitles.find(jt => jt.id === formData.job_title_id);
+      if (!selectedJob) return;
+      
+      const paddedGrade = selectedJob.grade.toString().padStart(3, '0');
+      
+      try {
+        // Buscar tabela ativa
+        const { data: activeTable } = await supabase
+          .from('salary_tables')
+          .select('id')
+          .eq('is_active', true)
+          .single();
+        
+        if (!activeTable) return;
+        
+        // Buscar faixa salarial
+        const { data: salaryRange } = await supabase
+          .from('salary_ranges')
+          .select('min_value, median_value, max_value')
+          .eq('grade', paddedGrade)
+          .eq('salary_table_id', activeTable.id)
+          .maybeSingle();
+        
+        if (salaryRange) {
+          const salary = parseFloat(formData.salary.toString().replace(/\./g, '').replace(',', '.'));
+          const percentage = calculateSalaryRangePercentage(salary, salaryRange);
+          
+          setFormData(prev => ({
+            ...prev,
+            salary_range_percentage: formatSalaryPercentage(percentage)
+          }));
+        }
+      } catch (error) {
+        console.error("Error calculating percentage:", error);
+      }
+    };
+    
+    calculatePercentage();
+  }, [formData.job_title_id, formData.salary, jobTitles]);
 
   const fetchPositions = async () => {
     try {
@@ -714,26 +769,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             <h3 className="text-sm font-semibold mb-4 text-foreground">Informações de Cargo e Remuneração</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="job_title">Título do Cargo</Label>
-                <Input
-                  id="job_title"
-                  value={formData.job_title}
-                  onChange={(e) => setFormData({ ...formData, job_title: e.target.value })}
-                  disabled={loading}
-                  placeholder="Ex: Analista de RH"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="grade">Grade</Label>
-                <Input
-                  id="grade"
-                  value={formData.grade}
-                  onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                  disabled={loading}
-                  placeholder="Ex: A1, B2, C3"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="salary">Salário Fixo (R$)</Label>
                 <Input
                   id="salary"
@@ -808,21 +843,24 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="salary_range_percentage">% da Faixa</Label>
+                <Label htmlFor="salary_range_percentage">% da Faixa (Calculado Automaticamente)</Label>
                 <Input
                   id="salary_range_percentage"
-                  type="number"
-                  step="0.01"
-                  min="-100"
-                  max="100"
-                  value={formData.salary_range_percentage}
-                  onChange={(e) => setFormData({ ...formData, salary_range_percentage: e.target.value })}
-                  disabled={loading}
-                  placeholder="0-100%"
+                  type="text"
+                  value={formData.salary_range_percentage ? `${formData.salary_range_percentage}%` : "Selecione cargo e informe salário"}
+                  disabled={true}
+                  className="bg-muted"
                 />
-                <p className="text-xs text-muted-foreground">
-                  💡 Valores negativos indicam salário abaixo da faixa mínima
-                </p>
+                {formData.salary_range_percentage && (
+                  <div className={`mt-2 p-3 rounded-md ${getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).color}`}>
+                    <p className="text-sm font-medium">
+                      {getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).label}
+                    </p>
+                    <p className="text-xs opacity-90 mt-1">
+                      Posição salarial: {formData.salary_range_percentage}% em relação ao mercado
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="performance_rating">Nota Avaliação de Desempenho</Label>
