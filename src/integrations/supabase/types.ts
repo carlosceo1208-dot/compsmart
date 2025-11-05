@@ -773,6 +773,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      recalculate_salary_range_percentages: {
+        Args: never
+        Returns: {
+          employee_grade: string
+          employee_name: string
+          new_percentage: number
+          old_percentage: number
+        }[]
+      }
       suggest_next_employee_number: { Args: never; Returns: string }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
