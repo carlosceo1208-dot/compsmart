@@ -60,7 +60,7 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
                   </span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Atualizado: {economicData.usd.lastUpdate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                  Atualizado: {economicData.usd.lastUpdate?.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) || 'N/A'}
                 </p>
               </div>
             ) : (
