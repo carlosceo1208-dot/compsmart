@@ -3,6 +3,7 @@ import { FilterPanel } from '@/components/analytics/FilterPanel';
 import { KPICard } from '@/components/analytics/KPICard';
 import { ChartCard } from '@/components/analytics/ChartCard';
 import { EmployeeListCard } from '@/components/analytics/EmployeeListCard';
+import { SalaryDistributionCard } from '@/components/analytics/SalaryDistributionCard';
 import { usePeopleAnalytics } from '@/hooks/usePeopleAnalytics';
 import { DollarSign, Users, Wallet, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -53,6 +54,12 @@ const PeopleAnalyticsContent = () => {
               isLoading={kpis.isLoading}
             />
           </div>
+
+          {/* Salary Range Distribution */}
+          <SalaryDistributionCard
+            data={charts.salaryRangeDistribution || []}
+            isLoading={charts.isLoading}
+          />
 
           {/* Chart: Distribution by Unit */}
           <ChartCard

@@ -217,6 +217,57 @@ export const usePeopleAnalytics = () => {
     staleTime: 5 * 60 * 1000,
   });
 
+  // Chart: Salary Range Distribution
+  const { data: salaryRangeDistribution, isLoading: isLoadingDistribution } = useQuery({
+    queryKey: ['analytics-salary-range-distribution', filters],
+    queryFn: async () => {
+      let query = buildFilterConditions();
+      query = query.not('salary', 'is', null)
+                   .not('salary_range_percentage', 'is', null);
+      
+      const { data, error } = await query;
+      if (error) throw error;
+      if (!data || data.length === 0) return [];
+
+      // Categorizar funcionários usando a mesma lógica de getSalaryStatusBadge
+      const distribution = [
+        { 
+          category: 'Abaixo do Mínimo', 
+          count: data.filter(p => p.salary_range_percentage < 0).length,
+          color: '#dc2626',
+          badge: '⚠️'
+        },
+        { 
+          category: 'Início da Faixa', 
+          count: data.filter(p => p.salary_range_percentage >= 0 && p.salary_range_percentage < 40).length,
+          color: '#ca8a04',
+          badge: '📊'
+        },
+        { 
+          category: 'Próximo ao Mercado', 
+          count: data.filter(p => p.salary_range_percentage >= 40 && p.salary_range_percentage < 60).length,
+          color: '#16a34a',
+          badge: '✅'
+        },
+        { 
+          category: 'Acima do Mercado', 
+          count: data.filter(p => p.salary_range_percentage >= 60 && p.salary_range_percentage <= 100).length,
+          color: '#ea580c',
+          badge: '🔸'
+        },
+        { 
+          category: 'Acima da Faixa', 
+          count: data.filter(p => p.salary_range_percentage > 100).length,
+          color: '#dc2626',
+          badge: '🔴'
+        }
+      ].filter(item => item.count > 0); // Remover categorias vazias
+
+      return distribution;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   // Top 10 Highest Salaries
   const { data: topSalaries, isLoading: isLoadingTop } = useQuery({
     queryKey: ['analytics-top-salaries', filters],
@@ -244,7 +295,8 @@ export const usePeopleAnalytics = () => {
       distributionByUnit,
       distributionByGrade,
       salaryVsRange,
-      isLoading: isLoadingByUnit || isLoadingByGrade || isLoadingComparison,
+      salaryRangeDistribution,
+      isLoading: isLoadingByUnit || isLoadingByGrade || isLoadingComparison || isLoadingDistribution,
     },
     topSalaries: {
       data: topSalaries,
