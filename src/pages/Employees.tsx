@@ -37,6 +37,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { UserDialog } from "@/components/UserDialog";
 import { EmployeeBulkImport } from "@/components/EmployeeBulkImport";
+import { formatCurrency } from "@/lib/formatters";
 import {
   Select,
   SelectContent,
@@ -272,15 +273,22 @@ const Users = () => {
   const formatSalaryRangePercentage = (percentage: number | null) => {
     if (percentage === null) return '-';
     
-    const formatted = `${percentage.toFixed(1)}%`;
+    // Formatar com 2 casas decimais e vírgula brasileira, forçando exibição do sinal
+    const formatted = percentage.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      signDisplay: 'always'
+    }) + '%';
     
     // Cores baseadas no valor
     if (percentage < 0) {
-      return <span className="text-red-600 font-bold">{formatted} ⚠️</span>;
+      return <span className="text-red-600 dark:text-red-400 font-bold">{formatted} ⚠️</span>;
     } else if (percentage >= 0 && percentage < 50) {
-      return <span className="text-yellow-600 font-semibold">{formatted}</span>;
+      return <span className="text-yellow-600 dark:text-yellow-400 font-semibold">{formatted}</span>;
+    } else if (percentage >= 50 && percentage <= 100) {
+      return <span className="text-green-600 dark:text-green-400 font-semibold">{formatted}</span>;
     } else {
-      return <span className="text-green-600 font-semibold">{formatted}</span>;
+      return <span className="text-orange-600 dark:text-orange-400 font-semibold">{formatted}</span>;
     }
   };
 
@@ -606,7 +614,7 @@ const Users = () => {
                         <TableCell className="text-right text-xs">
                           <span className="text-muted-foreground">
                             {profile.salary 
-                              ? `R$ ${(profile.salary / 1000).toFixed(1)}k`
+                              ? formatCurrency(profile.salary)
                               : "-"}
                           </span>
                         </TableCell>
@@ -615,7 +623,7 @@ const Users = () => {
                         <TableCell className="text-right text-xs">
                           <span className="text-muted-foreground">
                             {profile.variable_salary 
-                              ? `R$ ${(profile.variable_salary / 1000).toFixed(1)}k`
+                              ? formatCurrency(profile.variable_salary)
                               : "-"}
                           </span>
                         </TableCell>
@@ -624,7 +632,7 @@ const Users = () => {
                         <TableCell className="text-right text-xs font-semibold bg-blue-50/50 dark:bg-blue-950/20">
                           <span className="text-blue-700 dark:text-blue-300">
                             {totalCash > 0 
-                              ? `R$ ${(totalCash / 1000).toFixed(1)}k`
+                              ? formatCurrency(totalCash)
                               : "-"}
                           </span>
                         </TableCell>
@@ -633,7 +641,7 @@ const Users = () => {
                         <TableCell className="text-right text-xs">
                           <span className="text-green-700 dark:text-green-400">
                             {profile.benefits_value 
-                              ? `R$ ${(profile.benefits_value / 1000).toFixed(1)}k`
+                              ? formatCurrency(profile.benefits_value)
                               : "-"}
                           </span>
                         </TableCell>
@@ -642,7 +650,7 @@ const Users = () => {
                         <TableCell className="text-right text-xs">
                           <span className="text-purple-700 dark:text-purple-400">
                             {totalIncentives > 0 
-                              ? `R$ ${(totalIncentives / 1000).toFixed(1)}k`
+                              ? formatCurrency(totalIncentives)
                               : "-"}
                           </span>
                         </TableCell>
@@ -651,7 +659,7 @@ const Users = () => {
                         <TableCell className="text-right text-xs font-bold bg-primary/10">
                           <span className="text-primary text-sm">
                             {totalCompensation > 0 
-                              ? `R$ ${(totalCompensation / 1000).toFixed(1)}k`
+                              ? formatCurrency(totalCompensation)
                               : "-"}
                           </span>
                         </TableCell>

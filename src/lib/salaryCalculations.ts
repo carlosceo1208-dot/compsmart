@@ -16,9 +16,9 @@ export const calculateSalaryRangePercentage = (
 ): number => {
   const { min_value, median_value, max_value } = range;
 
-  // CASO 1: Abaixo do mínimo (% de aumento necessário para atingir o mínimo)
+  // CASO 1: Abaixo do mínimo (% de aumento necessário para atingir o mínimo - VALOR NEGATIVO)
   if (salary < min_value) {
-    return ((min_value / salary) - 1) * 100;
+    return -((min_value / salary) - 1) * 100;
   }
   
   // CASO 2: Dentro da faixa (0% a 100%, onde 50% = Média de Mercado)

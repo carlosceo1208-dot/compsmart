@@ -847,9 +847,19 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 <Input
                   id="salary_range_percentage"
                   type="text"
-                  value={formData.salary_range_percentage ? `${formData.salary_range_percentage}%` : "Selecione cargo e informe salário"}
+                  value={
+                    formData.salary_range_percentage 
+                      ? `${parseFloat(formData.salary_range_percentage).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'always' })}%`
+                      : "Selecione cargo e informe salário"
+                  }
                   disabled={true}
-                  className="bg-muted"
+                  className={`bg-muted font-mono ${
+                    parseFloat(formData.salary_range_percentage || '0') < 0 
+                      ? 'text-red-600 dark:text-red-400 font-bold' 
+                      : parseFloat(formData.salary_range_percentage || '0') >= 50 && parseFloat(formData.salary_range_percentage || '0') <= 100
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-yellow-600 dark:text-yellow-400'
+                  }`}
                 />
                 {formData.salary_range_percentage && (
                   <div className={`mt-2 p-3 rounded-md ${getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).color}`}>
@@ -857,7 +867,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                       {getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).label}
                     </p>
                     <p className="text-xs opacity-90 mt-1">
-                      Posição salarial: {formData.salary_range_percentage}% em relação ao mercado
+                      {parseFloat(formData.salary_range_percentage) < 0 
+                        ? `⚠️ Salário está ${Math.abs(parseFloat(formData.salary_range_percentage)).toFixed(2)}% ABAIXO do mínimo do mercado`
+                        : parseFloat(formData.salary_range_percentage) >= 0 && parseFloat(formData.salary_range_percentage) < 50
+                          ? `📊 Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (abaixo da média de mercado)`
+                          : parseFloat(formData.salary_range_percentage) >= 50 && parseFloat(formData.salary_range_percentage) <= 100
+                            ? `✅ Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (próximo ou acima da média de mercado)`
+                            : `🔴 Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% acima do máximo da faixa`
+                      }
                     </p>
                   </div>
                 )}
