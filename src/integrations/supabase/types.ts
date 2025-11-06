@@ -169,6 +169,60 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_benefits: {
+        Row: {
+          benefit_id: string
+          company_contribution_value: number
+          created_at: string | null
+          employee_contribution_value: number | null
+          employee_id: string
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          benefit_id: string
+          company_contribution_value: number
+          created_at?: string | null
+          employee_contribution_value?: number | null
+          employee_id: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          benefit_id?: string
+          company_contribution_value?: number
+          created_at?: string | null
+          employee_contribution_value?: number | null
+          employee_id?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_benefits_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incentive_eligibility: {
         Row: {
           created_at: string | null
@@ -508,6 +562,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          benefits_value: number | null
           birth_date: string | null
           cpf: string | null
           created_at: string
@@ -519,17 +574,20 @@ export type Database = {
           id: string
           job_title: string | null
           job_title_id: string | null
+          long_term_incentive: number | null
           manager_id: string | null
           performance_rating: number | null
           phone: string | null
           salary: number | null
           salary_range_percentage: number | null
+          short_term_incentive: number | null
           status: Database["public"]["Enums"]["user_status"]
           unit_id: string | null
           updated_at: string
           variable_salary: number | null
         }
         Insert: {
+          benefits_value?: number | null
           birth_date?: string | null
           cpf?: string | null
           created_at?: string
@@ -541,17 +599,20 @@ export type Database = {
           id: string
           job_title?: string | null
           job_title_id?: string | null
+          long_term_incentive?: number | null
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
+          short_term_incentive?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
         }
         Update: {
+          benefits_value?: number | null
           birth_date?: string | null
           cpf?: string | null
           created_at?: string
@@ -563,11 +624,13 @@ export type Database = {
           id?: string
           job_title?: string | null
           job_title_id?: string | null
+          long_term_incentive?: number | null
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
+          short_term_incentive?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           unit_id?: string | null
           updated_at?: string
@@ -890,6 +953,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_employee_benefits: {
+        Args: { p_employee_id: string }
+        Returns: number
+      }
       calculate_salary_range: {
         Args: { p_amplitude: number; p_median: number }
         Returns: {

@@ -68,6 +68,9 @@ interface Profile {
   variable_salary: number | null;
   salary_range_percentage: number | null;
   performance_rating: number | null;
+  benefits_value: number | null;
+  short_term_incentive: number | null;
+  long_term_incentive: number | null;
   unit: { id: string; name: string; code: string; type: string; description: string | null } | null;
   org_breadcrumb: string;
   org_label: string;
@@ -163,7 +166,7 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit:unit_id(id, name, code, type, description)")
+        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:unit_id(id, name, code, type, description)")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;
@@ -548,161 +551,166 @@ const Users = () => {
             <div className="border rounded-lg">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead># Registro</TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Estrutura Organizacional</TableHead>
-                    {viewMode === "detailed" && (
-                      <>
-                        <TableHead>Cargo</TableHead>
-                        <TableHead>Grade</TableHead>
-                        <TableHead>Salário Fixo (R$)</TableHead>
-                        <TableHead>Salário Variável (R$)</TableHead>
-                      </>
-                    )}
-                    <TableHead>Total Cash (R$)</TableHead>
-                    {viewMode === "detailed" && (
-                      <>
-                        <TableHead>% Faixa</TableHead>
-                        <TableHead>Nota</TableHead>
-                        <TableHead>Perfil</TableHead>
-                      </>
-                    )}
-                    <TableHead>Status</TableHead>
-                    {viewMode === "detailed" && <TableHead>Data de Admissão</TableHead>}
+                  <TableRow className="text-xs">
+                    <TableHead className="w-[90px] text-xs"># Registro</TableHead>
+                    <TableHead className="min-w-[180px] text-xs">Nome</TableHead>
+                    <TableHead className="min-w-[120px] text-xs">Estrutura Org</TableHead>
+                    <TableHead className="min-w-[130px] text-xs">Cargo</TableHead>
+                    <TableHead className="w-[60px] text-xs text-center">Grade</TableHead>
+                    <TableHead className="w-[100px] text-right text-xs">Fixo</TableHead>
+                    <TableHead className="w-[100px] text-right text-xs">Variável</TableHead>
+                    <TableHead className="w-[110px] text-right text-xs font-semibold">Total Cash</TableHead>
+                    <TableHead className="w-[100px] text-right text-xs">Benefícios</TableHead>
+                    <TableHead className="w-[100px] text-right text-xs">Incentivos</TableHead>
+                    <TableHead className="w-[120px] text-right text-xs font-bold">Total Comp</TableHead>
+                    <TableHead className="w-[80px] text-center text-xs">% Faixa</TableHead>
+                    <TableHead className="w-[80px] text-xs">Status</TableHead>
                     <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedProfiles.map((profile, index) => (
-                    <TableRow key={profile.id} className="hover:bg-muted/50">
-                      <TableCell className="font-mono font-bold text-primary">
-                        {profile.employee_number || '-'}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <div>
+                  {paginatedProfiles.map((profile) => {
+                    const totalCash = (profile.salary || 0) + (profile.variable_salary || 0);
+                    const totalIncentives = (profile.short_term_incentive || 0) + (profile.long_term_incentive || 0);
+                    const totalCompensation = totalCash + (profile.benefits_value || 0) + totalIncentives;
+
+                    return (
+                      <TableRow key={profile.id} className="hover:bg-muted/50 text-xs">
+                        {/* # Registro */}
+                        <TableCell className="font-mono font-bold text-primary text-xs">
+                          {profile.employee_number || '-'}
+                        </TableCell>
+                        
+                        {/* Nome + Cargo/Grade no modo compacto */}
+                        <TableCell className="font-medium text-xs">
                           <div>{profile.full_name}</div>
-                          {viewMode === "compact" && (
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {profile.job_title || "-"} • {profile.grade || "-"}
-                            </div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span 
-                          className="text-sm" 
-                          title={profile.org_breadcrumb || undefined}
-                        >
-                          {profile.org_label || 'Não vinculado'}
-                        </span>
-                      </TableCell>
-                      {viewMode === "detailed" && (
-                        <>
-                          <TableCell>
-                            <span className="text-sm">{profile.job_title || "-"}</span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm">{profile.grade || "-"}</span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm font-medium">
-                              {profile.salary 
-                                ? profile.salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                : "-"}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm font-medium">
-                              {profile.variable_salary 
-                                ? profile.variable_salary.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                : "-"}
-                            </span>
-                          </TableCell>
-                        </>
-                      )}
-                      <TableCell>
-                        <span className="text-sm font-bold">
-                          {(profile.salary || profile.variable_salary)
-                            ? ((profile.salary || 0) + (profile.variable_salary || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                            : "-"}
-                        </span>
-                      </TableCell>
-                      {viewMode === "detailed" && (
-                        <>
-                          <TableCell>
-                            {formatSalaryRangePercentage(profile.salary_range_percentage)}
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm">
-                              {profile.performance_rating 
-                                ? profile.performance_rating.toFixed(1) 
-                                : "-"}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-1 flex-wrap">
-                              {getRoleBadge(profile.user_roles)}
-                            </div>
-                          </TableCell>
-                        </>
-                      )}
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={
-                            profile.status === "active"
-                              ? "bg-success/10 text-success border-success/20"
-                              : "bg-muted/50 text-muted-foreground"
-                          }
-                        >
-                          {profile.status === "active" ? "Ativo" : "Inativo"}
-                        </Badge>
-                      </TableCell>
-                      {viewMode === "detailed" && (
-                        <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar className="w-4 h-4" />
-                            {format(new Date(profile.created_at), "dd/MM/yyyy", {
-                              locale: ptBR,
-                            })}
+                          <div className="text-[10px] text-muted-foreground mt-0.5">
+                            {profile.job_title || "-"} • {profile.grade || "-"}
                           </div>
                         </TableCell>
-                      )}
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditUser(profile.id)}>
-                              <Edit className="w-4 h-4 mr-2" />
-                              Editar
-                            </DropdownMenuItem>
-                            {profile.status === "active" ? (
-                              <DropdownMenuItem
-                                onClick={() => setInactivateUserId(profile.id)}
-                                className="text-destructive"
-                              >
-                                <UserX className="w-4 h-4 mr-2" />
-                                Inativar
+                        
+                        {/* Estrutura Organizacional */}
+                        <TableCell className="text-xs" title={profile.org_breadcrumb}>
+                          {profile.org_label || 'Não vinculado'}
+                        </TableCell>
+                        
+                        {/* Cargo */}
+                        <TableCell className="text-xs">{profile.job_title || "-"}</TableCell>
+                        
+                        {/* Grade */}
+                        <TableCell className="text-xs text-center font-semibold">
+                          {profile.grade || "-"}
+                        </TableCell>
+                        
+                        {/* Salário Fixo */}
+                        <TableCell className="text-right text-xs">
+                          <span className="text-muted-foreground">
+                            {profile.salary 
+                              ? `R$ ${(profile.salary / 1000).toFixed(1)}k`
+                              : "-"}
+                          </span>
+                        </TableCell>
+                        
+                        {/* Variável */}
+                        <TableCell className="text-right text-xs">
+                          <span className="text-muted-foreground">
+                            {profile.variable_salary 
+                              ? `R$ ${(profile.variable_salary / 1000).toFixed(1)}k`
+                              : "-"}
+                          </span>
+                        </TableCell>
+                        
+                        {/* Total Cash (destaque) */}
+                        <TableCell className="text-right text-xs font-semibold bg-blue-50/50 dark:bg-blue-950/20">
+                          <span className="text-blue-700 dark:text-blue-300">
+                            {totalCash > 0 
+                              ? `R$ ${(totalCash / 1000).toFixed(1)}k`
+                              : "-"}
+                          </span>
+                        </TableCell>
+                        
+                        {/* Benefícios */}
+                        <TableCell className="text-right text-xs">
+                          <span className="text-green-700 dark:text-green-400">
+                            {profile.benefits_value 
+                              ? `R$ ${(profile.benefits_value / 1000).toFixed(1)}k`
+                              : "-"}
+                          </span>
+                        </TableCell>
+                        
+                        {/* Incentivos */}
+                        <TableCell className="text-right text-xs">
+                          <span className="text-purple-700 dark:text-purple-400">
+                            {totalIncentives > 0 
+                              ? `R$ ${(totalIncentives / 1000).toFixed(1)}k`
+                              : "-"}
+                          </span>
+                        </TableCell>
+                        
+                        {/* Total Compensation (maior destaque) */}
+                        <TableCell className="text-right text-xs font-bold bg-primary/10">
+                          <span className="text-primary text-sm">
+                            {totalCompensation > 0 
+                              ? `R$ ${(totalCompensation / 1000).toFixed(1)}k`
+                              : "-"}
+                          </span>
+                        </TableCell>
+                        
+                        {/* % Faixa */}
+                        <TableCell className="text-center text-xs">
+                          {formatSalaryRangePercentage(profile.salary_range_percentage)}
+                        </TableCell>
+                        
+                        {/* Status */}
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={
+                              profile.status === "active"
+                                ? "bg-success/10 text-success border-success/20 text-[10px] px-2 py-0"
+                                : "bg-muted/50 text-muted-foreground text-[10px] px-2 py-0"
+                            }
+                          >
+                            {profile.status === "active" ? "Ativo" : "Inativo"}
+                          </Badge>
+                        </TableCell>
+                        
+                        {/* Ações */}
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEditUser(profile.id)}>
+                                <Edit className="w-4 h-4 mr-2" />
+                                Editar
                               </DropdownMenuItem>
-                            ) : (
-                              <DropdownMenuItem
-                                onClick={() => setReactivateUserId(profile.id)}
-                                className="text-success"
-                              >
-                                <UserCheck className="w-4 h-4 mr-2" />
-                                Reativar
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                              {profile.status === "active" ? (
+                                <DropdownMenuItem
+                                  onClick={() => setInactivateUserId(profile.id)}
+                                  className="text-destructive"
+                                >
+                                  <UserX className="w-4 h-4 mr-2" />
+                                  Inativar
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() => setReactivateUserId(profile.id)}
+                                  className="text-success"
+                                >
+                                  <UserCheck className="w-4 h-4 mr-2" />
+                                  Reativar
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
