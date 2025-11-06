@@ -130,7 +130,7 @@ export default function SalaryRanges() {
                     <TableHead>Modo</TableHead>
                     <TableHead className="text-right">Mínimo</TableHead>
                     <TableHead className="text-right">1º Quartil</TableHead>
-                    <TableHead className="text-right">Ponto Médio</TableHead>
+                    <TableHead className="text-right">Média de Mercado</TableHead>
                     <TableHead className="text-right">3º Quartil</TableHead>
                     <TableHead className="text-right">Máximo</TableHead>
                     <TableHead className="text-center">Ações</TableHead>

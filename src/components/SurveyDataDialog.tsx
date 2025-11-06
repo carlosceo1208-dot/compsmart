@@ -318,7 +318,7 @@ export function SurveyDataDialog({
                   />
                 </div>
                 <div>
-                  <Label htmlFor="median">Média</Label>
+                  <Label htmlFor="median">Média de Mercado</Label>
                   <Input
                     id="median"
                     type="number"
@@ -356,7 +356,7 @@ export function SurveyDataDialog({
             <TabsContent value="automatic" className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="inputMedian">Ponto Médio (R$)</Label>
+                  <Label htmlFor="inputMedian">Média de Mercado (R$)</Label>
                   <Input
                     id="inputMedian"
                     type="number"
@@ -396,7 +396,7 @@ export function SurveyDataDialog({
                         <p className="font-semibold">{formatCurrency(calculatedValues.q1_value)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Média</p>
+                        <p className="text-xs text-muted-foreground">Média de Mercado</p>
                         <p className="font-semibold">{formatCurrency(calculatedValues.median_value)}</p>
                       </div>
                       <div>

@@ -242,7 +242,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
                     />
                   </div>
                   <div>
-                    <Label className="text-xs">Ponto Médio</Label>
+                    <Label className="text-xs">Média de Mercado</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -281,7 +281,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
               <Card>
                 <CardContent className="pt-6 space-y-4">
                   <div>
-                    <Label>Ponto Médio (R$)</Label>
+                    <Label>Média de Mercado (R$)</Label>
                     <Input
                       type="number"
                       step="0.01"
@@ -321,7 +321,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
                         <p className="font-semibold text-sm">{formatCurrency(calculatedValues.q1)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground mb-1">Média</p>
+                        <p className="text-xs text-muted-foreground mb-1">Média de Mercado</p>
                         <p className="font-semibold text-sm text-primary">{formatCurrency(calculatedValues.median)}</p>
                       </div>
                       <div>

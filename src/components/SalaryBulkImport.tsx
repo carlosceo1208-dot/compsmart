@@ -193,7 +193,7 @@ export function SalaryBulkImport({ open, onOpenChange, salaryTableId, onSuccess 
                       <TableHead>Grade</TableHead>
                       <TableHead className="text-right">Mínimo</TableHead>
                       <TableHead className="text-right">Q1</TableHead>
-                      <TableHead className="text-right">Mediana</TableHead>
+                      <TableHead className="text-right">Média de Mercado</TableHead>
                       <TableHead className="text-right">Q3</TableHead>
                       <TableHead className="text-right">Máximo</TableHead>
                     </TableRow>

@@ -6,8 +6,8 @@ interface SalaryRange {
 
 /**
  * Calcula o percentual de posição salarial usando a fórmula de 3 casos:
- * - Abaixo do mínimo: ((salary - min) / min) * 100 (negativo)
- * - Dentro da faixa: (salary / median) * 100 (0-100%, comparado ao mercado)
+ * - Abaixo do mínimo: ((min / salary) - 1) * 100 (% de aumento necessário)
+ * - Dentro da faixa: ((salary - min) / (max - min)) * 100 (0% a 100%, onde 50% = Média de Mercado)
  * - Acima do máximo: (salary / max) * 100 (>100%)
  */
 export const calculateSalaryRangePercentage = (
@@ -16,17 +16,17 @@ export const calculateSalaryRangePercentage = (
 ): number => {
   const { min_value, median_value, max_value } = range;
 
-  // CASO 1: Abaixo do mínimo (negativo)
+  // CASO 1: Abaixo do mínimo (% de aumento necessário para atingir o mínimo)
   if (salary < min_value) {
-    return ((salary - min_value) / min_value) * 100;
+    return ((min_value / salary) - 1) * 100;
   }
   
-  // CASO 2: Dentro da faixa (0-100%, comparado ao ponto médio = mercado)
+  // CASO 2: Dentro da faixa (0% a 100%, onde 50% = Média de Mercado)
   else if (salary >= min_value && salary <= max_value) {
-    return (salary / median_value) * 100;
+    return ((salary - min_value) / (max_value - min_value)) * 100;
   }
   
-  // CASO 3: Acima do máximo (>100%)
+  // CASO 3: Acima do máximo (percentual em relação ao teto)
   else {
     return (salary / max_value) * 100;
   }
@@ -48,25 +48,25 @@ export const getSalaryStatusBadge = (percentage: number) => {
       color: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300', 
       label: '⚠️ Abaixo do Mínimo' 
     };
-  } else if (percentage < 80) {
+  } else if (percentage < 40) {
     return { 
       color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300', 
-      label: '📊 Início da Faixa' 
+      label: '📊 Início da Faixa (Abaixo do Mercado)' 
     };
-  } else if (percentage < 100) {
+  } else if (percentage < 60) {
     return { 
       color: 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300', 
-      label: '✅ Próximo ao Mercado' 
+      label: '✅ Próximo ao Mercado (50% = Mercado)' 
     };
-  } else if (percentage <= 110) {
+  } else if (percentage <= 100) {
     return { 
       color: 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300', 
-      label: '🔸 Acima da Faixa' 
+      label: '🔸 Acima do Mercado' 
     };
   } else {
     return { 
       color: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300', 
-      label: '🔴 Muito Acima do Teto' 
+      label: '🔴 Acima da Faixa' 
     };
   }
 };
