@@ -120,6 +120,7 @@ export type Database = {
           fiscal_year: number
           id: string
           month: number
+          unit_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -129,6 +130,7 @@ export type Database = {
           fiscal_year: number
           id?: string
           month: number
+          unit_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -138,9 +140,18 @@ export type Database = {
           fiscal_year?: number
           id?: string
           month?: number
+          unit_id?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "budget_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       competencies: {
         Row: {

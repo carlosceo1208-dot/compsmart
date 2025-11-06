@@ -20,6 +20,7 @@ import {
   Shield,
   Building,
   ArrowLeftRight,
+  PiggyBank,
 } from 'lucide-react';
 
 interface Module {
@@ -43,6 +44,7 @@ const moduleGroups: Record<string, Module[]> = {
   'G-P': [
     { title: 'Gestão de Benefícios', path: '/benefits', icon: Target, status: 'coming-soon' },
     { title: 'Gestão de Perfis', path: '/roles', icon: Shield, status: 'active' },
+    { title: 'Orçamento', path: '/budget', icon: PiggyBank, status: 'active' },
     { title: 'People Analytics', path: '/people-analytics', icon: BarChart3, status: 'active' },
     { title: 'Pesquisa Salarial', path: '/survey-data', icon: TrendingUp, status: 'active' },
     { title: 'Plano de Cargos', path: '/job-titles', icon: Briefcase, status: 'active' },

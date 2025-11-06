@@ -9,10 +9,11 @@ import { Currency } from '@/types/economic';
 
 interface BudgetCardProps {
   currency: Currency;
+  unitId?: string | null;
 }
 
-export const BudgetCard = ({ currency }: BudgetCardProps) => {
-  const { data, isLoading } = useBudgetKPI();
+export const BudgetCard = ({ currency, unitId }: BudgetCardProps) => {
+  const { data, isLoading } = useBudgetKPI({ unitId });
   const { convert } = useCurrencyConverter();
 
   const realSalary = data ? convert(data.realSalary, 'BRL', currency) : 0;
@@ -32,6 +33,15 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-20 w-full" />
+        ) : !data || data.budgetedSalary === 0 ? (
+          <div className="text-center py-4">
+            <p className="text-sm text-muted-foreground mb-2">
+              📊 Nenhum orçamento cadastrado
+            </p>
+            <a href="/budget" className="text-sm text-primary hover:underline">
+              Cadastre o orçamento mensal
+            </a>
+          </div>
         ) : (
           <div className="space-y-3">
             <div className="flex justify-between items-center">
