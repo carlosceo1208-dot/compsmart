@@ -849,16 +849,26 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   type="text"
                   value={
                     formData.salary_range_percentage 
-                      ? `${parseFloat(formData.salary_range_percentage).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: 'always' })}%`
+                      ? (() => {
+                          const pct = parseFloat(formData.salary_range_percentage);
+                          const formatted = Math.abs(pct).toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          });
+                          
+                          if (pct < 0) return `-${formatted}%`;
+                          if (pct <= 100) return `${formatted}%`;
+                          return `+${formatted}%`;
+                        })()
                       : "Selecione cargo e informe salário"
                   }
                   disabled={true}
                   className={`bg-muted font-mono ${
                     parseFloat(formData.salary_range_percentage || '0') < 0 
                       ? 'text-red-600 dark:text-red-400 font-bold' 
-                      : parseFloat(formData.salary_range_percentage || '0') >= 50 && parseFloat(formData.salary_range_percentage || '0') <= 100
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-yellow-600 dark:text-yellow-400'
+                      : parseFloat(formData.salary_range_percentage || '0') <= 100
+                        ? 'text-green-600 dark:text-green-400 font-semibold'
+                        : 'text-blue-600 dark:text-blue-400 font-bold'
                   }`}
                 />
                 {formData.salary_range_percentage && (
@@ -869,11 +879,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                     <p className="text-xs opacity-90 mt-1">
                       {parseFloat(formData.salary_range_percentage) < 0 
                         ? `⚠️ Salário está ${Math.abs(parseFloat(formData.salary_range_percentage)).toFixed(2)}% ABAIXO do mínimo do mercado`
-                        : parseFloat(formData.salary_range_percentage) >= 0 && parseFloat(formData.salary_range_percentage) < 50
-                          ? `📊 Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (abaixo da média de mercado)`
-                          : parseFloat(formData.salary_range_percentage) >= 50 && parseFloat(formData.salary_range_percentage) <= 100
-                            ? `✅ Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (próximo ou acima da média de mercado)`
-                            : `🔴 Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% acima do máximo da faixa`
+                        : parseFloat(formData.salary_range_percentage) >= 0 && parseFloat(formData.salary_range_percentage) <= 100
+                          ? `✅ Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (competitivo com o mercado)`
+                          : `🔵 Salário está ${(parseFloat(formData.salary_range_percentage) - 100).toFixed(2)}% acima do máximo da faixa`
                       }
                     </p>
                   </div>

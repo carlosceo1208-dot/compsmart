@@ -273,22 +273,35 @@ const Users = () => {
   const formatSalaryRangePercentage = (percentage: number | null) => {
     if (percentage === null) return '-';
     
-    // Formatar com 2 casas decimais e vírgula brasileira, forçando exibição do sinal
-    const formatted = percentage.toLocaleString('pt-BR', {
+    // Formatar com 2 casas decimais e vírgula brasileira
+    const absFormatted = Math.abs(percentage).toLocaleString('pt-BR', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-      signDisplay: 'always'
-    }) + '%';
+    });
     
-    // Cores baseadas no valor
+    // CASO 1: Abaixo da faixa (< 0%) - Vermelho com sinal negativo
     if (percentage < 0) {
-      return <span className="text-red-600 dark:text-red-400 font-bold">{formatted} ⚠️</span>;
-    } else if (percentage >= 0 && percentage < 50) {
-      return <span className="text-yellow-600 dark:text-yellow-400 font-semibold">{formatted}</span>;
-    } else if (percentage >= 50 && percentage <= 100) {
-      return <span className="text-green-600 dark:text-green-400 font-semibold">{formatted}</span>;
-    } else {
-      return <span className="text-orange-600 dark:text-orange-400 font-semibold">{formatted}</span>;
+      return (
+        <span className="text-red-600 dark:text-red-400 font-bold">
+          -{absFormatted}% ⚠️
+        </span>
+      );
+    } 
+    // CASO 2: Dentro da faixa (0% a 100%) - Verde SEM sinal
+    else if (percentage >= 0 && percentage <= 100) {
+      return (
+        <span className="text-green-600 dark:text-green-400 font-semibold">
+          {absFormatted}%
+        </span>
+      );
+    } 
+    // CASO 3: Acima da faixa (> 100%) - Azul com sinal positivo
+    else {
+      return (
+        <span className="text-blue-600 dark:text-blue-400 font-bold">
+          +{absFormatted}%
+        </span>
+      );
     }
   };
 
