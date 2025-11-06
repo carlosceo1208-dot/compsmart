@@ -4,6 +4,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Currency } from '@/types/economic';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
+import { BenefitsCard } from './BenefitsCard';
+import { IncentivesCard } from './IncentivesCard';
+import { BudgetCard } from './BudgetCard';
 
 interface KPIDashboardProps {
   currency: Currency;
@@ -76,6 +79,10 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
         format="currency"
         isLoading={loadingSalary}
       />
+      
+      <BenefitsCard currency={currency} />
+      <IncentivesCard currency={currency} />
+      <BudgetCard currency={currency} />
     </div>
   );
 };

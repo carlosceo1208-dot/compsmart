@@ -47,6 +47,101 @@ export type Database = {
         }
         Relationships: []
       }
+      benefit_eligibility: {
+        Row: {
+          benefit_id: string | null
+          created_at: string | null
+          custom_value: number | null
+          grade: string
+          id: string
+        }
+        Insert: {
+          benefit_id?: string | null
+          created_at?: string | null
+          custom_value?: number | null
+          grade: string
+          id?: string
+        }
+        Update: {
+          benefit_id?: string | null
+          created_at?: string | null
+          custom_value?: number | null
+          grade?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "benefit_eligibility_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      benefits: {
+        Row: {
+          benefit_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+          value_per_employee: number | null
+        }
+        Insert: {
+          benefit_type: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+          value_per_employee?: number | null
+        }
+        Update: {
+          benefit_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+          value_per_employee?: number | null
+        }
+        Relationships: []
+      }
+      budget: {
+        Row: {
+          budgeted_headcount: number
+          budgeted_salary: number
+          created_at: string | null
+          fiscal_year: number
+          id: string
+          month: number
+          updated_at: string | null
+        }
+        Insert: {
+          budgeted_headcount: number
+          budgeted_salary: number
+          created_at?: string | null
+          fiscal_year: number
+          id?: string
+          month: number
+          updated_at?: string | null
+        }
+        Update: {
+          budgeted_headcount?: number
+          budgeted_salary?: number
+          created_at?: string | null
+          fiscal_year?: number
+          id?: string
+          month?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       competencies: {
         Row: {
           created_at: string
@@ -71,6 +166,74 @@ export type Database = {
           name?: string
           type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      incentive_eligibility: {
+        Row: {
+          created_at: string | null
+          custom_percentage: number | null
+          grade: string
+          id: string
+          program_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          custom_percentage?: number | null
+          grade: string
+          id?: string
+          program_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          custom_percentage?: number | null
+          grade?: string
+          id?: string
+          program_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incentive_eligibility_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "incentive_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incentive_programs: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          payment_frequency: string | null
+          program_type: string
+          target_percentage: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          payment_frequency?: string | null
+          program_type: string
+          target_percentage?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          payment_frequency?: string | null
+          program_type?: string
+          target_percentage?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
