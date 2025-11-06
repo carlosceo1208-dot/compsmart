@@ -777,9 +777,13 @@ export type Database = {
         Args: never
         Returns: {
           employee_grade: string
+          employee_id: string
           employee_name: string
           new_percentage: number
           old_percentage: number
+          range_info: string
+          salary: number
+          status: string
         }[]
       }
       suggest_next_employee_number: { Args: never; Returns: string }
