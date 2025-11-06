@@ -54,7 +54,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </div>
             </div>
 
-            {data && data.budgetedSalary > 0 && (
+            {data?.budgetedSalary > 0 && (
               <Badge variant={isOverBudget ? "destructive" : "success"} className="w-full justify-center">
                 {isOverBudget ? '⚠️ Acima' : '✅ Dentro'} do Orçamento
               </Badge>
