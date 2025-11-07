@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,6 +91,7 @@ const normalizeLabel = (value?: string | null): string => {
 };
 
 const Users = () => {
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -417,6 +419,16 @@ const Users = () => {
             <Upload className="w-4 h-4" />
             Atualizar Funcionários
           </Button>
+          {(currentUserRoles.includes('manager') || currentUserRoles.includes('hr_manager') || currentUserRoles.includes('admin')) && (
+            <Button 
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate('/budget-planning')}
+            >
+              <Calendar className="w-4 h-4" />
+              Planejar Orçamento 2026
+            </Button>
+          )}
           <Button onClick={handleNewUser} className="bg-primary hover:bg-primary-hover gap-2 shadow-sm hover:shadow-md">
             <UserPlus className="w-4 h-4" />
             Novo Funcionário

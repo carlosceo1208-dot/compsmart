@@ -120,6 +120,7 @@ export type Database = {
           fiscal_year: number
           id: string
           month: number
+          submission_id: string | null
           unit_id: string | null
           updated_at: string | null
         }
@@ -130,6 +131,7 @@ export type Database = {
           fiscal_year: number
           id?: string
           month: number
+          submission_id?: string | null
           unit_id?: string | null
           updated_at?: string | null
         }
@@ -140,12 +142,167 @@ export type Database = {
           fiscal_year?: number
           id?: string
           month?: number
+          submission_id?: string | null
           unit_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: "budget_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "budget_submissions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "budget_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budget_employee_projections: {
+        Row: {
+          change_type: string | null
+          created_at: string
+          created_by: string
+          employee_id: string | null
+          fiscal_year: number
+          id: string
+          is_active: boolean | null
+          is_planned_hire: boolean | null
+          justification: string | null
+          month: number
+          planned_employee_name: string | null
+          projected_benefits: number
+          projected_fixed_salary: number
+          projected_grade: string | null
+          projected_job_title_id: string | null
+          projected_unit_id: string | null
+          projected_variable_salary: number
+          updated_at: string
+        }
+        Insert: {
+          change_type?: string | null
+          created_at?: string
+          created_by: string
+          employee_id?: string | null
+          fiscal_year: number
+          id?: string
+          is_active?: boolean | null
+          is_planned_hire?: boolean | null
+          justification?: string | null
+          month: number
+          planned_employee_name?: string | null
+          projected_benefits?: number
+          projected_fixed_salary?: number
+          projected_grade?: string | null
+          projected_job_title_id?: string | null
+          projected_unit_id?: string | null
+          projected_variable_salary?: number
+          updated_at?: string
+        }
+        Update: {
+          change_type?: string | null
+          created_at?: string
+          created_by?: string
+          employee_id?: string | null
+          fiscal_year?: number
+          id?: string
+          is_active?: boolean | null
+          is_planned_hire?: boolean | null
+          justification?: string | null
+          month?: number
+          planned_employee_name?: string | null
+          projected_benefits?: number
+          projected_fixed_salary?: number
+          projected_grade?: string | null
+          projected_job_title_id?: string | null
+          projected_unit_id?: string | null
+          projected_variable_salary?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_employee_projections_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_employee_projections_projected_job_title_id_fkey"
+            columns: ["projected_job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_employee_projections_projected_unit_id_fkey"
+            columns: ["projected_unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      budget_submissions: {
+        Row: {
+          created_at: string
+          fiscal_year: number
+          id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submission_notes: string | null
+          submitted_at: string | null
+          submitted_by: string | null
+          unit_id: string | null
+          unlock_justification: string | null
+          unlocked_at: string | null
+          unlocked_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fiscal_year: number
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_notes?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          unit_id?: string | null
+          unlock_justification?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fiscal_year?: number
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submission_notes?: string | null
+          submitted_at?: string | null
+          submitted_by?: string | null
+          unit_id?: string | null
+          unlock_justification?: string | null
+          unlocked_at?: string | null
+          unlocked_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_submissions_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"

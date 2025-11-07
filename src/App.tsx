@@ -25,6 +25,7 @@ import LegalAssistant from "./pages/LegalAssistant";
 import Pricing from "./pages/Pricing";
 import SalaryAnalysisReport from "./pages/SalaryAnalysisReport";
 import Budget from "./pages/Budget";
+import BudgetPlanning from "./pages/BudgetPlanning";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -57,6 +58,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/salary-analysis-report" element={<SalaryAnalysisReport />} />
               <Route path="/budget" element={<Budget />} />
+              <Route path="/budget-planning" element={<BudgetPlanning />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
