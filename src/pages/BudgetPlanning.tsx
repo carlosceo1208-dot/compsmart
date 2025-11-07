@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { BudgetPlanningFilterPanel } from '@/components/budget/BudgetPlanningFilterPanel';
 import { BudgetSummaryTable } from '@/components/budget/BudgetSummaryTable';
 import { EmployeeBudgetList } from '@/components/budget/EmployeeBudgetList';
+import { EmployeeBudgetDialog } from '@/components/budget/EmployeeBudgetDialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
@@ -17,34 +18,64 @@ const BudgetPlanning = () => {
   const navigate = useNavigate();
   const [fiscalYear, setFiscalYear] = useState(2026);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   
   const { data: userData } = useCurrentUserRole();
+  
+  // Definir unidade selecionada baseado no role
+  useState(() => {
+    if (userData?.isAdmin || userData?.isHR) {
+      setSelectedUnitId(null); // Empresa toda
+    } else {
+      setSelectedUnitId(userData?.unitId || null);
+    }
+  });
+
   const { data: summary, isLoading: summaryLoading } = useBudgetSummary(
-    userData?.unitId || null,
+    selectedUnitId,
     fiscalYear
   );
   const { data: submissionData } = useSubmissionStatus(
-    userData?.unitId || null,
+    selectedUnitId,
     fiscalYear
   );
 
   // Buscar funcionários da unidade
   const { data: employees } = useQuery({
-    queryKey: ['unit-employees', userData?.unitId],
+    queryKey: ['unit-employees', selectedUnitId, fiscalYear],
     queryFn: async () => {
-      if (!userData?.unitId) return [];
-
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
         .select('id, full_name, job_title, salary')
-        .eq('unit_id', userData.unitId)
         .eq('status', 'active')
         .order('full_name');
 
+      if (selectedUnitId) {
+        query = query.eq('unit_id', selectedUnitId);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
-      return data || [];
+
+      // Contar mudanças planejadas por funcionário
+      const employeeIds = data?.map(e => e.id) || [];
+      const { data: changes } = await supabase
+        .from('budget_employee_projections')
+        .select('employee_id')
+        .eq('fiscal_year', fiscalYear)
+        .in('employee_id', employeeIds)
+        .not('change_type', 'is', null);
+
+      const changeCounts = new Map<string, number>();
+      changes?.forEach(c => {
+        changeCounts.set(c.employee_id, (changeCounts.get(c.employee_id) || 0) + 1);
+      });
+
+      return data?.map(emp => ({
+        ...emp,
+        changeCount: changeCounts.get(emp.id) || 0,
+      })) || [];
     },
-    enabled: !!userData?.unitId,
   });
 
   const handleSubmit = async () => {
@@ -123,10 +154,14 @@ const BudgetPlanning = () => {
         {getStatusBadge()}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6 mb-6">
         <BudgetPlanningFilterPanel
           fiscalYear={fiscalYear}
           onFiscalYearChange={setFiscalYear}
+          selectedUnitId={selectedUnitId}
+          onUnitChange={setSelectedUnitId}
+          isAdmin={userData?.isAdmin || false}
+          isHR={userData?.isHR || false}
         />
 
         <div className="space-y-6">
@@ -144,6 +179,16 @@ const BudgetPlanning = () => {
               toast.info('Funcionalidade em desenvolvimento');
             }}
           />
+
+          {selectedEmployeeId && (
+            <EmployeeBudgetDialog
+              employeeId={selectedEmployeeId}
+              employeeName={employees?.find(e => e.id === selectedEmployeeId)?.full_name || ''}
+              fiscalYear={fiscalYear}
+              open={!!selectedEmployeeId}
+              onOpenChange={(open) => !open && setSelectedEmployeeId(null)}
+            />
+          )}
 
           <div className="flex gap-4">
             <Button variant="outline" onClick={() => navigate('/employees')}>
