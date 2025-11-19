@@ -14,6 +14,7 @@ import {
   UserCircle,
   Scale,
   FileBarChart,
+  FileCheck,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -120,6 +121,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       path: '/salary-analysis-report',
       status: 'active' as const,
       category: 'consultation' as const,
+    },
+    {
+      title: 'Aprovações de Orçamento',
+      description: 'Revise e aprove orçamentos',
+      icon: FileCheck,
+      path: '/budget-approvals',
+      status: 'active' as const,
+      category: 'management' as const,
     },
     {
       title: 'Configurações',
