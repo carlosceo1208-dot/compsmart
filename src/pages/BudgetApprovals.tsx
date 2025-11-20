@@ -156,6 +156,7 @@ const BudgetApprovals = () => {
                   <TableHead>Status</TableHead>
                   <TableHead>Submetido Por</TableHead>
                   <TableHead>Data Submissão</TableHead>
+                  <TableHead>Revisado Por</TableHead>
                   <TableHead>Total Anual</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>
@@ -171,6 +172,7 @@ const BudgetApprovals = () => {
                     </TableCell>
                     <TableCell>{sub.submitted_by_profile?.full_name || 'N/A'}</TableCell>
                     <TableCell>{formatDate(sub.submitted_at)}</TableCell>
+                    <TableCell>{sub.reviewed_by_profile?.full_name || '-'}</TableCell>
                     <TableCell className="font-semibold">{formatCurrency(sub.totalAnnual || 0)}</TableCell>
                     <TableCell>
                       <Button
