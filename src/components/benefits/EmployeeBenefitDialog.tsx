@@ -54,9 +54,14 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
 
   useEffect(() => {
     if (selectedBenefit) {
+      // Pre-fill with benefit's default values
       setFormData(prev => ({
         ...prev,
         company_contribution_value: selectedBenefit.value_per_employee,
+        employee_contribution_type: (selectedBenefit.default_employee_contribution_type === 'none' 
+          ? 'fixed' 
+          : selectedBenefit.default_employee_contribution_type) as 'fixed' | 'percentage',
+        employee_contribution_value: selectedBenefit.default_employee_contribution_value || 0,
       }));
     }
   }, [selectedBenefit]);
