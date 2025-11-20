@@ -187,7 +187,7 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
             </div>
           </TabsContent>
 
-          {/* Aba: Funcionários com Mudanças */}
+          {/* Aba: Funcionários com Alterações */}
           <TabsContent value="employees" className="space-y-4">
             {details.employeeChanges.length > 0 ? (
               details.employeeChanges.map((emp, idx) => (
@@ -202,7 +202,7 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
                     {emp.changes.map((change: any, cIdx: number) => (
                       <div key={cIdx} className="flex items-center justify-between text-sm p-2 bg-muted/30 rounded">
                         <span>
-                          <strong>{getMonthName(change.month)}</strong> - {change.change_type || 'Mudança'}
+                          <strong>{getMonthName(change.month)}</strong> - {change.change_type || 'Alteração'}
                         </span>
                         <span className="font-mono">{formatCurrency(change.projected_fixed_salary)}</span>
                       </div>
@@ -217,7 +217,7 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
               ))
             ) : (
               <div className="text-center py-8 text-muted-foreground">
-                Nenhuma mudança registrada
+                Nenhuma alteração registrada
               </div>
             )}
           </TabsContent>

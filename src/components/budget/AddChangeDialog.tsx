@@ -10,6 +10,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { formatCurrency } from '@/lib/formatters';
+import { Badge } from '@/components/ui/badge';
 
 interface AddChangeDialogProps {
   open: boolean;
@@ -24,12 +26,12 @@ interface AddChangeDialogProps {
 const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
 const changeTypes = [
-  { value: 'merit', label: '🎯 Aumento por Mérito', needsPercentage: true },
+  { value: 'merit_increase', label: '🎯 Aumento por Mérito', needsPercentage: true },
   { value: 'promotion', label: '🚀 Promoção', needsJobTitle: true },
-  { value: 'collective', label: '📈 Acordo Coletivo', needsPercentage: true },
+  { value: 'collective_bargaining', label: '📈 Acordo Coletivo', needsPercentage: true },
   { value: 'planned_termination', label: '❌ Demissão Planejada', needsNothing: true },
   { value: 'transfer_out', label: '🔄 Transferência', needsUnit: true },
-  { value: 'manual', label: '✏️ Ajuste Manual', needsManual: true },
+  { value: 'adjustment', label: '✏️ Ajuste Manual', needsManual: true },
 ];
 
 export const AddChangeDialog = ({
@@ -42,7 +44,7 @@ export const AddChangeDialog = ({
   onSave,
 }: AddChangeDialogProps) => {
   const queryClient = useQueryClient();
-  const [changeType, setChangeType] = useState('merit');
+  const [changeType, setChangeType] = useState('merit_increase');
   const [percentage, setPercentage] = useState('');
   const [newJobTitleId, setNewJobTitleId] = useState('');
   const [newGrade, setNewGrade] = useState('');
@@ -135,12 +137,12 @@ export const AddChangeDialog = ({
     const range = currentData.job_titles.salary_ranges;
     let projectedSalary = currentData.salary;
 
-    if (changeType === 'merit' || changeType === 'collective') {
+    if (changeType === 'merit_increase' || changeType === 'collective_bargaining') {
       const pct = parseFloat(percentage);
       if (!isNaN(pct)) {
         projectedSalary = currentData.salary * (1 + pct / 100);
       }
-    } else if (changeType === 'manual') {
+    } else if (changeType === 'adjustment') {
       const manual = parseFloat(manualSalary);
       if (!isNaN(manual)) {
         projectedSalary = manual;
@@ -163,24 +165,25 @@ export const AddChangeDialog = ({
     }
 
     try {
-      let projectedSalary = currentData.salary;
-      let projectedVariable = currentData.variable_salary;
-      let projectedBenefits = currentData.benefits_value;
+      // Garantir valores numéricos (tratar NULL)
+      let projectedSalary = currentData.salary || 0;
+      let projectedVariable = currentData.variable_salary || 0;
+      let projectedBenefits = currentData.benefits_value || 0;
       let projectedJobTitleId = currentData.job_title_id;
       let projectedGrade = currentData.grade;
       let projectedUnitId = currentData.unit_id;
 
-      // Calcular valores baseado no tipo de mudança
+      // Calcular valores baseado no tipo de alteração
       switch (changeType) {
-        case 'merit':
-        case 'collective':
+        case 'merit_increase':
+        case 'collective_bargaining':
           const pct = parseFloat(percentage);
           if (isNaN(pct)) {
             toast.error('Percentual inválido');
             return;
           }
-          projectedSalary = currentData.salary * (1 + pct / 100);
-          projectedVariable = currentData.variable_salary * (1 + pct / 100);
+          projectedSalary = (currentData.salary || 0) * (1 + pct / 100);
+          projectedVariable = (currentData.variable_salary || 0) * (1 + pct / 100);
           break;
 
         case 'promotion':
@@ -210,7 +213,7 @@ export const AddChangeDialog = ({
           projectedUnitId = newUnitId;
           break;
 
-        case 'manual':
+        case 'adjustment':
           const manual = parseFloat(manualSalary);
           if (isNaN(manual)) {
             toast.error('Salário inválido');
@@ -271,8 +274,8 @@ export const AddChangeDialog = ({
       onSave();
       onOpenChange(false);
     } catch (error) {
-      console.error('Erro ao salvar mudança:', error);
-      toast.error('Erro ao salvar mudança');
+      console.error('Erro ao salvar alteração:', error);
+      toast.error('Erro ao salvar alteração');
     }
   };
 
@@ -283,13 +286,13 @@ export const AddChangeDialog = ({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            Adicionar Mudança - {employeeName} ({month ? monthNames[month - 1] : ''})
+            Adicionar Alteração - {employeeName} ({month ? monthNames[month - 1] : ''})
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <div>
-            <Label>Tipo de Mudança</Label>
+            <Label>Tipo de Alteração</Label>
             <Select value={changeType} onValueChange={setChangeType}>
               <SelectTrigger>
                 <SelectValue />
@@ -304,23 +307,45 @@ export const AddChangeDialog = ({
             </Select>
           </div>
 
-          {selectedType?.needsPercentage && (
-            <div>
-              <Label>Percentual de Aumento (%)</Label>
-              <Input
-                type="number"
-                step="0.01"
-                value={percentage}
-                onChange={(e) => setPercentage(e.target.value)}
-                placeholder="Ex: 5.5"
-              />
-              {currentData && percentage && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Novo salário: R$ {(currentData.salary * (1 + parseFloat(percentage) / 100)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
-              )}
-            </div>
-          )}
+        {selectedType?.needsPercentage && (
+          <div>
+            <Label>Percentual de Aumento (%)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={percentage}
+              onChange={(e) => setPercentage(e.target.value)}
+              placeholder="Ex: 5.5"
+            />
+            {currentData && percentage && !isNaN(parseFloat(percentage)) && (
+              <div className="mt-3 p-3 bg-primary/10 border-2 border-primary/30 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">Salário Atual</span>
+                    <span className="text-lg font-medium">
+                      {formatCurrency(currentData.salary)}
+                    </span>
+                  </div>
+                  
+                  <div className="mx-4 text-2xl text-primary">→</div>
+                  
+                  <div className="flex flex-col">
+                    <span className="text-sm text-muted-foreground">Novo Salário</span>
+                    <span className="text-2xl font-bold text-primary">
+                      {formatCurrency(currentData.salary * (1 + parseFloat(percentage) / 100))}
+                    </span>
+                  </div>
+                  
+                  <div className="ml-4">
+                    <Badge variant="default" className="text-base px-3 py-1">
+                      +{percentage}%
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
           {selectedType?.needsJobTitle && (
             <>
@@ -386,7 +411,7 @@ export const AddChangeDialog = ({
             <Textarea
               value={justification}
               onChange={(e) => setJustification(e.target.value)}
-              placeholder="Descreva o motivo desta mudança..."
+              placeholder="Descreva o motivo desta alteração..."
               rows={3}
             />
           </div>
@@ -403,7 +428,7 @@ export const AddChangeDialog = ({
               Cancelar
             </Button>
             <Button onClick={handleSave}>
-              Salvar Mudança
+              Salvar Alteração
             </Button>
           </div>
         </div>
