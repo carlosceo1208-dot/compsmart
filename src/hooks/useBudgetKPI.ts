@@ -1,16 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useBudgetKPIFromPlanning } from './useBudgetKPIFromPlanning';
 
 interface UseBudgetKPIParams {
   unitId?: string | null;
 }
 
 export const useBudgetKPI = (params: UseBudgetKPIParams = {}) => {
-  return useQuery({
-    queryKey: ['kpi-budget', params.unitId],
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+  
+  // Tentar buscar do planejamento primeiro
+  const planningQuery = useBudgetKPIFromPlanning({ 
+    unitId: params.unitId, 
+    fiscalYear: currentYear 
+  });
+
+  // Buscar do orçamento manual como fallback
+  const manualQuery = useQuery({
+    queryKey: ['kpi-budget-manual', params.unitId],
     queryFn: async () => {
-      const currentMonth = new Date().getMonth() + 1;
-      const currentYear = new Date().getFullYear();
 
       // Buscar orçamento do mês atual
       let budgetQuery = supabase
@@ -67,8 +76,27 @@ export const useBudgetKPI = (params: UseBudgetKPIParams = {}) => {
         realHeadcount,
         salaryVariance: realSalary - (budget?.budgeted_salary || 0),
         headcountVariance: realHeadcount - (budget?.budgeted_headcount || 0),
+        source: 'manual' as const,
+        fiscalYear: currentYear,
       };
     },
     staleTime: 5 * 60 * 1000,
+    enabled: !planningQuery.data || planningQuery.data.budgetedSalary === 0,
   });
+
+  // Priorizar dados do planejamento se existirem
+  if (planningQuery.data && planningQuery.data.budgetedSalary > 0) {
+    return {
+      data: planningQuery.data,
+      isLoading: planningQuery.isLoading,
+      error: planningQuery.error,
+    };
+  }
+
+  // Fallback para orçamento manual
+  return {
+    data: manualQuery.data,
+    isLoading: manualQuery.isLoading,
+    error: manualQuery.error,
+  };
 };

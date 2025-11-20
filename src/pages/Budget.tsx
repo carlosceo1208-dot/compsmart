@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Plus, Info } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { BudgetFiltersProvider, useBudgetFilters } from '@/contexts/BudgetFiltersContext';
 import { BudgetFilterPanel } from '@/components/budget/BudgetFilterPanel';
 import { BudgetDialog } from '@/components/budget/BudgetDialog';
@@ -21,6 +23,18 @@ const BudgetContent = () => {
         <p className="text-muted-foreground">
           Gerencie orçamentos mensais de salários e headcount por unidade organizacional
         </p>
+        
+        <Alert className="mt-4">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            💡 <strong>Dica:</strong> Para um controle orçamentário mais detalhado e estratégico, 
+            utilize o{' '}
+            <Link to="/budget-planning" className="text-primary hover:underline font-medium">
+              Planejamento Orçamentário
+            </Link>
+            {' '}que permite projeções mensais por funcionário, contratações planejadas e análise de variações.
+          </AlertDescription>
+        </Alert>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr_350px] gap-6 mb-6">
