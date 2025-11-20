@@ -8,25 +8,41 @@ export const useBenefitsKPI = () => {
       // Buscar total de benefícios ativos
       const { data: benefits, error: benefitsError } = await supabase
         .from('benefits')
-        .select('value_per_employee')
+        .select('id, value_per_employee, is_active')
         .eq('is_active', true);
       
       if (benefitsError) throw benefitsError;
 
-      // Buscar total de funcionários ativos
-      const { count: activeEmployees, error: employeesError } = await supabase
+      // Buscar benefícios atribuídos aos funcionários ativos
+      const { data: employeeBenefits, error: employeeBenefitsError } = await supabase
+        .from('employee_benefits')
+        .select(`
+          company_contribution_value,
+          employee_contribution_value,
+          employee_contribution_type,
+          employee_id,
+          is_active
+        `)
+        .eq('is_active', true);
+      
+      if (employeeBenefitsError) throw employeeBenefitsError;
+
+      // Buscar funcionários ativos para validar
+      const { data: activeEmployees, error: employeesError } = await supabase
         .from('profiles')
-        .select('*', { count: 'exact', head: true })
+        .select('id')
         .eq('status', 'active');
       
       if (employeesError) throw employeesError;
 
-      const totalBenefitsPerEmployee = benefits.reduce(
-        (sum, b) => sum + (b.value_per_employee || 0), 
-        0
-      );
-      
-      const totalMonthlyCost = totalBenefitsPerEmployee * (activeEmployees || 0);
+      const activeEmployeeIds = new Set(activeEmployees.map(e => e.id));
+
+      // Calcular custo mensal total (apenas benefícios de funcionários ativos)
+      const totalMonthlyCost = employeeBenefits
+        .filter(eb => activeEmployeeIds.has(eb.employee_id))
+        .reduce((sum, eb) => {
+          return sum + (eb.company_contribution_value || 0);
+        }, 0);
 
       return {
         totalBenefits: benefits.length,

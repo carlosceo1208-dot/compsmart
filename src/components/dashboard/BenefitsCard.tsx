@@ -1,5 +1,7 @@
-import { Gift } from 'lucide-react';
+import { Gift, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBenefitsKPI } from '@/hooks/useBenefitsKPI';
 import { formatCompactCurrency, formatNumber } from '@/lib/formatters';
@@ -19,10 +21,18 @@ export const BenefitsCard = ({ currency }: BenefitsCardProps) => {
   return (
     <Card className="hover:shadow-lg transition-all duration-200">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <Gift className="h-4 w-4" />
-          Gestão de Benefícios
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+            <Gift className="h-4 w-4" />
+            Gestão de Benefícios
+          </CardTitle>
+          <Link to="/benefits">
+            <Button size="sm" variant="ghost" className="h-7 gap-1">
+              <ExternalLink className="h-3 w-3" />
+              <span className="text-xs">Gerenciar</span>
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
