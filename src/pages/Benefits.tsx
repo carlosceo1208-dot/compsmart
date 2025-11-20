@@ -169,11 +169,22 @@ const Benefits = () => {
                   <CardContent>
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Valor Base:</span>
+                        <span className="text-muted-foreground">Valor Total:</span>
                         <span className="font-semibold">R$ {benefit.value_per_employee.toFixed(2)}</span>
                       </div>
+                      {benefit.default_employee_contribution_type && benefit.default_employee_contribution_type !== 'none' && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">Participação Funcionário:</span>
+                          <span className="font-semibold">
+                            {benefit.default_employee_contribution_type === 'percentage'
+                              ? `${benefit.default_employee_contribution_value}% (R$ ${((benefit.value_per_employee * (benefit.default_employee_contribution_value || 0)) / 100).toFixed(2)})`
+                              : `R$ ${(benefit.default_employee_contribution_value || 0).toFixed(2)}`
+                            }
+                          </span>
+                        </div>
+                      )}
                       {benefit.description && (
-                        <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                        <p className="text-sm text-muted-foreground pt-2">{benefit.description}</p>
                       )}
                     </div>
                   </CardContent>

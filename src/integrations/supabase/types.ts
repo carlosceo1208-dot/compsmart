@@ -83,6 +83,8 @@ export type Database = {
         Row: {
           benefit_type: string
           created_at: string | null
+          default_employee_contribution_type: string | null
+          default_employee_contribution_value: number | null
           description: string | null
           id: string
           is_active: boolean | null
@@ -93,6 +95,8 @@ export type Database = {
         Insert: {
           benefit_type: string
           created_at?: string | null
+          default_employee_contribution_type?: string | null
+          default_employee_contribution_value?: number | null
           description?: string | null
           id?: string
           is_active?: boolean | null
@@ -103,6 +107,8 @@ export type Database = {
         Update: {
           benefit_type?: string
           created_at?: string | null
+          default_employee_contribution_type?: string | null
+          default_employee_contribution_value?: number | null
           description?: string | null
           id?: string
           is_active?: boolean | null
