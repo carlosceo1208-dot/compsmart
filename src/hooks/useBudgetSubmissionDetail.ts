@@ -25,7 +25,7 @@ export const useBudgetSubmissionDetail = (submissionId: string | null) => {
 
       if (submissionError) throw submissionError;
 
-      // Buscar projeções agrupadas por funcionário
+      // Buscar projeções (funcionários existentes + contratações planejadas)
       const { data: projections, error: projectionsError } = await supabase
         .from('budget_employee_projections')
         .select(`
@@ -41,13 +41,24 @@ export const useBudgetSubmissionDetail = (submissionId: string | null) => {
 
       if (projectionsError) throw projectionsError;
 
-      // Agrupar por funcionário
+      // Separar contratações planejadas de funcionários existentes
+      const plannedHires = projections?.filter(p => p.is_planned_hire) || [];
+      const employeeProjections = projections?.filter(p => !p.is_planned_hire) || [];
+
+      // Agrupar contratações planejadas por nome (cada nome = 1 contratação)
+      const uniquePlannedHires = Array.from(
+        new Map(plannedHires.map(h => [h.planned_employee_name, h])).values()
+      );
+
+      // Agrupar funcionários existentes com alterações
       const employeeChanges = new Map();
-      projections?.forEach(proj => {
-        const empId = proj.employee_id || `planned_hire_${proj.planned_employee_name}`;
+      employeeProjections?.forEach(proj => {
+        const empId = proj.employee_id;
+        if (!empId) return;
+        
         if (!employeeChanges.has(empId)) {
           employeeChanges.set(empId, {
-            employee: proj.employee || { full_name: proj.planned_employee_name || 'Contratação Planejada' },
+            employee: proj.employee,
             changes: [],
             totalImpact: 0,
           });
@@ -75,6 +86,7 @@ export const useBudgetSubmissionDetail = (submissionId: string | null) => {
       return {
         submission,
         employeeChanges: Array.from(employeeChanges.values()),
+        plannedHires: uniquePlannedHires,
         monthlyTotals,
         alerts: generateAlerts(projections),
       };
