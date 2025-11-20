@@ -11,6 +11,8 @@ import { BudgetPlanningFilterPanel } from '@/components/budget/BudgetPlanningFil
 import { BudgetSummaryTable } from '@/components/budget/BudgetSummaryTable';
 import { EmployeeBudgetList } from '@/components/budget/EmployeeBudgetList';
 import { EmployeeBudgetDialog } from '@/components/budget/EmployeeBudgetDialog';
+import { PlannedHireDialog } from '@/components/budget/PlannedHireDialog';
+import { EditPlannedHireDialog } from '@/components/budget/EditPlannedHireDialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
@@ -19,6 +21,8 @@ const BudgetPlanning = () => {
   const [fiscalYear, setFiscalYear] = useState(2026);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [plannedHireDialogOpen, setPlannedHireDialogOpen] = useState(false);
+  const [editPlannedHireId, setEditPlannedHireId] = useState<string | null>(null);
   
   const { data: userData } = useCurrentUserRole();
   
@@ -40,10 +44,11 @@ const BudgetPlanning = () => {
     fiscalYear
   );
 
-  // Buscar funcionários da unidade
+  // Buscar funcionários da unidade + contratações planejadas
   const { data: employees } = useQuery({
     queryKey: ['unit-employees', selectedUnitId, fiscalYear],
     queryFn: async () => {
+      // Funcionários existentes
       let query = supabase
         .from('profiles')
         .select('id, full_name, job_title, salary')
@@ -54,11 +59,11 @@ const BudgetPlanning = () => {
         query = query.eq('unit_id', selectedUnitId);
       }
 
-      const { data, error } = await query;
+      const { data: employeeData, error } = await query;
       if (error) throw error;
 
       // Contar alterações planejadas por funcionário
-      const employeeIds = data?.map(e => e.id) || [];
+      const employeeIds = employeeData?.map(e => e.id) || [];
       const { data: changes } = await supabase
         .from('budget_employee_projections')
         .select('employee_id')
@@ -71,10 +76,46 @@ const BudgetPlanning = () => {
         changeCounts.set(c.employee_id, (changeCounts.get(c.employee_id) || 0) + 1);
       });
 
-      return data?.map(emp => ({
-        ...emp,
-        changeCount: changeCounts.get(emp.id) || 0,
-      })) || [];
+      // Contratações planejadas (buscar primeiro registro de cada)
+      let plannedQuery = supabase
+        .from('budget_employee_projections')
+        .select('id, planned_employee_name, projected_job_title_id, projected_fixed_salary, month, projected_job_title:job_titles(title)')
+        .eq('fiscal_year', fiscalYear)
+        .eq('is_planned_hire', true)
+        .order('month');
+
+      if (selectedUnitId) {
+        plannedQuery = plannedQuery.eq('projected_unit_id', selectedUnitId);
+      }
+
+      const { data: plannedHires } = await plannedQuery;
+
+      // Agrupar contratações planejadas por nome (cada nome único = 1 contratação)
+      const uniqueHires = Array.from(
+        new Map(plannedHires?.map(h => [h.planned_employee_name, h]) || []).values()
+      );
+
+      // Combinar funcionários + contratações
+      const allEmployees = [
+        ...(employeeData?.map(emp => ({
+          id: emp.id,
+          full_name: emp.full_name,
+          job_title: emp.job_title,
+          salary: emp.salary,
+          changeCount: changeCounts.get(emp.id) || 0,
+          isPlannedHire: false,
+        })) || []),
+        ...uniqueHires.map(hire => ({
+          id: hire.id,
+          full_name: `🆕 ${hire.planned_employee_name}`,
+          job_title: hire.projected_job_title?.title,
+          salary: hire.projected_fixed_salary,
+          changeCount: 0,
+          isPlannedHire: true,
+        })),
+      ];
+
+      return allEmployees;
     },
   });
 
@@ -174,10 +215,14 @@ const BudgetPlanning = () => {
 
           <EmployeeBudgetList
             employees={employees || []}
-            onEditEmployee={(id) => setSelectedEmployeeId(id)}
-            onAddPlannedHire={() => {
-              toast.info('Funcionalidade em desenvolvimento');
+            onEditEmployee={(id, isPlannedHire) => {
+              if (isPlannedHire) {
+                setEditPlannedHireId(id);
+              } else {
+                setSelectedEmployeeId(id);
+              }
             }}
+            onAddPlannedHire={() => setPlannedHireDialogOpen(true)}
           />
 
           {selectedEmployeeId && (
@@ -187,6 +232,22 @@ const BudgetPlanning = () => {
               fiscalYear={fiscalYear}
               open={!!selectedEmployeeId}
               onOpenChange={(open) => !open && setSelectedEmployeeId(null)}
+            />
+          )}
+
+          <PlannedHireDialog
+            open={plannedHireDialogOpen}
+            onOpenChange={setPlannedHireDialogOpen}
+            unitId={selectedUnitId}
+            fiscalYear={fiscalYear}
+          />
+
+          {editPlannedHireId && (
+            <EditPlannedHireDialog
+              plannedHireId={editPlannedHireId}
+              open={!!editPlannedHireId}
+              onOpenChange={(open) => !open && setEditPlannedHireId(null)}
+              fiscalYear={fiscalYear}
             />
           )}
 

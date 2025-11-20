@@ -11,11 +11,12 @@ interface Employee {
   job_title?: string;
   salary?: number;
   changeCount?: number;
+  isPlannedHire?: boolean;
 }
 
 interface EmployeeBudgetListProps {
   employees: Employee[];
-  onEditEmployee: (employeeId: string) => void;
+  onEditEmployee: (employeeId: string, isPlannedHire: boolean) => void;
   onAddPlannedHire: () => void;
 }
 
@@ -48,7 +49,14 @@ export const EmployeeBudgetList = ({
             {employees.map((employee) => (
               <TableRow key={employee.id}>
                 <TableCell className="font-medium">
-                  {employee.full_name}
+                  <div className="flex items-center gap-2">
+                    {employee.full_name}
+                    {employee.isPlannedHire && (
+                      <Badge variant="secondary" className="text-xs">
+                        🆕 NOVA CONTRATAÇÃO
+                      </Badge>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>{employee.job_title || '-'}</TableCell>
                 <TableCell className="text-right">
@@ -67,7 +75,7 @@ export const EmployeeBudgetList = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onEditEmployee(employee.id)}
+                    onClick={() => onEditEmployee(employee.id, !!employee.isPlannedHire)}
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Editar

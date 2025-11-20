@@ -29,44 +29,37 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
 
       const employeeIds = employees?.map(e => e.id) || [];
 
-      // 2. Buscar projeções de funcionários existentes
+      // 2. Buscar todas as projeções (funcionários + contratações planejadas)
       let projectionsQuery = supabase
         .from('budget_employee_projections')
         .select('*')
         .eq('fiscal_year', fiscalYear);
 
-      if (employeeIds.length > 0) {
-        projectionsQuery = projectionsQuery.in('employee_id', employeeIds);
-      }
-
-      const { data: existingProjections } = await projectionsQuery;
-
-      // 3. Buscar contratações planejadas
-      let plannedHiresQuery = supabase
-        .from('budget_employee_projections')
-        .select('*')
-        .eq('fiscal_year', fiscalYear)
-        .eq('is_planned_hire', true);
-
       if (unitId) {
-        plannedHiresQuery = plannedHiresQuery.eq('projected_unit_id', unitId);
+        // Para contratações planejadas, usar projected_unit_id
+        // Para funcionários, filtrar depois pelos IDs
+        projectionsQuery = projectionsQuery.or(`projected_unit_id.eq.${unitId},employee_id.in.(${employeeIds.join(',')})`);
+      } else if (employeeIds.length > 0) {
+        projectionsQuery = projectionsQuery.or(`is_planned_hire.eq.true,employee_id.in.(${employeeIds.join(',')})`);
       }
 
-      const { data: plannedHires } = await plannedHiresQuery;
+      const { data: allProjections } = await projectionsQuery;
 
-      // 4. Calcular totais mensais
+      // 3. Calcular totais mensais (funcionários + contratações planejadas)
       const monthlyTotals: MonthlySummary[] = Array.from({ length: 12 }, (_, i) => {
         const month = i + 1;
         
         let totalFixed = 0;
         let totalVariable = 0;
         let totalBenefits = 0;
-        let headcount = 0;
+        const uniqueIds = new Set<string>();
 
         // Processar funcionários existentes
         employees?.forEach(emp => {
-          const projection = existingProjections?.find(p => 
-            p.employee_id === emp.id && p.month === month
+          const projection = allProjections?.find(p => 
+            p.employee_id === emp.id && 
+            p.month === month &&
+            !p.is_planned_hire
           );
 
           // Demissão planejada - pular
@@ -83,31 +76,35 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
           totalFixed += projection?.projected_fixed_salary || emp.salary || 0;
           totalVariable += projection?.projected_variable_salary || emp.variable_salary || 0;
           totalBenefits += projection?.projected_benefits || emp.benefits_value || 0;
-          headcount++;
+          uniqueIds.add(emp.id);
         });
 
-        // Processar contratações planejadas (começam no mês definido)
-        plannedHires?.forEach(hire => {
-          if (hire.month <= month) {
-            totalFixed += hire.projected_fixed_salary || 0;
-            totalVariable += hire.projected_variable_salary || 0;
-            totalBenefits += hire.projected_benefits || 0;
-            headcount++;
-          }
+        // Processar contratações planejadas (ativas no mês atual)
+        const plannedHiresForMonth = allProjections?.filter(p => 
+          p.is_planned_hire && 
+          p.month === month
+        ) || [];
+
+        plannedHiresForMonth.forEach(hire => {
+          totalFixed += hire.projected_fixed_salary || 0;
+          totalVariable += hire.projected_variable_salary || 0;
+          totalBenefits += hire.projected_benefits || 0;
+          uniqueIds.add(hire.planned_employee_name || hire.id);
         });
 
         // Processar transferências de entrada
-        const transfersIn = existingProjections?.filter(p => 
+        const transfersIn = allProjections?.filter(p => 
           p.month === month && 
           p.change_type === 'transfer_in' && 
-          p.projected_unit_id === unitId
+          p.projected_unit_id === unitId &&
+          !p.is_planned_hire
         ) || [];
 
         transfersIn.forEach(transfer => {
           totalFixed += transfer.projected_fixed_salary || 0;
           totalVariable += transfer.projected_variable_salary || 0;
           totalBenefits += transfer.projected_benefits || 0;
-          headcount++;
+          if (transfer.employee_id) uniqueIds.add(transfer.employee_id);
         });
 
         return {
@@ -116,7 +113,7 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
           totalVariable,
           totalCash: totalFixed + totalVariable,
           totalBenefits,
-          headcount,
+          headcount: uniqueIds.size,
         };
       });
 

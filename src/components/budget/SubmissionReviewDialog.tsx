@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, CheckCircle, XCircle, Loader2, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -189,35 +190,100 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
 
           {/* Aba: Funcionários com Alterações */}
           <TabsContent value="employees" className="space-y-4">
-            {details.employeeChanges.length > 0 ? (
-              details.employeeChanges.map((emp, idx) => (
-                <div key={idx} className="border rounded-lg p-4 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-lg">{emp.employee.full_name}</h4>
-                    <span className={`font-semibold ${emp.totalImpact >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      Impacto: {formatCurrency(emp.totalImpact)}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    {emp.changes.map((change: any, cIdx: number) => (
-                      <div key={cIdx} className="flex items-center justify-between text-sm p-2 bg-muted/30 rounded">
-                        <span>
-                          <strong>{getMonthName(change.month)}</strong> - {change.change_type || 'Alteração'}
+            {/* Seção: Funcionários Existentes */}
+            {details.employeeChanges.length > 0 && (
+              <div>
+                <h3 className="font-semibold text-lg mb-3">👥 Funcionários Existentes</h3>
+                <div className="space-y-3">
+                  {details.employeeChanges.map((emp, idx) => (
+                    <div key={idx} className="border rounded-lg p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-semibold text-lg">{emp.employee.full_name}</h4>
+                        <span className={`font-semibold ${emp.totalImpact >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          Impacto: {formatCurrency(emp.totalImpact)}
                         </span>
-                        <span className="font-mono">{formatCurrency(change.projected_fixed_salary)}</span>
                       </div>
-                    ))}
-                  </div>
-                  {emp.changes[0]?.justification && (
-                    <p className="text-sm text-muted-foreground italic">
-                      Justificativa: {emp.changes[0].justification}
-                    </p>
-                  )}
+                      <div className="space-y-1">
+                        {emp.changes.map((change: any, cIdx: number) => (
+                          <div key={cIdx} className="flex items-center justify-between text-sm p-2 bg-muted/30 rounded">
+                            <span>
+                              <strong>{getMonthName(change.month)}</strong> - {change.change_type || 'Alteração'}
+                            </span>
+                            <span className="font-mono">{formatCurrency(change.projected_fixed_salary)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {emp.changes[0]?.justification && (
+                        <p className="text-sm text-muted-foreground italic">
+                          Justificativa: {emp.changes[0].justification}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))
-            ) : (
+              </div>
+            )}
+
+            {/* Seção: Contratações Planejadas */}
+            {details.plannedHires && details.plannedHires.length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold text-lg mb-3">🆕 Novas Contratações Planejadas</h3>
+                <div className="space-y-3">
+                  {details.plannedHires.map((hire: any, idx: number) => {
+                    const monthsCount = 12 - hire.month + 1;
+                    const monthlyTotal = (hire.projected_fixed_salary || 0) + 
+                                       (hire.projected_variable_salary || 0) + 
+                                       (hire.projected_benefits || 0);
+                    const totalImpact = monthlyTotal * monthsCount;
+
+                    return (
+                      <div key={idx} className="border rounded-lg p-4 space-y-2 bg-primary/5">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Badge variant="secondary" className="mb-2">🆕 NOVA CONTRATAÇÃO</Badge>
+                            <h4 className="font-semibold">{hire.planned_employee_name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {hire.projected_job_title?.title} ({hire.projected_grade})
+                            </p>
+                          </div>
+                          <span className="font-semibold text-green-600">
+                            +{formatCurrency(totalImpact)}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Início:</span>{' '}
+                            <strong>{getMonthName(hire.month)}/{details.submission.fiscal_year}</strong>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Duração:</span>{' '}
+                            <strong>{monthsCount} meses</strong>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Salário Mensal:</span>{' '}
+                            <strong>{formatCurrency(monthlyTotal)}</strong>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Total Anual:</span>{' '}
+                            <strong>{formatCurrency(totalImpact)}</strong>
+                          </div>
+                        </div>
+                        {hire.justification && (
+                          <p className="text-sm text-muted-foreground italic mt-2">
+                            Justificativa: {hire.justification}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Mensagem se não houver nada */}
+            {details.employeeChanges.length === 0 && (!details.plannedHires || details.plannedHires.length === 0) && (
               <div className="text-center py-8 text-muted-foreground">
-                Nenhuma alteração registrada
+                Nenhuma alteração ou contratação registrada
               </div>
             )}
           </TabsContent>
