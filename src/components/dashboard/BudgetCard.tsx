@@ -1,4 +1,4 @@
-import { PiggyBank } from 'lucide-react';
+import { PiggyBank, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +6,7 @@ import { useBudgetKPI } from '@/hooks/useBudgetKPI';
 import { formatCompactCurrency, formatNumber } from '@/lib/formatters';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
 import { Currency } from '@/types/economic';
+import { Link } from 'react-router-dom';
 
 interface BudgetCardProps {
   currency: Currency;
@@ -38,9 +39,9 @@ export const BudgetCard = ({ currency, unitId }: BudgetCardProps) => {
             <p className="text-sm text-muted-foreground mb-2">
               📊 Nenhum orçamento cadastrado
             </p>
-            <a href="/budget" className="text-sm text-primary hover:underline">
-              Cadastre o orçamento mensal
-            </a>
+            <Link to="/budget-planning" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
+              Criar planejamento orçamentário <ExternalLink className="h-3 w-3" />
+            </Link>
           </div>
         ) : (
           <div className="space-y-3">
@@ -65,9 +66,37 @@ export const BudgetCard = ({ currency, unitId }: BudgetCardProps) => {
             </div>
 
             {data?.budgetedSalary > 0 && (
-              <Badge variant={isOverBudget ? "destructive" : "success"} className="w-full justify-center">
-                {isOverBudget ? '⚠️ Acima' : '✅ Dentro'} do Orçamento
-              </Badge>
+              <>
+                <Badge variant={isOverBudget ? "destructive" : "success"} className="w-full justify-center">
+                  {isOverBudget ? '⚠️ Acima' : '✅ Dentro'} do Orçamento
+                </Badge>
+                
+                {data.source === 'planning' ? (
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      📊 Fonte: Planejamento Orçamentário {data.fiscalYear}
+                    </p>
+                    <Link 
+                      to="/budget-planning" 
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Ver planejamento detalhado <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      📝 Fonte: Orçamento Manual
+                    </p>
+                    <Link 
+                      to="/budget" 
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      Gerenciar orçamento <ExternalLink className="h-3 w-3" />
+                    </Link>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
