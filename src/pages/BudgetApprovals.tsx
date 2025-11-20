@@ -10,9 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
+import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, FileText } from 'lucide-react';
 import { SubmissionReviewDialog } from '@/components/budget/SubmissionReviewDialog';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const BudgetApprovals = () => {
   const navigate = useNavigate();
@@ -62,7 +66,85 @@ const BudgetApprovals = () => {
     return sub.unit_id === unitFilter;
   }) || [];
 
-  // Verificar permissão
+  // Funções de exportação
+  const exportToExcel = () => {
+    try {
+      const exportData = filteredSubmissions.map(sub => ({
+        'Unidade': sub.unit?.description || 'N/A',
+        'Status': getStatusLabel(sub.status),
+        'Submetido Por': sub.submitted_by_profile?.full_name || 'N/A',
+        'Data Submissão': formatDate(sub.submitted_at),
+        'Revisado Por': sub.reviewed_by_profile?.full_name || '-',
+        'Total Anual': formatCurrency(sub.totalAnnual || 0),
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Aprovações');
+      
+      // Configurar largura das colunas
+      ws['!cols'] = [
+        { wch: 30 }, // Unidade
+        { wch: 15 }, // Status
+        { wch: 25 }, // Submetido Por
+        { wch: 15 }, // Data Submissão
+        { wch: 25 }, // Revisado Por
+        { wch: 18 }, // Total Anual
+      ];
+      
+      const fileName = `aprovacoes_orcamento_${fiscalYear}_${statusFilter}_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, fileName);
+      toast.success('Relatório Excel exportado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao exportar relatório Excel');
+      console.error(error);
+    }
+  };
+
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Título
+      doc.setFontSize(16);
+      doc.text('Aprovações de Orçamento', 14, 15);
+      
+      // Informações do filtro
+      doc.setFontSize(10);
+      doc.text(`Ano Fiscal: ${fiscalYear}`, 14, 25);
+      doc.text(`Status: ${statusFilter === 'all' ? 'Todos' : getStatusLabel(statusFilter)}`, 14, 30);
+      if (unitFilter !== 'all') {
+        const selectedUnit = units?.find(u => u.id === unitFilter);
+        doc.text(`Unidade: ${selectedUnit?.description || ''}`, 14, 35);
+      }
+      
+      // Tabela
+      const tableData = filteredSubmissions.map(sub => [
+        sub.unit?.description || 'N/A',
+        getStatusLabel(sub.status),
+        sub.submitted_by_profile?.full_name || 'N/A',
+        formatDate(sub.submitted_at),
+        sub.reviewed_by_profile?.full_name || '-',
+        formatCurrency(sub.totalAnnual || 0),
+      ]);
+
+      (doc as any).autoTable({
+        head: [['Unidade', 'Status', 'Submetido Por', 'Data', 'Revisado Por', 'Total Anual']],
+        body: tableData,
+        startY: unitFilter !== 'all' ? 40 : 35,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [41, 128, 185] },
+      });
+      
+      const fileName = `aprovacoes_orcamento_${fiscalYear}_${statusFilter}_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      toast.success('Relatório PDF exportado com sucesso!');
+    } catch (error) {
+      toast.error('Erro ao exportar relatório PDF');
+      console.error(error);
+    }
+  };
+
   if (!userData?.isAdmin && !userData?.isHR) {
     return (
       <div className="p-6">
@@ -215,7 +297,29 @@ const BudgetApprovals = () => {
       {/* Tabela de Submissões */}
       <Card>
         <CardHeader>
-          <CardTitle>Submissões de Orçamento</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Submissões de Orçamento</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportToExcel}
+                disabled={!filteredSubmissions || filteredSubmissions.length === 0}
+              >
+                <FileSpreadsheet className="w-4 h-4 mr-2" />
+                Excel
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={exportToPDF}
+                disabled={!filteredSubmissions || filteredSubmissions.length === 0}
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                PDF
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {isLoading ? (
