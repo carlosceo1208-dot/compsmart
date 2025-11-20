@@ -10,8 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, FileText } from 'lucide-react';
+import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, FileText, Mail } from 'lucide-react';
 import { SubmissionReviewDialog } from '@/components/budget/SubmissionReviewDialog';
+import { SendReportDialog } from '@/components/budget/SendReportDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
@@ -24,6 +25,7 @@ const BudgetApprovals = () => {
   const [statusFilter, setStatusFilter] = useState('submitted');
   const [unitFilter, setUnitFilter] = useState<string>('all');
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
+  const [showSendReportDialog, setShowSendReportDialog] = useState(false);
 
   const { data: userData } = useCurrentUserRole();
   const { data: submissions, isLoading } = useBudgetSubmissions(fiscalYear, statusFilter);
@@ -318,6 +320,15 @@ const BudgetApprovals = () => {
                 <FileText className="w-4 h-4 mr-2" />
                 PDF
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSendReportDialog(true)}
+                disabled={!filteredSubmissions || filteredSubmissions.length === 0}
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Enviar por Email
+              </Button>
             </div>
           </div>
         </CardHeader>
@@ -382,6 +393,28 @@ const BudgetApprovals = () => {
           onOpenChange={(open) => !open && setSelectedSubmissionId(null)}
         />
       )}
+
+      {/* Modal de Envio de Email */}
+      <SendReportDialog
+        open={showSendReportDialog}
+        onOpenChange={setShowSendReportDialog}
+        reportData={{
+          fiscalYear,
+          statusFilter,
+          unitFilter,
+          totalPending,
+          totalApproved,
+          totalBudget,
+          submissions: filteredSubmissions.map(sub => ({
+            unitName: sub.unit?.description || 'N/A',
+            status: getStatusLabel(sub.status),
+            submittedBy: sub.submitted_by_profile?.full_name || 'N/A',
+            submittedAt: formatDate(sub.submitted_at),
+            reviewedBy: sub.reviewed_by_profile?.full_name || '-',
+            totalAnnual: sub.totalAnnual || 0,
+          })),
+        }}
+      />
     </div>
   );
 };
