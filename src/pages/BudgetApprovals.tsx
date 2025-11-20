@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { useBudgetSubmissions } from '@/hooks/useBudgetSubmissions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react';
@@ -15,10 +18,49 @@ const BudgetApprovals = () => {
   const navigate = useNavigate();
   const [fiscalYear, setFiscalYear] = useState(2026);
   const [statusFilter, setStatusFilter] = useState('submitted');
+  const [unitFilter, setUnitFilter] = useState<string>('all');
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
 
   const { data: userData } = useCurrentUserRole();
   const { data: submissions, isLoading } = useBudgetSubmissions(fiscalYear, statusFilter);
+
+  // Buscar todas as unidades e identificar quais têm submissões
+  const { data: units, isLoading: unitsLoading } = useQuery({
+    queryKey: ['organizational-units-with-flags', fiscalYear],
+    queryFn: async () => {
+      // 1. Buscar todas as unidades
+      const { data: allUnits, error: unitsError } = await supabase
+        .from('organizational_structure')
+        .select('id, code, description, type')
+        .in('type', ['area', 'department', 'sector', 'project'])
+        .order('code');
+      
+      if (unitsError) throw unitsError;
+      if (!allUnits) return [];
+
+      // 2. Buscar IDs das unidades que têm submissões no ano fiscal
+      const { data: submissionsData } = await supabase
+        .from('budget_submissions')
+        .select('unit_id')
+        .eq('fiscal_year', fiscalYear);
+      
+      const unitIdsWithSubmissions = new Set(
+        submissionsData?.map(s => s.unit_id).filter(Boolean) || []
+      );
+
+      // 3. Adicionar flag 'hasSubmissions' em cada unidade
+      return allUnits.map(unit => ({
+        ...unit,
+        hasSubmissions: unitIdsWithSubmissions.has(unit.id)
+      }));
+    },
+  });
+
+  // Aplicar filtro de unidade
+  const filteredSubmissions = submissions?.filter(sub => {
+    if (unitFilter === 'all') return true;
+    return sub.unit_id === unitFilter;
+  }) || [];
 
   // Verificar permissão
   if (!userData?.isAdmin && !userData?.isHR) {
@@ -35,11 +77,11 @@ const BudgetApprovals = () => {
     );
   }
 
-  // Calcular totais consolidados
-  const totalPending = submissions?.filter(s => s.status === 'submitted').length || 0;
-  const totalApproved = submissions?.filter(s => s.status === 'approved').length || 0;
-  const totalBudget = submissions
-    ?.filter(s => s.status === 'approved')
+  // Calcular totais consolidados usando submissões filtradas
+  const totalPending = filteredSubmissions.filter(s => s.status === 'submitted').length || 0;
+  const totalApproved = filteredSubmissions.filter(s => s.status === 'approved').length || 0;
+  const totalBudget = filteredSubmissions
+    .filter(s => s.status === 'approved')
     .reduce((sum, s) => sum + (s.totalAnnual || 0), 0) || 0;
 
   return (
@@ -104,8 +146,8 @@ const BudgetApprovals = () => {
       {/* Filtros */}
       <Card className="mb-6">
         <CardHeader>
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="flex-1 w-full">
               <label className="text-sm font-medium mb-2 block">Ano Fiscal</label>
               <Select
                 value={fiscalYear.toString()}
@@ -122,7 +164,7 @@ const BudgetApprovals = () => {
               </Select>
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 w-full">
               <label className="text-sm font-medium mb-2 block">Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger>
@@ -136,6 +178,36 @@ const BudgetApprovals = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="flex-1 w-full">
+              <label className="text-sm font-medium mb-2 block">Unidade</label>
+              {unitsLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
+                <Select value={unitFilter} onValueChange={setUnitFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">🏢 Todas as Unidades</SelectItem>
+                    {units?.map((unit) => (
+                      <SelectItem 
+                        key={unit.id} 
+                        value={unit.id}
+                        className={unit.hasSubmissions ? "font-semibold" : "text-muted-foreground"}
+                      >
+                        <div className="flex items-center gap-2">
+                          {unit.hasSubmissions && (
+                            <CheckCircle className="h-4 w-4 text-green-600" />
+                          )}
+                          <span>{unit.code} - {unit.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
           </div>
         </CardHeader>
       </Card>
@@ -148,7 +220,7 @@ const BudgetApprovals = () => {
         <CardContent>
           {isLoading ? (
             <div className="text-center py-8 text-muted-foreground">Carregando...</div>
-          ) : submissions && submissions.length > 0 ? (
+          ) : filteredSubmissions && filteredSubmissions.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -162,7 +234,7 @@ const BudgetApprovals = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {submissions.map((sub) => (
+                {filteredSubmissions.map((sub) => (
                   <TableRow key={sub.id}>
                     <TableCell className="font-medium">{sub.unit?.description || 'N/A'}</TableCell>
                     <TableCell>
@@ -189,7 +261,10 @@ const BudgetApprovals = () => {
             </Table>
           ) : (
             <div className="text-center py-8 text-muted-foreground">
-              Nenhuma submissão encontrada para os filtros selecionados
+              {unitFilter !== 'all' 
+                ? 'Nenhuma submissão encontrada para a unidade selecionada'
+                : 'Nenhuma submissão encontrada para os filtros selecionados'
+              }
             </div>
           )}
         </CardContent>
