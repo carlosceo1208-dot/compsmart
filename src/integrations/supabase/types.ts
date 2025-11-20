@@ -342,6 +342,7 @@ export type Database = {
           benefit_id: string
           company_contribution_value: number
           created_at: string | null
+          employee_contribution_type: string
           employee_contribution_value: number | null
           employee_id: string
           end_date: string | null
@@ -354,6 +355,7 @@ export type Database = {
           benefit_id: string
           company_contribution_value: number
           created_at?: string | null
+          employee_contribution_type?: string
           employee_contribution_value?: number | null
           employee_id: string
           end_date?: string | null
@@ -366,6 +368,7 @@ export type Database = {
           benefit_id?: string
           company_contribution_value?: number
           created_at?: string | null
+          employee_contribution_type?: string
           employee_contribution_value?: number | null
           employee_id?: string
           end_date?: string | null
