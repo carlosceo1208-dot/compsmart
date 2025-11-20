@@ -40,7 +40,7 @@ export const EmployeeBudgetDialog = ({
   const handleSaveChange = () => {
     setAddChangeDialogOpen(false);
     setSelectedMonth(null);
-    toast.success('Mudança salva com sucesso!');
+    toast.success('Alteração salva com sucesso!');
   };
 
   return (
@@ -66,7 +66,7 @@ export const EmployeeBudgetDialog = ({
                       <TableHead className="text-right">Variável</TableHead>
                       <TableHead className="text-right">Benefícios</TableHead>
                       <TableHead className="text-right">Total Cash</TableHead>
-                      <TableHead>Tipo de Mudança</TableHead>
+                      <TableHead>Tipo de Alteração</TableHead>
                       <TableHead className="w-[100px]"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -98,12 +98,12 @@ export const EmployeeBudgetDialog = ({
                           <TableCell>
                             {hasChange ? (
                               <Badge variant="secondary">
-                                {proj.change_type === 'merit' && '🎯 Mérito'}
+                                {proj.change_type === 'merit_increase' && '🎯 Mérito'}
                                 {proj.change_type === 'promotion' && '🚀 Promoção'}
-                                {proj.change_type === 'collective' && '📈 Acordo Coletivo'}
+                                {proj.change_type === 'collective_bargaining' && '📈 Acordo Coletivo'}
                                 {proj.change_type === 'planned_termination' && '❌ Demissão'}
                                 {proj.change_type === 'transfer_out' && '🔄 Transferência'}
-                                {proj.change_type === 'manual' && '✏️ Ajuste Manual'}
+                                {proj.change_type === 'adjustment' && '✏️ Ajuste Manual'}
                               </Badge>
                             ) : (
                               <span className="text-muted-foreground text-sm">-</span>

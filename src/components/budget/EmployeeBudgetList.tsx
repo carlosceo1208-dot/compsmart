@@ -40,7 +40,7 @@ export const EmployeeBudgetList = ({
               <TableHead>Nome</TableHead>
               <TableHead>Cargo</TableHead>
               <TableHead className="text-right">Salário Atual</TableHead>
-              <TableHead className="text-center">Mudanças</TableHead>
+              <TableHead className="text-center">Alterações</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
@@ -57,7 +57,7 @@ export const EmployeeBudgetList = ({
                 <TableCell className="text-center">
                   {employee.changeCount ? (
                     <Badge variant="secondary">
-                      {employee.changeCount} {employee.changeCount === 1 ? 'mudança' : 'mudanças'}
+                      {employee.changeCount} alteração{employee.changeCount > 1 ? 'ões' : ''}
                     </Badge>
                   ) : (
                     <span className="text-muted-foreground">-</span>

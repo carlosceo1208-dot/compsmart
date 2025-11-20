@@ -57,7 +57,7 @@ const BudgetPlanning = () => {
       const { data, error } = await query;
       if (error) throw error;
 
-      // Contar mudanças planejadas por funcionário
+      // Contar alterações planejadas por funcionário
       const employeeIds = data?.map(e => e.id) || [];
       const { data: changes } = await supabase
         .from('budget_employee_projections')
@@ -148,7 +148,7 @@ const BudgetPlanning = () => {
         <div>
           <h1 className="text-3xl font-bold mb-2">Planejamento de Orçamento</h1>
           <p className="text-muted-foreground">
-            Gerencie o orçamento anual planejando mudanças individuais para cada funcionário
+            Gerencie o orçamento anual planejando alterações individuais para cada funcionário
           </p>
         </div>
         {getStatusBadge()}
