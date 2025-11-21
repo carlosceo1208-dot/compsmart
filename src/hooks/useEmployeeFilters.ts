@@ -46,7 +46,7 @@ export const useEmployeeFilters = () => {
           grade,
           salary,
           unit_id,
-          unit:organizational_structure!profiles_position_id_fkey(
+          unit:organizational_structure(
             id, 
             name, 
             type,
