@@ -60,7 +60,7 @@ export const BenefitsCard = ({ currency }: BenefitsCardProps) => {
   const { data, isLoading } = useBenefitsKPI();
   const { convert } = useCurrencyConverter();
 
-  const monthlyCost = data ? convert(data.monthlyCost, 'BRL', currency) : 0;
+  const monthlyCost = data ? convert(data.totalCost, 'BRL', currency) : 0;
 
   const { data: benefitsList, isLoading: isLoadingList } = useQuery({
     queryKey: ['benefits-list'],
