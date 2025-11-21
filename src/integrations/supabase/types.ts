@@ -77,6 +77,76 @@ export type Database = {
             referencedRelation: "benefits"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "benefit_eligibility_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "v_benefit_eligibility_report"
+            referencedColumns: ["benefit_id"]
+          },
+        ]
+      }
+      benefit_eligibility_rules: {
+        Row: {
+          benefit_id: string
+          company_contribution_value: number
+          created_at: string | null
+          description: string | null
+          employee_contribution_type: string | null
+          employee_contribution_value: number | null
+          grade_max: string | null
+          grade_min: string | null
+          id: string
+          is_active: boolean | null
+          salary_max: number | null
+          salary_min: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          benefit_id: string
+          company_contribution_value: number
+          created_at?: string | null
+          description?: string | null
+          employee_contribution_type?: string | null
+          employee_contribution_value?: number | null
+          grade_max?: string | null
+          grade_min?: string | null
+          id?: string
+          is_active?: boolean | null
+          salary_max?: number | null
+          salary_min?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          benefit_id?: string
+          company_contribution_value?: number
+          created_at?: string | null
+          description?: string | null
+          employee_contribution_type?: string | null
+          employee_contribution_value?: number | null
+          grade_max?: string | null
+          grade_min?: string | null
+          id?: string
+          is_active?: boolean | null
+          salary_max?: number | null
+          salary_min?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "benefit_eligibility_rules_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "benefits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "benefit_eligibility_rules_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "v_benefit_eligibility_report"
+            referencedColumns: ["benefit_id"]
+          },
         ]
       }
       benefits: {
@@ -86,9 +156,12 @@ export type Database = {
           default_employee_contribution_type: string | null
           default_employee_contribution_value: number | null
           description: string | null
+          eligibility_type: string | null
           id: string
           is_active: boolean | null
+          is_template: boolean | null
           name: string
+          template_type: string | null
           updated_at: string | null
           value_per_employee: number | null
         }
@@ -98,9 +171,12 @@ export type Database = {
           default_employee_contribution_type?: string | null
           default_employee_contribution_value?: number | null
           description?: string | null
+          eligibility_type?: string | null
           id?: string
           is_active?: boolean | null
+          is_template?: boolean | null
           name: string
+          template_type?: string | null
           updated_at?: string | null
           value_per_employee?: number | null
         }
@@ -110,9 +186,12 @@ export type Database = {
           default_employee_contribution_type?: string | null
           default_employee_contribution_value?: number | null
           description?: string | null
+          eligibility_type?: string | null
           id?: string
           is_active?: boolean | null
+          is_template?: boolean | null
           name?: string
+          template_type?: string | null
           updated_at?: string | null
           value_per_employee?: number | null
         }
@@ -348,6 +427,7 @@ export type Database = {
           benefit_id: string
           company_contribution_value: number
           created_at: string | null
+          eligibility_rule_id: string | null
           employee_contribution_type: string
           employee_contribution_value: number | null
           employee_id: string
@@ -361,6 +441,7 @@ export type Database = {
           benefit_id: string
           company_contribution_value: number
           created_at?: string | null
+          eligibility_rule_id?: string | null
           employee_contribution_type?: string
           employee_contribution_value?: number | null
           employee_id: string
@@ -374,6 +455,7 @@ export type Database = {
           benefit_id?: string
           company_contribution_value?: number
           created_at?: string | null
+          eligibility_rule_id?: string | null
           employee_contribution_type?: string
           employee_contribution_value?: number | null
           employee_id?: string
@@ -390,6 +472,27 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "benefits"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_benefits_benefit_id_fkey"
+            columns: ["benefit_id"]
+            isOneToOne: false
+            referencedRelation: "v_benefit_eligibility_report"
+            referencedColumns: ["benefit_id"]
+          },
+          {
+            foreignKeyName: "employee_benefits_eligibility_rule_id_fkey"
+            columns: ["eligibility_rule_id"]
+            isOneToOne: false
+            referencedRelation: "benefit_eligibility_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_benefits_eligibility_rule_id_fkey"
+            columns: ["eligibility_rule_id"]
+            isOneToOne: false
+            referencedRelation: "v_benefit_eligibility_report"
+            referencedColumns: ["rule_id"]
           },
           {
             foreignKeyName: "employee_benefits_employee_id_fkey"
@@ -1127,7 +1230,25 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_benefit_eligibility_report: {
+        Row: {
+          benefit_id: string | null
+          benefit_name: string | null
+          company_contribution_value: number | null
+          description: string | null
+          eligibility_type: string | null
+          eligible_employees_count: number | null
+          employee_contribution_type: string | null
+          employee_contribution_value: number | null
+          grade_max: string | null
+          grade_min: string | null
+          rule_id: string | null
+          salary_max: number | null
+          salary_min: number | null
+          total_projected_cost: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_employee_benefits: {
@@ -1152,6 +1273,25 @@ export type Database = {
           min_value: number
           q1_value: number
           q3_value: number
+        }[]
+      }
+      calculate_transportation_benefit: {
+        Args: { p_employee_id: string; p_monthly_cost: number }
+        Returns: {
+          company_subsidy: number
+          employee_discount: number
+          total_cost: number
+        }[]
+      }
+      check_employee_eligibility: {
+        Args: { p_benefit_id: string; p_employee_id: string }
+        Returns: {
+          company_value: number
+          description: string
+          employee_contribution_type: string
+          employee_contribution_value: number
+          is_eligible: boolean
+          rule_id: string
         }[]
       }
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
