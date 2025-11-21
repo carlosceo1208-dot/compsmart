@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BenefitDialog } from '@/components/benefits/BenefitDialog';
 import { EmployeeBenefitDialog } from '@/components/benefits/EmployeeBenefitDialog';
+import { BenefitsHistoryChart } from '@/components/benefits/BenefitsHistoryChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Gift, Users, DollarSign, Pencil, TrendingUp } from 'lucide-react';
 import { useBenefitsKPI } from '@/hooks/useBenefitsKPI';
@@ -210,6 +211,7 @@ const Benefits = () => {
           <TabsTrigger value="catalog">Catálogo de Benefícios</TabsTrigger>
           <TabsTrigger value="assignments">Benefícios Atribuídos</TabsTrigger>
           <TabsTrigger value="employees">Atribuir por Funcionário</TabsTrigger>
+          <TabsTrigger value="history">Histórico</TabsTrigger>
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-4">
@@ -332,6 +334,10 @@ const Benefits = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-4">
+          <BenefitsHistoryChart />
         </TabsContent>
       </Tabs>
     </div>
