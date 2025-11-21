@@ -267,22 +267,32 @@ export const EmployeeBenefitAssignmentFilters = ({
                     <Briefcase className="h-4 w-4" />
                     Cargo
                   </Label>
-                  <Select
-                    value={filters.job_title}
-                    onValueChange={(value) => onFiltersChange({ ...filters, job_title: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todos os cargos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todos os cargos</SelectItem>
-                      {jobTitles?.map((title) => (
-                        <SelectItem key={title} value={title}>
-                          {title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select
+                      value={filters.job_title || undefined}
+                      onValueChange={(value) => onFiltersChange({ ...filters, job_title: value })}
+                    >
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Todos os cargos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jobTitles?.map((title) => (
+                          <SelectItem key={title} value={title}>
+                            {title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {filters.job_title && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onFiltersChange({ ...filters, job_title: '' })}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
