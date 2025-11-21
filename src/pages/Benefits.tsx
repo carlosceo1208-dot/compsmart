@@ -18,10 +18,174 @@ import { BenefitDialog } from '@/components/benefits/BenefitDialog';
 import { EmployeeBenefitDialog } from '@/components/benefits/EmployeeBenefitDialog';
 import { BenefitsHistoryChart } from '@/components/benefits/BenefitsHistoryChart';
 import { BenefitsComparisonDashboard } from '@/components/benefits/BenefitsComparisonDashboard';
+import { EmployeeBenefitAssignmentFilters } from '@/components/benefits/EmployeeBenefitAssignmentFilters';
+import { EmployeePagination } from '@/components/benefits/EmployeePagination';
+import { BulkBenefitAssignment } from '@/components/benefits/BulkBenefitAssignment';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Gift, Users, DollarSign, Pencil, TrendingUp } from 'lucide-react';
+import { Gift, Users, DollarSign, Pencil, TrendingUp, Hash, Briefcase, Award, Building2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useBenefitsKPI } from '@/hooks/useBenefitsKPI';
+import { useEmployeeFilters } from '@/hooks/useEmployeeFilters';
 import { formatCurrency, formatCurrencyNoDecimals, formatDecimal, toFixedSafe } from '@/lib/formatters';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+
+// Componente separado para a aba de atribuição
+const EmployeeAssignmentTab = () => {
+  const {
+    filters,
+    setFilters,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    sortBy,
+    setSortBy,
+    sortOrder,
+    setSortOrder,
+    data,
+    isLoading,
+    clearFilters,
+    hasActiveFilters,
+    activeFiltersCount,
+  } = useEmployeeFilters();
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Atribuir Benefícios por Funcionário</CardTitle>
+          <CardDescription>
+            Use os filtros para encontrar funcionários e atribuir benefícios
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* Componente de Filtros */}
+      <EmployeeBenefitAssignmentFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        resultCount={data?.totalCount || 0}
+        activeFiltersCount={activeFiltersCount}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearFilters}
+      />
+
+      {/* Lista de Funcionários Filtrados */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <div>
+            <CardTitle className="text-lg">Funcionários</CardTitle>
+            <CardDescription>
+              {data?.totalCount || 0} funcionário(s) encontrado(s)
+            </CardDescription>
+          </div>
+
+          {/* Ações e Ordenação */}
+          <div className="flex items-center gap-2">
+            {data && data.totalCount > 0 && (
+              <BulkBenefitAssignment 
+                filters={filters} 
+                employeeCount={data.totalCount} 
+              />
+            )}
+            <div className="flex items-center gap-2">
+              <Label className="text-sm">Ordenar:</Label>
+              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="full_name">Nome</SelectItem>
+                  <SelectItem value="employee_number">Matrícula</SelectItem>
+                  <SelectItem value="grade">Grade</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                size="icon"
+                variant="outline"
+                onClick={() => setSortOrder(o => o === 'asc' ? 'desc' : 'asc')}
+              >
+                {sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-2">
+              {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-20" />)}
+            </div>
+          ) : data?.employees.length === 0 ? (
+            <div className="text-center py-12">
+              <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-lg font-semibold">Nenhum funcionário encontrado</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Tente ajustar os filtros de busca
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {data?.employees.map((employee) => (
+                <div
+                  key={employee.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{employee.full_name}</p>
+                      {employee.benefits_count > 0 && (
+                        <Badge variant="secondary" className="text-xs">
+                          {employee.benefits_count} benefício(s)
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <Hash className="h-3 w-3" />
+                        {employee.employee_number}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Briefcase className="h-3 w-3" />
+                        {employee.job_title || 'Sem cargo'}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Award className="h-3 w-3" />
+                        Grade {employee.grade || 'N/A'}
+                      </span>
+                      {employee.unit && (
+                        <span className="flex items-center gap-1">
+                          <Building2 className="h-3 w-3" />
+                          {employee.unit.description || employee.unit.name}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <EmployeeBenefitDialog employeeId={employee.id} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Paginação */}
+          {data && data.totalPages > 1 && (
+            <EmployeePagination
+              page={page}
+              totalPages={data.totalPages}
+              pageSize={pageSize}
+              totalCount={data.totalCount}
+              onPageChange={setPage}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </>
+  );
+};
 
 const Benefits = () => {
   const { data: kpiData, isLoading: loadingKPI } = useBenefitsKPI();
@@ -347,27 +511,7 @@ const Benefits = () => {
         </TabsContent>
 
         <TabsContent value="employees" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Atribuir Benefícios por Funcionário</CardTitle>
-              <CardDescription>Selecione um funcionário para atribuir benefícios</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {employees?.map((employee) => (
-                  <div key={employee.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{employee.full_name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {employee.employee_number} • {employee.job_title || 'Sem cargo'} • Grade {employee.grade || 'N/A'}
-                      </p>
-                    </div>
-                    <EmployeeBenefitDialog employeeId={employee.id} />
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <EmployeeAssignmentTab />
         </TabsContent>
 
         <TabsContent value="history" className="space-y-4">
