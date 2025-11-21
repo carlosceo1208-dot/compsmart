@@ -164,7 +164,7 @@ const Benefits = () => {
                     <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                     <span className="text-muted-foreground truncate">
                       Empresa: R$ {(kpiData.companyCost || 0).toLocaleString('pt-BR', { 
-                        minimumFractionDigits: 2,
+                        minimumFractionDigits: 0,
                         maximumFractionDigits: 0
                       })}
                     </span>
@@ -173,7 +173,7 @@ const Benefits = () => {
                     <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0" />
                     <span className="text-muted-foreground truncate">
                       Funcionário: R$ {(kpiData.employeeCost || 0).toLocaleString('pt-BR', { 
-                        minimumFractionDigits: 2,
+                        minimumFractionDigits: 0,
                         maximumFractionDigits: 0
                       })}
                     </span>
@@ -199,7 +199,7 @@ const Benefits = () => {
             )}
             <p className="text-xs text-muted-foreground">
               {kpiData?.employeeCostPercentage && kpiData.employeeCostPercentage > 0
-                ? `Economia de R$ ${(kpiData.employeeCost || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 0 })} para empresa`
+                ? `Economia de R$ ${(kpiData.employeeCost || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} para empresa`
                 : 'Empresa arca com 100% dos custos'
               }
             </p>
