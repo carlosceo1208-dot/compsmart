@@ -2,8 +2,11 @@
  * ✅ MIGRADO: Formatação centralizada implementada
  * Data: 2025-01-20
  * 
- * Todas as formatações monetárias agora usam @/lib/formatters
- * para prevenir RangeError e garantir consistência.
+ * Sistema de Elegibilidade de Benefícios por Grade e Faixa Salarial implementado
+ * - Badges de elegibilidade
+ * - Regras configuráveis por benefício
+ * - Atribuição automática baseada em regras
+ * - Vale Transporte com cálculo de 6%
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,6 +84,30 @@ const Benefits = () => {
       other: 'Outro',
     };
     return types[type] || type;
+  };
+
+  const getEligibilityBadge = (eligibilityType: string) => {
+    switch (eligibilityType) {
+      case 'grade':
+        return (
+          <Badge variant="default" className="gap-1">
+            📊 Por Grade
+          </Badge>
+        );
+      case 'salary_range':
+        return (
+          <Badge variant="default" className="gap-1">
+            💰 Por Salário
+          </Badge>
+        );
+      case 'none':
+      default:
+        return (
+          <Badge variant="secondary" className="gap-1">
+            ✨ Todos Elegíveis
+          </Badge>
+        );
+    }
   };
 
   return (
@@ -226,16 +253,22 @@ const Benefits = () => {
                 <Card key={benefit.id}>
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="flex items-center gap-2">
+                      <div className="space-y-2">
+                        <CardTitle className="flex items-center gap-2 flex-wrap">
                           {benefit.name}
                           {benefit.is_active ? (
                             <Badge variant="default" className="text-xs">Ativo</Badge>
                           ) : (
                             <Badge variant="secondary" className="text-xs">Inativo</Badge>
                           )}
+                          {benefit.is_template && (
+                            <Badge variant="outline" className="text-xs">Template</Badge>
+                          )}
                         </CardTitle>
-                        <CardDescription>{getBenefitTypeLabel(benefit.benefit_type)}</CardDescription>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <CardDescription>{getBenefitTypeLabel(benefit.benefit_type)}</CardDescription>
+                          {getEligibilityBadge(benefit.eligibility_type || 'none')}
+                        </div>
                       </div>
                       <BenefitDialog
                         benefit={benefit}

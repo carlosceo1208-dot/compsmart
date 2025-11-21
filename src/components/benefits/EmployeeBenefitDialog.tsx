@@ -9,8 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Plus, Info } from 'lucide-react';
+import { Plus, Info, Bus } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAutoAssignBenefit } from '@/hooks/useAutoAssignBenefit';
+import { useTransportationCalculator } from '@/hooks/useTransportationCalculator';
+import { formatCurrency } from '@/lib/formatters';
 
 interface EmployeeBenefitDialogProps {
   employeeId: string;
@@ -20,6 +24,7 @@ interface EmployeeBenefitDialogProps {
 export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [transportationCost, setTransportationCost] = useState<number | null>(null);
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
@@ -30,6 +35,21 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
     is_active: true,
     start_date: new Date().toISOString().split('T')[0],
     end_date: '',
+    eligibility_rule_id: null as string | null,
+  });
+
+  // Buscar dados do funcionário
+  const { data: employee } = useQuery({
+    queryKey: ['employee', employeeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', employeeId)
+        .single();
+      if (error) throw error;
+      return data;
+    },
   });
 
   const { data: benefits } = useQuery({
@@ -48,13 +68,38 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
 
   const selectedBenefit = benefits?.find(b => b.id === formData.benefit_id);
   
+  // Verificar elegibilidade automática
+  const { data: eligibility, isLoading: checkingEligibility } = useAutoAssignBenefit(
+    employeeId,
+    formData.benefit_id
+  );
+
+  // Calcular Vale Transporte
+  const { data: transportationCalc } = useTransportationCalculator(
+    employeeId,
+    transportationCost
+  );
+
   const calculatedEmployeeValue = formData.employee_contribution_type === 'percentage'
     ? (formData.company_contribution_value * formData.employee_contribution_value) / 100
     : formData.employee_contribution_value;
 
+  // Atribuição automática baseada em elegibilidade
   useEffect(() => {
-    if (selectedBenefit) {
-      // Pre-fill with benefit's default values
+    if (eligibility?.is_eligible) {
+      setFormData(prev => ({
+        ...prev,
+        company_contribution_value: eligibility.company_value,
+        employee_contribution_type: (eligibility.employee_contribution_type === 'none' 
+          ? 'fixed' 
+          : eligibility.employee_contribution_type) as 'fixed' | 'percentage',
+        employee_contribution_value: eligibility.employee_contribution_value,
+        eligibility_rule_id: eligibility.rule_id,
+      }));
+    } else if (eligibility && !eligibility.is_eligible) {
+      toast.warning('Funcionário não elegível para este benefício');
+    } else if (selectedBenefit && !eligibility) {
+      // Fallback para valores padrão se não houver regras
       setFormData(prev => ({
         ...prev,
         company_contribution_value: selectedBenefit.value_per_employee,
@@ -62,21 +107,37 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
           ? 'fixed' 
           : selectedBenefit.default_employee_contribution_type) as 'fixed' | 'percentage',
         employee_contribution_value: selectedBenefit.default_employee_contribution_value || 0,
+        eligibility_rule_id: null,
       }));
     }
-  }, [selectedBenefit]);
+  }, [eligibility, selectedBenefit]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Para Vale Transporte, usar valores calculados
+      let finalCompanyValue = formData.company_contribution_value;
+      let finalEmployeeValue = formData.employee_contribution_value;
+
+      if (selectedBenefit?.template_type === 'transportation' && transportationCalc) {
+        finalCompanyValue = transportationCalc.company_subsidy;
+        finalEmployeeValue = transportationCalc.employee_discount;
+      }
+
       const { error } = await supabase
         .from('employee_benefits')
         .insert([{
           employee_id: employeeId,
-          ...formData,
+          benefit_id: formData.benefit_id,
+          company_contribution_value: finalCompanyValue,
+          employee_contribution_type: formData.employee_contribution_type,
+          employee_contribution_value: finalEmployeeValue,
+          is_active: formData.is_active,
+          start_date: formData.start_date,
           end_date: formData.end_date || null,
+          eligibility_rule_id: formData.eligibility_rule_id,
         }]);
 
       if (error) throw error;
@@ -85,6 +146,7 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
       queryClient.invalidateQueries({ queryKey: ['employee-benefits', employeeId] });
       queryClient.invalidateQueries({ queryKey: ['kpi-benefits'] });
       setOpen(false);
+      setTransportationCost(null);
     } catch (error) {
       console.error('Error assigning benefit:', error);
       toast.error('Erro ao atribuir benefício');
@@ -119,14 +181,79 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
                 <SelectValue placeholder="Selecione um benefício" />
               </SelectTrigger>
               <SelectContent>
-                {benefits?.map((benefit) => (
+                {benefits?.map((benefit: any) => (
                   <SelectItem key={benefit.id} value={benefit.id}>
-                    {benefit.name} - R$ {benefit.value_per_employee.toFixed(2)}
+                    {benefit.name} - {formatCurrency(benefit.value_per_employee)}
+                    {benefit.eligibility_type !== 'none' && (
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ({benefit.eligibility_type === 'grade' ? '📊 Por Grade' : '💰 Por Salário'})
+                      </span>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {checkingEligibility && (
+              <p className="text-sm text-muted-foreground">Verificando elegibilidade...</p>
+            )}
+            {eligibility?.description && (
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  {eligibility.description}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
+
+          {/* Vale Transporte - Calculadora Especial */}
+          {selectedBenefit?.template_type === 'transportation' && (
+            <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Bus className="h-4 w-4" />
+                  Cálculo Vale Transporte (Limite 6% do Salário)
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  CLT Art. 458 - Desconto limitado a 6% do salário fixo
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <Label htmlFor="transportation_cost">Custo Mensal do Transporte (R$)</Label>
+                  <Input
+                    id="transportation_cost"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="200.00"
+                    value={transportationCost || ''}
+                    onChange={(e) => setTransportationCost(parseFloat(e.target.value) || null)}
+                  />
+                </div>
+
+                {transportationCalc && employee && (
+                  <Alert className="bg-background">
+                    <Info className="h-4 w-4" />
+                    <AlertDescription className="text-sm space-y-1">
+                      <div><strong>Salário:</strong> {formatCurrency(employee.salary || 0)}</div>
+                      <div><strong>6% do Salário:</strong> {formatCurrency((employee.salary || 0) * 0.06)}</div>
+                      <hr className="my-2" />
+                      <div className="text-primary">
+                        <strong>Desconto Funcionário:</strong> {formatCurrency(transportationCalc.employee_discount)}
+                      </div>
+                      <div className="text-primary">
+                        <strong>Subsídio Empresa:</strong> {formatCurrency(transportationCalc.company_subsidy)}
+                      </div>
+                      <div className="font-semibold">
+                        <strong>Total:</strong> {formatCurrency(transportationCalc.total_cost)}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           <div>
             <Label htmlFor="company_contribution_value">Contribuição da Empresa (R$)</Label>
@@ -183,8 +310,8 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   💡 Cálculo: {formData.employee_contribution_type === 'percentage' 
-                    ? `${formData.employee_contribution_value}% de R$ ${formData.company_contribution_value.toFixed(2)} = R$ ${calculatedEmployeeValue.toFixed(2)}`
-                    : `R$ ${calculatedEmployeeValue.toFixed(2)}`
+                    ? `${formData.employee_contribution_value}% de ${formatCurrency(formData.company_contribution_value)} = ${formatCurrency(calculatedEmployeeValue)}`
+                    : formatCurrency(calculatedEmployeeValue)
                   }
                 </AlertDescription>
               </Alert>

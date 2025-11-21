@@ -5,7 +5,7 @@
  * Todas as formatações monetárias agora usam @/lib/formatters
  * para prevenir RangeError e garantir consistência.
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import { toast } from 'sonner';
 import { Plus, Pencil, Info } from 'lucide-react';
 import { z } from 'zod';
 import { toFixedSafe } from '@/lib/formatters';
+import { BenefitEligibilityManager, EligibilityRule } from './BenefitEligibilityManager';
 
 const benefitSchema = z.object({
   name: z.string().trim().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
@@ -30,6 +31,7 @@ const benefitSchema = z.object({
   default_employee_contribution_type: z.enum(['none', 'fixed', 'percentage']),
   default_employee_contribution_value: z.number().min(0, 'Valor deve ser maior ou igual a zero').max(100, 'Percentual não pode ser maior que 100'),
   is_active: z.boolean(),
+  eligibility_type: z.enum(['none', 'grade', 'salary_range']),
 });
 
 interface Benefit {
@@ -41,6 +43,9 @@ interface Benefit {
   default_employee_contribution_type?: string;
   default_employee_contribution_value?: number;
   is_active: boolean;
+  eligibility_type?: string;
+  is_template?: boolean;
+  template_type?: string;
 }
 
 interface BenefitDialogProps {
@@ -52,6 +57,7 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [eligibilityRules, setEligibilityRules] = useState<EligibilityRule[]>([]);
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
@@ -62,7 +68,29 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
     default_employee_contribution_type: (benefit?.default_employee_contribution_type as 'none' | 'fixed' | 'percentage') || 'none',
     default_employee_contribution_value: benefit?.default_employee_contribution_value || 0,
     is_active: benefit?.is_active ?? true,
+    eligibility_type: (benefit?.eligibility_type as 'none' | 'grade' | 'salary_range') || 'none',
   });
+
+  // Carregar regras existentes ao editar
+  useEffect(() => {
+    const loadRules = async () => {
+      if (benefit?.id) {
+        const { data, error } = await supabase
+          .from('benefit_eligibility_rules')
+          .select('*')
+          .eq('benefit_id', benefit.id)
+          .eq('is_active', true);
+        
+        if (!error && data) {
+          setEligibilityRules(data.map(rule => ({
+            ...rule,
+            employee_contribution_type: rule.employee_contribution_type as 'none' | 'fixed' | 'percentage',
+          })));
+        }
+      }
+    };
+    loadRules();
+  }, [benefit?.id]);
 
   const calculatedEmployeeValue = formData.default_employee_contribution_type === 'percentage'
     ? (formData.value_per_employee * formData.default_employee_contribution_value) / 100
@@ -85,6 +113,9 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
         return;
       }
 
+      // Salvar benefício e obter ID
+      let benefitId = benefit?.id;
+      
       if (benefit) {
         const { error } = await supabase
           .from('benefits')
@@ -96,13 +127,13 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
             default_employee_contribution_type: validatedData.default_employee_contribution_type,
             default_employee_contribution_value: validatedData.default_employee_contribution_value,
             is_active: validatedData.is_active,
+            eligibility_type: validatedData.eligibility_type,
           })
           .eq('id', benefit.id);
 
         if (error) throw error;
-        toast.success('Benefício atualizado com sucesso');
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('benefits')
           .insert([{
             name: validatedData.name,
@@ -112,11 +143,40 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
             default_employee_contribution_type: validatedData.default_employee_contribution_type,
             default_employee_contribution_value: validatedData.default_employee_contribution_value,
             is_active: validatedData.is_active,
-          }]);
+            eligibility_type: validatedData.eligibility_type,
+          }])
+          .select()
+          .single();
 
         if (error) throw error;
-        toast.success('Benefício cadastrado com sucesso');
+        benefitId = data.id;
       }
+
+      // Salvar regras de elegibilidade se houver
+      if (validatedData.eligibility_type !== 'none' && eligibilityRules.length > 0 && benefitId) {
+        // Desativar regras antigas
+        if (benefit?.id) {
+          await supabase
+            .from('benefit_eligibility_rules')
+            .update({ is_active: false })
+            .eq('benefit_id', benefitId);
+        }
+
+        // Inserir novas regras
+        const rulesToInsert = eligibilityRules.map(rule => ({
+          benefit_id: benefitId,
+          ...rule,
+          is_active: true,
+        }));
+
+        const { error: rulesError } = await supabase
+          .from('benefit_eligibility_rules')
+          .insert(rulesToInsert);
+
+        if (rulesError) throw rulesError;
+      }
+
+      toast.success(benefit ? 'Benefício atualizado com sucesso' : 'Benefício cadastrado com sucesso');
 
       queryClient.invalidateQueries({ queryKey: ['benefits'] });
       setOpen(false);
@@ -286,6 +346,45 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
             />
             {validationErrors.description && (
               <p className="text-sm text-destructive mt-1">{validationErrors.description}</p>
+            )}
+          </div>
+
+          {/* Elegibilidade */}
+          <div className="space-y-3 p-4 border rounded-lg">
+            <Label className="text-base">Elegibilidade do Benefício</Label>
+            <RadioGroup
+              value={formData.eligibility_type}
+              onValueChange={(value: 'none' | 'grade' | 'salary_range') => {
+                setFormData({ ...formData, eligibility_type: value });
+                if (value === 'none') setEligibilityRules([]);
+              }}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="eligibility-none" />
+                <Label htmlFor="eligibility-none" className="font-normal cursor-pointer">
+                  Sem restrição (todos elegíveis)
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="grade" id="eligibility-grade" />
+                <Label htmlFor="eligibility-grade" className="font-normal cursor-pointer">
+                  Por Grade/Nível
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="salary_range" id="eligibility-salary" />
+                <Label htmlFor="eligibility-salary" className="font-normal cursor-pointer">
+                  Por Faixa Salarial
+                </Label>
+              </div>
+            </RadioGroup>
+
+            {formData.eligibility_type !== 'none' && (
+              <BenefitEligibilityManager
+                eligibilityType={formData.eligibility_type}
+                rules={eligibilityRules}
+                onChange={setEligibilityRules}
+              />
             )}
           </div>
 
