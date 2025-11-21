@@ -102,15 +102,23 @@ export const useEmployeeFilters = () => {
       let filteredProfiles = profiles || [];
       
       if (filters.search.trim()) {
-        const search = normalizeString(filters.search);
+        // Dividir a busca em tokens (palavras separadas por espaço)
+        const searchTerms = filters.search
+          .trim()
+          .split(/\s+/)
+          .map(term => normalizeString(term))
+          .filter(term => term.length > 0);
 
         filteredProfiles = filteredProfiles.filter((p: any) => {
           const name = normalizeString(p.full_name || '');
           const employeeNumber = (p.employee_number || '').toString().toLowerCase();
+          
+          // Concatenar nome + matrícula para busca unificada
+          const searchableText = `${name} ${employeeNumber}`;
 
-          return (
-            name.includes(search) ||
-            employeeNumber.includes(search)
+          // TODOS os termos devem estar presentes (AND)
+          return searchTerms.every(term => 
+            searchableText.includes(term)
           );
         });
       }
