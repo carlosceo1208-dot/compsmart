@@ -153,10 +153,10 @@ const EmployeeAssignmentTab = () => {
                         <Award className="h-3 w-3" />
                         Grade {employee.grade || 'N/A'}
                       </span>
-                      {employee.unit && (
+                      {employee.unit && Array.isArray(employee.unit) && employee.unit[0] && (
                         <span className="flex items-center gap-1">
                           <Building2 className="h-3 w-3" />
-                          {employee.unit.description || employee.unit.name}
+                          {employee.unit[0].name}
                         </span>
                       )}
                     </div>
