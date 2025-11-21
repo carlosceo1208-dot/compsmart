@@ -1,8 +1,16 @@
+/**
+ * ✅ MIGRADO: Formatação centralizada implementada
+ * Data: 2025-01-20
+ * 
+ * Todas as formatações monetárias agora usam @/lib/formatters
+ * para prevenir RangeError e garantir consistência.
+ */
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { useBenefitsHistory } from '@/hooks/useBenefitsHistory';
 import { TrendingUp, Users } from 'lucide-react';
+import { formatCurrency, formatPercentageSafe } from '@/lib/formatters';
 
 export const BenefitsHistoryChart = () => {
   const { data: history, isLoading } = useBenefitsHistory(12);
@@ -47,12 +55,8 @@ export const BenefitsHistoryChart = () => {
     );
   }
 
-  const formatCurrency = (value: number) => {
+  const formatCompactK = (value: number) => {
     return `R$ ${(value / 1000).toFixed(1)}k`;
-  };
-
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(1)}%`;
   };
 
   // Dados para o gráfico de área stacked (empresa vs funcionário)
@@ -85,12 +89,12 @@ export const BenefitsHistoryChart = () => {
                 className="text-muted-foreground"
               />
               <YAxis 
-                tickFormatter={formatCurrency}
+                tickFormatter={formatCompactK}
                 tick={{ fontSize: 12 }}
                 className="text-muted-foreground"
               />
               <Tooltip 
-                formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                formatter={(value: number) => formatCurrency(value)}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
@@ -142,13 +146,13 @@ export const BenefitsHistoryChart = () => {
                 className="text-muted-foreground"
               />
               <YAxis 
-                tickFormatter={formatPercentage}
+                tickFormatter={(value: number) => formatPercentageSafe(value, 1)}
                 domain={[0, 100]}
                 tick={{ fontSize: 12 }}
                 className="text-muted-foreground"
               />
               <Tooltip 
-                formatter={(value: number) => `${value.toFixed(1)}%`}
+                formatter={(value: number) => formatPercentageSafe(value, 1)}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
@@ -190,12 +194,12 @@ export const BenefitsHistoryChart = () => {
                 className="text-muted-foreground"
               />
               <YAxis 
-                tickFormatter={formatCurrency}
+                tickFormatter={formatCompactK}
                 tick={{ fontSize: 12 }}
                 className="text-muted-foreground"
               />
               <Tooltip 
-                formatter={(value: number) => `R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+                formatter={(value: number) => formatCurrency(value)}
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',

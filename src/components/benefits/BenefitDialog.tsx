@@ -1,3 +1,10 @@
+/**
+ * ✅ MIGRADO: Formatação centralizada implementada
+ * Data: 2025-01-20
+ * 
+ * Todas as formatações monetárias agora usam @/lib/formatters
+ * para prevenir RangeError e garantir consistência.
+ */
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +20,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Plus, Pencil, Info } from 'lucide-react';
 import { z } from 'zod';
+import { toFixedSafe } from '@/lib/formatters';
 
 const benefitSchema = z.object({
   name: z.string().trim().min(1, 'Nome é obrigatório').max(100, 'Nome deve ter no máximo 100 caracteres'),
@@ -256,11 +264,11 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   💡 Cálculo: {formData.default_employee_contribution_type === 'percentage' 
-                    ? `${formData.default_employee_contribution_value}% de R$ ${formData.value_per_employee.toFixed(2)} = R$ ${calculatedEmployeeValue.toFixed(2)}`
-                    : `R$ ${calculatedEmployeeValue.toFixed(2)}`
+                    ? `${formData.default_employee_contribution_value}% de R$ ${toFixedSafe(formData.value_per_employee, 2)} = R$ ${toFixedSafe(calculatedEmployeeValue, 2)}`
+                    : `R$ ${toFixedSafe(calculatedEmployeeValue, 2)}`
                   }
                   <br />
-                  <span className="text-xs">Empresa paga: R$ {(formData.value_per_employee - calculatedEmployeeValue).toFixed(2)}</span>
+                  <span className="text-xs">Empresa paga: R$ {toFixedSafe(formData.value_per_employee - calculatedEmployeeValue, 2)}</span>
                 </AlertDescription>
               </Alert>
             )}
