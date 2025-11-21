@@ -42,12 +42,13 @@ export const TrendAnalysisSection = ({ unitsData }: TrendAnalysisSectionProps) =
   unitsData.forEach((unit) => {
     const lastMonth = unit.history[unit.history.length - 1];
     const unitAvgCost = lastMonth?.avgCostPerEmployee || 0;
-    if (unitAvgCost < avgCostPerEmployee * 0.8) {
+    if (unitAvgCost < avgCostPerEmployee * 0.8 && avgCostPerEmployee > 0) {
+      const diffPercentage = ((avgCostPerEmployee - unitAvgCost) / avgCostPerEmployee) * 100;
       insights.push({
         type: 'warning',
         icon: <AlertTriangle className="h-5 w-5" />,
         title: `${unit.unitName} - Abaixo da Média`,
-        description: `Custo/funcionário ${formatPercentage(((avgCostPerEmployee - unitAvgCost) / avgCostPerEmployee) * 100)} abaixo da média geral (${formatCurrency(unitAvgCost)} vs ${formatCurrency(avgCostPerEmployee)}).`,
+        description: `Custo/funcionário ${formatPercentage(diffPercentage)} abaixo da média geral (${formatCurrency(unitAvgCost)} vs ${formatCurrency(avgCostPerEmployee)}).`,
       });
     }
   });

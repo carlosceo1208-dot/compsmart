@@ -3,7 +3,7 @@
  */
 
 export const formatCurrency = (value: number | null | undefined): string => {
-  if (value === null || value === undefined) return 'R$ 0,00';
+  if (value === null || value === undefined || !isFinite(value)) return 'R$ 0,00';
   
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -14,7 +14,7 @@ export const formatCurrency = (value: number | null | undefined): string => {
 };
 
 export const formatCompactCurrency = (value: number | null | undefined): string => {
-  if (value === null || value === undefined) return 'R$ 0';
+  if (value === null || value === undefined || !isFinite(value)) return 'R$ 0';
   
   if (value >= 1000000) {
     return `R$ ${(value / 1000000).toFixed(1)}M`;
@@ -26,7 +26,7 @@ export const formatCompactCurrency = (value: number | null | undefined): string 
 };
 
 export const formatNumber = (value: number | null | undefined): string => {
-  if (value === null || value === undefined) return '0';
+  if (value === null || value === undefined || !isFinite(value)) return '0';
   
   return new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: 0,
@@ -35,7 +35,7 @@ export const formatNumber = (value: number | null | undefined): string => {
 };
 
 export const formatPercentage = (value: number | null | undefined): string => {
-  if (value === null || value === undefined) return '0%';
+  if (value === null || value === undefined || !isFinite(value)) return '0%';
   
   return new Intl.NumberFormat('pt-BR', {
     style: 'percent',
@@ -58,7 +58,7 @@ export const formatCurrencyCustom = (
   value: number | null | undefined, 
   currency: 'BRL' | 'USD'
 ): string => {
-  if (value === null || value === undefined) return currency === 'BRL' ? 'R$ 0,00' : '$ 0.00';
+  if (value === null || value === undefined || !isFinite(value)) return currency === 'BRL' ? 'R$ 0,00' : '$ 0.00';
   
   return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', {
     style: 'currency',
