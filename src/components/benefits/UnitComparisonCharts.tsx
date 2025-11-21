@@ -1,3 +1,10 @@
+/**
+ * ✅ MIGRADO: Formatação centralizada implementada
+ * Data: 2025-01-20
+ * 
+ * Todas as formatações monetárias agora usam @/lib/formatters
+ * para prevenir RangeError e garantir consistência.
+ */
 import { Card } from '@/components/ui/card';
 import {
   LineChart,
@@ -17,7 +24,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { UnitBenefitsHistory } from '@/hooks/useBenefitsHistoryByUnit';
-import { formatCurrency, formatPercentage } from '@/lib/formatters';
+import { formatCurrency, formatPercentage, formatDecimal } from '@/lib/formatters';
 
 interface UnitComparisonChartsProps {
   unitsData: UnitBenefitsHistory[];
@@ -136,7 +143,7 @@ export const UnitComparisonCharts = ({ unitsData }: UnitComparisonChartsProps) =
           <LineChart data={evolutionData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis dataKey="month" className="text-xs" />
-            <YAxis className="text-xs" tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
+            <YAxis className="text-xs" tickFormatter={(value) => `R$ ${formatDecimal(value / 1000, 0)}k`} />
             <Tooltip
               formatter={(value: number) => formatCurrency(value)}
               contentStyle={{
@@ -186,7 +193,7 @@ export const UnitComparisonCharts = ({ unitsData }: UnitComparisonChartsProps) =
                   dataKey="value"
                   nameKey="name"
                   label={({ name, percentage }) => 
-                    `${name}: ${percentage.toFixed(1)}%`
+                    `${name}: ${formatDecimal(percentage, 1)}%`
                   }
                   labelLine={true}
                   animationBegin={0}
@@ -243,7 +250,7 @@ export const UnitComparisonCharts = ({ unitsData }: UnitComparisonChartsProps) =
                           {formatCurrency(unit.value)}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {unit.percentage.toFixed(1)}%
+                          {formatDecimal(unit.percentage, 1)}%
                         </p>
                       </div>
                     </div>
@@ -261,7 +268,7 @@ export const UnitComparisonCharts = ({ unitsData }: UnitComparisonChartsProps) =
           <BarChart data={lastMonthData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis dataKey="name" className="text-xs" />
-            <YAxis className="text-xs" tickFormatter={(value) => `R$ ${(value / 1000).toFixed(0)}k`} />
+            <YAxis className="text-xs" tickFormatter={(value) => `R$ ${formatDecimal(value / 1000, 0)}k`} />
             <Tooltip
               formatter={(value: number) => formatCurrency(value)}
               contentStyle={{

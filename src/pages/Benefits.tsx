@@ -1,3 +1,10 @@
+/**
+ * ✅ MIGRADO: Formatação centralizada implementada
+ * Data: 2025-01-20
+ * 
+ * Todas as formatações monetárias agora usam @/lib/formatters
+ * para prevenir RangeError e garantir consistência.
+ */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +18,7 @@ import { BenefitsComparisonDashboard } from '@/components/benefits/BenefitsCompa
 import { Skeleton } from '@/components/ui/skeleton';
 import { Gift, Users, DollarSign, Pencil, TrendingUp } from 'lucide-react';
 import { useBenefitsKPI } from '@/hooks/useBenefitsKPI';
+import { formatCurrency, formatCurrencyNoDecimals, formatDecimal, toFixedSafe } from '@/lib/formatters';
 
 const Benefits = () => {
   const { data: kpiData, isLoading: loadingKPI } = useBenefitsKPI();
@@ -132,10 +140,7 @@ const Benefits = () => {
               <Skeleton className="h-8 w-24" />
             ) : (
               <div className="text-2xl font-bold">
-                R$ {(kpiData?.totalCost || 0).toLocaleString('pt-BR', { 
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2 
-                })}
+                {formatCurrency(kpiData?.totalCost || 0)}
               </div>
             )}
             
@@ -163,19 +168,13 @@ const Benefits = () => {
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                     <span className="text-muted-foreground truncate">
-                      Empresa: R$ {(kpiData.companyCost || 0).toLocaleString('pt-BR', { 
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      })}
+                      Empresa: {formatCurrencyNoDecimals(kpiData.companyCost || 0)}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <div className="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0" />
                     <span className="text-muted-foreground truncate">
-                      Funcionário: R$ {(kpiData.employeeCost || 0).toLocaleString('pt-BR', { 
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0
-                      })}
+                      Funcionário: {formatCurrencyNoDecimals(kpiData.employeeCost || 0)}
                     </span>
                   </div>
                 </div>
@@ -194,12 +193,12 @@ const Benefits = () => {
               <Skeleton className="h-8 w-16" />
             ) : (
               <div className="text-2xl font-bold">
-                {(kpiData?.employeeCostPercentage || 0).toFixed(1)}%
+                {formatDecimal(kpiData?.employeeCostPercentage || 0, 1)}%
               </div>
             )}
             <p className="text-xs text-muted-foreground">
               {kpiData?.employeeCostPercentage && kpiData.employeeCostPercentage > 0
-                ? `Economia de R$ ${(kpiData.employeeCost || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} para empresa`
+                ? `Economia de ${formatCurrencyNoDecimals(kpiData.employeeCost || 0)} para empresa`
                 : 'Empresa arca com 100% dos custos'
               }
             </p>
@@ -252,15 +251,15 @@ const Benefits = () => {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Valor Total:</span>
-                        <span className="font-semibold">R$ {benefit.value_per_employee.toFixed(2)}</span>
+                        <span className="font-semibold">{formatCurrency(benefit.value_per_employee)}</span>
                       </div>
                       {benefit.default_employee_contribution_type && benefit.default_employee_contribution_type !== 'none' && (
                         <div className="flex justify-between text-sm">
                           <span className="text-muted-foreground">Participação Funcionário:</span>
                           <span className="font-semibold">
                             {benefit.default_employee_contribution_type === 'percentage'
-                              ? `${benefit.default_employee_contribution_value}% (R$ ${((benefit.value_per_employee * (benefit.default_employee_contribution_value || 0)) / 100).toFixed(2)})`
-                              : `R$ ${(benefit.default_employee_contribution_value || 0).toFixed(2)}`
+                              ? `${benefit.default_employee_contribution_value}% (${formatCurrency((benefit.value_per_employee * (benefit.default_employee_contribution_value || 0)) / 100)})`
+                              : formatCurrency(benefit.default_employee_contribution_value || 0)
                             }
                           </span>
                         </div>
@@ -297,12 +296,12 @@ const Benefits = () => {
                       </div>
                       <div className="text-right space-y-1">
                         <p className="text-sm font-semibold">
-                          Empresa: R$ {eb.company_contribution_value.toFixed(2)}
+                          Empresa: {formatCurrency(eb.company_contribution_value)}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           Funcionário: {eb.employee_contribution_type === 'percentage' 
-                            ? `${eb.employee_contribution_value}% (R$ ${((eb.company_contribution_value * eb.employee_contribution_value) / 100).toFixed(2)})`
-                            : `R$ ${eb.employee_contribution_value.toFixed(2)}`
+                            ? `${eb.employee_contribution_value}% (${formatCurrency((eb.company_contribution_value * eb.employee_contribution_value) / 100)})`
+                            : formatCurrency(eb.employee_contribution_value)
                           }
                         </p>
                       </div>
