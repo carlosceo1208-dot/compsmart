@@ -589,382 +589,94 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{userId ? "Editar Funcionário" : "Novo Funcionário"}</DialogTitle>
           <DialogDescription>
             {userId ? "Atualize as informações do funcionário e suas permissões" : "Preencha os dados para criar um novo funcionário"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2 space-y-2">
-              <Label htmlFor="full_name">Nome Completo *</Label>
-              <Popover open={openEmployees} onOpenChange={setOpenEmployees}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openEmployees}
-                    className="w-full justify-between"
-                    type="button"
-                    disabled={loading}
-                  >
-                    {formData.full_name || "Buscar funcionário ou digitar novo nome"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 z-[1000] w-full">
-                  <Command>
-                    <CommandInput 
-                      placeholder="Digite o nome do funcionário..." 
-                      value={formData.full_name}
-                      onValueChange={(value) => {
-                        setFormData({ ...formData, full_name: value });
-                        if (!value) setSelectedEmployee(null);
-                      }}
-                    />
-                    <CommandList className="max-h-[300px]">
-                      <CommandEmpty>
-                        <div className="p-2 text-sm text-muted-foreground">
-                          {formData.full_name ? `Nenhum funcionário encontrado. Use "${formData.full_name}" para novo cadastro` : "Digite para buscar"}
-                        </div>
-                      </CommandEmpty>
-                      
-                      {employees.filter(emp => 
-                        emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase())
-                      ).length > 0 && (
-                        <CommandGroup heading="Funcionários Cadastrados">
-                          {employees
-                            .filter(emp => emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase()))
-                            .slice(0, 10)
-                            .map((emp) => (
-                              <CommandItem
-                                key={emp.id}
-                                value={emp.full_name}
-                                onSelect={() => {
-                                  handleEmployeeSelect(emp);
-                                  setOpenEmployees(false);
-                                }}
-                              >
-                                <div className="flex flex-col w-full">
-                                  <div className="flex justify-between items-center">
-                                    <span className="font-medium">{emp.full_name}</span>
-                                    <span className="text-xs text-muted-foreground">#{emp.email}</span>
-                                  </div>
-                                  <div className="flex gap-4 text-xs text-muted-foreground mt-1">
-                                    {emp.job_title && <span>Cargo: {emp.job_title}</span>}
-                                    {emp.grade && <span>Grade: {emp.grade}</span>}
-                                    {emp.salary && (
-                                      <span>
-                                        Salário: R$ {emp.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              </CommandItem>
-                            ))}
-                        </CommandGroup>
-                      )}
-                      
-                      <CommandGroup heading="Ações">
-                        <CommandItem
-                          onSelect={() => {
-                            setOpenEmployees(false);
-                          }}
-                        >
-                          {formData.full_name ? `Usar "${formData.full_name}" (novo cadastro)` : "Fechar"}
-                        </CommandItem>
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <p className="text-xs text-muted-foreground">
-                {selectedEmployee 
-                  ? `✅ Dados importados de: ${selectedEmployee.full_name}` 
-                  : "Digite para buscar funcionário existente ou criar novo"}
-              </p>
-            </div>
-            <div className="col-span-2 space-y-2">
-              <Label htmlFor="email">Email *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-                disabled={loading || !!userId}
-              />
-            </div>
-            {!userId && (
+        
+        {/* Container com scroll */}
+        <div className="overflow-y-auto flex-1 pr-2 -mr-2">
+          <form id="user-form" onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 space-y-2">
-                <Label htmlFor="password">Senha *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  required={!userId}
-                  disabled={loading}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Mínimo 8 caracteres
-                </p>
-              </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="phone">Telefone</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                disabled={loading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cpf">CPF</Label>
-              <Input
-                id="cpf"
-                value={formData.cpf}
-                onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                disabled={loading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="employee_number" className="flex items-center gap-1">
-                Número de Registro (RE)
-                <span className="text-destructive">*</span>
-              </Label>
-              <Input
-                id="employee_number"
-                value={formData.employee_number}
-                onChange={(e) => {
-                  const value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
-                  setFormData({ ...formData, employee_number: value });
-                }}
-                disabled={loading}
-                placeholder="Ex: 2025005, FUNC-001, RE-123"
-                maxLength={50}
-                required
-                className="font-mono"
-              />
-              <p className="text-xs text-muted-foreground">
-                📋 Matrícula ou número de registro interno da empresa
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="birth_date">Data de Nascimento</Label>
-              <Input
-                id="birth_date"
-                type="date"
-                value={formData.birth_date}
-                onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <div className="pt-4 border-t">
-            <h3 className="text-sm font-semibold mb-4 text-foreground">Informações de Cargo e Remuneração</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="salary">Salário Fixo (R$)</Label>
-                <Input
-                  id="salary"
-                  type="text"
-                  value={formData.salary}
-                  onChange={(e) => {
-                    // Remove tudo exceto números e vírgula
-                    let value = e.target.value.replace(/[^\d,]/g, '');
-                    // Permite apenas uma vírgula
-                    const parts = value.split(',');
-                    if (parts.length > 2) {
-                      value = parts[0] + ',' + parts.slice(1).join('');
-                    }
-                    setFormData({ ...formData, salary: value });
-                  }}
-                  onBlur={(e) => {
-                    // Formata o valor ao sair do campo
-                    const value = e.target.value.replace(/[^\d,]/g, '');
-                    if (value) {
-                      const numericValue = parseFloat(value.replace(',', '.'));
-                      if (!isNaN(numericValue)) {
-                        const formatted = numericValue.toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        });
-                        setFormData({ ...formData, salary: formatted });
-                      }
-                    }
-                  }}
-                  disabled={loading}
-                  placeholder="Ex: 20.000,00"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Use vírgula para centavos (Ex: 20000,00)
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="variable_salary">Salário Variável (R$)</Label>
-                <Input
-                  id="variable_salary"
-                  type="text"
-                  value={formData.variable_salary}
-                  onChange={(e) => {
-                    // Remove tudo exceto números e vírgula
-                    let value = e.target.value.replace(/[^\d,]/g, '');
-                    // Permite apenas uma vírgula
-                    const parts = value.split(',');
-                    if (parts.length > 2) {
-                      value = parts[0] + ',' + parts.slice(1).join('');
-                    }
-                    setFormData({ ...formData, variable_salary: value });
-                  }}
-                  onBlur={(e) => {
-                    // Formata o valor ao sair do campo
-                    const value = e.target.value.replace(/[^\d,]/g, '');
-                    if (value) {
-                      const numericValue = parseFloat(value.replace(',', '.'));
-                      if (!isNaN(numericValue)) {
-                        const formatted = numericValue.toLocaleString('pt-BR', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        });
-                        setFormData({ ...formData, variable_salary: formatted });
-                      }
-                    }
-                  }}
-                  disabled={loading}
-                  placeholder="Ex: 5.000,00"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Use vírgula para centavos (Ex: 5000,00)
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="salary_range_percentage">% da Faixa (Calculado Automaticamente)</Label>
-                <Input
-                  id="salary_range_percentage"
-                  type="text"
-                  value={
-                    formData.salary_range_percentage 
-                      ? (() => {
-                          const pct = parseFloat(formData.salary_range_percentage);
-                          const formatted = Math.abs(pct).toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          });
-                          
-                          if (pct < 0) return `-${formatted}%`;
-                          if (pct <= 100) return `${formatted}%`;
-                          return `+${formatted}%`;
-                        })()
-                      : "Selecione cargo e informe salário"
-                  }
-                  disabled={true}
-                  className={`bg-muted font-mono ${
-                    parseFloat(formData.salary_range_percentage || '0') < 0 
-                      ? 'text-red-600 dark:text-red-400 font-bold' 
-                      : parseFloat(formData.salary_range_percentage || '0') <= 100
-                        ? 'text-green-600 dark:text-green-400 font-semibold'
-                        : 'text-blue-600 dark:text-blue-400 font-bold'
-                  }`}
-                />
-                {formData.salary_range_percentage && (
-                  <div className={`mt-2 p-3 rounded-md ${getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).color}`}>
-                    <p className="text-sm font-medium">
-                      {getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).label}
-                    </p>
-                    <p className="text-xs opacity-90 mt-1">
-                      {parseFloat(formData.salary_range_percentage) < 0 
-                        ? `⚠️ Salário está ${Math.abs(parseFloat(formData.salary_range_percentage)).toFixed(2)}% ABAIXO do mínimo do mercado`
-                        : parseFloat(formData.salary_range_percentage) >= 0 && parseFloat(formData.salary_range_percentage) <= 100
-                          ? `✅ Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (competitivo com o mercado)`
-                          : `🔵 Salário está ${(parseFloat(formData.salary_range_percentage) - 100).toFixed(2)}% acima do máximo da faixa`
-                      }
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="performance_rating">Nota Avaliação de Desempenho</Label>
-                <Input
-                  id="performance_rating"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  max="10"
-                  value={formData.performance_rating}
-                  onChange={(e) => setFormData({ ...formData, performance_rating: e.target.value })}
-                  disabled={loading}
-                  placeholder="0.00 - 10.00"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t">
-            <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="unit_id">Unidade Organizacional</Label>
-                <Popover open={openUnits} onOpenChange={setOpenUnits}>
+                <Label htmlFor="full_name">Nome Completo *</Label>
+                <Popover open={openEmployees} onOpenChange={setOpenEmployees}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       role="combobox"
-                      aria-expanded={openUnits}
+                      aria-expanded={openEmployees}
                       className="w-full justify-between"
                       type="button"
                       disabled={loading}
                     >
-                      {selectedUnitLabel || "Selecionar Área/Depto/Setor/Projeto"}
+                      {formData.full_name || "Buscar funcionário ou digitar novo nome"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="p-0 z-[1000] w-[480px]">
+                  <PopoverContent className="p-0 z-[1000] w-full">
                     <Command>
-                      <CommandInput placeholder="Digite código ou nome..." />
-                      <CommandList className="max-h-[60vh]">
-                        <CommandEmpty>Nenhuma unidade encontrada.</CommandEmpty>
-
-                        {(["area", "department", "sector", "project"] as const).map((t) => (
-                          grouped[t].length > 0 && (
-                            <CommandGroup key={t} heading={typeLabelMap[t]}>
-                              {grouped[t].map((u) => (
+                      <CommandInput 
+                        placeholder="Digite o nome do funcionário..." 
+                        value={formData.full_name}
+                        onValueChange={(value) => {
+                          setFormData({ ...formData, full_name: value });
+                          if (!value) setSelectedEmployee(null);
+                        }}
+                      />
+                      <CommandList className="max-h-[300px]">
+                        <CommandEmpty>
+                          <div className="p-2 text-sm text-muted-foreground">
+                            {formData.full_name ? `Nenhum funcionário encontrado. Use "${formData.full_name}" para novo cadastro` : "Digite para buscar"}
+                          </div>
+                        </CommandEmpty>
+                        
+                        {employees.filter(emp => 
+                          emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase())
+                        ).length > 0 && (
+                          <CommandGroup heading="Funcionários Cadastrados">
+                            {employees
+                              .filter(emp => emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase()))
+                              .slice(0, 10)
+                              .map((emp) => (
                                 <CommandItem
-                                  key={u.id}
-                                  value={`${u.code || ""} ${u.description || u.name}`}
+                                  key={emp.id}
+                                  value={emp.full_name}
                                   onSelect={() => {
-                                    handleUnitChange(u.id);
-                                    setOpenUnits(false);
+                                    handleEmployeeSelect(emp);
+                                    setOpenEmployees(false);
                                   }}
                                 >
-                                  <div className="flex flex-col">
-                                    <span className="text-sm">
-                                      {u.code ? <span className="font-mono mr-1">{u.code}</span> : null}
-                                      {u.description || u.name}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">
-                                      {typeLabelMap[u.type] || u.type}
-                                    </span>
+                                  <div className="flex flex-col w-full">
+                                    <div className="flex justify-between items-center">
+                                      <span className="font-medium">{emp.full_name}</span>
+                                      <span className="text-xs text-muted-foreground">#{emp.email}</span>
+                                    </div>
+                                    <div className="flex gap-4 text-xs text-muted-foreground mt-1">
+                                      {emp.job_title && <span>Cargo: {emp.job_title}</span>}
+                                      {emp.grade && <span>Grade: {emp.grade}</span>}
+                                      {emp.salary && (
+                                        <span>
+                                          Salário: R$ {emp.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </CommandItem>
                               ))}
-                            </CommandGroup>
-                          )
-                        ))}
-
+                          </CommandGroup>
+                        )}
+                        
                         <CommandGroup heading="Ações">
                           <CommandItem
-                            value="limpar"
                             onSelect={() => {
-                              handleUnitChange("");
-                              setOpenUnits(false);
+                              setOpenEmployees(false);
                             }}
                           >
-                            Limpar seleção
+                            {formData.full_name ? `Usar "${formData.full_name}" (novo cadastro)` : "Fechar"}
                           </CommandItem>
                         </CommandGroup>
                       </CommandList>
@@ -972,129 +684,423 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   </PopoverContent>
                 </Popover>
                 <p className="text-xs text-muted-foreground">
-                  Selecione a unidade onde o colaborador está alocado (Área, Departamento, Setor, Projeto)
-                </p>
-                {positions.length === 0 && (
-                  <div className="text-sm text-muted-foreground mt-2 bg-amber-50 dark:bg-amber-950 p-3 rounded border border-amber-200 dark:border-amber-800 space-y-2">
-                    <p>⚠️ Nenhuma Unidade Organizacional cadastrada (Área/Departamento/Setor/Projeto).</p>
-                    <p className="text-xs">O cadastro pode ser feito sem vínculo. Você pode vincular depois.</p>
-                    <a 
-                      href="/organization" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-xs text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      Abrir Estrutura Organizacional →
-                    </a>
-                  </div>
-                )}
-                {loadingBreadcrumb && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Carregando hierarquia...
-                  </div>
-                )}
-                {selectedUnitBreadcrumb && !loadingBreadcrumb && (
-                  <div className="text-xs font-mono bg-muted p-2 rounded mt-2">
-                    📍 {selectedUnitBreadcrumb}
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="job_title_id">Cargo (Plano de Cargos)</Label>
-                <select
-                  id="job_title_id"
-                  value={formData.job_title_id}
-                  onChange={(e) => setFormData({ ...formData, job_title_id: e.target.value })}
-                  disabled={loading}
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Selecione um cargo</option>
-                  {jobTitles.map((jobTitle) => (
-                    <option key={jobTitle.id} value={jobTitle.id}>
-                      {jobTitle.title}
-                    </option>
-                  ))}
-                </select>
-                {selectedJobTitle && (
-                  <div className="mt-2 p-3 bg-muted rounded-md space-y-1">
-                    <p className="text-xs font-medium">Informações do Cargo:</p>
-                    <p className="text-xs"><span className="font-medium">Código:</span> {selectedJobTitle.code}</p>
-                    <p className="text-xs"><span className="font-medium">Grade:</span> {selectedJobTitle.grade}</p>
-                    <p className="text-xs"><span className="font-medium">Pontos Medianos:</span> {selectedJobTitle.median_points.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  </div>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="manager_id">Gestor Direto</Label>
-                <select
-                  id="manager_id"
-                  value={formData.manager_id}
-                  onChange={(e) => setFormData({ ...formData, manager_id: e.target.value })}
-                  disabled={loading}
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Selecione um gestor</option>
-                  {managers
-                    .filter(m => m.id !== userId) // Don't allow selecting self as manager
-                    .map((manager) => (
-                      <option key={manager.id} value={manager.id}>
-                        {manager.full_name}
-                      </option>
-                    ))}
-                </select>
-                <p className="text-xs text-muted-foreground">
-                  Defina quem é o gestor direto deste colaborador
+                  {selectedEmployee 
+                    ? `✅ Dados importados de: ${selectedEmployee.full_name}` 
+                    : "Digite para buscar funcionário existente ou criar novo"}
                 </p>
               </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 pt-4 border-t">
-            <Label>Perfis de Acesso *</Label>
-            <div className="space-y-2">
-              {roleOptions.map((role) => (
-                <div key={role.value} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={role.value}
-                    checked={formData.roles.includes(role.value)}
-                    onCheckedChange={() => handleRoleToggle(role.value)}
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
+                  disabled={loading || !!userId}
+                />
+              </div>
+              {!userId && (
+                <div className="col-span-2 space-y-2">
+                  <Label htmlFor="password">Senha *</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required={!userId}
                     disabled={loading}
                   />
-                  <Label htmlFor={role.value} className="font-normal cursor-pointer">
-                    {role.label}
-                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Mínimo 8 caracteres
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-              className="flex-1"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading || formData.roles.length === 0}
-              className="flex-1 bg-gradient-primary hover:opacity-90"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                userId ? "Atualizar" : "Criar Usuário"
               )}
-            </Button>
-          </div>
-        </form>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Telefone</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="cpf">CPF</Label>
+                <Input
+                  id="cpf"
+                  value={formData.cpf}
+                  onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="employee_number" className="flex items-center gap-1">
+                  Número de Registro (RE)
+                  <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="employee_number"
+                  value={formData.employee_number}
+                  onChange={(e) => {
+                    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+                    setFormData({ ...formData, employee_number: value });
+                  }}
+                  disabled={loading}
+                  placeholder="Ex: 2025005, FUNC-001, RE-123"
+                  maxLength={50}
+                  required
+                  className="font-mono"
+                />
+                <p className="text-xs text-muted-foreground">
+                  📋 Matrícula ou número de registro interno da empresa
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="birth_date">Data de Nascimento</Label>
+                <Input
+                  id="birth_date"
+                  type="date"
+                  value={formData.birth_date}
+                  onChange={(e) => setFormData({ ...formData, birth_date: e.target.value })}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 border-t">
+              <h3 className="text-sm font-semibold mb-4 text-foreground">Informações de Cargo e Remuneração</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="salary">Salário Fixo (R$)</Label>
+                  <Input
+                    id="salary"
+                    type="text"
+                    value={formData.salary}
+                    onChange={(e) => {
+                      // Remove tudo exceto números e vírgula
+                      let value = e.target.value.replace(/[^\d,]/g, '');
+                      // Permite apenas uma vírgula
+                      const parts = value.split(',');
+                      if (parts.length > 2) {
+                        value = parts[0] + ',' + parts.slice(1).join('');
+                      }
+                      setFormData({ ...formData, salary: value });
+                    }}
+                    onBlur={(e) => {
+                      // Formata o valor ao sair do campo
+                      const value = e.target.value.replace(/[^\d,]/g, '');
+                      if (value) {
+                        const numericValue = parseFloat(value.replace(',', '.'));
+                        if (!isNaN(numericValue)) {
+                          const formatted = numericValue.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          });
+                          setFormData({ ...formData, salary: formatted });
+                        }
+                      }
+                    }}
+                    disabled={loading}
+                    placeholder="Ex: 20.000,00"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use vírgula para centavos (Ex: 20000,00)
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="variable_salary">Salário Variável (R$)</Label>
+                  <Input
+                    id="variable_salary"
+                    type="text"
+                    value={formData.variable_salary}
+                    onChange={(e) => {
+                      // Remove tudo exceto números e vírgula
+                      let value = e.target.value.replace(/[^\d,]/g, '');
+                      // Permite apenas uma vírgula
+                      const parts = value.split(',');
+                      if (parts.length > 2) {
+                        value = parts[0] + ',' + parts.slice(1).join('');
+                      }
+                      setFormData({ ...formData, variable_salary: value });
+                    }}
+                    onBlur={(e) => {
+                      // Formata o valor ao sair do campo
+                      const value = e.target.value.replace(/[^\d,]/g, '');
+                      if (value) {
+                        const numericValue = parseFloat(value.replace(',', '.'));
+                        if (!isNaN(numericValue)) {
+                          const formatted = numericValue.toLocaleString('pt-BR', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          });
+                          setFormData({ ...formData, variable_salary: formatted });
+                        }
+                      }
+                    }}
+                    disabled={loading}
+                    placeholder="Ex: 5.000,00"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Use vírgula para centavos (Ex: 5000,00)
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="salary_range_percentage">% da Faixa (Calculado Automaticamente)</Label>
+                  <Input
+                    id="salary_range_percentage"
+                    type="text"
+                    value={
+                      formData.salary_range_percentage 
+                        ? (() => {
+                            const pct = parseFloat(formData.salary_range_percentage);
+                            const formatted = Math.abs(pct).toLocaleString('pt-BR', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            });
+                            
+                            if (pct < 0) return `-${formatted}%`;
+                            if (pct <= 100) return `${formatted}%`;
+                            return `+${formatted}%`;
+                          })()
+                        : "Selecione cargo e informe salário"
+                    }
+                    disabled={true}
+                    className={`bg-muted font-mono ${
+                      parseFloat(formData.salary_range_percentage || '0') < 0 
+                        ? 'text-red-600 dark:text-red-400 font-bold' 
+                        : parseFloat(formData.salary_range_percentage || '0') <= 100
+                          ? 'text-green-600 dark:text-green-400 font-semibold'
+                          : 'text-blue-600 dark:text-blue-400 font-bold'
+                    }`}
+                  />
+                  {formData.salary_range_percentage && (
+                    <div className={`mt-2 p-3 rounded-md ${getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).color}`}>
+                      <p className="text-sm font-medium">
+                        {getSalaryStatusBadge(parseFloat(formData.salary_range_percentage)).label}
+                      </p>
+                      <p className="text-xs opacity-90 mt-1">
+                        {parseFloat(formData.salary_range_percentage) < 0 
+                          ? `⚠️ Salário está ${Math.abs(parseFloat(formData.salary_range_percentage)).toFixed(2)}% ABAIXO do mínimo do mercado`
+                          : parseFloat(formData.salary_range_percentage) >= 0 && parseFloat(formData.salary_range_percentage) <= 100
+                            ? `✅ Salário está ${parseFloat(formData.salary_range_percentage).toFixed(2)}% dentro da faixa (competitivo com o mercado)`
+                            : `🔵 Salário está ${(parseFloat(formData.salary_range_percentage) - 100).toFixed(2)}% acima do máximo da faixa`
+                        }
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="performance_rating">Nota Avaliação de Desempenho</Label>
+                  <Input
+                    id="performance_rating"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    max="10"
+                    value={formData.performance_rating}
+                    onChange={(e) => setFormData({ ...formData, performance_rating: e.target.value })}
+                    disabled={loading}
+                    placeholder="0.00 - 10.00"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t">
+              <h3 className="text-sm font-semibold mb-4 text-foreground">Vínculo Organizacional</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="unit_id">Unidade Organizacional</Label>
+                  <Popover open={openUnits} onOpenChange={setOpenUnits}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={openUnits}
+                        className="w-full justify-between"
+                        type="button"
+                        disabled={loading}
+                      >
+                        {selectedUnitLabel || "Selecionar Área/Depto/Setor/Projeto"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0 z-[1000] w-[480px]">
+                      <Command>
+                        <CommandInput placeholder="Digite código ou nome..." />
+                        <CommandList className="max-h-[60vh]">
+                          <CommandEmpty>Nenhuma unidade encontrada.</CommandEmpty>
+
+                          {(["area", "department", "sector", "project"] as const).map((t) => (
+                            grouped[t].length > 0 && (
+                              <CommandGroup key={t} heading={typeLabelMap[t]}>
+                                {grouped[t].map((u) => (
+                                  <CommandItem
+                                    key={u.id}
+                                    value={`${u.code || ""} ${u.description || u.name}`}
+                                    onSelect={() => {
+                                      handleUnitChange(u.id);
+                                      setOpenUnits(false);
+                                    }}
+                                  >
+                                    <div className="flex flex-col">
+                                      <span className="text-sm">
+                                        {u.code ? <span className="font-mono mr-1">{u.code}</span> : null}
+                                        {u.description || u.name}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {typeLabelMap[u.type] || u.type}
+                                      </span>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            )
+                          ))}
+
+                          <CommandGroup heading="Ações">
+                            <CommandItem
+                              value="limpar"
+                              onSelect={() => {
+                                handleUnitChange("");
+                                setOpenUnits(false);
+                              }}
+                            >
+                              Limpar seleção
+                            </CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <p className="text-xs text-muted-foreground">
+                    Selecione a unidade onde o colaborador está alocado (Área, Departamento, Setor, Projeto)
+                  </p>
+                  {positions.length === 0 && (
+                    <div className="text-sm text-muted-foreground mt-2 bg-amber-50 dark:bg-amber-950 p-3 rounded border border-amber-200 dark:border-amber-800 space-y-2">
+                      <p>⚠️ Nenhuma Unidade Organizacional cadastrada (Área/Departamento/Setor/Projeto).</p>
+                      <p className="text-xs">O cadastro pode ser feito sem vínculo. Você pode vincular depois.</p>
+                      <a 
+                        href="/organization" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        Abrir Estrutura Organizacional →
+                      </a>
+                    </div>
+                  )}
+                  {loadingBreadcrumb && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Carregando hierarquia...
+                    </div>
+                  )}
+                  {selectedUnitBreadcrumb && !loadingBreadcrumb && (
+                    <div className="text-xs font-mono bg-muted p-2 rounded mt-2">
+                      📍 {selectedUnitBreadcrumb}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="job_title_id">Cargo (Plano de Cargos)</Label>
+                  <select
+                    id="job_title_id"
+                    value={formData.job_title_id}
+                    onChange={(e) => setFormData({ ...formData, job_title_id: e.target.value })}
+                    disabled={loading}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Selecione um cargo</option>
+                    {jobTitles.map((jobTitle) => (
+                      <option key={jobTitle.id} value={jobTitle.id}>
+                        {jobTitle.title}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedJobTitle && (
+                    <div className="mt-2 p-3 bg-muted rounded-md space-y-1">
+                      <p className="text-xs font-medium">Informações do Cargo:</p>
+                      <p className="text-xs"><span className="font-medium">Código:</span> {selectedJobTitle.code}</p>
+                      <p className="text-xs"><span className="font-medium">Grade:</span> {selectedJobTitle.grade}</p>
+                      <p className="text-xs"><span className="font-medium">Pontos Medianos:</span> {selectedJobTitle.median_points.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="manager_id">Gestor Direto</Label>
+                  <select
+                    id="manager_id"
+                    value={formData.manager_id}
+                    onChange={(e) => setFormData({ ...formData, manager_id: e.target.value })}
+                    disabled={loading}
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Selecione um gestor</option>
+                    {managers
+                      .filter(m => m.id !== userId) // Don't allow selecting self as manager
+                      .map((manager) => (
+                        <option key={manager.id} value={manager.id}>
+                          {manager.full_name}
+                        </option>
+                      ))}
+                  </select>
+                  <p className="text-xs text-muted-foreground">
+                    Defina quem é o gestor direto deste colaborador
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-4 border-t">
+              <Label>Perfis de Acesso *</Label>
+              <div className="space-y-2">
+                {roleOptions.map((role) => (
+                  <div key={role.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={role.value}
+                      checked={formData.roles.includes(role.value)}
+                      onCheckedChange={() => handleRoleToggle(role.value)}
+                      disabled={loading}
+                    />
+                    <Label htmlFor={role.value} className="font-normal cursor-pointer">
+                      {role.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {/* Botões fixos no rodapé */}
+        <div className="flex gap-3 pt-4 border-t mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+            className="flex-1"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            form="user-form"
+            disabled={loading || formData.roles.length === 0}
+            className="flex-1 bg-gradient-primary hover:opacity-90"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              userId ? "Atualizar" : "Criar Usuário"
+            )}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

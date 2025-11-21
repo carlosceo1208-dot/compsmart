@@ -179,175 +179,177 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {grade ? `Editar ${getLabel('salary_range')} - ${grade}` : `Nova ${getLabel('salary_range')}`}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {!grade && (
+        <div className="overflow-y-auto flex-1 pr-2 -mr-2">
+          <form id="salary-range-form" onSubmit={handleSubmit} className="space-y-6">
+            {!grade && (
+              <div>
+                <Label>{getLabel('grade')}</Label>
+                <Input
+                  value={gradeInput}
+                  onChange={(e) => setGradeInput(e.target.value)}
+                  placeholder="Ex: Nível 5, Grade A, etc."
+                  required
+                />
+              </div>
+            )}
+
             <div>
-              <Label>{getLabel('grade')}</Label>
-              <Input
-                value={gradeInput}
-                onChange={(e) => setGradeInput(e.target.value)}
-                placeholder="Ex: Nível 5, Grade A, etc."
-                required
-              />
-            </div>
-          )}
-
-          <div>
-            <Label>Modo de Definição</Label>
-            <RadioGroup value={mode} onValueChange={(v) => setMode(v as CalculationMode)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="manual" id="manual" />
-                <Label htmlFor="manual" className="cursor-pointer font-normal">
-                  Manual - Informar os 5 valores individualmente
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="automatic" id="automatic" />
-                <Label htmlFor="automatic" className="cursor-pointer font-normal">
-                  Automático - Calcular baseado em Ponto Médio + Amplitude
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {mode === 'manual' && (
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-5 gap-4">
-                  <div>
-                    <Label className="text-xs">Mínimo</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={manualValues.min}
-                      onChange={(e) => setManualValues({ ...manualValues, min: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">1º Quartil</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={manualValues.q1}
-                      onChange={(e) => setManualValues({ ...manualValues, q1: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Média de Mercado</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={manualValues.median}
-                      onChange={(e) => setManualValues({ ...manualValues, median: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">3º Quartil</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={manualValues.q3}
-                      onChange={(e) => setManualValues({ ...manualValues, q3: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Máximo</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={manualValues.max}
-                      onChange={(e) => setManualValues({ ...manualValues, max: e.target.value })}
-                      required
-                    />
-                  </div>
+              <Label>Modo de Definição</Label>
+              <RadioGroup value={mode} onValueChange={(v) => setMode(v as CalculationMode)}>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="manual" id="manual" />
+                  <Label htmlFor="manual" className="cursor-pointer font-normal">
+                    Manual - Informar os 5 valores individualmente
+                  </Label>
                 </div>
-              </CardContent>
-            </Card>
-          )}
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="automatic" id="automatic" />
+                  <Label htmlFor="automatic" className="cursor-pointer font-normal">
+                    Automático - Calcular baseado em Ponto Médio + Amplitude
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
 
-          {mode === 'automatic' && (
-            <div className="space-y-4">
+            {mode === 'manual' && (
               <Card>
                 <CardContent className="pt-6 space-y-4">
-                  <div>
-                    <Label>Média de Mercado (R$)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={autoMedian}
-                      onChange={(e) => setAutoMedian(e.target.value)}
-                      placeholder="Ex: 7000"
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      O sistema calculará automaticamente: Mínimo (-20%) e Máximo (+25%)
-                    </p>
+                  <div className="grid grid-cols-5 gap-4">
+                    <div>
+                      <Label className="text-xs">Mínimo</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={manualValues.min}
+                        onChange={(e) => setManualValues({ ...manualValues, min: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">1º Quartil</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={manualValues.q1}
+                        onChange={(e) => setManualValues({ ...manualValues, q1: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Média de Mercado</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={manualValues.median}
+                        onChange={(e) => setManualValues({ ...manualValues, median: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">3º Quartil</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={manualValues.q3}
+                        onChange={(e) => setManualValues({ ...manualValues, q3: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Máximo</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={manualValues.max}
+                        onChange={(e) => setManualValues({ ...manualValues, max: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleCalculateAuto}
-                    className="w-full"
-                  >
-                    <Calculator className="w-4 h-4 mr-2" />
-                    Calcular Faixa Salarial
-                  </Button>
                 </CardContent>
               </Card>
+            )}
 
-              {calculatedValues && (
-                <Card className="bg-primary/5">
-                  <CardContent className="pt-6">
-                    <h4 className="font-semibold mb-4">Valores Calculados</h4>
-                    <div className="grid grid-cols-5 gap-4 text-center">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Mínimo</p>
-                        <p className="font-semibold text-sm">{formatCurrency(calculatedValues.min)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">1º Quartil</p>
-                        <p className="font-semibold text-sm">{formatCurrency(calculatedValues.q1)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Média de Mercado</p>
-                        <p className="font-semibold text-sm text-primary">{formatCurrency(calculatedValues.median)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">3º Quartil</p>
-                        <p className="font-semibold text-sm">{formatCurrency(calculatedValues.q3)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Máximo</p>
-                        <p className="font-semibold text-sm">{formatCurrency(calculatedValues.max)}</p>
-                      </div>
+            {mode === 'automatic' && (
+              <div className="space-y-4">
+                <Card>
+                  <CardContent className="pt-6 space-y-4">
+                    <div>
+                      <Label>Média de Mercado (R$)</Label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={autoMedian}
+                        onChange={(e) => setAutoMedian(e.target.value)}
+                        placeholder="Ex: 7000"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        O sistema calculará automaticamente: Mínimo (-20%) e Máximo (+25%)
+                      </p>
                     </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCalculateAuto}
+                      className="w-full"
+                    >
+                      <Calculator className="w-4 h-4 mr-2" />
+                      Calcular Faixa Salarial
+                    </Button>
                   </CardContent>
                 </Card>
-              )}
-            </div>
-          )}
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Salvando...' : 'Salvar Faixa Salarial'}
-            </Button>
-          </div>
-        </form>
+                {calculatedValues && (
+                  <Card className="bg-primary/5">
+                    <CardContent className="pt-6">
+                      <h4 className="font-semibold mb-4">Valores Calculados</h4>
+                      <div className="grid grid-cols-5 gap-4 text-center">
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Mínimo</p>
+                          <p className="font-semibold text-sm">{formatCurrency(calculatedValues.min)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">1º Quartil</p>
+                          <p className="font-semibold text-sm">{formatCurrency(calculatedValues.q1)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Média de Mercado</p>
+                          <p className="font-semibold text-sm text-primary">{formatCurrency(calculatedValues.median)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">3º Quartil</p>
+                          <p className="font-semibold text-sm">{formatCurrency(calculatedValues.q3)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-muted-foreground mb-1">Máximo</p>
+                          <p className="font-semibold text-sm">{formatCurrency(calculatedValues.max)}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+          </form>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button type="submit" form="salary-range-form" disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar Faixa Salarial'}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
