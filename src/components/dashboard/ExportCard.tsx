@@ -268,7 +268,7 @@ export const ExportCard = () => {
     
     const benefitsData = [
       ['Total de Benefícios Ativos', benefitsKPI?.totalBenefits?.toString() || '0'],
-      ['Custo Mensal', formatCurrencyCustom(convert(benefitsKPI?.monthlyCost || 0, 'BRL', currency), currency)],
+      ['Custo Mensal', formatCurrencyCustom(convert(benefitsKPI?.totalCost || 0, 'BRL', currency), currency)],
       ['Incentivos Curto Prazo (ICP)', formatCurrencyCustom(convert(incentivesKPI?.shortTerm || 0, 'BRL', currency), currency)],
       ['Incentivos Longo Prazo (ILP)', formatCurrencyCustom(convert(incentivesKPI?.longTerm || 0, 'BRL', currency), currency)],
       ['Total Incentivos', formatCurrencyCustom(convert(incentivesKPI?.total || 0, 'BRL', currency), currency)],
@@ -456,7 +456,7 @@ export const ExportCard = () => {
     
     const benefitsSummary = [
       ['Total de Benefícios Ativos', benefitsKPI?.totalBenefits?.toString() || '0'],
-      ['Custo Mensal Total', formatCurrencyCustom(convert(benefitsKPI?.monthlyCost || 0, 'BRL', currency), currency)],
+      ['Custo Mensal Total', formatCurrencyCustom(convert(benefitsKPI?.totalCost || 0, 'BRL', currency), currency)],
       ['Funcionários Ativos', totalEmployees?.toString() || '0'],
     ];
     
@@ -682,7 +682,7 @@ export const ExportCard = () => {
     const benefitsData = [
       ['Item', 'Valor'],
       ['Total de Benefícios Ativos', benefitsKPI?.totalBenefits || 0],
-      ['Custo Mensal de Benefícios', benefitsKPI?.monthlyCost || 0],
+      ['Custo Mensal de Benefícios', benefitsKPI?.totalCost || 0],
       ['Incentivos Curto Prazo (ICP)', incentivesKPI?.shortTerm || 0],
       ['Incentivos Longo Prazo (ILP)', incentivesKPI?.longTerm || 0],
       ['Total Incentivos', incentivesKPI?.total || 0],
@@ -799,7 +799,7 @@ export const ExportCard = () => {
     const summaryData = [
       ['Item', 'Valor'],
       ['Total de Benefícios Ativos', benefitsKPI?.totalBenefits || 0],
-      ['Custo Mensal Total', benefitsKPI?.monthlyCost || 0],
+      ['Custo Mensal Total', benefitsKPI?.totalCost || 0],
       ['Funcionários Ativos', totalEmployees || 0],
     ];
     const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
