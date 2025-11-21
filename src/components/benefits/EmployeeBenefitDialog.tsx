@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Plus, Info, Bus } from 'lucide-react';
+import { Plus, Info, Bus, ChevronDown } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useAutoAssignBenefit } from '@/hooks/useAutoAssignBenefit';
 import { useTransportationCalculator } from '@/hooks/useTransportationCalculator';
 import { formatCurrency } from '@/lib/formatters';
@@ -165,199 +166,214 @@ export const EmployeeBenefitDialog = ({ employeeId, trigger }: EmployeeBenefitDi
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Atribuir Benefício ao Funcionário</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="benefit_id">Benefício</Label>
-            <Select
-              value={formData.benefit_id}
-              onValueChange={(value) => setFormData({ ...formData, benefit_id: value })}
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um benefício" />
-              </SelectTrigger>
-              <SelectContent>
-                {benefits?.map((benefit: any) => (
-                  <SelectItem key={benefit.id} value={benefit.id}>
-                    {benefit.name} - {formatCurrency(benefit.value_per_employee)}
-                    {benefit.eligibility_type !== 'none' && (
-                      <span className="text-xs text-muted-foreground ml-2">
-                        ({benefit.eligibility_type === 'grade' ? '📊 Por Grade' : '💰 Por Salário'})
-                      </span>
-                    )}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {checkingEligibility && (
-              <p className="text-sm text-muted-foreground">Verificando elegibilidade...</p>
-            )}
-            {eligibility?.description && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  {eligibility.description}
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
-
-          {/* Vale Transporte - Calculadora Especial */}
-          {selectedBenefit?.template_type === 'transportation' && (
-            <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-              <CardHeader>
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Bus className="h-4 w-4" />
-                  Cálculo Vale Transporte (Limite 6% do Salário)
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  CLT Art. 458 - Desconto limitado a 6% do salário fixo
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label htmlFor="transportation_cost">Custo Mensal do Transporte (R$)</Label>
-                  <Input
-                    id="transportation_cost"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="200.00"
-                    value={transportationCost || ''}
-                    onChange={(e) => setTransportationCost(parseFloat(e.target.value) || null)}
-                  />
-                </div>
-
-                {transportationCalc && employee && (
-                  <Alert className="bg-background">
-                    <Info className="h-4 w-4" />
-                    <AlertDescription className="text-sm space-y-1">
-                      <div><strong>Salário:</strong> {formatCurrency(employee.salary || 0)}</div>
-                      <div><strong>6% do Salário:</strong> {formatCurrency((employee.salary || 0) * 0.06)}</div>
-                      <hr className="my-2" />
-                      <div className="text-primary">
-                        <strong>Desconto Funcionário:</strong> {formatCurrency(transportationCalc.employee_discount)}
-                      </div>
-                      <div className="text-primary">
-                        <strong>Subsídio Empresa:</strong> {formatCurrency(transportationCalc.company_subsidy)}
-                      </div>
-                      <div className="font-semibold">
-                        <strong>Total:</strong> {formatCurrency(transportationCalc.total_cost)}
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          <div>
-            <Label htmlFor="company_contribution_value">Contribuição da Empresa (R$)</Label>
-            <Input
-              id="company_contribution_value"
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.company_contribution_value}
-              onChange={(e) => setFormData({ ...formData, company_contribution_value: parseFloat(e.target.value) || 0 })}
-              required
-            />
-          </div>
-
-          <div className="space-y-3">
-            <Label>Participação do Funcionário</Label>
-            <RadioGroup
-              value={formData.employee_contribution_type}
-              onValueChange={(value: 'fixed' | 'percentage') => 
-                setFormData({ ...formData, employee_contribution_type: value })
-              }
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="fixed" id="fixed" />
-                <Label htmlFor="fixed" className="font-normal cursor-pointer">
-                  Valor Fixo (R$)
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="percentage" id="percentage" />
-                <Label htmlFor="percentage" className="font-normal cursor-pointer">
-                  Percentual (%)
-                </Label>
-              </div>
-            </RadioGroup>
-
+        
+        {/* Container com scroll */}
+        <div className="overflow-y-auto flex-1 pr-2 -mr-2">
+          <form id="benefit-form" onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="employee_contribution_value">
-                {formData.employee_contribution_type === 'percentage' ? 'Percentual' : 'Valor'} da Participação
-              </Label>
-              <Input
-                id="employee_contribution_value"
-                type="number"
-                step={formData.employee_contribution_type === 'percentage' ? '0.01' : '0.01'}
-                min="0"
-                max={formData.employee_contribution_type === 'percentage' ? '100' : undefined}
-                value={formData.employee_contribution_value}
-                onChange={(e) => setFormData({ ...formData, employee_contribution_value: parseFloat(e.target.value) || 0 })}
-              />
+              <Label htmlFor="benefit_id">Benefício</Label>
+              <Select
+                value={formData.benefit_id}
+                onValueChange={(value) => setFormData({ ...formData, benefit_id: value })}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um benefício" />
+                </SelectTrigger>
+                <SelectContent>
+                  {benefits?.map((benefit: any) => (
+                    <SelectItem key={benefit.id} value={benefit.id}>
+                      {benefit.name} - {formatCurrency(benefit.value_per_employee)}
+                      {benefit.eligibility_type !== 'none' && (
+                        <span className="text-xs text-muted-foreground ml-2">
+                          ({benefit.eligibility_type === 'grade' ? '📊 Por Grade' : '💰 Por Salário'})
+                        </span>
+                      )}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {checkingEligibility && (
+                <p className="text-sm text-muted-foreground">Verificando elegibilidade...</p>
+              )}
+              {eligibility?.description && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    {eligibility.description}
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
 
-            {formData.employee_contribution_value > 0 && (
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  💡 Cálculo: {formData.employee_contribution_type === 'percentage' 
-                    ? `${formData.employee_contribution_value}% de ${formatCurrency(formData.company_contribution_value)} = ${formatCurrency(calculatedEmployeeValue)}`
-                    : formatCurrency(calculatedEmployeeValue)
-                  }
-                </AlertDescription>
-              </Alert>
-            )}
-          </div>
+            {/* Vale Transporte - Calculadora Collapsible */}
+            {selectedBenefit?.template_type === 'transportation' && (
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button type="button" variant="outline" className="w-full justify-between">
+                    <span className="flex items-center gap-2">
+                      <Bus className="h-4 w-4" />
+                      Calculadora Vale Transporte (6%)
+                    </span>
+                    <ChevronDown className="h-4 w-4 transition-transform" />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <Card className="mt-2 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+                    <CardHeader>
+                      <CardTitle className="text-sm">Cálculo Vale Transporte (Limite 6% do Salário)</CardTitle>
+                      <CardDescription className="text-xs">
+                        CLT Art. 458 - Desconto limitado a 6% do salário fixo
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div>
+                        <Label htmlFor="transportation_cost">Custo Mensal do Transporte (R$)</Label>
+                        <Input
+                          id="transportation_cost"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          placeholder="200.00"
+                          value={transportationCost || ''}
+                          onChange={(e) => setTransportationCost(parseFloat(e.target.value) || null)}
+                        />
+                      </div>
 
-          <div className="grid grid-cols-2 gap-4">
+                      {transportationCalc && employee && (
+                        <Alert className="bg-background">
+                          <Info className="h-4 w-4" />
+                          <AlertDescription className="text-sm space-y-1">
+                            <div><strong>Salário:</strong> {formatCurrency(employee.salary || 0)}</div>
+                            <div><strong>6% do Salário:</strong> {formatCurrency((employee.salary || 0) * 0.06)}</div>
+                            <hr className="my-2" />
+                            <div className="text-primary">
+                              <strong>Desconto Funcionário:</strong> {formatCurrency(transportationCalc.employee_discount)}
+                            </div>
+                            <div className="text-primary">
+                              <strong>Subsídio Empresa:</strong> {formatCurrency(transportationCalc.company_subsidy)}
+                            </div>
+                            <div className="font-semibold">
+                              <strong>Total:</strong> {formatCurrency(transportationCalc.total_cost)}
+                            </div>
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </CardContent>
+                  </Card>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
+
             <div>
-              <Label htmlFor="start_date">Data de Início</Label>
+              <Label htmlFor="company_contribution_value">Contribuição da Empresa (R$)</Label>
               <Input
-                id="start_date"
-                type="date"
-                value={formData.start_date}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                id="company_contribution_value"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.company_contribution_value}
+                onChange={(e) => setFormData({ ...formData, company_contribution_value: parseFloat(e.target.value) || 0 })}
                 required
               />
             </div>
-            <div>
-              <Label htmlFor="end_date">Data de Término (opcional)</Label>
-              <Input
-                id="end_date"
-                type="date"
-                value={formData.end_date}
-                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-              />
+
+            <div className="space-y-3">
+              <Label>Participação do Funcionário</Label>
+              <RadioGroup
+                value={formData.employee_contribution_type}
+                onValueChange={(value: 'fixed' | 'percentage') => 
+                  setFormData({ ...formData, employee_contribution_type: value })
+                }
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="fixed" id="fixed" />
+                  <Label htmlFor="fixed" className="font-normal cursor-pointer">
+                    Valor Fixo (R$)
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="percentage" id="percentage" />
+                  <Label htmlFor="percentage" className="font-normal cursor-pointer">
+                    Percentual (%)
+                  </Label>
+                </div>
+              </RadioGroup>
+
+              <div>
+                <Label htmlFor="employee_contribution_value">
+                  {formData.employee_contribution_type === 'percentage' ? 'Percentual' : 'Valor'} da Participação
+                </Label>
+                <Input
+                  id="employee_contribution_value"
+                  type="number"
+                  step={formData.employee_contribution_type === 'percentage' ? '0.01' : '0.01'}
+                  min="0"
+                  max={formData.employee_contribution_type === 'percentage' ? '100' : undefined}
+                  value={formData.employee_contribution_value}
+                  onChange={(e) => setFormData({ ...formData, employee_contribution_value: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+
+              {formData.employee_contribution_value > 0 && (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    💡 Cálculo: {formData.employee_contribution_type === 'percentage' 
+                      ? `${formData.employee_contribution_value}% de ${formatCurrency(formData.company_contribution_value)} = ${formatCurrency(calculatedEmployeeValue)}`
+                      : formatCurrency(calculatedEmployeeValue)
+                    }
+                  </AlertDescription>
+                </Alert>
+              )}
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <Switch
-              id="is_active"
-              checked={formData.is_active}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-            />
-            <Label htmlFor="is_active">Benefício Ativo</Label>
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="start_date">Data de Início</Label>
+                <Input
+                  id="start_date"
+                  type="date"
+                  value={formData.start_date}
+                  onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="end_date">Data de Término (opcional)</Label>
+                <Input
+                  id="end_date"
+                  type="date"
+                  value={formData.end_date}
+                  onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+                />
+              </div>
+            </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Atribuindo...' : 'Atribuir'}
-            </Button>
-          </div>
-        </form>
+            <div className="flex items-center gap-2">
+              <Switch
+                id="is_active"
+                checked={formData.is_active}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              />
+              <Label htmlFor="is_active">Benefício Ativo</Label>
+            </div>
+          </form>
+        </div>
+
+        {/* Botões fixos no rodapé */}
+        <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            Cancelar
+          </Button>
+          <Button type="submit" form="benefit-form" disabled={loading}>
+            {loading ? 'Atribuindo...' : 'Atribuir'}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

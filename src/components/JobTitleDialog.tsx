@@ -249,250 +249,252 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {jobTitleId ? "Editar Cargo" : "Novo Cargo"}
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="basics" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="basics">📌 Dados Básicos</TabsTrigger>
-            <TabsTrigger value="description">📄 Descrição</TabsTrigger>
-            <TabsTrigger value="competencies">🧩 Competências</TabsTrigger>
-            <TabsTrigger value="requirements">🎓 Requisitos</TabsTrigger>
-          </TabsList>
+        <div className="overflow-y-auto flex-1 pr-2 -mr-2">
+          <Tabs defaultValue="basics" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="basics">📌 Dados Básicos</TabsTrigger>
+              <TabsTrigger value="description">📄 Descrição</TabsTrigger>
+              <TabsTrigger value="competencies">🧩 Competências</TabsTrigger>
+              <TabsTrigger value="requirements">🎓 Requisitos</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="basics" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="family">Família do Cargo</Label>
-                <Select value={formData.job_family} onValueChange={(v) => setFormData({...formData, job_family: v})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jobFamilies.map((family) => (
-                      <SelectItem key={family} value={family}>{family}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <TabsContent value="basics" className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="family">Família do Cargo</Label>
+                  <Select value={formData.job_family} onValueChange={(v) => setFormData({...formData, job_family: v})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {jobFamilies.map((family) => (
+                        <SelectItem key={family} value={family}>{family}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="code">Código do Cargo</Label>
+                  <Input
+                    id="code"
+                    value={formData.code}
+                    onChange={(e) => setFormData({...formData, code: e.target.value})}
+                    placeholder="Ex: ANA-JR-01"
+                  />
+                </div>
               </div>
+
               <div>
-                <Label htmlFor="code">Código do Cargo</Label>
+                <Label htmlFor="title">Título do Cargo</Label>
                 <Input
-                  id="code"
-                  value={formData.code}
-                  onChange={(e) => setFormData({...formData, code: e.target.value})}
-                  placeholder="Ex: ANA-JR-01"
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  placeholder="Ex: Analista de RH Júnior"
                 />
               </div>
-            </div>
 
-            <div>
-              <Label htmlFor="title">Título do Cargo</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="Ex: Analista de RH Júnior"
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="grade">Grade/Nível</Label>
-                <Input
-                  id="grade"
-                  value={formData.grade}
-                  onChange={(e) => setFormData({...formData, grade: e.target.value})}
-                  placeholder="Ex: 3"
-                />
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="grade">Grade/Nível</Label>
+                  <Input
+                    id="grade"
+                    value={formData.grade}
+                    onChange={(e) => setFormData({...formData, grade: e.target.value})}
+                    placeholder="Ex: 3"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="cbo">CBO</Label>
+                  <Input
+                    id="cbo"
+                    value={formData.cbo}
+                    onChange={(e) => setFormData({...formData, cbo: e.target.value})}
+                    placeholder="XXXX-XX"
+                    maxLength={7}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="median_points">Pontos Médios</Label>
+                  <Input
+                    id="median_points"
+                    type="number"
+                    value={formData.median_points}
+                    onChange={(e) => setFormData({...formData, median_points: parseFloat(e.target.value) || 0})}
+                    placeholder="0"
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="cbo">CBO</Label>
-                <Input
-                  id="cbo"
-                  value={formData.cbo}
-                  onChange={(e) => setFormData({...formData, cbo: e.target.value})}
-                  placeholder="XXXX-XX"
-                  maxLength={7}
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_active"
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
                 />
+                <Label htmlFor="is_active">Cargo Ativo</Label>
               </div>
-              <div>
-                <Label htmlFor="median_points">Pontos Médios</Label>
-                <Input
-                  id="median_points"
-                  type="number"
-                  value={formData.median_points}
-                  onChange={(e) => setFormData({...formData, median_points: parseFloat(e.target.value) || 0})}
-                  placeholder="0"
-                />
-              </div>
-            </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
-              />
-              <Label htmlFor="is_active">Cargo Ativo</Label>
-            </div>
+              {salaryRangeInfo && (
+                <Card>
+                  <CardContent className="pt-4">
+                    <p className="text-sm text-muted-foreground">Faixa Salarial Vinculada (Grade {formData.grade}):</p>
+                    <p className="font-semibold">{salaryRangeInfo}</p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
 
-            {salaryRangeInfo && (
-              <Card>
-                <CardContent className="pt-4">
-                  <p className="text-sm text-muted-foreground">Faixa Salarial Vinculada (Grade {formData.grade}):</p>
-                  <p className="font-semibold">{salaryRangeInfo}</p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="description" className="space-y-4 mt-4">
-            <div className="flex justify-end mb-2">
-              <Button
-                onClick={() => handleGenerateAI('full')}
-                disabled={aiLoading}
-                variant="outline"
-                size="sm"
-              >
-                {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-                Gerar Descrição Completa com IA
-              </Button>
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <Label htmlFor="summary">Sumário do Cargo</Label>
+            <TabsContent value="description" className="space-y-4 mt-4">
+              <div className="flex justify-end mb-2">
                 <Button
-                  onClick={() => handleGenerateAI('summary')}
+                  onClick={() => handleGenerateAI('full')}
                   disabled={aiLoading}
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
                 >
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Gerar
+                  {aiLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+                  Gerar Descrição Completa com IA
                 </Button>
               </div>
-              <Textarea
-                id="summary"
-                value={formData.summary || ""}
-                onChange={(e) => setFormData({...formData, summary: e.target.value})}
-                placeholder="Breve descrição executiva do cargo (2-3 frases)"
-                rows={3}
-              />
-            </div>
 
-            <div>
-              <Label htmlFor="main_responsibilities">Principais Responsabilidades</Label>
-              <Textarea
-                id="main_responsibilities"
-                value={formData.main_responsibilities || ""}
-                onChange={(e) => setFormData({...formData, main_responsibilities: e.target.value})}
-                placeholder="Liste as principais responsabilidades do cargo"
-                rows={6}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="key_factors">Fatores Chave</Label>
-              <Textarea
-                id="key_factors"
-                value={formData.key_factors || ""}
-                onChange={(e) => setFormData({...formData, key_factors: e.target.value})}
-                placeholder="Competências críticas e fatores determinantes"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="job_impact">Impacto do Cargo</Label>
-              <Textarea
-                id="job_impact"
-                value={formData.job_impact || ""}
-                onChange={(e) => setFormData({...formData, job_impact: e.target.value})}
-                placeholder="Impacto organizacional e contribuição esperada"
-                rows={3}
-              />
-            </div>
-          </TabsContent>
-
-          <TabsContent value="competencies" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="soft_skills">Soft Skills (Comportamentais)</Label>
+                <div className="flex justify-between items-center mb-2">
+                  <Label htmlFor="summary">Sumário do Cargo</Label>
+                  <Button
+                    onClick={() => handleGenerateAI('summary')}
+                    disabled={aiLoading}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    Gerar
+                  </Button>
+                </div>
                 <Textarea
-                  id="soft_skills"
-                  value={formData.soft_skills || ""}
-                  onChange={(e) => setFormData({...formData, soft_skills: e.target.value})}
-                  placeholder="Ex: Comunicação&#10;Liderança&#10;Trabalho em equipe"
+                  id="summary"
+                  value={formData.summary || ""}
+                  onChange={(e) => setFormData({...formData, summary: e.target.value})}
+                  placeholder="Breve descrição executiva do cargo (2-3 frases)"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="main_responsibilities">Principais Responsabilidades</Label>
+                <Textarea
+                  id="main_responsibilities"
+                  value={formData.main_responsibilities || ""}
+                  onChange={(e) => setFormData({...formData, main_responsibilities: e.target.value})}
+                  placeholder="Liste as principais responsabilidades do cargo"
                   rows={6}
                 />
               </div>
+
               <div>
-                <Label htmlFor="hard_skills">Hard Skills (Técnicas)</Label>
+                <Label htmlFor="key_factors">Fatores Chave</Label>
                 <Textarea
-                  id="hard_skills"
-                  value={formData.hard_skills || ""}
-                  onChange={(e) => setFormData({...formData, hard_skills: e.target.value})}
-                  placeholder="Ex: Excel Avançado&#10;Power BI&#10;SQL"
-                  rows={6}
+                  id="key_factors"
+                  value={formData.key_factors || ""}
+                  onChange={(e) => setFormData({...formData, key_factors: e.target.value})}
+                  placeholder="Competências críticas e fatores determinantes"
+                  rows={3}
                 />
               </div>
-            </div>
 
-            {jobTitleId && (
-              <div className="border-t pt-4 mt-4">
-                <CompetencyManager
-                  jobTitleId={jobTitleId}
-                  jobTitle={formData.title}
-                  grade={formData.grade}
+              <div>
+                <Label htmlFor="job_impact">Impacto do Cargo</Label>
+                <Textarea
+                  id="job_impact"
+                  value={formData.job_impact || ""}
+                  onChange={(e) => setFormData({...formData, job_impact: e.target.value})}
+                  placeholder="Impacto organizacional e contribuição esperada"
+                  rows={3}
                 />
               </div>
-            )}
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="requirements" className="space-y-4 mt-4">
-            <div>
-              <Label htmlFor="required_experience">Experiência Requerida</Label>
-              <Textarea
-                id="required_experience"
-                value={formData.required_experience || ""}
-                onChange={(e) => setFormData({...formData, required_experience: e.target.value})}
-                placeholder="Ex: 5+ anos em gestão de projetos de TI"
-                rows={4}
-              />
-            </div>
+            <TabsContent value="competencies" className="space-y-4 mt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="soft_skills">Soft Skills (Comportamentais)</Label>
+                  <Textarea
+                    id="soft_skills"
+                    value={formData.soft_skills || ""}
+                    onChange={(e) => setFormData({...formData, soft_skills: e.target.value})}
+                    placeholder="Ex: Comunicação&#10;Liderança&#10;Trabalho em equipe"
+                    rows={6}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="hard_skills">Hard Skills (Técnicas)</Label>
+                  <Textarea
+                    id="hard_skills"
+                    value={formData.hard_skills || ""}
+                    onChange={(e) => setFormData({...formData, hard_skills: e.target.value})}
+                    placeholder="Ex: Excel Avançado&#10;Power BI&#10;SQL"
+                    rows={6}
+                  />
+                </div>
+              </div>
 
-            <div>
-              <Label htmlFor="required_education">Formação Acadêmica</Label>
-              <Textarea
-                id="required_education"
-                value={formData.required_education || ""}
-                onChange={(e) => setFormData({...formData, required_education: e.target.value})}
-                placeholder="Ex: Superior completo em Administração, Psicologia ou áreas correlatas"
-                rows={4}
-              />
-            </div>
+              {jobTitleId && (
+                <div className="border-t pt-4 mt-4">
+                  <CompetencyManager
+                    jobTitleId={jobTitleId}
+                    jobTitle={formData.title}
+                    grade={formData.grade}
+                  />
+                </div>
+              )}
+            </TabsContent>
 
-            {salaryRangeInfo && (
-              <Card>
-                <CardContent className="pt-4">
-                  <p className="text-sm text-muted-foreground mb-1">Faixa Salarial Vinculada:</p>
-                  <p className="font-semibold text-lg">{salaryRangeInfo}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Atualizada automaticamente com base no Grade {formData.grade}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="requirements" className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="required_experience">Experiência Requerida</Label>
+                <Textarea
+                  id="required_experience"
+                  value={formData.required_experience || ""}
+                  onChange={(e) => setFormData({...formData, required_experience: e.target.value})}
+                  placeholder="Ex: 5+ anos em gestão de projetos de TI"
+                  rows={4}
+                />
+              </div>
 
-        <DialogFooter>
+              <div>
+                <Label htmlFor="required_education">Formação Acadêmica</Label>
+                <Textarea
+                  id="required_education"
+                  value={formData.required_education || ""}
+                  onChange={(e) => setFormData({...formData, required_education: e.target.value})}
+                  placeholder="Ex: Superior completo em Administração, Psicologia ou áreas correlatas"
+                  rows={4}
+                />
+              </div>
+
+              {salaryRangeInfo && (
+                <Card>
+                  <CardContent className="pt-4">
+                    <p className="text-sm text-muted-foreground mb-1">Faixa Salarial Vinculada:</p>
+                    <p className="font-semibold text-lg">{salaryRangeInfo}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Atualizada automaticamente com base no Grade {formData.grade}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        <DialogFooter className="pt-4 border-t mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
