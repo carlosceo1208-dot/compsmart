@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper para normalizar strings removendo acentos e convertendo para minúsculas
+const normalizeString = (value: string) => {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+};
+
 export interface FilterState {
   search: string;
   unit_id: string[];
@@ -35,6 +44,9 @@ export const useEmployeeFilters = () => {
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['employees-filtered', filters, page, pageSize, sortBy, sortOrder],
     queryFn: async () => {
+      // Decidir se usaremos paginação no banco ou em memória
+      const useDbPagination = !filters.search.trim();
+
       let query = supabase
         .from('profiles')
         .select(
@@ -57,13 +69,6 @@ export const useEmployeeFilters = () => {
         )
         .eq('status', 'active');
 
-      // Busca por texto (nome ou matrícula)
-      if (filters.search.trim()) {
-        query = query.or(
-          `full_name.ilike.%${filters.search}%,employee_number.ilike.%${filters.search}%`
-        );
-      }
-
       // Filtro por unidades específicas
       if (filters.unit_id.length > 0) {
         query = query.in('unit_id', filters.unit_id);
@@ -83,16 +88,35 @@ export const useEmployeeFilters = () => {
       const orderColumn = sortBy === 'full_name' ? 'full_name' : sortBy;
       query = query.order(orderColumn, { ascending: sortOrder === 'asc' });
 
-      // Paginação
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
-      query = query.range(from, to);
+      // Paginação no banco (apenas quando não há busca de texto)
+      if (useDbPagination) {
+        const from = (page - 1) * pageSize;
+        const to = from + pageSize - 1;
+        query = query.range(from, to);
+      }
 
       const { data: profiles, error, count } = await query;
       if (error) throw error;
 
+      // Aplicar filtro de busca em memória (acento-insensitive)
+      let filteredProfiles = profiles || [];
+      
+      if (filters.search.trim()) {
+        const search = normalizeString(filters.search);
+
+        filteredProfiles = filteredProfiles.filter((p: any) => {
+          const name = normalizeString(p.full_name || '');
+          const employeeNumber = (p.employee_number || '').toString().toLowerCase();
+
+          return (
+            name.includes(search) ||
+            employeeNumber.includes(search)
+          );
+        });
+      }
+
       // Buscar contagem de benefícios para cada funcionário
-      const employeeIds = profiles?.map((p) => p.id) || [];
+      const employeeIds = filteredProfiles.map((p) => p.id);
       let benefitCounts: Record<string, number> = {};
 
       if (employeeIds.length > 0) {
@@ -108,23 +132,37 @@ export const useEmployeeFilters = () => {
         }, {} as Record<string, number>);
       }
 
-      // Filtrar por status de benefícios se necessário
-      let filteredProfiles = profiles || [];
+      // Filtrar por status de benefícios
       if (filters.has_benefits === 'with') {
         filteredProfiles = filteredProfiles.filter((p) => benefitCounts[p.id] > 0);
       } else if (filters.has_benefits === 'without') {
         filteredProfiles = filteredProfiles.filter((p) => !benefitCounts[p.id]);
       }
 
-      const employees = filteredProfiles.map((profile) => ({
+      // Paginação em memória (quando há busca de texto)
+      let paginatedProfiles = filteredProfiles;
+      let totalCount: number;
+
+      if (useDbPagination) {
+        totalCount = filters.has_benefits === 'all' ? count || 0 : filteredProfiles.length;
+      } else {
+        totalCount = filteredProfiles.length;
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        paginatedProfiles = filteredProfiles.slice(start, end);
+      }
+
+      const employees = paginatedProfiles.map((profile) => ({
         ...profile,
         benefits_count: benefitCounts[profile.id] || 0,
       }));
 
+      const totalPages = Math.ceil(totalCount / pageSize);
+
       return {
         employees,
-        totalCount: filters.has_benefits === 'all' ? count || 0 : employees.length,
-        totalPages: Math.ceil((filters.has_benefits === 'all' ? count || 0 : employees.length) / pageSize),
+        totalCount,
+        totalPages,
       };
     },
   });
