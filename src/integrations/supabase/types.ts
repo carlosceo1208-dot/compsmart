@@ -503,6 +503,48 @@ export type Database = {
           },
         ]
       }
+      incentive_assistant_conversations: {
+        Row: {
+          answer: string
+          context_data: Json | null
+          created_at: string | null
+          document_name: string | null
+          document_text: string | null
+          id: string
+          operation_mode: string | null
+          question: string
+          response_time_ms: number | null
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          context_data?: Json | null
+          created_at?: string | null
+          document_name?: string | null
+          document_text?: string | null
+          id?: string
+          operation_mode?: string | null
+          question: string
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          context_data?: Json | null
+          created_at?: string | null
+          document_name?: string | null
+          document_text?: string | null
+          id?: string
+          operation_mode?: string | null
+          question?: string
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       incentive_eligibility: {
         Row: {
           created_at: string | null
@@ -720,12 +762,74 @@ export type Database = {
           },
         ]
       }
+      knowledge_base: {
+        Row: {
+          agent_type: string
+          category: string
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          is_global: boolean | null
+          keywords: string[] | null
+          root_company_id: string | null
+          source_document: string | null
+          subcategory: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_type: string
+          category: string
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_global?: boolean | null
+          keywords?: string[] | null
+          root_company_id?: string | null
+          source_document?: string | null
+          subcategory?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_type?: string
+          category?: string
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_global?: boolean | null
+          keywords?: string[] | null
+          root_company_id?: string | null
+          source_document?: string | null
+          subcategory?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "knowledge_base_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_assistant_conversations: {
         Row: {
           answer: string
           created_at: string
+          document_name: string | null
+          document_text: string | null
           id: string
           legal_references: Json | null
+          operation_mode: string | null
           question: string
           response_time_ms: number | null
           tokens_used: number | null
@@ -734,8 +838,11 @@ export type Database = {
         Insert: {
           answer: string
           created_at?: string
+          document_name?: string | null
+          document_text?: string | null
           id?: string
           legal_references?: Json | null
+          operation_mode?: string | null
           question: string
           response_time_ms?: number | null
           tokens_used?: number | null
@@ -744,8 +851,11 @@ export type Database = {
         Update: {
           answer?: string
           created_at?: string
+          document_name?: string | null
+          document_text?: string | null
           id?: string
           legal_references?: Json | null
+          operation_mode?: string | null
           question?: string
           response_time_ms?: number | null
           tokens_used?: number | null

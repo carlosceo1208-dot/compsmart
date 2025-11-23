@@ -5,8 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Target, Send, History, FileText, Sparkles } from 'lucide-react';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
@@ -15,7 +14,6 @@ interface Conversation {
   id: string;
   question: string;
   answer: string;
-  legal_references?: any;
   document_name?: string;
   operation_mode?: string;
   created_at: string;
@@ -23,31 +21,31 @@ interface Conversation {
 
 const quickActions: QuickAction[] = [
   {
-    label: 'Validar Contrato',
-    prompt: '/validar_politica Cole o texto do contrato ou política que deseja validar',
-    icon: Gavel,
-    mode: 'validar_politica',
+    label: 'Criar PLR',
+    prompt: '/gerar_politica Crie uma política de PLR para uma empresa de tecnologia com 200 funcionários',
+    icon: Sparkles,
+    mode: 'gerar_politica',
   },
   {
-    label: 'Analisar Cláusula',
-    prompt: 'Analise a seguinte cláusula contratual sob a ótica da CLT',
+    label: 'Revisar Tabela Salarial',
+    prompt: '/comparar_mercado Analise a competitividade da nossa tabela salarial para cargos de TI',
     icon: FileText,
+    mode: 'comparar_mercado',
   },
   {
-    label: 'Interpretar Lei',
-    prompt: '/interpretar_lei Explique de forma prática o Art. 58 da CLT sobre jornada de trabalho',
-    icon: BookOpen,
-    mode: 'interpretar_lei',
+    label: 'Mix Total Rewards',
+    prompt: '/mix_total_rewards Avalie o nosso pacote de remuneração total e sugira otimizações',
+    icon: Target,
+    mode: 'mix_total_rewards',
   },
   {
-    label: 'Compliance Check',
-    prompt: '/compliance_check Verifique se nossa política de férias está em conformidade',
-    icon: ShieldCheck,
-    mode: 'compliance_check',
+    label: 'Descrever Cargo',
+    prompt: 'Como criar uma descrição de cargo estruturada usando metodologia Hay?',
+    icon: FileText,
   },
 ];
 
-const LegalAssistant = () => {
+const IncentiveAssistant = () => {
   const [question, setQuestion] = useState('');
   const [loading, setLoading] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -69,7 +67,7 @@ const LegalAssistant = () => {
 
   const fetchConversations = async () => {
     const { data } = await supabase
-      .from('legal_assistant_conversations')
+      .from('incentive_assistant_conversations')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
@@ -100,9 +98,9 @@ const LegalAssistant = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('legal-assistant', {
+      const { data, error } = await supabase.functions.invoke('incentive-assistant', {
         body: { 
-          question,
+          question, 
           document_text: documentText || undefined,
           document_name: documentName || undefined,
         },
@@ -147,25 +145,16 @@ const LegalAssistant = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Scale className="w-8 h-8 text-primary" />
+            <Target className="w-8 h-8 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Assistente Jurídico</h1>
+              <h1 className="text-3xl font-bold">Assistente de R&B</h1>
               <p className="text-muted-foreground">
-                Consultoria trabalhista e previdenciária com IA
+                Consultoria em Remuneração, Benefícios e Incentivos
               </p>
             </div>
           </div>
-          <ContextBadges agent="legal" activeMode={activeMode} />
+          <ContextBadges agent="incentive" activeMode={activeMode} />
         </div>
-
-        <Alert className="mb-6 border-warning bg-warning/10">
-          <AlertCircle className="h-4 w-4 text-warning" />
-          <AlertDescription className="text-sm">
-            <strong>Aviso Legal:</strong> As respostas fornecidas são para fins informativos e educacionais.
-            Não substituem a consulta com um advogado especializado. Sempre consulte um profissional
-            jurídico para casos específicos.
-          </AlertDescription>
-        </Alert>
 
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
           <Card>
@@ -237,13 +226,6 @@ const LegalAssistant = () => {
                       {conversations[0].answer}
                     </p>
                   </ScrollArea>
-                  {conversations[0].legal_references && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Referências Legais
-                      </p>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
             )}
@@ -269,7 +251,7 @@ const LegalAssistant = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Textarea
-                    placeholder="Digite sua dúvida sobre legislação trabalhista ou previdenciária...&#10;&#10;Exemplos:&#10;- Qual o prazo para pagamento de férias?&#10;- Como funciona o aviso prévio indenizado?&#10;&#10;Modos especiais:&#10;/validar_politica - Validar políticas e contratos&#10;/interpretar_lei - Explicar artigos da lei&#10;/compliance_check - Verificar conformidade"
+                    placeholder="Digite sua dúvida sobre remuneração, benefícios ou incentivos...&#10;&#10;Exemplos:&#10;- Como estruturar uma política de PLR?&#10;- Qual a diferença entre ICP e ILP?&#10;- Como calcular compa-ratio?&#10;&#10;Modos especiais:&#10;/gerar_politica - Criar políticas de remuneração&#10;/comparar_mercado - Análise competitiva&#10;/mix_total_rewards - Otimizar pacote de remuneração"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     rows={12}
@@ -305,4 +287,4 @@ const LegalAssistant = () => {
   );
 };
 
-export default LegalAssistant;
+export default IncentiveAssistant;
