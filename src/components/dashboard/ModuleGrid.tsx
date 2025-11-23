@@ -15,6 +15,8 @@ import {
   Scale,
   FileBarChart,
   FileCheck,
+  Target,
+  BookOpen,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -112,7 +114,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       path: '/legal-assistant',
       status: 'active' as const,
       category: 'consultation' as const,
-      requiredPlan: 'pro' as const,
+    },
+    {
+      title: 'Assistente de R&B',
+      description: 'Consultoria em remuneração, benefícios e incentivos',
+      icon: Target,
+      path: '/incentive-assistant',
+      status: 'active' as const,
+      category: 'consultation' as const,
     },
     {
       title: 'Análise Salarial',
@@ -154,7 +163,7 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
             icon={module.icon}
             status={module.status}
             category={module.category}
-            requiredPlan={module.requiredPlan}
+            requiredPlan={'requiredPlan' in module ? module.requiredPlan as any : undefined}
             onClick={() => navigate(module.path)}
           />
         ))}

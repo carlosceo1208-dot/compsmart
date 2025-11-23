@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,73 +12,172 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+
+    if (!supabaseUrl || !supabaseKey || !lovableApiKey) {
+      throw new Error('Missing required environment variables');
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get user from auth header
-    const authHeader = req.headers.get('Authorization')!;
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Não autorizado' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (userError || !user) {
+      throw new Error('Invalid user token');
     }
 
-    // Check user subscription plan
-    const { data: subscription } = await supabase
-      .from('user_subscriptions')
-      .select('plan_type')
-      .eq('user_id', user.id)
-      .single();
-
-    if (subscription?.plan_type !== 'pro') {
-      return new Response(
-        JSON.stringify({ error: 'Este recurso requer plano PRO' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const { question } = await req.json();
+    const { question, document_text, document_name } = await req.json();
 
     if (!question) {
-      return new Response(
-        JSON.stringify({ error: 'Pergunta não fornecida' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('Question is required');
     }
 
-    // TODO: Integrate with your AI webhook endpoint here
-    // For now, returning a mock response
     const startTime = Date.now();
-    
-    const mockAnswer = `Com base na legislação trabalhista brasileira (CLT), sobre sua pergunta: "${question}"
 
-Esta é uma resposta de exemplo. Você deve configurar seu webhook de IA para processar consultas jurídicas reais.
+    let operationMode = 'consulta';
+    let enhancedQuestion = question;
 
-Artigos relevantes da CLT:
-- Art. 129 a 153 (Férias)
-- Art. 457 a 467 (Remuneração)
-- Art. 468 (Alteração contratual)
+    if (question.toLowerCase().startsWith('/validar_politica')) {
+      operationMode = 'validar_politica';
+      enhancedQuestion = question.substring('/validar_politica'.length).trim();
+    } else if (question.toLowerCase().startsWith('/interpretar_lei')) {
+      operationMode = 'interpretar_lei';
+      enhancedQuestion = question.substring('/interpretar_lei'.length).trim();
+    } else if (question.toLowerCase().startsWith('/compliance_check')) {
+      operationMode = 'compliance_check';
+      enhancedQuestion = question.substring('/compliance_check'.length).trim();
+    }
 
-IMPORTANTE: Esta resposta é meramente informativa e não substitui a consulta a um advogado especializado.`;
+    const { data: kbDocs } = await supabase
+      .from('knowledge_base')
+      .select('title, content, category')
+      .or(`agent_type.eq.legal,agent_type.eq.both`)
+      .eq('is_active', true)
+      .eq('is_global', true)
+      .limit(5);
+
+    let contextFromKB = '';
+    if (kbDocs && kbDocs.length > 0) {
+      contextFromKB = '\n\n## Base de Conhecimento Relevante:\n\n';
+      kbDocs.forEach(doc => {
+        contextFromKB += `### ${doc.title} (${doc.category})\n${doc.content}\n\n`;
+      });
+    }
+
+    let systemPrompt = `Você é o Agente Smart Legal do CompSmart, especialista em direito trabalhista e previdenciário brasileiro.
+
+## Seu Objetivo
+Fornecer consultoria jurídica clara, precisa e acionável sobre questões de RH e legislação trabalhista.
+
+## Contexto do CompSmart
+O CompSmart é uma plataforma de gestão de remuneração estratégica para empresas brasileiras de todos os portes.
+
+${contextFromKB}
+
+## Modo de Operação Atual: ${operationMode}
+
+${operationMode === 'validar_politica' ? `
+### MODO: Validação de Política
+Você deve analisar políticas e documentos de RH sob a ótica jurídica, verificando:
+- Conformidade com CLT e legislação vigente
+- Riscos trabalhistas potenciais
+- Cláusulas que podem gerar passivos
+- Sugestões de adequação legal
+` : ''}
+
+${operationMode === 'interpretar_lei' ? `
+### MODO: Interpretação de Lei
+Você deve explicar artigos e dispositivos legais de forma didática:
+- Texto da lei em linguagem simples
+- Exemplos práticos de aplicação
+- Impactos para a empresa
+- Orientações de conformidade
+` : ''}
+
+${operationMode === 'compliance_check' ? `
+### MODO: Verificação de Compliance
+Você deve verificar se práticas e processos estão em conformidade:
+- Checklist de conformidade aplicável
+- Identificar não-conformidades
+- Classificar riscos (baixo, médio, alto)
+- Plano de ação para adequação
+` : ''}
+
+## Diretrizes de Resposta
+1. **Seja específico**: Cite artigos da CLT quando aplicável
+2. **Seja prático**: Forneça orientações acionáveis
+3. **Seja claro**: Use linguagem acessível sem perder precisão técnica
+4. **Seja completo**: Cubra todos os aspectos relevantes da questão
+5. **Seja atualizado**: Considere reformas trabalhistas recentes
+
+## Formato de Resposta
+- Use markdown para formatação
+- Destaque riscos em **negrito**
+- Liste referências legais ao final
+- Inclua resumo executivo quando pertinente
+
+## Avisos Importantes
+- Suas respostas são orientações gerais, não substituem advocacia específica
+- Casos complexos devem ser avaliados por advogado especializado
+- Sempre oriente sobre riscos e melhores práticas
+
+${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\n\nConteúdo:\n${document_text.substring(0, 15000)}\n` : ''}`;
+
+    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${lovableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: enhancedQuestion || question }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
+      }),
+    });
+
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error('AI API Error:', aiResponse.status, errorText);
+      throw new Error(`AI API error: ${aiResponse.status}`);
+    }
+
+    const aiData = await aiResponse.json();
+    const answer = aiData.choices[0]?.message?.content || 'Desculpe, não consegui gerar uma resposta.';
+    const tokensUsed = aiData.usage?.total_tokens || 0;
+
+    const legalReferences: any[] = [];
+    const artRegex = /art\.?\s*(\d+)/gi;
+    let match;
+    while ((match = artRegex.exec(answer)) !== null) {
+      legalReferences.push({ type: 'CLT', article: match[1] });
+    }
 
     const responseTime = Date.now() - startTime;
 
-    // Save conversation to database
     const { error: insertError } = await supabase
       .from('legal_assistant_conversations')
       .insert({
         user_id: user.id,
         question,
-        answer: mockAnswer,
-        legal_references: {
-          articles: ['CLT Art. 129-153', 'CLT Art. 457-467', 'CLT Art. 468'],
-        },
-        tokens_used: 500,
+        answer,
+        document_text,
+        document_name,
+        operation_mode: operationMode,
+        legal_references: legalReferences.length > 0 ? legalReferences : null,
+        tokens_used: tokensUsed,
         response_time_ms: responseTime,
       });
 
@@ -88,20 +187,25 @@ IMPORTANTE: Esta resposta é meramente informativa e não substitui a consulta a
 
     return new Response(
       JSON.stringify({
-        answer: mockAnswer,
-        legal_references: {
-          articles: ['CLT Art. 129-153', 'CLT Art. 457-467', 'CLT Art. 468'],
-        },
-        tokens_used: 500,
+        answer,
+        legal_references: legalReferences,
+        tokens_used: tokensUsed,
+        response_time_ms: responseTime,
+        operation_mode: operationMode,
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
     );
 
   } catch (error) {
     console.error('Error in legal-assistant function:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Erro desconhecido' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
     );
   }
 });

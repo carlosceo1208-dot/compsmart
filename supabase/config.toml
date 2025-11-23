@@ -9,5 +9,11 @@ verify_jwt = false
 [functions.legal-assistant]
 verify_jwt = true
 
+[functions.incentive-assistant]
+verify_jwt = true
+
 [functions.create-employee-user]
+verify_jwt = true
+
+[functions.send-budget-report]
 verify_jwt = true
