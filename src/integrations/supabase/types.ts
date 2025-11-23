@@ -1383,6 +1383,26 @@ export type Database = {
       }
     }
     Views: {
+      v_agent_conversations: {
+        Row: {
+          agent_type: string | null
+          answer: string | null
+          company_name: string | null
+          created_at: string | null
+          document_name: string | null
+          id: string | null
+          operation_mode: string | null
+          question: string | null
+          response_time_ms: number | null
+          root_company_id: string | null
+          tokens_used: number | null
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+          user_roles: string | null
+        }
+        Relationships: []
+      }
       v_benefit_eligibility_report: {
         Row: {
           benefit_id: string | null
@@ -1445,6 +1465,62 @@ export type Database = {
           employee_contribution_value: number
           is_eligible: boolean
           rule_id: string
+        }[]
+      }
+      count_agent_audit_logs: {
+        Args: {
+          p_agent_type?: string
+          p_end_date?: string
+          p_operation_mode?: string
+          p_start_date?: string
+          p_user_id?: string
+        }
+        Returns: number
+      }
+      get_agent_audit_logs: {
+        Args: {
+          p_agent_type?: string
+          p_end_date?: string
+          p_limit?: number
+          p_offset?: number
+          p_operation_mode?: string
+          p_root_company_id?: string
+          p_start_date?: string
+          p_user_id?: string
+        }
+        Returns: {
+          agent_type: string
+          answer: string
+          company_name: string
+          created_at: string
+          document_name: string
+          id: string
+          operation_mode: string
+          question: string
+          response_time_ms: number
+          root_company_id: string
+          tokens_used: number
+          user_email: string
+          user_id: string
+          user_name: string
+          user_roles: string
+        }[]
+      }
+      get_agent_usage_kpis: {
+        Args: {
+          p_agent_type?: string
+          p_end_date: string
+          p_root_company_id?: string
+          p_start_date: string
+          p_user_id?: string
+        }
+        Returns: {
+          avg_response_time: number
+          incentive_queries: number
+          legal_queries: number
+          total_queries: number
+          total_tokens: number
+          unique_users: number
         }[]
       }
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
