@@ -34,6 +34,7 @@ import KnowledgeBase from "./pages/KnowledgeBase";
 import AuditLogs from "./pages/AuditLogs";
 import AlertSettings from "./pages/AlertSettings";
 import Onboarding from "./pages/Onboarding";
+import Organogram from "./pages/Organogram";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/employees" element={<Employees />} />
               <Route path="/organization" element={<Organization />} />
+              <Route path="/organograma" element={<Organogram />} />
               <Route path="/roles" element={<Roles />} />
               <Route path="/access-control" element={<AccessControl />} />
               <Route path="/my-profile" element={<MyProfile />} />
