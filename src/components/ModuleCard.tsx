@@ -55,8 +55,9 @@ export const ModuleCard = ({
       <Card
         className={`
           group transition-all duration-300 h-full relative
+          bg-gradient-to-br from-background to-primary/8
           ${(isClickable || (!hasFeatureAccess && requiredPlan))
-            ? "cursor-pointer hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02]" 
+            ? "cursor-pointer hover:shadow-xl hover:-translate-y-3 hover:scale-[1.03]" 
             : "opacity-60 cursor-not-allowed"
           }
           ${categoryColors[category]} border-2
@@ -73,15 +74,15 @@ export const ModuleCard = ({
         <CardHeader className="space-y-3">
           <div className="flex items-start justify-between">
             <div className={`
-              w-12 h-12 rounded-lg flex items-center justify-center
-              transition-transform duration-300
-              ${isClickable ? "group-hover:scale-110" : ""}
+              w-14 h-14 bg-primary/15 rounded-xl flex items-center justify-center shadow-md
+              transition-all duration-300
+              ${isClickable ? "group-hover:scale-110 group-hover:shadow-primary" : ""}
             `}>
-              <Icon className="w-6 h-6" />
+              <Icon className="w-7 h-7 text-primary" />
             </div>
             {statusBadges[status]}
           </div>
-          <CardTitle className="text-lg leading-tight">{title}</CardTitle>
+          <CardTitle className="text-lg leading-tight font-bold">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <CardDescription className="text-sm leading-relaxed">

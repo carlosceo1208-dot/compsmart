@@ -23,25 +23,26 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
   };
 
   return (
-    <Card className="border-primary/20">
+    <Card className="border-2 border-primary/30 bg-gradient-to-br from-background via-primary/3 to-primary/8 shadow-lg hover:shadow-primary transition-all duration-300">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Indicadores Econômicos</h3>
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-bold text-foreground">Indicadores Econômicos</h3>
           <Button
             variant="ghost"
             size="icon"
             onClick={handleRefresh}
             disabled={economicData.isLoading}
+            className="hover:bg-primary/10"
           >
-            <RefreshCw className={`h-4 w-4 ${economicData.isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-5 w-5 text-primary ${economicData.isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-x divide-primary/20">
           {/* USD/BRL */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <DollarSign className="h-4 w-4" />
+          <div className="space-y-2 px-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <DollarSign className="h-5 w-5" />
               <span>Dólar (USD/BRL)</span>
             </div>
             {!economicData.usd && economicData.isLoading ? (
@@ -79,9 +80,9 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
           </div>
 
           {/* INPC */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <TrendingUp className="h-4 w-4" />
+          <div className="space-y-2 px-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <TrendingUp className="h-5 w-5" />
               <span>INPC</span>
             </div>
             {!economicData.inpc && economicData.isLoading ? (
@@ -112,8 +113,8 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
           </div>
 
           {/* Seletor de Moeda */}
-          <div className="space-y-2">
-            <label className="text-sm text-muted-foreground">Moeda de Exibição</label>
+          <div className="space-y-2 px-4">
+            <label className="text-sm font-semibold text-primary">Moeda de Exibição</label>
             <Select value={currency} onValueChange={(value) => onCurrencyChange(value as Currency)}>
               <SelectTrigger>
                 <SelectValue />
@@ -124,7 +125,7 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
               </SelectContent>
             </Select>
             
-            <label className="text-sm text-muted-foreground mt-2 block">Período INPC</label>
+            <label className="text-sm font-semibold text-primary mt-2 block">Período INPC</label>
             <Select value={inpcPeriod.toString()} onValueChange={(value) => setInpcPeriod(parseInt(value))}>
               <SelectTrigger>
                 <SelectValue />

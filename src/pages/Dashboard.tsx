@@ -14,11 +14,11 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6 p-6">
         {/* Coluna Esquerda: KPIs */}
         <div className="space-y-4">
-          <div className="rounded-lg bg-gradient-to-br from-primary/10 via-primary/5 to-background p-6 border border-primary/20">
+          <div className="rounded-xl bg-gradient-to-br from-primary via-primary-hover to-primary-dark p-8 border-2 border-primary/30 shadow-primary">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold mb-1">CompSmart</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-3xl font-bold mb-2 text-white">CompSmart</h1>
+                <p className="text-sm text-white/90 font-medium">
                   Dashboard Executivo
                 </p>
               </div>
