@@ -148,6 +148,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       category: 'management' as const,
     },
     {
+      title: 'Auditoria de Acesso',
+      description: 'Logs e relatórios de uso dos Agentes Smart',
+      icon: Shield,
+      path: '/audit-logs',
+      status: 'active' as const,
+      category: 'management' as const,
+    },
+    {
       title: 'Configurações',
       description: 'Parametrize o sistema',
       icon: Settings,

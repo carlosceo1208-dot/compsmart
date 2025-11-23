@@ -30,6 +30,7 @@ import BudgetPlanning from "./pages/BudgetPlanning";
 import BudgetApprovals from "./pages/BudgetApprovals";
 import Benefits from "./pages/Benefits";
 import KnowledgeBase from "./pages/KnowledgeBase";
+import AuditLogs from "./pages/AuditLogs";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/budget-approvals" element={<BudgetApprovals />} />
               <Route path="/benefits" element={<Benefits />} />
               <Route path="/knowledge-base" element={<KnowledgeBase />} />
+              <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
