@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -45,6 +46,7 @@ import { Search, Plus, MoreVertical, Edit, Trash2, Building2, Loader2, Network }
 import { toast } from "sonner";
 import { OrganizationDialog } from "@/components/OrganizationDialog";
 import { OrganizationTree } from "@/components/OrganizationTree";
+import { CompanyContextCard } from "@/components/organization/CompanyContextCard";
 
 interface OrgEntity {
   id: string;
@@ -72,6 +74,7 @@ interface Company {
 }
 
 const Organization = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [entities, setEntities] = useState<OrgEntity[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>("all");
@@ -82,7 +85,7 @@ const Organization = () => {
   const [deleteEntityId, setDeleteEntityId] = useState<string | null>(null);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
   const [permissionsLoading, setPermissionsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("list");
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "list");
 
   useEffect(() => {
     checkUserPermissions();
@@ -225,6 +228,26 @@ const Organization = () => {
   const handleNewEntity = () => {
     setSelectedEntityId(null);
     setDialogOpen(true);
+  };
+
+  const handleEditCompany = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("root_company_id")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profile?.root_company_id) {
+        setSelectedEntityId(profile.root_company_id);
+        setDialogOpen(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const filteredEntities = entities.filter((entity) =>
@@ -451,8 +474,15 @@ const Organization = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={(tab) => {
+        setActiveTab(tab);
+        setSearchParams({ tab });
+      }}>
         <TabsList>
+          <TabsTrigger value="overview" className="gap-2">
+            <Building2 className="w-4 h-4" />
+            Visão Geral
+          </TabsTrigger>
           <TabsTrigger value="list" className="gap-2">
             <Building2 className="w-4 h-4" />
             Lista
@@ -462,6 +492,55 @@ const Organization = () => {
             Organograma
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview" className="mt-6">
+          <div className="space-y-6">
+            <CompanyContextCard onEditClick={handleEditCompany} />
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Total Entidades
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Matrizes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-primary">{stats.headquarters}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Filiais
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-info">{stats.branches}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Departamentos
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-success">{stats.departments}</div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
 
         <TabsContent value="list" className="mt-6">
           <Card>

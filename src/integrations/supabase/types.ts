@@ -1030,6 +1030,7 @@ export type Database = {
           description: string | null
           fantasy_name: string | null
           id: string
+          logo_url: string | null
           name: string
           parent_id: string | null
           root_company_id: string | null
@@ -1046,6 +1047,7 @@ export type Database = {
           description?: string | null
           fantasy_name?: string | null
           id?: string
+          logo_url?: string | null
           name: string
           parent_id?: string | null
           root_company_id?: string | null
@@ -1062,6 +1064,7 @@ export type Database = {
           description?: string | null
           fantasy_name?: string | null
           id?: string
+          logo_url?: string | null
           name?: string
           parent_id?: string | null
           root_company_id?: string | null

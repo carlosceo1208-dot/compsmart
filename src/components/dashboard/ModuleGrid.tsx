@@ -18,6 +18,7 @@ import {
   Target,
   BookOpen,
   Bell,
+  Building2,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -28,6 +29,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
   const navigate = useNavigate();
 
   const activeModules = [
+    {
+      title: 'Minha Empresa',
+      description: 'Dados, logo e configurações da empresa',
+      icon: Building2,
+      path: '/organization?tab=overview',
+      status: 'active' as const,
+      category: 'management' as const,
+    },
     {
       title: 'Comparação Salarial',
       description: 'Compare tabelas vs mercado',

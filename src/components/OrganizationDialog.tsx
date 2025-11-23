@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { Loader2, HelpCircle } from "lucide-react";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 interface OrganizationDialogProps {
   open: boolean;
@@ -47,6 +48,7 @@ interface EntityData {
   address: string;
   union_name: string;
   base_date: string;
+  logo_url: string;
 }
 
 interface ParentOption {
@@ -101,6 +103,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     address: "",
     union_name: "",
     base_date: "",
+    logo_url: "",
   });
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
@@ -147,6 +150,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
           address: data.address || "",
           union_name: data.union_name || "",
           base_date: data.base_date || "",
+          logo_url: data.logo_url || "",
         });
       }
     } catch (error: any) {
@@ -217,6 +221,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       address: "",
       union_name: "",
       base_date: "",
+      logo_url: "",
     });
   };
 
@@ -317,6 +322,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
         address: isCompanyType ? (formData.address || null) : null,
         union_name: isCompanyType ? (formData.union_name || null) : null,
         base_date: isCompanyType ? (formData.base_date || null) : null,
+        logo_url: formData.type === 'company' ? (formData.logo_url || null) : null,
       };
 
       if (entityId) {
@@ -560,6 +566,24 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                 <h3 className="text-sm font-semibold text-foreground">Informações da Empresa/Unidade</h3>
                 <p className="text-xs text-muted-foreground mt-1">Campos específicos para empresas, matrizes e filiais</p>
               </div>
+
+              {/* Logo Upload - apenas para tipo company */}
+              {formData.type === 'company' && (
+                <div className="space-y-2">
+                  <Label>Logo da Empresa</Label>
+                  <ImageUpload
+                    value={formData.logo_url || null}
+                    onChange={(url) => setFormData({ ...formData, logo_url: url || "" })}
+                    bucket="company-logos"
+                    label="Clique para selecionar o logo"
+                    description="PNG, JPG, WEBP ou SVG até 2MB"
+                    previewClassName="h-32"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    O logo será exibido em todo o sistema
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="fantasy_name">Nome Fantasia</Label>
