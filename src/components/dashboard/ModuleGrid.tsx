@@ -188,7 +188,7 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
   return (
     <div>
       <h3 className="text-lg font-semibold mb-4">Módulos Ativos</h3>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {visibleModules.map((module) => (
           <ModuleCard
             key={module.path}

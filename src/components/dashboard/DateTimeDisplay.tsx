@@ -15,16 +15,16 @@ export const DateTimeDisplay = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-end gap-1 text-sm">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Calendar className="h-4 w-4" />
-        <span className="font-medium">
+    <div className="flex flex-col items-end gap-1 text-xs sm:text-sm">
+      <div className="flex items-center gap-1.5 sm:gap-2 text-white/90">
+        <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <span className="font-medium whitespace-nowrap">
           {format(currentDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
         </span>
       </div>
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Clock className="h-4 w-4" />
-        <span>
+      <div className="flex items-center gap-1.5 sm:gap-2 text-white/80">
+        <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        <span className="whitespace-nowrap">
           {format(currentDate, 'EEEE', { locale: ptBR })} • {format(currentDate, 'HH:mm')}
         </span>
       </div>

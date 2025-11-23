@@ -82,7 +82,7 @@ export const ModuleCard = ({
             </div>
             {statusBadges[status]}
           </div>
-          <CardTitle className="text-lg leading-tight font-bold">{title}</CardTitle>
+          <CardTitle className="text-base sm:text-lg leading-tight font-bold line-clamp-2">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <CardDescription className="text-sm leading-relaxed">
