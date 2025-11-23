@@ -1350,6 +1350,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           benefits_value: number | null
           birth_date: string | null
           cpf: string | null
@@ -1376,6 +1377,7 @@ export type Database = {
           variable_salary: number | null
         }
         Insert: {
+          avatar_url?: string | null
           benefits_value?: number | null
           birth_date?: string | null
           cpf?: string | null
@@ -1402,6 +1404,7 @@ export type Database = {
           variable_salary?: number | null
         }
         Update: {
+          avatar_url?: string | null
           benefits_value?: number | null
           birth_date?: string | null
           cpf?: string | null

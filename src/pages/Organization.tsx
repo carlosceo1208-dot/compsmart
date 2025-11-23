@@ -332,15 +332,21 @@ const Organization = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">Estrutura Organizacional</h1>
-          <p className="text-muted-foreground mt-1">
-            Gerencie a hierarquia organizacional da empresa
-          </p>
+        <div className="flex items-center gap-3">
+          <Building2 className="w-8 h-8" />
+          <div>
+            <h1 className="text-3xl font-bold">Gestão de Estrutura Organizacional</h1>
+            <p className="text-muted-foreground mt-1">
+              Gerencie filiais, áreas, departamentos e setores da sua empresa
+            </p>
+            <Badge variant="outline" className="mt-2">
+              Empresa principal já cadastrada ✓
+            </Badge>
+          </div>
         </div>
         <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
           <Plus className="w-4 h-4" />
-          Nova Entidade
+          + Adicionar Unidade Organizacional
         </Button>
       </div>
 

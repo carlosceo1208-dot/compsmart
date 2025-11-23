@@ -5,10 +5,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { User, Briefcase, DollarSign, Shield } from 'lucide-react';
+import { User, Briefcase, DollarSign, Shield, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLabels } from '@/contexts/LabelsContext';
 import { format } from 'date-fns';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 interface Profile {
   id: string;
@@ -23,6 +24,7 @@ interface Profile {
   salary: number | null;
   variable_salary: number | null;
   manager_id: string | null;
+  avatar_url: string | null;
 }
 
 export default function MyProfile() {
@@ -127,6 +129,24 @@ export default function MyProfile() {
           </p>
         </div>
       </div>
+
+      {/* Foto de Perfil */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Camera className="w-5 h-5" />
+            Foto de Perfil
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AvatarUpload
+            userId={profile.id}
+            currentAvatarUrl={profile.avatar_url}
+            userName={profile.full_name}
+            onAvatarChange={(url) => setProfile({ ...profile, avatar_url: url })}
+          />
+        </CardContent>
+      </Card>
 
       {/* Dados Pessoais (Editável) */}
       <Card>

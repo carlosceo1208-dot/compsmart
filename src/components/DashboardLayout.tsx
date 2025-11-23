@@ -160,11 +160,11 @@ export const DashboardLayout = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/organization")}
+              onClick={() => navigate("/organograma")}
               className="hidden md:flex items-center"
             >
               <Network className="w-4 h-4 mr-2" />
-              Estrutura
+              Organograma
             </Button>
             <Button
               variant="ghost"
