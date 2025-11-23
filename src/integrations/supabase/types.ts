@@ -14,6 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_configurations: {
+        Row: {
+          alert_type: string
+          check_frequency: string | null
+          created_at: string | null
+          created_by: string | null
+          enabled: boolean | null
+          id: string
+          recipients: string[]
+          root_company_id: string
+          severity: string | null
+          threshold_unit: string | null
+          threshold_value: number
+          updated_at: string | null
+        }
+        Insert: {
+          alert_type: string
+          check_frequency?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          enabled?: boolean | null
+          id?: string
+          recipients: string[]
+          root_company_id: string
+          severity?: string | null
+          threshold_unit?: string | null
+          threshold_value: number
+          updated_at?: string | null
+        }
+        Update: {
+          alert_type?: string
+          check_frequency?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          enabled?: boolean | null
+          id?: string
+          recipients?: string[]
+          root_company_id?: string
+          severity?: string | null
+          threshold_unit?: string | null
+          threshold_value?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_configurations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_configurations_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      alert_history: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          context: Json | null
+          created_at: string | null
+          description: string
+          email_recipients: string[] | null
+          email_sent: boolean | null
+          email_sent_at: string | null
+          id: string
+          metric_value: number
+          resolved_at: string | null
+          root_company_id: string
+          severity: string
+          status: string | null
+          threshold_value: number
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          context?: Json | null
+          created_at?: string | null
+          description: string
+          email_recipients?: string[] | null
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          id?: string
+          metric_value: number
+          resolved_at?: string | null
+          root_company_id: string
+          severity: string
+          status?: string | null
+          threshold_value: number
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          context?: Json | null
+          created_at?: string | null
+          description?: string
+          email_recipients?: string[] | null
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          id?: string
+          metric_value?: number
+          resolved_at?: string | null
+          root_company_id?: string
+          severity?: string
+          status?: string | null
+          threshold_value?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_history_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_history_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1476,6 +1611,65 @@ export type Database = {
           p_user_id?: string
         }
         Returns: number
+      }
+      detect_after_hours_usage: {
+        Args: { p_company_id: string; p_threshold: number }
+        Returns: {
+          after_hours_count: number
+          detected: boolean
+          queries_detail: Json
+        }[]
+      }
+      detect_inactive_users: {
+        Args: { p_company_id: string; p_days_threshold: number }
+        Returns: {
+          detected: boolean
+          inactive_count: number
+          inactive_users: Json
+        }[]
+      }
+      detect_query_spikes: {
+        Args: { p_company_id: string; p_threshold: number }
+        Returns: {
+          avg_last_7_days: number
+          current_count: number
+          detected: boolean
+          percentage_increase: number
+        }[]
+      }
+      detect_recurring_errors: {
+        Args: { p_company_id: string; p_threshold: number }
+        Returns: {
+          affected_users: string[]
+          detected: boolean
+          error_count: number
+          slow_queries: number
+        }[]
+      }
+      detect_token_overconsumption: {
+        Args: {
+          p_company_id: string
+          p_monthly_limit: number
+          p_threshold_percentage: number
+        }
+        Returns: {
+          days_elapsed: number
+          detected: boolean
+          percentage_used: number
+          projected_total: number
+          tokens_limit: number
+          tokens_used: number
+        }[]
+      }
+      detect_user_concentration: {
+        Args: { p_company_id: string; p_threshold: number }
+        Returns: {
+          concentration_percentage: number
+          detected: boolean
+          top_user_count: number
+          top_user_name: string
+          total_count: number
+        }[]
       }
       get_agent_audit_logs: {
         Args: {

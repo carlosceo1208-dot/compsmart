@@ -17,6 +17,7 @@ import {
   FileCheck,
   Target,
   BookOpen,
+  Bell,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -152,6 +153,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       description: 'Logs e relatórios de uso dos Agentes Smart',
       icon: Shield,
       path: '/audit-logs',
+      status: 'active' as const,
+      category: 'management' as const,
+    },
+    {
+      title: 'Alertas Automáticos',
+      description: 'Configure alertas de monitoramento dos agentes',
+      icon: Bell,
+      path: '/alert-settings',
       status: 'active' as const,
       category: 'management' as const,
     },
