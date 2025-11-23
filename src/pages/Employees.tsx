@@ -169,7 +169,7 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:unit_id(id, name, code, type, description)")
+        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:organizational_structure!unit_id(id, name, code, type, description)")
         .order("created_at", { ascending: false });
 
       if (profilesError) throw profilesError;

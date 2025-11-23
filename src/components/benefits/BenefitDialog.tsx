@@ -113,6 +113,18 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
         return;
       }
 
+      // Get user's root_company_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not found');
+
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('root_company_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!userProfile?.root_company_id) throw new Error('Company not found');
+
       // Salvar benefício e obter ID
       let benefitId = benefit?.id;
       
@@ -128,6 +140,7 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
             default_employee_contribution_value: validatedData.default_employee_contribution_value,
             is_active: validatedData.is_active,
             eligibility_type: validatedData.eligibility_type,
+            root_company_id: userProfile.root_company_id,
           })
           .eq('id', benefit.id);
 
@@ -144,6 +157,7 @@ export const BenefitDialog = ({ benefit, trigger }: BenefitDialogProps) => {
             default_employee_contribution_value: validatedData.default_employee_contribution_value,
             is_active: validatedData.is_active,
             eligibility_type: validatedData.eligibility_type,
+            root_company_id: userProfile.root_company_id,
           }])
           .select()
           .single();

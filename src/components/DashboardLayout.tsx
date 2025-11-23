@@ -15,6 +15,7 @@ import { LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, 
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 import compsmartLogo from "@/assets/compsmart-logo.png";
+import { SecurityFooter } from "@/components/SecurityFooter";
 
 interface UserProfile {
   full_name: string;
@@ -88,7 +89,7 @@ export const DashboardLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-20 items-center justify-between px-4">
@@ -193,9 +194,12 @@ export const DashboardLayout = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container px-4 py-8">
+      <main className="container px-4 py-8 flex-1">
         <Outlet />
       </main>
+
+      {/* Security Footer */}
+      <SecurityFooter />
     </div>
   );
 };

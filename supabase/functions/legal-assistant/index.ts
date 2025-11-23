@@ -56,13 +56,23 @@ serve(async (req) => {
       enhancedQuestion = question.substring('/compliance_check'.length).trim();
     }
 
+    // Fetch user's company for context filtering
+    const { data: userProfile } = await supabase
+      .from('profiles')
+      .select('root_company_id')
+      .eq('id', user.id)
+      .single();
+
+    const userCompanyId = userProfile?.root_company_id;
+
+    // Fetch relevant context from Knowledge Base (RAG) - Global + Company-specific
     const { data: kbDocs } = await supabase
       .from('knowledge_base')
       .select('title, content, category')
       .or(`agent_type.eq.legal,agent_type.eq.both`)
       .eq('is_active', true)
-      .eq('is_global', true)
-      .limit(5);
+      .or(`is_global.eq.true${userCompanyId ? `,root_company_id.eq.${userCompanyId}` : ''}`)
+      .limit(10);
 
     let contextFromKB = '';
     if (kbDocs && kbDocs.length > 0) {
@@ -79,6 +89,14 @@ Fornecer consultoria jurídica clara, precisa e acionável sobre questões de RH
 
 ## Contexto do CompSmart
 O CompSmart é uma plataforma de gestão de remuneração estratégica para empresas brasileiras de todos os portes.
+
+## 🔒 POLÍTICA DE PRIVACIDADE DE DADOS
+
+⚠️ IMPORTANTE: Proteção de Dados Multi-Tenant
+- NUNCA mencione nomes de colaboradores de outras empresas
+- NUNCA cite valores salariais específicos de outras empresas
+- NUNCA revele estruturas organizacionais de outros clientes
+- Use APENAS exemplos genéricos e dados agregados da Knowledge Base Global
 
 ${contextFromKB}
 
