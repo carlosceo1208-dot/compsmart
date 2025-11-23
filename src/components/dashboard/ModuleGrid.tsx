@@ -140,6 +140,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       category: 'management' as const,
     },
     {
+      title: 'Base de Conhecimento',
+      description: 'Gerencie documentos de referência para os Agentes Smart',
+      icon: BookOpen,
+      path: '/knowledge-base',
+      status: 'active' as const,
+      category: 'management' as const,
+    },
+    {
       title: 'Configurações',
       description: 'Parametrize o sistema',
       icon: Settings,
