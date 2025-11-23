@@ -11,14 +11,14 @@ const Dashboard = () => {
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto">
-      <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6 p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-4 sm:gap-6 p-4 sm:p-6">
         {/* Coluna Esquerda: KPIs */}
         <div className="space-y-4">
-          <div className="rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-8 border-2 border-primary/30 shadow-primary">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold mb-2 text-white">CompSmart</h1>
-                <p className="text-sm text-white/90 font-medium">
+          <div className="rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-6 md:p-8 border-2 border-primary/30 shadow-primary">
+            <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">CompSmart</h1>
+                <p className="text-xs sm:text-sm text-white/90 font-medium">
                   Dashboard Executivo
                 </p>
               </div>
