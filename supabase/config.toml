@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.send-budget-report]
 verify_jwt = true
+
+[functions.check-agent-alerts]
+verify_jwt = false
