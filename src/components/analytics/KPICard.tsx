@@ -28,11 +28,11 @@ export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading
   };
 
   return (
-    <Card className={`hover:shadow-lg transition-all duration-200 ${className}`}>
+    <Card className={`bg-gradient-to-br from-background to-primary/5 border-2 border-primary/20 hover:border-primary/40 hover:shadow-primary hover:-translate-y-1 transition-all duration-300 ${className}`}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground mb-2">{title}</p>
+            <p className="text-sm text-muted-foreground mb-2 font-medium">{title}</p>
             {isLoading ? (
               <Skeleton className="h-10 w-32" />
             ) : (
@@ -41,7 +41,7 @@ export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading
               </p>
             )}
           </div>
-          <div className="p-3 bg-primary/10 rounded-lg">
+          <div className="p-3 bg-primary/15 rounded-xl shadow-md flex items-center justify-center">
             <Icon className="h-6 w-6 text-primary" />
           </div>
         </div>

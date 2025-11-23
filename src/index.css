@@ -15,16 +15,17 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
     
-    /* Primary - Azul elétrico vibrante */
-    --primary: 214 95% 56%;
-    --primary-hover: 214 95% 48%;
-    --primary-light: 214 100% 94%;
+    /* Primary - Verde CompSmart */
+    --primary: 142 86% 42%;
+    --primary-hover: 142 86% 35%;
+    --primary-light: 142 86% 95%;
+    --primary-dark: 142 86% 25%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --secondary: 220 13% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 13% 96%;
+    --muted-foreground: 220 13% 45%;
     
     /* Success - Verde vivo */
     --success: 142 86% 42%;
@@ -36,40 +37,41 @@ All colors MUST be HSL.
     --warning-light: 32 95% 93%;
     --warning-foreground: 0 0% 100%;
     
-    /* Accent - Roxo vibrante */
-    --accent: 262 83% 58%;
-    --accent-light: 262 83% 94%;
+    /* Accent - Azul petróleo */
+    --accent: 200 95% 45%;
+    --accent-light: 200 95% 94%;
     --accent-foreground: 0 0% 100%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 214 95% 56%;
+    --border: 220 13% 90%;
+    --input: 220 13% 90%;
+    --ring: 142 86% 42%;
     --radius: 0.5rem;
     
-    --chart-1: 214 95% 56%;
-    --chart-2: 142 86% 42%;
+    --chart-1: 142 86% 42%;
+    --chart-2: 200 95% 45%;
     --chart-3: 32 95% 58%;
-    --chart-4: 262 83% 58%;
-    --chart-5: 210 98% 78%;
+    --chart-4: 197 83% 52%;
+    --chart-5: 280 65% 60%;
     
-    /* Gradientes dinâmicos */
-    --gradient-primary: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(262 83% 58%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(214 95% 40%) 50%, hsl(262 83% 58%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(214 100% 99%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(142 86% 32%) 100%);
+    /* Gradientes dinâmicos - Verde CompSmart */
+    --gradient-primary: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(142 86% 32%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(200 95% 45%) 50%, hsl(142 86% 25%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(142 86% 99%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(142 86% 35%) 100%);
     --gradient-warning: linear-gradient(135deg, hsl(32 95% 58%) 0%, hsl(32 95% 48%) 100%);
+    --gradient-footer: linear-gradient(135deg, hsl(142 86% 35%) 0%, hsl(142 86% 45%) 100%);
     
-    /* Sombras pronunciadas */
-    --shadow-sm: 0 2px 4px hsl(222 47% 11% / 0.08);
-    --shadow-md: 0 8px 16px -4px hsl(222 47% 11% / 0.12);
-    --shadow-lg: 0 16px 24px -6px hsl(222 47% 11% / 0.15);
-    --shadow-xl: 0 24px 48px -8px hsl(222 47% 11% / 0.20);
-    --shadow-primary: 0 8px 24px -4px hsl(214 95% 56% / 0.25);
-    --shadow-success: 0 8px 24px -4px hsl(142 86% 42% / 0.25);
-    --shadow-warning: 0 8px 24px -4px hsl(32 95% 58% / 0.25);
-    --shadow-accent: 0 8px 24px -4px hsl(262 83% 58% / 0.25);
+    /* Sombras pronunciadas - Verde CompSmart */
+    --shadow-sm: 0 2px 8px hsl(142 86% 42% / 0.08);
+    --shadow-md: 0 8px 24px -4px hsl(142 86% 42% / 0.12);
+    --shadow-lg: 0 16px 32px -8px hsl(142 86% 42% / 0.18);
+    --shadow-xl: 0 24px 48px -12px hsl(142 86% 42% / 0.25);
+    --shadow-primary: 0 12px 32px -8px hsl(142 86% 42% / 0.35);
+    --shadow-success: 0 12px 32px -8px hsl(142 86% 42% / 0.35);
+    --shadow-warning: 0 12px 32px -8px hsl(32 95% 58% / 0.3);
+    --shadow-accent: 0 12px 32px -8px hsl(200 95% 45% / 0.3);
     
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5% 26%;
@@ -78,7 +80,7 @@ All colors MUST be HSL.
     --sidebar-accent: 240 5% 96%;
     --sidebar-accent-foreground: 240 6% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 214 95% 56%;
+    --sidebar-ring: 142 86% 42%;
   }
 
   .dark {
@@ -89,11 +91,12 @@ All colors MUST be HSL.
     --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
     
-    /* Primary - Azul elétrico vibrante */
-    --primary: 214 95% 56%;
-    --primary-hover: 214 95% 64%;
-    --primary-light: 214 100% 20%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Verde CompSmart (dark mode) */
+    --primary: 142 86% 52%;
+    --primary-hover: 142 86% 45%;
+    --primary-light: 142 86% 20%;
+    --primary-dark: 142 86% 65%;
+    --primary-foreground: 222 47% 11%;
     
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -110,39 +113,40 @@ All colors MUST be HSL.
     --warning-light: 32 95% 20%;
     --warning-foreground: 0 0% 100%;
     
-    /* Accent - Roxo vibrante */
-    --accent: 262 83% 58%;
-    --accent-light: 262 83% 20%;
+    /* Accent - Azul petróleo (dark mode) */
+    --accent: 200 95% 55%;
+    --accent-light: 200 95% 20%;
     --accent-foreground: 0 0% 100%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 214 95% 56%;
+    --ring: 142 86% 52%;
     
-    --chart-1: 214 95% 56%;
-    --chart-2: 142 86% 42%;
-    --chart-3: 32 95% 58%;
-    --chart-4: 262 83% 58%;
-    --chart-5: 340 75% 55%;
+    --chart-1: 142 86% 52%;
+    --chart-2: 200 95% 55%;
+    --chart-3: 32 95% 65%;
+    --chart-4: 197 83% 62%;
+    --chart-5: 280 65% 70%;
     
-    /* Gradientes dinâmicos */
-    --gradient-primary: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(262 83% 58%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(214 95% 56%) 0%, hsl(214 95% 40%) 50%, hsl(262 83% 58%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(222 47% 11%) 0%, hsl(217 33% 15%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 86% 42%) 0%, hsl(142 86% 32%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(32 95% 58%) 0%, hsl(32 95% 48%) 100%);
+    /* Gradientes dinâmicos - Verde CompSmart (dark mode) */
+    --gradient-primary: linear-gradient(135deg, hsl(142 86% 52%) 0%, hsl(142 86% 42%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(142 86% 52%) 0%, hsl(200 95% 55%) 50%, hsl(142 86% 35%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(222 47% 11%) 0%, hsl(142 86% 15%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(142 86% 52%) 0%, hsl(142 86% 42%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(32 95% 65%) 0%, hsl(32 95% 55%) 100%);
+    --gradient-footer: linear-gradient(135deg, hsl(142 86% 45%) 0%, hsl(142 86% 55%) 100%);
     
-    /* Sombras pronunciadas */
-    --shadow-sm: 0 2px 4px hsl(0 0% 0% / 0.3);
-    --shadow-md: 0 8px 16px -4px hsl(0 0% 0% / 0.4);
-    --shadow-lg: 0 16px 24px -6px hsl(0 0% 0% / 0.5);
-    --shadow-xl: 0 24px 48px -8px hsl(0 0% 0% / 0.6);
-    --shadow-primary: 0 8px 24px -4px hsl(214 95% 56% / 0.4);
-    --shadow-success: 0 8px 24px -4px hsl(142 86% 42% / 0.4);
-    --shadow-warning: 0 8px 24px -4px hsl(32 95% 58% / 0.4);
-    --shadow-accent: 0 8px 24px -4px hsl(262 83% 58% / 0.4);
+    /* Sombras pronunciadas - Verde CompSmart (dark mode) */
+    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 8px 24px -4px hsl(0 0% 0% / 0.5);
+    --shadow-lg: 0 16px 32px -8px hsl(0 0% 0% / 0.6);
+    --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.7);
+    --shadow-primary: 0 12px 32px -8px hsl(142 86% 52% / 0.5);
+    --shadow-success: 0 12px 32px -8px hsl(142 86% 52% / 0.5);
+    --shadow-warning: 0 12px 32px -8px hsl(32 95% 65% / 0.4);
+    --shadow-accent: 0 12px 32px -8px hsl(200 95% 55% / 0.4);
     
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
@@ -151,7 +155,7 @@ All colors MUST be HSL.
     --sidebar-accent: 217 33% 17%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217 33% 17%;
-    --sidebar-ring: 214 95% 56%;
+    --sidebar-ring: 142 86% 52%;
   }
 }
 
