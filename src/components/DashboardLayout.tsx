@@ -16,10 +16,12 @@ import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { SecurityFooter } from "@/components/SecurityFooter";
+import { CompanyLogo } from "@/components/CompanyLogo";
 
 interface UserProfile {
   full_name: string;
   email: string;
+  root_company_id: string | null;
 }
 
 export const DashboardLayout = () => {
@@ -27,6 +29,8 @@ export const DashboardLayout = () => {
   const { getLabel } = useLabels();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState<string>("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -39,15 +43,36 @@ export const DashboardLayout = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name, email")
+        .select("full_name, email, root_company_id")
         .eq("id", session.user.id)
         .single();
 
       if (error) {
         console.error("Error fetching profile:", error);
-      } else {
-        setProfile(data);
+        setLoading(false);
+        return;
       }
+
+      setProfile(data);
+
+      // Check if needs onboarding
+      if (!data.root_company_id) {
+        navigate("/onboarding");
+        return;
+      }
+
+      // Fetch company logo
+      const { data: company } = await supabase
+        .from("organizational_structure")
+        .select("logo_url, name, fantasy_name")
+        .eq("id", data.root_company_id)
+        .single();
+
+      if (company) {
+        setCompanyLogo(company.logo_url || null);
+        setCompanyName(company.fantasy_name || company.name);
+      }
+
       setLoading(false);
     };
 
@@ -93,8 +118,15 @@ export const DashboardLayout = () => {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-20 items-center justify-between px-4">
-          <Link to="/dashboard" className="flex items-center justify-center hover:opacity-80 hover:scale-105 transition-all">
-            <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-full max-h-16 md:w-36 md:max-h-18 lg:w-40 lg:max-h-20 object-contain py-2" />
+          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            {companyLogo ? (
+              <CompanyLogo logoUrl={companyLogo} companyName={companyName} size="md" />
+            ) : (
+              <img src={compsmartLogo} alt="CompSmart Logo" className="h-12 w-auto object-contain opacity-50" />
+            )}
+            <span className="text-sm text-muted-foreground hidden md:block max-w-[200px] truncate">
+              {companyName || "CompSmart"}
+            </span>
           </Link>
 
           <div className="flex items-center space-x-4">
