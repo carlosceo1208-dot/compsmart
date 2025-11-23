@@ -54,7 +54,7 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       category: 'management' as const,
     },
     {
-      title: 'Gestão de Estrutura',
+      title: 'Estrutura Organizacional',
       description: 'Gerencie filiais, áreas e departamentos',
       icon: Building,
       path: '/organization',
