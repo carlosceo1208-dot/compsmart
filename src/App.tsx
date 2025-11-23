@@ -17,6 +17,7 @@ import AccessControl from "./pages/AccessControl";
 import MyProfile from "./pages/MyProfile";
 import SalaryRanges from "./pages/SalaryRanges";
 import Settings from "./pages/Settings";
+import Plans from "./pages/settings/Plans";
 import SurveyData from "./pages/SurveyData";
 import SalaryComparison from "./pages/SalaryComparison";
 import JobTitles from "./pages/JobTitles";
@@ -74,6 +75,7 @@ const App = () => (
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/alert-settings" element={<AlertSettings />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/settings/plans" element={<Plans />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
