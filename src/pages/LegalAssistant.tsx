@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
@@ -158,12 +158,21 @@ const LegalAssistant = () => {
           <ContextBadges agent="legal" activeMode={activeMode} />
         </div>
 
-        <Alert className="mb-6 border-warning bg-warning/10">
+        <Alert className="mb-4 border-warning bg-warning/10">
           <AlertCircle className="h-4 w-4 text-warning" />
           <AlertDescription className="text-sm">
             <strong>Aviso Legal:</strong> As respostas fornecidas são para fins informativos e educacionais.
             Não substituem a consulta com um advogado especializado. Sempre consulte um profissional
             jurídico para casos específicos.
+          </AlertDescription>
+        </Alert>
+
+        <Alert className="mb-6 border-green-500/50 bg-green-500/10">
+          <ShieldCheck className="h-4 w-4 text-green-600" />
+          <AlertTitle>Privacidade e Segurança</AlertTitle>
+          <AlertDescription>
+            Todas as consultas e análises são privadas e isoladas. 
+            Seus dados nunca são compartilhados com outras empresas.
           </AlertDescription>
         </Alert>
 

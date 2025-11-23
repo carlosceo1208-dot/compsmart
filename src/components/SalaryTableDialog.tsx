@@ -107,11 +107,24 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
     try {
       setLoading(true);
 
+      // Get user's root_company_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not found');
+
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('root_company_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!userProfile?.root_company_id) throw new Error('Company not found');
+
       const tableData = {
         name: name.trim(),
         effective_month: effectiveMonth,
         effective_year: effectiveYear,
         is_active: isActive,
+        root_company_id: userProfile.root_company_id,
       };
 
       if (tableId) {

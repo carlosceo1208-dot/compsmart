@@ -161,6 +161,7 @@ export type Database = {
           is_active: boolean | null
           is_template: boolean | null
           name: string
+          root_company_id: string
           template_type: string | null
           updated_at: string | null
           value_per_employee: number | null
@@ -176,6 +177,7 @@ export type Database = {
           is_active?: boolean | null
           is_template?: boolean | null
           name: string
+          root_company_id: string
           template_type?: string | null
           updated_at?: string | null
           value_per_employee?: number | null
@@ -191,11 +193,20 @@ export type Database = {
           is_active?: boolean | null
           is_template?: boolean | null
           name?: string
+          root_company_id?: string
           template_type?: string | null
           updated_at?: string | null
           value_per_employee?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "benefits_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       budget: {
         Row: {
@@ -586,6 +597,7 @@ export type Database = {
           name: string
           payment_frequency: string | null
           program_type: string
+          root_company_id: string
           target_percentage: number | null
           updated_at: string | null
         }
@@ -597,6 +609,7 @@ export type Database = {
           name: string
           payment_frequency?: string | null
           program_type: string
+          root_company_id: string
           target_percentage?: number | null
           updated_at?: string | null
         }
@@ -608,10 +621,19 @@ export type Database = {
           name?: string
           payment_frequency?: string | null
           program_type?: string
+          root_company_id?: string
           target_percentage?: number | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "incentive_programs_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_families: {
         Row: {
@@ -968,6 +990,7 @@ export type Database = {
           manager_id: string | null
           performance_rating: number | null
           phone: string | null
+          root_company_id: string
           salary: number | null
           salary_range_percentage: number | null
           short_term_incentive: number | null
@@ -993,6 +1016,7 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
+          root_company_id: string
           salary?: number | null
           salary_range_percentage?: number | null
           short_term_incentive?: number | null
@@ -1018,6 +1042,7 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
+          root_company_id?: string
           salary?: number | null
           salary_range_percentage?: number | null
           short_term_incentive?: number | null
@@ -1044,6 +1069,13 @@ export type Database = {
           {
             foreignKeyName: "profiles_position_id_fkey"
             columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
@@ -1143,6 +1175,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          root_company_id: string
           updated_at: string
         }
         Insert: {
@@ -1152,6 +1185,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          root_company_id: string
           updated_at?: string
         }
         Update: {
@@ -1161,9 +1195,18 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          root_company_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "salary_tables_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       survey_data: {
         Row: {
@@ -1409,6 +1452,7 @@ export type Database = {
         Args: { entity_id: string }
         Returns: string
       }
+      get_user_company_id: { Args: never; Returns: string }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]

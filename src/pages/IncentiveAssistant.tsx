@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Target, Send, History, FileText, Sparkles } from 'lucide-react';
+import { Target, Send, History, FileText, Sparkles, ShieldCheck } from 'lucide-react';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 interface Conversation {
   id: string;
@@ -155,6 +156,15 @@ const IncentiveAssistant = () => {
           </div>
           <ContextBadges agent="incentive" activeMode={activeMode} />
         </div>
+
+        <Alert className="mb-6 border-green-500/50 bg-green-500/10">
+          <ShieldCheck className="h-4 w-4 text-green-600" />
+          <AlertTitle>Privacidade e Segurança</AlertTitle>
+          <AlertDescription>
+            Todas as consultas e análises são privadas e isoladas. 
+            Seus dados nunca são compartilhados com outras empresas.
+          </AlertDescription>
+        </Alert>
 
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
           <Card>

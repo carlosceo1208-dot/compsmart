@@ -58,14 +58,27 @@ serve(async (req) => {
       enhancedQuestion = question.substring('/mix_total_rewards'.length).trim();
     }
 
-    // Fetch relevant context from Knowledge Base (RAG)
+    // Fetch user profile with company context (single query to avoid duplication)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('grade, salary, unit_id, job_title_id, root_company_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || !profile.root_company_id) {
+      throw new Error('User profile or company not found');
+    }
+
+    const userCompanyId = profile.root_company_id;
+
+    // Fetch relevant context from Knowledge Base (RAG) - Global + Company-specific
     const { data: kbDocs } = await supabase
       .from('knowledge_base')
       .select('title, content, category')
       .or(`agent_type.eq.incentive,agent_type.eq.both`)
       .eq('is_active', true)
-      .eq('is_global', true)
-      .limit(5);
+      .or(`is_global.eq.true${userCompanyId ? `,root_company_id.eq.${userCompanyId}` : ''}`)
+      .limit(10);
 
     let contextFromKB = '';
     if (kbDocs && kbDocs.length > 0) {
@@ -75,22 +88,18 @@ serve(async (req) => {
       });
     }
 
-    // Fetch company context data
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('grade, salary, unit_id, job_title_id')
-      .eq('id', user.id)
-      .single();
-
+    // Fetch company context data (with root_company_id for isolation)
     const { data: activeSalaryTable } = await supabase
       .from('salary_tables')
       .select('id, name')
+      .eq('root_company_id', userCompanyId)
       .eq('is_active', true)
-      .single();
+      .maybeSingle();
 
     const { data: activePrograms } = await supabase
       .from('incentive_programs')
       .select('name, program_type, target_percentage')
+      .eq('root_company_id', userCompanyId)
       .eq('is_active', true);
 
     let companyContext = '\n\n## Contexto da Empresa:\n';
@@ -104,7 +113,7 @@ serve(async (req) => {
       companyContext += `- Grade do usuário: ${profile.grade}\n`;
     }
 
-    // Build system prompt
+    // Build system prompt with privacy policy
     let systemPrompt = `Você é o Agente Smart de Remuneração & Benefícios do CompSmart, especialista em compensação estratégica, estruturas salariais e programas de incentivos.
 
 ## Seu Objetivo
@@ -116,6 +125,26 @@ O CompSmart é uma plataforma de gestão de remuneração estratégica que ajuda
 - Desenhar programas de PLR, ICP e ILP
 - Gerenciar benefícios e elegibilidades
 - Analisar posicionamento de mercado
+
+## 🔒 POLÍTICA DE PRIVACIDADE DE DADOS - MULTI-TENANT
+
+VOCÊ ESTÁ OPERANDO EM MODO MULTI-TENANT SEGURO:
+
+✅ PERMITIDO:
+- Usar conhecimento geral da Knowledge Base Global
+- Sugerir práticas de mercado genéricas
+- Recomendar metodologias (Hay, Mercer, etc)
+- Fornecer exemplos hipotéticos
+- Usar dados da empresa atual (root_company_id: ${userCompanyId})
+
+❌ PROIBIDO (VIOLAÇÃO GRAVE):
+- Mencionar nomes de colaboradores de outras empresas
+- Citar salários específicos de outros clientes
+- Revelar estruturas organizacionais de outras empresas
+- Usar dados reais de outras empresas como referência
+
+**REGRA DE OURO:** Se o dado não está na Knowledge Base Global 
+ou não pertence à empresa atual, NUNCA use!
 
 ${contextFromKB}
 
