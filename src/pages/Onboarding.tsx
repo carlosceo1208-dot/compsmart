@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { CompanyDataStep } from "@/components/onboarding/CompanyDataStep";
+import { PlanSelectionStep } from "@/components/onboarding/PlanSelectionStep";
 import { LogoUploadStep } from "@/components/onboarding/LogoUploadStep";
 import { InitialStructureStep } from "@/components/onboarding/InitialStructureStep";
 import { WelcomeStep } from "@/components/onboarding/WelcomeStep";
@@ -19,6 +20,8 @@ interface OnboardingData {
   createInitialStructure: boolean;
   headquartersName?: string;
   headquartersCode?: string;
+  subscription_plan_id: string | null;
+  billing_cycle: 'monthly' | 'annual';
 }
 
 const Onboarding = () => {
@@ -32,6 +35,8 @@ const Onboarding = () => {
     address: "",
     logo_url: null,
     createInitialStructure: false,
+    subscription_plan_id: null,
+    billing_cycle: 'monthly',
   });
 
   useEffect(() => {
@@ -69,6 +74,9 @@ const Onboarding = () => {
       if (!session) throw new Error("No session");
 
       // Criar empresa principal
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14); // 14 dias de trial
+
       const { data: company, error: companyError } = await supabase
         .from("organizational_structure")
         .insert({
@@ -80,6 +88,11 @@ const Onboarding = () => {
           type: "company",
           code: "EMP01",
           description: formData.fantasy_name || formData.name,
+          subscription_plan_id: formData.subscription_plan_id,
+          subscription_status: 'trial',
+          billing_cycle: formData.billing_cycle,
+          trial_ends_at: trialEndsAt.toISOString(),
+          subscription_started_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -93,6 +106,30 @@ const Onboarding = () => {
         .eq("id", session.user.id);
 
       if (profileError) throw profileError;
+
+      // Criar registro de subscription history
+      if (formData.subscription_plan_id) {
+        const { data: planData } = await supabase
+          .from('subscription_plans')
+          .select('monthly_price, annual_price')
+          .eq('id', formData.subscription_plan_id)
+          .single();
+
+        if (planData) {
+          await supabase
+            .from('company_subscriptions')
+            .insert({
+              company_id: company.id,
+              plan_id: formData.subscription_plan_id,
+              started_at: new Date().toISOString(),
+              billing_cycle: formData.billing_cycle,
+              monthly_price: planData.monthly_price,
+              annual_price: planData.annual_price,
+              status: 'trial',
+              created_by: session.user.id,
+            });
+        }
+      }
 
       // Criar estrutura inicial se solicitado
       if (formData.createInitialStructure && formData.headquartersName) {
@@ -109,7 +146,7 @@ const Onboarding = () => {
       }
 
       toast.success("🎉 Empresa cadastrada com sucesso!");
-      setCurrentStep(4);
+      setCurrentStep(5);
     } catch (error: any) {
       console.error("Error completing onboarding:", error);
       toast.error("Erro ao cadastrar empresa: " + error.message);
@@ -129,7 +166,8 @@ const Onboarding = () => {
     );
   }
 
-  const progress = (currentStep / 4) * 100;
+  const totalSteps = 4;
+  const progress = (currentStep / totalSteps) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5 flex items-center justify-center p-4">
@@ -141,12 +179,12 @@ const Onboarding = () => {
           </p>
         </div>
 
-        {currentStep < 4 && (
+        {currentStep <= totalSteps && (
           <Card>
             <CardHeader>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-muted-foreground">
-                  <span>Passo {currentStep} de 3</span>
+                  <span>Passo {currentStep} de {totalSteps}</span>
                   <span>{Math.round(progress)}%</span>
                 </div>
                 <Progress value={progress} />
@@ -164,25 +202,36 @@ const Onboarding = () => {
         )}
 
         {currentStep === 2 && (
-          <LogoUploadStep
-            logoUrl={formData.logo_url}
-            onUpdate={(logo_url) => setFormData({ ...formData, logo_url })}
+          <PlanSelectionStep
+            selectedPlanId={formData.subscription_plan_id}
+            onUpdate={(planId, billingCycle) => 
+              setFormData({ ...formData, subscription_plan_id: planId, billing_cycle: billingCycle })
+            }
             onNext={() => setCurrentStep(3)}
             onBack={() => setCurrentStep(1)}
           />
         )}
 
         {currentStep === 3 && (
-          <InitialStructureStep
-            formData={formData}
-            onUpdate={setFormData}
-            onComplete={handleComplete}
+          <LogoUploadStep
+            logoUrl={formData.logo_url}
+            onUpdate={(logo_url) => setFormData({ ...formData, logo_url })}
+            onNext={() => setCurrentStep(4)}
             onBack={() => setCurrentStep(2)}
-            loading={loading}
           />
         )}
 
         {currentStep === 4 && (
+          <InitialStructureStep
+            formData={formData}
+            onUpdate={setFormData}
+            onComplete={handleComplete}
+            onBack={() => setCurrentStep(3)}
+            loading={loading}
+          />
+        )}
+
+        {currentStep === 5 && (
           <WelcomeStep
             companyName={formData.fantasy_name || formData.name}
             logoUrl={formData.logo_url}

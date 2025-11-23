@@ -541,6 +541,75 @@ export type Database = {
           },
         ]
       }
+      company_subscriptions: {
+        Row: {
+          annual_price: number
+          billing_cycle: string
+          canceled_at: string | null
+          canceled_by: string | null
+          cancellation_reason: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          ended_at: string | null
+          id: string
+          monthly_price: number
+          plan_id: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          annual_price: number
+          billing_cycle: string
+          canceled_at?: string | null
+          canceled_by?: string | null
+          cancellation_reason?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          ended_at?: string | null
+          id?: string
+          monthly_price: number
+          plan_id: string
+          started_at?: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          annual_price?: number
+          billing_cycle?: string
+          canceled_at?: string | null
+          canceled_by?: string | null
+          cancellation_reason?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          ended_at?: string | null
+          id?: string
+          monthly_price?: number
+          plan_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competencies: {
         Row: {
           created_at: string
@@ -766,6 +835,141 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_items: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          invoice_id: string
+          item_type: string | null
+          period_end: string | null
+          period_start: string | null
+          plan_id: string | null
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          invoice_id: string
+          item_type?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          plan_id?: string | null
+          quantity?: number
+          subtotal: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          invoice_id?: string
+          item_type?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          plan_id?: string | null
+          quantity?: number
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          discount: number | null
+          due_date: string
+          id: string
+          invoice_number: string
+          issue_date: string
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          status: string
+          subscription_id: string | null
+          subtotal: number
+          tax: number | null
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          discount?: number | null
+          due_date: string
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          status?: string
+          subscription_id?: string | null
+          subtotal?: number
+          tax?: number | null
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          discount?: number | null
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          status?: string
+          subscription_id?: string | null
+          subtotal?: number
+          tax?: number | null
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "company_subscriptions"
             referencedColumns: ["id"]
           },
         ]
@@ -1024,16 +1228,25 @@ export type Database = {
         Row: {
           address: string | null
           base_date: string | null
+          billing_cycle: string | null
+          billing_email: string | null
           cnpj: string | null
           code: string | null
           created_at: string
+          custom_annual_price: number | null
+          custom_monthly_price: number | null
           description: string | null
           fantasy_name: string | null
           id: string
           logo_url: string | null
           name: string
           parent_id: string | null
+          payment_method: string | null
           root_company_id: string | null
+          subscription_plan_id: string | null
+          subscription_started_at: string | null
+          subscription_status: string | null
+          trial_ends_at: string | null
           type: string
           union_name: string | null
           updated_at: string
@@ -1041,16 +1254,25 @@ export type Database = {
         Insert: {
           address?: string | null
           base_date?: string | null
+          billing_cycle?: string | null
+          billing_email?: string | null
           cnpj?: string | null
           code?: string | null
           created_at?: string
+          custom_annual_price?: number | null
+          custom_monthly_price?: number | null
           description?: string | null
           fantasy_name?: string | null
           id?: string
           logo_url?: string | null
           name: string
           parent_id?: string | null
+          payment_method?: string | null
           root_company_id?: string | null
+          subscription_plan_id?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: string | null
+          trial_ends_at?: string | null
           type: string
           union_name?: string | null
           updated_at?: string
@@ -1058,16 +1280,25 @@ export type Database = {
         Update: {
           address?: string | null
           base_date?: string | null
+          billing_cycle?: string | null
+          billing_email?: string | null
           cnpj?: string | null
           code?: string | null
           created_at?: string
+          custom_annual_price?: number | null
+          custom_monthly_price?: number | null
           description?: string | null
           fantasy_name?: string | null
           id?: string
           logo_url?: string | null
           name?: string
           parent_id?: string | null
+          payment_method?: string | null
           root_company_id?: string | null
+          subscription_plan_id?: string | null
+          subscription_started_at?: string | null
+          subscription_status?: string | null
+          trial_ends_at?: string | null
           type?: string
           union_name?: string | null
           updated_at?: string
@@ -1085,6 +1316,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
             referencedColumns: ["id"]
           },
         ]
@@ -1345,6 +1583,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          annual_price: number
+          created_at: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          is_public: boolean | null
+          max_employees: number | null
+          max_users: number | null
+          monthly_price: number
+          name: string
+          plan_type: string
+          setup_fee: number | null
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          annual_price?: number
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          max_employees?: number | null
+          max_users?: number | null
+          monthly_price?: number
+          name: string
+          plan_type: string
+          setup_fee?: number | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          annual_price?: number
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          is_public?: boolean | null
+          max_employees?: number | null
+          max_users?: number | null
+          monthly_price?: number
+          name?: string
+          plan_type?: string
+          setup_fee?: number | null
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       survey_data: {
         Row: {
