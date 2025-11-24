@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.legal-assistant]
 verify_jwt = true
 
+[functions.salary-assistant]
+verify_jwt = true
+
 [functions.incentive-assistant]
 verify_jwt = true
 

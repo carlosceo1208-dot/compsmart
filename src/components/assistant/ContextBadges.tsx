@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
-import { Scale, Target, Sparkles } from "lucide-react";
+import { Scale, Target, Sparkles, TrendingUp } from "lucide-react";
 
 interface ContextBadgesProps {
-  agent: 'legal' | 'incentive';
+  agent: 'legal' | 'incentive' | 'salary';
   activeMode?: string;
 }
 
@@ -29,6 +29,20 @@ const agentConfig = {
       gerar_politica: '📝 Geração de Política',
       comparar_mercado: '📊 Comparação com Mercado',
       mix_total_rewards: '💰 Mix de Remuneração Total',
+    },
+  },
+  salary: {
+    badges: [
+      { label: 'Estruturas', icon: TrendingUp },
+      { label: 'Faixas Salariais', icon: TrendingUp },
+      { label: 'Benchmarking', icon: TrendingUp },
+    ],
+    modes: {
+      analise_equidade: '⚖️ Análise de Equidade',
+      benchmark_mercado: '📊 Benchmark de Mercado',
+      recomendacao_ajuste: '💡 Recomendação de Ajuste',
+      compa_ratio: '📈 Compa-Ratio',
+      distorcoes: '🔍 Identificação de Distorções',
     },
   },
 };
