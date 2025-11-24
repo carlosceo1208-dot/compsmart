@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Send, ThumbsUp, ThumbsDown, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSupport } from "@/hooks/useSupport";
 import { QuickActionsPanel } from "./QuickActionsPanel";
@@ -46,7 +45,7 @@ export const SupportChat = () => {
   };
 
   return (
-    <div className="fixed bottom-20 right-6 z-50 flex h-[600px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
+    <div className="fixed bottom-20 right-6 z-50 flex h-[650px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
         <Avatar className="h-10 w-10 border-2 border-white/30">
@@ -67,9 +66,9 @@ export const SupportChat = () => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
+      <div className="flex-1 p-4 overflow-y-auto" ref={scrollRef}>
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4">
+          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-8">
             <Avatar className="h-16 w-16 mb-4 border-2 border-primary/20">
               <AvatarImage src="" />
               <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
@@ -165,7 +164,7 @@ export const SupportChat = () => {
             )}
           </div>
         )}
-      </ScrollArea>
+      </div>
 
       {/* Quick Actions (when there are messages) */}
       {messages.length > 0 && quickActions.length > 0 && (
