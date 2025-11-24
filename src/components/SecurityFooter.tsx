@@ -9,9 +9,9 @@ export function SecurityFooter() {
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-primary via-primary-hover to-primary-dark py-10 mt-12 shadow-[0_-8px_32px_-8px_rgba(0,0,0,0.4)] border-t-2 border-primary-light/10">
+    <footer className="bg-gradient-to-br from-primary via-primary-hover to-primary-dark py-6 mt-8 shadow-[0_-8px_32px_-8px_rgba(0,0,0,0.4)] border-t-2 border-primary-light/10">
       <div className="container px-4">
-        <div className="flex flex-col items-center justify-center space-y-6">
+        <div className="flex flex-col items-center justify-center space-y-3">
           
           {/* Título com toque de verde */}
           <div className="text-center">
@@ -25,15 +25,15 @@ export function SecurityFooter() {
           </div>
 
           {/* Certificações - Cards com fundo azul mais claro e bordas verdes */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl">
             {certifications.map((cert) => (
               <div 
                 key={cert.name}
-                className="flex flex-col items-center gap-2 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border-2 border-secondary/40 hover:bg-white/15 hover:border-secondary/60 hover:scale-105 transition-all duration-300 shadow-lg"
+                className="flex flex-col items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border-2 border-secondary/40 hover:bg-white/15 hover:border-secondary/60 hover:scale-105 transition-all duration-300 shadow-lg"
               >
                 {/* Ícone com fundo verde */}
-                <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center border-2 border-secondary/50">
-                  <cert.icon className="w-6 h-6 text-secondary" />
+                <div className="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center border-2 border-secondary/50">
+                  <cert.icon className="w-5 h-5 text-secondary" />
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-bold text-white">{cert.name}</p>
@@ -49,7 +49,7 @@ export function SecurityFooter() {
           <div className="w-full max-w-md h-px bg-gradient-to-r from-transparent via-secondary/50 to-transparent" />
 
           {/* Aviso Legal */}
-          <div className="text-center max-w-3xl bg-white/5 rounded-lg p-4 border border-white/10">
+          <div className="text-center max-w-3xl bg-white/5 rounded-lg p-3 border border-white/10">
             <p className="text-xs text-white/85 leading-relaxed">
               O CompSmart utiliza isolamento de dados em nível de aplicação e banco de dados 
               para garantir que informações de cada empresa sejam acessíveis apenas por seus 

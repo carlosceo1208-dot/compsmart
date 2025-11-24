@@ -1,7 +1,5 @@
-import { Gift, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Gift } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useBenefitsKPI } from '@/hooks/useBenefitsKPI';
 import { formatCompactCurrency, formatNumber } from '@/lib/formatters';
@@ -20,20 +18,12 @@ export const BenefitsCard = ({ currency }: BenefitsCardProps) => {
   const annualCost = monthlyCost * 12;
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200/50 hover:border-blue-300 hover:shadow-lg transition-all duration-200 cursor-pointer" onClick={() => window.location.href = '/benefits'}>
+    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200/50 hover:border-blue-300 hover:shadow-lg transition-all duration-200">
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <Gift className="h-4 w-4" />
-            Gestão de Benefícios
-          </CardTitle>
-          <Link to="/benefits" onClick={(e) => e.stopPropagation()}>
-            <Button size="sm" variant="ghost" className="h-7 gap-1">
-              <ExternalLink className="h-3 w-3" />
-              <span className="text-xs">Gerenciar</span>
-            </Button>
-          </Link>
-        </div>
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <Gift className="h-4 w-4" />
+          Benefícios Ativos
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
