@@ -21,6 +21,7 @@ import {
   Bell,
   Building2,
   Bot,
+  Gift,
 } from 'lucide-react';
 
 export const ModuleGrid = () => {
@@ -64,6 +65,14 @@ export const ModuleGrid = () => {
       description: 'Gerencie informações de funcionários',
       icon: Users,
       path: '/employees',
+      status: 'active' as const,
+      category: 'management' as const,
+    },
+    {
+      title: 'Gestão de Benefícios',
+      description: 'Configure benefícios, elegibilidade e atribuições',
+      icon: Gift,
+      path: '/benefits',
       status: 'active' as const,
       category: 'management' as const,
     },
