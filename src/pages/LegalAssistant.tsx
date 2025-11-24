@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
+// ScrollArea removido - usando scroll nativo
 import { useToast } from '@/hooks/use-toast';
 import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck, Archive, ArrowDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -91,19 +91,25 @@ const LegalAssistant = () => {
   useEffect(() => {
     if (conversations.length > 0 && !loading) {
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        }
       }, 100);
     }
   }, [conversations, loading]);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const element = event.currentTarget;
-    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
-    setShowScrollButton(!isNearBottom && conversations.length > 2);
+    const scrollBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+    const isNearBottom = scrollBottom < 100;
+    setShowScrollButton(!isNearBottom && conversations.length > 0);
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      setShowScrollButton(false);
+    }
   };
 
   const loadSessionConversations = async () => {
@@ -252,7 +258,7 @@ const LegalAssistant = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[600px]">
+              <div className="h-[600px] overflow-y-auto scroll-smooth pr-2">
                 <div className="space-y-2">
                   {sessions.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">
@@ -298,7 +304,7 @@ const LegalAssistant = () => {
                     ))
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </CardContent>
           </Card>
 
@@ -322,12 +328,13 @@ const LegalAssistant = () => {
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
                 <CardContent className="relative">
-                  <ScrollArea 
-                    className="max-h-[600px]" 
+                  <div 
                     ref={scrollAreaRef}
-                    onScrollCapture={handleScroll}
+                    onScroll={handleScroll}
+                    className="max-h-[600px] overflow-y-auto pr-4 scroll-smooth"
+                    style={{ scrollbarGutter: 'stable' }}
                   >
-                    <div className="space-y-4 pr-4">
+                    <div className="space-y-4">
                       {loading && conversations.length > 0 && (
                         <div className="space-y-2 animate-fade-in">
                           <div className="bg-primary/10 p-3 rounded-lg">
@@ -383,7 +390,7 @@ const LegalAssistant = () => {
                       ))}
                       <div ref={messagesEndRef} />
                     </div>
-                  </ScrollArea>
+                  </div>
                   
                   {showScrollButton && (
                     <Button
