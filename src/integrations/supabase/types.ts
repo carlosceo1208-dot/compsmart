@@ -762,6 +762,60 @@ export type Database = {
           },
         ]
       }
+      employee_incentive_assignments: {
+        Row: {
+          actual_value: number | null
+          created_at: string | null
+          employee_id: string
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          program_id: string
+          target_value: number
+          updated_at: string | null
+          vesting_start_date: string | null
+        }
+        Insert: {
+          actual_value?: number | null
+          created_at?: string | null
+          employee_id: string
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          program_id: string
+          target_value?: number
+          updated_at?: string | null
+          vesting_start_date?: string | null
+        }
+        Update: {
+          actual_value?: number | null
+          created_at?: string | null
+          employee_id?: string
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          program_id?: string
+          target_value?: number
+          updated_at?: string | null
+          vesting_start_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_incentive_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_incentive_assignments_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "incentive_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       incentive_assistant_conversations: {
         Row: {
           answer: string
@@ -838,40 +892,52 @@ export type Database = {
       }
       incentive_programs: {
         Row: {
+          cliff_months: number | null
           created_at: string | null
           description: string | null
           id: string
           is_active: boolean | null
+          matching_percentage: number | null
           name: string
           payment_frequency: string | null
           program_type: string
           root_company_id: string
+          subtype: string | null
           target_percentage: number | null
           updated_at: string | null
+          vesting_months: number | null
         }
         Insert: {
+          cliff_months?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
+          matching_percentage?: number | null
           name: string
           payment_frequency?: string | null
           program_type: string
           root_company_id: string
+          subtype?: string | null
           target_percentage?: number | null
           updated_at?: string | null
+          vesting_months?: number | null
         }
         Update: {
+          cliff_months?: number | null
           created_at?: string | null
           description?: string | null
           id?: string
           is_active?: boolean | null
+          matching_percentage?: number | null
           name?: string
           payment_frequency?: string | null
           program_type?: string
           root_company_id?: string
+          subtype?: string | null
           target_percentage?: number | null
           updated_at?: string | null
+          vesting_months?: number | null
         }
         Relationships: [
           {

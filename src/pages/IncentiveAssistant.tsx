@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Target, Send, History, FileText, Sparkles, ShieldCheck } from 'lucide-react';
+import { Target, Send, History, FileText, Sparkles, ShieldCheck, ArrowDown, Bot } from 'lucide-react';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Conversation {
   id: string;
@@ -54,6 +55,10 @@ const IncentiveAssistant = () => {
   const [documentText, setDocumentText] = useState('');
   const [documentName, setDocumentName] = useState('');
   const [charCount, setCharCount] = useState(0);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [showNewBadge, setShowNewBadge] = useState(false);
   const { toast } = useToast();
 
   const maxChars = 50000;
@@ -65,6 +70,32 @@ const IncentiveAssistant = () => {
   useEffect(() => {
     setCharCount(question.length + documentText.length);
   }, [question, documentText]);
+
+  useEffect(() => {
+    if (conversations.length > 0 && !loading) {
+      setShowNewBadge(true);
+      setTimeout(() => {
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+        }
+        setTimeout(() => setShowNewBadge(false), 3000);
+      }, 100);
+    }
+  }, [conversations, loading]);
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const element = event.currentTarget;
+    const scrollBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+    const isNearBottom = scrollBottom < 100;
+    setShowScrollButton(!isNearBottom && conversations.length > 0);
+  };
+
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+      setShowScrollButton(false);
+    }
+  };
 
   const fetchConversations = async () => {
     const { data } = await supabase
@@ -175,7 +206,7 @@ const IncentiveAssistant = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[600px]">
+              <div className="h-[600px] overflow-y-auto scroll-smooth pr-2">
                 <div className="space-y-2">
                   {conversations.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">
@@ -205,7 +236,7 @@ const IncentiveAssistant = () => {
                     ))
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             </CardContent>
           </Card>
 
@@ -225,17 +256,90 @@ const IncentiveAssistant = () => {
 
             {conversations.length > 0 && (
               <Card className="bg-accent/30 border-accent">
-                <CardContent className="p-4">
-                  <p className="text-sm font-medium mb-2">Última Consulta:</p>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {conversations[0].question}
-                  </p>
-                  <p className="text-sm font-medium mb-2">Resposta:</p>
-                  <ScrollArea className="max-h-[200px]">
-                    <p className="text-sm whitespace-pre-wrap pr-4">
-                      {conversations[0].answer}
-                    </p>
-                  </ScrollArea>
+                <CardHeader>
+                  <CardTitle className="text-lg">Última Consulta</CardTitle>
+                </CardHeader>
+                <CardContent className="relative">
+                  <div 
+                    ref={scrollAreaRef}
+                    onScroll={handleScroll}
+                    className="max-h-[600px] overflow-y-auto pr-4 scroll-smooth"
+                    style={{ scrollbarGutter: 'stable' }}
+                  >
+                    <div className="space-y-4">
+                      {loading && conversations.length > 0 ? (
+                        <div className="space-y-2 animate-fade-in">
+                          <div className="bg-primary/10 p-3 rounded-lg">
+                            <Skeleton className="h-4 w-3/4 mb-2" />
+                            <Skeleton className="h-4 w-full" />
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Bot className="h-4 w-4 animate-pulse" />
+                            <span>Analisando contexto...</span>
+                          </div>
+                        </div>
+                      ) : loading && conversations.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Bot className="h-12 w-12 mx-auto mb-4 text-primary animate-pulse" />
+                          <p className="text-sm text-muted-foreground">
+                            Processando sua consulta...
+                          </p>
+                        </div>
+                      ) : conversations.length === 0 ? (
+                        <div className="text-center py-8">
+                          <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                          <p className="text-sm text-muted-foreground">
+                            Faça sua primeira consulta para começar
+                          </p>
+                        </div>
+                      ) : (
+                        conversations.map((conv, index) => (
+                          <div key={index} className="space-y-2">
+                            <div className="bg-muted/30 p-4 rounded-lg space-y-2">
+                              <h4 className="font-medium text-sm flex items-center gap-2">
+                                <Target className="h-4 w-4" />
+                                Pergunta:
+                              </h4>
+                              <p className="text-sm">{conv.question}</p>
+                            </div>
+                            
+                            <div className="bg-primary/10 p-4 rounded-lg space-y-2 relative">
+                              {index === conversations.length - 1 && showNewBadge && (
+                                <Badge className="absolute -top-2 -right-2 bg-primary animate-pulse">
+                                  Nova
+                                </Badge>
+                              )}
+                              <h4 className="font-medium text-sm flex items-center gap-2">
+                                <Bot className="h-4 w-4" />
+                                Resposta:
+                              </h4>
+                              <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
+                              
+                              {conv.document_name && (
+                                <Badge variant="outline" className="mt-2">
+                                  <FileText className="h-3 w-3 mr-1" />
+                                  {conv.document_name}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  </div>
+                  
+                  {showScrollButton && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="absolute bottom-4 right-8 shadow-lg animate-fade-in"
+                      onClick={scrollToBottom}
+                    >
+                      <ArrowDown className="h-4 w-4 mr-2" />
+                      Última mensagem
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}

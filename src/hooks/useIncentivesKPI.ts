@@ -41,6 +41,7 @@ export const useIncentivesKPI = () => {
         shortTerm: shortTermProvision,
         longTerm: longTermProvision,
         total: shortTermProvision + longTermProvision,
+        activePrograms: programs.length,
       };
     },
     staleTime: 5 * 60 * 1000,
