@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import compsmartLogo from "@/assets/compsmart-logo.png";
+import { SecurityFooter } from "@/components/SecurityFooter";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -108,8 +109,9 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary-light/10 to-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary-light/10 to-background flex flex-col">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="space-y-4 text-center">
           <div className="flex flex-col items-center">
             <img src={compsmartLogo} alt="CompSmart Logo" className="w-40 h-auto md:w-48 object-contain" />
@@ -200,6 +202,9 @@ const Auth = () => {
           </div>
         </CardContent>
       </Card>
+      </div>
+      
+      <SecurityFooter />
     </div>
   );
 };
