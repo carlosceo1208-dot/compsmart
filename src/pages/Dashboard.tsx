@@ -16,7 +16,7 @@ const Dashboard = () => {
         <div className="space-y-4">
           <div className="rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-6 md:p-8 border-2 border-primary/30 shadow-primary">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-              <div className="flex-1 min-w-0">
+              <div>
                 <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">CompSmart</h1>
                 <p className="text-xs sm:text-sm text-white/90 font-medium">
                   Dashboard Executivo
