@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { SecurityFooter } from "@/components/SecurityFooter";
 import { CompanyLogo } from "@/components/CompanyLogo";
+import { SupportWidget } from "@/components/support/SupportWidget";
 
 interface UserProfile {
   full_name: string;
@@ -232,6 +233,9 @@ export const DashboardLayout = () => {
 
       {/* Security Footer */}
       <SecurityFooter />
+      
+      {/* Support Widget - sempre visível */}
+      <SupportWidget />
     </div>
   );
 };
