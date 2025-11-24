@@ -45,11 +45,11 @@ export const SupportChat = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex h-[550px] w-[360px] flex-col rounded-lg border border-border bg-background shadow-2xl max-w-[calc(100vw-2rem)]">
+    <div className="fixed bottom-4 right-4 z-50 flex h-[500px] w-[360px] flex-col rounded-lg border border-border bg-background shadow-2xl max-w-[calc(100vw-2rem)]">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
-        <div className="h-10 w-10 border-2 border-white/30 rounded-full bg-gradient-to-br from-primary to-primary/70 text-white flex items-center justify-center flex-shrink-0">
-          <Bot className="h-5 w-5" />
+        <div className="h-10 w-10 border-2 border-white rounded-full bg-white flex items-center justify-center flex-shrink-0">
+          <Bot className="h-5 w-5 text-success" />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
@@ -63,10 +63,10 @@ export const SupportChat = () => {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto" ref={scrollRef}>
+      <div className="flex-1 p-3 overflow-y-auto" ref={scrollRef}>
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6">
-            <div className="h-16 w-16 mb-4 border-2 border-primary/20 rounded-full bg-gradient-to-br from-primary to-primary/70 text-white flex items-center justify-center flex-shrink-0">
+            <div className="h-16 w-16 mb-4 border-3 border-primary rounded-full bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center flex-shrink-0 shadow-lg">
               <Bot className="h-8 w-8" />
             </div>
             <div className="flex items-center gap-2 mb-3">
