@@ -289,7 +289,7 @@ const LegalAssistant = () => {
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ScrollArea className="max-h-[400px]">
+                  <ScrollArea className="max-h-[600px]">
                     <div className="space-y-4 pr-4">
                       {conversations.map((conv) => (
                         <div key={conv.id} className="space-y-2">
@@ -306,6 +306,9 @@ const LegalAssistant = () => {
                           <div className="bg-muted p-3 rounded-lg">
                             <p className="text-xs font-medium text-muted-foreground mb-1">Smart:</p>
                             <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
+                            <p className="text-xs text-muted-foreground mt-2 italic">
+                              💡 Role para ver o documento completo
+                            </p>
                             {conv.legal_references && (
                               <div className="mt-2 pt-2 border-t">
                                 <p className="text-xs font-medium text-muted-foreground">
