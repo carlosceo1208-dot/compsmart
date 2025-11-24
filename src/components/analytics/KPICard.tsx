@@ -2,6 +2,7 @@ import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatNumber, formatPercentage, formatCompactCurrency } from '@/lib/formatters';
+import { cn } from '@/lib/utils';
 
 interface KPICardProps {
   title: string;
@@ -10,9 +11,10 @@ interface KPICardProps {
   format?: 'currency' | 'number' | 'percentage' | 'compact-currency';
   isLoading?: boolean;
   className?: string;
+  variant?: 'default' | 'success' | 'info' | 'premium' | 'warning';
 }
 
-export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading, className }: KPICardProps) => {
+export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading, className, variant = 'default' }: KPICardProps) => {
   const formatValue = (val: number | null | undefined) => {
     switch (format) {
       case 'currency':
@@ -27,8 +29,16 @@ export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading
     }
   };
 
+  const variantStyles = {
+    default: "bg-gradient-to-br from-background to-primary/5 border-2 border-primary/20 hover:border-primary/40 hover:shadow-primary",
+    success: "bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200/50 hover:border-green-300 hover:shadow-green-200/50",
+    info: "bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200/50 hover:border-blue-300 hover:shadow-blue-200/50",
+    premium: "bg-gradient-to-br from-purple-50 to-violet-50 border-2 border-purple-200/50 hover:border-purple-300 hover:shadow-purple-200/50",
+    warning: "bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200/50 hover:border-yellow-300 hover:shadow-yellow-200/50"
+  };
+
   return (
-    <Card className={`bg-gradient-to-br from-background to-primary/5 border-2 border-primary/20 hover:border-primary/40 hover:shadow-primary hover:-translate-y-1 transition-all duration-300 ${className}`}>
+    <Card className={cn("hover:-translate-y-1 transition-all duration-300", variantStyles[variant], className)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">

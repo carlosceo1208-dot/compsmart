@@ -24,7 +24,7 @@ export const BudgetCard = ({ currency, unitId }: BudgetCardProps) => {
   const isOverBudget = salaryVariance > 0;
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-200">
+    <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200/50 hover:border-yellow-300 hover:shadow-lg transition-all duration-200">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <PiggyBank className="h-4 w-4" />

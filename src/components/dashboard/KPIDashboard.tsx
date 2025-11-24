@@ -61,6 +61,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
         value={totalEmployees}
         icon={Users}
         format="number"
+        variant="success"
         isLoading={loadingEmployees}
       />
       
@@ -69,6 +70,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
         value={totalSalary}
         icon={DollarSign}
         format="compact-currency"
+        variant="success"
         isLoading={loadingSalary}
       />
       
@@ -77,6 +79,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
         value={avgSalary}
         icon={TrendingUp}
         format="currency"
+        variant="success"
         isLoading={loadingSalary}
       />
       
