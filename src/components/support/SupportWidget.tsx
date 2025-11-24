@@ -25,9 +25,9 @@ export const SupportWidget = () => {
               <Button
                 onClick={() => setIsOpen(!isOpen)}
                 size="lg"
+                variant="secondary"
                 className={cn(
                   "h-14 w-14 rounded-full shadow-lg transition-all hover:scale-110",
-                  "bg-success hover:bg-success/90",
                   hasUnreadMessages && "animate-pulse"
                 )}
               >
