@@ -13,6 +13,7 @@ interface ModuleCardProps {
   status?: "active" | "coming-soon" | "beta";
   category?: "management" | "simulation" | "consultation" | "export";
   requiredPlan?: PlanType;
+  isSmartAgent?: boolean;
 }
 
 const categoryColors = {
@@ -35,7 +36,8 @@ export const ModuleCard = ({
   onClick, 
   status = "active",
   category = "management",
-  requiredPlan
+  requiredPlan,
+  isSmartAgent = false
 }: ModuleCardProps) => {
   const { hasAccess } = useFeatureAccess();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -55,15 +57,25 @@ export const ModuleCard = ({
       <Card
         className={`
           group transition-all duration-300 h-full relative
-          bg-gradient-to-br from-background to-primary/8
+          ${isSmartAgent 
+            ? "bg-gradient-to-br from-primary/5 to-purple-600/5 border-2 border-primary/50" 
+            : "bg-gradient-to-br from-background to-primary/8"
+          }
           ${(isClickable || (!hasFeatureAccess && requiredPlan))
             ? "cursor-pointer hover:shadow-xl hover:-translate-y-3 hover:scale-[1.03]" 
             : "opacity-60 cursor-not-allowed"
           }
-          ${categoryColors[category]} border-2
+          ${!isSmartAgent ? categoryColors[category] : ""} ${!isSmartAgent ? "border-2" : ""}
         `}
         onClick={hasFeatureAccess ? (isClickable ? onClick : undefined) : handleClick}
       >
+        {isSmartAgent && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge className="text-xs bg-gradient-to-r from-primary to-purple-600 border-0">
+              IA
+            </Badge>
+          </div>
+        )}
         {requiredPlan && !hasFeatureAccess && (
           <div className="absolute top-3 right-3 z-10">
             <div className="bg-background/90 backdrop-blur-sm rounded-full p-2 shadow-md">

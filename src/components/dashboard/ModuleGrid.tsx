@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ModuleCard } from '@/components/ModuleCard';
+import { Badge } from '@/components/ui/badge';
 import {
   Users,
   Briefcase,
@@ -22,11 +23,7 @@ import {
   Bot,
 } from 'lucide-react';
 
-interface ModuleGridProps {
-  maxVisible?: number;
-}
-
-export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
+export const ModuleGrid = () => {
   const navigate = useNavigate();
 
   const activeModules = [
@@ -200,24 +197,91 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
     },
   ];
 
-  const visibleModules = activeModules.slice(0, maxVisible);
+  // Separar módulos por tipo
+  const smartAgents = activeModules.filter(m => 
+    m.path.includes('assistant') || m.path === '/salary-assistant'
+  );
+
+  const analyticsModules = activeModules.filter(m => 
+    m.category === 'consultation' && !smartAgents.some(agent => agent.path === m.path)
+  );
+
+  const managementModules = activeModules.filter(m => 
+    m.category === 'management'
+  );
 
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-4">Módulos Ativos</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {visibleModules.map((module) => (
-          <ModuleCard
-            key={module.path}
-            title={module.title}
-            description={module.description}
-            icon={module.icon}
-            status={module.status}
-            category={module.category}
-            requiredPlan={'requiredPlan' in module ? module.requiredPlan as any : undefined}
-            onClick={() => navigate(module.path)}
-          />
-        ))}
+    <div className="space-y-8">
+      {/* Seção 1: Agentes Smart (Destaque Premium) */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Bot className="h-6 w-6 text-primary" />
+          <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            Agentes Smart
+          </h3>
+          <Badge className="ml-2 bg-gradient-to-r from-primary to-purple-600 border-0">
+            IA
+          </Badge>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {smartAgents.map((module) => (
+            <ModuleCard
+              key={module.path}
+              title={module.title}
+              description={module.description}
+              icon={module.icon}
+              status={module.status}
+              category={module.category}
+              requiredPlan={'requiredPlan' in module ? module.requiredPlan as any : undefined}
+              onClick={() => navigate(module.path)}
+              isSmartAgent={true}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Seção 2: Analytics & Relatórios */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <BarChart3 className="h-5 w-5 text-blue-600" />
+          <h3 className="text-lg font-semibold">Analytics & Relatórios</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {analyticsModules.map((module) => (
+            <ModuleCard
+              key={module.path}
+              title={module.title}
+              description={module.description}
+              icon={module.icon}
+              status={module.status}
+              category={module.category}
+              requiredPlan={'requiredPlan' in module ? module.requiredPlan as any : undefined}
+              onClick={() => navigate(module.path)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Seção 3: Gestão e Configuração */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Settings className="h-5 w-5 text-muted-foreground" />
+          <h3 className="text-lg font-semibold">Gestão e Configuração</h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {managementModules.map((module) => (
+            <ModuleCard
+              key={module.path}
+              title={module.title}
+              description={module.description}
+              icon={module.icon}
+              status={module.status}
+              category={module.category}
+              requiredPlan={'requiredPlan' in module ? module.requiredPlan as any : undefined}
+              onClick={() => navigate(module.path)}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
