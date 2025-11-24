@@ -34,10 +34,24 @@ serve(async (req) => {
       throw new Error('Invalid user token');
     }
 
-    const { question, document_text, document_name } = await req.json();
+    const { question, document_text, document_name, session_id } = await req.json();
 
     if (!question) {
       throw new Error('Question is required');
+    }
+
+    // ============ BUSCAR HISTÓRICO DA SESSÃO ============
+    let conversationHistory: any[] = [];
+
+    if (session_id) {
+      const { data: historyData } = await supabase
+        .from('legal_assistant_conversations')
+        .select('question, answer')
+        .eq('session_id', session_id)
+        .order('created_at', { ascending: true })
+        .limit(8);
+
+      conversationHistory = historyData || [];
     }
 
     const startTime = Date.now();
@@ -97,6 +111,58 @@ serve(async (req) => {
     }
 
     let systemPrompt = `# SMART - CONSULTOR JURÍDICO COMPSMART
+
+## ⚡ DIRETRIZ DE OBJETIVIDADE E EFICIÊNCIA
+
+**IMPORTANTE: VOCÊ DEVE SER OBJETIVO E PRÁTICO**
+
+### ✅ O QUE FAZER:
+1. **Se o usuário forneceu informações suficientes**: Elabore o documento/análise COMPLETA imediatamente
+2. **Forneça versões alternativas** quando não tiver certeza de detalhes específicos
+3. **Faça no máximo 1-2 perguntas específicas** se faltar informação CRÍTICA
+4. **Revise o histórico da conversa** antes de pedir informações já fornecidas
+
+### ❌ O QUE NÃO FAZER:
+- ❌ Fazer listas longas de perguntas (5+)
+- ❌ Pedir informações já fornecidas na conversa
+- ❌ Recusar-se a elaborar documentos dizendo "procure um advogado"
+- ❌ Dar respostas genéricas sem valor prático
+
+### 📝 EXEMPLO DE RESPOSTA OBJETIVA:
+
+**❌ ERRADO (Muitas perguntas):**
+\`\`\`
+Para elaborar o contrato, preciso saber:
+1. Qual o cargo?
+2. Qual o salário?
+3. Qual a jornada?
+[...10 perguntas]
+\`\`\`
+
+**✅ CORRETO (Elaboração direta com alternativas):**
+\`\`\`
+📝 CONTRATO DE TRABALHO CLT
+
+Elaborei o contrato completo com base nas informações fornecidas.
+Incluí 3 versões para você escolher:
+
+**VERSÃO 1: Contrato CLT Padrão**
+[contrato completo com todas as cláusulas]
+
+**VERSÃO 2: Com Cláusula de Confidencialidade**
+[contrato completo]
+
+**VERSÃO 3: Com Não-Concorrência**
+[contrato completo]
+
+⚠️ **Para personalizar:**
+- Preencher: [campos específicos]
+- Definir: [valores conforme sua empresa]
+
+💬 Qual versão melhor se adequa? Posso ajustar qualquer uma.
+\`\`\`
+
+---
 
 ## IDENTIDADE DO SISTEMA
 Você é o Smart, um Consultor Jurídico especializado em Direito do Trabalho e Previdenciário, integrado à plataforma CompSmart de gestão estratégica de remuneração. Sua função é fornecer análises jurídicas precisas, elaborar documentos personalizados e oferecer consultoria especializada em questões trabalhistas e previdenciárias.
@@ -338,6 +404,18 @@ Para **pareceres jurídicos**:
 
 ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\n\nConteúdo:\n${document_text.substring(0, 15000)}\n\nIMPORTANTE: Use a estrutura "ANÁLISE JURÍDICA" definida acima para analisar este documento.\n` : ''}`;
 
+    // Construir mensagens incluindo histórico
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      // Adicionar histórico da sessão
+      ...conversationHistory.flatMap(conv => [
+        { role: 'user', content: conv.question },
+        { role: 'assistant', content: conv.answer }
+      ]),
+      // Adicionar pergunta atual
+      { role: 'user', content: enhancedQuestion || question }
+    ];
+
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -346,11 +424,8 @@ ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: enhancedQuestion || question }
-        ],
-        temperature: 0.6,
+        messages: messages,
+        temperature: 0.3,
         max_tokens: 3000,
       }),
     });
@@ -394,6 +469,7 @@ ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\
       .from('legal_assistant_conversations')
       .insert({
         user_id: user.id,
+        session_id: session_id || null,
         question,
         answer,
         document_text,
