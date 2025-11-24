@@ -53,7 +53,7 @@ export const SupportWidget = () => {
       </TooltipProvider>
 
       {/* Chat widget */}
-      {isOpen && <SupportChat />}
+      {isOpen && <SupportChat onClose={() => setIsOpen(false)} />}
     </>
   );
 };

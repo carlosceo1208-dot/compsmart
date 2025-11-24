@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, ThumbsUp, ThumbsDown, Loader2, Bot } from "lucide-react";
+import { Send, ThumbsUp, ThumbsDown, Loader2, Bot, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 // Avatar replaced with custom divs for better rendering
@@ -8,9 +8,10 @@ import { QuickActionsPanel } from "./QuickActionsPanel";
 import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 
-export const SupportChat = () => {
+export const SupportChat = ({ onClose }: { onClose: () => void }) => {
   const { messages, isLoading, sendMessage, quickActions } = useSupport();
   const [input, setInput] = useState("");
+  const [feedback, setFeedback] = useState<{ [key: number]: 'up' | 'down' | null }>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -60,6 +61,14 @@ export const SupportChat = () => {
           </div>
           <p className="text-xs text-white/80">Assistente de Suporte</p>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-8 w-8 text-white hover:bg-white/20"
+        >
+          <X className="h-4 w-4" />
+        </Button>
       </div>
 
       {/* Messages */}
@@ -68,12 +77,6 @@ export const SupportChat = () => {
           <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6">
             <div className="h-16 w-16 mb-4 border-3 border-primary rounded-full bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center flex-shrink-0 shadow-lg">
               <Bot className="h-8 w-8" />
-            </div>
-            <div className="flex items-center gap-2 mb-3">
-              <h4 className="font-semibold text-foreground text-lg">Smart</h4>
-              <span className="px-2 py-0.5 text-[10px] font-bold bg-primary/10 text-primary rounded">
-                IA
-              </span>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Estou aqui para responder suas dúvidas sobre o CompSmart
@@ -122,14 +125,22 @@ export const SupportChat = () => {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 w-7 p-0"
+                        onClick={() => setFeedback({ ...feedback, [index]: 'up' })}
+                        className={cn(
+                          "h-7 w-7 p-0 transition-colors",
+                          feedback[index] === 'up' && "text-green-600 bg-green-50"
+                        )}
                       >
                         <ThumbsUp className="h-3.5 w-3.5" />
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-7 w-7 p-0"
+                        onClick={() => setFeedback({ ...feedback, [index]: 'down' })}
+                        className={cn(
+                          "h-7 w-7 p-0 transition-colors",
+                          feedback[index] === 'down' && "text-red-600 bg-red-50"
+                        )}
                       >
                         <ThumbsDown className="h-3.5 w-3.5" />
                       </Button>
