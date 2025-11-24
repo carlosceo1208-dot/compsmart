@@ -426,7 +426,7 @@ ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\
         model: 'google/gemini-2.5-flash',
         messages: messages,
         temperature: 0.3,
-        max_tokens: 3000,
+        max_tokens: 8000,
       }),
     });
 
