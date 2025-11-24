@@ -19,6 +19,7 @@ import {
   BookOpen,
   Bell,
   Building2,
+  Bot,
 } from 'lucide-react';
 
 interface ModuleGridProps {
@@ -126,9 +127,17 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       category: 'consultation' as const,
     },
     {
-      title: 'Assistente de R&B',
-      description: 'Consultoria em remuneração, benefícios e incentivos',
+      title: 'Programas de Incentivos',
+      description: 'Gerencie ICP, ILP, PLR e Stock Options',
       icon: Target,
+      path: '/incentive-programs',
+      status: 'active' as const,
+      category: 'management' as const,
+    },
+    {
+      title: 'Assistente de R&B',
+      description: 'Consultas sobre Remuneração e Benefícios com IA',
+      icon: Bot,
       path: '/incentive-assistant',
       status: 'active' as const,
       category: 'consultation' as const,

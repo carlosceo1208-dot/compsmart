@@ -24,6 +24,7 @@ import JobTitles from "./pages/JobTitles";
 import PeopleAnalytics from "./pages/PeopleAnalytics";
 import LegalAssistant from "./pages/LegalAssistant";
 import IncentiveAssistant from "./pages/IncentiveAssistant";
+import IncentivePrograms from "./pages/IncentivePrograms";
 import Pricing from "./pages/Pricing";
 import SalaryAnalysisReport from "./pages/SalaryAnalysisReport";
 import Budget from "./pages/Budget";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/people-analytics" element={<PeopleAnalytics />} />
               <Route path="/legal-assistant" element={<LegalAssistant />} />
               <Route path="/incentive-assistant" element={<IncentiveAssistant />} />
+              <Route path="/incentive-programs" element={<IncentivePrograms />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/salary-analysis-report" element={<SalaryAnalysisReport />} />
               <Route path="/budget" element={<Budget />} />
