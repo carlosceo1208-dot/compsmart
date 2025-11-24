@@ -47,7 +47,7 @@ export const SupportChat = () => {
   return (
     <div className="fixed bottom-24 right-6 z-50 flex h-[600px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
       {/* Header */}
-      <div className="flex items-center gap-3 border-b border-border bg-primary px-4 py-3 rounded-t-lg">
+      <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
           <span className="text-xl">💬</span>
         </div>

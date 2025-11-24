@@ -27,7 +27,7 @@ export const SupportWidget = () => {
                 size="lg"
                 className={cn(
                   "h-14 w-14 rounded-full shadow-lg transition-all hover:scale-110",
-                  "bg-primary hover:bg-primary-hover",
+                  "bg-success hover:bg-success/90",
                   hasUnreadMessages && "animate-pulse"
                 )}
               >
