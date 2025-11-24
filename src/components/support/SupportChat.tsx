@@ -46,7 +46,7 @@ export const SupportChat = () => {
   };
 
   return (
-    <div className="fixed bottom-24 right-6 z-50 flex h-[600px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
+    <div className="fixed bottom-20 right-6 z-50 flex h-[600px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
         <Avatar className="h-10 w-10 border-2 border-white/30">
@@ -69,10 +69,17 @@ export const SupportChat = () => {
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="mb-4 text-4xl">👋</div>
-            <h4 className="font-semibold text-foreground mb-2">
-              Olá! Como posso ajudar?
-            </h4>
+            <Avatar className="h-16 w-16 mb-4 border-2 border-primary/20">
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
+                <Bot className="h-8 w-8" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex items-center gap-2 mb-3">
+              <h4 className="font-semibold text-foreground text-lg">Smart</h4>
+              <span className="px-2 py-0.5 text-[10px] font-bold bg-primary/10 text-primary rounded">
+                IA
+              </span>
+            </div>
             <p className="text-sm text-muted-foreground mb-4">
               Estou aqui para responder suas dúvidas sobre o CompSmart
             </p>
