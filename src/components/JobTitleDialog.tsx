@@ -112,6 +112,10 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
 
   const fetchSalaryRange = async () => {
     try {
+      // Normalizar grade para formato de 3 dígitos com zeros à esquerda
+      // Ex: "3" → "003", "12" → "012", "555" → "555"
+      const normalizedGrade = formData.grade.trim().padStart(3, '0');
+      
       const { data, error } = await supabase
         .from("salary_ranges")
         .select(`
@@ -119,7 +123,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
           max_value,
           salary_tables!inner(is_active)
         `)
-        .eq("grade", formData.grade)
+        .eq("grade", normalizedGrade)
         .eq("salary_tables.is_active", true)
         .maybeSingle();
 
