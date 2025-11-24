@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck, Archive } from 'lucide-react';
+import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck, Archive, ArrowDown } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
@@ -57,7 +58,10 @@ const LegalAssistant = () => {
   const [documentText, setDocumentText] = useState('');
   const [documentName, setDocumentName] = useState('');
   const [charCount, setCharCount] = useState(0);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const { toast } = useToast();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const {
     sessions,
@@ -82,6 +86,25 @@ const LegalAssistant = () => {
       loadSessionConversations();
     }
   }, [currentSessionId]);
+
+  // Auto-scroll para última mensagem
+  useEffect(() => {
+    if (conversations.length > 0 && !loading) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [conversations, loading]);
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const element = event.currentTarget;
+    const isNearBottom = element.scrollHeight - element.scrollTop - element.clientHeight < 100;
+    setShowScrollButton(!isNearBottom && conversations.length > 2);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const loadSessionConversations = async () => {
     if (!currentSessionId) return;
@@ -298,11 +321,33 @@ const LegalAssistant = () => {
                 <CardHeader>
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <ScrollArea className="max-h-[600px]">
+                <CardContent className="relative">
+                  <ScrollArea 
+                    className="max-h-[600px]" 
+                    ref={scrollAreaRef}
+                    onScrollCapture={handleScroll}
+                  >
                     <div className="space-y-4 pr-4">
-                      {conversations.map((conv) => (
-                        <div key={conv.id} className="space-y-2">
+                      {loading && conversations.length > 0 && (
+                        <div className="space-y-2 animate-fade-in">
+                          <div className="bg-primary/10 p-3 rounded-lg">
+                            <Skeleton className="h-4 w-20 mb-2" />
+                            <Skeleton className="h-12 w-full" />
+                          </div>
+                          <div className="bg-muted p-3 rounded-lg">
+                            <Skeleton className="h-4 w-16 mb-2" />
+                            <div className="flex items-center gap-2">
+                              <span className="animate-pulse text-xs">●</span>
+                              <span className="animate-pulse text-xs" style={{ animationDelay: '0.2s' }}>●</span>
+                              <span className="animate-pulse text-xs" style={{ animationDelay: '0.4s' }}>●</span>
+                              <span className="text-xs text-muted-foreground ml-2">Smart está analisando...</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {conversations.map((conv, index) => (
+                        <div key={conv.id} className="space-y-2 animate-fade-in">
                           <div className="bg-primary/10 p-3 rounded-lg">
                             <p className="text-xs font-medium text-muted-foreground mb-1">Você:</p>
                             <p className="text-sm">{conv.question}</p>
@@ -313,12 +358,19 @@ const LegalAssistant = () => {
                               </div>
                             )}
                           </div>
-                          <div className="bg-muted p-3 rounded-lg">
+                          <div className="bg-muted p-3 rounded-lg relative">
+                            {index === conversations.length - 1 && !loading && (
+                              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full animate-pulse shadow-lg">
+                                Nova
+                              </span>
+                            )}
                             <p className="text-xs font-medium text-muted-foreground mb-1">Smart:</p>
                             <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
-                            <p className="text-xs text-muted-foreground mt-2 italic">
-                              💡 Role para ver o documento completo
-                            </p>
+                            {conv.answer.length > 500 && (
+                              <p className="text-xs text-muted-foreground mt-2 italic">
+                                💡 Role para ver o documento completo
+                              </p>
+                            )}
                             {conv.legal_references && (
                               <div className="mt-2 pt-2 border-t">
                                 <p className="text-xs font-medium text-muted-foreground">
@@ -329,8 +381,21 @@ const LegalAssistant = () => {
                           </div>
                         </div>
                       ))}
+                      <div ref={messagesEndRef} />
                     </div>
                   </ScrollArea>
+                  
+                  {showScrollButton && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="absolute bottom-4 right-8 shadow-lg animate-fade-in z-10"
+                      onClick={scrollToBottom}
+                    >
+                      <ArrowDown className="h-4 w-4 mr-2" />
+                      Última mensagem
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -356,12 +421,17 @@ const LegalAssistant = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Textarea
-                    placeholder="Digite sua dúvida sobre legislação trabalhista ou previdenciária...&#10;&#10;Exemplos:&#10;- Qual o prazo para pagamento de férias?&#10;- Como funciona o aviso prévio indenizado?&#10;&#10;Modos especiais:&#10;/validar_politica - Validar políticas e contratos&#10;/interpretar_lei - Explicar artigos da lei&#10;/compliance_check - Verificar conformidade"
+                    placeholder={
+                      conversations.length === 0 
+                        ? "Digite sua dúvida sobre legislação trabalhista ou previdenciária...\n\nExemplos:\n- Qual o prazo para pagamento de férias?\n- Como funciona o aviso prévio indenizado?\n\nModos especiais:\n/validar_politica - Validar políticas e contratos\n/interpretar_lei - Explicar artigos da lei\n/compliance_check - Verificar conformidade"
+                        : "Digite sua próxima pergunta sobre legislação trabalhista ou previdenciária..."
+                    }
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     rows={12}
                     className="resize-none"
                     maxLength={maxChars}
+                    disabled={loading}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>
@@ -374,15 +444,22 @@ const LegalAssistant = () => {
                     )}
                   </div>
                 </div>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={loading || !question.trim()}
-                  className="w-full"
-                  size="lg"
-                >
-                  <Send className="w-4 h-4 mr-2" />
-                  {loading ? 'Processando...' : uploadedFile ? 'Analisar Documento' : 'Enviar Consulta'}
-                </Button>
+                <div className="relative group">
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={loading || !question.trim()}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    {loading ? 'Processando...' : uploadedFile ? 'Analisar Documento' : 'Enviar Consulta'}
+                  </Button>
+                  {!question.trim() && !loading && (
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-popover text-popover-foreground text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap">
+                      Digite uma pergunta para enviar
+                    </span>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </div>
