@@ -3,7 +3,7 @@ import { Send, ThumbsUp, ThumbsDown, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useSupport } from "@/hooks/useSupport";
 import { QuickActionsPanel } from "./QuickActionsPanel";
 import ReactMarkdown from "react-markdown";
@@ -50,6 +50,7 @@ export const SupportChat = () => {
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
         <Avatar className="h-10 w-10 border-2 border-white/30">
+          <AvatarImage src="" />
           <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
             <Bot className="h-5 w-5" />
           </AvatarFallback>
@@ -70,6 +71,7 @@ export const SupportChat = () => {
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <Avatar className="h-16 w-16 mb-4 border-2 border-primary/20">
+              <AvatarImage src="" />
               <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
                 <Bot className="h-8 w-8" />
               </AvatarFallback>
@@ -102,6 +104,7 @@ export const SupportChat = () => {
               >
                 {message.role === "assistant" && (
                   <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                    <AvatarImage src="" />
                     <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
                       <Bot className="h-4 w-4" />
                     </AvatarFallback>
@@ -149,6 +152,7 @@ export const SupportChat = () => {
             {isLoading && (
               <div className="flex justify-start items-start gap-2">
                 <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                  <AvatarImage src="" />
                   <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
                     <Bot className="h-4 w-4" />
                   </AvatarFallback>
