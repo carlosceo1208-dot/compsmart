@@ -1641,6 +1641,72 @@ export type Database = {
         }
         Relationships: []
       }
+      support_conversations: {
+        Row: {
+          answer: string
+          created_at: string | null
+          feedback_comment: string | null
+          helpful: boolean | null
+          id: string
+          page_context: string | null
+          question: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string | null
+          feedback_comment?: string | null
+          helpful?: boolean | null
+          id?: string
+          page_context?: string | null
+          question: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string | null
+          feedback_comment?: string | null
+          helpful?: boolean | null
+          id?: string
+          page_context?: string | null
+          question?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_quick_actions: {
+        Row: {
+          clicks_count: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          page_path: string
+          priority: number | null
+          question_text: string
+        }
+        Insert: {
+          clicks_count?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          page_path: string
+          priority?: number | null
+          question_text: string
+        }
+        Update: {
+          clicks_count?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          page_path?: string
+          priority?: number | null
+          question_text?: string
+        }
+        Relationships: []
+      }
       survey_data: {
         Row: {
           calculation_mode: Database["public"]["Enums"]["calculation_mode"]
