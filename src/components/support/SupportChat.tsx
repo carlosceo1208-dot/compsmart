@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, ThumbsUp, ThumbsDown, Loader2 } from "lucide-react";
+import { Send, ThumbsUp, ThumbsDown, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useSupport } from "@/hooks/useSupport";
 import { QuickActionsPanel } from "./QuickActionsPanel";
 import ReactMarkdown from "react-markdown";
@@ -48,11 +49,18 @@ export const SupportChat = () => {
     <div className="fixed bottom-24 right-6 z-50 flex h-[600px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
-          <span className="text-xl">💬</span>
-        </div>
+        <Avatar className="h-10 w-10 border-2 border-white/30">
+          <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
+            <Bot className="h-5 w-5" />
+          </AvatarFallback>
+        </Avatar>
         <div className="flex-1">
-          <h3 className="font-semibold text-white">CompSmart Helper</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-white">Smart</h3>
+            <span className="px-1.5 py-0.5 text-[10px] font-bold bg-white/20 rounded">
+              IA
+            </span>
+          </div>
           <p className="text-xs text-white/80">Assistente de Suporte</p>
         </div>
       </div>
@@ -81,10 +89,17 @@ export const SupportChat = () => {
               <div
                 key={index}
                 className={cn(
-                  "flex",
-                  message.role === "user" ? "justify-end" : "justify-start"
+                  "flex gap-2",
+                  message.role === "user" ? "justify-end" : "justify-start items-start"
                 )}
               >
+                {message.role === "assistant" && (
+                  <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
+                      <Bot className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                )}
                 <div
                   className={cn(
                     "max-w-[80%] rounded-lg px-4 py-2",
@@ -125,7 +140,12 @@ export const SupportChat = () => {
             ))}
             
             {isLoading && (
-              <div className="flex justify-start">
+              <div className="flex justify-start items-start gap-2">
+                <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
+                    <Bot className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-sm text-muted-foreground">Pensando...</span>
