@@ -83,21 +83,21 @@ export const ModuleCard = ({
             </div>
           </div>
         )}
-        <CardHeader className="space-y-3">
+        <CardHeader className="space-y-2">
           <div className="flex items-start justify-between">
             <div className={`
-              w-14 h-14 bg-primary/15 rounded-xl flex items-center justify-center shadow-md
+              w-12 h-12 bg-primary/15 rounded-xl flex items-center justify-center shadow-md
               transition-all duration-300
               ${isClickable ? "group-hover:scale-110 group-hover:shadow-primary" : ""}
             `}>
-              <Icon className="w-7 h-7 text-primary" />
+              <Icon className="w-6 h-6 text-primary" />
             </div>
             {statusBadges[status]}
           </div>
-          <CardTitle className="text-base sm:text-lg leading-tight font-bold line-clamp-2">{title}</CardTitle>
+          <CardTitle className="text-sm sm:text-base leading-tight font-bold line-clamp-2">{title}</CardTitle>
         </CardHeader>
-        <CardContent>
-          <CardDescription className="text-sm leading-relaxed">
+        <CardContent className="pt-0">
+          <CardDescription className="text-xs leading-relaxed">
             {description}
           </CardDescription>
         </CardContent>
