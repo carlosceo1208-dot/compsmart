@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck } from 'lucide-react';
+import { Scale, Send, AlertCircle, History, FileText, Gavel, BookOpen, ShieldCheck, Archive } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
+import { useLegalSessions } from '@/hooks/useLegalSessions';
+import { cn } from '@/lib/utils';
 
 interface Conversation {
   id: string;
@@ -57,26 +59,34 @@ const LegalAssistant = () => {
   const [charCount, setCharCount] = useState(0);
   const { toast } = useToast();
 
-  const maxChars = 50000;
+  const {
+    sessions,
+    currentSessionId,
+    setCurrentSessionId,
+    showArchived,
+    setShowArchived,
+    createNewSession,
+    archiveSession,
+    fetchSessionConversations,
+    refreshSessions,
+  } = useLegalSessions();
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+  const maxChars = 50000;
 
   useEffect(() => {
     setCharCount(question.length + documentText.length);
   }, [question, documentText]);
 
-  const fetchConversations = async () => {
-    const { data } = await supabase
-      .from('legal_assistant_conversations')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    if (data) {
-      setConversations(data);
+  useEffect(() => {
+    if (currentSessionId) {
+      loadSessionConversations();
     }
+  }, [currentSessionId]);
+
+  const loadSessionConversations = async () => {
+    if (!currentSessionId) return;
+    const data = await fetchSessionConversations(currentSessionId);
+    setConversations(data);
   };
 
   const handleFileSelect = (file: File, text: string) => {
@@ -98,6 +108,13 @@ const LegalAssistant = () => {
   const handleSubmit = async () => {
     if (!question.trim()) return;
 
+    // Criar sessão automaticamente se não existir
+    let sessionId = currentSessionId;
+    if (!sessionId) {
+      sessionId = await createNewSession();
+      if (!sessionId) return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('legal-assistant', {
@@ -105,6 +122,7 @@ const LegalAssistant = () => {
           question,
           document_text: documentText || undefined,
           document_name: documentName || undefined,
+          session_id: sessionId,
         },
       });
 
@@ -126,7 +144,8 @@ const LegalAssistant = () => {
 
       setQuestion('');
       handleFileRemove();
-      fetchConversations();
+      await loadSessionConversations();
+      refreshSessions();
     } catch (error: any) {
       toast({
         title: 'Erro ao processar consulta',
@@ -178,39 +197,70 @@ const LegalAssistant = () => {
 
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <History className="w-5 h-5" />
-                Histórico
+                Sessões
               </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowArchived(!showArchived)}
+                >
+                  {showArchived ? 'Ativas' : 'Arquivadas'}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={createNewSession}
+                >
+                  + Nova
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[600px]">
                 <div className="space-y-2">
-                  {conversations.length === 0 ? (
+                  {sessions.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">
-                      Nenhuma consulta ainda
+                      {showArchived ? 'Nenhuma sessão arquivada' : 'Nenhuma sessão ativa'}
                     </p>
                   ) : (
-                    conversations.map((conv) => (
+                    sessions.map((session) => (
                       <Card
-                        key={conv.id}
-                        className="p-3 cursor-pointer hover:bg-accent transition-colors"
+                        key={session.id}
+                        className={cn(
+                          "p-3 cursor-pointer transition-colors",
+                          currentSessionId === session.id 
+                            ? "border-primary bg-accent" 
+                            : "hover:bg-accent"
+                        )}
+                        onClick={() => setCurrentSessionId(session.id)}
                       >
-                        <p className="text-sm font-medium line-clamp-2">
-                          {conv.question}
-                        </p>
-                        {conv.document_name && (
-                          <div className="flex items-center gap-1 mt-1">
-                            <FileText className="w-3 h-3 text-muted-foreground" />
-                            <p className="text-xs text-muted-foreground truncate">
-                              {conv.document_name}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium line-clamp-1">
+                              {session.title || 'Sem título'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {session.message_count} mensagens
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(session.last_message_at).toLocaleDateString('pt-BR')}
                             </p>
                           </div>
-                        )}
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(conv.created_at).toLocaleDateString('pt-BR')}
-                        </p>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              archiveSession(session.id);
+                            }}
+                            className="shrink-0 h-8 w-8 p-0"
+                          >
+                            <Archive className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </Card>
                     ))
                   )}
@@ -233,26 +283,41 @@ const LegalAssistant = () => {
               </CardContent>
             </Card>
 
-            {conversations.length > 0 && (
+            {currentSessionId && conversations.length > 0 && (
               <Card className="bg-accent/30 border-accent">
-                <CardContent className="p-4">
-                  <p className="text-sm font-medium mb-2">Última Consulta:</p>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {conversations[0].question}
-                  </p>
-                  <p className="text-sm font-medium mb-2">Resposta:</p>
-                  <ScrollArea className="max-h-[200px]">
-                    <p className="text-sm whitespace-pre-wrap pr-4">
-                      {conversations[0].answer}
-                    </p>
-                  </ScrollArea>
-                  {conversations[0].legal_references && (
-                    <div className="mt-3 pt-3 border-t">
-                      <p className="text-xs font-medium text-muted-foreground">
-                        Referências Legais
-                      </p>
+                <CardHeader>
+                  <CardTitle className="text-lg">Conversa Atual</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="max-h-[400px]">
+                    <div className="space-y-4 pr-4">
+                      {conversations.map((conv) => (
+                        <div key={conv.id} className="space-y-2">
+                          <div className="bg-primary/10 p-3 rounded-lg">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Você:</p>
+                            <p className="text-sm">{conv.question}</p>
+                            {conv.document_name && (
+                              <div className="flex items-center gap-1 mt-2">
+                                <FileText className="w-3 h-3 text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">{conv.document_name}</p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-muted p-3 rounded-lg">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Smart:</p>
+                            <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
+                            {conv.legal_references && (
+                              <div className="mt-2 pt-2 border-t">
+                                <p className="text-xs font-medium text-muted-foreground">
+                                  Referências Legais
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  )}
+                  </ScrollArea>
                 </CardContent>
               </Card>
             )}

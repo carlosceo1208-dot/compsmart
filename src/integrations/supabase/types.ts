@@ -637,6 +637,50 @@ export type Database = {
         }
         Relationships: []
       }
+      conversation_sessions: {
+        Row: {
+          agent_type: string
+          created_at: string | null
+          id: string
+          is_archived: boolean | null
+          last_message_at: string | null
+          message_count: number | null
+          root_company_id: string | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          agent_type: string
+          created_at?: string | null
+          id?: string
+          is_archived?: boolean | null
+          last_message_at?: string | null
+          message_count?: number | null
+          root_company_id?: string | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          agent_type?: string
+          created_at?: string | null
+          id?: string
+          is_archived?: boolean | null
+          last_message_at?: string | null
+          message_count?: number | null
+          root_company_id?: string | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_sessions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_benefits: {
         Row: {
           benefit_id: string
@@ -1193,6 +1237,7 @@ export type Database = {
           operation_mode: string | null
           question: string
           response_time_ms: number | null
+          session_id: string | null
           tokens_used: number | null
           user_id: string
         }
@@ -1206,6 +1251,7 @@ export type Database = {
           operation_mode?: string | null
           question: string
           response_time_ms?: number | null
+          session_id?: string | null
           tokens_used?: number | null
           user_id: string
         }
@@ -1219,10 +1265,19 @@ export type Database = {
           operation_mode?: string | null
           question?: string
           response_time_ms?: number | null
+          session_id?: string | null
           tokens_used?: number | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "legal_assistant_conversations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organizational_structure: {
         Row: {
