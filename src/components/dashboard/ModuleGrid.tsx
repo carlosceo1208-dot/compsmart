@@ -135,6 +135,14 @@ export const ModuleGrid = ({ maxVisible = 12 }: ModuleGridProps) => {
       category: 'management' as const,
     },
     {
+      title: 'Agente de Análise Salarial',
+      description: 'IA para estruturas, faixas e benchmarking salarial',
+      icon: TrendingUp,
+      path: '/salary-assistant',
+      status: 'active' as const,
+      category: 'consultation' as const,
+    },
+    {
       title: 'Assistente de R&B',
       description: 'Consultas sobre Remuneração e Benefícios com IA',
       icon: Bot,

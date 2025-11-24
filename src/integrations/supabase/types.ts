@@ -1611,6 +1611,53 @@ export type Database = {
           },
         ]
       }
+      salary_assistant_conversations: {
+        Row: {
+          answer: string
+          context_data: Json | null
+          created_at: string | null
+          document_name: string | null
+          id: string
+          operation_mode: string | null
+          question: string
+          response_time_ms: number | null
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          context_data?: Json | null
+          created_at?: string | null
+          document_name?: string | null
+          id?: string
+          operation_mode?: string | null
+          question: string
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          context_data?: Json | null
+          created_at?: string | null
+          document_name?: string | null
+          id?: string
+          operation_mode?: string | null
+          question?: string
+          response_time_ms?: number | null
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salary_assistant_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salary_ranges: {
         Row: {
           calculation_mode: Database["public"]["Enums"]["calculation_mode"]

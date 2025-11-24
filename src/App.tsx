@@ -23,6 +23,7 @@ import SalaryComparison from "./pages/SalaryComparison";
 import JobTitles from "./pages/JobTitles";
 import PeopleAnalytics from "./pages/PeopleAnalytics";
 import LegalAssistant from "./pages/LegalAssistant";
+import SalaryAssistant from "./pages/SalaryAssistant";
 import IncentiveAssistant from "./pages/IncentiveAssistant";
 import IncentivePrograms from "./pages/IncentivePrograms";
 import Pricing from "./pages/Pricing";
@@ -67,6 +68,7 @@ const App = () => (
               <Route path="/job-titles" element={<JobTitles />} />
               <Route path="/people-analytics" element={<PeopleAnalytics />} />
               <Route path="/legal-assistant" element={<LegalAssistant />} />
+              <Route path="/salary-assistant" element={<SalaryAssistant />} />
               <Route path="/incentive-assistant" element={<IncentiveAssistant />} />
               <Route path="/incentive-programs" element={<IncentivePrograms />} />
               <Route path="/pricing" element={<Pricing />} />
