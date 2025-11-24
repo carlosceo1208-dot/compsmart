@@ -5,6 +5,7 @@ import { ModuleGrid } from "@/components/dashboard/ModuleGrid";
 import { DateTimeDisplay } from "@/components/dashboard/DateTimeDisplay";
 import { ExportCard } from "@/components/dashboard/ExportCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
+import compsmartLogo from "@/assets/compsmart-logo.png";
 
 const Dashboard = () => {
   const { currency, setCurrency } = useCurrencyConverter();
@@ -15,13 +16,23 @@ const Dashboard = () => {
         {/* Coluna Esquerda: KPIs */}
         <div className="space-y-4">
           <div className="rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-6 md:p-8 border-2 border-primary/30 shadow-primary">
-            <div className="flex flex-col sm:flex-row items-start sm:items-start justify-between gap-3 sm:gap-4">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">CompSmart</h1>
-                <p className="text-xs sm:text-sm text-white/90 font-medium">
-                  Dashboard Executivo
-                </p>
+            <div className="flex items-center justify-between gap-4">
+              {/* Logo + Título */}
+              <div className="flex items-center gap-3 md:gap-4">
+                <img 
+                  src={compsmartLogo} 
+                  alt="CompSmart Logo" 
+                  className="w-12 h-12 md:w-16 md:h-16 object-contain"
+                />
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white">CompSmart</h1>
+                  <p className="text-xs sm:text-sm text-white/90 font-medium">
+                    Dashboard Executivo
+                  </p>
+                </div>
               </div>
+              
+              {/* Data/Hora - sempre à direita */}
               <DateTimeDisplay />
             </div>
           </div>
