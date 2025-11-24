@@ -129,11 +129,21 @@ const LegalAssistant = () => {
       if (error) throw error;
 
       if (data.error) {
-        toast({
-          title: 'Erro',
-          description: data.error,
-          variant: 'destructive',
-        });
+        // Tratamento específico para erro 503
+        if (data.error.includes('temporariamente indisponível') || data.error.includes('503')) {
+          toast({
+            title: '⏳ Serviço Temporariamente Indisponível',
+            description: 'O assistente está processando muitas requisições. Tente novamente em 10-20 segundos.',
+            variant: 'destructive',
+            duration: 6000,
+          });
+        } else {
+          toast({
+            title: 'Erro',
+            description: data.error,
+            variant: 'destructive',
+          });
+        }
         return;
       }
 

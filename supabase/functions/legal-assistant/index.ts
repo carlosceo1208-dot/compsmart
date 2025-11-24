@@ -433,6 +433,33 @@ ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('AI API Error:', aiResponse.status, errorText);
+      
+      // Tratamento específico para erro 503 (Service Unavailable)
+      if (aiResponse.status === 503) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'O serviço de IA está temporariamente indisponível. Por favor, tente novamente em alguns instantes.' 
+          }),
+          { 
+            status: 503,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
+      // Tratamento para erro 429 (Rate Limit)
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Limite de requisições atingido. Por favor, aguarde alguns momentos e tente novamente.' 
+          }),
+          { 
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+      
       throw new Error(`AI API error: ${aiResponse.status}`);
     }
 
