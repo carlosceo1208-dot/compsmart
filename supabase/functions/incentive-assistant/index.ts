@@ -35,10 +35,24 @@ serve(async (req) => {
       throw new Error('Invalid user token');
     }
 
-    const { question, document_text, document_name } = await req.json();
+    const { question, document_text, document_name, session_id } = await req.json();
 
     if (!question) {
       throw new Error('Question is required');
+    }
+
+    // ============ BUSCAR HISTÓRICO DA SESSÃO ============
+    let conversationHistory: any[] = [];
+
+    if (session_id) {
+      const { data: historyData } = await supabase
+        .from('incentive_assistant_conversations')
+        .select('question, answer')
+        .eq('session_id', session_id)
+        .order('created_at', { ascending: true })
+        .limit(8);
+
+      conversationHistory = historyData || [];
     }
 
     const startTime = Date.now();

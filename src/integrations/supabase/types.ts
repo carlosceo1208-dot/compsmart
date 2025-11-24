@@ -827,6 +827,7 @@ export type Database = {
           operation_mode: string | null
           question: string
           response_time_ms: number | null
+          session_id: string | null
           tokens_used: number | null
           user_id: string
         }
@@ -840,6 +841,7 @@ export type Database = {
           operation_mode?: string | null
           question: string
           response_time_ms?: number | null
+          session_id?: string | null
           tokens_used?: number | null
           user_id: string
         }
@@ -853,10 +855,19 @@ export type Database = {
           operation_mode?: string | null
           question?: string
           response_time_ms?: number | null
+          session_id?: string | null
           tokens_used?: number | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "incentive_assistant_conversations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       incentive_eligibility: {
         Row: {
@@ -1621,6 +1632,7 @@ export type Database = {
           operation_mode: string | null
           question: string
           response_time_ms: number | null
+          session_id: string | null
           tokens_used: number | null
           user_id: string
         }
@@ -1633,6 +1645,7 @@ export type Database = {
           operation_mode?: string | null
           question: string
           response_time_ms?: number | null
+          session_id?: string | null
           tokens_used?: number | null
           user_id: string
         }
@@ -1645,10 +1658,18 @@ export type Database = {
           operation_mode?: string | null
           question?: string
           response_time_ms?: number | null
+          session_id?: string | null
           tokens_used?: number | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "salary_assistant_conversations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_sessions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "salary_assistant_conversations_user_id_fkey"
             columns: ["user_id"]

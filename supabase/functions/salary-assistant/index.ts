@@ -35,7 +35,7 @@ serve(async (req) => {
       throw new Error('Usuário não autenticado');
     }
 
-    const { question, document_text, document_name } = await req.json();
+    const { question, document_text, document_name, session_id } = await req.json();
 
     // Buscar perfil do usuário e dados da empresa
     const { data: profile } = await supabase
@@ -238,6 +238,20 @@ ${operationMode === 'recomendacao_ajuste' ? `
 ${document_text ? `\n**📄 DOCUMENTO ANEXADO: ${document_name}\nAnalise o documento fornecido para complementar sua resposta.` : ''}
 
 Responda de forma clara, estruturada e sempre baseada nos dados fornecidos.`;
+
+    // ============ BUSCAR HISTÓRICO DA SESSÃO ============
+    let conversationHistory: any[] = [];
+
+    if (session_id) {
+      const { data: historyData } = await supabase
+        .from('salary_assistant_conversations')
+        .select('question, answer')
+        .eq('session_id', session_id)
+        .order('created_at', { ascending: true })
+        .limit(8);
+
+      conversationHistory = historyData || [];
+    }
 
     const startTime = Date.now();
 
