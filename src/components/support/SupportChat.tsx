@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Send, ThumbsUp, ThumbsDown, Loader2, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// Avatar replaced with custom divs for better rendering
 import { useSupport } from "@/hooks/useSupport";
 import { QuickActionsPanel } from "./QuickActionsPanel";
 import ReactMarkdown from "react-markdown";
@@ -45,15 +45,12 @@ export const SupportChat = () => {
   };
 
   return (
-    <div className="fixed bottom-20 right-6 z-50 flex h-[650px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
+    <div className="fixed bottom-20 right-6 z-50 flex h-[600px] w-[380px] flex-col rounded-lg border border-border bg-background shadow-2xl">
       {/* Header */}
       <div className="flex items-center gap-3 border-b border-border bg-success px-4 py-3 rounded-t-lg">
-        <Avatar className="h-10 w-10 border-2 border-white/30">
-          <AvatarImage src="" />
-          <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
-            <Bot className="h-5 w-5" />
-          </AvatarFallback>
-        </Avatar>
+        <div className="h-10 w-10 border-2 border-white/30 rounded-full bg-gradient-to-br from-primary to-primary/70 text-white flex items-center justify-center flex-shrink-0">
+          <Bot className="h-5 w-5" />
+        </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="font-semibold text-white">Smart</h3>
@@ -68,13 +65,10 @@ export const SupportChat = () => {
       {/* Messages */}
       <div className="flex-1 p-4 overflow-y-auto" ref={scrollRef}>
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-8">
-            <Avatar className="h-16 w-16 mb-4 border-2 border-primary/20">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
-                <Bot className="h-8 w-8" />
-              </AvatarFallback>
-            </Avatar>
+          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6">
+            <div className="h-16 w-16 mb-4 border-2 border-primary/20 rounded-full bg-gradient-to-br from-primary to-primary/70 text-white flex items-center justify-center flex-shrink-0">
+              <Bot className="h-8 w-8" />
+            </div>
             <div className="flex items-center gap-2 mb-3">
               <h4 className="font-semibold text-foreground text-lg">Smart</h4>
               <span className="px-2 py-0.5 text-[10px] font-bold bg-primary/10 text-primary rounded">
@@ -102,12 +96,9 @@ export const SupportChat = () => {
                 )}
               >
                 {message.role === "assistant" && (
-                  <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-                    <AvatarImage src="" />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
-                      <Bot className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="h-8 w-8 mt-1 flex-shrink-0 rounded-full bg-gradient-to-br from-primary to-primary/70 text-white flex items-center justify-center">
+                    <Bot className="h-4 w-4" />
+                  </div>
                 )}
                 <div
                   className={cn(
@@ -150,12 +141,9 @@ export const SupportChat = () => {
             
             {isLoading && (
               <div className="flex justify-start items-start gap-2">
-                <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-                  <AvatarImage src="" />
-                  <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-white">
-                    <Bot className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
+                <div className="h-8 w-8 mt-1 flex-shrink-0 rounded-full bg-gradient-to-br from-primary to-primary/70 text-white flex items-center justify-center">
+                  <Bot className="h-4 w-4" />
+                </div>
                 <div className="flex items-center gap-2 rounded-lg bg-muted px-4 py-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span className="text-sm text-muted-foreground">Pensando...</span>
