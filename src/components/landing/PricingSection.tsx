@@ -1,0 +1,150 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Check, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+export const PricingSection = () => {
+  const navigate = useNavigate();
+
+  const plans = [
+    {
+      name: "Start",
+      price: "Grátis",
+      period: "",
+      description: "Ideal para pequenas empresas começando a organizar remuneração",
+      features: [
+        "Até 20 funcionários",
+        "Estrutura básica de cargos",
+        "Dashboards essenciais",
+        "Suporte por email",
+        "1 usuário administrador"
+      ],
+      cta: "Começar Grátis",
+      highlighted: false
+    },
+    {
+      name: "Pro",
+      price: "R$ 199",
+      period: "/mês",
+      description: "Para empresas que querem crescer com inteligência e compliance",
+      badge: "Mais Popular",
+      features: [
+        "Até 500 funcionários",
+        "3 Agentes Smart com IA",
+        "Benchmark de mercado",
+        "Gestão de PLR e incentivos",
+        "Compliance automático",
+        "Relatórios avançados",
+        "Usuários ilimitados",
+        "Suporte prioritário"
+      ],
+      cta: "Começar Teste Grátis",
+      highlighted: true
+    },
+    {
+      name: "Enterprise",
+      price: "Sob consulta",
+      period: "",
+      description: "Solução completa para grandes empresas e consultorias especializadas",
+      features: [
+        "Funcionários ilimitados",
+        "Tudo do Pro incluído",
+        "Consultoria dedicada",
+        "Integrações customizadas",
+        "API e webhooks",
+        "SLA garantido",
+        "Treinamento personalizado",
+        "Gerente de conta"
+      ],
+      cta: "Falar com Vendas",
+      highlighted: false
+    }
+  ];
+
+  return (
+    <section id="pricing" className="py-20 bg-background">
+      <div className="container mx-auto px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+              Planos{" "}
+              <span className="bg-gradient-primary bg-clip-text text-transparent">
+                transparentes
+              </span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Escolha o plano ideal para o tamanho e necessidades da sua empresa. Sem custos ocultos.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {plans.map((plan, index) => (
+              <Card 
+                key={index} 
+                className={`relative flex flex-col ${
+                  plan.highlighted 
+                    ? 'border-2 border-primary shadow-2xl scale-105 md:scale-110 z-10' 
+                    : 'border-border'
+                }`}
+              >
+                {plan.badge && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-gradient-primary text-white px-4 py-1.5">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      {plan.badge}
+                    </Badge>
+                  </div>
+                )}
+
+                <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
+                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <CardDescription className="text-sm min-h-[48px]">
+                    {plan.description}
+                  </CardDescription>
+                  <div className="pt-4">
+                    <span className="text-4xl font-bold">{plan.price}</span>
+                    {plan.period && (
+                      <span className="text-muted-foreground ml-1">{plan.period}</span>
+                    )}
+                  </div>
+                </CardHeader>
+
+                <CardContent className="flex-grow">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+
+                <CardFooter>
+                  <Button 
+                    className={`w-full ${
+                      plan.highlighted 
+                        ? 'bg-gradient-primary hover:opacity-90' 
+                        : 'bg-secondary hover:bg-secondary/80'
+                    }`}
+                    size="lg"
+                    onClick={() => navigate("/auth")}
+                  >
+                    {plan.cta}
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-sm text-muted-foreground">
+              💳 Sem compromisso • 🔄 Cancele quando quiser • 🎯 Upgrade ou downgrade a qualquer momento
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
