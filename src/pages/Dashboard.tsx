@@ -4,6 +4,7 @@ import { AlphabeticalNav } from "@/components/dashboard/AlphabeticalNav";
 import { ModuleGrid } from "@/components/dashboard/ModuleGrid";
 import { DateTimeDisplay } from "@/components/dashboard/DateTimeDisplay";
 import { ExportCard } from "@/components/dashboard/ExportCard";
+import { OrganizationalIdentityCard } from "@/components/dashboard/OrganizationalIdentityCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
@@ -27,6 +28,8 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          
+          <OrganizationalIdentityCard />
           
           <KPIDashboard currency={currency} />
           

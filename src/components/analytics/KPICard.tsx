@@ -39,20 +39,20 @@ export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading
 
   return (
     <Card className={cn("hover:-translate-y-1 transition-all duration-300", variantStyles[variant], className)}>
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <p className="text-sm text-muted-foreground mb-2 font-medium">{title}</p>
             {isLoading ? (
-              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-8 w-32" />
             ) : (
-              <p className="text-3xl font-bold text-foreground">
+              <p className="text-2xl font-bold text-foreground">
                 {formatValue(value)}
               </p>
             )}
           </div>
-          <div className="p-3 bg-primary/15 rounded-xl shadow-md flex items-center justify-center">
-            <Icon className="h-6 w-6 text-primary" />
+          <div className="p-2 bg-primary/15 rounded-xl shadow-md flex items-center justify-center">
+            <Icon className="h-5 w-5 text-primary" />
           </div>
         </div>
       </CardContent>
