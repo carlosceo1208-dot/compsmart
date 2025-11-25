@@ -541,6 +541,53 @@ export type Database = {
           },
         ]
       }
+      company_identity: {
+        Row: {
+          annual_goal_description: string | null
+          annual_goal_year: number | null
+          created_at: string | null
+          id: string
+          is_visible: boolean | null
+          mission: string | null
+          root_company_id: string
+          updated_at: string | null
+          values: Json | null
+          vision: string | null
+        }
+        Insert: {
+          annual_goal_description?: string | null
+          annual_goal_year?: number | null
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          mission?: string | null
+          root_company_id: string
+          updated_at?: string | null
+          values?: Json | null
+          vision?: string | null
+        }
+        Update: {
+          annual_goal_description?: string | null
+          annual_goal_year?: number | null
+          created_at?: string | null
+          id?: string
+          is_visible?: boolean | null
+          mission?: string | null
+          root_company_id?: string
+          updated_at?: string | null
+          values?: Json | null
+          vision?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_identity_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: true
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_subscriptions: {
         Row: {
           annual_price: number
