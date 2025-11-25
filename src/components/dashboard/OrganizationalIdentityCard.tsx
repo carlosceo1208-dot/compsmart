@@ -98,7 +98,7 @@ export const OrganizationalIdentityCard = () => {
   };
 
   const handleAddValue = () => {
-    if (newValue.trim() && formData.values.length < 5) {
+    if (newValue.trim() && formData.values.length < 10) {
       setFormData({
         ...formData,
         values: [...formData.values, newValue.trim()]
@@ -228,7 +228,7 @@ export const OrganizationalIdentityCard = () => {
 
                 <div className="space-y-2">
                   <Label className="text-xs font-bold text-purple-900 uppercase tracking-wide">
-                    Valores (máximo 5)
+                    Valores (máximo 10)
                   </Label>
                   <div className="flex gap-2">
                     <Input
@@ -236,13 +236,13 @@ export const OrganizationalIdentityCard = () => {
                       onChange={(e) => setNewValue(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleAddValue()}
                       placeholder="Digite um valor e pressione Enter"
-                      disabled={formData.values.length >= 5}
+                      disabled={formData.values.length >= 10}
                       className="text-sm"
                     />
                     <Button 
                       size="sm"
                       onClick={handleAddValue} 
-                      disabled={!newValue.trim() || formData.values.length >= 5}
+                      disabled={!newValue.trim() || formData.values.length >= 10}
                     >
                       Add
                     </Button>
