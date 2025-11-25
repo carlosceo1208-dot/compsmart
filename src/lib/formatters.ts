@@ -250,3 +250,23 @@ export const formatCurrencyWithOptions = (
     maximumFractionDigits: safeDecimals,
   }).format(value);
 };
+
+/**
+ * Formata valor numérico como anos ou meses
+ * @param value - Valor em anos (decimal)
+ * @returns String formatada (ex: "2,5 anos" ou "8 meses")
+ */
+export const formatYears = (value: number | null | undefined): string => {
+  if (value === null || value === undefined || !isFinite(value)) return '0 anos';
+  
+  if (value < 1) {
+    const months = Math.round(value * 12);
+    return months === 1 ? '1 mês' : `${months} meses`;
+  }
+  
+  const formatted = value.toLocaleString('pt-BR', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  return value === 1 ? '1 ano' : `${formatted} anos`;
+};
