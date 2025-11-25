@@ -7,6 +7,7 @@ import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
 import { BenefitsCard } from './BenefitsCard';
 import { IncentivesCard } from './IncentivesCard';
 import { BudgetCard } from './BudgetCard';
+import { HRMetricsCard } from './HRMetricsCard';
 
 interface KPIDashboardProps {
   currency: Currency;
@@ -86,6 +87,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
       <BenefitsCard currency={currency} />
       <IncentivesCard currency={currency} />
       <BudgetCard currency={currency} />
+      <HRMetricsCard />
     </div>
   );
 };
