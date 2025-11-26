@@ -32,8 +32,8 @@ export const HeroSection = () => {
           </div>
 
           {/* Headline - Animated Entry with Gradient Shift */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-            Gestão de Remuneração{" "}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+            Gestão Inteligente em Remuneração{" "}
             <span 
               className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-gradient-shift"
               style={{ 
@@ -41,14 +41,13 @@ export const HeroSection = () => {
                 willChange: "background-position"
               }}
             >
-              Estratégica com IA
+              para decisões mais rápidas, justas e estratégicas.
             </span>
           </h1>
 
           {/* Subtitle - Animated Entry */}
-          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            Monte estruturas salariais, benefícios, PLR e fique em compliance — tudo em um só lugar.
-            Uma plataforma completa que atende empresas de todos os portes — de startups a grandes corporações.
+          <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+            Estruture salários, Programas de Incentivos, Benefícios, PLR e todo o orçamento de pessoas com precisão e inteligência. Uma plataforma completa que leva empresas de qualquer porte — de startups a grandes corporações — a uma gestão de remuneração verdadeiramente estratégica e em total compliance com a legislação vigente.
           </p>
 
           {/* CTAs - Animated Entry with Enhanced Hover Effects */}
