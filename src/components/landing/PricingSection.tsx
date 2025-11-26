@@ -156,7 +156,24 @@ export const PricingSection = () => {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-12 text-center space-y-4">
+            {/* Diferenciais e Integrações */}
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2">
+                🏢 <strong>Ideal para PMEs e Grandes Empresas</strong>
+              </span>
+              <span className="flex items-center gap-2">
+                🧩 <strong>Integração com Google Workspace e outros</strong>
+              </span>
+              <span className="flex items-center gap-2">
+                🔁 <strong>Evolução Contínua do Produto</strong>
+              </span>
+              <span className="flex items-center gap-2">
+                🤝 <strong>Suporte Consultivo</strong>
+              </span>
+            </div>
+
+            {/* Garantias */}
             <p className="text-sm text-muted-foreground">
               💳 Sem compromisso • 🔄 Cancele quando quiser • 🎯 Upgrade ou downgrade a qualquer momento
             </p>

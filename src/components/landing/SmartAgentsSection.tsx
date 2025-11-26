@@ -95,10 +95,21 @@ export const SmartAgentsSection = () => {
             ))}
           </div>
 
-          <div className="mt-12 text-center">
-            <p className="text-sm text-muted-foreground">
-              ✨ Powered by <strong>Lovable AI</strong> • 🔒 Dados protegidos e criptografados • 🇧🇷 Otimizado para legislação brasileira
-            </p>
+          <div className="mt-12 text-center space-y-4">
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2">
+                🔒 <strong>Segurança Corporativa</strong>
+              </span>
+              <span className="flex items-center gap-2">
+                🔐 <strong>Criptografia Ponta a Ponta</strong>
+              </span>
+              <span className="flex items-center gap-2">
+                📜 <strong>Totalmente em Conformidade com a LGPD</strong>
+              </span>
+              <span className="flex items-center gap-2">
+                🇧🇷 <strong>Otimizado para a Legislação Brasileira</strong>
+              </span>
+            </div>
           </div>
         </div>
       </div>
