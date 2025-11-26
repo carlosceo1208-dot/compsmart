@@ -22,7 +22,7 @@ export const Header = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <img src={compsmartLogo} alt="CompSmart" className="h-8 md:h-10 w-auto object-contain" />
+            <img src={compsmartLogo} alt="CompSmart" className="h-12 md:h-16 w-auto object-contain hover:scale-105 transition-transform" />
           </div>
 
           {/* Desktop Navigation */}

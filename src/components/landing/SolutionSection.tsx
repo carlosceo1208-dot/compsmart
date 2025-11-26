@@ -15,23 +15,23 @@ export const SolutionSection = () => {
     },
     {
       icon: CheckCircle2,
-      title: "Gestão de PLR e Incentivos",
-      description: "Configure programas de ICP, ILP, bônus e comissões com regras claras e automáticas"
-    },
-    {
-      icon: Shield,
-      title: "Compliance Automático",
-      description: "Agente jurídico integrado verifica conformidade trabalhista e previdenciária"
-    },
-    {
-      icon: FileText,
-      title: "Dashboards Inteligentes",
-      description: "Visualize KPIs, análises e tendências em tempo real com relatórios prontos"
+      title: "Simulações de Política Salarial",
+      description: "Ajuste automaticamente toda a tabela para manter percentuais ideais de salários dentro do range"
     },
     {
       icon: Zap,
-      title: "Automação Completa",
-      description: "Elimine planilhas e processos manuais com workflows inteligentes"
+      title: "Modelagem Preditiva",
+      description: "Previsão de custo de folha para 12-36 meses com projeções automáticas de crescimento"
+    },
+    {
+      icon: Shield,
+      title: "Dashboard de Riscos Trabalhistas",
+      description: "Fusão entre remuneração e compliance jurídico — diferencial único no mercado"
+    },
+    {
+      icon: FileText,
+      title: "Análise de Equidade Interna",
+      description: "Comparações detalhadas por área, nível hierárquico, faixa salarial e gênero"
     }
   ];
 

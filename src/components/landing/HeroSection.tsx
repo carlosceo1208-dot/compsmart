@@ -29,14 +29,6 @@ export const HeroSection = () => {
               <Sparkles className="h-4 w-4" />
               Lançamento Janeiro 2026
             </Badge>
-            <Badge variant="secondary" className="px-4 py-1.5 text-sm flex items-center gap-1 shadow-md">
-              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-              <span className="ml-1">Desenvolvido para PMEs</span>
-            </Badge>
           </div>
 
           {/* Headline - Animated Entry with Gradient Shift */}
@@ -56,7 +48,7 @@ export const HeroSection = () => {
           {/* Subtitle - Animated Entry */}
           <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             Monte estruturas salariais, benefícios, PLR e fique em compliance — tudo em um só lugar.
-            Desenvolvido para pequenas e médias empresas brasileiras.
+            Uma plataforma completa que atende empresas de todos os portes — de startups a grandes corporações.
           </p>
 
           {/* CTAs - Animated Entry with Enhanced Hover Effects */}

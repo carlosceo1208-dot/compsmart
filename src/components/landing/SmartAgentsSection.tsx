@@ -1,6 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Bot, Briefcase, FileText, Sparkles } from "lucide-react";
+import avatarWoman2 from "@/assets/avatar-woman-2.png";
+import avatarMan1 from "@/assets/avatar-man-1.png";
+import avatarWoman1 from "@/assets/avatar-woman-1.png";
 
 export const SmartAgentsSection = () => {
   const agents = [
@@ -8,19 +12,25 @@ export const SmartAgentsSection = () => {
       icon: FileText,
       title: "Assistente Jurídico Smart",
       description: "Geração automática de contratos, políticas e análise de compliance trabalhista com referências legais atualizadas",
-      badge: "Compliance"
+      badge: "Compliance",
+      avatar: avatarWoman2,
+      name: "Dra. Carolina Santos"
     },
     {
       icon: Briefcase,
       title: "Agente de Análise Salarial",
       description: "Benchmarking de mercado, cálculo de compa-ratio e recomendações estratégicas para ajustes salariais",
-      badge: "Análise"
+      badge: "Análise",
+      avatar: avatarMan1,
+      name: "Dr. Rafael Costa"
     },
     {
       icon: Bot,
       title: "Assistente de R&B",
       description: "Consultoria especializada em incentivos de curto e longo prazo, benefícios e políticas de retenção",
-      badge: "Consultoria"
+      badge: "Consultoria",
+      avatar: avatarWoman1,
+      name: "Dra. Mariana Oliveira"
     }
   ];
 
@@ -39,14 +49,13 @@ export const SmartAgentsSection = () => {
               Diferencial Tecnológico
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Três{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
-                Agentes Smart
+                Agentes Inteligentes
               </span>{" "}
-              trabalhando para você
+              COM Você
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Nossos agentes de IA especializados analisam, recomendam e geram documentos automaticamente
+              Nossos agentes especializados analisam, recomendam e geram documentos — trabalhando ao seu lado como parceiros estratégicos
             </p>
           </div>
 
@@ -60,9 +69,18 @@ export const SmartAgentsSection = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-primary opacity-10 rounded-full blur-2xl" />
                 
                 <CardHeader className="relative">
-                  <Badge className="w-fit mb-3" variant="secondary">
-                    {agent.badge}
-                  </Badge>
+                  <div className="flex items-center gap-4 mb-3">
+                    <Avatar className="h-12 w-12 border-2 border-primary/20">
+                      <AvatarImage src={agent.avatar} alt={agent.name} />
+                      <AvatarFallback>{agent.name.split(' ')[0][0]}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <Badge className="w-fit mb-1" variant="secondary">
+                        {agent.badge}
+                      </Badge>
+                      <p className="text-xs text-muted-foreground">{agent.name}</p>
+                    </div>
+                  </div>
                   <div className="p-4 bg-gradient-primary rounded-2xl w-fit mb-4 shadow-lg">
                     <agent.icon className="h-8 w-8 text-white" />
                   </div>
