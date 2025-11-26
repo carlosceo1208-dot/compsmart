@@ -13,24 +13,21 @@ export const SmartAgentsSection = () => {
       title: "Assistente Jurídico Smart",
       description: "Geração automática de contratos, políticas e análise de compliance trabalhista com referências legais atualizadas",
       badge: "Compliance",
-      avatar: avatarWoman2,
-      name: "Dra. Carolina Santos"
+      avatar: avatarWoman2
     },
     {
       icon: Briefcase,
       title: "Agente de Análise Salarial",
       description: "Benchmarking de mercado, cálculo de compa-ratio e recomendações estratégicas para ajustes salariais",
       badge: "Análise",
-      avatar: avatarMan1,
-      name: "Dr. Rafael Costa"
+      avatar: avatarMan1
     },
     {
       icon: Bot,
       title: "Assistente de R&B",
       description: "Consultoria especializada em incentivos de curto e longo prazo, benefícios e políticas de retenção",
       badge: "Consultoria",
-      avatar: avatarWoman1,
-      name: "Dra. Mariana Oliveira"
+      avatar: avatarWoman1
     }
   ];
 
@@ -71,14 +68,13 @@ export const SmartAgentsSection = () => {
                 <CardHeader className="relative">
                   <div className="flex items-center gap-4 mb-3">
                     <Avatar className="h-12 w-12 border-2 border-primary/20">
-                      <AvatarImage src={agent.avatar} alt={agent.name} />
-                      <AvatarFallback>{agent.name.split(' ')[0][0]}</AvatarFallback>
+                      <AvatarImage src={agent.avatar} alt={agent.title} />
+                      <AvatarFallback>{agent.title[0]}</AvatarFallback>
                     </Avatar>
                     <div>
                       <Badge className="w-fit mb-1" variant="secondary">
                         {agent.badge}
                       </Badge>
-                      <p className="text-xs text-muted-foreground">{agent.name}</p>
                     </div>
                   </div>
                   <div className="p-4 bg-gradient-primary rounded-2xl w-fit mb-4 shadow-lg">
