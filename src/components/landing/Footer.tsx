@@ -118,13 +118,13 @@ export const Footer = () => {
               © {currentYear} CompSmart. Todos os direitos reservados.
             </p>
             <div className="flex gap-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="/termos-de-uso" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Termos de Uso
               </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="/politica-de-privacidade" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Política de Privacidade
               </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <a href="/politica-de-privacidade#lgpd" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 LGPD
               </a>
             </div>
