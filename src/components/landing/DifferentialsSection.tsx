@@ -6,12 +6,12 @@ export const DifferentialsSection = () => {
     {
       icon: Sparkles,
       title: "IA Integrada",
-      description: "Três agentes smart especializados em jurídico, remuneração e benefícios"
+      description: "Agentes Inteligentes especializados em compliance, análise salarial e gestão de benefícios"
     },
     {
       icon: Globe2,
-      title: "Foco em PMEs LATAM",
-      description: "Desenvolvido especialmente para pequenas e médias empresas brasileiras"
+      title: "Presença Brasil + LATAM",
+      description: "Solução desenvolvida para empresas brasileiras com expansão para toda América Latina"
     },
     {
       icon: HeartHandshake,
@@ -31,7 +31,7 @@ export const DifferentialsSection = () => {
     {
       icon: Award,
       title: "Metodologia Comprovada",
-      description: "Baseado em metodologias Hay, Mercer e melhores práticas de mercado"
+      description: "Construído sobre as melhores práticas e metodologias consolidadas do mercado"
     }
   ];
 

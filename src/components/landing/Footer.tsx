@@ -11,7 +11,7 @@ export const Footer = () => {
         <div className="py-12 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <img src={compsmartLogo} alt="CompSmart" className="h-10 w-auto object-contain mb-4" />
+            <img src={compsmartLogo} alt="CompSmart" className="h-14 w-auto object-contain mb-4" />
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
               Plataforma de gestão estratégica de remuneração e benefícios com inteligência artificial.
             </p>

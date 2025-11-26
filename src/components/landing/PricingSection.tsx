@@ -9,38 +9,56 @@ export const PricingSection = () => {
 
   const plans = [
     {
-      name: "Start",
-      price: "Grátis",
-      period: "",
+      name: "Starter",
+      price: "R$ 249",
+      period: "/mês",
       description: "Ideal para pequenas empresas começando a organizar remuneração",
       features: [
-        "Até 20 funcionários",
+        "Até 50 funcionários",
         "Estrutura básica de cargos",
         "Dashboards essenciais",
         "Suporte por email",
-        "1 usuário administrador"
+        "2 usuários administradores"
       ],
       cta: "Começar Grátis",
       highlighted: false
     },
     {
-      name: "Pro",
-      price: "R$ 199",
+      name: "Growth",
+      price: "R$ 499",
       period: "/mês",
       description: "Para empresas que querem crescer com inteligência e compliance",
       badge: "Mais Popular",
       features: [
-        "Até 500 funcionários",
-        "3 Agentes Smart com IA",
+        "Até 250 funcionários",
+        "Agentes Inteligentes integrados",
         "Benchmark de mercado",
         "Gestão de PLR e incentivos",
         "Compliance automático",
         "Relatórios avançados",
-        "Usuários ilimitados",
+        "5 usuários",
         "Suporte prioritário"
       ],
       cta: "Começar Teste Grátis",
       highlighted: true
+    },
+    {
+      name: "Business",
+      price: "R$ 999",
+      period: "/mês",
+      description: "Solução robusta para empresas em expansão que precisam de tudo",
+      features: [
+        "Até 500 funcionários",
+        "Tudo do Growth incluído",
+        "Análise de equidade interna",
+        "Simulações de política salarial",
+        "Modelagem preditiva",
+        "Dashboard de riscos trabalhistas",
+        "Usuários ilimitados",
+        "Treinamento online"
+      ],
+      cta: "Começar Teste Grátis",
+      highlighted: false
     },
     {
       name: "Enterprise",
@@ -48,8 +66,8 @@ export const PricingSection = () => {
       period: "",
       description: "Solução completa para grandes empresas e consultorias especializadas",
       features: [
-        "Funcionários ilimitados",
-        "Tudo do Pro incluído",
+        "+500 funcionários",
+        "Tudo do Business incluído",
         "Consultoria dedicada",
         "Integrações customizadas",
         "API e webhooks",
@@ -65,7 +83,7 @@ export const PricingSection = () => {
   return (
     <section id="pricing" className="py-20 bg-background">
       <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Planos{" "}
@@ -78,13 +96,13 @@ export const PricingSection = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {plans.map((plan, index) => (
               <Card 
                 key={index} 
                 className={`relative flex flex-col ${
                   plan.highlighted 
-                    ? 'border-2 border-primary shadow-2xl scale-105 md:scale-110 z-10' 
+                    ? 'border-2 border-primary shadow-2xl scale-105 z-10' 
                     : 'border-border'
                 }`}
               >
@@ -98,24 +116,24 @@ export const PricingSection = () => {
                 )}
 
                 <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
-                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                  <CardDescription className="text-sm min-h-[48px]">
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <CardDescription className="text-xs min-h-[40px]">
                     {plan.description}
                   </CardDescription>
-                  <div className="pt-4">
-                    <span className="text-4xl font-bold">{plan.price}</span>
+                  <div className="pt-3">
+                    <span className="text-3xl font-bold">{plan.price}</span>
                     {plan.period && (
-                      <span className="text-muted-foreground ml-1">{plan.period}</span>
+                      <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
                     )}
                   </div>
                 </CardHeader>
 
                 <CardContent className="flex-grow">
-                  <ul className="space-y-3">
+                  <ul className="space-y-2.5">
                     {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-sm">{feature}</span>
+                      <li key={idx} className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-xs">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -128,7 +146,7 @@ export const PricingSection = () => {
                         ? 'bg-gradient-primary hover:opacity-90' 
                         : 'bg-secondary hover:bg-secondary/80'
                     }`}
-                    size="lg"
+                    size="sm"
                     onClick={() => navigate("/auth")}
                   >
                     {plan.cta}

@@ -41,10 +41,10 @@ export const TestimonialsSection = () => {
                 <Building2 className="h-8 w-8 text-white" />
               </div>
               <div className="text-4xl font-bold mb-2 bg-gradient-primary bg-clip-text text-transparent">
-                PMEs
+                Todos os Portes
               </div>
               <p className="text-muted-foreground">
-                Foco em pequenas e médias empresas até 1000 funcionários
+                Plataforma flexível que atende desde startups até grandes corporações
               </p>
             </Card>
 
@@ -63,7 +63,7 @@ export const TestimonialsSection = () => {
 
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground">
-              🏆 Desenvolvido por especialistas em RH e Remuneração • 🔬 Metodologia baseada em Hay e Mercer
+              🏆 Desenvolvido por especialistas em RH e Remuneração • 🔬 Metodologia baseada nas melhores práticas globais de remuneração
             </p>
           </div>
         </div>
