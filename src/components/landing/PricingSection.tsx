@@ -1,10 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Loader2 } from "lucide-react";
+import { Check, Sparkles, Loader2, Rocket, TrendingUp, Building2, Crown, LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+
+interface ColorClasses {
+  gradient: string;
+  border: string;
+  borderHover: string;
+  iconBg: string;
+  iconColor: string;
+  priceColor: string;
+  checkColor: string;
+  button: string;
+}
 
 interface PlanConfig {
   name: string;
@@ -13,6 +24,8 @@ interface PlanConfig {
   cta: string;
   highlighted: boolean;
   badge?: string;
+  icon: LucideIcon;
+  colorClasses: ColorClasses;
 }
 
 const planConfigs: Record<string, PlanConfig> = {
@@ -27,10 +40,21 @@ const planConfigs: Record<string, PlanConfig> = {
       "2 usuários administradores"
     ],
     cta: "Começar Grátis",
-    highlighted: false
+    highlighted: false,
+    icon: Rocket,
+    colorClasses: {
+      gradient: 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30',
+      border: 'border-green-400',
+      borderHover: 'hover:border-green-300',
+      iconBg: 'bg-green-100 dark:bg-green-900/50',
+      iconColor: 'text-green-600 dark:text-green-400',
+      priceColor: 'text-green-600 dark:text-green-400',
+      checkColor: 'text-green-500',
+      button: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
+    }
   },
-  "Growth": {
-    name: "Growth",
+  "Medium": {
+    name: "Medium",
     description: "Para empresas que querem crescer com inteligência e compliance",
     badge: "Mais Popular",
     features: [
@@ -44,14 +68,25 @@ const planConfigs: Record<string, PlanConfig> = {
       "Suporte prioritário"
     ],
     cta: "Começar Teste Grátis",
-    highlighted: true
+    highlighted: true,
+    icon: TrendingUp,
+    colorClasses: {
+      gradient: 'bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30',
+      border: 'border-violet-500',
+      borderHover: 'hover:border-violet-300',
+      iconBg: 'bg-violet-100 dark:bg-violet-900/50',
+      iconColor: 'text-violet-600 dark:text-violet-400',
+      priceColor: 'text-violet-600 dark:text-violet-400',
+      checkColor: 'text-violet-500',
+      button: 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white'
+    }
   },
-  "Business": {
-    name: "Business",
+  "Pro": {
+    name: "Pro",
     description: "Solução robusta para empresas em expansão que precisam de tudo",
     features: [
       "Até 500 funcionários",
-      "Tudo do Growth incluído",
+      "Tudo do Medium incluído",
       "Análise de equidade interna",
       "Simulações de política salarial",
       "Modelagem preditiva",
@@ -60,14 +95,25 @@ const planConfigs: Record<string, PlanConfig> = {
       "Treinamento online"
     ],
     cta: "Começar Teste Grátis",
-    highlighted: false
+    highlighted: false,
+    icon: Building2,
+    colorClasses: {
+      gradient: 'bg-gradient-to-br from-blue-50 to-sky-50 dark:from-blue-950/30 dark:to-sky-950/30',
+      border: 'border-blue-400',
+      borderHover: 'hover:border-blue-300',
+      iconBg: 'bg-blue-100 dark:bg-blue-900/50',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+      priceColor: 'text-blue-600 dark:text-blue-400',
+      checkColor: 'text-blue-500',
+      button: 'bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white'
+    }
   },
   "Enterprise": {
     name: "Enterprise",
     description: "Solução completa para grandes empresas e consultorias especializadas",
     features: [
       "+500 funcionários",
-      "Tudo do Business incluído",
+      "Tudo do Pro incluído",
       "Consultoria dedicada",
       "Integrações customizadas",
       "API e webhooks",
@@ -76,31 +122,47 @@ const planConfigs: Record<string, PlanConfig> = {
       "Gerente de conta"
     ],
     cta: "Falar com Vendas",
-    highlighted: false
+    highlighted: false,
+    icon: Crown,
+    colorClasses: {
+      gradient: 'bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30',
+      border: 'border-amber-400',
+      borderHover: 'hover:border-amber-300',
+      iconBg: 'bg-amber-100 dark:bg-amber-900/50',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      priceColor: 'text-amber-600 dark:text-amber-400',
+      checkColor: 'text-amber-500',
+      button: 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white'
+    }
   }
 };
+
+interface PlanData {
+  id: string;
+  name: string;
+  monthlyPrice: number;
+  annualPrice: number;
+  description: string;
+  features: string[];
+  cta: string;
+  highlighted: boolean;
+  badge?: string;
+  icon: LucideIcon;
+  colorClasses: ColorClasses;
+}
 
 export const PricingSection = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [plans, setPlans] = useState<Array<{
-    id: string;
-    name: string;
-    price: string;
-    period: string;
-    description: string;
-    features: string[];
-    cta: string;
-    highlighted: boolean;
-    badge?: string;
-  }>>([]);
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [plans, setPlans] = useState<PlanData[]>([]);
 
   useEffect(() => {
     const fetchPlans = async () => {
       try {
         const { data, error } = await supabase
           .from('subscription_plans')
-          .select('id, name, monthly_price')
+          .select('id, name, monthly_price, annual_price')
           .eq('is_active', true)
           .eq('is_public', true)
           .order('monthly_price', { ascending: true });
@@ -118,28 +180,34 @@ export const PricingSection = () => {
               description: "",
               features: [],
               cta: "Começar",
-              highlighted: false
+              highlighted: false,
+              icon: Rocket,
+              colorClasses: planConfigs["Starter"].colorClasses
             };
-
-            const isEnterprise = dbPlan.name === "Enterprise" || dbPlan.monthly_price === 0;
-            const price = isEnterprise 
-              ? "Sob consulta" 
-              : `R$ ${dbPlan.monthly_price.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
             return {
               id: dbPlan.id,
               name: config.name,
-              price,
-              period: isEnterprise ? "" : "/mês",
+              monthlyPrice: dbPlan.monthly_price || 0,
+              annualPrice: dbPlan.annual_price || 0,
               description: config.description,
               features: config.features,
               cta: config.cta,
               highlighted: config.highlighted,
-              badge: config.badge
+              badge: config.badge,
+              icon: config.icon,
+              colorClasses: config.colorClasses
             };
           });
 
-          setPlans(mappedPlans);
+          // Sort: Enterprise always at the end
+          const sortedPlans = mappedPlans.sort((a, b) => {
+            if (a.name === 'Enterprise') return 1;
+            if (b.name === 'Enterprise') return -1;
+            return 0;
+          });
+
+          setPlans(sortedPlans);
         }
       } catch (err) {
         console.error('Error fetching plans:', err);
@@ -150,6 +218,21 @@ export const PricingSection = () => {
 
     fetchPlans();
   }, []);
+
+  const getDisplayPrice = (plan: PlanData) => {
+    const isEnterprise = plan.name === "Enterprise" || plan.monthlyPrice === 0;
+    if (isEnterprise) return "Sob consulta";
+
+    const price = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice;
+    return `R$ ${price.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  };
+
+  const getSavingsPercent = (plan: PlanData) => {
+    if (plan.monthlyPrice === 0) return 0;
+    const monthlyTotal = plan.monthlyPrice * 12;
+    const savings = monthlyTotal - plan.annualPrice;
+    return Math.round((savings / monthlyTotal) * 100);
+  };
 
   if (loading) {
     return (
@@ -167,82 +250,142 @@ export const PricingSection = () => {
     <section id="pricing" className="py-20 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Planos{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 transparentes
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Escolha o plano ideal para o tamanho e necessidades da sua empresa. Sem custos ocultos.
             </p>
+
+            {/* Billing Cycle Toggle */}
+            <div className="flex items-center justify-center gap-4">
+              <span className={`text-sm font-medium transition-colors duration-200 ${
+                billingCycle === 'monthly' ? 'text-foreground' : 'text-muted-foreground'
+              }`}>
+                Mensal
+              </span>
+              
+              <button
+                onClick={() => setBillingCycle(prev => prev === 'monthly' ? 'annual' : 'monthly')}
+                className={`
+                  relative w-14 h-7 rounded-full transition-colors duration-300 ease-out
+                  ${billingCycle === 'annual' ? 'bg-primary' : 'bg-muted'}
+                `}
+                aria-label="Alternar ciclo de pagamento"
+              >
+                <span className={`
+                  absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md
+                  transition-transform duration-300 ease-out
+                  ${billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-0'}
+                `} />
+              </button>
+              
+              <span className={`text-sm font-medium transition-colors duration-200 ${
+                billingCycle === 'annual' ? 'text-foreground' : 'text-muted-foreground'
+              }`}>
+                Anual
+              </span>
+              
+              <Badge className="bg-green-500 text-white animate-pulse">
+                Economize 2 meses!
+              </Badge>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plans.map((plan, index) => (
-              <Card 
-                key={index} 
-                className={`relative flex flex-col ${
-                  plan.highlighted 
-                    ? 'border-2 border-primary shadow-2xl scale-105 z-10' 
-                    : 'border-border'
-                }`}
-              >
-                {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-gradient-primary text-white px-4 py-1.5">
-                      <Sparkles className="h-3 w-3 mr-1" />
-                      {plan.badge}
-                    </Badge>
+            {plans.map((plan) => {
+              const IconComponent = plan.icon;
+              const isEnterprise = plan.name === "Enterprise" || plan.monthlyPrice === 0;
+              const savingsPercent = getSavingsPercent(plan);
+
+              return (
+                <Card 
+                  key={plan.id} 
+                  className={`
+                    relative flex flex-col overflow-hidden
+                    transition-all duration-300 ease-out
+                    hover:scale-[1.02] hover:shadow-xl
+                    ${plan.highlighted 
+                      ? `border-2 ${plan.colorClasses.border} ${plan.colorClasses.gradient} shadow-2xl scale-105 z-10` 
+                      : `border-border ${plan.colorClasses.borderHover} hover:${plan.colorClasses.gradient}`
+                    }
+                  `}
+                >
+                  {/* Icon in top right corner */}
+                  <div className={`absolute top-4 right-4 p-2 rounded-full ${plan.colorClasses.iconBg} transition-transform duration-300 hover:scale-110`}>
+                    <IconComponent className={`h-5 w-5 ${plan.colorClasses.iconColor}`} />
                   </div>
-                )}
 
-                <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
-                  <CardTitle className="text-xl">{plan.name}</CardTitle>
-                  <CardDescription className="text-xs min-h-[40px]">
-                    {plan.description}
-                  </CardDescription>
-                  <div className="pt-3">
-                    <span className="text-3xl font-bold">{plan.price}</span>
-                    {plan.period && (
-                      <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
-                    )}
-                  </div>
-                </CardHeader>
+                  {plan.badge && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <Badge className={`${plan.colorClasses.button} px-4 py-1.5 animate-pulse shadow-lg`}>
+                        <Sparkles className="h-3 w-3 mr-1 animate-bounce" />
+                        {plan.badge}
+                      </Badge>
+                    </div>
+                  )}
 
-                <CardContent className="flex-grow">
-                  <ul className="space-y-2.5">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-xs">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
+                  <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
+                    <CardTitle className="text-xl">{plan.name}</CardTitle>
+                    <CardDescription className="text-xs min-h-[40px]">
+                      {plan.description}
+                    </CardDescription>
+                    <div className="pt-3">
+                      {/* Annual discount display */}
+                      {billingCycle === 'annual' && !isEnterprise && savingsPercent > 0 && (
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm text-muted-foreground line-through">
+                            R$ {(plan.monthlyPrice * 12).toLocaleString('pt-BR')}
+                          </span>
+                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs">
+                            -{savingsPercent}%
+                          </Badge>
+                        </div>
+                      )}
+                      <span className={`text-3xl font-bold transition-colors duration-200 ${plan.colorClasses.priceColor}`}>
+                        {getDisplayPrice(plan)}
+                      </span>
+                      {!isEnterprise && (
+                        <span className="text-muted-foreground text-sm ml-1">
+                          {billingCycle === 'annual' ? '/ano' : '/mês'}
+                        </span>
+                      )}
+                    </div>
+                  </CardHeader>
 
-                <CardFooter>
-                  <Button 
-                    className={`w-full ${
-                      plan.highlighted 
-                        ? 'bg-gradient-primary hover:opacity-90' 
-                        : 'bg-secondary hover:bg-secondary/80'
-                    }`}
-                    size="sm"
-                    onClick={() => {
-                      if (plan.name === "Enterprise") {
-                        window.location.href = 'mailto:vendas@compsmart.com.br?subject=CompSmart Enterprise - Solicitação de Contato';
-                      } else {
-                        navigate(`/checkout?plan=${plan.id}&cycle=monthly`);
-                      }
-                    }}
-                  >
-                    {plan.cta}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+                  <CardContent className="flex-grow">
+                    <ul className="space-y-2.5">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-2 group">
+                          <Check className={`h-4 w-4 ${plan.colorClasses.checkColor} flex-shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110`} />
+                          <span className="text-xs">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+
+                  <CardFooter>
+                    <Button 
+                      className={`w-full transition-all duration-200 ${plan.colorClasses.button}`}
+                      size="sm"
+                      onClick={() => {
+                        if (plan.name === "Enterprise") {
+                          window.location.href = 'mailto:vendas@compsmart.com.br?subject=CompSmart Enterprise - Solicitação de Contato';
+                        } else {
+                          navigate(`/checkout?plan=${plan.id}&cycle=${billingCycle}`);
+                        }
+                      }}
+                    >
+                      {plan.cta}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              );
+            })}
           </div>
 
           <div className="mt-12 text-center space-y-4">
