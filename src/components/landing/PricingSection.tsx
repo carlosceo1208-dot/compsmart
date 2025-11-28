@@ -183,6 +183,14 @@ export const PricingSection = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Fallback: se após 500ms ainda não estiver visível, força exibição
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isVisible) setIsVisible(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isVisible]);
+
   useEffect(() => {
     const fetchPlans = async () => {
       try {
