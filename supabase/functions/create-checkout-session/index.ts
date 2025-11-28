@@ -28,7 +28,7 @@ serve(async (req) => {
       });
     }
 
-    const { plan_id, billing_cycle, payment_method, coupon_code, card_token } = await req.json();
+    const { plan_id, billing_cycle, payment_method, coupon_code, card_token, document_type, document_value } = await req.json();
 
     if (!plan_id || !billing_cycle || !payment_method) {
       return new Response(JSON.stringify({ error: 'Parâmetros obrigatórios não fornecidos' }), {
@@ -57,6 +57,62 @@ serve(async (req) => {
       .select('*, organizational_structure:root_company_id(*)')
       .eq('id', user.id)
       .single();
+
+    // Determinar documento a usar
+    let customerDocument: string;
+    let customerType: 'individual' | 'company';
+
+    if (document_type && document_value) {
+      // Usar documento fornecido pelo frontend
+      customerDocument = document_value.replace(/\D/g, '');
+      customerType = document_type === 'cnpj' ? 'company' : 'individual';
+    } else if (document_type === 'cnpj' && profile?.organizational_structure?.cnpj) {
+      // Fallback para CNPJ da empresa
+      customerDocument = profile.organizational_structure.cnpj.replace(/\D/g, '');
+      customerType = 'company';
+    } else if (profile?.cpf) {
+      // Fallback para CPF do perfil
+      customerDocument = profile.cpf.replace(/\D/g, '');
+      customerType = 'individual';
+    } else {
+      return new Response(JSON.stringify({ 
+        error: 'CPF ou CNPJ é obrigatório para processar o pagamento' 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Validar documento
+    if (customerType === 'company' && customerDocument.length !== 14) {
+      return new Response(JSON.stringify({ 
+        error: 'CNPJ inválido - deve conter 14 dígitos' 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (customerType === 'individual' && customerDocument.length !== 11) {
+      return new Response(JSON.stringify({ 
+        error: 'CPF inválido - deve conter 11 dígitos' 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Rejeitar documentos inválidos (todos zeros)
+    if (customerDocument === '00000000000' || customerDocument === '00000000000000') {
+      return new Response(JSON.stringify({ 
+        error: `${customerType === 'company' ? 'CNPJ' : 'CPF'} inválido` 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    console.log(`Processing payment for ${customerType} with document: ${customerDocument.substring(0, 3)}***`);
 
     // Calcular valor
     let amount_cents = billing_cycle === 'annual' 
@@ -107,8 +163,8 @@ serve(async (req) => {
       customer: {
         name: profile?.full_name || user.email?.split('@')[0] || 'Cliente',
         email: user.email,
-        type: 'individual',
-        document: profile?.cpf?.replace(/\D/g, '') || '00000000000',
+        type: customerType,
+        document: customerDocument,
         phones: {
           mobile_phone: {
             country_code: '55',
