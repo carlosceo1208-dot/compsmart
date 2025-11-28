@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import { ptBR } from 'date-fns/locale';
 
+const TIMEZONE = 'America/Sao_Paulo';
+
 export const DateTimeDisplay = () => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(() => 
+    toZonedTime(new Date(), TIMEZONE)
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 60000); // Atualiza a cada 1 minuto
+      setCurrentDate(toZonedTime(new Date(), TIMEZONE));
+    }, 60000);
 
     return () => clearInterval(timer);
   }, []);
