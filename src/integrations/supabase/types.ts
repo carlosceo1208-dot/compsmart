@@ -541,6 +541,96 @@ export type Database = {
           },
         ]
       }
+      checkout_sessions: {
+        Row: {
+          amount_cents: number
+          billing_cycle: string
+          boleto_barcode: string | null
+          boleto_due_date: string | null
+          boleto_url: string | null
+          company_id: string | null
+          coupon_code: string | null
+          created_at: string | null
+          discount_cents: number | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          pagarme_charge_id: string | null
+          pagarme_order_id: string | null
+          paid_at: string | null
+          payment_method: string
+          pix_expiration: string | null
+          pix_qr_code: string | null
+          pix_qr_code_url: string | null
+          plan_id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          billing_cycle: string
+          boleto_barcode?: string | null
+          boleto_due_date?: string | null
+          boleto_url?: string | null
+          company_id?: string | null
+          coupon_code?: string | null
+          created_at?: string | null
+          discount_cents?: number | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          pagarme_charge_id?: string | null
+          pagarme_order_id?: string | null
+          paid_at?: string | null
+          payment_method: string
+          pix_expiration?: string | null
+          pix_qr_code?: string | null
+          pix_qr_code_url?: string | null
+          plan_id: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          billing_cycle?: string
+          boleto_barcode?: string | null
+          boleto_due_date?: string | null
+          boleto_url?: string | null
+          company_id?: string | null
+          coupon_code?: string | null
+          created_at?: string | null
+          discount_cents?: number | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          pagarme_charge_id?: string | null
+          pagarme_order_id?: string | null
+          paid_at?: string | null
+          payment_method?: string
+          pix_expiration?: string | null
+          pix_qr_code?: string | null
+          pix_qr_code_url?: string | null
+          plan_id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkout_sessions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "checkout_sessions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_identity: {
         Row: {
           annual_goal_description: string | null
@@ -599,8 +689,14 @@ export type Database = {
           created_at: string
           created_by: string | null
           ended_at: string | null
+          failed_attempts: number | null
           id: string
+          last_payment_date: string | null
           monthly_price: number
+          next_billing_date: string | null
+          pagarme_customer_id: string | null
+          pagarme_subscription_id: string | null
+          payment_method_id: string | null
           plan_id: string
           started_at: string
           status: string
@@ -616,8 +712,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           ended_at?: string | null
+          failed_attempts?: number | null
           id?: string
+          last_payment_date?: string | null
           monthly_price: number
+          next_billing_date?: string | null
+          pagarme_customer_id?: string | null
+          pagarme_subscription_id?: string | null
+          payment_method_id?: string | null
           plan_id: string
           started_at?: string
           status: string
@@ -633,8 +735,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           ended_at?: string | null
+          failed_attempts?: number | null
           id?: string
+          last_payment_date?: string | null
           monthly_price?: number
+          next_billing_date?: string | null
+          pagarme_customer_id?: string | null
+          pagarme_subscription_id?: string | null
+          payment_method_id?: string | null
           plan_id?: string
           started_at?: string
           status?: string
@@ -646,6 +754,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
             referencedColumns: ["id"]
           },
           {
@@ -727,6 +842,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      discount_coupons: {
+        Row: {
+          applicable_plans: string[] | null
+          code: string
+          created_at: string | null
+          created_by: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_billing_cycle: string | null
+          updated_at: string | null
+          used_count: number | null
+          valid_from: string | null
+          valid_until: string | null
+        }
+        Insert: {
+          applicable_plans?: string[] | null
+          code: string
+          created_at?: string | null
+          created_by?: string | null
+          discount_type: string
+          discount_value: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_billing_cycle?: string | null
+          updated_at?: string | null
+          used_count?: number | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Update: {
+          applicable_plans?: string[] | null
+          code?: string
+          created_at?: string | null
+          created_by?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_billing_cycle?: string | null
+          updated_at?: string | null
+          used_count?: number | null
+          valid_from?: string | null
+          valid_until?: string | null
+        }
+        Relationships: []
       }
       employee_benefits: {
         Row: {
@@ -1502,6 +1668,56 @@ export type Database = {
             columns: ["subscription_plan_id"]
             isOneToOne: false
             referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          brand: string | null
+          company_id: string
+          created_at: string | null
+          holder_name: string | null
+          id: string
+          is_default: boolean | null
+          last_four: string | null
+          pagarme_card_id: string | null
+          pagarme_customer_id: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          brand?: string | null
+          company_id: string
+          created_at?: string | null
+          holder_name?: string | null
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          pagarme_card_id?: string | null
+          pagarme_customer_id?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          brand?: string | null
+          company_id?: string
+          created_at?: string | null
+          holder_name?: string | null
+          id?: string
+          is_default?: boolean | null
+          last_four?: string | null
+          pagarme_card_id?: string | null
+          pagarme_customer_id?: string | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
         ]
