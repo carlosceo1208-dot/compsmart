@@ -74,6 +74,18 @@ serve(async (req) => {
         await handleChargePaymentFailed(supabaseAdmin, data);
         break;
 
+      case 'subscription.created':
+        await handleSubscriptionCreated(supabaseAdmin, data);
+        break;
+
+      case 'subscription.canceled':
+        await handleSubscriptionCanceled(supabaseAdmin, data);
+        break;
+
+      case 'subscription.updated':
+        await handleSubscriptionUpdated(supabaseAdmin, data);
+        break;
+
       default:
         console.log(`Unhandled event type: ${eventType}`);
     }
@@ -300,4 +312,109 @@ async function createInvoice(supabase: any, checkoutSession: any, orderData: any
   }
 
   console.log('Invoice created:', invoiceNumber);
+}
+
+// ============= Subscription Event Handlers =============
+
+async function handleSubscriptionCreated(supabase: any, data: any) {
+  console.log('Processing subscription.created:', data.id);
+
+  // Buscar company pelo customer_id do Pagar.me
+  const { data: subscription } = await supabase
+    .from('company_subscriptions')
+    .select('id, company_id')
+    .eq('pagarme_customer_id', data.customer?.id)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  if (subscription) {
+    // Atualizar com o ID da subscription do Pagar.me
+    await supabase
+      .from('company_subscriptions')
+      .update({
+        pagarme_subscription_id: data.id,
+        next_billing_date: data.next_billing_at,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', subscription.id);
+
+    console.log(`Subscription ${data.id} linked to company ${subscription.company_id}`);
+  } else {
+    console.log('No active subscription found for customer:', data.customer?.id);
+  }
+}
+
+async function handleSubscriptionCanceled(supabase: any, data: any) {
+  console.log('Processing subscription.canceled:', data.id);
+
+  const now = new Date();
+
+  // Buscar assinatura pelo pagarme_subscription_id
+  const { data: subscription } = await supabase
+    .from('company_subscriptions')
+    .select('id, company_id')
+    .eq('pagarme_subscription_id', data.id)
+    .maybeSingle();
+
+  if (subscription) {
+    // Cancelar assinatura
+    await supabase
+      .from('company_subscriptions')
+      .update({
+        status: 'canceled',
+        canceled_at: now.toISOString(),
+        cancellation_reason: data.cancellation_reason || 'Cancelamento via Pagar.me',
+        ended_at: data.canceled_at || now.toISOString(),
+        updated_at: now.toISOString()
+      })
+      .eq('id', subscription.id);
+
+    // Atualizar organizational_structure
+    await supabase
+      .from('organizational_structure')
+      .update({
+        subscription_status: 'canceled'
+      })
+      .eq('id', subscription.company_id);
+
+    console.log(`Subscription canceled for company ${subscription.company_id}`);
+  } else {
+    console.log('Subscription not found for pagarme_subscription_id:', data.id);
+  }
+}
+
+async function handleSubscriptionUpdated(supabase: any, data: any) {
+  console.log('Processing subscription.updated:', data.id);
+
+  // Buscar assinatura existente
+  const { data: subscription } = await supabase
+    .from('company_subscriptions')
+    .select('id, company_id')
+    .eq('pagarme_subscription_id', data.id)
+    .maybeSingle();
+
+  if (subscription) {
+    const updateData: Record<string, any> = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Atualizar próxima data de cobrança se disponível
+    if (data.next_billing_at) {
+      updateData.next_billing_date = data.next_billing_at;
+    }
+
+    // Atualizar ciclo se alterado
+    if (data.interval) {
+      updateData.billing_cycle = data.interval === 'year' ? 'annual' : 'monthly';
+    }
+
+    await supabase
+      .from('company_subscriptions')
+      .update(updateData)
+      .eq('id', subscription.id);
+
+    console.log(`Subscription updated for company ${subscription.company_id}`);
+  } else {
+    console.log('Subscription not found for pagarme_subscription_id:', data.id);
+  }
 }
