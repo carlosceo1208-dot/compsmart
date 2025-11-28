@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Loader2, CreditCard, QrCode, FileText, Tag, Check, ArrowLeft, Shield } from 'lucide-react';
+import { Loader2, CreditCard, QrCode, FileText, Tag, Check, ArrowLeft, Shield, Building2, User } from 'lucide-react';
 import { CheckoutSummary } from '@/components/checkout/CheckoutSummary';
 import { PaymentMethodSelector } from '@/components/checkout/PaymentMethodSelector';
 import { PixPayment } from '@/components/checkout/PixPayment';
@@ -22,6 +23,34 @@ interface Plan {
   annual_price: number;
   features: any;
 }
+
+// Funções de formatação e validação de documentos
+const formatCPF = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+};
+
+const formatCNPJ = (value: string): string => {
+  const digits = value.replace(/\D/g, '').slice(0, 14);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  if (digits.length <= 8) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+  if (digits.length <= 12) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
+};
+
+const isValidCPF = (cpf: string): boolean => {
+  const digits = cpf.replace(/\D/g, '');
+  return digits.length === 11 && digits !== '00000000000';
+};
+
+const isValidCNPJ = (cnpj: string): boolean => {
+  const digits = cnpj.replace(/\D/g, '');
+  return digits.length === 14 && digits !== '00000000000000';
+};
 
 export default function Checkout() {
   const [searchParams] = useSearchParams();
@@ -40,26 +69,65 @@ export default function Checkout() {
   const [processing, setProcessing] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState<any>(null);
 
+  // Estados para documento
+  const [documentType, setDocumentType] = useState<'cpf' | 'cnpj'>('cnpj');
+  const [documentValue, setDocumentValue] = useState('');
+  const [savedCpf, setSavedCpf] = useState<string | null>(null);
+  const [savedCnpj, setSavedCnpj] = useState<string | null>(null);
+  const [useExistingDocument, setUseExistingDocument] = useState(true);
+
   useEffect(() => {
     if (planId) {
-      fetchPlan();
+      fetchPlanAndUserData();
     } else {
       navigate('/pricing');
     }
   }, [planId]);
 
-  const fetchPlan = async () => {
+  const fetchPlanAndUserData = async () => {
     try {
-      const { data, error } = await supabase
+      // Buscar plano
+      const { data: planData, error: planError } = await supabase
         .from('subscription_plans')
         .select('*')
         .eq('id', planId)
         .single();
 
-      if (error) throw error;
-      setPlan(data);
+      if (planError) throw planError;
+      setPlan(planData);
+
+      // Buscar dados do usuário (CPF e CNPJ da empresa)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('cpf, root_company_id')
+          .eq('id', user.id)
+          .single();
+
+        if (profile?.cpf) {
+          setSavedCpf(profile.cpf);
+        }
+
+        if (profile?.root_company_id) {
+          const { data: company } = await supabase
+            .from('organizational_structure')
+            .select('cnpj')
+            .eq('id', profile.root_company_id)
+            .single();
+
+          if (company?.cnpj) {
+            setSavedCnpj(company.cnpj);
+            setDocumentType('cnpj');
+          } else if (profile?.cpf) {
+            setDocumentType('cpf');
+          }
+        } else if (profile?.cpf) {
+          setDocumentType('cpf');
+        }
+      }
     } catch (error) {
-      console.error('Error fetching plan:', error);
+      console.error('Error fetching data:', error);
       toast.error('Plano não encontrado');
       navigate('/pricing');
     } finally {
@@ -117,16 +185,77 @@ export default function Checkout() {
     return Math.max(amount, 1);
   };
 
+  const getDocumentToUse = (): { type: 'cpf' | 'cnpj'; value: string } | null => {
+    if (useExistingDocument) {
+      if (documentType === 'cnpj' && savedCnpj) {
+        return { type: 'cnpj', value: savedCnpj };
+      }
+      if (documentType === 'cpf' && savedCpf) {
+        return { type: 'cpf', value: savedCpf };
+      }
+    }
+    
+    // Usar documento digitado
+    if (documentValue) {
+      const isValid = documentType === 'cpf' ? isValidCPF(documentValue) : isValidCNPJ(documentValue);
+      if (isValid) {
+        return { type: documentType, value: documentValue };
+      }
+    }
+
+    return null;
+  };
+
+  const hasValidExistingDocument = (): boolean => {
+    if (documentType === 'cnpj') return !!savedCnpj;
+    return !!savedCpf;
+  };
+
   const handleCheckout = async (cardToken?: string) => {
+    // Validar documento
+    const document = getDocumentToUse();
+    if (!document) {
+      toast.error(`Por favor, insira um ${documentType.toUpperCase()} válido`);
+      return;
+    }
+
     setProcessing(true);
     try {
+      // Salvar documento no perfil se for novo
+      if (!useExistingDocument && documentValue) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          if (documentType === 'cpf') {
+            await supabase
+              .from('profiles')
+              .update({ cpf: documentValue.replace(/\D/g, '') })
+              .eq('id', user.id);
+          } else {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('root_company_id')
+              .eq('id', user.id)
+              .single();
+
+            if (profile?.root_company_id) {
+              await supabase
+                .from('organizational_structure')
+                .update({ cnpj: documentValue.replace(/\D/g, '') })
+                .eq('id', profile.root_company_id);
+            }
+          }
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           plan_id: planId,
           billing_cycle: billingCycle,
           payment_method: paymentMethod,
           coupon_code: couponApplied ? couponCode : null,
-          card_token: cardToken
+          card_token: cardToken,
+          document_type: document.type,
+          document_value: document.value.replace(/\D/g, '')
         }
       });
 
@@ -145,6 +274,12 @@ export default function Checkout() {
     }
   };
 
+  const handleDocumentChange = (value: string) => {
+    const formatted = documentType === 'cpf' ? formatCPF(value) : formatCNPJ(value);
+    setDocumentValue(formatted);
+    setUseExistingDocument(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -156,6 +291,10 @@ export default function Checkout() {
   if (!plan) {
     return null;
   }
+
+  const hasExistingDocument = hasValidExistingDocument();
+  const currentDocument = getDocumentToUse();
+  const isDocumentValid = !!currentDocument;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-8 px-4">
@@ -190,6 +329,108 @@ export default function Checkout() {
           <div className="lg:col-span-3 space-y-6">
             {!checkoutResult ? (
               <>
+                {/* Dados do Pagador */}
+                <Card>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Dados do Pagador
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <RadioGroup 
+                      value={documentType} 
+                      onValueChange={(v: 'cpf' | 'cnpj') => {
+                        setDocumentType(v);
+                        setDocumentValue('');
+                        setUseExistingDocument(true);
+                      }}
+                      className="flex gap-4"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="cnpj" id="cnpj" />
+                        <Label htmlFor="cnpj" className="flex items-center gap-2 cursor-pointer">
+                          <Building2 className="h-4 w-4" />
+                          Pessoa Jurídica (CNPJ)
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="cpf" id="cpf" />
+                        <Label htmlFor="cpf" className="flex items-center gap-2 cursor-pointer">
+                          <User className="h-4 w-4" />
+                          Pessoa Física (CPF)
+                        </Label>
+                      </div>
+                    </RadioGroup>
+
+                    {hasExistingDocument && (
+                      <div className="p-3 bg-muted/50 rounded-lg border">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              {documentType === 'cnpj' ? 'CNPJ cadastrado' : 'CPF cadastrado'}
+                            </p>
+                            <p className="font-mono font-medium">
+                              {documentType === 'cnpj' 
+                                ? formatCNPJ(savedCnpj || '')
+                                : formatCPF(savedCpf || '')}
+                            </p>
+                          </div>
+                          {useExistingDocument && (
+                            <Badge variant="secondary" className="bg-green-100 text-green-700">
+                              <Check className="h-3 w-3 mr-1" />
+                              Selecionado
+                            </Badge>
+                          )}
+                        </div>
+                        {!useExistingDocument && (
+                          <Button 
+                            variant="link" 
+                            size="sm" 
+                            className="mt-2 p-0 h-auto"
+                            onClick={() => {
+                              setUseExistingDocument(true);
+                              setDocumentValue('');
+                            }}
+                          >
+                            Usar documento cadastrado
+                          </Button>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="document">
+                        {hasExistingDocument 
+                          ? `Ou digite um novo ${documentType.toUpperCase()}`
+                          : `${documentType.toUpperCase()} *`}
+                      </Label>
+                      <Input
+                        id="document"
+                        placeholder={documentType === 'cpf' ? '000.000.000-00' : '00.000.000/0000-00'}
+                        value={documentValue}
+                        onChange={(e) => handleDocumentChange(e.target.value)}
+                        className={`font-mono ${
+                          documentValue && !isDocumentValid && !hasExistingDocument
+                            ? 'border-destructive focus-visible:ring-destructive'
+                            : ''
+                        }`}
+                      />
+                      {documentValue && (
+                        <p className={`text-xs ${
+                          (documentType === 'cpf' ? isValidCPF(documentValue) : isValidCNPJ(documentValue))
+                            ? 'text-green-600'
+                            : 'text-destructive'
+                        }`}>
+                          {(documentType === 'cpf' ? isValidCPF(documentValue) : isValidCNPJ(documentValue))
+                            ? `✓ ${documentType.toUpperCase()} válido`
+                            : `${documentType.toUpperCase()} inválido - ${documentType === 'cpf' ? '11 dígitos' : '14 dígitos'} necessários`}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <PaymentMethodSelector
                   paymentMethod={paymentMethod}
                   setPaymentMethod={setPaymentMethod}
@@ -216,7 +457,7 @@ export default function Checkout() {
                         </Badge>
                         <Button 
                           onClick={() => handleCheckout()} 
-                          disabled={processing}
+                          disabled={processing || !isDocumentValid}
                           className="w-full"
                           size="lg"
                         >
@@ -232,6 +473,11 @@ export default function Checkout() {
                             </>
                           )}
                         </Button>
+                        {!isDocumentValid && (
+                          <p className="text-sm text-destructive">
+                            Preencha um {documentType.toUpperCase()} válido para continuar
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
@@ -248,7 +494,7 @@ export default function Checkout() {
                         </p>
                         <Button 
                           onClick={() => handleCheckout()} 
-                          disabled={processing}
+                          disabled={processing || !isDocumentValid}
                           className="w-full"
                           size="lg"
                         >
@@ -264,6 +510,11 @@ export default function Checkout() {
                             </>
                           )}
                         </Button>
+                        {!isDocumentValid && (
+                          <p className="text-sm text-destructive">
+                            Preencha um {documentType.toUpperCase()} válido para continuar
+                          </p>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
