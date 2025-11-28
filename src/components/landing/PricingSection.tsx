@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Check, Sparkles, Loader2, Rocket, TrendingUp, Building2, Crown, LucideIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ColorClasses {
@@ -15,6 +15,7 @@ interface ColorClasses {
   priceColor: string;
   checkColor: string;
   button: string;
+  shadow: string;
 }
 
 interface PlanConfig {
@@ -50,7 +51,8 @@ const planConfigs: Record<string, PlanConfig> = {
       iconColor: 'text-green-600 dark:text-green-400',
       priceColor: 'text-green-600 dark:text-green-400',
       checkColor: 'text-green-500',
-      button: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white'
+      button: 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white',
+      shadow: 'hover:shadow-[0_20px_50px_-12px_rgba(34,197,94,0.25)]'
     }
   },
   "Medium": {
@@ -78,7 +80,8 @@ const planConfigs: Record<string, PlanConfig> = {
       iconColor: 'text-violet-600 dark:text-violet-400',
       priceColor: 'text-violet-600 dark:text-violet-400',
       checkColor: 'text-violet-500',
-      button: 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white'
+      button: 'bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white',
+      shadow: 'hover:shadow-[0_20px_50px_-12px_rgba(139,92,246,0.35)]'
     }
   },
   "Pro": {
@@ -105,7 +108,8 @@ const planConfigs: Record<string, PlanConfig> = {
       iconColor: 'text-blue-600 dark:text-blue-400',
       priceColor: 'text-blue-600 dark:text-blue-400',
       checkColor: 'text-blue-500',
-      button: 'bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white'
+      button: 'bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white',
+      shadow: 'hover:shadow-[0_20px_50px_-12px_rgba(59,130,246,0.25)]'
     }
   },
   "Enterprise": {
@@ -132,7 +136,8 @@ const planConfigs: Record<string, PlanConfig> = {
       iconColor: 'text-amber-600 dark:text-amber-400',
       priceColor: 'text-amber-600 dark:text-amber-400',
       checkColor: 'text-amber-500',
-      button: 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white'
+      button: 'bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white',
+      shadow: 'hover:shadow-[0_20px_50px_-12px_rgba(245,158,11,0.25)]'
     }
   }
 };
@@ -156,6 +161,27 @@ export const PricingSection = () => {
   const [loading, setLoading] = useState(true);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   const [plans, setPlans] = useState<PlanData[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  // Intersection Observer for stagger animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -296,19 +322,28 @@ export const PricingSection = () => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plans.map((plan) => {
+          <div 
+            ref={sectionRef}
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
+          >
+            {plans.map((plan, index) => {
               const IconComponent = plan.icon;
               const isEnterprise = plan.name === "Enterprise" || plan.monthlyPrice === 0;
               const savingsPercent = getSavingsPercent(plan);
 
               return (
                 <Card 
-                  key={plan.id} 
+                  key={plan.id}
+                  style={{
+                    opacity: isVisible ? 1 : 0,
+                    transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+                    transition: `opacity 0.5s ease-out ${index * 0.15}s, transform 0.5s ease-out ${index * 0.15}s`
+                  }}
                   className={`
-                    relative flex flex-col overflow-hidden
+                    relative flex flex-col
                     transition-all duration-300 ease-out
-                    hover:scale-[1.02] hover:shadow-xl
+                    hover:scale-[1.02]
+                    ${plan.colorClasses.shadow}
                     ${plan.highlighted 
                       ? `border-2 ${plan.colorClasses.border} ${plan.colorClasses.gradient} shadow-2xl scale-105 z-10` 
                       : `border-border ${plan.colorClasses.borderHover} hover:${plan.colorClasses.gradient}`
