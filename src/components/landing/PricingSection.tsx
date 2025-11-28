@@ -1,84 +1,165 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles } from "lucide-react";
+import { Check, Sparkles, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface PlanConfig {
+  name: string;
+  description: string;
+  features: string[];
+  cta: string;
+  highlighted: boolean;
+  badge?: string;
+}
+
+const planConfigs: Record<string, PlanConfig> = {
+  "Starter": {
+    name: "Starter",
+    description: "Ideal para pequenas empresas começando a organizar remuneração",
+    features: [
+      "Até 50 funcionários",
+      "Estrutura básica de cargos",
+      "Dashboards essenciais",
+      "Suporte por email",
+      "2 usuários administradores"
+    ],
+    cta: "Começar Grátis",
+    highlighted: false
+  },
+  "Growth": {
+    name: "Growth",
+    description: "Para empresas que querem crescer com inteligência e compliance",
+    badge: "Mais Popular",
+    features: [
+      "Até 250 funcionários",
+      "Agentes Inteligentes integrados",
+      "Benchmark de mercado",
+      "Gestão de PLR e incentivos",
+      "Compliance automático",
+      "Relatórios avançados",
+      "5 usuários",
+      "Suporte prioritário"
+    ],
+    cta: "Começar Teste Grátis",
+    highlighted: true
+  },
+  "Business": {
+    name: "Business",
+    description: "Solução robusta para empresas em expansão que precisam de tudo",
+    features: [
+      "Até 500 funcionários",
+      "Tudo do Growth incluído",
+      "Análise de equidade interna",
+      "Simulações de política salarial",
+      "Modelagem preditiva",
+      "Dashboard de riscos trabalhistas",
+      "Usuários ilimitados",
+      "Treinamento online"
+    ],
+    cta: "Começar Teste Grátis",
+    highlighted: false
+  },
+  "Enterprise": {
+    name: "Enterprise",
+    description: "Solução completa para grandes empresas e consultorias especializadas",
+    features: [
+      "+500 funcionários",
+      "Tudo do Business incluído",
+      "Consultoria dedicada",
+      "Integrações customizadas",
+      "API e webhooks",
+      "SLA garantido",
+      "Treinamento personalizado",
+      "Gerente de conta"
+    ],
+    cta: "Falar com Vendas",
+    highlighted: false
+  }
+};
 
 export const PricingSection = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState<Array<{
+    name: string;
+    price: string;
+    period: string;
+    description: string;
+    features: string[];
+    cta: string;
+    highlighted: boolean;
+    badge?: string;
+  }>>([]);
 
-  const plans = [
-    {
-      name: "Starter",
-      price: "R$ 249",
-      period: "/mês",
-      description: "Ideal para pequenas empresas começando a organizar remuneração",
-      features: [
-        "Até 50 funcionários",
-        "Estrutura básica de cargos",
-        "Dashboards essenciais",
-        "Suporte por email",
-        "2 usuários administradores"
-      ],
-      cta: "Começar Grátis",
-      highlighted: false
-    },
-    {
-      name: "Growth",
-      price: "R$ 499",
-      period: "/mês",
-      description: "Para empresas que querem crescer com inteligência e compliance",
-      badge: "Mais Popular",
-      features: [
-        "Até 250 funcionários",
-        "Agentes Inteligentes integrados",
-        "Benchmark de mercado",
-        "Gestão de PLR e incentivos",
-        "Compliance automático",
-        "Relatórios avançados",
-        "5 usuários",
-        "Suporte prioritário"
-      ],
-      cta: "Começar Teste Grátis",
-      highlighted: true
-    },
-    {
-      name: "Business",
-      price: "R$ 999",
-      period: "/mês",
-      description: "Solução robusta para empresas em expansão que precisam de tudo",
-      features: [
-        "Até 500 funcionários",
-        "Tudo do Growth incluído",
-        "Análise de equidade interna",
-        "Simulações de política salarial",
-        "Modelagem preditiva",
-        "Dashboard de riscos trabalhistas",
-        "Usuários ilimitados",
-        "Treinamento online"
-      ],
-      cta: "Começar Teste Grátis",
-      highlighted: false
-    },
-    {
-      name: "Enterprise",
-      price: "Sob consulta",
-      period: "",
-      description: "Solução completa para grandes empresas e consultorias especializadas",
-      features: [
-        "+500 funcionários",
-        "Tudo do Business incluído",
-        "Consultoria dedicada",
-        "Integrações customizadas",
-        "API e webhooks",
-        "SLA garantido",
-        "Treinamento personalizado",
-        "Gerente de conta"
-      ],
-      cta: "Falar com Vendas",
-      highlighted: false
-    }
-  ];
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('subscription_plans')
+          .select('name, monthly_price')
+          .eq('is_active', true)
+          .eq('is_public', true)
+          .order('monthly_price', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching plans:', error);
+          setLoading(false);
+          return;
+        }
+
+        if (data) {
+          const mappedPlans = data.map(dbPlan => {
+            const config = planConfigs[dbPlan.name] || {
+              name: dbPlan.name,
+              description: "",
+              features: [],
+              cta: "Começar",
+              highlighted: false
+            };
+
+            const isEnterprise = dbPlan.name === "Enterprise" || dbPlan.monthly_price === 0;
+            const price = isEnterprise 
+              ? "Sob consulta" 
+              : `R$ ${dbPlan.monthly_price.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
+            return {
+              name: config.name,
+              price,
+              period: isEnterprise ? "" : "/mês",
+              description: config.description,
+              features: config.features,
+              cta: config.cta,
+              highlighted: config.highlighted,
+              badge: config.badge
+            };
+          });
+
+          setPlans(mappedPlans);
+        }
+      } catch (err) {
+        console.error('Error fetching plans:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="pricing" className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="pricing" className="py-20 bg-background">
