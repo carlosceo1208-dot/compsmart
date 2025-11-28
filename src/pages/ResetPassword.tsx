@@ -6,21 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import { z } from "zod";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import compsmartLogo from "@/assets/compsmart-logo.png";
-
-const passwordSchema = z.object({
-  password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres"),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não correspondem",
-  path: ["confirmPassword"],
-});
+import { PasswordStrengthIndicator, validatePassword } from "@/components/auth/PasswordStrengthIndicator";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
@@ -31,25 +25,32 @@ const ResetPassword = () => {
     setLoading(true);
 
     try {
-      const validation = passwordSchema.parse(formData);
+      // Validate password strength
+      const passwordValidation = validatePassword(formData.password);
+      if (!passwordValidation.isValid) {
+        toast.error(passwordValidation.errors[0]);
+        return;
+      }
+
+      // Validate password match
+      if (formData.password !== formData.confirmPassword) {
+        toast.error("As senhas não correspondem");
+        return;
+      }
 
       const { error } = await supabase.auth.updateUser({
-        password: validation.password,
+        password: formData.password,
       });
 
       if (error) {
-        toast.error(error.message);
+        toast.error("Erro ao redefinir senha. Tente novamente.");
         return;
       }
 
       toast.success("Senha redefinida com sucesso!");
       navigate("/auth");
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast.error(error.errors[0].message);
-      } else {
-        toast.error("Erro ao processar solicitação");
-      }
+      toast.error("Erro ao processar solicitação");
     } finally {
       setLoading(false);
     }
@@ -65,7 +66,7 @@ const ResetPassword = () => {
           <div>
             <CardTitle className="text-3xl font-bold">Nova Senha</CardTitle>
             <CardDescription className="text-base mt-2">
-              Digite sua nova senha
+              Crie uma senha forte e segura
             </CardDescription>
           </div>
         </CardHeader>
@@ -73,35 +74,62 @@ const ResetPassword = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="password">Nova Senha</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-                disabled={loading}
-              />
-              <p className="text-xs text-muted-foreground">
-                Mínimo 8 caracteres, incluindo letras e números
-              </p>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                  disabled={loading}
+                  maxLength={128}
+                  autoComplete="new-password"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <PasswordStrengthIndicator password={formData.password} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-                disabled={loading}
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••••"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  required
+                  disabled={loading}
+                  maxLength={128}
+                  autoComplete="new-password"
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+                <p className="text-xs text-destructive">As senhas não correspondem</p>
+              )}
             </div>
             <Button
               type="submit"
               className="w-full bg-gradient-primary hover:opacity-90"
-              disabled={loading}
+              disabled={loading || !formData.password || formData.password !== formData.confirmPassword}
             >
               {loading ? (
                 <>
