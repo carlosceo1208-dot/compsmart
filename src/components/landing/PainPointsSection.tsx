@@ -36,11 +36,11 @@ export const PainPointsSection = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Sua empresa ainda enfrenta{" "}
-              <span className="text-destructive">esses desafios?</span>
+              Ainda improvisa na{" "}
+              <span className="text-destructive">gestão de remuneração?</span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              A gestão de remuneração não pode ser improvisada. Empresas modernas precisam de sistemas inteligentes.
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Empresas líderes exigem mais que planilhas. Com a CompSmart, você e a inteligência artificial orquestram no detalhe toda a gestão de Cargos, Salários, Benefícios, Programas de Incentivos e outros, garantindo a atração e retenção dos melhores talentos com total equidade. Transforme sua remuneração em uma vantagem estratégica decisiva para o seu negócio.
             </p>
           </div>
 
