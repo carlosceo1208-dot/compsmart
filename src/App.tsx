@@ -39,6 +39,10 @@ import Onboarding from "./pages/Onboarding";
 import Organogram from "./pages/Organogram";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Checkout from "./pages/Checkout";
+import CheckoutSuccess from "./pages/checkout/Success";
+import CheckoutProcessing from "./pages/checkout/Processing";
+import Billing from "./pages/settings/Billing";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -58,6 +62,9 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/termos-de-uso" element={<TermsOfUse />} />
             <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
+            <Route path="/checkout/processing" element={<CheckoutProcessing />} />
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/employees" element={<Employees />} />
@@ -86,6 +93,7 @@ const App = () => (
               <Route path="/alert-settings" element={<AlertSettings />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/settings/plans" element={<Plans />} />
+              <Route path="/settings/billing" element={<Billing />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

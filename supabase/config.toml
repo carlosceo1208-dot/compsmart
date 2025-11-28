@@ -26,3 +26,12 @@ verify_jwt = false
 
 [functions.support-assistant]
 verify_jwt = true
+
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.pagarme-webhook]
+verify_jwt = false
+
+[functions.validate-coupon]
+verify_jwt = true
