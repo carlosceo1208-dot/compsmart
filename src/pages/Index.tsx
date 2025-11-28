@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -16,21 +15,19 @@ import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 
 const Index = () => {
-  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
-      }
+      setIsLoggedIn(!!session);
     };
     checkSession();
-  }, [navigate]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <Header isLoggedIn={isLoggedIn} />
       <HeroSection />
       <PainPointsSection />
       <SolutionSection />

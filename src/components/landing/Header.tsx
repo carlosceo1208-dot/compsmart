@@ -1,10 +1,15 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 
-export const Header = () => {
+interface HeaderProps {
+  isLoggedIn?: boolean;
+}
+
+export const Header = ({ isLoggedIn = false }: HeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -14,6 +19,11 @@ export const Header = () => {
       element.scrollIntoView({ behavior: "smooth" });
       setIsMenuOpen(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
   };
 
   return (
@@ -36,12 +46,28 @@ export const Header = () => {
             <button onClick={() => scrollToSection("faq")} className="text-sm text-muted-foreground hover:text-primary transition-colors">
               FAQ
             </button>
-            <Button variant="outline" onClick={() => navigate("/auth")} size="sm">
-              Entrar
-            </Button>
-            <Button onClick={() => navigate("/auth")} size="sm" className="bg-gradient-primary">
-              Começar Grátis
-            </Button>
+            
+            {isLoggedIn ? (
+              <>
+                <Button variant="outline" onClick={() => navigate("/dashboard")} size="sm">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Ir para Dashboard
+                </Button>
+                <Button variant="ghost" onClick={handleLogout} size="sm">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => navigate("/auth")} size="sm">
+                  Entrar
+                </Button>
+                <Button onClick={() => navigate("/auth")} size="sm" className="bg-gradient-primary">
+                  Começar Grátis
+                </Button>
+              </>
+            )}
           </nav>
 
           {/* Mobile Menu Button */}
@@ -65,12 +91,28 @@ export const Header = () => {
             <button onClick={() => scrollToSection("faq")} className="text-left text-sm text-muted-foreground hover:text-primary">
               FAQ
             </button>
-            <Button variant="outline" onClick={() => navigate("/auth")} className="w-full">
-              Entrar
-            </Button>
-            <Button onClick={() => navigate("/auth")} className="w-full bg-gradient-primary">
-              Começar Grátis
-            </Button>
+            
+            {isLoggedIn ? (
+              <>
+                <Button variant="outline" onClick={() => navigate("/dashboard")} className="w-full">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Ir para Dashboard
+                </Button>
+                <Button variant="ghost" onClick={handleLogout} className="w-full">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => navigate("/auth")} className="w-full">
+                  Entrar
+                </Button>
+                <Button onClick={() => navigate("/auth")} className="w-full bg-gradient-primary">
+                  Começar Grátis
+                </Button>
+              </>
+            )}
           </nav>
         )}
       </div>
