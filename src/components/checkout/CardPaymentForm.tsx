@@ -12,6 +12,8 @@ interface CardPaymentFormProps {
   total: number;
 }
 
+const PAGARME_PUBLIC_KEY = 'pk_bGW21WpFxiM5d9Zy';
+
 export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentFormProps) {
   const [cardData, setCardData] = useState({
     number: '',
@@ -20,6 +22,7 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
     exp_year: '',
     cvv: '',
   });
+  const [tokenizing, setTokenizing] = useState(false);
 
   const formatCardNumber = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -27,36 +30,74 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
     return groups ? groups.join(' ').substring(0, 19) : '';
   };
 
+  const createCardToken = async (): Promise<string> => {
+    const response = await fetch(`https://api.pagar.me/core/v5/tokens?appId=${PAGARME_PUBLIC_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'card',
+        card: {
+          number: cardData.number.replace(/\s/g, ''),
+          holder_name: cardData.holder_name,
+          exp_month: parseInt(cardData.exp_month),
+          exp_year: parseInt('20' + cardData.exp_year),
+          cvv: cardData.cvv
+        }
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('Pagar.me tokenization error:', data);
+      throw new Error(data.message || 'Erro ao validar cartão');
+    }
+    
+    console.log('Card token created:', data.id);
+    return data.id;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validação básica
     if (!cardData.number || !cardData.holder_name || !cardData.exp_month || !cardData.exp_year || !cardData.cvv) {
       toast.error('Preencha todos os campos do cartão');
       return;
     }
 
-    try {
-      // Em produção, usar SDK Pagar.me para tokenizar
-      // Por enquanto, simulando token
-      const mockToken = `card_token_${Date.now()}`;
-      
-      // Aqui você integraria com o SDK Pagar.me para tokenização real:
-      // const card = pagarme.card({
-      //   number: cardData.number.replace(/\s/g, ''),
-      //   holder_name: cardData.holder_name,
-      //   exp_month: cardData.exp_month,
-      //   exp_year: cardData.exp_year,
-      //   cvv: cardData.cvv
-      // });
-      // const token = await card.createToken();
+    // Validação básica do número do cartão
+    const cardNumber = cardData.number.replace(/\s/g, '');
+    if (cardNumber.length < 13 || cardNumber.length > 19) {
+      toast.error('Número do cartão inválido');
+      return;
+    }
 
-      onSubmit(mockToken);
+    // Validação do mês
+    const month = parseInt(cardData.exp_month);
+    if (month < 1 || month > 12) {
+      toast.error('Mês de validade inválido');
+      return;
+    }
+
+    // Validação do CVV
+    if (cardData.cvv.length < 3 || cardData.cvv.length > 4) {
+      toast.error('CVV inválido');
+      return;
+    }
+
+    try {
+      setTokenizing(true);
+      const realToken = await createCardToken();
+      onSubmit(realToken);
     } catch (error) {
       console.error('Error tokenizing card:', error);
-      toast.error('Erro ao processar cartão');
+      toast.error('Erro ao validar cartão. Verifique os dados e tente novamente.');
+    } finally {
+      setTokenizing(false);
     }
   };
+
+  const isLoading = tokenizing || processing;
 
   return (
     <Card>
@@ -76,6 +117,7 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
               value={cardData.number}
               onChange={(e) => setCardData({ ...cardData, number: formatCardNumber(e.target.value) })}
               maxLength={19}
+              disabled={isLoading}
             />
           </div>
 
@@ -86,6 +128,7 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
               placeholder="NOME COMO ESTÁ NO CARTÃO"
               value={cardData.holder_name}
               onChange={(e) => setCardData({ ...cardData, holder_name: e.target.value.toUpperCase() })}
+              disabled={isLoading}
             />
           </div>
 
@@ -98,6 +141,7 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
                 maxLength={2}
                 value={cardData.exp_month}
                 onChange={(e) => setCardData({ ...cardData, exp_month: e.target.value.replace(/\D/g, '') })}
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -108,6 +152,7 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
                 maxLength={2}
                 value={cardData.exp_year}
                 onChange={(e) => setCardData({ ...cardData, exp_year: e.target.value.replace(/\D/g, '') })}
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -119,16 +164,22 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
                 type="password"
                 value={cardData.cvv}
                 onChange={(e) => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '') })}
+                disabled={isLoading}
               />
             </div>
           </div>
 
           <div className="pt-4">
-            <Button type="submit" disabled={processing} className="w-full" size="lg">
-              {processing ? (
+            <Button type="submit" disabled={isLoading} className="w-full" size="lg">
+              {tokenizing ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Processando...
+                  Validando cartão...
+                </>
+              ) : processing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Processando pagamento...
                 </>
               ) : (
                 <>
