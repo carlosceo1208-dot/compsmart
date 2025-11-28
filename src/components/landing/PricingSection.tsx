@@ -84,6 +84,7 @@ export const PricingSection = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<Array<{
+    id: string;
     name: string;
     price: string;
     period: string;
@@ -99,7 +100,7 @@ export const PricingSection = () => {
       try {
         const { data, error } = await supabase
           .from('subscription_plans')
-          .select('name, monthly_price')
+          .select('id, name, monthly_price')
           .eq('is_active', true)
           .eq('is_public', true)
           .order('monthly_price', { ascending: true });
@@ -126,6 +127,7 @@ export const PricingSection = () => {
               : `R$ ${dbPlan.monthly_price.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
             return {
+              id: dbPlan.id,
               name: config.name,
               price,
               period: isEnterprise ? "" : "/mês",
@@ -228,7 +230,13 @@ export const PricingSection = () => {
                         : 'bg-secondary hover:bg-secondary/80'
                     }`}
                     size="sm"
-                    onClick={() => navigate("/auth")}
+                    onClick={() => {
+                      if (plan.name === "Enterprise") {
+                        window.location.href = 'mailto:vendas@compsmart.com.br?subject=CompSmart Enterprise - Solicitação de Contato';
+                      } else {
+                        navigate(`/checkout?plan=${plan.id}&cycle=monthly`);
+                      }
+                    }}
                   >
                     {plan.cta}
                   </Button>
