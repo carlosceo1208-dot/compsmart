@@ -196,7 +196,16 @@ serve(async (req) => {
         credit_card: {
           card_token: card_token,
           installments: 1,
-          statement_descriptor: 'COMPSMART'
+          statement_descriptor: 'COMPSMART',
+          card: {
+            billing_address: {
+              line_1: '123, Av Paulista',
+              zip_code: '01310100',
+              city: 'São Paulo',
+              state: 'SP',
+              country: 'BR'
+            }
+          }
         }
       });
     } else if (payment_method === 'boleto') {
