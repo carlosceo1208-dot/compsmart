@@ -348,7 +348,7 @@ export const PricingSection = () => {
                     transition: `opacity 0.5s ease-out ${index * 0.15}s, transform 0.5s ease-out ${index * 0.15}s`
                   }}
                   className={`
-                    relative flex flex-col
+                    relative flex flex-col overflow-visible
                     transition-all duration-300 ease-out
                     hover:scale-[1.02]
                     ${plan.colorClasses.shadow}
@@ -364,7 +364,7 @@ export const PricingSection = () => {
                   </div>
 
                   {plan.badge && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
                       <Badge className={`${plan.colorClasses.button} px-4 py-1.5 animate-pulse shadow-lg`}>
                         <Sparkles className="h-3 w-3 mr-1 animate-bounce" />
                         {plan.badge}
