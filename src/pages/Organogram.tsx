@@ -1,10 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Network, Download, ZoomIn, ZoomOut } from "lucide-react";
+import { Network, Download, ZoomIn, ZoomOut, FileImage, FileText } from "lucide-react";
 import { OrgTree } from "@/components/organogram/OrgTree";
 import { OrgFilters } from "@/components/organogram/OrgFilters";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface OrgEntity {
   id: string;
@@ -34,6 +40,7 @@ export default function Organogram() {
   const [entities, setEntities] = useState<OrgEntity[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [units, setUnits] = useState<Array<{ id: string; name: string }>>([]);
+  const orgChartRef = useRef<HTMLDivElement>(null);
   
   // Filtros
   const [searchTerm, setSearchTerm] = useState("");
@@ -153,8 +160,88 @@ export default function Organogram() {
       .filter(Boolean) as OrgEntity[];
   };
 
-  const handleExport = () => {
-    toast.info('Funcionalidade de exportação será implementada em breve');
+  const exportToPNG = async () => {
+    if (!orgChartRef.current) return;
+    
+    try {
+      toast.info('Gerando imagem...');
+      const html2canvas = (await import('html2canvas')).default;
+      
+      // Salvar zoom original e resetar para 100%
+      const originalZoom = zoom;
+      setZoom(100);
+      
+      // Aguardar re-render
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      const canvas = await html2canvas(orgChartRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      
+      // Restaurar zoom original
+      setZoom(originalZoom);
+      
+      // Download
+      const link = document.createElement('a');
+      link.download = `organograma-${new Date().toISOString().split('T')[0]}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      toast.success('Organograma exportado como PNG!');
+    } catch (error) {
+      console.error('Erro ao exportar PNG:', error);
+      toast.error('Erro ao exportar imagem');
+    }
+  };
+
+  const exportToPDF = async () => {
+    if (!orgChartRef.current) return;
+    
+    try {
+      toast.info('Gerando PDF...');
+      const html2canvas = (await import('html2canvas')).default;
+      const { default: jsPDF } = await import('jspdf');
+      
+      // Salvar zoom original e resetar para 100%
+      const originalZoom = zoom;
+      setZoom(100);
+      
+      // Aguardar re-render
+      await new Promise(resolve => setTimeout(resolve, 150));
+      
+      const canvas = await html2canvas(orgChartRef.current, {
+        backgroundColor: '#ffffff',
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      
+      // Restaurar zoom original
+      setZoom(originalZoom);
+      
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      // Determinar orientação baseado no aspect ratio
+      const isLandscape = imgWidth > imgHeight;
+      const doc = new jsPDF({
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [imgWidth / 2, imgHeight / 2]
+      });
+      
+      doc.addImage(imgData, 'PNG', 0, 0, imgWidth / 2, imgHeight / 2);
+      doc.save(`organograma-${new Date().toISOString().split('T')[0]}.pdf`);
+      
+      toast.success('Organograma exportado como PDF!');
+    } catch (error) {
+      console.error('Erro ao exportar PDF:', error);
+      toast.error('Erro ao exportar PDF');
+    }
   };
 
   if (loading) {
@@ -202,10 +289,25 @@ export default function Organogram() {
           >
             <ZoomIn className="w-4 h-4" />
           </Button>
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="w-4 h-4 mr-2" />
-            Exportar
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <Download className="w-4 h-4 mr-2" />
+                Exportar
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={exportToPNG}>
+                <FileImage className="w-4 h-4 mr-2" />
+                Exportar como PNG
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToPDF}>
+                <FileText className="w-4 h-4 mr-2" />
+                Exportar como PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -224,7 +326,8 @@ export default function Organogram() {
 
       {/* Organograma */}
       <div 
-        className="bg-card border rounded-lg overflow-auto"
+        ref={orgChartRef}
+        className="bg-card border rounded-lg overflow-auto p-6"
         style={{ 
           transform: `scale(${zoom / 100})`,
           transformOrigin: 'top left',
