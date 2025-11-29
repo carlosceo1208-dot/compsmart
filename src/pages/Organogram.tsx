@@ -124,7 +124,7 @@ export default function Organogram() {
     return node.children?.some(child => containsSelectedUnit(child)) || false;
   };
 
-  const filterTree = (nodes: OrgEntity[]): OrgEntity[] => {
+  const filterTree = (nodes: OrgEntity[], isDescendantOfSelected: boolean = false): OrgEntity[] => {
     if (!searchTerm && selectedUnit === 'all') return nodes;
 
     return nodes
@@ -142,9 +142,15 @@ export default function Organogram() {
           )
         ) : true;
 
-        const filteredChildren = node.children ? filterTree(node.children) : [];
+        // Filhos são descendentes se: já éramos descendentes OU este nó é a unidade selecionada
+        const childrenAreDescendants = isDescendantOfSelected || isSelectedUnit;
+        const filteredChildren = node.children 
+          ? filterTree(node.children, childrenAreDescendants) 
+          : [];
         
         const filteredEmployees = node.employees?.filter(e => {
+          // Se é descendente da unidade selecionada e não há busca, incluir todos
+          if ((isDescendantOfSelected || isSelectedUnit) && !searchTerm) return true;
           if (!searchTerm) return true;
           return (
             e.full_name.toLowerCase().includes(search) ||
@@ -155,11 +161,13 @@ export default function Organogram() {
         let shouldInclude = false;
 
         if (selectedUnit !== 'all' && !searchTerm) {
-          shouldInclude = hasSelectedUnit;
+          // Incluir se: é ancestral/igual à unidade selecionada OU é descendente dela
+          shouldInclude = hasSelectedUnit || isDescendantOfSelected;
         } else if (selectedUnit === 'all' && searchTerm) {
           shouldInclude = matchesSearchText || filteredChildren.length > 0;
         } else if (selectedUnit !== 'all' && searchTerm) {
-          shouldInclude = hasSelectedUnit && (matchesSearchText || filteredChildren.length > 0);
+          shouldInclude = (hasSelectedUnit || isDescendantOfSelected) && 
+                          (matchesSearchText || filteredChildren.length > 0);
         }
 
         if (shouldInclude) {
