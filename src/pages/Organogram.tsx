@@ -9,6 +9,7 @@ import { toast } from "sonner";
 interface OrgEntity {
   id: string;
   name: string;
+  description?: string;
   type: string;
   code?: string;
   parent_id: string | null;
@@ -52,7 +53,7 @@ export default function Organogram() {
       // Buscar estrutura organizacional
       const { data: entitiesData, error: entitiesError } = await supabase
         .from('organizational_structure')
-        .select('id, name, type, code, parent_id')
+        .select('id, name, description, type, code, parent_id')
         .order('name');
 
       if (entitiesError) throw entitiesError;
@@ -72,10 +73,10 @@ export default function Organogram() {
       const tree = buildTree(entitiesData || [], employeesData || []);
       setEntities(tree);
 
-      // Construir lista de unidades para filtro
+      // Construir lista de unidades para filtro (usar description para exibição)
       const unitsList = (entitiesData || [])
         .filter(e => ['area', 'department', 'sector', 'project'].includes(e.type))
-        .map(e => ({ id: e.id, name: e.name }));
+        .map(e => ({ id: e.id, name: e.description || e.name }));
       setUnits(unitsList);
 
     } catch (error) {

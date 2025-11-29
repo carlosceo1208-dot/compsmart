@@ -10,6 +10,7 @@ import {
 interface OrgEntity {
   id: string;
   name: string;
+  description?: string;
   type: string;
   code?: string;
   parent_id: string | null;
@@ -48,7 +49,9 @@ export function OrgTree({ data, viewMode, showPhotos, onNodeClick }: OrgTreeProp
         {(viewMode === 'entities' || viewMode === 'hybrid') && (
           <OrgNode
             type="entity"
-            name={node.name}
+            name={['area', 'department', 'sector', 'project'].includes(node.type) 
+              ? (node.description || node.name) 
+              : node.name}
             subtitle={node.code}
             employeeCount={node.employees?.length}
             onClick={() => onNodeClick?.(node)}
