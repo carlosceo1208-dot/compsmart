@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Settings as SettingsIcon } from 'lucide-react';
+import { Settings as SettingsIcon, FileEdit, CreditCard, Crown, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 export default function Settings() {
   const { labels, updateLabel } = useLabels();
@@ -97,6 +99,33 @@ export default function Settings() {
     }
   ];
 
+  const { data: userRole } = useCurrentUserRole();
+  const isAdmin = userRole?.isAdmin || false;
+
+  const settingsLinks = [
+    { 
+      title: 'Planos', 
+      description: 'Gerencie os planos de assinatura', 
+      path: '/settings/plans', 
+      icon: Crown,
+      adminOnly: true 
+    },
+    { 
+      title: 'Faturamento', 
+      description: 'Visualize faturas e métodos de pagamento', 
+      path: '/settings/billing', 
+      icon: CreditCard,
+      adminOnly: false 
+    },
+    { 
+      title: 'Conteúdo da Landing Page', 
+      description: 'Edite os textos da página inicial', 
+      path: '/settings/landing-content', 
+      icon: FileEdit,
+      adminOnly: true 
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -104,10 +133,40 @@ export default function Settings() {
         <div>
           <h1 className="text-3xl font-bold">Configurações do Sistema</h1>
           <p className="text-muted-foreground mt-1">
-            Personalize a nomenclatura utilizada no sistema
+            Personalize a nomenclatura e gerencie configurações
           </p>
         </div>
       </div>
+
+      {/* Quick Links Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Acesso Rápido</CardTitle>
+          <CardDescription>
+            Navegue para outras áreas de configuração
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {settingsLinks
+              .filter(link => !link.adminOnly || isAdmin)
+              .map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className="flex items-center gap-3 p-4 rounded-lg border hover:bg-accent transition-colors"
+                >
+                  <link.icon className="h-5 w-5 text-muted-foreground" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm">{link.title}</p>
+                    <p className="text-xs text-muted-foreground">{link.description}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+              ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Labels Section */}
       <Card>

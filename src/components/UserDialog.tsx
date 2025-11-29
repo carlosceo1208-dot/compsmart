@@ -519,12 +519,25 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         // Create new user
         const validation = userSchema.parse(formData);
 
+        // Buscar root_company_id do usuário admin atual
+        const { data: currentUser } = await supabase.auth.getUser();
+        const { data: adminProfile } = await supabase
+          .from('profiles')
+          .select('root_company_id')
+          .eq('id', currentUser.user?.id)
+          .single();
+
+        if (!adminProfile?.root_company_id) {
+          throw new Error('Você precisa estar vinculado a uma empresa para cadastrar funcionários');
+        }
+
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: validation.email,
           password: validation.password!,
           options: {
             data: {
               full_name: validation.full_name,
+              root_company_id: adminProfile.root_company_id,
             },
           },
         });
