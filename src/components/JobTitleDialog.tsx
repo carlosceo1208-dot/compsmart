@@ -165,8 +165,9 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
   };
 
   const handleGenerateAI = async (mode: 'summary' | 'full' = 'full') => {
-    if (!formData.title || !formData.grade || !formData.cbo) {
-      toast.error("Preencha título, grade e CBO antes de gerar com IA");
+    // CBO agora é opcional - IA vai sugerir se não fornecido
+    if (!formData.title || !formData.grade) {
+      toast.error("Preencha título e grade antes de gerar com IA");
       return;
     }
 
@@ -176,7 +177,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
         body: {
           jobTitle: formData.title,
           grade: formData.grade,
-          cbo: formData.cbo,
+          cbo: formData.cbo || undefined, // Não envia se vazio - IA vai sugerir
           jobFamily: formData.job_family,
           mode
         }
@@ -192,6 +193,8 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
       // Update form with AI-generated content
       setFormData(prev => ({
         ...prev,
+        // Se IA sugeriu CBO e campo estava vazio, aplica sugestão
+        cbo: data.suggested_cbo && !prev.cbo ? data.suggested_cbo : prev.cbo,
         summary: data.summary || prev.summary,
         main_responsibilities: data.main_responsibilities || prev.main_responsibilities,
         key_factors: data.key_factors || prev.key_factors,
@@ -202,7 +205,15 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
         required_education: data.required_education || prev.required_education,
       }));
 
-      toast.success(mode === 'full' ? "Descrição completa gerada!" : "Sumário gerado!");
+      // Notifica sobre CBO sugerido
+      if (data.suggested_cbo && !formData.cbo) {
+        toast.success(`CBO sugerido: ${data.suggested_cbo} - ${data.cbo_title}`, {
+          description: data.cbo_reasoning,
+          duration: 6000,
+        });
+      } else {
+        toast.success(mode === 'full' ? "Descrição completa gerada!" : "Sumário gerado!");
+      }
     } catch (error: any) {
       console.error('AI generation error:', error);
       toast.error("Erro ao gerar descrição com IA");

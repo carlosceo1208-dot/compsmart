@@ -13,9 +13,10 @@ serve(async (req) => {
   try {
     const { jobTitle, grade, cbo, jobFamily, mode = 'full' } = await req.json();
     
-    if (!jobTitle || !grade || !cbo) {
+    // CBO agora é opcional - IA vai sugerir se não fornecido
+    if (!jobTitle || !grade) {
       return new Response(
-        JSON.stringify({ error: 'jobTitle, grade e cbo são obrigatórios' }),
+        JSON.stringify({ error: 'jobTitle e grade são obrigatórios' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -28,30 +29,42 @@ serve(async (req) => {
     // Build prompt based on mode
     const systemPrompt = `Você é um especialista em RH e estruturação de cargos no Brasil.
 Gere descrições profissionais e objetivas baseadas nas melhores práticas de mercado.
+Você conhece profundamente a Classificação Brasileira de Ocupações (CBO) e sabe identificar o código mais adequado para cada cargo.
 Sempre retorne um JSON válido com as chaves solicitadas.`;
 
     let userPrompt = '';
     
+    // Instrução sobre CBO
+    const cboInstruction = cbo 
+      ? `- CBO informado: ${cbo}` 
+      : `- CBO: NÃO INFORMADO - você DEVE sugerir o código CBO mais adequado baseado no título, família e nível do cargo`;
+    
     if (mode === 'summary') {
       userPrompt = `Gere um sumário executivo para o cargo:
 - Título: ${jobTitle}
-- Família: ${jobFamily}
+- Família: ${jobFamily || 'Não informada'}
 - Grade: ${grade}
-- CBO: ${cbo}
+${cboInstruction}
 
 Retorne JSON com:
 {
+  ${!cbo ? `"suggested_cbo": "XXXX-XX",
+  "cbo_title": "Nome oficial da ocupação conforme CBO",
+  "cbo_reasoning": "Breve justificativa (1-2 frases) explicando a escolha do CBO",` : ''}
   "summary": "2-3 frases descrevendo o propósito e escopo do cargo"
 }`;
     } else {
       userPrompt = `Gere a descrição completa para o cargo:
 - Título: ${jobTitle}
-- Família: ${jobFamily}
+- Família: ${jobFamily || 'Não informada'}
 - Grade: ${grade}
-- CBO: ${cbo}
+${cboInstruction}
 
 Retorne JSON com:
 {
+  ${!cbo ? `"suggested_cbo": "XXXX-XX",
+  "cbo_title": "Nome oficial da ocupação conforme CBO",
+  "cbo_reasoning": "Breve justificativa (1-2 frases) explicando a escolha do CBO",` : ''}
   "summary": "2-3 frases executivas",
   "main_responsibilities": "Lista de 5-7 responsabilidades principais (separadas por quebra de linha)",
   "key_factors": "Competências críticas e fatores determinantes",
