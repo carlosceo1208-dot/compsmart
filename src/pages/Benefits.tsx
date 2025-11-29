@@ -18,6 +18,7 @@ import { BenefitDialog } from '@/components/benefits/BenefitDialog';
 import { EmployeeBenefitDialog } from '@/components/benefits/EmployeeBenefitDialog';
 import { BenefitsHistoryChart } from '@/components/benefits/BenefitsHistoryChart';
 import { BenefitsComparisonDashboard } from '@/components/benefits/BenefitsComparisonDashboard';
+import { BenefitsCostDistributionChart } from '@/components/benefits/BenefitsCostDistributionChart';
 import { EmployeeBenefitAssignmentFilters } from '@/components/benefits/EmployeeBenefitAssignmentFilters';
 import { EmployeePagination } from '@/components/benefits/EmployeePagination';
 import { BulkBenefitAssignment } from '@/components/benefits/BulkBenefitAssignment';
@@ -396,6 +397,9 @@ const Benefits = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Gráfico de Distribuição de Custos */}
+      <BenefitsCostDistributionChart />
 
       <Tabs defaultValue="catalog" className="space-y-4">
         <TabsList>
