@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { SalaryTableSelector } from "@/components/SalaryTableSelector";
 import { SurveyTableSelector } from "@/components/SurveyTableSelector";
 import { ArrowUp, ArrowDown } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { formatCompactCurrency } from "@/lib/formatters";
 
 interface ComparisonRow {
   grade: string;
@@ -191,13 +193,82 @@ export default function SalaryComparison() {
       </div>
 
       {salaryTableId && surveyTableId && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Comparação por Grade</CardTitle>
-            <CardDescription>
-              Análise comparativa dos pontos médios por grade/nível
-            </CardDescription>
-          </CardHeader>
+        <>
+          {/* Gráfico de Linhas Comparativo */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Curva Comparativa de Medianas</CardTitle>
+              <CardDescription>
+                Visualização gráfica da comparação por grade/nível
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="h-[350px] flex items-center justify-center">
+                  <p className="text-muted-foreground">Carregando...</p>
+                </div>
+              ) : comparisonData.length === 0 ? (
+                <div className="h-[350px] flex items-center justify-center">
+                  <p className="text-muted-foreground">Nenhum dado disponível</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis 
+                      dataKey="grade" 
+                      tick={{ fontSize: 12 }}
+                      className="text-muted-foreground"
+                    />
+                    <YAxis 
+                      tickFormatter={(value) => formatCompactCurrency(value)}
+                      tick={{ fontSize: 12 }}
+                      className="text-muted-foreground"
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => formatCurrency(value)}
+                      labelFormatter={(label) => `Grade: ${label}`}
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))',
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="internal_median" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6 }}
+                      name="Tabela Interna"
+                      connectNulls
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="survey_median" 
+                      stroke="hsl(25, 95%, 53%)" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(25, 95%, 53%)', strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6 }}
+                      name="Pesquisa de Mercado"
+                      connectNulls
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Tabela Comparativa */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Comparação por Grade</CardTitle>
+              <CardDescription>
+                Análise comparativa dos pontos médios por grade/nível
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             {loading ? (
               <p className="text-center text-muted-foreground py-8">Carregando...</p>
@@ -261,7 +332,8 @@ export default function SalaryComparison() {
               </div>
             )}
           </CardContent>
-        </Card>
+          </Card>
+        </>
       )}
     </div>
   );
