@@ -2039,6 +2039,39 @@ export type Database = {
           },
         ]
       }
+      site_content: {
+        Row: {
+          content: Json
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          section_key: string
+          section_name: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          content?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          section_key: string
+          section_name: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          content?: Json
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          section_key?: string
+          section_name?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           annual_price: number
