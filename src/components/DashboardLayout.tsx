@@ -18,6 +18,7 @@ import compsmartLogo from "@/assets/compsmart-logo.png";
 import { SecurityFooter } from "@/components/SecurityFooter";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { SupportWidget } from "@/components/support/SupportWidget";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface UserProfile {
   full_name: string;
@@ -135,7 +136,7 @@ export const DashboardLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/dashboard")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 transition-all duration-300"
+              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
             >
               <Home className="w-4 h-4 mr-2" />
               Dashboard
@@ -144,7 +145,7 @@ export const DashboardLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/employees")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 transition-all duration-300"
+              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
             >
               <UsersIcon className="w-4 h-4 mr-2" />
               {getLabel('employee')}s
@@ -153,7 +154,7 @@ export const DashboardLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/salary-ranges")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 transition-all duration-300"
+              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
             >
               <DollarSign className="w-4 h-4 mr-2" />
               Tabela Salarial
@@ -162,7 +163,7 @@ export const DashboardLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/organograma")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 transition-all duration-300"
+              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
             >
               <Network className="w-4 h-4 mr-2" />
               Organograma
@@ -171,11 +172,13 @@ export const DashboardLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate("/job-titles")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 transition-all duration-300"
+              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
             >
               <Briefcase className="w-4 h-4 mr-2" />
               Cargos & Salários
             </Button>
+
+            <ThemeToggle />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
