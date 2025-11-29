@@ -4,13 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Calculator, Send, History, FileText, ShieldCheck, ArrowDown, Bot, TrendingUp, BarChart3, Target, DollarSign } from 'lucide-react';
+import { Calculator, Send, History, FileText, ShieldCheck, ArrowDown, Bot, TrendingUp, BarChart3, Target, DollarSign, Archive } from 'lucide-react';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useSalaryAssistantSessions } from '@/hooks/useSalaryAssistantSessions';
+import { cn } from '@/lib/utils';
 
 interface Conversation {
   id: string;
@@ -58,27 +60,38 @@ const SalaryAssistant = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [showNewBadge, setShowNewBadge] = useState(false);
   const { toast } = useToast();
 
-  const maxChars = 50000;
+  const {
+    sessions,
+    currentSessionId,
+    setCurrentSessionId,
+    showArchived,
+    setShowArchived,
+    createNewSession,
+    archiveSession,
+    fetchSessionConversations,
+    refreshSessions,
+  } = useSalaryAssistantSessions();
 
-  useEffect(() => {
-    fetchConversations();
-  }, []);
+  const maxChars = 50000;
 
   useEffect(() => {
     setCharCount(question.length + documentText.length);
   }, [question, documentText]);
 
   useEffect(() => {
+    if (currentSessionId) {
+      loadSessionConversations();
+    }
+  }, [currentSessionId]);
+
+  useEffect(() => {
     if (conversations.length > 0 && !loading) {
-      setShowNewBadge(true);
       setTimeout(() => {
         if (scrollAreaRef.current) {
           scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
         }
-        setTimeout(() => setShowNewBadge(false), 3000);
       }, 100);
     }
   }, [conversations, loading]);
@@ -97,16 +110,10 @@ const SalaryAssistant = () => {
     }
   };
 
-  const fetchConversations = async () => {
-    const { data } = await supabase
-      .from('salary_assistant_conversations')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10);
-
-    if (data) {
-      setConversations(data);
-    }
+  const loadSessionConversations = async () => {
+    if (!currentSessionId) return;
+    const data = await fetchSessionConversations(currentSessionId);
+    setConversations(data);
   };
 
   const handleFileSelect = (file: File, text: string) => {
@@ -128,6 +135,12 @@ const SalaryAssistant = () => {
   const handleSubmit = async () => {
     if (!question.trim()) return;
 
+    let sessionId = currentSessionId;
+    if (!sessionId) {
+      sessionId = await createNewSession();
+      if (!sessionId) return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('salary-assistant', {
@@ -135,6 +148,7 @@ const SalaryAssistant = () => {
           question, 
           document_text: documentText || undefined,
           document_name: documentName || undefined,
+          session_id: sessionId,
         },
       });
 
@@ -156,7 +170,8 @@ const SalaryAssistant = () => {
 
       setQuestion('');
       handleFileRemove();
-      fetchConversations();
+      await loadSessionConversations();
+      refreshSessions();
     } catch (error: any) {
       toast({
         title: 'Erro ao processar análise',
@@ -199,44 +214,70 @@ const SalaryAssistant = () => {
 
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <History className="w-5 h-5" />
-                Histórico
+                Sessões
               </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowArchived(!showArchived)}
+                >
+                  {showArchived ? 'Ativas' : 'Arquivadas'}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={createNewSession}
+                >
+                  + Nova
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="h-[600px] overflow-y-auto scroll-smooth pr-2">
                 <div className="space-y-2">
-                  {conversations.length === 0 ? (
+                  {sessions.length === 0 ? (
                     <p className="text-sm text-muted-foreground text-center py-8">
-                      Nenhuma análise ainda
+                      {showArchived ? 'Nenhuma sessão arquivada' : 'Nenhuma sessão ativa'}
                     </p>
                   ) : (
-                    conversations.map((conv) => (
+                    sessions.map((session) => (
                       <Card
-                        key={conv.id}
-                        className="p-3 cursor-pointer hover:bg-accent transition-colors"
-                      >
-                        <p className="text-sm font-medium line-clamp-2">
-                          {conv.question}
-                        </p>
-                        {conv.operation_mode && (
-                          <Badge variant="outline" className="mt-1 text-xs">
-                            {conv.operation_mode}
-                          </Badge>
+                        key={session.id}
+                        className={cn(
+                          "p-3 cursor-pointer transition-colors",
+                          currentSessionId === session.id 
+                            ? "border-primary bg-accent" 
+                            : "hover:bg-accent"
                         )}
-                        {conv.document_name && (
-                          <div className="flex items-center gap-1 mt-1">
-                            <FileText className="w-3 h-3 text-muted-foreground" />
-                            <p className="text-xs text-muted-foreground truncate">
-                              {conv.document_name}
+                        onClick={() => setCurrentSessionId(session.id)}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium line-clamp-1">
+                              {session.title || 'Sem título'}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {session.message_count} mensagens
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(session.last_message_at).toLocaleDateString('pt-BR')}
                             </p>
                           </div>
-                        )}
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(conv.created_at).toLocaleDateString('pt-BR')}
-                        </p>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              archiveSession(session.id);
+                            }}
+                            className="shrink-0 h-8 w-8 p-0"
+                          >
+                            <Archive className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </Card>
                     ))
                   )}
@@ -259,10 +300,10 @@ const SalaryAssistant = () => {
               </CardContent>
             </Card>
 
-            {conversations.length > 0 && (
+            {currentSessionId && conversations.length > 0 && (
               <Card className="bg-accent/30 border-accent">
                 <CardHeader>
-                  <CardTitle className="text-lg">Última Análise</CardTitle>
+                  <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
                 <CardContent className="relative">
                   <div 
@@ -272,64 +313,52 @@ const SalaryAssistant = () => {
                     style={{ scrollbarGutter: 'stable' }}
                   >
                     <div className="space-y-4">
-                      {loading && conversations.length > 0 ? (
+                      {loading && conversations.length > 0 && (
                         <div className="space-y-2 animate-fade-in">
                           <div className="bg-primary/10 p-3 rounded-lg">
-                            <Skeleton className="h-4 w-3/4 mb-2" />
-                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-20 mb-2" />
+                            <Skeleton className="h-12 w-full" />
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Bot className="h-4 w-4 animate-pulse" />
-                            <span>Analisando dados salariais...</span>
-                          </div>
-                        </div>
-                      ) : loading && conversations.length === 0 ? (
-                        <div className="text-center py-8">
-                          <Bot className="h-12 w-12 mx-auto mb-4 text-primary animate-pulse" />
-                          <p className="text-sm text-muted-foreground">
-                            Processando análise salarial...
-                          </p>
-                        </div>
-                      ) : conversations.length === 0 ? (
-                        <div className="text-center py-8">
-                          <Calculator className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                          <p className="text-sm text-muted-foreground">
-                            Faça sua primeira análise para começar
-                          </p>
-                        </div>
-                      ) : (
-                        conversations.map((conv, index) => (
-                          <div key={index} className="space-y-2">
-                            <div className="bg-muted/30 p-4 rounded-lg space-y-2">
-                              <h4 className="font-medium text-sm flex items-center gap-2">
-                                <DollarSign className="h-4 w-4" />
-                                Consulta:
-                              </h4>
-                              <p className="text-sm">{conv.question}</p>
-                            </div>
-                            
-                            <div className="bg-primary/10 p-4 rounded-lg space-y-2 relative">
-                              {index === conversations.length - 1 && showNewBadge && (
-                                <Badge className="absolute -top-2 -right-2 bg-primary animate-pulse">
-                                  Nova
-                                </Badge>
-                              )}
-                              <h4 className="font-medium text-sm flex items-center gap-2">
-                                <Bot className="h-4 w-4" />
-                                Análise:
-                              </h4>
-                              <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
-                              
-                              {conv.document_name && (
-                                <Badge variant="outline" className="mt-2">
-                                  <FileText className="h-3 w-3 mr-1" />
-                                  {conv.document_name}
-                                </Badge>
-                              )}
+                          <div className="bg-muted p-3 rounded-lg">
+                            <Skeleton className="h-4 w-16 mb-2" />
+                            <div className="flex items-center gap-2">
+                              <span className="animate-pulse text-xs">●</span>
+                              <span className="animate-pulse text-xs" style={{ animationDelay: '0.2s' }}>●</span>
+                              <span className="animate-pulse text-xs" style={{ animationDelay: '0.4s' }}>●</span>
+                              <span className="text-xs text-muted-foreground ml-2">Smart está analisando...</span>
                             </div>
                           </div>
-                        ))
+                        </div>
                       )}
+                      
+                      {conversations.map((conv, index) => (
+                        <div key={conv.id} className="space-y-2 animate-fade-in">
+                          <div className="bg-primary/10 p-3 rounded-lg">
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Você:</p>
+                            <p className="text-sm">{conv.question}</p>
+                            {conv.document_name && (
+                              <div className="flex items-center gap-1 mt-2">
+                                <FileText className="w-3 h-3 text-muted-foreground" />
+                                <p className="text-xs text-muted-foreground">{conv.document_name}</p>
+                              </div>
+                            )}
+                          </div>
+                          <div className="bg-muted p-3 rounded-lg relative">
+                            {index === conversations.length - 1 && !loading && (
+                              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full animate-pulse shadow-lg">
+                                Nova
+                              </span>
+                            )}
+                            <p className="text-xs font-medium text-muted-foreground mb-1">Smart:</p>
+                            <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
+                            {conv.operation_mode && (
+                              <Badge variant="outline" className="mt-2">
+                                {conv.operation_mode}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                       <div ref={messagesEndRef} />
                     </div>
                   </div>
@@ -338,11 +367,11 @@ const SalaryAssistant = () => {
                     <Button
                       size="sm"
                       variant="secondary"
-                      className="absolute bottom-4 right-8 shadow-lg animate-fade-in"
+                      className="absolute bottom-4 right-8 shadow-lg animate-fade-in z-10"
                       onClick={scrollToBottom}
                     >
                       <ArrowDown className="h-4 w-4 mr-2" />
-                      Última análise
+                      Última mensagem
                     </Button>
                   )}
                 </CardContent>
@@ -370,12 +399,17 @@ const SalaryAssistant = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Textarea
-                    placeholder="Digite sua dúvida sobre estrutura salarial, compa-ratio ou benchmarking...&#10;&#10;Exemplos:&#10;- Calcule o compa-ratio dos funcionários&#10;- Compare nossa Grade C com o mercado&#10;- Identifique distorções salariais&#10;&#10;Modos especiais:&#10;/analise_equidade - Análise de equidade interna&#10;/benchmark_mercado - Comparação com mercado&#10;/recomendacao_ajuste - Sugestões de ajustes"
+                    placeholder={
+                      conversations.length === 0 
+                        ? "Digite sua dúvida sobre estrutura salarial, compa-ratio ou benchmarking...\n\nExemplos:\n- Calcule o compa-ratio dos funcionários\n- Compare nossa Grade C com o mercado\n- Identifique distorções salariais\n\nModos especiais:\n/analise_equidade - Análise de equidade interna\n/benchmark_mercado - Comparação com mercado\n/recomendacao_ajuste - Sugestões de ajustes"
+                        : "Digite sua próxima pergunta sobre estrutura salarial..."
+                    }
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     rows={12}
                     className="resize-none"
                     maxLength={maxChars}
+                    disabled={loading}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>
