@@ -1755,6 +1755,7 @@ export type Database = {
           full_name: string
           grade: string | null
           has_system_access: boolean | null
+          hire_date: string | null
           id: string
           job_title: string | null
           job_title_id: string | null
@@ -1782,6 +1783,7 @@ export type Database = {
           full_name: string
           grade?: string | null
           has_system_access?: boolean | null
+          hire_date?: string | null
           id: string
           job_title?: string | null
           job_title_id?: string | null
@@ -1809,6 +1811,7 @@ export type Database = {
           full_name?: string
           grade?: string | null
           has_system_access?: boolean | null
+          hire_date?: string | null
           id?: string
           job_title?: string | null
           job_title_id?: string | null

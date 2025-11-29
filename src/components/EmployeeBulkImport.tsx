@@ -23,6 +23,7 @@ interface ParsedEmployee {
   phone?: string;
   cpf?: string;
   birth_date?: string;
+  hire_date?: string;
   job_title?: string;
   grade?: string;
   salary?: number;
@@ -100,6 +101,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           phone,
           cpf,
           birth_date,
+          hire_date,
           job_input,
           grade_input,
           salary_str,
@@ -194,6 +196,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           phone: phone || undefined,
           cpf: cpf || undefined,
           birth_date: birth_date || undefined,
+          hire_date: hire_date || undefined,
           job_title: matchedJob?.title || undefined,
           grade: matchedJob?.grade || undefined,
           job_title_id: matchedJob?.id || undefined,
@@ -276,6 +279,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             phone: row.phone || null,
             cpf: row.cpf || null,
             birth_date: row.birth_date || null,
+            hire_date: row.hire_date || null,
             job_title: row.job_title || null,
             grade: row.grade || null,
             job_title_id: row.job_title_id || null,
@@ -309,6 +313,7 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             phone: row.phone || null,
             cpf: row.cpf || null,
             birth_date: row.birth_date || null,
+            hire_date: row.hire_date || null,
             job_title: row.job_title || null,
             grade: row.grade || null,
             job_title_id: row.job_title_id || null,
@@ -369,8 +374,8 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Formato Mínimo (3 colunas):</strong> Nome Completo, Email, Código Unidade<br />
-              <strong>Formato Completo (14 colunas):</strong> Nome, Email, # Registro, Telefone, CPF, Data Nascimento, <strong>Código ou Nome do Cargo</strong>, Grade (validado automaticamente), Salário Fixo, Salário Variável, % Faixa (calculado automaticamente), Nota Desempenho, Código Unidade, Email Gestor<br />
+        <strong>Formato Mínimo (3 colunas):</strong> Nome Completo, Email, Código Unidade<br />
+              <strong>Formato Completo (15 colunas):</strong> Nome, Email, # Registro, Telefone, CPF, Data Nascimento, <strong>Data Admissão</strong>, <strong>Código ou Nome do Cargo</strong>, Grade (validado automaticamente), Salário Fixo, Salário Variável, % Faixa (calculado automaticamente), Nota Desempenho, Código Unidade, Email Gestor<br />
               <em>Separadores aceitos: TAB, ponto-e-vírgula (;) ou vírgula (,)</em><br />
               <em className="text-xs">💡 O cargo pode ser informado pelo código OU nome. O Grade e % da Faixa são calculados automaticamente.</em>
             </AlertDescription>
