@@ -33,9 +33,9 @@ export const UnitComparisonFilter = ({ onFilterChange }: UnitComparisonFilterPro
     queryFn: async () => {
       let query = supabase
         .from('organizational_structure')
-        .select('id, name, type, code')
+        .select('id, name, type, code, description')
         .in('type', ['area', 'department', 'sector', 'project'])
-        .order('name');
+        .order('description');
 
       if (unitType) {
         query = query.eq('type', unitType);
@@ -150,7 +150,7 @@ export const UnitComparisonFilter = ({ onFilterChange }: UnitComparisonFilterPro
                   htmlFor={unit.id}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
                 >
-                  {unit.name}
+                  {unit.description || unit.name}
                   {unit.code && (
                     <span className="text-muted-foreground ml-2">({unit.code})</span>
                   )}
