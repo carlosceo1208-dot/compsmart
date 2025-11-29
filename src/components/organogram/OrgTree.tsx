@@ -49,7 +49,7 @@ export function OrgTree({ data, viewMode, showPhotos, onNodeClick }: OrgTreeProp
         {(viewMode === 'entities' || viewMode === 'hybrid') && (
           <OrgNode
             type="entity"
-            name={['area', 'department', 'sector', 'project'].includes(node.type) 
+            name={['headquarters', 'branch', 'area', 'department', 'sector', 'project'].includes(node.type) 
               ? (node.description || node.name) 
               : node.name}
             subtitle={node.code}
