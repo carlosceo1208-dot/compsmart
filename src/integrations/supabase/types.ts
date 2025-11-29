@@ -1762,7 +1762,7 @@ export type Database = {
           manager_id: string | null
           performance_rating: number | null
           phone: string | null
-          root_company_id: string
+          root_company_id: string | null
           salary: number | null
           salary_range_percentage: number | null
           short_term_incentive: number | null
@@ -1789,7 +1789,7 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
-          root_company_id: string
+          root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
           short_term_incentive?: number | null
@@ -1816,7 +1816,7 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
-          root_company_id?: string
+          root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
           short_term_incentive?: number | null
