@@ -541,6 +541,33 @@ export type Database = {
           },
         ]
       }
+      cbo_codes: {
+        Row: {
+          code: string
+          created_at: string | null
+          family: string | null
+          id: string
+          synonyms: string[] | null
+          title: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          family?: string | null
+          id?: string
+          synonyms?: string[] | null
+          title: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          family?: string | null
+          id?: string
+          synonyms?: string[] | null
+          title?: string
+        }
+        Relationships: []
+      }
       checkout_sessions: {
         Row: {
           amount_cents: number
@@ -2609,6 +2636,8 @@ export type Database = {
           status: string
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       suggest_next_employee_number: { Args: never; Returns: string }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }

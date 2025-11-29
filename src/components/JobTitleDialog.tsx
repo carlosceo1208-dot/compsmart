@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
 import { CompetencyManager } from "./CompetencyManager";
+import { CBOSearchInput } from "./CBOSearchInput";
 
 interface JobTitleDialogProps {
   open: boolean;
@@ -317,12 +318,10 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
                 </div>
                 <div>
                   <Label htmlFor="cbo">CBO</Label>
-                  <Input
-                    id="cbo"
+                  <CBOSearchInput
                     value={formData.cbo}
-                    onChange={(e) => setFormData({...formData, cbo: e.target.value})}
-                    placeholder="XXXX-XX"
-                    maxLength={7}
+                    onChange={(cbo) => setFormData({...formData, cbo})}
+                    placeholder="Digite código ou título..."
                   />
                 </div>
                 <div>
