@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"; // Organogram v2
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Network, Download, ZoomIn, ZoomOut, FileImage, FileText } from "lucide-react";
@@ -42,7 +42,6 @@ export default function Organogram() {
   const [units, setUnits] = useState<Array<{ id: string; name: string }>>([]);
   const orgChartRef = useRef<HTMLDivElement>(null);
   
-  // Filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState<'entities' | 'employees' | 'hybrid'>('hybrid');
   const [showPhotos, setShowPhotos] = useState(true);
@@ -57,7 +56,6 @@ export default function Organogram() {
     try {
       setLoading(true);
 
-      // Buscar estrutura organizacional
       const { data: entitiesData, error: entitiesError } = await supabase
         .from('organizational_structure')
         .select('id, name, description, type, code, parent_id')
@@ -65,7 +63,6 @@ export default function Organogram() {
 
       if (entitiesError) throw entitiesError;
 
-      // Buscar colaboradores
       const { data: employeesData, error: employeesError } = await supabase
         .from('profiles')
         .select('id, full_name, email, phone, job_title, grade, avatar_url, unit_id, manager_id')
@@ -76,11 +73,9 @@ export default function Organogram() {
 
       setEmployees(employeesData || []);
 
-      // Construir árvore hierárquica
       const tree = buildTree(entitiesData || [], employeesData || []);
       setEntities(tree);
 
-      // Construir lista de unidades para filtro (usar description para exibição)
       const unitsList = (entitiesData || [])
         .filter(e => ['area', 'department', 'sector', 'project'].includes(e.type))
         .map(e => ({ id: e.id, name: e.description || e.name }));
@@ -97,7 +92,6 @@ export default function Organogram() {
   const buildTree = (entities: any[], employees: any[]): OrgEntity[] => {
     const entityMap = new Map<string, OrgEntity>();
     
-    // Criar mapa de entidades
     entities.forEach(entity => {
       entityMap.set(entity.id, {
         ...entity,
@@ -106,14 +100,12 @@ export default function Organogram() {
       });
     });
 
-    // Adicionar colaboradores às suas unidades
     employees.forEach(employee => {
       if (employee.unit_id && entityMap.has(employee.unit_id)) {
         entityMap.get(employee.unit_id)!.employees!.push(employee);
       }
     });
 
-    // Construir árvore
     const roots: OrgEntity[] = [];
     entityMap.forEach(entity => {
       if (entity.parent_id && entityMap.has(entity.parent_id)) {
@@ -126,23 +118,20 @@ export default function Organogram() {
     return roots;
   };
 
+  const containsSelectedUnit = (node: OrgEntity): boolean => {
+    if (selectedUnit === 'all') return true;
+    if (node.id === selectedUnit) return true;
+    return node.children?.some(child => containsSelectedUnit(child)) || false;
+  };
+
   const filterTree = (nodes: OrgEntity[]): OrgEntity[] => {
     if (!searchTerm && selectedUnit === 'all') return nodes;
 
-    // Função auxiliar para verificar se um nó ou seus descendentes contém a unidade selecionada
-    const containsSelectedUnit = (node: OrgEntity): boolean => {
-      if (selectedUnit === 'all') return true;
-      if (node.id === selectedUnit) return true;
-      return node.children?.some(child => containsSelectedUnit(child)) || false;
-    };
-
     return nodes
       .map(node => {
-        // Verificar se este nó ou descendentes contém a unidade selecionada
         const hasSelectedUnit = containsSelectedUnit(node);
         const isSelectedUnit = selectedUnit !== 'all' && node.id === selectedUnit;
 
-        // Verificar busca por texto
         const search = searchTerm.toLowerCase();
         const matchesSearchText = searchTerm ? (
           node.name.toLowerCase().includes(search) ||
@@ -153,10 +142,8 @@ export default function Organogram() {
           )
         ) : true;
 
-        // Filtrar filhos recursivamente
         const filteredChildren = node.children ? filterTree(node.children) : [];
         
-        // Filtrar funcionários pelo termo de busca
         const filteredEmployees = node.employees?.filter(e => {
           if (!searchTerm) return true;
           return (
@@ -165,17 +152,13 @@ export default function Organogram() {
           );
         });
 
-        // Lógica de inclusão
         let shouldInclude = false;
 
         if (selectedUnit !== 'all' && !searchTerm) {
-          // Apenas filtro por unidade: mostrar caminho até a unidade e seus filhos
           shouldInclude = hasSelectedUnit;
         } else if (selectedUnit === 'all' && searchTerm) {
-          // Apenas busca por texto
           shouldInclude = matchesSearchText || filteredChildren.length > 0;
         } else if (selectedUnit !== 'all' && searchTerm) {
-          // Ambos os filtros: mostrar caminho até unidade E filtrar por texto
           shouldInclude = hasSelectedUnit && (matchesSearchText || filteredChildren.length > 0);
         }
 
@@ -199,11 +182,9 @@ export default function Organogram() {
       toast.info('Gerando imagem...');
       const html2canvas = (await import('html2canvas')).default;
       
-      // Salvar zoom original e resetar para 100%
       const originalZoom = zoom;
       setZoom(100);
       
-      // Aguardar re-render
       await new Promise(resolve => setTimeout(resolve, 150));
       
       const canvas = await html2canvas(orgChartRef.current, {
@@ -213,10 +194,8 @@ export default function Organogram() {
         logging: false,
       });
       
-      // Restaurar zoom original
       setZoom(originalZoom);
       
-      // Download
       const link = document.createElement('a');
       link.download = `organograma-${new Date().toISOString().split('T')[0]}.png`;
       link.href = canvas.toDataURL('image/png');
@@ -237,11 +216,9 @@ export default function Organogram() {
       const html2canvas = (await import('html2canvas')).default;
       const { default: jsPDF } = await import('jspdf');
       
-      // Salvar zoom original e resetar para 100%
       const originalZoom = zoom;
       setZoom(100);
       
-      // Aguardar re-render
       await new Promise(resolve => setTimeout(resolve, 150));
       
       const canvas = await html2canvas(orgChartRef.current, {
@@ -251,14 +228,12 @@ export default function Organogram() {
         logging: false,
       });
       
-      // Restaurar zoom original
       setZoom(originalZoom);
       
       const imgData = canvas.toDataURL('image/png');
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       
-      // Determinar orientação baseado no aspect ratio
       const isLandscape = imgWidth > imgHeight;
       const doc = new jsPDF({
         orientation: isLandscape ? 'landscape' : 'portrait',
@@ -291,7 +266,6 @@ export default function Organogram() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Network className="w-8 h-8" />
@@ -343,7 +317,6 @@ export default function Organogram() {
         </div>
       </div>
 
-      {/* Filtros */}
       <OrgFilters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
@@ -356,7 +329,6 @@ export default function Organogram() {
         units={units}
       />
 
-      {/* Organograma */}
       <div 
         ref={orgChartRef}
         className="bg-card border rounded-lg overflow-auto p-6"
