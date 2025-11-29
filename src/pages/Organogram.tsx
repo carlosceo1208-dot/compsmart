@@ -129,25 +129,57 @@ export default function Organogram() {
   const filterTree = (nodes: OrgEntity[]): OrgEntity[] => {
     if (!searchTerm && selectedUnit === 'all') return nodes;
 
+    // Função auxiliar para verificar se um nó ou seus descendentes contém a unidade selecionada
+    const containsSelectedUnit = (node: OrgEntity): boolean => {
+      if (selectedUnit === 'all') return true;
+      if (node.id === selectedUnit) return true;
+      return node.children?.some(child => containsSelectedUnit(child)) || false;
+    };
+
     return nodes
       .map(node => {
-        const matchesSearch = !searchTerm || 
-          node.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        // Verificar se este nó ou descendentes contém a unidade selecionada
+        const hasSelectedUnit = containsSelectedUnit(node);
+        const isSelectedUnit = selectedUnit !== 'all' && node.id === selectedUnit;
+
+        // Verificar busca por texto
+        const search = searchTerm.toLowerCase();
+        const matchesSearchText = searchTerm ? (
+          node.name.toLowerCase().includes(search) ||
+          node.description?.toLowerCase().includes(search) ||
           node.employees?.some(e => 
-            e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            e.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
-          );
+            e.full_name.toLowerCase().includes(search) ||
+            e.job_title?.toLowerCase().includes(search)
+          )
+        ) : true;
 
-        const matchesUnit = selectedUnit === 'all' || node.id === selectedUnit;
-
+        // Filtrar filhos recursivamente
         const filteredChildren = node.children ? filterTree(node.children) : [];
-        const filteredEmployees = node.employees?.filter(e =>
-          !searchTerm ||
-          e.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          e.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+        
+        // Filtrar funcionários pelo termo de busca
+        const filteredEmployees = node.employees?.filter(e => {
+          if (!searchTerm) return true;
+          return (
+            e.full_name.toLowerCase().includes(search) ||
+            e.job_title?.toLowerCase().includes(search)
+          );
+        });
 
-        if (matchesSearch || matchesUnit || filteredChildren.length > 0) {
+        // Lógica de inclusão
+        let shouldInclude = false;
+
+        if (selectedUnit !== 'all' && !searchTerm) {
+          // Apenas filtro por unidade: mostrar caminho até a unidade e seus filhos
+          shouldInclude = hasSelectedUnit;
+        } else if (selectedUnit === 'all' && searchTerm) {
+          // Apenas busca por texto
+          shouldInclude = matchesSearchText || filteredChildren.length > 0;
+        } else if (selectedUnit !== 'all' && searchTerm) {
+          // Ambos os filtros: mostrar caminho até unidade E filtrar por texto
+          shouldInclude = hasSelectedUnit && (matchesSearchText || filteredChildren.length > 0);
+        }
+
+        if (shouldInclude) {
           return {
             ...node,
             children: filteredChildren,
