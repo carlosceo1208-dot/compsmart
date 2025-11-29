@@ -545,10 +545,11 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         if (authError) throw authError;
         if (!authData.user) throw new Error("Falha ao criar usuário");
 
-        // Update profile with additional info
+        // Update profile with additional info (including root_company_id to ensure it's set)
         const { error: profileError } = await supabase
           .from("profiles")
           .update({
+            root_company_id: adminProfile.root_company_id,
             employee_number: formData.employee_number,
             phone: formData.phone || null,
             cpf: formData.cpf || null,
