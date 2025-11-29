@@ -15,9 +15,9 @@ import { z } from "zod";
 
 const userSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
-  email: z.string().email("Email inválido"),
-  employee_number: z.string().min(1, "Número de Registro é obrigatório"),
-  password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").optional(),
+  email: z.string().email("Email inválido").optional().or(z.literal('')),
+  employee_number: z.string().min(1, "Número de Registro (Matrícula) é obrigatório"),
+  password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").optional().or(z.literal('')),
   phone: z.string().optional(),
   cpf: z.string()
     .optional()
@@ -516,7 +516,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           toast.success("Funcionário atualizado com sucesso!");
         }
       } else {
-        // Create new user
+        // Create new user via Edge Function (não afeta sessão do admin)
         const validation = userSchema.parse(formData);
 
         // Buscar root_company_id do usuário admin atual
@@ -531,30 +531,17 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           throw new Error('Você precisa estar vinculado a uma empresa para cadastrar funcionários');
         }
 
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: validation.email,
-          password: validation.password!,
-          options: {
-            data: {
-              full_name: validation.full_name,
-              root_company_id: adminProfile.root_company_id,
-            },
-          },
-        });
-
-        if (authError) throw authError;
-        if (!authData.user) throw new Error("Falha ao criar usuário");
-
-        // Update profile with additional info (including root_company_id to ensure it's set)
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .update({
-            root_company_id: adminProfile.root_company_id,
-            employee_number: formData.employee_number,
+        // Usar Edge Function para criar usuário (não troca sessão do admin)
+        const { data: result, error: fnError } = await supabase.functions.invoke('create-employee-user', {
+          body: {
+            email: validation.email || null,
+            full_name: validation.full_name,
+            employee_number: validation.employee_number,
             phone: formData.phone || null,
             cpf: formData.cpf || null,
             birth_date: formData.birth_date || null,
             job_title: formData.job_title || null,
+            job_title_id: formData.job_title_id || null,
             grade: formData.grade || null,
             salary: parseBRCurrency(formData.salary),
             variable_salary: parseBRCurrency(formData.variable_salary),
@@ -562,21 +549,18 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
             unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
-            job_title_id: formData.job_title_id || null,
-          })
-          .eq("id", authData.user.id);
-
-        if (profileError) throw profileError;
-
-        // Assign roles using secure function
-        const { error: rolesError } = await supabase.rpc('manage_user_roles', {
-          p_user_id: authData.user.id,
-          p_roles: formData.roles as Database["public"]["Enums"]["app_role"][]
+            has_system_access: !!validation.email,
+            root_company_id: adminProfile.root_company_id,
+            roles: formData.roles
+          }
         });
 
-        if (rolesError) throw rolesError;
+        if (fnError) throw fnError;
+        if (!result.success) throw new Error(result.error || "Falha ao criar funcionário");
 
-        if (!formData.unit_id) {
+        if (result.action === 'created_without_auth') {
+          toast.success("Funcionário criado! Poderá ativar conta posteriormente em /activate");
+        } else if (!formData.unit_id) {
           toast.info("Funcionário criado sem vínculo organizacional. Você pode vincular a uma Área/Departamento/Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
         } else {
           toast.success("Funcionário criado com sucesso!");
@@ -704,29 +688,36 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 </p>
               </div>
               <div className="col-span-2 space-y-2">
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Email {userId ? '' : '(opcional)'}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  required
                   disabled={loading || !!userId}
+                  placeholder="funcionario@empresa.com"
                 />
+                {!userId && (
+                  <p className="text-xs text-muted-foreground">
+                    {formData.email 
+                      ? "✅ Funcionário terá acesso ao sistema" 
+                      : "⚠️ Sem email = sem acesso ao sistema. Funcionário poderá ativar conta posteriormente em /activate"}
+                  </p>
+                )}
               </div>
-              {!userId && (
+              {!userId && formData.email && (
                 <div className="col-span-2 space-y-2">
-                  <Label htmlFor="password">Senha *</Label>
+                  <Label htmlFor="password">Senha</Label>
                   <Input
                     id="password"
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    required={!userId}
                     disabled={loading}
+                    placeholder="Senha temporária: TempPass123!"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Mínimo 8 caracteres
+                    Deixe em branco para usar senha temporária (TempPass123!)
                   </p>
                 </div>
               )}

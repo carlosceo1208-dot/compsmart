@@ -277,14 +277,24 @@ const Auth = () => {
                 {isLogin ? "Não tem uma conta? Cadastre-se" : "Já tem uma conta? Faça login"}
               </button>
               {isLogin && (
-                <button
-                  type="button"
-                  onClick={() => navigate("/forgot-password")}
-                  className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
-                  disabled={loading}
-                >
-                  Esqueci minha senha
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
+                    disabled={loading}
+                  >
+                    Esqueci minha senha
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate("/activate")}
+                    className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
+                    disabled={loading}
+                  >
+                    Ativar minha conta (primeira vez)
+                  </button>
+                </>
               )}
             </div>
           </CardContent>
