@@ -123,9 +123,13 @@ function TreeNode({ entity, children, allEntities, onEdit, level }: TreeNodeProp
               {getTypeBadge(entity.type)}
             </div>
             
-            <h3 className="font-semibold text-xs mb-0.5 line-clamp-2">{entity.name}</h3>
+            <h3 className="font-semibold text-xs mb-0.5 line-clamp-2">
+              {entity.type === 'company' 
+                ? entity.name 
+                : (entity.description || entity.name)}
+            </h3>
             
-            {entity.description && (
+            {entity.type === 'company' && entity.description && (
               <p className="text-[10px] text-muted-foreground line-clamp-2 italic">
                 {entity.description}
               </p>
