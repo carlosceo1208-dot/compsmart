@@ -33,7 +33,12 @@ const fetchUSDRate = async (): Promise<USDData> => {
       const age = Date.now() - parseInt(cacheTime);
       if (age < 60 * 60 * 1000) { // 1 hora
         console.info('Usando cache do USD');
-        return JSON.parse(cached);
+        const parsedCache = JSON.parse(cached);
+        // Converter lastUpdate de string para Date
+        return {
+          ...parsedCache,
+          lastUpdate: new Date(parsedCache.lastUpdate)
+        };
       }
     }
     
