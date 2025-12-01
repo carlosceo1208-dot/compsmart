@@ -1,13 +1,65 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Currency, CurrencyConverter } from '@/types/economic';
+import { Currency, CurrencyConverter, USDData } from '@/types/economic';
 
-const fetchExchangeRate = async (): Promise<number> => {
-  const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
-  if (!response.ok) throw new Error('Failed to fetch exchange rate');
+const fetchUSDRate = async (): Promise<USDData> => {
+  const cachedRate = localStorage.getItem('usd-rate-cache');
+  const cacheTimestamp = localStorage.getItem('usd-rate-timestamp');
   
-  const data = await response.json();
-  return parseFloat(data.USDBRL.bid);
+  if (cachedRate && cacheTimestamp) {
+    const cacheAge = Date.now() - parseInt(cacheTimestamp);
+    if (cacheAge < 60 * 60 * 1000) {
+      return JSON.parse(cachedRate);
+    }
+  }
+
+  try {
+    const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL');
+    if (!response.ok) throw new Error('Failed to fetch USD rate');
+    
+    const data = await response.json();
+    const usdData = data.USDBRL;
+    
+    const result: USDData = {
+      value: parseFloat(usdData.bid),
+      variation: parseFloat(usdData.varBid),
+      percentChange: parseFloat(usdData.pctChange),
+      lastUpdate: new Date(parseInt(usdData.timestamp) * 1000),
+    };
+    
+    localStorage.setItem('usd-rate-cache', JSON.stringify(result));
+    localStorage.setItem('usd-rate-timestamp', Date.now().toString());
+    
+    return result;
+  } catch (error) {
+    console.error('Failed to fetch from AwesomeAPI, trying Banco Central fallback:', error);
+    
+    const bcbResponse = await fetch('https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarDia(dataCotacao=@dataCotacao)?@dataCotacao=%27' + 
+      new Date().toISOString().split('T')[0] + '%27&$format=json');
+    
+    if (!bcbResponse.ok) {
+      if (cachedRate) {
+        console.warn('Using stale cache due to API failures');
+        return JSON.parse(cachedRate);
+      }
+      throw new Error('All USD rate APIs failed');
+    }
+    
+    const bcbData = await bcbResponse.json();
+    const cotacao = bcbData.value[0];
+    
+    const result: USDData = {
+      value: parseFloat(cotacao.cotacaoCompra),
+      variation: 0,
+      percentChange: 0,
+      lastUpdate: new Date(cotacao.dataHoraCotacao),
+    };
+    
+    localStorage.setItem('usd-rate-cache', JSON.stringify(result));
+    localStorage.setItem('usd-rate-timestamp', Date.now().toString());
+    
+    return result;
+  }
 };
 
 export const useCurrencyConverter = (): CurrencyConverter => {
@@ -17,10 +69,11 @@ export const useCurrencyConverter = (): CurrencyConverter => {
   });
 
   const { data: exchangeRate } = useQuery({
-    queryKey: ['usd-rate'], // Usar mesma queryKey para compartilhar cache
-    queryFn: fetchExchangeRate,
-    staleTime: 60 * 60 * 1000, // 1 hora
-    refetchInterval: false, // Não fazer polling (deixar useEconomicData gerenciar)
+    queryKey: ['usd-rate'],
+    queryFn: fetchUSDRate,
+    select: (data) => data.value,
+    staleTime: 60 * 60 * 1000,
+    refetchInterval: false,
     retry: 2,
     refetchOnWindowFocus: false,
   });
