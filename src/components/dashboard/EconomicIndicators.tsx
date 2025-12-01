@@ -7,6 +7,7 @@ import { useEconomicData } from '@/hooks/useEconomicData';
 import { Currency } from '@/types/economic';
 import { useState } from 'react';
 import { formatCurrencyCustom } from '@/lib/formatters';
+import { toast } from 'sonner';
 
 interface EconomicIndicatorsProps {
   currency: Currency;
@@ -15,12 +16,25 @@ interface EconomicIndicatorsProps {
 
 export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndicatorsProps) => {
   const [inpcPeriod, setInpcPeriod] = useState<number>(12);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   const economicData = useEconomicData(inpcPeriod);
 
-  const handleRefresh = () => {
-    economicData.refetchUsd();
-    economicData.refetchInpc();
+  const handleRefresh = async () => {
+    setIsManualRefreshing(true);
+    
+    await Promise.all([
+      economicData.refetchUsd(),
+      economicData.refetchInpc()
+    ]);
+    
+    // Garantir tempo mínimo de feedback visual (800ms)
+    setTimeout(() => {
+      setIsManualRefreshing(false);
+      toast.success('Dados atualizados com sucesso!');
+    }, 800);
   };
+
+  const isRefreshingAny = economicData.isLoading || economicData.isRefreshing || isManualRefreshing;
 
   return (
     <Card className="border-2 border-primary/30 bg-gradient-to-br from-background via-primary/3 to-primary/8 shadow-lg hover:shadow-primary transition-all duration-300">
@@ -31,10 +45,10 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            disabled={economicData.isLoading || economicData.isRefreshing}
+            disabled={isRefreshingAny}
             className="bg-primary/10 border-primary/30 hover:bg-primary/20 hover:border-primary text-primary gap-2 shadow-sm"
           >
-            <RefreshCw className={`h-4 w-4 ${(economicData.isLoading || economicData.isRefreshing) ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${isRefreshingAny ? 'animate-spin' : ''}`} />
             <span className="text-xs font-medium">Atualizar</span>
           </Button>
         </div>
