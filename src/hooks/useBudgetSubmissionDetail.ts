@@ -25,8 +25,8 @@ export const useBudgetSubmissionDetail = (submissionId: string | null) => {
 
       if (submissionError) throw submissionError;
 
-      // Buscar projeções (funcionários existentes + contratações planejadas)
-      const { data: projections, error: projectionsError } = await supabase
+      // Buscar projeções - condicional por unidade
+      let projectionsQuery = supabase
         .from('budget_employee_projections')
         .select(`
           *,
@@ -35,9 +35,15 @@ export const useBudgetSubmissionDetail = (submissionId: string | null) => {
           projected_unit:organizational_structure(description)
         `)
         .eq('fiscal_year', submission.fiscal_year)
-        .eq('projected_unit_id', submission.unit_id)
-        .eq('is_active', true)
-        .order('employee_id');
+        .eq('is_active', true);
+
+      // CORREÇÃO: Se unit_id for null (empresa toda), buscar TODAS as projeções
+      if (submission.unit_id) {
+        projectionsQuery = projectionsQuery.eq('projected_unit_id', submission.unit_id);
+      }
+      // Se unit_id for null, não filtra por unidade (traz todas)
+
+      const { data: projections, error: projectionsError } = await projectionsQuery.order('employee_id');
 
       if (projectionsError) throw projectionsError;
 

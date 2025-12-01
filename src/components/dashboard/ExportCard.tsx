@@ -22,7 +22,8 @@ type ReportType =
   | 'payroll-mass' 
   | 'people-analytics' 
   | 'benefits-incentives' 
-  | 'budget-overview';
+  | 'budget-overview'
+  | 'budget-approved-detail';
 
 type ExportFormat = 'pdf' | 'excel' | 'both';
 
@@ -200,6 +201,47 @@ export const ExportCard = () => {
       
       if (error) throw error;
       return data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Buscar projeções de orçamento aprovado
+  const { data: budgetProjections } = useQuery({
+    queryKey: ['budget-projections-export'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('budget_employee_projections')
+        .select(`
+          *,
+          employee:profiles(full_name, job_title, salary, grade),
+          projected_unit:organizational_structure(description, code),
+          projected_job_title:job_titles(title)
+        `)
+        .eq('fiscal_year', 2026)
+        .eq('is_active', true)
+        .order('projected_unit_id');
+      
+      if (error) throw error;
+      
+      // Agrupar por unidade
+      const byUnit = (data || []).reduce((acc: any, proj: any) => {
+        const unitName = proj.projected_unit?.description || 'Não definida';
+        if (!acc[unitName]) {
+          acc[unitName] = {
+            projections: [],
+            plannedHires: 0,
+            salaryChanges: 0,
+            totalProjected: 0
+          };
+        }
+        acc[unitName].projections.push(proj);
+        if (proj.is_planned_hire) acc[unitName].plannedHires++;
+        if (proj.change_type) acc[unitName].salaryChanges++;
+        acc[unitName].totalProjected += proj.projected_fixed_salary || 0;
+        return acc;
+      }, {});
+      
+      return { raw: data, byUnit };
     },
     staleTime: 5 * 60 * 1000,
   });
@@ -905,6 +947,103 @@ export const ExportCard = () => {
     return wb;
   };
 
+  // Novo relatório PDF: Orçamento Aprovado Detalhado
+  const generateBudgetApprovedDetailPDF = async (doc: any) => {
+    const currentDate = format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+    
+    doc.setFontSize(18);
+    doc.text('CompSmart - Orçamento Aprovado Detalhado', 14, 20);
+    doc.setFontSize(10);
+    doc.text(`Gerado em: ${currentDate}`, 14, 28);
+    doc.text('Ano Fiscal: 2026', 14, 33);
+    
+    // SEÇÃO 1: Resumo por Unidade Organizacional
+    doc.setFontSize(14);
+    doc.text('1. Resumo por Unidade Organizacional', 14, 45);
+    
+    const unitSummary = Object.entries(budgetProjections?.byUnit || {}).map(
+      ([unit, data]: [string, any]) => [
+        unit,
+        data.projections.length,
+        data.plannedHires,
+        data.salaryChanges,
+        formatCurrency(data.totalProjected)
+      ]
+    );
+    
+    (doc as any).autoTable({
+      head: [['Unidade', 'Projeções', 'Contratações', 'Alt. Salário', 'Total Projetado']],
+      body: unitSummary,
+      startY: 50,
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [41, 128, 185] },
+    });
+
+    // SEÇÃO 2: Contratações Planejadas (detalhado)
+    const finalY1 = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(14);
+    doc.text('2. Contratações Planejadas', 14, finalY1);
+    
+    const plannedHires = budgetProjections?.raw
+      ?.filter((p: any) => p.is_planned_hire)
+      ?.map((p: any) => [
+        p.planned_employee_name || 'N/A',
+        p.projected_unit?.description || 'N/A',
+        `Mês ${p.month}`,
+        p.projected_grade || 'N/A',
+        formatCurrency(p.projected_fixed_salary || 0),
+        (p.justification || 'Sem justificativa').substring(0, 50)
+      ]) || [];
+    
+    if (plannedHires.length > 0) {
+      (doc as any).autoTable({
+        head: [['Nome', 'Unidade', 'Mês', 'Grade', 'Salário', 'Justificativa']],
+        body: plannedHires,
+        startY: finalY1 + 5,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [22, 160, 133] },
+      });
+    } else {
+      doc.setFontSize(10);
+      doc.text('Nenhuma contratação planejada', 14, finalY1 + 5);
+    }
+
+    // SEÇÃO 3: Alterações Salariais (mérito, promoção, etc)
+    const finalY2 = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : finalY1 + 25;
+    doc.setFontSize(14);
+    doc.text('3. Alterações Salariais', 14, finalY2);
+    
+    const salaryChanges = budgetProjections?.raw
+      ?.filter((p: any) => p.change_type && !p.is_planned_hire)
+      ?.map((p: any) => {
+        const currentSalary = p.employee?.salary || 0;
+        const newSalary = p.projected_fixed_salary || 0;
+        const increase = currentSalary > 0 ? (((newSalary - currentSalary) / currentSalary) * 100).toFixed(1) : '0.0';
+        
+        return [
+          p.employee?.full_name || 'N/A',
+          p.change_type || 'N/A',
+          `Mês ${p.month}`,
+          formatCurrency(currentSalary),
+          formatCurrency(newSalary),
+          `${increase}%`
+        ];
+      }) || [];
+    
+    if (salaryChanges.length > 0) {
+      (doc as any).autoTable({
+        head: [['Funcionário', 'Tipo', 'Mês', 'Atual', 'Projetado', '% Aumento']],
+        body: salaryChanges,
+        startY: finalY2 + 5,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [231, 76, 60] },
+      });
+    } else {
+      doc.setFontSize(10);
+      doc.text('Nenhuma alteração salarial planejada', 14, finalY2 + 5);
+    }
+  };
+
   const generateExcelReport = async (reportType: ReportType) => {
     const XLSX = await import('xlsx');
     
@@ -926,10 +1065,59 @@ export const ExportCard = () => {
       case 'budget-overview':
         workbook = await generateBudgetOverviewExcel(XLSX);
         break;
+      case 'budget-approved-detail':
+        // Para Excel, criar planilha simples com todas as projeções
+        workbook = XLSX.utils.book_new();
+        const projectionsData = [
+          ['Funcionário/Nome', 'Unidade', 'Tipo', 'Mês', 'Grade', 'Salário Projetado', 'Justificativa'],
+          ...(budgetProjections?.raw?.map((p: any) => [
+            p.is_planned_hire ? p.planned_employee_name : p.employee?.full_name,
+            p.projected_unit?.description || 'N/A',
+            p.is_planned_hire ? 'Contratação' : (p.change_type || 'Manutenção'),
+            p.month,
+            p.projected_grade || p.employee?.grade || 'N/A',
+            p.projected_fixed_salary || 0,
+            p.justification || 'Sem justificativa'
+          ]) || [])
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(projectionsData);
+        XLSX.utils.book_append_sheet(workbook, ws, 'Projeções Orçamento');
+        break;
     }
     
     const fileName = `compsmart_${reportType}_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
     XLSX.writeFile(workbook, fileName);
+  };
+
+  const generatePDFReport = async (reportType: ReportType) => {
+    const jsPDF = (await import('jspdf')).default;
+    const autoTable = (await import('jspdf-autotable')).default;
+    
+    const doc = new jsPDF();
+    
+    switch (reportType) {
+      case 'executive-consolidated':
+        await generateExecutiveConsolidatedPDF(doc);
+        break;
+      case 'payroll-mass':
+        await generatePayrollMassPDF(doc);
+        break;
+      case 'people-analytics':
+        await generatePeopleAnalyticsPDF(doc);
+        break;
+      case 'benefits-incentives':
+        await generateBenefitsIncentivesPDF(doc);
+        break;
+      case 'budget-overview':
+        await generateBudgetOverviewPDF(doc);
+        break;
+      case 'budget-approved-detail':
+        await generateBudgetApprovedDetailPDF(doc);
+        break;
+    }
+    
+    const fileName = `compsmart_${reportType}_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
+    doc.save(fileName);
   };
 
   const handleGenerateReport = async () => {
@@ -990,6 +1178,9 @@ export const ExportCard = () => {
               </SelectItem>
               <SelectItem value="budget-overview">
                 📈 Budget Overview
+              </SelectItem>
+              <SelectItem value="budget-approved-detail">
+                📋 Orçamento Aprovado Detalhado
               </SelectItem>
             </SelectContent>
           </Select>
