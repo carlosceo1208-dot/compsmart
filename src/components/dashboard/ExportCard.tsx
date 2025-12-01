@@ -653,34 +653,6 @@ export const ExportCard = () => {
     });
   };
 
-  const generatePDFReport = async (reportType: ReportType) => {
-    const { default: jsPDF } = await import('jspdf');
-    await import('jspdf-autotable');
-    
-    const doc = new jsPDF();
-    
-    switch (reportType) {
-      case 'executive-consolidated':
-        await generateExecutiveConsolidatedPDF(doc);
-        break;
-      case 'payroll-mass':
-        await generatePayrollMassPDF(doc);
-        break;
-      case 'people-analytics':
-        await generatePeopleAnalyticsPDF(doc);
-        break;
-      case 'benefits-incentives':
-        await generateBenefitsIncentivesPDF(doc);
-        break;
-      case 'budget-overview':
-        await generateBudgetOverviewPDF(doc);
-        break;
-    }
-    
-    const fileName = `compsmart_${reportType}_${format(new Date(), 'yyyy-MM-dd')}.pdf`;
-    doc.save(fileName);
-  };
-
   // Excel Generation Functions
   const generateExecutiveConsolidatedExcel = async (XLSX: any) => {
     const wb = XLSX.utils.book_new();
