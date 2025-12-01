@@ -1,7 +1,7 @@
 import { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { formatCurrency, formatNumber, formatPercentage, formatCompactCurrency } from '@/lib/formatters';
+import { formatCurrency, formatNumber, formatPercentage, formatCompactCurrency, formatCurrencyCustom } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 interface KPICardProps {
@@ -12,15 +12,16 @@ interface KPICardProps {
   isLoading?: boolean;
   className?: string;
   variant?: 'default' | 'success' | 'info' | 'premium' | 'warning';
+  currency?: 'BRL' | 'USD';
 }
 
-export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading, className, variant = 'default' }: KPICardProps) => {
+export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading, className, variant = 'default', currency = 'BRL' }: KPICardProps) => {
   const formatValue = (val: number | null | undefined) => {
     switch (format) {
       case 'currency':
-        return formatCurrency(val);
+        return formatCurrencyCustom(val, currency);
       case 'compact-currency':
-        return formatCompactCurrency(val);
+        return formatCompactCurrency(val, currency);
       case 'percentage':
         return formatPercentage(val);
       case 'number':

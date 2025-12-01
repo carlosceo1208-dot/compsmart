@@ -36,10 +36,10 @@ export const BenefitsCard = ({ currency }: BenefitsCardProps) => {
             </div>
             <div className="space-y-1">
               <div className="text-sm text-muted-foreground">
-                Custo Mensal: <span className="font-semibold text-foreground">{formatCompactCurrency(monthlyCost)}</span>
+                Custo Mensal: <span className="font-semibold text-foreground">{formatCompactCurrency(monthlyCost, currency)}</span>
               </div>
               <div className="text-sm text-muted-foreground">
-                Custo Anual: <span className="font-semibold text-foreground">{formatCompactCurrency(annualCost)}</span>
+                Custo Anual: <span className="font-semibold text-foreground">{formatCompactCurrency(annualCost, currency)}</span>
               </div>
             </div>
           </div>
