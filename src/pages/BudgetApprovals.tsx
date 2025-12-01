@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, FileText, Mail } from 'lucide-react';
+import { FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, FileText, Mail, UserCog } from 'lucide-react';
 import { SubmissionReviewDialog } from '@/components/budget/SubmissionReviewDialog';
 import { SendReportDialog } from '@/components/budget/SendReportDialog';
+import { ApproversConfigDialog } from '@/components/budget/ApproversConfigDialog';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
@@ -26,6 +27,7 @@ const BudgetApprovals = () => {
   const [unitFilter, setUnitFilter] = useState<string>('all');
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
   const [showSendReportDialog, setShowSendReportDialog] = useState(false);
+  const [showApproversConfig, setShowApproversConfig] = useState(false);
 
   const { data: userData } = useCurrentUserRole();
   const { data: submissions, isLoading } = useBudgetSubmissions(fiscalYear, statusFilter);
@@ -171,22 +173,45 @@ const BudgetApprovals = () => {
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto p-6">
       {/* Cabeçalho */}
-      <div className="mb-6 flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/dashboard')}
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Voltar
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Aprovações de Orçamento</h1>
-          <p className="text-muted-foreground">
-            Revise e aprove os orçamentos submetidos pelas unidades
-          </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/dashboard')}
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar
+          </Button>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Aprovações de Orçamento</h1>
+            <p className="text-muted-foreground">
+              Revise e aprove os orçamentos submetidos pelas unidades
+            </p>
+          </div>
         </div>
+        
+        {userData?.isAdmin && (
+          <Button
+            variant="outline"
+            onClick={() => setShowApproversConfig(true)}
+          >
+            <UserCog className="w-4 h-4 mr-2" />
+            Configurar Aprovadores
+          </Button>
+        )}
       </div>
+
+      {/* Alertas de Atenção */}
+      {totalPending > 0 && (
+        <Alert className="mb-4 bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200">
+          <Clock className="h-4 w-4 text-yellow-600" />
+          <AlertTitle>⚠️ Submissões Pendentes Requerem Atenção</AlertTitle>
+          <AlertDescription>
+            Há <strong>{totalPending}</strong> orçamento(s) aguardando sua revisão e aprovação.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Cards de Resumo */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -414,6 +439,12 @@ const BudgetApprovals = () => {
             totalAnnual: sub.totalAnnual || 0,
           })),
         }}
+      />
+
+      {/* Modal de Configuração de Aprovadores */}
+      <ApproversConfigDialog
+        open={showApproversConfig}
+        onOpenChange={setShowApproversConfig}
       />
     </div>
   );

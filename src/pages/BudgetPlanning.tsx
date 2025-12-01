@@ -125,6 +125,8 @@ const BudgetPlanning = () => {
       return;
     }
 
+    let submissionId: string;
+
     try {
       // Verificar se já existe uma submissão
       const { data: existing } = await supabase
@@ -146,9 +148,10 @@ const BudgetPlanning = () => {
           .eq('id', existing.id);
 
         if (error) throw error;
+        submissionId = existing.id;
       } else {
         // Criar nova submissão
-        const { error } = await supabase
+        const { data: newSubmission, error } = await supabase
           .from('budget_submissions')
           .insert({
             unit_id: userData.unitId,
@@ -156,12 +159,48 @@ const BudgetPlanning = () => {
             status: 'submitted',
             submitted_at: new Date().toISOString(),
             submitted_by: userData.userId,
-          });
+          })
+          .select('id')
+          .single();
 
         if (error) throw error;
+        if (!newSubmission) throw new Error('Falha ao criar submissão');
+        submissionId = newSubmission.id;
       }
 
       toast.success('Orçamento submetido para aprovação!');
+      
+      // Notificar aprovadores por email
+      try {
+        const { data: unitData } = await supabase
+          .from('organizational_structure')
+          .select('description')
+          .eq('id', userData.unitId)
+          .single();
+
+        const { data: userProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', userData.userId)
+          .single();
+
+        await supabase.functions.invoke('notify-budget-submission', {
+          body: {
+            submissionId,
+            unitName: unitData?.description || 'Unidade',
+            submittedBy: userProfile?.full_name || 'Usuário',
+            totalAmount: summary?.yearTotal || 0,
+            fiscalYear: fiscalYear,
+          },
+        });
+        
+        console.log('✅ Notificações enviadas aos aprovadores');
+        toast.success('📧 Aprovadores foram notificados por email');
+      } catch (notifyError) {
+        console.error('⚠️ Erro ao enviar notificações (não crítico):', notifyError);
+        toast.warning('Orçamento submetido, mas notificação por email falhou');
+      }
+
       navigate('/');
     } catch (error) {
       console.error('Erro ao submeter orçamento:', error);
