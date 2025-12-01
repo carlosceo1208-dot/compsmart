@@ -116,13 +116,12 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
 
   const totals = breakdown?.reduce(
     (acc, unit) => ({
-      projectionCount: acc.projectionCount + unit.projectionCount,
       existingEmployees: acc.existingEmployees + unit.existingEmployees,
       plannedHires: acc.plannedHires + unit.plannedHires,
       salaryChanges: acc.salaryChanges + unit.salaryChanges,
       totalSalary: acc.totalSalary + unit.totalSalary,
     }),
-    { projectionCount: 0, existingEmployees: 0, plannedHires: 0, salaryChanges: 0, totalSalary: 0 }
+    { existingEmployees: 0, plannedHires: 0, salaryChanges: 0, totalSalary: 0 }
   );
 
   return (
@@ -141,7 +140,6 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
           <TableHeader>
             <TableRow>
               <TableHead>Unidade</TableHead>
-              <TableHead className="text-right">Projeções (# Meses)</TableHead>
               <TableHead className="text-right">Func. Existentes</TableHead>
               <TableHead className="text-right">Contratações</TableHead>
               <TableHead className="text-right">Alt. Salariais</TableHead>
@@ -152,7 +150,6 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
             {breakdown?.map((unit) => (
               <TableRow key={unit.unitId}>
                 <TableCell className="font-medium">{unit.unitName}</TableCell>
-                <TableCell className="text-right">{unit.projectionCount}</TableCell>
                 <TableCell className="text-right">
                   <Badge variant="outline" className="border-purple-200 text-purple-700">
                     {unit.existingEmployees}
@@ -176,7 +173,6 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
             {/* Linha de Total */}
             <TableRow className="bg-muted/50 font-bold border-t-2">
               <TableCell>TOTAL</TableCell>
-              <TableCell className="text-right">{totals?.projectionCount || 0}</TableCell>
               <TableCell className="text-right">
                 <Badge variant="outline" className="border-purple-300 text-purple-800">
                   {totals?.existingEmployees || 0}
