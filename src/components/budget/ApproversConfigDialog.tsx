@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
@@ -26,6 +26,7 @@ interface ApproversConfigDialogProps {
 export const ApproversConfigDialog = ({ open, onOpenChange }: ApproversConfigDialogProps) => {
   const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [userConfigs, setUserConfigs] = useState<Record<string, { superiorId: string | null; canSelfApprove: boolean }>>({});
 
   // Buscar usuários com roles de admin/hr_manager/manager
   const { data: usersWithRoles, isLoading: usersLoading } = useQuery({
@@ -118,6 +119,29 @@ export const ApproversConfigDialog = ({ open, onOpenChange }: ApproversConfigDia
     return usersWithRoles?.find(u => u.id === superiorId)?.full_name;
   };
 
+  // Inicializar configurações quando dados carregarem
+  useEffect(() => {
+    if (approvers && usersWithRoles && Object.keys(userConfigs).length === 0) {
+      const initialConfigs: Record<string, { superiorId: string | null; canSelfApprove: boolean }> = {};
+      usersWithRoles.forEach(user => {
+        const config = approvers.find(a => a.user_id === user.id);
+        initialConfigs[user.id] = {
+          superiorId: config?.superior_approver_id || null,
+          canSelfApprove: config?.can_self_approve || false,
+        };
+      });
+      setUserConfigs(initialConfigs);
+    }
+  }, [approvers, usersWithRoles, userConfigs]);
+
+  // Atualizar configuração de um usuário específico
+  const updateUserConfig = (userId: string, updates: Partial<{ superiorId: string | null; canSelfApprove: boolean }>) => {
+    setUserConfigs(prev => ({
+      ...prev,
+      [userId]: { ...(prev[userId] || { superiorId: null, canSelfApprove: false }), ...updates }
+    }));
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
@@ -149,8 +173,8 @@ export const ApproversConfigDialog = ({ open, onOpenChange }: ApproversConfigDia
           <div className="space-y-4">
             {usersWithRoles?.map((user) => {
               const config = getUserApproverConfig(user.id);
-              const [superiorId, setSuperiorId] = useState<string | null>(config?.superior_approver_id || null);
-              const [canSelfApprove, setCanSelfApprove] = useState(config?.can_self_approve || false);
+              const userConfig = userConfigs[user.id] || { superiorId: null, canSelfApprove: false };
+              const { superiorId, canSelfApprove } = userConfig;
               const superiorName = getSuperiorName(superiorId);
               const hasChanges = superiorId !== (config?.superior_approver_id || null) || 
                                  canSelfApprove !== (config?.can_self_approve || false);
@@ -188,7 +212,7 @@ export const ApproversConfigDialog = ({ open, onOpenChange }: ApproversConfigDia
                         <Label>Aprovador Superior</Label>
                         <Select
                           value={superiorId || 'none'}
-                          onValueChange={(value) => setSuperiorId(value === 'none' ? null : value)}
+                          onValueChange={(value) => updateUserConfig(user.id, { superiorId: value === 'none' ? null : value })}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Selecione o aprovador superior" />
@@ -211,7 +235,7 @@ export const ApproversConfigDialog = ({ open, onOpenChange }: ApproversConfigDia
                         <div className="flex items-center gap-2 h-10">
                           <Switch
                             checked={canSelfApprove}
-                            onCheckedChange={setCanSelfApprove}
+                            onCheckedChange={(checked) => updateUserConfig(user.id, { canSelfApprove: checked })}
                             disabled={!!superiorId}
                           />
                           <span className="text-sm text-muted-foreground">
