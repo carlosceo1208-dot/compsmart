@@ -31,10 +31,10 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
             variant="outline"
             size="sm"
             onClick={handleRefresh}
-            disabled={economicData.isLoading}
+            disabled={economicData.isLoading || economicData.isRefreshing}
             className="bg-primary/10 border-primary/30 hover:bg-primary/20 hover:border-primary text-primary gap-2 shadow-sm"
           >
-            <RefreshCw className={`h-4 w-4 ${economicData.isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${(economicData.isLoading || economicData.isRefreshing) ? 'animate-spin' : ''}`} />
             <span className="text-xs font-medium">Atualizar</span>
           </Button>
         </div>
