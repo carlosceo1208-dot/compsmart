@@ -64,7 +64,7 @@ const fetchUSDRate = async (): Promise<USDData> => {
         value: parseFloat(bcData.value[0].cotacaoVenda),
         variation: 0,
         percentChange: 0,
-        lastUpdate: new Date(bcData.value[0].dataHoraCotacao || Date.now()),
+        lastUpdate: new Date(bcData.value[0].dataHoraCotacao || new Date()),
       };
       
       // Salvar no cache
