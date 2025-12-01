@@ -27,6 +27,7 @@ interface Props {
 
 export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Props) => {
   const [reviewNotes, setReviewNotes] = useState('');
+  const [selfApprovalJustification, setSelfApprovalJustification] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const queryClient = useQueryClient();
@@ -38,6 +39,42 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
 
     setIsSubmitting(true);
     try {
+      // Detectar auto-aprovação
+      const isSelfApproval = details.submission.submitted_by === userData.userId;
+      
+      // Se for auto-aprovação e não houver justificativa, bloquear
+      if (isSelfApproval && !selfApprovalJustification.trim()) {
+        toast.error('⚠️ Auto-aprovação requer justificativa detalhada');
+        setIsSubmitting(false);
+        return;
+      }
+
+      if (isSelfApproval && selfApprovalJustification.length < 50) {
+        toast.error('⚠️ Justificativa deve ter no mínimo 50 caracteres');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Verificar se há superior configurado
+      const { data: approverConfig } = await supabase
+        .from('budget_approvers')
+        .select('superior_approver_id, can_self_approve')
+        .eq('user_id', userData.userId)
+        .maybeSingle();
+
+      // Se tem superior e está tentando auto-aprovar, bloquear
+      if (isSelfApproval && approverConfig?.superior_approver_id) {
+        const { data: superiorProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', approverConfig.superior_approver_id)
+          .single();
+        
+        toast.error(`⚠️ Este orçamento requer aprovação de: ${superiorProfile?.full_name || 'Aprovador Superior'}`);
+        setIsSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase
         .from('budget_submissions')
         .update({
@@ -45,12 +82,17 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
           reviewed_at: new Date().toISOString(),
           reviewed_by: userData.userId,
           review_notes: reviewNotes || null,
+          is_self_approval: isSelfApproval,
+          self_approval_justification: isSelfApproval ? selfApprovalJustification : null,
         })
         .eq('id', submissionId);
 
       if (error) throw error;
 
-      toast.success('Orçamento aprovado com sucesso!');
+      toast.success(isSelfApproval 
+        ? '✅ Auto-aprovação registrada com justificativa' 
+        : '✅ Orçamento aprovado com sucesso!'
+      );
       queryClient.invalidateQueries({ queryKey: ['budget-submissions'] });
       queryClient.invalidateQueries({ queryKey: ['budget-submission-detail'] });
       onOpenChange(false);
@@ -109,6 +151,9 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
   }
 
   if (!details) return null;
+
+  // Detectar auto-aprovação
+  const isSelfApproval = details.submission.submitted_by === userData?.userId;
 
   const totalYearly = details.monthlyTotals.reduce(
     (sum, month) => sum + month.totalFixed + month.totalVariable + month.totalBenefits,
@@ -313,18 +358,70 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
         </Tabs>
 
         {/* Comentários de Revisão */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">
-            Comentários de Revisão {details.submission.status === 'submitted' && '(opcional)'}
-          </label>
-          <Textarea
-            value={reviewNotes}
-            onChange={(e) => setReviewNotes(e.target.value)}
-            placeholder="Adicione comentários sobre esta revisão..."
-            rows={3}
-            disabled={details.submission.status !== 'submitted'}
-          />
-        </div>
+        {details.submission.status === 'submitted' && (
+          <div className="space-y-4 border-t pt-6">
+            {isSelfApproval && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>⚠️ Auto-Aprovação Detectada</strong>
+                  <p className="mt-1">
+                    Você está aprovando um orçamento que você mesmo submeteu. 
+                    Uma justificativa detalhada é obrigatória para fins de auditoria e compliance.
+                  </p>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {isSelfApproval && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-red-600">
+                  Justificativa para Auto-Aprovação *
+                </label>
+                <Textarea
+                  value={selfApprovalJustification}
+                  onChange={(e) => setSelfApprovalJustification(e.target.value)}
+                  placeholder="Explique detalhadamente por que esta auto-aprovação é necessária (mínimo 50 caracteres)..."
+                  rows={4}
+                  className="border-red-200 focus:border-red-400"
+                  required
+                />
+                {selfApprovalJustification.length > 0 && selfApprovalJustification.length < 50 && (
+                  <p className="text-xs text-red-600">
+                    Mínimo 50 caracteres ({selfApprovalJustification.length}/50)
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                Comentários de Revisão {!isSelfApproval && '(opcional)'}
+              </label>
+              <Textarea
+                value={reviewNotes}
+                onChange={(e) => setReviewNotes(e.target.value)}
+                placeholder="Adicione comentários sobre esta revisão..."
+                rows={3}
+              />
+            </div>
+          </div>
+        )}
+
+        {details.submission.status !== 'submitted' && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Comentários de Revisão
+            </label>
+            <Textarea
+              value={reviewNotes}
+              onChange={(e) => setReviewNotes(e.target.value)}
+              placeholder="Adicione comentários sobre esta revisão..."
+              rows={3}
+              disabled
+            />
+          </div>
+        )}
 
         {details.submission.review_notes && (
           <Alert>
@@ -353,13 +450,13 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
                 )}
                 Rejeitar
               </Button>
-              <Button onClick={handleApprove} disabled={isSubmitting}>
+              <Button onClick={handleApprove} disabled={isSubmitting || (isSelfApproval && selfApprovalJustification.length < 50)}>
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                   <CheckCircle className="w-4 h-4 mr-2" />
                 )}
-                Aprovar
+                {isSelfApproval ? 'Aprovar (Auto-Aprovação)' : 'Aprovar'}
               </Button>
             </>
           )}

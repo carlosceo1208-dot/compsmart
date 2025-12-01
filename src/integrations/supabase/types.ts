@@ -394,6 +394,33 @@ export type Database = {
           },
         ]
       }
+      budget_approvers: {
+        Row: {
+          can_self_approve: boolean | null
+          created_at: string | null
+          id: string
+          superior_approver_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          can_self_approve?: boolean | null
+          created_at?: string | null
+          id?: string
+          superior_approver_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          can_self_approve?: boolean | null
+          created_at?: string | null
+          id?: string
+          superior_approver_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       budget_employee_projections: {
         Row: {
           change_type: string | null
@@ -484,9 +511,12 @@ export type Database = {
           created_at: string
           fiscal_year: number
           id: string
+          is_self_approval: boolean | null
+          requires_superior_approval: boolean | null
           review_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
+          self_approval_justification: string | null
           status: string
           submission_notes: string | null
           submitted_at: string | null
@@ -501,9 +531,12 @@ export type Database = {
           created_at?: string
           fiscal_year: number
           id?: string
+          is_self_approval?: boolean | null
+          requires_superior_approval?: boolean | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          self_approval_justification?: string | null
           status?: string
           submission_notes?: string | null
           submitted_at?: string | null
@@ -518,9 +551,12 @@ export type Database = {
           created_at?: string
           fiscal_year?: number
           id?: string
+          is_self_approval?: boolean | null
+          requires_superior_approval?: boolean | null
           review_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
+          self_approval_justification?: string | null
           status?: string
           submission_notes?: string | null
           submitted_at?: string | null

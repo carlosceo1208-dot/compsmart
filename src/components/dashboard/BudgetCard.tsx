@@ -34,14 +34,29 @@ export const BudgetCard = ({ currency, unitId }: BudgetCardProps) => {
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-20 w-full" />
-        ) : !data || data.budgetedSalary === 0 ? (
-          <div className="text-center py-4">
-            <p className="text-sm text-muted-foreground mb-2">
-              📊 Nenhum orçamento cadastrado
-            </p>
-            <Link to="/budget-planning" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
-              Criar planejamento orçamentário <ExternalLink className="h-3 w-3" />
-            </Link>
+        ) : !data ? (
+          <Skeleton className="h-20 w-full" />
+        ) : data.budgetedSalary === 0 ? (
+          <div className="space-y-3">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Salários Atuais:</span>
+              <div className="font-semibold text-sm">{formatCompactCurrency(realSalary, currency)}</div>
+            </div>
+            
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-muted-foreground">Headcount Atual:</span>
+              <div className="font-semibold text-sm">{formatNumber(data?.realHeadcount || 0)}</div>
+            </div>
+
+            <Badge variant="outline" className="w-full justify-center text-xs">
+              📋 Sem orçamento para comparação
+            </Badge>
+            
+            <div className="pt-2 border-t">
+              <Link to="/budget-planning" className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+                Criar planejamento para {new Date().getFullYear() + 1} <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
