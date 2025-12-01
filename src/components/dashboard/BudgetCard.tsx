@@ -32,7 +32,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
       rejected: { label: 'Rejeitado', variant: 'destructive' as const },
     };
 
-    const config = statusConfig[data.submissionStatus];
+    const config = statusConfig[data.submissionStatus as keyof typeof statusConfig];
+    if (!config) return null; // Safety check: status não mapeado
+    
     return (
       <Badge variant={config.variant} className="text-xs">
         {config.label}
