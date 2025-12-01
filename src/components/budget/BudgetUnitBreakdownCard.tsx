@@ -11,9 +11,10 @@ interface BudgetUnitBreakdown {
   unitName: string;
   unitId: string;
   totalSalary: number;
+  existingEmployees: number;
   plannedHires: number;
   salaryChanges: number;
-  headcount: number;
+  projectionCount: number;
 }
 
 interface BudgetUnitBreakdownCardProps {
@@ -32,6 +33,8 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
           projected_fixed_salary,
           is_planned_hire,
           change_type,
+          employee_id,
+          planned_employee_name,
           projected_unit:organizational_structure(description)
         `)
         .eq('fiscal_year', fiscalYear)
@@ -39,8 +42,15 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
 
       if (error) throw error;
 
-      // Agrupar por unidade
-      const unitMap = new Map<string, BudgetUnitBreakdown>();
+      // Agrupar por unidade usando Sets para contar pessoas únicas
+      const unitMap = new Map<string, {
+        unitName: string;
+        totalSalary: number;
+        projectionCount: number;
+        uniqueExistingEmployees: Set<string>;
+        uniqueHires: Set<string>;
+        uniqueChanges: Set<string>;
+      }>();
       
       projections?.forEach((p: any) => {
         const unitId = p.projected_unit_id || 'sem-unidade';
@@ -48,23 +58,43 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
         
         if (!unitMap.has(unitId)) {
           unitMap.set(unitId, {
-            unitId,
             unitName,
             totalSalary: 0,
-            plannedHires: 0,
-            salaryChanges: 0,
-            headcount: 0
+            projectionCount: 0,
+            uniqueExistingEmployees: new Set<string>(),
+            uniqueHires: new Set<string>(),
+            uniqueChanges: new Set<string>(),
           });
         }
         
         const unit = unitMap.get(unitId)!;
         unit.totalSalary += p.projected_fixed_salary || 0;
-        if (p.is_planned_hire) unit.plannedHires++;
-        if (p.change_type) unit.salaryChanges++;
-        unit.headcount++;
+        unit.projectionCount++;
+        
+        // Contar funcionários existentes únicos (não contratações planejadas)
+        if (p.is_planned_hire && p.planned_employee_name) {
+          unit.uniqueHires.add(p.planned_employee_name);
+        } else if (p.employee_id) {
+          unit.uniqueExistingEmployees.add(p.employee_id);
+        }
+        
+        // Contar alterações salariais únicas
+        if (p.change_type && p.employee_id) {
+          unit.uniqueChanges.add(p.employee_id);
+        }
       });
 
-      return Array.from(unitMap.values())
+      // Converter Sets para números finais
+      return Array.from(unitMap.entries())
+        .map(([unitId, unit]) => ({
+          unitId,
+          unitName: unit.unitName,
+          totalSalary: unit.totalSalary,
+          projectionCount: unit.projectionCount,
+          existingEmployees: unit.uniqueExistingEmployees.size,
+          plannedHires: unit.uniqueHires.size,
+          salaryChanges: unit.uniqueChanges.size,
+        }))
         .sort((a, b) => b.totalSalary - a.totalSalary);
     },
     staleTime: 2 * 60 * 1000,
@@ -86,12 +116,13 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
 
   const totals = breakdown?.reduce(
     (acc, unit) => ({
-      headcount: acc.headcount + unit.headcount,
+      projectionCount: acc.projectionCount + unit.projectionCount,
+      existingEmployees: acc.existingEmployees + unit.existingEmployees,
       plannedHires: acc.plannedHires + unit.plannedHires,
       salaryChanges: acc.salaryChanges + unit.salaryChanges,
       totalSalary: acc.totalSalary + unit.totalSalary,
     }),
-    { headcount: 0, plannedHires: 0, salaryChanges: 0, totalSalary: 0 }
+    { projectionCount: 0, existingEmployees: 0, plannedHires: 0, salaryChanges: 0, totalSalary: 0 }
   );
 
   return (
@@ -111,6 +142,7 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
             <TableRow>
               <TableHead>Unidade</TableHead>
               <TableHead className="text-right">Projeções</TableHead>
+              <TableHead className="text-right">Func. Existentes</TableHead>
               <TableHead className="text-right">Contratações</TableHead>
               <TableHead className="text-right">Alt. Salariais</TableHead>
               <TableHead className="text-right">Total Salários</TableHead>
@@ -120,7 +152,12 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
             {breakdown?.map((unit) => (
               <TableRow key={unit.unitId}>
                 <TableCell className="font-medium">{unit.unitName}</TableCell>
-                <TableCell className="text-right">{unit.headcount}</TableCell>
+                <TableCell className="text-right">{unit.projectionCount}</TableCell>
+                <TableCell className="text-right">
+                  <Badge variant="outline" className="border-purple-200 text-purple-700">
+                    {unit.existingEmployees}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-right">
                   <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200">
                     {unit.plannedHires}
@@ -139,7 +176,12 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
             {/* Linha de Total */}
             <TableRow className="bg-muted/50 font-bold border-t-2">
               <TableCell>TOTAL</TableCell>
-              <TableCell className="text-right">{totals?.headcount || 0}</TableCell>
+              <TableCell className="text-right">{totals?.projectionCount || 0}</TableCell>
+              <TableCell className="text-right">
+                <Badge variant="outline" className="border-purple-300 text-purple-800">
+                  {totals?.existingEmployees || 0}
+                </Badge>
+              </TableCell>
               <TableCell className="text-right">
                 <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
                   {totals?.plannedHires || 0}
