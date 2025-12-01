@@ -14,7 +14,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, XCircle, Loader2, Info } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { AlertTriangle, CheckCircle, XCircle, Loader2, Info, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -154,6 +155,10 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
 
   // Detectar auto-aprovação
   const isSelfApproval = details.submission.submitted_by === userData?.userId;
+
+  // Calcular progresso da justificativa
+  const justificationProgress = Math.min((selfApprovalJustification.length / 50) * 100, 100);
+  const isJustificationValid = selfApprovalJustification.length >= 50;
 
   const totalYearly = details.monthlyTotals.reduce(
     (sum, month) => sum + month.totalFixed + month.totalVariable + month.totalBenefits,
@@ -374,23 +379,54 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
             )}
 
             {isSelfApproval && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-red-600">
-                  Justificativa para Auto-Aprovação *
+              <div className="space-y-3">
+                <label className={`text-sm font-semibold flex items-center gap-2 ${
+                  isJustificationValid ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {isJustificationValid ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <AlertTriangle className="w-4 h-4" />
+                  )}
+                  Justificativa para Auto-Aprovação * (Obrigatório)
                 </label>
                 <Textarea
                   value={selfApprovalJustification}
                   onChange={(e) => setSelfApprovalJustification(e.target.value)}
-                  placeholder="Explique detalhadamente por que esta auto-aprovação é necessária (mínimo 50 caracteres)..."
-                  rows={4}
-                  className="border-red-200 focus:border-red-400"
+                  placeholder="Explique detalhadamente por que esta auto-aprovação é necessária. Seja específico sobre o contexto, motivos e responsabilidade assumida..."
+                  rows={5}
+                  className={`transition-colors ${
+                    isJustificationValid 
+                      ? 'border-green-400 focus:border-green-500 bg-green-50/50' 
+                      : 'border-red-300 focus:border-red-500'
+                  }`}
                   required
                 />
-                {selfApprovalJustification.length > 0 && selfApprovalJustification.length < 50 && (
-                  <p className="text-xs text-red-600">
-                    Mínimo 50 caracteres ({selfApprovalJustification.length}/50)
-                  </p>
-                )}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className={`font-medium ${
+                      isJustificationValid ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {selfApprovalJustification.length}/50 caracteres
+                    </span>
+                    {isJustificationValid ? (
+                      <span className="text-green-600 font-medium flex items-center gap-1">
+                        <Check className="w-3 h-3" />
+                        Requisito atendido
+                      </span>
+                    ) : (
+                      <span className="text-red-600">
+                        Mínimo 50 caracteres necessários
+                      </span>
+                    )}
+                  </div>
+                  <Progress 
+                    value={justificationProgress} 
+                    className={`h-2 ${
+                      isJustificationValid ? '[&>div]:bg-green-500' : '[&>div]:bg-red-500'
+                    }`}
+                  />
+                </div>
               </div>
             )}
 
