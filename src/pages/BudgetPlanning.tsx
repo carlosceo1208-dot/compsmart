@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { BudgetPlanningFilterPanel } from '@/components/budget/BudgetPlanningFilterPanel';
 import { BudgetSummaryTable } from '@/components/budget/BudgetSummaryTable';
+import { BudgetUnitBreakdownCard } from '@/components/budget/BudgetUnitBreakdownCard';
 import { EmployeeBudgetList } from '@/components/budget/EmployeeBudgetList';
 import { EmployeeBudgetDialog } from '@/components/budget/EmployeeBudgetDialog';
 import { PlannedHireDialog } from '@/components/budget/PlannedHireDialog';
@@ -120,21 +121,31 @@ const BudgetPlanning = () => {
   });
 
   const handleSubmit = async () => {
-    if (!userData?.unitId || !userData?.userId) {
-      toast.error('Erro ao identificar unidade ou usuário');
+    if (!userData?.userId) {
+      toast.error('Erro ao identificar usuário');
       return;
     }
+
+    // CORREÇÃO: Usar selectedUnitId (null = empresa toda)
+    const unitIdForSubmission = selectedUnitId;
 
     let submissionId: string;
 
     try {
       // Verificar se já existe uma submissão
-      const { data: existing } = await supabase
+      let query = supabase
         .from('budget_submissions')
         .select('id')
-        .eq('unit_id', userData.unitId)
-        .eq('fiscal_year', fiscalYear)
-        .single();
+        .eq('fiscal_year', fiscalYear);
+
+      // Query correta para empresa toda ou unidade específica
+      if (unitIdForSubmission === null) {
+        query = query.is('unit_id', null);
+      } else {
+        query = query.eq('unit_id', unitIdForSubmission);
+      }
+
+      const { data: existing } = await query.maybeSingle();
 
       if (existing) {
         // Atualizar submissão existente
@@ -154,7 +165,7 @@ const BudgetPlanning = () => {
         const { data: newSubmission, error } = await supabase
           .from('budget_submissions')
           .insert({
-            unit_id: userData.unitId,
+            unit_id: unitIdForSubmission, // null para empresa toda
             fiscal_year: fiscalYear,
             status: 'submitted',
             submitted_at: new Date().toISOString(),
@@ -172,11 +183,17 @@ const BudgetPlanning = () => {
       
       // Notificar aprovadores por email
       try {
-        const { data: unitData } = await supabase
-          .from('organizational_structure')
-          .select('description')
-          .eq('id', userData.unitId)
-          .single();
+        let unitName = 'Empresa Toda';
+        
+        if (unitIdForSubmission) {
+          const { data: unitData } = await supabase
+            .from('organizational_structure')
+            .select('description')
+            .eq('id', unitIdForSubmission)
+            .maybeSingle();
+          
+          unitName = unitData?.description || 'Unidade';
+        }
 
         const { data: userProfile } = await supabase
           .from('profiles')
@@ -187,7 +204,7 @@ const BudgetPlanning = () => {
         await supabase.functions.invoke('notify-budget-submission', {
           body: {
             submissionId,
-            unitName: unitData?.description || 'Unidade',
+            unitName,
             submittedBy: userProfile?.full_name || 'Usuário',
             totalAmount: summary?.yearTotal || 0,
             fiscalYear: fiscalYear,
@@ -246,6 +263,8 @@ const BudgetPlanning = () => {
         />
 
         <div className="space-y-6">
+          <BudgetUnitBreakdownCard fiscalYear={fiscalYear} />
+          
           <BudgetSummaryTable
             monthlyTotals={summary?.monthlyTotals || []}
             yearTotal={summary?.yearTotal || 0}
