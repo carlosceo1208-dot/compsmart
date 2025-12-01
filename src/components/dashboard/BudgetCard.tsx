@@ -48,9 +48,9 @@ export const BudgetCard = ({ currency, unitId }: BudgetCardProps) => {
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Salários:</span>
               <div className="text-right">
-                <div className="font-semibold text-sm">{formatCompactCurrency(realSalary)}</div>
+                <div className="font-semibold text-sm">{formatCompactCurrency(realSalary, currency)}</div>
                 <div className="text-xs text-muted-foreground">
-                  Budget: {formatCompactCurrency(budgetedSalary)}
+                  Budget: {formatCompactCurrency(budgetedSalary, currency)}
                 </div>
               </div>
             </div>

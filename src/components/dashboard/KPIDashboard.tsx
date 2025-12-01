@@ -73,6 +73,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
         format="compact-currency"
         variant="success"
         isLoading={loadingSalary}
+        currency={currency}
       />
       
       <KPICard
@@ -82,6 +83,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
         format="currency"
         variant="success"
         isLoading={loadingSalary}
+        currency={currency}
       />
       
       <BenefitsCard currency={currency} />

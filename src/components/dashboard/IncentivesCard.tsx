@@ -37,11 +37,11 @@ export const IncentivesCard = ({ currency }: IncentivesCardProps) => {
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">ICP (Curto):</span>
-              <span className="font-semibold">{formatCompactCurrency(shortTerm)}</span>
+              <span className="font-semibold">{formatCompactCurrency(shortTerm, currency)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">ILP (Longo):</span>
-              <span className="font-semibold">{formatCompactCurrency(longTerm)}</span>
+              <span className="font-semibold">{formatCompactCurrency(longTerm, currency)}</span>
             </div>
           </div>
         )}

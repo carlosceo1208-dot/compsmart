@@ -48,18 +48,25 @@ export const formatCurrency = (value: number | null | undefined): string => {
 /**
  * Formata valor como moeda compacta (K/M)
  * @param value - Valor a ser formatado
- * @returns String formatada (ex: "R$ 1.2M")
+ * @param currency - Moeda a usar (BRL ou USD)
+ * @returns String formatada (ex: "R$ 1.2M" ou "$ 1.2M")
  */
-export const formatCompactCurrency = (value: number | null | undefined): string => {
-  if (value === null || value === undefined || !isFinite(value)) return 'R$ 0';
+export const formatCompactCurrency = (
+  value: number | null | undefined,
+  currency: 'BRL' | 'USD' = 'BRL'
+): string => {
+  const symbol = currency === 'BRL' ? 'R$' : '$';
+  const defaultValue = currency === 'BRL' ? 'R$ 0' : '$ 0';
+  
+  if (value === null || value === undefined || !isFinite(value)) return defaultValue;
   
   if (value >= 1000000) {
-    return `R$ ${(value / 1000000).toFixed(1)}M`;
+    return `${symbol} ${(value / 1000000).toFixed(1)}M`;
   }
   if (value >= 1000) {
-    return `R$ ${(value / 1000).toFixed(1)}K`;
+    return `${symbol} ${(value / 1000).toFixed(1)}K`;
   }
-  return formatCurrency(value);
+  return formatCurrencyCustom(value, currency);
 };
 
 /**

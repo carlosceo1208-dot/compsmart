@@ -28,13 +28,14 @@ export const EconomicIndicators = ({ currency, onCurrencyChange }: EconomicIndic
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-foreground">Indicadores Econômicos</h3>
           <Button
-            variant="ghost"
-            size="icon"
+            variant="outline"
+            size="sm"
             onClick={handleRefresh}
             disabled={economicData.isLoading}
-            className="hover:bg-primary/10"
+            className="bg-primary/10 border-primary/30 hover:bg-primary/20 hover:border-primary text-primary gap-2 shadow-sm"
           >
-            <RefreshCw className={`h-5 w-5 text-primary ${economicData.isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${economicData.isLoading ? 'animate-spin' : ''}`} />
+            <span className="text-xs font-medium">Atualizar</span>
           </Button>
         </div>
 
