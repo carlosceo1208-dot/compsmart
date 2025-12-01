@@ -596,8 +596,12 @@ const Organization = () => {
                           </TableCell>
                           <TableCell>
                             <div className="space-y-1">
-                              <span className="font-medium">{entity.name}</span>
-                              {entity.description && (
+                              <span className="font-medium">
+                                {entity.type === 'company' 
+                                  ? entity.name 
+                                  : (entity.description || entity.name)}
+                              </span>
+                              {entity.type === 'company' && entity.description && (
                                 <p className="text-xs text-muted-foreground">
                                   {entity.description}
                                 </p>
