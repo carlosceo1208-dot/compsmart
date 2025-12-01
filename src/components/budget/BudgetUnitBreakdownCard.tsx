@@ -25,8 +25,6 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
   const { data: breakdown, isLoading } = useQuery({
     queryKey: ['budget-unit-breakdown', fiscalYear],
     queryFn: async () => {
-      console.log('🔄 BudgetUnitBreakdown - Iniciando query para fiscalYear:', fiscalYear);
-      
       // Buscar todas as projeções agrupadas por unidade
       const { data: projections, error } = await supabase
         .from('budget_employee_projections')
@@ -43,9 +41,6 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
         .eq('is_active', true);
 
       if (error) throw error;
-      
-      console.log('📊 Total de projeções retornadas:', projections?.length);
-      console.log('📋 Primeiras 3 projeções:', projections?.slice(0, 3));
 
       // Agrupar por unidade usando Sets para contar pessoas únicas
       const unitMap = new Map<string, {
@@ -57,21 +52,9 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
         uniqueChanges: Set<string>;
       }>();
       
-      projections?.forEach((p: any, index: number) => {
+      projections?.forEach((p: any) => {
         const unitId = p.projected_unit_id || 'sem-unidade';
         const unitName = p.projected_unit?.description || 'Sem Unidade';
-        
-        // Log detalhado das primeiras 5 projeções
-        if (index < 5) {
-          console.log(`📌 Projeção ${index + 1}:`, {
-            unit: unitName,
-            is_planned_hire: p.is_planned_hire,
-            employee_id: p.employee_id,
-            planned_employee_name: p.planned_employee_name,
-            change_type: p.change_type,
-            salary: p.projected_fixed_salary
-          });
-        }
         
         if (!unitMap.has(unitId)) {
           unitMap.set(unitId, {
@@ -90,47 +73,29 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
         
         // Contar funcionários existentes únicos (não contratações planejadas)
         if (p.is_planned_hire && p.planned_employee_name) {
-          console.log(`✅ Adicionando contratação planejada: ${p.planned_employee_name} em ${unitName}`);
           unit.uniqueHires.add(p.planned_employee_name);
         } else if (p.employee_id) {
-          console.log(`👤 Adicionando funcionário existente: ${p.employee_id} em ${unitName}`);
           unit.uniqueExistingEmployees.add(p.employee_id);
         }
         
         // Contar alterações salariais únicas
         if (p.change_type && p.employee_id) {
-          console.log(`💰 Alteração salarial detectada: ${p.employee_id} (${p.change_type}) em ${unitName}`);
           unit.uniqueChanges.add(p.employee_id);
         }
       });
 
       // Converter Sets para números finais
-      const finalBreakdown = Array.from(unitMap.entries())
-        .map(([unitId, unit]) => {
-          console.log(`📊 Unidade ${unit.unitName}:`, {
-            projeções: unit.projectionCount,
-            'func_existentes (Set.size)': unit.uniqueExistingEmployees.size,
-            'contratações (Set.size)': unit.uniqueHires.size,
-            'alt_salariais (Set.size)': unit.uniqueChanges.size,
-            'uniqueHires Set values': Array.from(unit.uniqueHires),
-            'uniqueExistingEmployees Set values': Array.from(unit.uniqueExistingEmployees),
-            'uniqueChanges Set values': Array.from(unit.uniqueChanges)
-          });
-          
-          return {
-            unitId,
-            unitName: unit.unitName,
-            totalSalary: unit.totalSalary,
-            projectionCount: unit.projectionCount,
-            existingEmployees: unit.uniqueExistingEmployees.size,
-            plannedHires: unit.uniqueHires.size,
-            salaryChanges: unit.uniqueChanges.size,
-          };
-        })
+      return Array.from(unitMap.entries())
+        .map(([unitId, unit]) => ({
+          unitId,
+          unitName: unit.unitName,
+          totalSalary: unit.totalSalary,
+          projectionCount: unit.projectionCount,
+          existingEmployees: unit.uniqueExistingEmployees.size,
+          plannedHires: unit.uniqueHires.size,
+          salaryChanges: unit.uniqueChanges.size,
+        }))
         .sort((a, b) => b.totalSalary - a.totalSalary);
-      
-      console.log('✅ Breakdown final:', finalBreakdown);
-      return finalBreakdown;
     },
     staleTime: 2 * 60 * 1000,
   });
@@ -176,7 +141,7 @@ export const BudgetUnitBreakdownCard = ({ fiscalYear }: BudgetUnitBreakdownCardP
           <TableHeader>
             <TableRow>
               <TableHead>Unidade</TableHead>
-              <TableHead className="text-right">Projeções</TableHead>
+              <TableHead className="text-right">Projeções (# Meses)</TableHead>
               <TableHead className="text-right">Func. Existentes</TableHead>
               <TableHead className="text-right">Contratações</TableHead>
               <TableHead className="text-right">Alt. Salariais</TableHead>
