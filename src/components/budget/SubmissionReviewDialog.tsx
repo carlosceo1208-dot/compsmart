@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { AlertTriangle, CheckCircle, XCircle, Loader2, Info, Check } from 'lucide-react';
+import { AlertTriangle, CheckCircle, XCircle, Loader2, Info, Check, Trophy, BarChart3, TrendingUp, UserPlus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
@@ -182,7 +182,7 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="summary">Resumo Mensal</TabsTrigger>
             <TabsTrigger value="employees">
-              Funcionários ({details.employeeChanges.length})
+              Funcionários ({(details.salaryChanges?.length || 0) + (details.promotions?.length || 0) + (details.plannedHires?.length || 0)})
             </TabsTrigger>
             <TabsTrigger value="alerts">
               Alertas ({details.alerts.length})
@@ -238,46 +238,152 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
             </div>
           </TabsContent>
 
-          {/* Aba: Funcionários com Alterações */}
-          <TabsContent value="employees" className="space-y-4">
-            {/* Seção: Funcionários Existentes */}
-            {details.employeeChanges.length > 0 && (
+          {/* Aba: Funcionários com Alterações - Reorganizada em 3 seções */}
+          <TabsContent value="employees" className="space-y-6">
+            {/* Seção 1: Aumentos Salariais */}
+            {details.salaryChanges && details.salaryChanges.length > 0 && (
               <div>
-                <h3 className="font-semibold text-lg mb-3">👥 Funcionários Existentes</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                    <Trophy className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg">Aumentos Salariais</h3>
+                  <Badge variant="secondary" className="ml-2">{details.salaryChanges.length}</Badge>
+                </div>
                 <div className="space-y-3">
-                  {details.employeeChanges.map((emp, idx) => (
-                    <div key={idx} className="border rounded-lg p-4 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-lg">{emp.employee.full_name}</h4>
-                        <span className={`font-semibold ${emp.totalImpact >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          Impacto: {formatCurrency(emp.totalImpact)}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        {emp.changes.map((change: any, cIdx: number) => (
-                          <div key={cIdx} className="flex items-center justify-between text-sm p-2 bg-muted/30 rounded">
-                            <span>
-                              <strong>{getMonthName(change.month)}</strong> - {change.change_type || 'Alteração'}
-                            </span>
-                            <span className="font-mono">{formatCurrency(change.projected_fixed_salary)}</span>
+                  {details.salaryChanges.map((emp: any, idx: number) => {
+                    const currentSalary = emp.employee?.salary || 0;
+                    const projectedSalary = emp.changes[0]?.projected_fixed_salary || 0;
+                    const percentChange = currentSalary > 0 
+                      ? ((projectedSalary - currentSalary) / currentSalary) * 100 
+                      : 0;
+                    
+                    return (
+                      <div key={idx} className="border rounded-lg p-4 space-y-3 bg-amber-50/50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            {getChangeTypeBadge(emp.changeType)}
+                            <h4 className="font-semibold text-lg mt-2">{emp.employee?.full_name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {emp.employee?.job_title} • Grade {emp.employee?.grade}
+                            </p>
                           </div>
-                        ))}
+                          <span className={`font-bold text-lg ${emp.totalImpact >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {emp.totalImpact >= 0 ? '+' : ''}{formatCurrency(emp.totalImpact)}
+                          </span>
+                        </div>
+                        
+                        {/* Detalhes do aumento */}
+                        <div className="bg-white dark:bg-background/50 rounded-lg p-3 border">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">
+                              <strong>{getMonthName(emp.changes[0]?.month)}</strong> - Salário
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-muted-foreground">{formatCurrency(currentSalary)}</span>
+                              <span className="text-muted-foreground">→</span>
+                              <span className="font-mono font-semibold">{formatCurrency(projectedSalary)}</span>
+                              <Badge className={`ml-2 ${percentChange > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30' : 'bg-red-100 text-red-700 dark:bg-red-900/30'}`}>
+                                {percentChange >= 0 ? '+' : ''}{percentChange.toFixed(1)}%
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+
+                        {emp.changes[0]?.justification && (
+                          <p className="text-sm text-muted-foreground italic border-l-2 border-amber-300 pl-3">
+                            {emp.changes[0].justification}
+                          </p>
+                        )}
                       </div>
-                      {emp.changes[0]?.justification && (
-                        <p className="text-sm text-muted-foreground italic">
-                          Justificativa: {emp.changes[0].justification}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Seção: Contratações Planejadas */}
+            {/* Seção 2: Promoções de Cargo */}
+            {details.promotions && details.promotions.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                    <TrendingUp className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg">Promoções de Cargo</h3>
+                  <Badge variant="secondary" className="ml-2">{details.promotions.length}</Badge>
+                </div>
+                <div className="space-y-3">
+                  {details.promotions.map((emp: any, idx: number) => {
+                    const currentSalary = emp.employee?.salary || 0;
+                    const projectedSalary = emp.changes[0]?.projected_fixed_salary || 0;
+                    const percentChange = currentSalary > 0 
+                      ? ((projectedSalary - currentSalary) / currentSalary) * 100 
+                      : 0;
+                    
+                    return (
+                      <div key={idx} className="border rounded-lg p-4 space-y-3 bg-purple-50/50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            {getChangeTypeBadge('promotion')}
+                            <h4 className="font-semibold text-lg mt-2">{emp.employee?.full_name}</h4>
+                          </div>
+                          <span className="font-bold text-lg text-green-600">
+                            +{formatCurrency(emp.totalImpact)}
+                          </span>
+                        </div>
+                        
+                        {/* Transição de cargo */}
+                        <div className="bg-white dark:bg-background/50 rounded-lg p-3 border">
+                          <div className="flex items-center gap-3 text-sm">
+                            <div className="flex-1">
+                              <p className="text-muted-foreground text-xs">Cargo Atual</p>
+                              <p className="font-medium">{emp.employee?.job_title} ({emp.employee?.grade})</p>
+                            </div>
+                            <TrendingUp className="h-5 w-5 text-purple-500" />
+                            <div className="flex-1">
+                              <p className="text-muted-foreground text-xs">Novo Cargo</p>
+                              <p className="font-medium">{emp.changes[0]?.projected_job_title?.title} ({emp.changes[0]?.projected_grade})</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Detalhes salariais */}
+                        <div className="flex items-center justify-between text-sm bg-white dark:bg-background/50 rounded-lg p-3 border">
+                          <span className="text-muted-foreground">
+                            <strong>{getMonthName(emp.changes[0]?.month)}</strong> - Novo Salário
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-muted-foreground">{formatCurrency(currentSalary)}</span>
+                            <span className="text-muted-foreground">→</span>
+                            <span className="font-mono font-semibold">{formatCurrency(projectedSalary)}</span>
+                            <Badge className="ml-2 bg-purple-100 text-purple-700 dark:bg-purple-900/30">
+                              +{percentChange.toFixed(1)}%
+                            </Badge>
+                          </div>
+                        </div>
+
+                        {emp.changes[0]?.justification && (
+                          <p className="text-sm text-muted-foreground italic border-l-2 border-purple-300 pl-3">
+                            {emp.changes[0].justification}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Seção 3: Novas Contratações Planejadas */}
             {details.plannedHires && details.plannedHires.length > 0 && (
-              <div className="mt-6">
-                <h3 className="font-semibold text-lg mb-3">🆕 Novas Contratações Planejadas</h3>
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-2 rounded-lg bg-emerald-100 dark:bg-emerald-900/30">
+                    <UserPlus className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg">Novas Contratações Planejadas</h3>
+                  <Badge variant="secondary" className="ml-2">{details.plannedHires.length}</Badge>
+                </div>
                 <div className="space-y-3">
                   {details.plannedHires.map((hire: any, idx: number) => {
                     const monthsCount = 12 - hire.month + 1;
@@ -287,20 +393,24 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
                     const totalImpact = monthlyTotal * monthsCount;
 
                     return (
-                      <div key={idx} className="border rounded-lg p-4 space-y-2 bg-primary/5">
-                        <div className="flex items-center justify-between">
+                      <div key={idx} className="border rounded-lg p-4 space-y-3 bg-emerald-50/50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800">
+                        <div className="flex items-start justify-between">
                           <div>
-                            <Badge variant="secondary" className="mb-2">🆕 NOVA CONTRATAÇÃO</Badge>
-                            <h4 className="font-semibold">{hire.planned_employee_name}</h4>
+                            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30">
+                              <UserPlus className="h-3 w-3 mr-1" />
+                              NOVA CONTRATAÇÃO
+                            </Badge>
+                            <h4 className="font-semibold text-lg mt-2">{hire.planned_employee_name}</h4>
                             <p className="text-sm text-muted-foreground">
-                              {hire.projected_job_title?.title} ({hire.projected_grade})
+                              {hire.projected_job_title?.title} • Grade {hire.projected_grade}
                             </p>
                           </div>
-                          <span className="font-semibold text-green-600">
+                          <span className="font-bold text-lg text-emerald-600">
                             +{formatCurrency(totalImpact)}
                           </span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm">
+                        
+                        <div className="grid grid-cols-2 gap-3 text-sm bg-white dark:bg-background/50 rounded-lg p-3 border">
                           <div>
                             <span className="text-muted-foreground">Início:</span>{' '}
                             <strong>{getMonthName(hire.month)}/{details.submission.fiscal_year}</strong>
@@ -314,13 +424,14 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
                             <strong>{formatCurrency(monthlyTotal)}</strong>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Total Anual:</span>{' '}
-                            <strong>{formatCurrency(totalImpact)}</strong>
+                            <span className="text-muted-foreground">Impacto Anual:</span>{' '}
+                            <strong className="text-emerald-600">{formatCurrency(totalImpact)}</strong>
                           </div>
                         </div>
+
                         {hire.justification && (
-                          <p className="text-sm text-muted-foreground italic mt-2">
-                            Justificativa: {hire.justification}
+                          <p className="text-sm text-muted-foreground italic border-l-2 border-emerald-300 pl-3">
+                            {hire.justification}
                           </p>
                         )}
                       </div>
@@ -331,7 +442,9 @@ export const SubmissionReviewDialog = ({ submissionId, open, onOpenChange }: Pro
             )}
 
             {/* Mensagem se não houver nada */}
-            {details.employeeChanges.length === 0 && (!details.plannedHires || details.plannedHires.length === 0) && (
+            {(!details.salaryChanges || details.salaryChanges.length === 0) && 
+             (!details.promotions || details.promotions.length === 0) && 
+             (!details.plannedHires || details.plannedHires.length === 0) && (
               <div className="text-center py-8 text-muted-foreground">
                 Nenhuma alteração ou contratação registrada
               </div>
@@ -513,4 +626,44 @@ function formatCurrency(value: number): string {
     currency: 'BRL',
     minimumFractionDigits: 2,
   }).format(value);
+}
+
+// Helper para badges coloridos por tipo de alteração
+function getChangeTypeBadge(changeType: string) {
+  const badges: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
+    merit_increase: { 
+      label: 'MÉRITO', 
+      className: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-300', 
+      icon: <Trophy className="h-3 w-3 mr-1" />,
+    },
+    adjustment: { 
+      label: 'ENQUADRAMENTO', 
+      className: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300', 
+      icon: <BarChart3 className="h-3 w-3 mr-1" />,
+    },
+    promotion: { 
+      label: 'PROMOÇÃO', 
+      className: 'bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-300', 
+      icon: <TrendingUp className="h-3 w-3 mr-1" />,
+    },
+    transfer: { 
+      label: 'TRANSFERÊNCIA', 
+      className: 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-900/30 dark:text-cyan-300', 
+      icon: null,
+    },
+    other: { 
+      label: 'AJUSTE', 
+      className: 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800/30 dark:text-gray-300', 
+      icon: null,
+    },
+  };
+  
+  const config = badges[changeType] || badges.other;
+  
+  return (
+    <Badge className={config.className}>
+      {config.icon}
+      {config.label}
+    </Badge>
+  );
 }
