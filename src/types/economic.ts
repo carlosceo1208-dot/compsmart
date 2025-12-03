@@ -12,9 +12,16 @@ export interface INPCData {
   referenceMonth: string;
 }
 
+export interface MinimumWageData {
+  value: number;
+  effectiveDate: string;
+  year: number;
+}
+
 export interface EconomicData {
   usd: USDData | null;
   inpc: INPCData | null;
+  minimumWage: MinimumWageData | null;
   isLoading: boolean;
   isRefreshing: boolean;
   error: Error | null;

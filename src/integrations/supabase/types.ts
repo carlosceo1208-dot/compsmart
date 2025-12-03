@@ -1745,6 +1745,7 @@ export type Database = {
           parent_id: string | null
           payment_method: string | null
           root_company_id: string | null
+          social_charges_percentage: number | null
           subscription_plan_id: string | null
           subscription_started_at: string | null
           subscription_status: string | null
@@ -1771,6 +1772,7 @@ export type Database = {
           parent_id?: string | null
           payment_method?: string | null
           root_company_id?: string | null
+          social_charges_percentage?: number | null
           subscription_plan_id?: string | null
           subscription_started_at?: string | null
           subscription_status?: string | null
@@ -1797,6 +1799,7 @@ export type Database = {
           parent_id?: string | null
           payment_method?: string | null
           root_company_id?: string | null
+          social_charges_percentage?: number | null
           subscription_plan_id?: string | null
           subscription_started_at?: string | null
           subscription_status?: string | null

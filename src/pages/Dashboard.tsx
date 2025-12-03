@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { EconomicIndicators } from "@/components/dashboard/EconomicIndicators";
 import { KPIDashboard } from "@/components/dashboard/KPIDashboard";
 import { AlphabeticalNav } from "@/components/dashboard/AlphabeticalNav";
@@ -10,6 +11,7 @@ import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
   const { currency, setCurrency } = useCurrencyConverter();
+  const [showWithCharges, setShowWithCharges] = useState(false);
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto">
@@ -35,7 +37,7 @@ const Dashboard = () => {
           
           <OrganizationalIdentityCard />
           
-          <KPIDashboard currency={currency} />
+          <KPIDashboard currency={currency} showWithCharges={showWithCharges} />
           
           <ExportCard />
         </div>
@@ -45,6 +47,8 @@ const Dashboard = () => {
           <EconomicIndicators 
             currency={currency} 
             onCurrencyChange={setCurrency}
+            showWithCharges={showWithCharges}
+            onShowWithChargesChange={setShowWithCharges}
           />
           
           <AlphabeticalNav />
