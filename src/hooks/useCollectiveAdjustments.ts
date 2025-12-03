@@ -42,6 +42,16 @@ export interface SimulationPreview {
   unitId?: string;
 }
 
+export interface ScenarioConflict {
+  code: 'SCENARIO_CONFLICT';
+  existing: {
+    id: string;
+    adjustment_name: string;
+    total_annual_cost: number;
+  };
+  message: string;
+}
+
 export const useCollectiveAdjustments = (fiscalYear?: number) => {
   const queryClient = useQueryClient();
 
@@ -161,6 +171,36 @@ export const useCollectiveAdjustments = (fiscalYear?: number) => {
 
   const approveForBudget = useMutation({
     mutationFn: async (id: string) => {
+      // 1. Buscar dados do ajuste atual
+      const { data: adjustment, error: adjError } = await supabase
+        .from('collective_salary_adjustments')
+        .select('fiscal_year')
+        .eq('id', id)
+        .single();
+
+      if (adjError) throw adjError;
+
+      // 2. Verificar se já existe outro cenário aprovado para o mesmo ano fiscal
+      const { data: existingApproved, error: existError } = await supabase
+        .from('collective_salary_adjustments')
+        .select('id, adjustment_name, total_annual_cost')
+        .eq('fiscal_year', adjustment.fiscal_year)
+        .eq('status', 'approved_budget')
+        .neq('id', id);
+
+      if (existError) throw existError;
+
+      // 3. Se existir, lançar erro com dados do conflito
+      if (existingApproved && existingApproved.length > 0) {
+        const conflict: ScenarioConflict = {
+          code: 'SCENARIO_CONFLICT',
+          existing: existingApproved[0],
+          message: 'Já existe um cenário aprovado para este ano fiscal'
+        };
+        throw conflict;
+      }
+
+      // 4. Se não existir conflito, aprovar normalmente
       const { data, error } = await supabase
         .from('collective_salary_adjustments')
         .update({ status: 'approved_budget' })
@@ -176,9 +216,72 @@ export const useCollectiveAdjustments = (fiscalYear?: number) => {
       queryClient.invalidateQueries({ queryKey: ['budget-planning-annual-kpi'] });
       toast.success('Ajuste aprovado para o orçamento');
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      // Não mostrar toast para conflito - será tratado no componente
+      if (error?.code === 'SCENARIO_CONFLICT') {
+        return;
+      }
       console.error('Error approving adjustment:', error);
       toast.error('Erro ao aprovar ajuste');
+    },
+  });
+
+  // Nova mutation para substituir cenário existente
+  const replaceApprovedScenario = useMutation({
+    mutationFn: async ({ newId, fiscalYear }: { newId: string; fiscalYear: number }) => {
+      // 1. Reverter cenário anterior para 'simulation'
+      const { error: revertError } = await supabase
+        .from('collective_salary_adjustments')
+        .update({ status: 'simulation' })
+        .eq('fiscal_year', fiscalYear)
+        .eq('status', 'approved_budget')
+        .neq('id', newId);
+
+      if (revertError) throw revertError;
+
+      // 2. Aprovar o novo cenário
+      const { data, error } = await supabase
+        .from('collective_salary_adjustments')
+        .update({ status: 'approved_budget' })
+        .eq('id', newId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['collective-adjustments'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-planning-annual-kpi'] });
+      toast.success('Cenário substituído com sucesso');
+    },
+    onError: (error) => {
+      console.error('Error replacing scenario:', error);
+      toast.error('Erro ao substituir cenário');
+    },
+  });
+
+  // Nova mutation para desconsiderar cenário do orçamento
+  const revertToSimulation = useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from('collective_salary_adjustments')
+        .update({ status: 'simulation' })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['collective-adjustments'] });
+      queryClient.invalidateQueries({ queryKey: ['budget-planning-annual-kpi'] });
+      toast.success('Cenário desconsiderado do orçamento');
+    },
+    onError: (error) => {
+      console.error('Error reverting to simulation:', error);
+      toast.error('Erro ao desconsiderar cenário');
     },
   });
 
@@ -260,6 +363,8 @@ export const useCollectiveAdjustments = (fiscalYear?: number) => {
     updateAdjustment,
     deleteAdjustment,
     approveForBudget,
+    replaceApprovedScenario,
+    revertToSimulation,
     effectuateSalaries,
     refetch: () => {
       adjustmentsQuery.refetch();
