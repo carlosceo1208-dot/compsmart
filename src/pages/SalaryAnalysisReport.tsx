@@ -12,10 +12,15 @@ import {
   TrendingUp, 
   Download,
   Users,
-  DollarSign
+  DollarSign,
+  Calculator,
+  FolderOpen
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 import { formatCurrency } from "@/lib/formatters";
+import { SalarySimulationDialog } from "@/components/salary/SalarySimulationDialog";
+import { SimulationScenarioCard } from "@/components/salary/SimulationScenarioCard";
+import { useCollectiveAdjustments } from "@/hooks/useCollectiveAdjustments";
 
 interface EmployeeAnalysis {
   id: string;
@@ -40,6 +45,16 @@ const COLORS = {
 
 export default function SalaryAnalysisReport() {
   const [activeTab, setActiveTab] = useState<'all' | 'below' | 'within' | 'above'>('all');
+  const [showSimulationDialog, setShowSimulationDialog] = useState(false);
+  const [showScenarios, setShowScenarios] = useState(false);
+  
+  const { 
+    adjustments, 
+    isLoading: isLoadingAdjustments,
+    approveForBudget,
+    effectuateSalaries,
+    deleteAdjustment,
+  } = useCollectiveAdjustments();
 
   const { data: employees, isLoading } = useQuery({
     queryKey: ['salary-analysis'],
@@ -185,11 +200,58 @@ export default function SalaryAnalysisReport() {
             Relatório de posicionamento salarial dos funcionários
           </p>
         </div>
-        <Button onClick={exportToCSV} variant="outline">
-          <Download className="w-4 h-4 mr-2" />
-          Exportar CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowSimulationDialog(true)}>
+            <Calculator className="w-4 h-4 mr-2" />
+            Nova Simulação
+          </Button>
+          <Button onClick={() => setShowScenarios(!showScenarios)} variant="outline">
+            <FolderOpen className="w-4 h-4 mr-2" />
+            Cenários ({adjustments.length})
+          </Button>
+          <Button onClick={exportToCSV} variant="outline">
+            <Download className="w-4 h-4 mr-2" />
+            Exportar CSV
+          </Button>
+        </div>
       </div>
+
+      {/* Simulation Scenarios */}
+      {showScenarios && adjustments.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calculator className="w-5 h-5" />
+              Simulações de Ajuste Coletivo
+            </CardTitle>
+            <CardDescription>
+              Gerencie cenários de ajuste salarial (ACT, Dissídio, etc.)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {adjustments.map((adj) => (
+                <SimulationScenarioCard
+                  key={adj.id}
+                  adjustment={adj}
+                  onApproveForBudget={() => approveForBudget.mutate(adj.id)}
+                  onEffectuate={() => effectuateSalaries.mutate(adj)}
+                  onDelete={() => deleteAdjustment.mutate(adj.id)}
+                  isApproving={approveForBudget.isPending}
+                  isEffectuating={effectuateSalaries.isPending}
+                  isDeleting={deleteAdjustment.isPending}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Simulation Dialog */}
+      <SalarySimulationDialog 
+        open={showSimulationDialog} 
+        onOpenChange={setShowSimulationDialog} 
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

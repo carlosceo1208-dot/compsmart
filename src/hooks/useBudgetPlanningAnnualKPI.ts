@@ -4,50 +4,74 @@ import { supabase } from '@/integrations/supabase/client';
 export interface BudgetPlanningAnnualKPI {
   // Dados Atuais (baseline)
   currentYear: number;
-  currentAnnualSalary: number;      // Salário mensal atual × 12
+  currentAnnualSalary: number;      // Baseado no custo real do ano atual
   currentHeadcount: number;          // Funcionários ativos hoje
   
   // Dados Projetados (planejamento)
   projectedYear: number;
-  projectedAnnualSalary: number;    // Soma de todas projeções do ano
-  projectedHeadcount: number;        // HC único (existentes + contratações)
+  projectedAnnualSalary: number;    // Baseline automático + alterações
+  projectedHeadcount: number;        // HC atual + contratações - desligamentos
   
   // Variações
-  salaryVariance: number;            // Projetado - Atual
+  salaryVariance: number;            // Projetado - Atual (anualizado)
   salaryVariancePercent: number;     // Variação %
   headcountVariance: number;         // HC Projetado - HC Atual
   headcountVariancePercent: number;  // Variação %
   
   // Status
-  hasPlanning: boolean;              // Se existe planejamento para o ano
+  hasPlanning: boolean;              // Se existe planejamento/submissão
   submissionStatus?: 'draft' | 'pending' | 'approved' | 'rejected';
   fiscalYear: number;
 }
 
 export const useBudgetPlanningAnnualKPI = () => {
   const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1; // 1-12
   const nextYear = currentYear + 1;
 
   return useQuery({
     queryKey: ['budget-planning-annual-kpi', nextYear],
     queryFn: async () => {
-      // 1. Buscar baseline atual (funcionários × salários atuais)
+      // 1. Buscar funcionários atuais com data de admissão
       const { data: currentEmployees, error: currentError } = await supabase
         .from('profiles')
-        .select('id, salary, variable_salary, benefits_value')
+        .select('id, salary, variable_salary, benefits_value, hire_date')
         .eq('status', 'active')
         .not('salary', 'is', null);
 
       if (currentError) throw currentError;
 
-      const currentAnnualSalary = currentEmployees.reduce((sum, emp) => {
+      // 2. Calcular baseline do ano ATUAL (2025)
+      // Considera apenas os meses em que o funcionário esteve ativo
+      let currentAnnualSalary = 0;
+      
+      currentEmployees.forEach(emp => {
         const monthlySalary = (emp.salary || 0) + (emp.variable_salary || 0) + (emp.benefits_value || 0);
-        return sum + (monthlySalary * 12);
-      }, 0);
+        
+        // Se tem data de admissão no ano atual, calcular meses proporcionais
+        if (emp.hire_date) {
+          const hireDate = new Date(emp.hire_date);
+          const hireYear = hireDate.getFullYear();
+          
+          if (hireYear === currentYear) {
+            // Funcionário contratado no ano atual
+            const hireMonth = hireDate.getMonth() + 1; // 1-12
+            const monthsWorked = currentMonth - hireMonth + 1;
+            const validMonths = Math.max(0, Math.min(monthsWorked, 12));
+            currentAnnualSalary += monthlySalary * validMonths;
+          } else if (hireYear < currentYear) {
+            // Funcionário já estava na empresa antes do ano atual
+            currentAnnualSalary += monthlySalary * currentMonth; // Até o mês atual
+          }
+        } else {
+          // Sem data de admissão, assumir ano completo até o mês atual
+          currentAnnualSalary += monthlySalary * currentMonth;
+        }
+      });
 
       const currentHeadcount = currentEmployees.length;
 
-      // 2. Buscar projeções para o ano fiscal
+      // 3. Buscar projeções específicas para o próximo ano
       const { data: projections, error: projectionsError } = await supabase
         .from('budget_employee_projections')
         .select('*')
@@ -56,7 +80,7 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (projectionsError) throw projectionsError;
 
-      // 3. Verificar status de submissão geral
+      // 4. Verificar status de submissão
       const { data: submissions, error: submissionsError } = await supabase
         .from('budget_submissions')
         .select('status')
@@ -66,59 +90,63 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (submissionsError) throw submissionsError;
 
-      const hasPlanning = projections && projections.length > 0;
+      // 5. Calcular projeção para próximo ano (BASELINE AUTOMÁTICO)
+      // Lógica: todos funcionários atuais continuam com salário atual × 12
+      // + alterações específicas (aumentos, promoções)
+      // + novas contratações
+      
+      const employeeIdsWithProjection = new Set<string>();
+      const plannedHireNames = new Set<string>();
+      let projectedAnnualSalary = 0;
 
-      if (!hasPlanning) {
-        // Sem planejamento - retornar apenas baseline
-        return {
-          currentYear,
-          currentAnnualSalary,
-          currentHeadcount,
-          projectedYear: nextYear,
-          projectedAnnualSalary: 0,
-          projectedHeadcount: 0,
-          salaryVariance: 0,
-          salaryVariancePercent: 0,
-          headcountVariance: 0,
-          headcountVariancePercent: 0,
-          hasPlanning: false,
-          fiscalYear: nextYear,
-        } as BudgetPlanningAnnualKPI;
-      }
-
-      // 4. Calcular totais projetados
-      // Agrupar por employee_id/planned_employee_name para calcular custo anual individual
-      const employeeProjections = new Map<string, {
-        isPlannedHire: boolean;
-        annualSalary: number;
-      }>();
-
-      projections.forEach(proj => {
-        const key = proj.employee_id || proj.planned_employee_name || `temp-${proj.id}`;
-        
-        if (!employeeProjections.has(key)) {
-          employeeProjections.set(key, {
-            isPlannedHire: proj.is_planned_hire || false,
-            annualSalary: 0,
-          });
+      // Primeiro: processar projeções específicas
+      projections?.forEach(proj => {
+        if (proj.is_planned_hire) {
+          // Nova contratação
+          const key = proj.planned_employee_name || proj.id;
+          if (!plannedHireNames.has(key)) {
+            plannedHireNames.add(key);
+          }
+          const monthlySalary = (proj.projected_fixed_salary || 0) + 
+                               (proj.projected_variable_salary || 0) + 
+                               (proj.projected_benefits || 0);
+          // Considerar meses a partir do mês da contratação
+          const monthsActive = 12 - proj.month + 1;
+          projectedAnnualSalary += monthlySalary * Math.max(1, monthsActive);
+        } else if (proj.employee_id) {
+          // Funcionário existente com alteração
+          employeeIdsWithProjection.add(proj.employee_id);
+          const monthlySalary = (proj.projected_fixed_salary || 0) + 
+                               (proj.projected_variable_salary || 0) + 
+                               (proj.projected_benefits || 0);
+          // Considera a projeção mensal (pode ser ajuste parcial)
+          projectedAnnualSalary += monthlySalary;
         }
-
-        const emp = employeeProjections.get(key)!;
-        const monthlySalary = (proj.projected_fixed_salary || 0) + 
-                             (proj.projected_variable_salary || 0) + 
-                             (proj.projected_benefits || 0);
-        emp.annualSalary += monthlySalary;
       });
 
-      const projectedAnnualSalary = Array.from(employeeProjections.values())
-        .reduce((sum, emp) => sum + emp.annualSalary, 0);
+      // Segundo: adicionar baseline para funcionários SEM projeção específica
+      currentEmployees.forEach(emp => {
+        if (!employeeIdsWithProjection.has(emp.id)) {
+          // Sem projeção = manter salário atual × 12 meses
+          const monthlySalary = (emp.salary || 0) + (emp.variable_salary || 0) + (emp.benefits_value || 0);
+          projectedAnnualSalary += monthlySalary * 12;
+        }
+      });
 
-      const projectedHeadcount = employeeProjections.size;
+      // Headcount projetado = atual + novas contratações
+      const projectedHeadcount = currentHeadcount + plannedHireNames.size;
 
-      // 5. Calcular variações
-      const salaryVariance = projectedAnnualSalary - currentAnnualSalary;
-      const salaryVariancePercent = currentAnnualSalary > 0 
-        ? (salaryVariance / currentAnnualSalary) * 100 
+      // 6. Calcular baseline anualizado do ano atual para comparação
+      // Para comparação YoY, precisamos anualizar o custo atual
+      const annualizedCurrentSalary = currentEmployees.reduce((sum, emp) => {
+        const monthly = (emp.salary || 0) + (emp.variable_salary || 0) + (emp.benefits_value || 0);
+        return sum + (monthly * 12);
+      }, 0);
+
+      // 7. Calcular variações (comparando projetado com baseline anualizado)
+      const salaryVariance = projectedAnnualSalary - annualizedCurrentSalary;
+      const salaryVariancePercent = annualizedCurrentSalary > 0 
+        ? (salaryVariance / annualizedCurrentSalary) * 100 
         : 0;
 
       const headcountVariance = projectedHeadcount - currentHeadcount;
@@ -126,7 +154,10 @@ export const useBudgetPlanningAnnualKPI = () => {
         ? (headcountVariance / currentHeadcount) * 100 
         : 0;
 
-      // 6. Determinar status geral
+      // 8. Determinar se há planejamento
+      const hasPlanning = (projections && projections.length > 0) || 
+                          (submissions && submissions.length > 0);
+
       let submissionStatus: 'draft' | 'pending' | 'approved' | 'rejected' | undefined;
       if (submissions && submissions.length > 0) {
         submissionStatus = submissions[0].status as any;
@@ -134,7 +165,7 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       return {
         currentYear,
-        currentAnnualSalary,
+        currentAnnualSalary: annualizedCurrentSalary, // Usar anualizado para comparação
         currentHeadcount,
         projectedYear: nextYear,
         projectedAnnualSalary,
@@ -143,7 +174,7 @@ export const useBudgetPlanningAnnualKPI = () => {
         salaryVariancePercent,
         headcountVariance,
         headcountVariancePercent,
-        hasPlanning: true,
+        hasPlanning,
         submissionStatus,
         fiscalYear: nextYear,
       } as BudgetPlanningAnnualKPI;
