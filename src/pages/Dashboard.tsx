@@ -5,6 +5,7 @@ import { ModuleGrid } from "@/components/dashboard/ModuleGrid";
 import { DateTimeDisplay } from "@/components/dashboard/DateTimeDisplay";
 import { ExportCard } from "@/components/dashboard/ExportCard";
 import { OrganizationalIdentityCard } from "@/components/dashboard/OrganizationalIdentityCard";
+import { PendingAdjustmentAlert } from "@/components/dashboard/PendingAdjustmentAlert";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
@@ -28,6 +29,9 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          
+          {/* Warning de Ajuste Pendente */}
+          <PendingAdjustmentAlert />
           
           <OrganizationalIdentityCard />
           

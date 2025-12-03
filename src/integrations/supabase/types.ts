@@ -694,6 +694,100 @@ export type Database = {
           },
         ]
       }
+      collective_salary_adjustments: {
+        Row: {
+          adjustment_name: string
+          adjustment_type: string
+          created_at: string | null
+          created_by: string
+          effective_month: number
+          effectuated_at: string | null
+          effectuated_by: string | null
+          filter_grades: string[] | null
+          filter_salary_max: number | null
+          filter_salary_min: number | null
+          filter_unit_id: string | null
+          fiscal_year: number
+          fixed_percentage: number | null
+          id: string
+          root_company_id: string
+          scaled_rules: Json | null
+          status: string
+          total_annual_cost: number | null
+          total_employees_affected: number | null
+          total_monthly_cost: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          adjustment_name: string
+          adjustment_type: string
+          created_at?: string | null
+          created_by: string
+          effective_month: number
+          effectuated_at?: string | null
+          effectuated_by?: string | null
+          filter_grades?: string[] | null
+          filter_salary_max?: number | null
+          filter_salary_min?: number | null
+          filter_unit_id?: string | null
+          fiscal_year: number
+          fixed_percentage?: number | null
+          id?: string
+          root_company_id: string
+          scaled_rules?: Json | null
+          status?: string
+          total_annual_cost?: number | null
+          total_employees_affected?: number | null
+          total_monthly_cost?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          adjustment_name?: string
+          adjustment_type?: string
+          created_at?: string | null
+          created_by?: string
+          effective_month?: number
+          effectuated_at?: string | null
+          effectuated_by?: string | null
+          filter_grades?: string[] | null
+          filter_salary_max?: number | null
+          filter_salary_min?: number | null
+          filter_unit_id?: string | null
+          fiscal_year?: number
+          fixed_percentage?: number | null
+          id?: string
+          root_company_id?: string
+          scaled_rules?: Json | null
+          status?: string
+          total_annual_cost?: number | null
+          total_employees_affected?: number | null
+          total_monthly_cost?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collective_salary_adjustments_effectuated_by_fkey"
+            columns: ["effectuated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_salary_adjustments_filter_unit_id_fkey"
+            columns: ["filter_unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_salary_adjustments_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_identity: {
         Row: {
           annual_goal_description: string | null
