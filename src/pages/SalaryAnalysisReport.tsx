@@ -52,6 +52,8 @@ export default function SalaryAnalysisReport() {
     adjustments, 
     isLoading: isLoadingAdjustments,
     approveForBudget,
+    replaceApprovedScenario,
+    revertToSimulation,
     effectuateSalaries,
     deleteAdjustment,
   } = useCollectiveAdjustments();
@@ -234,12 +236,15 @@ export default function SalaryAnalysisReport() {
                 <SimulationScenarioCard
                   key={adj.id}
                   adjustment={adj}
-                  onApproveForBudget={() => approveForBudget.mutate(adj.id)}
+                  onApproveForBudget={async () => { await approveForBudget.mutateAsync(adj.id); }}
                   onEffectuate={() => effectuateSalaries.mutate(adj)}
                   onDelete={() => deleteAdjustment.mutate(adj.id)}
                   isApproving={approveForBudget.isPending}
                   isEffectuating={effectuateSalaries.isPending}
                   isDeleting={deleteAdjustment.isPending}
+                  onReplaceScenario={() => replaceApprovedScenario.mutate({ newId: adj.id, fiscalYear: adj.fiscal_year })}
+                  onRevertToSimulation={() => revertToSimulation.mutate(adj.id)}
+                  isReverting={revertToSimulation.isPending}
                 />
               ))}
             </div>
