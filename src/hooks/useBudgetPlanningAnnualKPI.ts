@@ -1,25 +1,44 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface ApprovedAdjustment {
+  id: string;
+  name: string;
+  percentage: number;
+  annualCost: number;
+  monthlyCost: number;
+  effectiveMonth: number;
+  employeesAffected: number;
+}
+
 export interface BudgetPlanningAnnualKPI {
-  // Dados Atuais (baseline)
+  // Dados Atuais (baseline) - SEPARADOS
   currentYear: number;
-  currentAnnualSalary: number;      // Baseado no custo real do ano atual
-  currentHeadcount: number;          // Funcionários ativos hoje
+  currentFixedSalary: number;
+  currentVariableSalary: number;
+  currentBenefits: number;
+  currentTotal: number;
+  currentHeadcount: number;
   
-  // Dados Projetados (planejamento)
+  // Dados Projetados (planejamento) - SEPARADOS
   projectedYear: number;
-  projectedAnnualSalary: number;    // Baseline automático + alterações
-  projectedHeadcount: number;        // HC atual + contratações - desligamentos
+  projectedFixedSalary: number;
+  projectedVariableSalary: number;
+  projectedBenefits: number;
+  projectedTotal: number;
+  projectedHeadcount: number;
   
   // Variações
-  salaryVariance: number;            // Projetado - Atual (anualizado)
-  salaryVariancePercent: number;     // Variação %
-  headcountVariance: number;         // HC Projetado - HC Atual
-  headcountVariancePercent: number;  // Variação %
+  salaryVariance: number;
+  salaryVariancePercent: number;
+  headcountVariance: number;
+  headcountVariancePercent: number;
+  
+  // Ajuste Coletivo Aprovado (se existir)
+  approvedAdjustment?: ApprovedAdjustment;
   
   // Status
-  hasPlanning: boolean;              // Se existe planejamento/submissão
+  hasPlanning: boolean;
   submissionStatus?: 'draft' | 'pending' | 'approved' | 'rejected';
   fiscalYear: number;
 }
@@ -41,12 +60,15 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (currentError) throw currentError;
 
-      // 2. Calcular baseline do ano ATUAL (2025)
-      // Considera apenas os meses em que o funcionário esteve ativo
-      let currentAnnualSalary = 0;
+      // 2. Calcular baseline do ano ATUAL - SEPARADO
+      let currentFixedSalary = 0;
+      let currentVariableSalary = 0;
+      let currentBenefits = 0;
       
       currentEmployees.forEach(emp => {
-        const monthlySalary = (emp.salary || 0) + (emp.variable_salary || 0) + (emp.benefits_value || 0);
+        const fixedMonthly = emp.salary || 0;
+        const variableMonthly = emp.variable_salary || 0;
+        const benefitsMonthly = emp.benefits_value || 0;
         
         // Se tem data de admissão no ano atual, calcular meses proporcionais
         if (emp.hire_date) {
@@ -54,21 +76,25 @@ export const useBudgetPlanningAnnualKPI = () => {
           const hireYear = hireDate.getFullYear();
           
           if (hireYear === currentYear) {
-            // Funcionário contratado no ano atual
-            const hireMonth = hireDate.getMonth() + 1; // 1-12
+            const hireMonth = hireDate.getMonth() + 1;
             const monthsWorked = currentMonth - hireMonth + 1;
             const validMonths = Math.max(0, Math.min(monthsWorked, 12));
-            currentAnnualSalary += monthlySalary * validMonths;
+            currentFixedSalary += fixedMonthly * validMonths;
+            currentVariableSalary += variableMonthly * validMonths;
+            currentBenefits += benefitsMonthly * validMonths;
           } else if (hireYear < currentYear) {
-            // Funcionário já estava na empresa antes do ano atual
-            currentAnnualSalary += monthlySalary * currentMonth; // Até o mês atual
+            currentFixedSalary += fixedMonthly * currentMonth;
+            currentVariableSalary += variableMonthly * currentMonth;
+            currentBenefits += benefitsMonthly * currentMonth;
           }
         } else {
-          // Sem data de admissão, assumir ano completo até o mês atual
-          currentAnnualSalary += monthlySalary * currentMonth;
+          currentFixedSalary += fixedMonthly * currentMonth;
+          currentVariableSalary += variableMonthly * currentMonth;
+          currentBenefits += benefitsMonthly * currentMonth;
         }
       });
 
+      const currentTotal = currentFixedSalary + currentVariableSalary + currentBenefits;
       const currentHeadcount = currentEmployees.length;
 
       // 3. Buscar projeções específicas para o próximo ano
@@ -90,63 +116,85 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (submissionsError) throw submissionsError;
 
-      // 5. Calcular projeção para próximo ano (BASELINE AUTOMÁTICO)
-      // Lógica: todos funcionários atuais continuam com salário atual × 12
-      // + alterações específicas (aumentos, promoções)
-      // + novas contratações
-      
+      // 5. Buscar ajuste coletivo aprovado para o próximo ano
+      const { data: approvedAdjustments, error: adjustmentError } = await supabase
+        .from('collective_salary_adjustments')
+        .select('*')
+        .eq('fiscal_year', nextYear)
+        .eq('status', 'approved_budget')
+        .limit(1);
+
+      if (adjustmentError) throw adjustmentError;
+
+      // 6. Calcular projeção para próximo ano (BASELINE AUTOMÁTICO) - SEPARADO
       const employeeIdsWithProjection = new Set<string>();
       const plannedHireNames = new Set<string>();
-      let projectedAnnualSalary = 0;
+      let projectedFixedSalary = 0;
+      let projectedVariableSalary = 0;
+      let projectedBenefits = 0;
 
       // Primeiro: processar projeções específicas
       projections?.forEach(proj => {
         if (proj.is_planned_hire) {
-          // Nova contratação
           const key = proj.planned_employee_name || proj.id;
           if (!plannedHireNames.has(key)) {
             plannedHireNames.add(key);
           }
-          const monthlySalary = (proj.projected_fixed_salary || 0) + 
-                               (proj.projected_variable_salary || 0) + 
-                               (proj.projected_benefits || 0);
-          // Considerar meses a partir do mês da contratação
           const monthsActive = 12 - proj.month + 1;
-          projectedAnnualSalary += monthlySalary * Math.max(1, monthsActive);
+          projectedFixedSalary += (proj.projected_fixed_salary || 0) * Math.max(1, monthsActive);
+          projectedVariableSalary += (proj.projected_variable_salary || 0) * Math.max(1, monthsActive);
+          projectedBenefits += (proj.projected_benefits || 0) * Math.max(1, monthsActive);
         } else if (proj.employee_id) {
-          // Funcionário existente com alteração
           employeeIdsWithProjection.add(proj.employee_id);
-          const monthlySalary = (proj.projected_fixed_salary || 0) + 
-                               (proj.projected_variable_salary || 0) + 
-                               (proj.projected_benefits || 0);
-          // Considera a projeção mensal (pode ser ajuste parcial)
-          projectedAnnualSalary += monthlySalary;
+          // Para funcionários existentes com alteração, usa valor projetado
+          projectedFixedSalary += (proj.projected_fixed_salary || 0);
+          projectedVariableSalary += (proj.projected_variable_salary || 0);
+          projectedBenefits += (proj.projected_benefits || 0);
         }
       });
 
       // Segundo: adicionar baseline para funcionários SEM projeção específica
       currentEmployees.forEach(emp => {
         if (!employeeIdsWithProjection.has(emp.id)) {
-          // Sem projeção = manter salário atual × 12 meses
-          const monthlySalary = (emp.salary || 0) + (emp.variable_salary || 0) + (emp.benefits_value || 0);
-          projectedAnnualSalary += monthlySalary * 12;
+          projectedFixedSalary += (emp.salary || 0) * 12;
+          projectedVariableSalary += (emp.variable_salary || 0) * 12;
+          projectedBenefits += (emp.benefits_value || 0) * 12;
         }
       });
 
-      // Headcount projetado = atual + novas contratações
+      // 7. Processar ajuste coletivo aprovado e incluir no projetado
+      let approvedAdjustment: ApprovedAdjustment | undefined;
+      
+      if (approvedAdjustments && approvedAdjustments.length > 0) {
+        const adj = approvedAdjustments[0];
+        approvedAdjustment = {
+          id: adj.id,
+          name: adj.adjustment_name,
+          percentage: adj.fixed_percentage || 0,
+          annualCost: adj.total_annual_cost || 0,
+          monthlyCost: adj.total_monthly_cost || 0,
+          effectiveMonth: adj.effective_month,
+          employeesAffected: adj.total_employees_affected || 0,
+        };
+        
+        // Incluir custo do ajuste coletivo no salário fixo projetado
+        // O custo anual já considera os meses de vigência
+        projectedFixedSalary += approvedAdjustment.annualCost;
+      }
+
+      const projectedTotal = projectedFixedSalary + projectedVariableSalary + projectedBenefits;
       const projectedHeadcount = currentHeadcount + plannedHireNames.size;
 
-      // 6. Calcular baseline anualizado do ano atual para comparação
-      // Para comparação YoY, precisamos anualizar o custo atual
-      const annualizedCurrentSalary = currentEmployees.reduce((sum, emp) => {
-        const monthly = (emp.salary || 0) + (emp.variable_salary || 0) + (emp.benefits_value || 0);
-        return sum + (monthly * 12);
-      }, 0);
+      // 8. Calcular baseline anualizado do ano atual para comparação
+      const annualizedCurrentFixed = currentEmployees.reduce((sum, emp) => sum + (emp.salary || 0) * 12, 0);
+      const annualizedCurrentVariable = currentEmployees.reduce((sum, emp) => sum + (emp.variable_salary || 0) * 12, 0);
+      const annualizedCurrentBenefits = currentEmployees.reduce((sum, emp) => sum + (emp.benefits_value || 0) * 12, 0);
+      const annualizedCurrentTotal = annualizedCurrentFixed + annualizedCurrentVariable + annualizedCurrentBenefits;
 
-      // 7. Calcular variações (comparando projetado com baseline anualizado)
-      const salaryVariance = projectedAnnualSalary - annualizedCurrentSalary;
-      const salaryVariancePercent = annualizedCurrentSalary > 0 
-        ? (salaryVariance / annualizedCurrentSalary) * 100 
+      // 9. Calcular variações (comparando projetado com baseline anualizado)
+      const salaryVariance = projectedTotal - annualizedCurrentTotal;
+      const salaryVariancePercent = annualizedCurrentTotal > 0 
+        ? (salaryVariance / annualizedCurrentTotal) * 100 
         : 0;
 
       const headcountVariance = projectedHeadcount - currentHeadcount;
@@ -154,9 +202,10 @@ export const useBudgetPlanningAnnualKPI = () => {
         ? (headcountVariance / currentHeadcount) * 100 
         : 0;
 
-      // 8. Determinar se há planejamento
+      // 10. Determinar se há planejamento
       const hasPlanning = (projections && projections.length > 0) || 
-                          (submissions && submissions.length > 0);
+                          (submissions && submissions.length > 0) ||
+                          !!approvedAdjustment;
 
       let submissionStatus: 'draft' | 'pending' | 'approved' | 'rejected' | undefined;
       if (submissions && submissions.length > 0) {
@@ -165,15 +214,22 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       return {
         currentYear,
-        currentAnnualSalary: annualizedCurrentSalary, // Usar anualizado para comparação
+        currentFixedSalary: annualizedCurrentFixed,
+        currentVariableSalary: annualizedCurrentVariable,
+        currentBenefits: annualizedCurrentBenefits,
+        currentTotal: annualizedCurrentTotal,
         currentHeadcount,
         projectedYear: nextYear,
-        projectedAnnualSalary,
+        projectedFixedSalary,
+        projectedVariableSalary,
+        projectedBenefits,
+        projectedTotal,
         projectedHeadcount,
         salaryVariance,
         salaryVariancePercent,
         headcountVariance,
         headcountVariancePercent,
+        approvedAdjustment,
         hasPlanning,
         submissionStatus,
         fiscalYear: nextYear,

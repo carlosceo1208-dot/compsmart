@@ -1,8 +1,9 @@
-import { PiggyBank, ExternalLink, TrendingUp, TrendingDown } from 'lucide-react';
+import { PiggyBank, ExternalLink, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useBudgetPlanningAnnualKPI } from '@/hooks/useBudgetPlanningAnnualKPI';
 import { formatCompactCurrency, formatNumber, formatPercentageSafe } from '@/lib/formatters';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
@@ -14,13 +15,30 @@ interface BudgetCardProps {
   unitId?: string | null;
 }
 
+const MONTHS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+
 export const BudgetCard = ({ currency }: BudgetCardProps) => {
   const { data, isLoading } = useBudgetPlanningAnnualKPI();
   const { convert } = useCurrencyConverter();
 
-  const currentAnnual = data ? convert(data.currentAnnualSalary, 'BRL', currency) : 0;
-  const projectedAnnual = data ? convert(data.projectedAnnualSalary, 'BRL', currency) : 0;
-  const variance = data ? convert(data.salaryVariance, 'BRL', currency) : 0;
+  // Valores separados convertidos para moeda selecionada
+  const currentFixed = data ? convert(data.currentFixedSalary, 'BRL', currency) : 0;
+  const currentVariable = data ? convert(data.currentVariableSalary, 'BRL', currency) : 0;
+  const currentBenefits = data ? convert(data.currentBenefits, 'BRL', currency) : 0;
+  const currentTotal = data ? convert(data.currentTotal, 'BRL', currency) : 0;
+  
+  const projectedFixed = data ? convert(data.projectedFixedSalary, 'BRL', currency) : 0;
+  const projectedVariable = data ? convert(data.projectedVariableSalary, 'BRL', currency) : 0;
+  const projectedBenefits = data ? convert(data.projectedBenefits, 'BRL', currency) : 0;
+  const projectedTotal = data ? convert(data.projectedTotal, 'BRL', currency) : 0;
+
+  const adjustmentCost = data?.approvedAdjustment ? convert(data.approvedAdjustment.annualCost, 'BRL', currency) : 0;
+
+  // Calcular variações por categoria
+  const fixedVariance = currentFixed > 0 ? ((projectedFixed - currentFixed) / currentFixed) * 100 : 0;
+  const variableVariance = currentVariable > 0 ? ((projectedVariable - currentVariable) / currentVariable) * 100 : 0;
+  const benefitsVariance = currentBenefits > 0 ? ((projectedBenefits - currentBenefits) / currentBenefits) * 100 : 0;
+  const totalVariance = currentTotal > 0 ? ((projectedTotal - currentTotal) / currentTotal) * 100 : 0;
 
   const getStatusBadge = () => {
     if (!data?.submissionStatus) return null;
@@ -33,7 +51,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
     };
 
     const config = statusConfig[data.submissionStatus as keyof typeof statusConfig];
-    if (!config) return null; // Safety check: status não mapeado
+    if (!config) return null;
     
     return (
       <Badge variant={config.variant} className="text-xs">
@@ -42,20 +60,40 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
     );
   };
 
+  const renderVariance = (variance: number, showIcon = false) => {
+    const isPositive = variance > 0;
+    const isNegative = variance < 0;
+    const colorClass = isPositive 
+      ? 'text-green-600 dark:text-green-400' 
+      : isNegative 
+        ? 'text-red-600 dark:text-red-400' 
+        : 'text-muted-foreground';
+    
+    return (
+      <div className="flex items-center justify-center gap-0.5">
+        {showIcon && isPositive && <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />}
+        {showIcon && isNegative && <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />}
+        <span className={colorClass}>
+          {formatPercentageSafe(variance, 1, true)}
+        </span>
+      </div>
+    );
+  };
+
   return (
     <Card className="bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/30 dark:to-orange-950/30 border-2 border-yellow-200/50 dark:border-yellow-800/50 hover:border-yellow-300 dark:hover:border-yellow-700 hover:shadow-lg transition-all duration-200">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <PiggyBank className="h-4 w-4" />
           Planejamento Orçamentário {data?.projectedYear || new Date().getFullYear() + 1}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
         {isLoading ? (
-          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-40 w-full" />
         ) : !data?.hasPlanning ? (
           // Estado: Sem planejamento
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="space-y-2">
               <p className="text-xs font-semibold text-muted-foreground">Dados Atuais (Baseline)</p>
               <div className="flex justify-between items-center">
@@ -64,7 +102,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Custo Anual:</span>
-                <span className="font-semibold text-sm">{formatCompactCurrency(currentAnnual, currency)}</span>
+                <span className="font-semibold text-sm">{formatCompactCurrency(currentTotal, currency)}</span>
               </div>
             </div>
 
@@ -79,55 +117,85 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
             </Button>
           </div>
         ) : (
-          // Estado: Com planejamento - Comparação
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground mb-2">Comparação Ano-a-Ano</p>
-              
-              {/* Tabela de Comparação */}
-              <div className="border rounded-lg overflow-hidden">
-                <table className="w-full text-xs">
-                  <thead className="bg-muted/50">
-                    <tr>
-                      <th className="text-left p-2 font-medium"></th>
-                      <th className="text-center p-2 font-medium">{data.currentYear}</th>
-                      <th className="text-center p-2 font-medium">{data.projectedYear}</th>
-                      <th className="text-center p-2 font-medium">Var.</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-t">
-                      <td className="p-2 font-medium">Headcount</td>
-                      <td className="text-center p-2">{formatNumber(data.currentHeadcount)}</td>
-                      <td className="text-center p-2 font-semibold">{formatNumber(data.projectedHeadcount)}</td>
-                      <td className="text-center p-2">
-                        <span className={data.headcountVariance > 0 ? 'text-green-600 dark:text-green-400' : data.headcountVariance < 0 ? 'text-red-600 dark:text-red-400' : ''}>
-                          {data.headcountVariance > 0 && '+'}
-                          {formatPercentageSafe(data.headcountVariancePercent, 0, true)}
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="border-t bg-muted/30">
-                      <td className="p-2 font-medium">Salários</td>
-                      <td className="text-center p-2 text-[10px]">{formatCompactCurrency(currentAnnual, currency)}</td>
-                      <td className="text-center p-2 font-semibold text-[10px]">{formatCompactCurrency(projectedAnnual, currency)}</td>
-                      <td className="text-center p-2">
-                        <div className="flex items-center justify-center gap-1">
-                          {data.salaryVariance > 0 ? (
-                            <TrendingUp className="h-3 w-3 text-green-600 dark:text-green-400" />
-                          ) : data.salaryVariance < 0 ? (
-                            <TrendingDown className="h-3 w-3 text-red-600 dark:text-red-400" />
-                          ) : null}
-                          <span className={data.salaryVariance > 0 ? 'text-green-600 dark:text-green-400' : data.salaryVariance < 0 ? 'text-red-600 dark:text-red-400' : ''}>
-                            {formatPercentageSafe(data.salaryVariancePercent, 0, true)}
-                          </span>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          // Estado: Com planejamento - Comparação Detalhada
+          <div className="space-y-3">
+            {/* Tabela de Comparação */}
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full text-[10px]">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left p-1.5 font-medium"></th>
+                    <th className="text-center p-1.5 font-medium">{data.currentYear}</th>
+                    <th className="text-center p-1.5 font-medium">{data.projectedYear}</th>
+                    <th className="text-center p-1.5 font-medium">Var.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Headcount */}
+                  <tr className="border-t">
+                    <td className="p-1.5 font-medium">Headcount</td>
+                    <td className="text-center p-1.5">{formatNumber(data.currentHeadcount)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatNumber(data.projectedHeadcount)}</td>
+                    <td className="text-center p-1.5">
+                      {renderVariance(data.headcountVariancePercent)}
+                    </td>
+                  </tr>
+                  {/* Salário Fixo */}
+                  <tr className="border-t bg-muted/20">
+                    <td className="p-1.5 font-medium">Fixo</td>
+                    <td className="text-center p-1.5">{formatCompactCurrency(currentFixed, currency)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatCompactCurrency(projectedFixed, currency)}</td>
+                    <td className="text-center p-1.5">
+                      {renderVariance(fixedVariance, true)}
+                    </td>
+                  </tr>
+                  {/* Variável */}
+                  <tr className="border-t">
+                    <td className="p-1.5 font-medium">Variável</td>
+                    <td className="text-center p-1.5">{formatCompactCurrency(currentVariable, currency)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatCompactCurrency(projectedVariable, currency)}</td>
+                    <td className="text-center p-1.5">
+                      {renderVariance(variableVariance, true)}
+                    </td>
+                  </tr>
+                  {/* Benefícios */}
+                  <tr className="border-t bg-muted/20">
+                    <td className="p-1.5 font-medium">Benefícios</td>
+                    <td className="text-center p-1.5">{formatCompactCurrency(currentBenefits, currency)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatCompactCurrency(projectedBenefits, currency)}</td>
+                    <td className="text-center p-1.5">
+                      {renderVariance(benefitsVariance, true)}
+                    </td>
+                  </tr>
+                  {/* TOTAL */}
+                  <tr className="border-t bg-primary/10 font-bold">
+                    <td className="p-1.5">TOTAL</td>
+                    <td className="text-center p-1.5">{formatCompactCurrency(currentTotal, currency)}</td>
+                    <td className="text-center p-1.5">{formatCompactCurrency(projectedTotal, currency)}</td>
+                    <td className="text-center p-1.5">
+                      {renderVariance(totalVariance, true)}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+
+            {/* Alerta de Ajuste Coletivo Aprovado */}
+            {data.approvedAdjustment && (
+              <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800 py-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                <AlertTitle className="text-[10px] font-semibold text-amber-800 dark:text-amber-400 ml-1">
+                  Ajuste Coletivo Aprovado
+                </AlertTitle>
+                <AlertDescription className="text-[10px] text-amber-700 dark:text-amber-300 ml-1 space-y-0.5">
+                  <div className="font-medium">"{data.approvedAdjustment.name}" ({data.approvedAdjustment.percentage}%)</div>
+                  <div>Vigência: {MONTHS[data.approvedAdjustment.effectiveMonth - 1]}/{data.projectedYear}</div>
+                  <div className="font-semibold">
+                    Impacto: +{formatCompactCurrency(adjustmentCost, currency)} ({data.approvedAdjustment.employeesAffected} func.)
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
 
             {/* Status da Submissão */}
             {data.submissionStatus && (
@@ -137,13 +205,13 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
             )}
 
             {/* Botões de Ação */}
-            <div className="flex gap-2 pt-2 border-t">
-              <Button asChild variant="outline" size="sm" className="flex-1 text-xs">
+            <div className="flex gap-2 pt-1 border-t">
+              <Button asChild variant="outline" size="sm" className="flex-1 text-[10px] h-7">
                 <Link to="/budget-planning" className="inline-flex items-center gap-1">
-                  Ver Planejamento <ExternalLink className="h-3 w-3" />
+                  Planejamento <ExternalLink className="h-3 w-3" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="sm" className="flex-1 text-xs">
+              <Button asChild variant="outline" size="sm" className="flex-1 text-[10px] h-7">
                 <Link to="/budget-approvals" className="inline-flex items-center gap-1">
                   Aprovações <ExternalLink className="h-3 w-3" />
                 </Link>
