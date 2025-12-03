@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { BudgetPlanningFilterPanel } from '@/components/budget/BudgetPlanningFilterPanel';
 import { BudgetSummaryTable } from '@/components/budget/BudgetSummaryTable';
 import { BudgetUnitBreakdownCard } from '@/components/budget/BudgetUnitBreakdownCard';
+import { BudgetEvolutionChart } from '@/components/budget/BudgetEvolutionChart';
 import { EmployeeBudgetList } from '@/components/budget/EmployeeBudgetList';
 import { EmployeeBudgetDialog } from '@/components/budget/EmployeeBudgetDialog';
 import { PlannedHireDialog } from '@/components/budget/PlannedHireDialog';
@@ -264,6 +265,12 @@ const BudgetPlanning = () => {
 
         <div className="space-y-6">
           <BudgetUnitBreakdownCard fiscalYear={fiscalYear} />
+          
+          <BudgetEvolutionChart
+            monthlyTotals={summary?.monthlyTotals || []}
+            isLoading={summaryLoading}
+            fiscalYear={fiscalYear}
+          />
           
           <BudgetSummaryTable
             monthlyTotals={summary?.monthlyTotals || []}

@@ -919,100 +919,312 @@ export const ExportCard = () => {
     return wb;
   };
 
-  // Novo relatório PDF: Orçamento Aprovado Detalhado
+  // Novo relatório PDF: Orçamento Aprovado Detalhado (Melhorado)
   const generateBudgetApprovedDetailPDF = async (doc: any) => {
     const currentDate = format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
     
+    // === CAPA ===
+    doc.setFontSize(24);
+    doc.setTextColor(41, 128, 185);
+    doc.text('CompSmart', 105, 50, { align: 'center' });
     doc.setFontSize(18);
-    doc.text('CompSmart - Orçamento Aprovado Detalhado', 14, 20);
-    doc.setFontSize(10);
-    doc.text(`Gerado em: ${currentDate}`, 14, 28);
-    doc.text('Ano Fiscal: 2026', 14, 33);
-    
-    // SEÇÃO 1: Resumo por Unidade Organizacional
+    doc.setTextColor(0, 0, 0);
+    doc.text('Relatório de Orçamento Aprovado', 105, 65, { align: 'center' });
     doc.setFontSize(14);
-    doc.text('1. Resumo por Unidade Organizacional', 14, 45);
+    doc.text('Detalhamento Completo', 105, 78, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text(`Ano Fiscal: 2026`, 105, 95, { align: 'center' });
+    doc.text(`Moeda: ${currency}`, 105, 105, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setTextColor(128, 128, 128);
+    doc.text(`Gerado em: ${currentDate}`, 105, 120, { align: 'center' });
     
-    const unitSummary = Object.entries(budgetProjections?.byUnit || {}).map(
-      ([unit, data]: [string, any]) => [
-        unit,
-        data.projections.length,
-        data.plannedHires,
-        data.salaryChanges,
-        formatCurrency(data.totalProjected)
-      ]
-    );
+    doc.addPage();
+    doc.setTextColor(0, 0, 0);
+    
+    // === 1. RESUMO EXECUTIVO ===
+    doc.setFontSize(16);
+    doc.setTextColor(41, 128, 185);
+    doc.text('1. Resumo Executivo', 14, 20);
+    doc.setTextColor(0, 0, 0);
+    
+    // Calcular totais
+    const rawData = budgetProjections?.raw || [];
+    const totalFixed = rawData.reduce((sum: number, p: any) => sum + (p.projected_fixed_salary || 0), 0);
+    const totalVariable = rawData.reduce((sum: number, p: any) => sum + (p.projected_variable_salary || 0), 0);
+    const totalBenefits = rawData.reduce((sum: number, p: any) => sum + (p.projected_benefits || 0), 0);
+    const grandTotal = totalFixed + totalVariable + totalBenefits;
+    
+    // Contar funcionários únicos
+    const uniqueEmployeeIds = new Set(rawData.map((p: any) => p.employee_id || p.planned_employee_name).filter(Boolean));
+    const headcount = uniqueEmployeeIds.size;
+    
+    const kpiData = [
+      ['Total Orçado Anual', formatCurrencyCustom(convert(grandTotal, 'BRL', currency), currency)],
+      ['Salários Fixos', formatCurrencyCustom(convert(totalFixed, 'BRL', currency), currency)],
+      ['Remuneração Variável', formatCurrencyCustom(convert(totalVariable, 'BRL', currency), currency)],
+      ['Benefícios', formatCurrencyCustom(convert(totalBenefits, 'BRL', currency), currency)],
+      ['Headcount Projetado', headcount.toString()],
+      ['Custo Médio por Funcionário/Mês', headcount > 0 ? formatCurrencyCustom(convert(grandTotal / headcount / 12, 'BRL', currency), currency) : 'N/A'],
+    ];
     
     (doc as any).autoTable({
-      head: [['Unidade', 'Projeções', 'Contratações', 'Alt. Salário', 'Total Projetado']],
-      body: unitSummary,
-      startY: 50,
-      styles: { fontSize: 9 },
+      head: [['Indicador', 'Valor']],
+      body: kpiData,
+      startY: 25,
+      styles: { fontSize: 10 },
       headStyles: { fillColor: [41, 128, 185] },
     });
-
-    // SEÇÃO 2: Contratações Planejadas (detalhado)
-    const finalY1 = (doc as any).lastAutoTable.finalY + 10;
-    doc.setFontSize(14);
-    doc.text('2. Contratações Planejadas', 14, finalY1);
     
-    const plannedHires = budgetProjections?.raw
-      ?.filter((p: any) => p.is_planned_hire)
-      ?.map((p: any) => [
-        p.planned_employee_name || 'N/A',
+    // === 2. BREAKDOWN POR UNIDADE ORGANIZACIONAL ===
+    const finalY1 = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(16);
+    doc.setTextColor(41, 128, 185);
+    doc.text('2. Breakdown por Unidade Organizacional', 14, finalY1);
+    doc.setTextColor(0, 0, 0);
+    
+    const unitBreakdown = Object.entries(budgetProjections?.byUnit || {}).map(
+      ([unit, data]: [string, any]) => {
+        const fixed = data.projections.reduce((sum: number, p: any) => sum + (p.projected_fixed_salary || 0), 0);
+        const variable = data.projections.reduce((sum: number, p: any) => sum + (p.projected_variable_salary || 0), 0);
+        const benefits = data.projections.reduce((sum: number, p: any) => sum + (p.projected_benefits || 0), 0);
+        const uniqueInUnit = new Set(data.projections.map((p: any) => p.employee_id || p.planned_employee_name));
+        
+        return [
+          unit,
+          uniqueInUnit.size.toString(),
+          formatCurrencyCustom(convert(fixed, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(variable, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(benefits, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(fixed + variable + benefits, 'BRL', currency), currency),
+        ];
+      }
+    );
+    
+    // Linha de TOTAL
+    unitBreakdown.push([
+      'TOTAL',
+      headcount.toString(),
+      formatCurrencyCustom(convert(totalFixed, 'BRL', currency), currency),
+      formatCurrencyCustom(convert(totalVariable, 'BRL', currency), currency),
+      formatCurrencyCustom(convert(totalBenefits, 'BRL', currency), currency),
+      formatCurrencyCustom(convert(grandTotal, 'BRL', currency), currency),
+    ]);
+    
+    (doc as any).autoTable({
+      head: [['Unidade', 'HC', 'Fixo', 'Variável', 'Benefícios', 'Total']],
+      body: unitBreakdown,
+      startY: finalY1 + 5,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [52, 152, 219] },
+      footStyles: { fontStyle: 'bold', fillColor: [236, 240, 241] },
+    });
+    
+    // === 3. DISTRIBUIÇÃO POR CATEGORIA DE CUSTO ===
+    doc.addPage();
+    doc.setFontSize(16);
+    doc.setTextColor(41, 128, 185);
+    doc.text('3. Distribuição por Categoria de Custo', 14, 20);
+    doc.setTextColor(0, 0, 0);
+    
+    const categoryBreakdown = [
+      ['Salários Fixos', formatCurrencyCustom(convert(totalFixed, 'BRL', currency), currency), `${((totalFixed / grandTotal) * 100).toFixed(1)}%`],
+      ['Remuneração Variável', formatCurrencyCustom(convert(totalVariable, 'BRL', currency), currency), `${((totalVariable / grandTotal) * 100).toFixed(1)}%`],
+      ['Benefícios', formatCurrencyCustom(convert(totalBenefits, 'BRL', currency), currency), `${((totalBenefits / grandTotal) * 100).toFixed(1)}%`],
+      ['TOTAL', formatCurrencyCustom(convert(grandTotal, 'BRL', currency), currency), '100%'],
+    ];
+    
+    (doc as any).autoTable({
+      head: [['Categoria', 'Valor', '% do Total']],
+      body: categoryBreakdown,
+      startY: 25,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [155, 89, 182] },
+    });
+    
+    // === 4. DETALHAMENTO POR FUNCIONÁRIO ===
+    const finalY3 = (doc as any).lastAutoTable.finalY + 15;
+    doc.setFontSize(16);
+    doc.setTextColor(41, 128, 185);
+    doc.text('4. Detalhamento por Funcionário', 14, finalY3);
+    doc.setTextColor(0, 0, 0);
+    
+    let currentY = finalY3 + 5;
+    
+    for (const [unitName, unitData] of Object.entries(budgetProjections?.byUnit || {})) {
+      if (currentY > 250) {
+        doc.addPage();
+        currentY = 20;
+      }
+      
+      doc.setFontSize(12);
+      doc.setTextColor(41, 128, 185);
+      doc.text(`📁 ${unitName}`, 14, currentY);
+      doc.setTextColor(0, 0, 0);
+      
+      // Filtrar funcionários únicos
+      const employeeRows = (unitData as any).projections
+        .filter((p: any, index: number, self: any[]) => 
+          index === self.findIndex((t: any) => 
+            (t.employee_id || t.planned_employee_name) === (p.employee_id || p.planned_employee_name)
+          )
+        )
+        .map((p: any) => [
+          p.is_planned_hire ? `🆕 ${p.planned_employee_name}` : (p.employee?.full_name || 'N/A'),
+          p.projected_job_title?.title || p.employee?.job_title || 'N/A',
+          p.projected_grade || p.employee?.grade || 'N/A',
+          formatCurrencyCustom(convert(p.projected_fixed_salary || 0, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(p.projected_variable_salary || 0, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(p.projected_benefits || 0, 'BRL', currency), currency),
+        ]);
+      
+      (doc as any).autoTable({
+        head: [['Funcionário', 'Cargo', 'Grade', 'Fixo', 'Variável', 'Benefícios']],
+        body: employeeRows,
+        startY: currentY + 3,
+        styles: { fontSize: 7 },
+        headStyles: { fillColor: [127, 140, 141] },
+      });
+      
+      currentY = (doc as any).lastAutoTable.finalY + 10;
+    }
+    
+    // === 5. CONTRATAÇÕES PLANEJADAS ===
+    doc.addPage();
+    doc.setFontSize(16);
+    doc.setTextColor(39, 174, 96);
+    doc.text('5. Contratações Planejadas', 14, 20);
+    doc.setTextColor(0, 0, 0);
+    
+    const plannedHires = rawData.filter((p: any) => p.is_planned_hire);
+    // Filtrar únicos
+    const uniqueHires = plannedHires.filter((p: any, index: number, self: any[]) => 
+      index === self.findIndex((t: any) => t.planned_employee_name === p.planned_employee_name)
+    );
+    
+    if (uniqueHires.length > 0) {
+      const hiresRows = uniqueHires.map((p: any) => [
+        p.planned_employee_name,
         p.projected_unit?.description || 'N/A',
         `Mês ${p.month}`,
         p.projected_grade || 'N/A',
-        formatCurrency(p.projected_fixed_salary || 0),
-        (p.justification || 'Sem justificativa').substring(0, 50)
-      ]) || [];
-    
-    if (plannedHires.length > 0) {
+        formatCurrencyCustom(convert(p.projected_fixed_salary || 0, 'BRL', currency), currency),
+        (p.justification || 'N/A').substring(0, 40),
+      ]);
+      
       (doc as any).autoTable({
-        head: [['Nome', 'Unidade', 'Mês', 'Grade', 'Salário', 'Justificativa']],
-        body: plannedHires,
-        startY: finalY1 + 5,
+        head: [['Nome', 'Unidade', 'Mês Contratação', 'Grade', 'Salário', 'Justificativa']],
+        body: hiresRows,
+        startY: 25,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [22, 160, 133] },
+        headStyles: { fillColor: [39, 174, 96] },
       });
     } else {
       doc.setFontSize(10);
-      doc.text('Nenhuma contratação planejada', 14, finalY1 + 5);
+      doc.text('Nenhuma contratação planejada para este período.', 14, 30);
     }
-
-    // SEÇÃO 3: Alterações Salariais (mérito, promoção, etc)
-    const finalY2 = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 10 : finalY1 + 25;
-    doc.setFontSize(14);
-    doc.text('3. Alterações Salariais', 14, finalY2);
     
-    const salaryChanges = budgetProjections?.raw
-      ?.filter((p: any) => p.change_type && !p.is_planned_hire)
-      ?.map((p: any) => {
-        const currentSalary = p.employee?.salary || 0;
-        const newSalary = p.projected_fixed_salary || 0;
-        const increase = currentSalary > 0 ? (((newSalary - currentSalary) / currentSalary) * 100).toFixed(1) : '0.0';
-        
+    // === 6. ALTERAÇÕES SALARIAIS ===
+    const finalY5 = uniqueHires.length > 0 ? (doc as any).lastAutoTable.finalY + 15 : 45;
+    doc.setFontSize(16);
+    doc.setTextColor(230, 126, 34);
+    doc.text('6. Alterações Salariais (Mérito/Ajuste)', 14, finalY5);
+    doc.setTextColor(0, 0, 0);
+    
+    const salaryChanges = rawData.filter((p: any) => 
+      p.change_type && !p.is_planned_hire && !['promotion'].includes(p.change_type)
+    );
+    // Filtrar únicos
+    const uniqueChanges = salaryChanges.filter((p: any, index: number, self: any[]) => 
+      index === self.findIndex((t: any) => t.employee_id === p.employee_id)
+    );
+    
+    if (uniqueChanges.length > 0) {
+      const changesRows = uniqueChanges.map((p: any) => {
+        const current = p.employee?.salary || 0;
+        const projected = p.projected_fixed_salary || 0;
+        const pctChange = current > 0 ? ((projected - current) / current * 100).toFixed(1) : '0.0';
         return [
           p.employee?.full_name || 'N/A',
-          p.change_type || 'N/A',
+          p.change_type === 'merit' ? 'Mérito' : 'Ajuste',
           `Mês ${p.month}`,
-          formatCurrency(currentSalary),
-          formatCurrency(newSalary),
-          `${increase}%`
+          formatCurrencyCustom(convert(current, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(projected, 'BRL', currency), currency),
+          `${pctChange}%`,
         ];
-      }) || [];
-    
-    if (salaryChanges.length > 0) {
+      });
+      
       (doc as any).autoTable({
-        head: [['Funcionário', 'Tipo', 'Mês', 'Atual', 'Projetado', '% Aumento']],
-        body: salaryChanges,
-        startY: finalY2 + 5,
+        head: [['Funcionário', 'Tipo', 'Mês', 'Salário Atual', 'Salário Novo', '% Aumento']],
+        body: changesRows,
+        startY: finalY5 + 5,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [231, 76, 60] },
+        headStyles: { fillColor: [230, 126, 34] },
       });
     } else {
       doc.setFontSize(10);
-      doc.text('Nenhuma alteração salarial planejada', 14, finalY2 + 5);
+      doc.text('Nenhuma alteração salarial planejada.', 14, finalY5 + 10);
+    }
+    
+    // === 7. PROMOÇÕES DE CARGO ===
+    const finalY6 = uniqueChanges.length > 0 ? (doc as any).lastAutoTable.finalY + 15 : finalY5 + 25;
+    
+    if (finalY6 > 250) {
+      doc.addPage();
+      doc.setFontSize(16);
+      doc.setTextColor(142, 68, 173);
+      doc.text('7. Promoções de Cargo', 14, 20);
+      doc.setTextColor(0, 0, 0);
+    } else {
+      doc.setFontSize(16);
+      doc.setTextColor(142, 68, 173);
+      doc.text('7. Promoções de Cargo', 14, finalY6);
+      doc.setTextColor(0, 0, 0);
+    }
+    
+    const promotions = rawData.filter((p: any) => p.change_type === 'promotion');
+    const uniquePromos = promotions.filter((p: any, index: number, self: any[]) => 
+      index === self.findIndex((t: any) => t.employee_id === p.employee_id)
+    );
+    
+    if (uniquePromos.length > 0) {
+      const promoRows = uniquePromos.map((p: any) => {
+        const current = p.employee?.salary || 0;
+        const projected = p.projected_fixed_salary || 0;
+        return [
+          p.employee?.full_name || 'N/A',
+          p.employee?.job_title || 'N/A',
+          p.projected_job_title?.title || 'N/A',
+          `Mês ${p.month}`,
+          formatCurrencyCustom(convert(current, 'BRL', currency), currency),
+          formatCurrencyCustom(convert(projected, 'BRL', currency), currency),
+        ];
+      });
+      
+      (doc as any).autoTable({
+        head: [['Funcionário', 'Cargo Atual', 'Novo Cargo', 'Mês', 'Salário Atual', 'Salário Novo']],
+        body: promoRows,
+        startY: finalY6 > 250 ? 25 : finalY6 + 5,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [142, 68, 173] },
+      });
+    } else {
+      doc.setFontSize(10);
+      doc.text('Nenhuma promoção planejada.', 14, finalY6 > 250 ? 30 : finalY6 + 10);
+    }
+    
+    // === RODAPÉ EM TODAS AS PÁGINAS ===
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text(
+        `CompSmart - Relatório Orçamentário ${new Date().getFullYear()} | Página ${i} de ${pageCount}`,
+        105,
+        285,
+        { align: 'center' }
+      );
     }
   };
 

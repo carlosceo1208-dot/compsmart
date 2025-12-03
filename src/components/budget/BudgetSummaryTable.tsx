@@ -30,6 +30,11 @@ export const BudgetSummaryTable = ({
   avgHeadcount,
   isLoading,
 }: BudgetSummaryTableProps) => {
+  // Calcular totais por coluna
+  const totalFixed = monthlyTotals.reduce((sum, m) => sum + m.totalFixed, 0);
+  const totalVariable = monthlyTotals.reduce((sum, m) => sum + m.totalVariable, 0);
+  const totalBenefits = monthlyTotals.reduce((sum, m) => sum + m.totalBenefits, 0);
+
   if (isLoading) {
     return (
       <Card>
@@ -84,16 +89,27 @@ export const BudgetSummaryTable = ({
                   </TableCell>
                 </TableRow>
               ))}
+              {/* Linha de TOTAL */}
+              <TableRow className="bg-primary/10 font-bold border-t-2">
+                <TableCell className="font-bold">TOTAL</TableCell>
+                <TableCell className="text-right font-bold">
+                  {formatCurrency(totalFixed)}
+                </TableCell>
+                <TableCell className="text-right font-bold">
+                  {formatCurrency(totalVariable)}
+                </TableCell>
+                <TableCell className="text-right font-bold">
+                  {formatCurrency(yearTotal)}
+                </TableCell>
+                <TableCell className="text-right font-bold">
+                  {formatCurrency(totalBenefits)}
+                </TableCell>
+                <TableCell className="text-right font-bold">
+                  {avgHeadcount}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
-        </div>
-        <div className="mt-4 flex justify-between items-center border-t pt-4">
-          <div className="text-lg font-semibold">
-            Total Ano: {formatCurrency(yearTotal)}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            Headcount Médio: {avgHeadcount} pessoas
-          </div>
         </div>
       </CardContent>
     </Card>
