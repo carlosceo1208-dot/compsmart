@@ -21,7 +21,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calculator, DollarSign, Users, TrendingUp, Save } from "lucide-react";
 import { 
   ScaledRule, 
@@ -202,8 +201,8 @@ export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Calculator className="w-5 h-5" />
             Nova Simulação de Ajuste Coletivo
@@ -213,7 +212,8 @@ export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationD
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="flex-1 overflow-y-auto min-h-0 pr-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Left: Configuration */}
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
@@ -395,7 +395,7 @@ export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationD
                 <CardTitle className="text-sm">Detalhamento por Funcionário</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <ScrollArea className="h-[280px]">
+                <div className="h-[200px] overflow-y-auto">
                   {preview.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
                       Clique em "Calcular Preview" para ver o impacto
@@ -427,7 +427,7 @@ export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationD
                       ))}
                     </div>
                   )}
-                </ScrollArea>
+                </div>
               </CardContent>
             </Card>
 
@@ -439,6 +439,7 @@ export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationD
               <Save className="w-4 h-4 mr-2" />
               {isSaving ? 'Salvando...' : 'Salvar Simulação'}
             </Button>
+          </div>
           </div>
         </div>
       </DialogContent>
