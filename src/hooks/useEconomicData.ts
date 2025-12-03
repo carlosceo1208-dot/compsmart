@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { EconomicData, USDData, INPCData } from '@/types/economic';
+import { EconomicData, USDData, INPCData, MinimumWageData } from '@/types/economic';
+
+// Salário Mínimo 2025 - Decreto nº 12.342/2024
+const MINIMUM_WAGE_DATA: MinimumWageData = {
+  value: 1518.00,
+  effectiveDate: '01/01/2025',
+  year: 2025,
+};
 
 const fetchUSDRate = async (): Promise<USDData> => {
   try {
@@ -150,6 +157,7 @@ export const useEconomicData = (inpcMonths: number = 12) => {
   const economicData: EconomicData = {
     usd: usdQuery.data || null,
     inpc: inpcQuery.data || null,
+    minimumWage: MINIMUM_WAGE_DATA,
     isLoading: usdQuery.isLoading || inpcQuery.isLoading,
     isRefreshing: usdQuery.isFetching || inpcQuery.isFetching,
     error: usdQuery.error || inpcQuery.error || null,

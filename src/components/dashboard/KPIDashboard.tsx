@@ -4,17 +4,21 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Currency } from '@/types/economic';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
+import { useCompanySettings } from '@/hooks/useCompanySettings';
 import { BenefitsCard } from './BenefitsCard';
 import { IncentivesCard } from './IncentivesCard';
 import { BudgetCard } from './BudgetCard';
 import { HRMetricsCard } from './HRMetricsCard';
+import { Badge } from '@/components/ui/badge';
 
 interface KPIDashboardProps {
   currency: Currency;
+  showWithCharges?: boolean;
 }
 
-export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
+export const KPIDashboard = ({ currency, showWithCharges = false }: KPIDashboardProps) => {
   const { convert } = useCurrencyConverter();
+  const { socialChargesPercentage } = useCompanySettings();
 
   const { data: totalEmployees, isLoading: loadingEmployees } = useQuery({
     queryKey: ['kpi-total-employees'],
@@ -50,12 +54,27 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const totalSalary = salaryData ? convert(salaryData.total, 'BRL', currency) : 0;
-  const avgSalary = salaryData ? convert(salaryData.avg, 'BRL', currency) : 0;
+  // Aplicar multiplicador de encargos se ativado
+  const chargesMultiplier = showWithCharges && socialChargesPercentage > 0 
+    ? (1 + socialChargesPercentage / 100) 
+    : 1;
+
+  const baseTotalSalary = salaryData ? convert(salaryData.total, 'BRL', currency) : 0;
+  const baseAvgSalary = salaryData ? convert(salaryData.avg, 'BRL', currency) : 0;
+  
+  const totalSalary = baseTotalSalary * chargesMultiplier;
+  const avgSalary = baseAvgSalary * chargesMultiplier;
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">KPIs Principais</h3>
+      <div className="flex items-center gap-2">
+        <h3 className="text-lg font-semibold">KPIs Principais</h3>
+        {showWithCharges && socialChargesPercentage > 0 && (
+          <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+            Com Encargos (+{socialChargesPercentage}%)
+          </Badge>
+        )}
+      </div>
       
       <KPICard
         title="Funcionários Ativos"
@@ -67,7 +86,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
       />
       
       <KPICard
-        title="Massa Salarial Total"
+        title={showWithCharges && socialChargesPercentage > 0 ? "Massa Salarial (c/ Encargos)" : "Massa Salarial Total"}
         value={totalSalary}
         icon={DollarSign}
         format="compact-currency"
@@ -77,7 +96,7 @@ export const KPIDashboard = ({ currency }: KPIDashboardProps) => {
       />
       
       <KPICard
-        title="Média Salarial"
+        title={showWithCharges && socialChargesPercentage > 0 ? "Média Salarial (c/ Encargos)" : "Média Salarial"}
         value={avgSalary}
         icon={TrendingUp}
         format="currency"
