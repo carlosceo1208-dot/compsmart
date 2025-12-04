@@ -133,27 +133,49 @@ export const useBudgetPlanningAnnualKPI = () => {
       let projectedVariableSalary = 0;
       let projectedBenefits = 0;
 
-      // Primeiro: processar projeções específicas
-      projections?.forEach(proj => {
-        if (proj.is_planned_hire) {
-          const key = proj.planned_employee_name || proj.id;
-          if (!plannedHireNames.has(key)) {
-            plannedHireNames.add(key);
-          }
-          const monthsActive = 12 - proj.month + 1;
-          projectedFixedSalary += (proj.projected_fixed_salary || 0) * Math.max(1, monthsActive);
-          projectedVariableSalary += (proj.projected_variable_salary || 0) * Math.max(1, monthsActive);
-          projectedBenefits += (proj.projected_benefits || 0) * Math.max(1, monthsActive);
-        } else if (proj.employee_id) {
-          employeeIdsWithProjection.add(proj.employee_id);
-          // Para funcionários existentes com alteração, usa valor projetado
-          projectedFixedSalary += (proj.projected_fixed_salary || 0);
-          projectedVariableSalary += (proj.projected_variable_salary || 0);
-          projectedBenefits += (proj.projected_benefits || 0);
+      // Primeiro: processar contratações planejadas
+      // IMPORTANTE: Cada registro já representa UM mês específico, então apenas somar
+      projections?.filter(p => p.is_planned_hire).forEach(proj => {
+        const key = proj.planned_employee_name || proj.id;
+        if (!plannedHireNames.has(key)) {
+          plannedHireNames.add(key);
+        }
+        // Cada registro = 1 mês, simplesmente somar
+        projectedFixedSalary += (proj.projected_fixed_salary || 0);
+        projectedVariableSalary += (proj.projected_variable_salary || 0);
+        projectedBenefits += (proj.projected_benefits || 0);
+      });
+
+      // Segundo: processar funcionários existentes COM alteração salarial
+      // Agrupa projeções por employee_id para pegar a mais antiga (mês de início da alteração)
+      const employeeProjections = new Map<string, typeof projections[0]>();
+      projections?.filter(p => !p.is_planned_hire && p.employee_id).forEach(proj => {
+        const existing = employeeProjections.get(proj.employee_id!);
+        if (!existing || proj.month < existing.month) {
+          employeeProjections.set(proj.employee_id!, proj);
         }
       });
 
-      // Segundo: adicionar baseline para funcionários SEM projeção específica
+      employeeProjections.forEach((proj, empId) => {
+        employeeIdsWithProjection.add(empId);
+        const emp = currentEmployees.find(e => e.id === empId);
+        
+        if (emp) {
+          // Meses ANTES da alteração: usar salário atual
+          const monthsBefore = Math.max(0, proj.month - 1);
+          projectedFixedSalary += (emp.salary || 0) * monthsBefore;
+          projectedVariableSalary += (emp.variable_salary || 0) * monthsBefore;
+          projectedBenefits += (emp.benefits_value || 0) * monthsBefore;
+          
+          // Meses A PARTIR da alteração: usar salário projetado
+          const monthsAfter = 12 - proj.month + 1;
+          projectedFixedSalary += (proj.projected_fixed_salary || 0) * monthsAfter;
+          projectedVariableSalary += (proj.projected_variable_salary || 0) * monthsAfter;
+          projectedBenefits += (proj.projected_benefits || 0) * monthsAfter;
+        }
+      });
+
+      // Terceiro: adicionar baseline para funcionários SEM projeção específica
       currentEmployees.forEach(emp => {
         if (!employeeIdsWithProjection.has(emp.id)) {
           projectedFixedSalary += (emp.salary || 0) * 12;
