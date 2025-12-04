@@ -219,7 +219,7 @@ const BudgetPlanning = () => {
         toast.warning('Orçamento submetido, mas notificação por email falhou');
       }
 
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Erro ao submeter orçamento:', error);
       toast.error('Erro ao submeter orçamento');
