@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +24,7 @@ interface UserProfile {
   full_name: string;
   email: string;
   root_company_id: string | null;
+  avatar_url: string | null;
 }
 
 export const DashboardLayout = () => {
@@ -45,7 +46,7 @@ export const DashboardLayout = () => {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("full_name, email, root_company_id")
+        .select("full_name, email, root_company_id, avatar_url")
         .eq("id", session.user.id)
         .single();
 
@@ -184,6 +185,9 @@ export const DashboardLayout = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
+                    {profile?.avatar_url && (
+                      <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
+                    )}
                     <AvatarFallback className="bg-primary text-primary-foreground">
                       {profile ? getInitials(profile.full_name) : "U"}
                     </AvatarFallback>
