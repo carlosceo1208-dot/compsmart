@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { formatYears, formatPercentageSafe } from '@/lib/formatters';
 import { differenceInYears, differenceInMonths, subYears } from 'date-fns';
-import { Progress } from '@/components/ui/progress';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 export const HRMetricsCard = () => {
   const { data: hrMetrics, isLoading } = useQuery({
@@ -134,22 +134,59 @@ export const HRMetricsCard = () => {
 
             <div className="h-px bg-border" />
 
-            {/* Distribuição por Faixa Etária */}
+            {/* Distribuição por Faixa Etária - Gráfico de Pizza */}
             <div className="space-y-2">
               <div className="text-xs text-muted-foreground font-medium">
                 Distribuição por Idade
               </div>
-              <div className="space-y-2">
-                {Object.entries(hrMetrics?.agePercentages || {}).map(([range, percentage]) => (
-                  <div key={range} className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">{range} anos</span>
-                      <span className="font-medium">{formatPercentageSafe(percentage, 0)}</span>
-                    </div>
-                    <Progress value={percentage} className="h-1.5" />
+              {(() => {
+                const ageChartData = hrMetrics?.agePercentages ? [
+                  { name: '18-30', value: hrMetrics.agePercentages['18-30'], color: 'hsl(var(--chart-1))' },
+                  { name: '31-40', value: hrMetrics.agePercentages['31-40'], color: 'hsl(var(--chart-2))' },
+                  { name: '41-50', value: hrMetrics.agePercentages['41-50'], color: 'hsl(var(--chart-3))' },
+                  { name: '51+', value: hrMetrics.agePercentages['51+'], color: 'hsl(var(--chart-4))' },
+                ].filter(item => item.value > 0) : [];
+
+                return ageChartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={140}>
+                    <PieChart>
+                      <Pie
+                        data={ageChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={25}
+                        outerRadius={45}
+                        paddingAngle={2}
+                        dataKey="value"
+                        label={({ value }) => `${value.toFixed(0)}%`}
+                        labelLine={false}
+                      >
+                        {ageChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => [`${value.toFixed(1)}%`, '']}
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--popover))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '6px'
+                        }}
+                      />
+                      <Legend 
+                        verticalAlign="bottom"
+                        height={36}
+                        iconSize={8}
+                        formatter={(value) => <span className="text-xs text-muted-foreground">{value}</span>}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="text-xs text-muted-foreground text-center py-4">
+                    Sem dados de idade
                   </div>
-                ))}
-              </div>
+                );
+              })()}
             </div>
           </div>
         )}
