@@ -81,6 +81,52 @@ const BudgetApprovals = () => {
     },
   });
 
+  // Query separada para KPIs consolidados (independente do filtro de status)
+  const { data: kpiData } = useQuery({
+    queryKey: ['budget-submissions-kpi', fiscalYear],
+    queryFn: async () => {
+      // Buscar todas as submissões do ano fiscal
+      const { data: allSubmissions, error } = await supabase
+        .from('budget_submissions')
+        .select('id, status, unit_id')
+        .eq('fiscal_year', fiscalYear);
+      
+      if (error) throw error;
+      
+      const pending = allSubmissions?.filter(s => s.status === 'submitted').length || 0;
+      const approved = allSubmissions?.filter(s => s.status === 'approved') || [];
+      
+      // Calcular total aprovado somando projeções
+      let totalApprovedBudget = 0;
+      
+      for (const sub of approved) {
+        const query = supabase
+          .from('budget_employee_projections')
+          .select('projected_fixed_salary, projected_variable_salary, projected_benefits')
+          .eq('fiscal_year', fiscalYear)
+          .eq('is_active', true);
+        
+        // Filtrar por unidade ou buscar todas se unit_id for null (empresa toda)
+        if (sub.unit_id) {
+          query.eq('projected_unit_id', sub.unit_id);
+        }
+        
+        const { data: projections } = await query;
+        
+        totalApprovedBudget += projections?.reduce((sum, p) => 
+          sum + (p.projected_fixed_salary || 0) + 
+          (p.projected_variable_salary || 0) + 
+          (p.projected_benefits || 0), 0) || 0;
+      }
+      
+      return {
+        totalPending: pending,
+        totalApproved: approved.length,
+        totalApprovedBudget
+      };
+    },
+  });
+
   // Aplicar filtro de unidade
   const filteredSubmissions = submissions?.filter(sub => {
     if (unitFilter === 'all') return true;
@@ -171,12 +217,10 @@ const BudgetApprovals = () => {
     );
   }
 
-  // Calcular totais
-  const totalPending = filteredSubmissions.filter(s => s.status === 'submitted').length || 0;
-  const totalApproved = filteredSubmissions.filter(s => s.status === 'approved').length || 0;
-  const totalBudget = filteredSubmissions
-    .filter(s => s.status === 'approved')
-    .reduce((sum, s) => sum + (s.totalAnnual || 0), 0) || 0;
+  // Usar KPIs consolidados (independente do filtro de tabela)
+  const totalPending = kpiData?.totalPending || 0;
+  const totalApproved = kpiData?.totalApproved || 0;
+  const totalBudget = kpiData?.totalApprovedBudget || 0;
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto p-6">
