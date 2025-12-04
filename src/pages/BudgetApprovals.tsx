@@ -96,27 +96,41 @@ const BudgetApprovals = () => {
       const pending = allSubmissions?.filter(s => s.status === 'submitted').length || 0;
       const approved = allSubmissions?.filter(s => s.status === 'approved') || [];
       
-      // Calcular total aprovado somando projeções
+      // CORREÇÃO: Verificar se existe submissão "Empresa toda" aprovada (unit_id = NULL)
+      const companyWideApproved = approved.find(s => s.unit_id === null);
+      
       let totalApprovedBudget = 0;
       
-      for (const sub of approved) {
-        const query = supabase
+      if (companyWideApproved) {
+        // Se existe "Empresa toda", buscar TODAS as projeções (sem filtro de unidade)
+        // Isso evita duplicação pois a submissão "Empresa toda" já representa 100%
+        const { data: projections } = await supabase
           .from('budget_employee_projections')
           .select('projected_fixed_salary, projected_variable_salary, projected_benefits')
           .eq('fiscal_year', fiscalYear)
           .eq('is_active', true);
         
-        // Filtrar por unidade ou buscar todas se unit_id for null (empresa toda)
-        if (sub.unit_id) {
-          query.eq('projected_unit_id', sub.unit_id);
-        }
-        
-        const { data: projections } = await query;
-        
-        totalApprovedBudget += projections?.reduce((sum, p) => 
+        totalApprovedBudget = projections?.reduce((sum, p) => 
           sum + (p.projected_fixed_salary || 0) + 
           (p.projected_variable_salary || 0) + 
           (p.projected_benefits || 0), 0) || 0;
+      } else {
+        // Caso contrário, somar apenas unidades específicas aprovadas
+        for (const sub of approved) {
+          if (sub.unit_id) {
+            const { data: projections } = await supabase
+              .from('budget_employee_projections')
+              .select('projected_fixed_salary, projected_variable_salary, projected_benefits')
+              .eq('fiscal_year', fiscalYear)
+              .eq('projected_unit_id', sub.unit_id)
+              .eq('is_active', true);
+            
+            totalApprovedBudget += projections?.reduce((sum, p) => 
+              sum + (p.projected_fixed_salary || 0) + 
+              (p.projected_variable_salary || 0) + 
+              (p.projected_benefits || 0), 0) || 0;
+          }
+        }
       }
       
       return {
