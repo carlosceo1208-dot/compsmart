@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.validate-coupon]
 verify_jwt = true
+
+[functions.send-budget-deadline-reminder]
+verify_jwt = false

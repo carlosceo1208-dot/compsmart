@@ -421,6 +421,57 @@ export type Database = {
         }
         Relationships: []
       }
+      budget_deadline_settings: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          deadline_date: string
+          fiscal_year: number
+          id: string
+          last_reminder_sent_at: string | null
+          reminder_days_before: number[] | null
+          root_company_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          deadline_date: string
+          fiscal_year: number
+          id?: string
+          last_reminder_sent_at?: string | null
+          reminder_days_before?: number[] | null
+          root_company_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          deadline_date?: string
+          fiscal_year?: number
+          id?: string
+          last_reminder_sent_at?: string | null
+          reminder_days_before?: number[] | null
+          root_company_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "budget_deadline_settings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_deadline_settings_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       budget_employee_projections: {
         Row: {
           change_type: string | null
