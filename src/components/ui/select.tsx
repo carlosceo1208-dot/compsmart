@@ -96,7 +96,7 @@ const SelectContent = React.forwardRef<
         <SelectPrimitive.Viewport
           ref={viewportRef}
           className={cn(
-            "p-1 max-h-[80vh] overflow-y-auto",
+            "p-1 max-h-[80vh] overflow-y-auto scrollbar-thin",
             position === "popper" &&
               "w-full min-w-[var(--radix-select-trigger-width)]",
           )}
