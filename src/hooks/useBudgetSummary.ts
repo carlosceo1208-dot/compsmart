@@ -45,7 +45,69 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
 
       const { data: allProjections } = await projectionsQuery;
 
-      // 3. Calcular totais mensais (funcionários + contratações planejadas)
+      // 3. Preparar carry forward por funcionário
+      // Para cada funcionário, inicializar com valores atuais e propagar alterações
+      const employeeCarryForward = new Map<string, {
+        salary: number;
+        variable: number;
+        benefits: number;
+        terminated: boolean;
+        transferredOut: boolean;
+      }>();
+
+      // Inicializar com valores atuais de cada funcionário
+      employees?.forEach(emp => {
+        employeeCarryForward.set(emp.id, {
+          salary: emp.salary || 0,
+          variable: emp.variable_salary || 0,
+          benefits: emp.benefits_value || 0,
+          terminated: false,
+          transferredOut: false,
+        });
+      });
+
+      // Processar projeções mês a mês para atualizar carry forward
+      for (let month = 1; month <= 12; month++) {
+        employees?.forEach(emp => {
+          const projection = allProjections?.find(p => 
+            p.employee_id === emp.id && 
+            p.month === month &&
+            !p.is_planned_hire
+          );
+
+          if (projection) {
+            const current = employeeCarryForward.get(emp.id)!;
+            
+            // Marcar demissão
+            if (projection.change_type === 'planned_termination') {
+              current.terminated = true;
+            }
+            // Marcar transferência de saída
+            else if (projection.change_type === 'transfer_out') {
+              current.transferredOut = true;
+            }
+            // Atualizar valores (carry forward para meses seguintes)
+            else {
+              current.salary = projection.projected_fixed_salary;
+              current.variable = projection.projected_variable_salary;
+              current.benefits = projection.projected_benefits;
+            }
+          }
+        });
+      }
+
+      // Reinicializar carry forward para calcular totais mensais
+      employees?.forEach(emp => {
+        employeeCarryForward.set(emp.id, {
+          salary: emp.salary || 0,
+          variable: emp.variable_salary || 0,
+          benefits: emp.benefits_value || 0,
+          terminated: false,
+          transferredOut: false,
+        });
+      });
+
+      // 4. Calcular totais mensais com carry forward correto
       const monthlyTotals: MonthlySummary[] = Array.from({ length: 12 }, (_, i) => {
         const month = i + 1;
         
@@ -54,32 +116,48 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
         let totalBenefits = 0;
         const uniqueIds = new Set<string>();
 
-        // Processar funcionários existentes
+        // Processar funcionários existentes com carry forward
         employees?.forEach(emp => {
+          const current = employeeCarryForward.get(emp.id)!;
+          
+          // Pular se já foi demitido ou transferido
+          if (current.terminated || current.transferredOut) {
+            return;
+          }
+
           const projection = allProjections?.find(p => 
             p.employee_id === emp.id && 
             p.month === month &&
             !p.is_planned_hire
           );
 
-          // Demissão planejada - pular
-          if (projection?.change_type === 'planned_termination') {
-            return;
+          if (projection) {
+            // Demissão planejada - marcar e pular
+            if (projection.change_type === 'planned_termination') {
+              current.terminated = true;
+              return;
+            }
+
+            // Transferência para outra unidade - marcar e pular
+            if (projection.change_type === 'transfer_out') {
+              current.transferredOut = true;
+              return;
+            }
+
+            // Atualizar carry forward com valores da projeção
+            current.salary = projection.projected_fixed_salary;
+            current.variable = projection.projected_variable_salary;
+            current.benefits = projection.projected_benefits;
           }
 
-          // Transferência para outra unidade - pular
-          if (projection?.change_type === 'transfer_out') {
-            return;
-          }
-
-          // Usar valores projetados ou atuais
-          totalFixed += projection?.projected_fixed_salary || emp.salary || 0;
-          totalVariable += projection?.projected_variable_salary || emp.variable_salary || 0;
-          totalBenefits += projection?.projected_benefits || emp.benefits_value || 0;
+          // Usar valores do carry forward (propagados ou atuais)
+          totalFixed += current.salary;
+          totalVariable += current.variable;
+          totalBenefits += current.benefits;
           uniqueIds.add(emp.id);
         });
 
-        // Processar contratações planejadas (ativas no mês atual)
+        // Processar contratações planejadas (ativas a partir do mês de contratação)
         const plannedHiresForMonth = allProjections?.filter(p => 
           p.is_planned_hire && 
           p.month === month

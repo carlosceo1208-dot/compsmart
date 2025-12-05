@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useBudgetPlanningAnnualKPI } from '@/hooks/useBudgetPlanningAnnualKPI';
-import { formatCompactCurrency, formatNumber, formatPercentageSafe } from '@/lib/formatters';
+import { formatCurrency, formatNumber, formatPercentageSafe, convertCurrency } from '@/lib/formatters';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
 import { Currency } from '@/types/economic';
 import { Link } from 'react-router-dom';
@@ -102,7 +102,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Custo Anual:</span>
-                <span className="font-semibold text-sm">{formatCompactCurrency(currentTotal, currency)}</span>
+                <span className="font-semibold text-sm">{formatCurrency(currentTotal)}</span>
               </div>
             </div>
 
@@ -143,8 +143,8 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Salário Fixo */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Fixo</td>
-                    <td className="text-center p-1.5">{formatCompactCurrency(currentFixed, currency)}</td>
-                    <td className="text-center p-1.5 font-semibold">{formatCompactCurrency(projectedFixed, currency)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(currentFixed)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatCurrency(projectedFixed)}</td>
                     <td className="text-center p-1.5">
                       {renderVariance(fixedVariance, true)}
                     </td>
@@ -152,8 +152,8 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Variável */}
                   <tr className="border-t">
                     <td className="p-1.5 font-medium">Variável</td>
-                    <td className="text-center p-1.5">{formatCompactCurrency(currentVariable, currency)}</td>
-                    <td className="text-center p-1.5 font-semibold">{formatCompactCurrency(projectedVariable, currency)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(currentVariable)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatCurrency(projectedVariable)}</td>
                     <td className="text-center p-1.5">
                       {renderVariance(variableVariance, true)}
                     </td>
@@ -161,8 +161,8 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Benefícios */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Benefícios</td>
-                    <td className="text-center p-1.5">{formatCompactCurrency(currentBenefits, currency)}</td>
-                    <td className="text-center p-1.5 font-semibold">{formatCompactCurrency(projectedBenefits, currency)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(currentBenefits)}</td>
+                    <td className="text-center p-1.5 font-semibold">{formatCurrency(projectedBenefits)}</td>
                     <td className="text-center p-1.5">
                       {renderVariance(benefitsVariance, true)}
                     </td>
@@ -170,8 +170,8 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* TOTAL */}
                   <tr className="border-t bg-primary/10 font-bold">
                     <td className="p-1.5">TOTAL</td>
-                    <td className="text-center p-1.5">{formatCompactCurrency(currentTotal, currency)}</td>
-                    <td className="text-center p-1.5">{formatCompactCurrency(projectedTotal, currency)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(currentTotal)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(projectedTotal)}</td>
                     <td className="text-center p-1.5">
                       {renderVariance(totalVariance, true)}
                     </td>
@@ -191,7 +191,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   <div className="font-medium">"{data.approvedAdjustment.name}" ({data.approvedAdjustment.percentage}%)</div>
                   <div>Vigência: {MONTHS[data.approvedAdjustment.effectiveMonth - 1]}/{data.projectedYear}</div>
                   <div className="font-semibold">
-                    Impacto: +{formatCompactCurrency(adjustmentCost, currency)} ({data.approvedAdjustment.employeesAffected} func.)
+                    Impacto: +{formatCurrency(adjustmentCost)} ({data.approvedAdjustment.employeesAffected} func.)
                   </div>
                 </AlertDescription>
               </Alert>
