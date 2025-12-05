@@ -65,38 +65,20 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (currentError) throw currentError;
 
-      // 2. Calcular baseline do ano ATUAL - SEPARADO
+      // 2. Calcular baseline do ano ATUAL - USANDO MESES DE OPERAÇÃO DA EMPRESA
+      // Empresa CompSmart opera desde novembro/2025 = 2 meses de operação
+      const companyStartMonth = 11; // Novembro
+      const monthsInOperation2025 = Math.max(1, currentMonth - companyStartMonth + 1); // = 2 meses
+      
       let currentFixedSalary = 0;
       let currentVariableSalary = 0;
       let currentBenefits = 0;
       
+      // SIMPLES: todos funcionários ativos × meses de operação da empresa
       currentEmployees.forEach(emp => {
-        const fixedMonthly = emp.salary || 0;
-        const variableMonthly = emp.variable_salary || 0;
-        const benefitsMonthly = emp.benefits_value || 0;
-        
-        // Se tem data de admissão no ano atual, calcular meses proporcionais
-        if (emp.hire_date) {
-          const hireDate = new Date(emp.hire_date);
-          const hireYear = hireDate.getFullYear();
-          
-          if (hireYear === currentYear) {
-            const hireMonth = hireDate.getMonth() + 1;
-            const monthsWorked = currentMonth - hireMonth + 1;
-            const validMonths = Math.max(0, Math.min(monthsWorked, 12));
-            currentFixedSalary += fixedMonthly * validMonths;
-            currentVariableSalary += variableMonthly * validMonths;
-            currentBenefits += benefitsMonthly * validMonths;
-          } else if (hireYear < currentYear) {
-            currentFixedSalary += fixedMonthly * currentMonth;
-            currentVariableSalary += variableMonthly * currentMonth;
-            currentBenefits += benefitsMonthly * currentMonth;
-          }
-        } else {
-          currentFixedSalary += fixedMonthly * currentMonth;
-          currentVariableSalary += variableMonthly * currentMonth;
-          currentBenefits += benefitsMonthly * currentMonth;
-        }
+        currentFixedSalary += (emp.salary || 0) * monthsInOperation2025;
+        currentVariableSalary += (emp.variable_salary || 0) * monthsInOperation2025;
+        currentBenefits += (emp.benefits_value || 0) * monthsInOperation2025;
       });
 
       const currentTotal = currentFixedSalary + currentVariableSalary + currentBenefits;
@@ -172,11 +154,16 @@ export const useBudgetPlanningAnnualKPI = () => {
           projectedVariableSalary += (emp.variable_salary || 0) * monthsBefore;
           projectedBenefits += (emp.benefits_value || 0) * monthsBefore;
           
-          // Meses A PARTIR da alteração: usar salário projetado
+          // Meses A PARTIR da alteração: usar salário projetado para fixo
+          // Para variável e benefícios: usar projetado SE especificado, senão manter atual
           const monthsAfter = 12 - proj.month + 1;
-          projectedFixedSalary += (proj.projected_fixed_salary || 0) * monthsAfter;
-          projectedVariableSalary += (proj.projected_variable_salary || 0) * monthsAfter;
-          projectedBenefits += (proj.projected_benefits || 0) * monthsAfter;
+          projectedFixedSalary += (proj.projected_fixed_salary || emp.salary || 0) * monthsAfter;
+          projectedVariableSalary += (proj.projected_variable_salary !== null && proj.projected_variable_salary !== undefined 
+            ? proj.projected_variable_salary 
+            : (emp.variable_salary || 0)) * monthsAfter;
+          projectedBenefits += (proj.projected_benefits !== null && proj.projected_benefits !== undefined && proj.projected_benefits > 0
+            ? proj.projected_benefits 
+            : (emp.benefits_value || 0)) * monthsAfter;
         }
       });
 
@@ -214,10 +201,10 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       // 8. Calcular base comparável para variação (média mensal atual × 12)
       // Isso permite comparar maçãs com maçãs (ano vs ano) para variação percentual
-      const monthsInOperation = Math.max(1, currentMonth);
-      const monthlyBaseFixed = currentFixedSalary / monthsInOperation;
-      const monthlyBaseVariable = currentVariableSalary / monthsInOperation;
-      const monthlyBaseBenefits = currentBenefits / monthsInOperation;
+      // Usar monthsInOperation2025 (2 meses) para calcular média mensal correta
+      const monthlyBaseFixed = currentFixedSalary / monthsInOperation2025;
+      const monthlyBaseVariable = currentVariableSalary / monthsInOperation2025;
+      const monthlyBaseBenefits = currentBenefits / monthsInOperation2025;
       
       const comparableBaseFixed = monthlyBaseFixed * 12;
       const comparableBaseVariable = monthlyBaseVariable * 12;
