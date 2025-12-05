@@ -207,16 +207,22 @@ export const useBudgetPlanningAnnualKPI = () => {
       const projectedTotal = projectedFixedSalary + projectedVariableSalary + projectedBenefits;
       const projectedHeadcount = currentHeadcount + plannedHireNames.size;
 
-      // 8. Calcular baseline anualizado do ano atual para comparação
-      const annualizedCurrentFixed = currentEmployees.reduce((sum, emp) => sum + (emp.salary || 0) * 12, 0);
-      const annualizedCurrentVariable = currentEmployees.reduce((sum, emp) => sum + (emp.variable_salary || 0) * 12, 0);
-      const annualizedCurrentBenefits = currentEmployees.reduce((sum, emp) => sum + (emp.benefits_value || 0) * 12, 0);
-      const annualizedCurrentTotal = annualizedCurrentFixed + annualizedCurrentVariable + annualizedCurrentBenefits;
+      // 8. Calcular base comparável para variação (média mensal atual × 12)
+      // Isso permite comparar maçãs com maçãs (ano vs ano) para variação percentual
+      const monthsInOperation = Math.max(1, currentMonth);
+      const monthlyBaseFixed = currentFixedSalary / monthsInOperation;
+      const monthlyBaseVariable = currentVariableSalary / monthsInOperation;
+      const monthlyBaseBenefits = currentBenefits / monthsInOperation;
+      
+      const comparableBaseFixed = monthlyBaseFixed * 12;
+      const comparableBaseVariable = monthlyBaseVariable * 12;
+      const comparableBaseBenefits = monthlyBaseBenefits * 12;
+      const comparableBaseTotal = comparableBaseFixed + comparableBaseVariable + comparableBaseBenefits;
 
-      // 9. Calcular variações (comparando projetado com baseline anualizado)
-      const salaryVariance = projectedTotal - annualizedCurrentTotal;
-      const salaryVariancePercent = annualizedCurrentTotal > 0 
-        ? (salaryVariance / annualizedCurrentTotal) * 100 
+      // 9. Calcular variações (comparando projetado com base comparável anualizada)
+      const salaryVariance = projectedTotal - comparableBaseTotal;
+      const salaryVariancePercent = comparableBaseTotal > 0 
+        ? (salaryVariance / comparableBaseTotal) * 100 
         : 0;
 
       const headcountVariance = projectedHeadcount - currentHeadcount;
@@ -236,10 +242,10 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       return {
         currentYear,
-        currentFixedSalary: annualizedCurrentFixed,
-        currentVariableSalary: annualizedCurrentVariable,
-        currentBenefits: annualizedCurrentBenefits,
-        currentTotal: annualizedCurrentTotal,
+        currentFixedSalary,      // Valor proporcional real (meses trabalhados)
+        currentVariableSalary,   // Valor proporcional real
+        currentBenefits,         // Valor proporcional real
+        currentTotal,            // Valor proporcional real
         currentHeadcount,
         projectedYear: nextYear,
         projectedFixedSalary,
