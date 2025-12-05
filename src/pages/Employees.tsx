@@ -342,6 +342,28 @@ const Users = () => {
   const activeProfiles = profiles.filter(p => p.status === "active").length;
   const inactiveProfiles = profiles.filter(p => p.status === "inactive").length;
 
+  // Calcular totais dos funcionários filtrados
+  const totals = filteredProfiles.reduce((acc, profile) => {
+    const totalCash = (profile.salary || 0) + (profile.variable_salary || 0);
+    const totalIncentives = (profile.short_term_incentive || 0) + (profile.long_term_incentive || 0);
+    
+    return {
+      fixedSalary: acc.fixedSalary + (profile.salary || 0),
+      variableSalary: acc.variableSalary + (profile.variable_salary || 0),
+      totalCash: acc.totalCash + totalCash,
+      benefits: acc.benefits + (profile.benefits_value || 0),
+      incentives: acc.incentives + totalIncentives,
+      totalCompensation: acc.totalCompensation + totalCash + (profile.benefits_value || 0) + totalIncentives,
+    };
+  }, {
+    fixedSalary: 0,
+    variableSalary: 0,
+    totalCash: 0,
+    benefits: 0,
+    incentives: 0,
+    totalCompensation: 0,
+  });
+
   const getRoleBadge = (roles: Array<{ role: string }>) => {
     if (!roles || roles.length === 0) return null;
     
@@ -744,6 +766,46 @@ const Users = () => {
                       </TableRow>
                     );
                   })}
+                  
+                  {/* Linha de TOTAL */}
+                  {filteredProfiles.length > 0 && (
+                    <TableRow className="bg-primary/5 border-t-2 border-primary/20 font-bold">
+                      <TableCell className="text-xs font-bold">TOTAL</TableCell>
+                      <TableCell className="text-xs font-semibold">{filteredProfiles.length} funcionários</TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell className="text-right text-xs text-muted-foreground font-bold">
+                        {formatCurrency(totals.fixedSalary)}
+                      </TableCell>
+                      <TableCell className="text-right text-xs text-muted-foreground font-bold">
+                        {formatCurrency(totals.variableSalary)}
+                      </TableCell>
+                      <TableCell className="text-right text-xs font-bold bg-blue-100/70 dark:bg-blue-950/40">
+                        <span className="text-blue-700 dark:text-blue-300">
+                          {formatCurrency(totals.totalCash)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right text-xs font-bold">
+                        <span className="text-green-700 dark:text-green-400">
+                          {formatCurrency(totals.benefits)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right text-xs font-bold">
+                        <span className="text-purple-700 dark:text-purple-400">
+                          {formatCurrency(totals.incentives)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right font-bold bg-primary/15">
+                        <span className="text-primary text-sm">
+                          {formatCurrency(totals.totalCompensation)}
+                        </span>
+                      </TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                      <TableCell></TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
