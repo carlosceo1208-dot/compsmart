@@ -34,11 +34,11 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
 
   const adjustmentCost = data?.approvedAdjustment ? convert(data.approvedAdjustment.annualCost, 'BRL', currency) : 0;
 
-  // Calcular variações por categoria
-  const fixedVariance = currentFixed > 0 ? ((projectedFixed - currentFixed) / currentFixed) * 100 : 0;
-  const variableVariance = currentVariable > 0 ? ((projectedVariable - currentVariable) / currentVariable) * 100 : 0;
-  const benefitsVariance = currentBenefits > 0 ? ((projectedBenefits - currentBenefits) / currentBenefits) * 100 : 0;
-  const totalVariance = currentTotal > 0 ? ((projectedTotal - currentTotal) / currentTotal) * 100 : 0;
+  // Usar variações calculadas pelo hook em base comparável (ano vs ano)
+  const fixedVariance = data?.fixedVariancePercent || 0;
+  const variableVariance = data?.variableVariancePercent || 0;
+  const benefitsVariance = data?.benefitsVariancePercent || 0;
+  const totalVariance = data?.salaryVariancePercent || 0;
 
   const getStatusBadge = () => {
     if (!data?.submissionStatus) return null;

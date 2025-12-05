@@ -28,11 +28,16 @@ export interface BudgetPlanningAnnualKPI {
   projectedTotal: number;
   projectedHeadcount: number;
   
-  // Variações
+  // Variações Totais
   salaryVariance: number;
   salaryVariancePercent: number;
   headcountVariance: number;
   headcountVariancePercent: number;
+  
+  // Variações por Categoria (em base comparável ano-a-ano)
+  fixedVariancePercent: number;
+  variableVariancePercent: number;
+  benefitsVariancePercent: number;
   
   // Ajuste Coletivo Aprovado (se existir)
   approvedAdjustment?: ApprovedAdjustment;
@@ -219,7 +224,17 @@ export const useBudgetPlanningAnnualKPI = () => {
       const comparableBaseBenefits = monthlyBaseBenefits * 12;
       const comparableBaseTotal = comparableBaseFixed + comparableBaseVariable + comparableBaseBenefits;
 
-      // 9. Calcular variações (comparando projetado com base comparável anualizada)
+      // 9. Calcular variações por categoria (comparando projetado com base comparável anualizada)
+      const fixedVariancePercent = comparableBaseFixed > 0 
+        ? ((projectedFixedSalary - comparableBaseFixed) / comparableBaseFixed) * 100 
+        : 0;
+      const variableVariancePercent = comparableBaseVariable > 0 
+        ? ((projectedVariableSalary - comparableBaseVariable) / comparableBaseVariable) * 100 
+        : 0;
+      const benefitsVariancePercent = comparableBaseBenefits > 0 
+        ? ((projectedBenefits - comparableBaseBenefits) / comparableBaseBenefits) * 100 
+        : 0;
+      
       const salaryVariance = projectedTotal - comparableBaseTotal;
       const salaryVariancePercent = comparableBaseTotal > 0 
         ? (salaryVariance / comparableBaseTotal) * 100 
@@ -257,6 +272,9 @@ export const useBudgetPlanningAnnualKPI = () => {
         salaryVariancePercent,
         headcountVariance,
         headcountVariancePercent,
+        fixedVariancePercent,
+        variableVariancePercent,
+        benefitsVariancePercent,
         approvedAdjustment,
         hasPlanning,
         submissionStatus,
