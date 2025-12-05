@@ -133,50 +133,76 @@ export const useBudgetPlanningAnnualKPI = () => {
         projectedBenefits += (proj.projected_benefits || 0);
       });
 
-      // Segundo: processar funcionários existentes COM alteração salarial
-      // Agrupa projeções por employee_id para pegar a mais antiga (mês de início da alteração)
-      const employeeProjections = new Map<string, typeof projections[0]>();
+      // Segundo: processar funcionários existentes COM projeções (mérito/promoção)
+      // Agrupa todas as projeções por employee_id
+      const employeeProjectionsMap = new Map<string, typeof projections>();
       projections?.filter(p => !p.is_planned_hire && p.employee_id).forEach(proj => {
-        const existing = employeeProjections.get(proj.employee_id!);
-        if (!existing || proj.month < existing.month) {
-          employeeProjections.set(proj.employee_id!, proj);
-        }
+        const list = employeeProjectionsMap.get(proj.employee_id!) || [];
+        list.push(proj);
+        employeeProjectionsMap.set(proj.employee_id!, list);
       });
 
-      employeeProjections.forEach((proj, empId) => {
+      // Processar funcionários COM projeções usando carry forward mês a mês
+      employeeProjectionsMap.forEach((projList, empId) => {
         employeeIdsWithProjection.add(empId);
         const emp = currentEmployees.find(e => e.id === empId);
         
         if (emp) {
-          // Meses ANTES da alteração: usar salário atual
-          const monthsBefore = Math.max(0, proj.month - 1);
-          projectedFixedSalary += (emp.salary || 0) * monthsBefore;
-          projectedVariableSalary += (emp.variable_salary || 0) * monthsBefore;
-          projectedBenefits += (emp.benefits_value || 0) * monthsBefore;
+          // Inicializar carry forward com valores atuais
+          let lastKnownSalary = emp.salary || 0;
+          let lastKnownVariable = emp.variable_salary || 0;
+          let lastKnownBenefits = emp.benefits_value || 0;
           
-          // Meses A PARTIR da alteração: usar salário projetado para fixo
-          // Para variável e benefícios: usar projetado SE especificado, senão manter atual
-          const monthsAfter = 12 - proj.month + 1;
-          projectedFixedSalary += (proj.projected_fixed_salary || emp.salary || 0) * monthsAfter;
-          projectedVariableSalary += (proj.projected_variable_salary !== null && proj.projected_variable_salary !== undefined 
-            ? proj.projected_variable_salary 
-            : (emp.variable_salary || 0)) * monthsAfter;
-          projectedBenefits += (proj.projected_benefits !== null && proj.projected_benefits !== undefined && proj.projected_benefits > 0
-            ? proj.projected_benefits 
-            : (emp.benefits_value || 0)) * monthsAfter;
+          // Processar cada mês com carry forward
+          for (let month = 1; month <= 12; month++) {
+            const proj = projList.find(p => p.month === month);
+            
+            if (proj) {
+              // Atualizar carry forward com valores da projeção (mérito individual)
+              lastKnownSalary = proj.projected_fixed_salary;
+              lastKnownVariable = proj.projected_variable_salary ?? lastKnownVariable;
+              lastKnownBenefits = proj.projected_benefits ?? lastKnownBenefits;
+            }
+            
+            // Aplicar ajuste coletivo se estiver no mês efetivo ou após
+            let monthlySalary = lastKnownSalary;
+            if (approvedAdjustments?.length && month >= approvedAdjustments[0].effective_month) {
+              const percentage = approvedAdjustments[0].fixed_percentage || 0;
+              monthlySalary = lastKnownSalary * (1 + percentage / 100);
+            }
+            
+            projectedFixedSalary += monthlySalary;
+            projectedVariableSalary += lastKnownVariable;
+            projectedBenefits += lastKnownBenefits;
+          }
         }
       });
 
       // Terceiro: adicionar baseline para funcionários SEM projeção específica
+      // Também aplicar ajuste coletivo mês a mês
       currentEmployees.forEach(emp => {
         if (!employeeIdsWithProjection.has(emp.id)) {
-          projectedFixedSalary += (emp.salary || 0) * 12;
-          projectedVariableSalary += (emp.variable_salary || 0) * 12;
-          projectedBenefits += (emp.benefits_value || 0) * 12;
+          const baseSalary = emp.salary || 0;
+          const baseVariable = emp.variable_salary || 0;
+          const baseBenefits = emp.benefits_value || 0;
+          
+          for (let month = 1; month <= 12; month++) {
+            let monthlySalary = baseSalary;
+            
+            // Aplicar ajuste coletivo a partir do mês efetivo
+            if (approvedAdjustments?.length && month >= approvedAdjustments[0].effective_month) {
+              const percentage = approvedAdjustments[0].fixed_percentage || 0;
+              monthlySalary = baseSalary * (1 + percentage / 100);
+            }
+            
+            projectedFixedSalary += monthlySalary;
+            projectedVariableSalary += baseVariable;
+            projectedBenefits += baseBenefits;
+          }
         }
       });
 
-      // 7. Processar ajuste coletivo aprovado e incluir no projetado
+      // 7. Preparar informações do ajuste coletivo para exibição (sem somar novamente)
       let approvedAdjustment: ApprovedAdjustment | undefined;
       
       if (approvedAdjustments && approvedAdjustments.length > 0) {
@@ -190,10 +216,7 @@ export const useBudgetPlanningAnnualKPI = () => {
           effectiveMonth: adj.effective_month,
           employeesAffected: adj.total_employees_affected || 0,
         };
-        
-        // Incluir custo do ajuste coletivo no salário fixo projetado
-        // O custo anual já considera os meses de vigência
-        projectedFixedSalary += approvedAdjustment.annualCost;
+        // NÃO somar annualCost aqui - já foi aplicado mês a mês acima
       }
 
       const projectedTotal = projectedFixedSalary + projectedVariableSalary + projectedBenefits;
