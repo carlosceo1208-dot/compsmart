@@ -199,32 +199,20 @@ export const useBudgetPlanningAnnualKPI = () => {
       const projectedTotal = projectedFixedSalary + projectedVariableSalary + projectedBenefits;
       const projectedHeadcount = currentHeadcount + plannedHireNames.size;
 
-      // 8. Calcular base comparável para variação (média mensal atual × 12)
-      // Isso permite comparar maçãs com maçãs (ano vs ano) para variação percentual
-      // Usar monthsInOperation2025 (2 meses) para calcular média mensal correta
-      const monthlyBaseFixed = currentFixedSalary / monthsInOperation2025;
-      const monthlyBaseVariable = currentVariableSalary / monthsInOperation2025;
-      const monthlyBaseBenefits = currentBenefits / monthsInOperation2025;
-      
-      const comparableBaseFixed = monthlyBaseFixed * 12;
-      const comparableBaseVariable = monthlyBaseVariable * 12;
-      const comparableBaseBenefits = monthlyBaseBenefits * 12;
-      const comparableBaseTotal = comparableBaseFixed + comparableBaseVariable + comparableBaseBenefits;
-
-      // 9. Calcular variações por categoria (comparando projetado com base comparável anualizada)
-      const fixedVariancePercent = comparableBaseFixed > 0 
-        ? ((projectedFixedSalary - comparableBaseFixed) / comparableBaseFixed) * 100 
+      // 8. Calcular variações por comparação direta simples (2025 vs 2026)
+      const fixedVariancePercent = currentFixedSalary > 0 
+        ? ((projectedFixedSalary - currentFixedSalary) / currentFixedSalary) * 100 
         : 0;
-      const variableVariancePercent = comparableBaseVariable > 0 
-        ? ((projectedVariableSalary - comparableBaseVariable) / comparableBaseVariable) * 100 
+      const variableVariancePercent = currentVariableSalary > 0 
+        ? ((projectedVariableSalary - currentVariableSalary) / currentVariableSalary) * 100 
         : 0;
-      const benefitsVariancePercent = comparableBaseBenefits > 0 
-        ? ((projectedBenefits - comparableBaseBenefits) / comparableBaseBenefits) * 100 
+      const benefitsVariancePercent = currentBenefits > 0 
+        ? ((projectedBenefits - currentBenefits) / currentBenefits) * 100 
         : 0;
       
-      const salaryVariance = projectedTotal - comparableBaseTotal;
-      const salaryVariancePercent = comparableBaseTotal > 0 
-        ? (salaryVariance / comparableBaseTotal) * 100 
+      const salaryVariance = projectedTotal - currentTotal;
+      const salaryVariancePercent = currentTotal > 0 
+        ? (salaryVariance / currentTotal) * 100 
         : 0;
 
       const headcountVariance = projectedHeadcount - currentHeadcount;
