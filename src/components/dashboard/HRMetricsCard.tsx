@@ -13,7 +13,7 @@ export const HRMetricsCard = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('birth_date, created_at, status, updated_at');
+        .select('birth_date, hire_date, status, updated_at');
       
       if (error) throw error;
       if (!data) return null;
@@ -23,8 +23,8 @@ export const HRMetricsCard = () => {
       
       // 1. Tempo médio de empresa (em anos)
       const tenures = activeEmployees
-        .filter(p => p.created_at)
-        .map(p => differenceInMonths(now, new Date(p.created_at)) / 12);
+        .filter(p => p.hire_date)
+        .map(p => differenceInMonths(now, new Date(p.hire_date)) / 12);
       const avgTenure = tenures.length > 0 
         ? tenures.reduce((a, b) => a + b, 0) / tenures.length 
         : 0;
