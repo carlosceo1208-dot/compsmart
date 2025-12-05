@@ -55,12 +55,28 @@ export const useBudgetProjections = (employeeId: string | null, fiscalYear: numb
         .eq('id', employeeId)
         .single();
 
-      // Criar array de 12 meses
+      // Inicializar com valores atuais do funcionário (carry forward)
+      let lastKnownSalary = currentData?.salary || 0;
+      let lastKnownVariable = currentData?.variable_salary || 0;
+      let lastKnownBenefits = currentData?.benefits_value || 0;
+      let lastKnownJobTitleId = currentData?.job_title_id;
+      let lastKnownGrade = currentData?.grade;
+      let lastKnownUnitId = currentData?.unit_id;
+
+      // Criar array de 12 meses com propagação de alterações
       const monthlyProjections: BudgetProjection[] = Array.from({ length: 12 }, (_, i) => {
         const month = i + 1;
         const existing = projections?.find(p => p.month === month);
         
         if (existing) {
+          // Atualizar "último conhecido" com os valores da projeção
+          lastKnownSalary = existing.projected_fixed_salary;
+          lastKnownVariable = existing.projected_variable_salary;
+          lastKnownBenefits = existing.projected_benefits;
+          if (existing.projected_job_title_id) lastKnownJobTitleId = existing.projected_job_title_id;
+          if (existing.projected_grade) lastKnownGrade = existing.projected_grade;
+          if (existing.projected_unit_id) lastKnownUnitId = existing.projected_unit_id;
+
           // Verificar se está fora da faixa salarial
           let warningMessage: string | undefined;
           
@@ -78,15 +94,15 @@ export const useBudgetProjections = (employeeId: string | null, fiscalYear: numb
           return { ...existing, warningMessage };
         }
         
-        // Usar valores atuais se não houver projeção
+        // Usar ÚLTIMO VALOR CONHECIDO (propaga alterações de meses anteriores)
         return {
           month,
-          projected_fixed_salary: currentData?.salary || 0,
-          projected_variable_salary: currentData?.variable_salary || 0,
-          projected_benefits: currentData?.benefits_value || 0,
-          projected_job_title_id: currentData?.job_title_id,
-          projected_grade: currentData?.grade,
-          projected_unit_id: currentData?.unit_id,
+          projected_fixed_salary: lastKnownSalary,
+          projected_variable_salary: lastKnownVariable,
+          projected_benefits: lastKnownBenefits,
+          projected_job_title_id: lastKnownJobTitleId,
+          projected_grade: lastKnownGrade,
+          projected_unit_id: lastKnownUnitId,
           change_type: undefined,
           justification: undefined,
           warningMessage: undefined,
