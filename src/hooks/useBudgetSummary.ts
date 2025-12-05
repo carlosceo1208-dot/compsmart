@@ -45,6 +45,16 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
 
       const { data: allProjections } = await projectionsQuery;
 
+      // 3. Buscar ajuste coletivo aprovado para o ano fiscal
+      const { data: approvedAdjustments } = await supabase
+        .from('collective_salary_adjustments')
+        .select('*')
+        .eq('fiscal_year', fiscalYear)
+        .eq('status', 'approved_budget')
+        .limit(1);
+
+      const collectiveAdjustment = approvedAdjustments?.[0];
+
       // 3. Preparar carry forward por funcionário
       // Para cada funcionário, inicializar com valores atuais e propagar alterações
       const employeeCarryForward = new Map<string, {
@@ -144,14 +154,21 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
               return;
             }
 
-            // Atualizar carry forward com valores da projeção
+            // Atualizar carry forward com valores da projeção (mérito individual)
             current.salary = projection.projected_fixed_salary;
             current.variable = projection.projected_variable_salary;
             current.benefits = projection.projected_benefits;
           }
 
-          // Usar valores do carry forward (propagados ou atuais)
-          totalFixed += current.salary;
+          // Aplicar ajuste coletivo se estiver no mês efetivo ou após
+          let salaryWithAdjustment = current.salary;
+          if (collectiveAdjustment && month >= collectiveAdjustment.effective_month) {
+            const percentage = collectiveAdjustment.fixed_percentage || 0;
+            salaryWithAdjustment = current.salary * (1 + percentage / 100);
+          }
+
+          // Usar valores do carry forward com ajuste coletivo aplicado
+          totalFixed += salaryWithAdjustment;
           totalVariable += current.variable;
           totalBenefits += current.benefits;
           uniqueIds.add(emp.id);
