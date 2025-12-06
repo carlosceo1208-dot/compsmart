@@ -12,6 +12,7 @@ export const useCurrentUserRole = () => {
           isManager: false, 
           isHR: false, 
           isAdmin: false,
+          isSuperAdmin: false,
           unitId: null,
           userId: null
         };
@@ -36,6 +37,7 @@ export const useCurrentUserRole = () => {
         isManager: userRoles.includes('manager'),
         isHR: userRoles.includes('hr_manager'),
         isAdmin: userRoles.includes('admin'),
+        isSuperAdmin: userRoles.includes('super_admin'),
         unitId: profile?.unit_id || null,
         userId: user.id
       };
