@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Loader2, Rocket, TrendingUp, Building2, Crown, LucideIcon } from "lucide-react";
+import { Check, Sparkles, Loader2, Rocket, TrendingUp, Building2, Crown, LucideIcon, Zap, Brain, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ColorClasses {
   gradient: string;
@@ -21,24 +22,26 @@ interface ColorClasses {
 interface PlanConfig {
   name: string;
   description: string;
-  features: string[];
+  features: { text: string; tooltip?: string; isNew?: boolean }[];
   cta: string;
   highlighted: boolean;
   badge?: string;
   icon: LucideIcon;
   colorClasses: ColorClasses;
+  employeeLimit: string;
 }
 
 const planConfigs: Record<string, PlanConfig> = {
   "Starter": {
     name: "Starter",
     description: "Ideal para pequenas empresas começando a organizar remuneração",
+    employeeLimit: "Até 50 funcionários",
     features: [
-      "Até 50 funcionários",
-      "Estrutura básica de cargos",
-      "Dashboards essenciais",
-      "Suporte por email",
-      "2 usuários administradores"
+      { text: "Até 50 funcionários" },
+      { text: "Estrutura básica de cargos" },
+      { text: "Dashboards essenciais" },
+      { text: "Suporte por email" },
+      { text: "2 usuários administradores" }
     ],
     cta: "Começar Grátis",
     highlighted: false,
@@ -58,16 +61,17 @@ const planConfigs: Record<string, PlanConfig> = {
   "Medium": {
     name: "Medium",
     description: "Para empresas que querem crescer com inteligência e compliance",
+    employeeLimit: "Até 200 funcionários",
     badge: "Mais Popular",
     features: [
-      "Até 250 funcionários",
-      "Agentes Inteligentes integrados",
-      "Benchmark de mercado",
-      "Gestão de PLR e incentivos",
-      "Compliance automático",
-      "Relatórios avançados",
-      "5 usuários",
-      "Suporte prioritário"
+      { text: "Até 200 funcionários" },
+      { text: "Agentes Inteligentes IA", tooltip: "3 agentes especializados: Jurídico, Análise Salarial e R&B", isNew: true },
+      { text: "Pesquisa Salarial", tooltip: "Compare salários com dados reais de mercado", isNew: true },
+      { text: "Gestão de PLR e incentivos" },
+      { text: "Compliance automático" },
+      { text: "Relatórios avançados" },
+      { text: "5 usuários" },
+      { text: "Suporte prioritário" }
     ],
     cta: "Começar Teste Grátis",
     highlighted: true,
@@ -87,15 +91,16 @@ const planConfigs: Record<string, PlanConfig> = {
   "Pro": {
     name: "Pro",
     description: "Solução robusta para empresas em expansão que precisam de tudo",
+    employeeLimit: "Até 500 funcionários",
     features: [
-      "Até 500 funcionários",
-      "Tudo do Medium incluído",
-      "Análise de equidade interna",
-      "Simulações de política salarial",
-      "Modelagem preditiva",
-      "Dashboard de riscos trabalhistas",
-      "Usuários ilimitados",
-      "Treinamento online"
+      { text: "Até 500 funcionários" },
+      { text: "Tudo do Medium incluído" },
+      { text: "Análise de equidade interna", tooltip: "Comparações por área, nível, faixa e gênero" },
+      { text: "Simulações de política salarial", tooltip: "Ajuste automático de tabelas salariais", isNew: true },
+      { text: "Modelagem preditiva", tooltip: "Forecast de 12-36 meses", isNew: true },
+      { text: "Dashboard de riscos trabalhistas" },
+      { text: "Usuários ilimitados" },
+      { text: "Treinamento online" }
     ],
     cta: "Começar Teste Grátis",
     highlighted: false,
@@ -115,15 +120,16 @@ const planConfigs: Record<string, PlanConfig> = {
   "Enterprise": {
     name: "Enterprise",
     description: "Solução completa para grandes empresas e consultorias especializadas",
+    employeeLimit: "+500 funcionários",
     features: [
-      "+500 funcionários",
-      "Tudo do Pro incluído",
-      "Consultoria dedicada",
-      "Integrações customizadas",
-      "API e webhooks",
-      "SLA garantido",
-      "Treinamento personalizado",
-      "Gerente de conta"
+      { text: "+500 funcionários" },
+      { text: "Tudo do Pro incluído" },
+      { text: "Consultoria dedicada" },
+      { text: "Integrações customizadas" },
+      { text: "API e webhooks" },
+      { text: "SLA garantido" },
+      { text: "Treinamento personalizado" },
+      { text: "Gerente de conta" }
     ],
     cta: "Falar com Vendas",
     highlighted: false,
@@ -148,12 +154,13 @@ interface PlanData {
   monthlyPrice: number;
   annualPrice: number;
   description: string;
-  features: string[];
+  features: { text: string; tooltip?: string; isNew?: boolean }[];
   cta: string;
   highlighted: boolean;
   badge?: string;
   icon: LucideIcon;
   colorClasses: ColorClasses;
+  employeeLimit: string;
 }
 
 export const PricingSection = () => {
@@ -216,7 +223,8 @@ export const PricingSection = () => {
               cta: "Começar",
               highlighted: false,
               icon: Rocket,
-              colorClasses: planConfigs["Starter"].colorClasses
+              colorClasses: planConfigs["Starter"].colorClasses,
+              employeeLimit: ""
             };
 
             return {
@@ -230,7 +238,8 @@ export const PricingSection = () => {
               highlighted: config.highlighted,
               badge: config.badge,
               icon: config.icon,
-              colorClasses: config.colorClasses
+              colorClasses: config.colorClasses,
+              employeeLimit: config.employeeLimit
             };
           });
 
@@ -281,180 +290,218 @@ export const PricingSection = () => {
   }
 
   return (
-    <section id="pricing" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Planos{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
-                transparentes
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              Escolha o plano ideal para o tamanho e necessidades da sua empresa. Sem custos ocultos.
-            </p>
-
-            {/* Billing Cycle Toggle */}
-            <div className="flex items-center justify-center gap-4">
-              <span className={`text-sm font-medium transition-colors duration-200 ${
-                billingCycle === 'monthly' ? 'text-foreground' : 'text-muted-foreground'
-              }`}>
-                Mensal
-              </span>
-              
-              <button
-                onClick={() => setBillingCycle(prev => prev === 'monthly' ? 'annual' : 'monthly')}
-                className={`
-                  relative w-14 h-7 rounded-full transition-colors duration-300 ease-out
-                  ${billingCycle === 'annual' ? 'bg-primary' : 'bg-muted'}
-                `}
-                aria-label="Alternar ciclo de pagamento"
-              >
-                <span className={`
-                  absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md
-                  transition-transform duration-300 ease-out
-                  ${billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-0'}
-                `} />
-              </button>
-              
-              <span className={`text-sm font-medium transition-colors duration-200 ${
-                billingCycle === 'annual' ? 'text-foreground' : 'text-muted-foreground'
-              }`}>
-                Anual
-              </span>
-              
-              <Badge className="bg-green-500 text-white animate-pulse">
-                Economize 2 meses!
+    <TooltipProvider>
+      <section id="pricing" className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <Badge className="bg-gradient-primary text-white px-4 py-1.5 mb-6 text-sm">
+                <Zap className="h-4 w-4 mr-2" />
+                Preços Atualizados 2026
               </Badge>
-            </div>
-          </div>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                Planos{" "}
+                <span className="bg-gradient-primary bg-clip-text text-transparent">
+                  transparentes
+                </span>
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+                Escolha o plano ideal para o tamanho e necessidades da sua empresa. Sem custos ocultos.
+              </p>
 
-          <div 
-            ref={sectionRef}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
-          >
-            {plans.map((plan, index) => {
-              const IconComponent = plan.icon;
-              const isEnterprise = plan.name === "Enterprise" || plan.monthlyPrice === 0;
-              const savingsPercent = getSavingsPercent(plan);
-
-              return (
-                <Card 
-                  key={plan.id}
-                  style={{
-                    opacity: isVisible ? 1 : 0,
-                    transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
-                    transition: `opacity 0.5s ease-out ${index * 0.15}s, transform 0.5s ease-out ${index * 0.15}s`
-                  }}
+              {/* Billing Cycle Toggle */}
+              <div className="flex items-center justify-center gap-4">
+                <span className={`text-sm font-medium transition-colors duration-200 ${
+                  billingCycle === 'monthly' ? 'text-foreground' : 'text-muted-foreground'
+                }`}>
+                  Mensal
+                </span>
+                
+                <button
+                  onClick={() => setBillingCycle(prev => prev === 'monthly' ? 'annual' : 'monthly')}
                   className={`
-                    relative flex flex-col overflow-visible
-                    transition-all duration-300 ease-out
-                    hover:scale-[1.02]
-                    ${plan.colorClasses.shadow}
-                    ${plan.highlighted 
-                      ? `border-2 ${plan.colorClasses.border} ${plan.colorClasses.gradient} shadow-2xl scale-105 z-10` 
-                      : `border-border ${plan.colorClasses.borderHover} hover:${plan.colorClasses.gradient}`
-                    }
+                    relative w-14 h-7 rounded-full transition-colors duration-300 ease-out
+                    ${billingCycle === 'annual' ? 'bg-primary' : 'bg-muted'}
                   `}
+                  aria-label="Alternar ciclo de pagamento"
                 >
-                  {/* Icon in top right corner */}
-                  <div className={`absolute top-4 right-4 p-2 rounded-full ${plan.colorClasses.iconBg} transition-transform duration-300 hover:scale-110`}>
-                    <IconComponent className={`h-5 w-5 ${plan.colorClasses.iconColor}`} />
-                  </div>
-
-                  {plan.badge && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                      <Badge className={`${plan.colorClasses.button} px-4 py-1.5 animate-pulse shadow-lg`}>
-                        <Sparkles className="h-3 w-3 mr-1 animate-bounce" />
-                        {plan.badge}
-                      </Badge>
-                    </div>
-                  )}
-
-                  <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
-                    <CardTitle className="text-xl">{plan.name}</CardTitle>
-                    <CardDescription className="text-xs min-h-[40px]">
-                      {plan.description}
-                    </CardDescription>
-                    <div className="pt-3">
-                      {/* Annual discount display */}
-                      {billingCycle === 'annual' && !isEnterprise && savingsPercent > 0 && (
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-sm text-muted-foreground line-through">
-                            R$ {(plan.monthlyPrice * 12).toLocaleString('pt-BR')}
-                          </span>
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs">
-                            -{savingsPercent}%
-                          </Badge>
-                        </div>
-                      )}
-                      <span className={`text-3xl font-bold transition-colors duration-200 ${plan.colorClasses.priceColor}`}>
-                        {getDisplayPrice(plan)}
-                      </span>
-                      {!isEnterprise && (
-                        <span className="text-muted-foreground text-sm ml-1">
-                          {billingCycle === 'annual' ? '/ano' : '/mês'}
-                        </span>
-                      )}
-                    </div>
-                  </CardHeader>
-
-                  <CardContent className="flex-grow">
-                    <ul className="space-y-2.5">
-                      {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 group">
-                          <Check className={`h-4 w-4 ${plan.colorClasses.checkColor} flex-shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110`} />
-                          <span className="text-xs">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-
-                  <CardFooter>
-                    <Button 
-                      className={`w-full transition-all duration-200 ${plan.colorClasses.button}`}
-                      size="sm"
-                      onClick={() => {
-                        if (plan.name === "Enterprise") {
-                          window.location.href = 'mailto:vendas@compsmart.com.br?subject=CompSmart Enterprise - Solicitação de Contato';
-                        } else {
-                          navigate(`/checkout?plan=${plan.id}&cycle=${billingCycle}`);
-                        }
-                      }}
-                    >
-                      {plan.cta}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              );
-            })}
-          </div>
-
-          <div className="mt-12 text-center space-y-4">
-            {/* Diferenciais e Integrações */}
-            <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-              <span className="flex items-center gap-2">
-                🏢 <strong>Ideal para PMEs e Grandes Empresas</strong>
-              </span>
-              <span className="flex items-center gap-2">
-                🧩 <strong>Integração com Google Workspace e outros</strong>
-              </span>
-              <span className="flex items-center gap-2">
-                🔁 <strong>Evolução Contínua do Produto</strong>
-              </span>
-              <span className="flex items-center gap-2">
-                🤝 <strong>Suporte Consultivo</strong>
-              </span>
+                  <span className={`
+                    absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md
+                    transition-transform duration-300 ease-out
+                    ${billingCycle === 'annual' ? 'translate-x-7' : 'translate-x-0'}
+                  `} />
+                </button>
+                
+                <span className={`text-sm font-medium transition-colors duration-200 ${
+                  billingCycle === 'annual' ? 'text-foreground' : 'text-muted-foreground'
+                }`}>
+                  Anual
+                </span>
+                
+                <Badge className="bg-green-500 text-white animate-pulse">
+                  Economize 2 meses!
+                </Badge>
+              </div>
             </div>
 
-            {/* Garantias */}
-            <p className="text-sm text-muted-foreground">
-              💳 Sem compromisso • 🔄 Cancele quando quiser • 🎯 Upgrade ou downgrade a qualquer momento
-            </p>
+            <div 
+              ref={sectionRef}
+              className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 pt-8"
+            >
+              {plans.map((plan, index) => {
+                const IconComponent = plan.icon;
+                const isEnterprise = plan.name === "Enterprise" || plan.monthlyPrice === 0;
+                const savingsPercent = getSavingsPercent(plan);
+
+                return (
+                  <Card 
+                    key={plan.id}
+                    style={{
+                      opacity: isVisible ? 1 : 0,
+                      transform: isVisible ? 'translateY(0)' : 'translateY(30px)',
+                      transition: `opacity 0.5s ease-out ${index * 0.15}s, transform 0.5s ease-out ${index * 0.15}s`
+                    }}
+                    className={`
+                      relative flex flex-col overflow-visible
+                      transition-all duration-300 ease-out
+                      hover:scale-[1.02]
+                      ${plan.colorClasses.shadow}
+                      ${plan.highlighted 
+                        ? `border-2 ${plan.colorClasses.border} ${plan.colorClasses.gradient} shadow-2xl scale-105 z-10` 
+                        : `border-border ${plan.colorClasses.borderHover} hover:${plan.colorClasses.gradient}`
+                      }
+                    `}
+                  >
+                    {/* Icon in top right corner */}
+                    <div className={`absolute top-4 right-4 p-2 rounded-full ${plan.colorClasses.iconBg} transition-transform duration-300 hover:scale-110`}>
+                      <IconComponent className={`h-5 w-5 ${plan.colorClasses.iconColor}`} />
+                    </div>
+
+                    {plan.badge && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                        <Badge className={`${plan.colorClasses.button} px-4 py-1.5 animate-pulse shadow-lg`}>
+                          <Sparkles className="h-3 w-3 mr-1 animate-bounce" />
+                          {plan.badge}
+                        </Badge>
+                      </div>
+                    )}
+
+                    <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
+                      <CardTitle className="text-xl">{plan.name}</CardTitle>
+                      <CardDescription className="text-xs min-h-[40px]">
+                        {plan.description}
+                      </CardDescription>
+                      <div className="pt-3">
+                        {/* Annual discount display */}
+                        {billingCycle === 'annual' && !isEnterprise && savingsPercent > 0 && (
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-sm text-muted-foreground line-through">
+                              R$ {(plan.monthlyPrice * 12).toLocaleString('pt-BR')}
+                            </span>
+                            <Badge className="bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300 text-xs">
+                              -{savingsPercent}%
+                            </Badge>
+                          </div>
+                        )}
+                        <span className={`text-3xl font-bold transition-colors duration-200 ${plan.colorClasses.priceColor}`}>
+                          {getDisplayPrice(plan)}
+                        </span>
+                        {!isEnterprise && (
+                          <span className="text-muted-foreground text-sm ml-1">
+                            {billingCycle === 'annual' ? '/ano' : '/mês'}
+                          </span>
+                        )}
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="flex-grow">
+                      <ul className="space-y-2.5">
+                        {plan.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-start gap-2 group">
+                            <Check className={`h-4 w-4 ${plan.colorClasses.checkColor} flex-shrink-0 mt-0.5 transition-transform duration-200 group-hover:scale-110`} />
+                            <div className="flex items-center gap-1.5">
+                              {feature.tooltip ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="text-xs cursor-help underline decoration-dotted underline-offset-2">
+                                      {feature.text}
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p className="max-w-xs">{feature.tooltip}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                <span className="text-xs">{feature.text}</span>
+                              )}
+                              {feature.isNew && (
+                                <Badge className="text-[10px] px-1.5 py-0 bg-primary/10 text-primary border-primary/20">
+                                  Novo!
+                                </Badge>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+
+                    <CardFooter>
+                      <Button 
+                        className={`w-full transition-all duration-200 ${plan.colorClasses.button}`}
+                        size="sm"
+                        onClick={() => {
+                          if (plan.name === "Enterprise") {
+                            window.location.href = 'mailto:vendas@compsmart.com.br?subject=CompSmart Enterprise - Solicitação de Contato';
+                          } else {
+                            navigate(`/checkout?plan=${plan.id}&cycle=${billingCycle}`);
+                          }
+                        }}
+                      >
+                        {plan.cta}
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+
+            <div className="mt-12 text-center space-y-4">
+              {/* Feature highlights */}
+              <div className="flex flex-wrap justify-center gap-4 text-sm">
+                <div className="flex items-center gap-2 bg-primary/5 px-4 py-2 rounded-full">
+                  <Brain className="h-4 w-4 text-primary" />
+                  <span><strong>IA Integrada</strong> em todos os planos pagos</span>
+                </div>
+                <div className="flex items-center gap-2 bg-green-500/5 px-4 py-2 rounded-full">
+                  <Shield className="h-4 w-4 text-green-600" />
+                  <span><strong>LGPD Compliant</strong></span>
+                </div>
+              </div>
+
+              {/* Diferenciais e Integrações */}
+              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  🏢 <strong>Ideal para PMEs e Grandes Empresas</strong>
+                </span>
+                <span className="flex items-center gap-2">
+                  🧩 <strong>Integração com Google Workspace</strong>
+                </span>
+                <span className="flex items-center gap-2">
+                  🔁 <strong>Evolução Contínua</strong>
+                </span>
+                <span className="flex items-center gap-2">
+                  🤝 <strong>Suporte Consultivo</strong>
+                </span>
+              </div>
+
+              {/* Garantias */}
+              <p className="text-sm text-muted-foreground">
+                💳 Sem compromisso • 🔄 Cancele quando quiser • 🎯 Upgrade ou downgrade a qualquer momento
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </TooltipProvider>
   );
 };
