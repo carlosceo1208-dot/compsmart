@@ -1,6 +1,9 @@
 import { ArrowRight, BarChart3, Database, FileText, Settings, TrendingUp } from "lucide-react";
+import { useScrollReveal, getStaggeredStyle } from "@/hooks/useScrollReveal";
 
 export const HowItWorksSection = () => {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+
   const steps = [
     {
       number: "01",
@@ -35,10 +38,17 @@ export const HowItWorksSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-background" ref={ref}>
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div 
+            className="text-center mb-16"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? "translateY(0)" : "translateY(30px)",
+              transition: "opacity 0.6s ease-out, transform 0.6s ease-out",
+            }}
+          >
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               Como{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
@@ -52,11 +62,22 @@ export const HowItWorksSection = () => {
 
           <div className="relative">
             {/* Timeline Line - Desktop */}
-            <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/20 via-primary to-primary/20 -translate-y-1/2" />
+            <div 
+              className="hidden lg:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/20 via-primary to-primary/20 -translate-y-1/2"
+              style={{
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? "scaleX(1)" : "scaleX(0)",
+                transition: "opacity 0.8s ease-out 0.3s, transform 0.8s ease-out 0.3s",
+              }}
+            />
 
             <div className="grid lg:grid-cols-5 gap-8 lg:gap-4 relative">
               {steps.map((step, index) => (
-                <div key={index} className="relative">
+                <div 
+                  key={index} 
+                  className="relative"
+                  style={getStaggeredStyle(isVisible, index, 0.15)}
+                >
                   {/* Step Card */}
                   <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 relative z-10 h-full flex flex-col">
                     {/* Number Badge */}
@@ -87,7 +108,14 @@ export const HowItWorksSection = () => {
             </div>
           </div>
 
-          <div className="mt-12 text-center">
+          <div 
+            className="mt-12 text-center"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? "translateY(0)" : "translateY(20px)",
+              transition: "opacity 0.6s ease-out 0.8s, transform 0.6s ease-out 0.8s",
+            }}
+          >
             <p className="text-sm text-muted-foreground">
               ⚡ Setup completo em menos de <strong>5 minutos</strong> • 📊 Dashboard pronto para uso imediato
             </p>
