@@ -189,7 +189,7 @@ const IncentiveAssistant = () => {
     : undefined;
 
   return (
-    <div className="h-[calc(100vh-8rem)] overflow-auto p-6">
+    <div className="min-h-[calc(100vh-8rem)] p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
@@ -302,7 +302,7 @@ const IncentiveAssistant = () => {
             </Card>
 
             {currentSessionId && conversations.length > 0 && (
-              <Card className="bg-accent/30 border-accent">
+              <Card className="bg-accent/30 border-accent min-h-0">
                 <CardHeader>
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
@@ -310,7 +310,7 @@ const IncentiveAssistant = () => {
                   <div 
                     ref={scrollAreaRef}
                     onScroll={handleScroll}
-                    className="max-h-[600px] overflow-y-auto pr-4 scroll-smooth"
+                    className="max-h-[70vh] overflow-y-auto pr-4 scroll-smooth scrollbar-thin"
                     style={{ scrollbarGutter: 'stable' }}
                   >
                     <div className="space-y-4">
