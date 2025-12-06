@@ -11,6 +11,7 @@ import { ContextBadges } from '@/components/assistant/ContextBadges';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIncentiveAssistantSessions } from '@/hooks/useIncentiveAssistantSessions';
 import { cn } from '@/lib/utils';
 
@@ -301,17 +302,12 @@ const IncentiveAssistant = () => {
             </Card>
 
             {currentSessionId && conversations.length > 0 && (
-              <Card className="bg-accent/30 border-accent flex flex-col max-h-[700px]">
-                <CardHeader className="flex-shrink-0">
+              <Card className="bg-accent/30 border-accent">
+                <CardHeader>
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
-                <CardContent className="relative flex-1 overflow-hidden flex flex-col min-h-0">
-                  <div 
-                    ref={scrollAreaRef}
-                    onScroll={handleScroll}
-                    className="flex-1 overflow-y-auto pr-4 scroll-smooth min-h-0"
-                    style={{ scrollbarGutter: 'stable' }}
-                  >
+                <CardContent className="relative">
+                  <ScrollArea className="h-[500px] pr-4">
                     <div className="space-y-4">
                       {loading && conversations.length > 0 && (
                         <div className="space-y-2 animate-fade-in">
@@ -361,7 +357,7 @@ const IncentiveAssistant = () => {
                       ))}
                       <div ref={messagesEndRef} />
                     </div>
-                  </div>
+                  </ScrollArea>
                   
                   {showScrollButton && (
                     <Button
