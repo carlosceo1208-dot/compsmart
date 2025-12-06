@@ -266,6 +266,7 @@ ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\
       .from('incentive_assistant_conversations')
       .insert({
         user_id: user.id,
+        session_id: session_id || null,
         question,
         answer,
         document_text,
