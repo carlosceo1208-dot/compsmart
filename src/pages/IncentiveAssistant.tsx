@@ -302,15 +302,15 @@ const IncentiveAssistant = () => {
             </Card>
 
             {currentSessionId && conversations.length > 0 && (
-              <Card className="bg-accent/30 border-accent flex flex-col max-h-[700px] overflow-hidden">
+              <Card className="bg-accent/30 border-accent">
                 <CardHeader>
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
-                <CardContent className="relative flex-1 overflow-hidden">
+                <CardContent className="relative">
                   <div 
                     ref={scrollAreaRef}
                     onScroll={handleScroll}
-                    className="h-full overflow-y-auto pr-4 scroll-smooth"
+                    className="max-h-[600px] overflow-y-auto pr-4 scroll-smooth"
                     style={{ scrollbarGutter: 'stable' }}
                   >
                     <div className="space-y-4">
