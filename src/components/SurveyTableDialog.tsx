@@ -5,8 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
+import { AlertTriangle } from "lucide-react";
 
 interface SurveyTableDialogProps {
   open: boolean;
@@ -18,6 +21,7 @@ interface SurveyTableDialogProps {
     effective_year: number;
     is_active: boolean;
     default_amplitude: number | null;
+    root_company_id?: string | null;
   };
   onSuccess: () => void;
 }
@@ -29,12 +33,14 @@ export function SurveyTableDialog({
   onSuccess,
 }: SurveyTableDialogProps) {
   const { toast } = useToast();
+  const { data: userRole } = useCurrentUserRole();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [effectiveMonth, setEffectiveMonth] = useState("1");
   const [effectiveYear, setEffectiveYear] = useState(new Date().getFullYear().toString());
   const [isActive, setIsActive] = useState(false);
   const [defaultAmplitude, setDefaultAmplitude] = useState("");
+  const [isGlobalTemplate, setIsGlobalTemplate] = useState(false);
 
   useEffect(() => {
     if (surveyTable) {
@@ -43,12 +49,14 @@ export function SurveyTableDialog({
       setEffectiveYear(surveyTable.effective_year.toString());
       setIsActive(surveyTable.is_active);
       setDefaultAmplitude(surveyTable.default_amplitude?.toString() || "");
+      setIsGlobalTemplate(surveyTable.root_company_id === null);
     } else {
       setName("");
       setEffectiveMonth("1");
       setEffectiveYear(new Date().getFullYear().toString());
       setIsActive(false);
       setDefaultAmplitude("");
+      setIsGlobalTemplate(false);
     }
   }, [surveyTable, open]);
 
@@ -74,7 +82,24 @@ export function SurveyTableDialog({
 
     setLoading(true);
     try {
-      const data = {
+      // Determine root_company_id
+      let rootCompanyId: string | null = null;
+      
+      if (!isGlobalTemplate || !userRole?.isSuperAdmin) {
+        // Get user's company for non-template surveys
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("root_company_id")
+            .eq("id", user.id)
+            .single();
+          rootCompanyId = profile?.root_company_id || null;
+        }
+      }
+      // If isGlobalTemplate AND isSuperAdmin, rootCompanyId stays null (template)
+
+      const data: any = {
         name: name.trim(),
         effective_month: parseInt(effectiveMonth),
         effective_year: year,
@@ -83,6 +108,11 @@ export function SurveyTableDialog({
       };
 
       if (surveyTable) {
+        // Only update root_company_id if super_admin is changing template status
+        if (userRole?.isSuperAdmin) {
+          data.root_company_id = isGlobalTemplate ? null : rootCompanyId;
+        }
+
         const { error } = await supabase
           .from("survey_tables")
           .update(data)
@@ -95,6 +125,9 @@ export function SurveyTableDialog({
           description: "Pesquisa atualizada com sucesso",
         });
       } else {
+        // For new surveys, always set root_company_id
+        data.root_company_id = isGlobalTemplate && userRole?.isSuperAdmin ? null : rootCompanyId;
+
         const { error } = await supabase
           .from("survey_tables")
           .insert(data);
@@ -103,7 +136,7 @@ export function SurveyTableDialog({
 
         toast({
           title: "Sucesso",
-          description: "Pesquisa criada com sucesso",
+          description: isGlobalTemplate ? "Template CompSmart criado com sucesso" : "Pesquisa criada com sucesso",
         });
       }
 
@@ -121,6 +154,8 @@ export function SurveyTableDialog({
     }
   };
 
+  const isEditingTemplate = surveyTable?.root_company_id === null;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -131,6 +166,15 @@ export function SurveyTableDialog({
         </DialogHeader>
 
         <div className="space-y-4">
+          {isEditingTemplate && !userRole?.isSuperAdmin && (
+            <div className="p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg flex items-start gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Esta é uma pesquisa template CompSmart. Apenas super administradores podem editá-la.
+              </p>
+            </div>
+          )}
+
           <div>
             <Label htmlFor="name">Nome da Pesquisa</Label>
             <Input
@@ -138,13 +182,18 @@ export function SurveyTableDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: Pesquisa Agronegócio 2024"
+              disabled={isEditingTemplate && !userRole?.isSuperAdmin}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="month">Mês de Vigência</Label>
-              <Select value={effectiveMonth} onValueChange={setEffectiveMonth}>
+              <Select 
+                value={effectiveMonth} 
+                onValueChange={setEffectiveMonth}
+                disabled={isEditingTemplate && !userRole?.isSuperAdmin}
+              >
                 <SelectTrigger id="month">
                   <SelectValue />
                 </SelectTrigger>
@@ -170,6 +219,7 @@ export function SurveyTableDialog({
                 onChange={(e) => setEffectiveYear(e.target.value)}
                 min="2000"
                 max="2100"
+                disabled={isEditingTemplate && !userRole?.isSuperAdmin}
               />
             </div>
           </div>
@@ -183,6 +233,7 @@ export function SurveyTableDialog({
               onChange={(e) => setDefaultAmplitude(e.target.value)}
               placeholder="Ex: 45 (opcional)"
               step="0.01"
+              disabled={isEditingTemplate && !userRole?.isSuperAdmin}
             />
             <p className="text-xs text-muted-foreground mt-1">
               Será sugerida ao adicionar novos cargos no modo automático
@@ -195,15 +246,40 @@ export function SurveyTableDialog({
               id="active"
               checked={isActive}
               onCheckedChange={setIsActive}
+              disabled={isEditingTemplate && !userRole?.isSuperAdmin}
             />
           </div>
+
+          {/* Super admin only: create as global template */}
+          {userRole?.isSuperAdmin && (
+            <div className="pt-2 border-t">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="globalTemplate"
+                  checked={isGlobalTemplate}
+                  onCheckedChange={(checked) => setIsGlobalTemplate(checked === true)}
+                />
+                <div className="space-y-1">
+                  <Label htmlFor="globalTemplate" className="text-sm font-medium cursor-pointer">
+                    Criar como Template Global CompSmart
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Templates globais ficam disponíveis para todas as empresas copiarem
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={loading || (isEditingTemplate && !userRole?.isSuperAdmin)}
+          >
             {loading ? "Salvando..." : "Salvar"}
           </Button>
         </DialogFooter>
