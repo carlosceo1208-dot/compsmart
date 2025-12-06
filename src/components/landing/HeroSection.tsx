@@ -1,8 +1,8 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog";
-import { ArrowRight, Sparkles, Play, X, Shield, Lock, ShieldCheck, MapPin } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ArrowRight, Sparkles, Play, X, Shield, Lock, ShieldCheck, MapPin, Calendar, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface TrailParticle {
@@ -17,8 +17,36 @@ export const HeroSection = () => {
   const navigate = useNavigate();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [trailParticles, setTrailParticles] = useState<TrailParticle[]>([]);
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const particleIdRef = useRef(0);
   const playButtonRef = useRef<HTMLDivElement>(null);
+  
+  // Video URL - será substituído pelo upload direto em 08/12
+  const videoUrl = ""; // Deixar vazio até o vídeo ser carregado
+  const hasVideo = Boolean(videoUrl);
+
+  // Countdown to January 2026
+  useEffect(() => {
+    const targetDate = new Date('2026-01-01T00:00:00').getTime();
+    
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+      
+      if (difference > 0) {
+        setCountdown({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((difference % (1000 * 60)) / 1000)
+        });
+      }
+    };
+    
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!playButtonRef.current) return;
@@ -48,7 +76,6 @@ export const HeroSection = () => {
 
   const handleMouseLeave = useCallback(() => {
     // Optionally clear all particles immediately on leave
-    // setTrailParticles([]);
   }, []);
 
   return (
@@ -74,6 +101,41 @@ export const HeroSection = () => {
               <Sparkles className="h-4 w-4" />
               Lançamento Janeiro 2026
             </Badge>
+            <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Vídeo Institucional em Breve
+            </Badge>
+          </div>
+
+          {/* Countdown Timer */}
+          <div className="flex items-center justify-center gap-4 animate-fade-in-down" style={{ animationDelay: "0.05s" }}>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                {countdown.days}
+              </div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider">Dias</div>
+            </div>
+            <span className="text-2xl text-muted-foreground">:</span>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                {countdown.hours.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider">Horas</div>
+            </div>
+            <span className="text-2xl text-muted-foreground">:</span>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                {countdown.minutes.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider">Min</div>
+            </div>
+            <span className="text-2xl text-muted-foreground">:</span>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                {countdown.seconds.toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-muted-foreground uppercase tracking-wider">Seg</div>
+            </div>
           </div>
 
           {/* Headline - Animated Entry with Gradient Shift */}
@@ -99,7 +161,7 @@ export const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
             <Button 
               size="lg"
-              className="bg-gradient-primary hover:opacity-90 hover:shadow-primary hover:scale-105 text-lg px-8 shadow-lg w-full sm:w-auto transition-all duration-300 will-change-transform"
+              className="bg-gradient-primary hover:opacity-90 hover:shadow-primary hover:scale-105 text-lg px-8 shadow-lg w-full sm:w-auto transition-all duration-300 will-change-transform group"
               onClick={() => navigate("/auth")}
             >
               Começar Grátis
@@ -111,7 +173,7 @@ export const HeroSection = () => {
               className="glass-effect hover:bg-primary/10 hover:scale-105 text-lg px-8 w-full sm:w-auto transition-all duration-300 will-change-transform"
               onClick={() => navigate("/auth")}
             >
-              Ver Demonstração
+              Seja Empresa Pioneira
             </Button>
           </div>
 
@@ -160,8 +222,9 @@ export const HeroSection = () => {
                       
                       {/* Play Button com rings */}
                       <button 
-                        onClick={() => setIsVideoOpen(true)}
-                        className="group relative w-24 h-24 flex items-center justify-center pointer-events-auto z-10"
+                        onClick={() => hasVideo && setIsVideoOpen(true)}
+                        className={`group relative w-24 h-24 flex items-center justify-center pointer-events-auto z-10 ${!hasVideo ? 'cursor-default' : ''}`}
+                        disabled={!hasVideo}
                       >
                         {/* Outer glow ring */}
                         <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping" style={{ animationDuration: "2s" }} />
@@ -169,9 +232,16 @@ export const HeroSection = () => {
                         {/* Middle pulse ring */}
                         <div className="absolute inset-2 rounded-full bg-secondary/30 animate-ping" style={{ animationDuration: "2.5s", animationDelay: "0.5s" }} />
                         
-                        {/* Play button */}
-                        <div className="relative w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(155,89,182,0.5)] hover:shadow-[0_0_60px_rgba(155,89,182,0.7)] hover:scale-110 transition-all duration-300">
-                          <Play className="h-8 w-8 text-white ml-1 group-hover:scale-110 transition-transform" fill="white" />
+                        {/* Play button ou Upload icon */}
+                        <div className={`relative w-20 h-20 ${hasVideo ? 'bg-gradient-primary' : 'bg-gradient-to-br from-slate-600 to-slate-700'} rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(155,89,182,0.5)] hover:shadow-[0_0_60px_rgba(155,89,182,0.7)] hover:scale-110 transition-all duration-300`}>
+                          {hasVideo ? (
+                            <Play className="h-8 w-8 text-white ml-1 group-hover:scale-110 transition-transform" fill="white" />
+                          ) : (
+                            <div className="flex flex-col items-center">
+                              <Upload className="h-6 w-6 text-white/70" />
+                              <span className="text-[8px] text-white/50 mt-1">08/12</span>
+                            </div>
+                          )}
                         </div>
                       </button>
                     </div>
@@ -179,8 +249,12 @@ export const HeroSection = () => {
                   
                   {/* Text below */}
                   <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-                    <p className="text-white/90 text-sm font-medium">Conheça o CompSmart em 2 minutos</p>
-                    <p className="text-white/60 text-xs mt-1">🎬 Vídeo institucional</p>
+                    <p className="text-white/90 text-sm font-medium">
+                      {hasVideo ? 'Conheça o CompSmart em 2 minutos' : 'CEO e Head de RH apresentam o CompSmart'}
+                    </p>
+                    <p className="text-white/60 text-xs mt-1">
+                      {hasVideo ? '🎬 Vídeo institucional' : '🎬 Vídeo disponível em 08/12'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -188,19 +262,19 @@ export const HeroSection = () => {
 
             {/* Security Badges */}
             <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-              <Badge className="bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/20 px-4 py-2">
+              <Badge className="bg-green-500/10 text-green-600 border-green-500/20 hover:bg-green-500/20 px-4 py-2 transition-all hover:scale-105">
                 <ShieldCheck className="h-4 w-4 mr-2" />
                 LGPD Compliant
               </Badge>
-              <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20 px-4 py-2">
+              <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/20 px-4 py-2 transition-all hover:scale-105">
                 <Lock className="h-4 w-4 mr-2" />
                 Criptografia Ponta-a-Ponta
               </Badge>
-              <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 hover:bg-yellow-500/20 px-4 py-2">
+              <Badge className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 hover:bg-yellow-500/20 px-4 py-2 transition-all hover:scale-105">
                 <MapPin className="h-4 w-4 mr-2" />
                 100% Brasileiro
               </Badge>
-              <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 hover:bg-purple-500/20 px-4 py-2">
+              <Badge className="bg-purple-500/10 text-purple-600 border-purple-500/20 hover:bg-purple-500/20 px-4 py-2 transition-all hover:scale-105">
                 <Shield className="h-4 w-4 mr-2" />
                 Segurança Corporativa
               </Badge>
@@ -209,7 +283,7 @@ export const HeroSection = () => {
 
           {/* Trust Badge - Animated Entry */}
           <p className="text-sm text-muted-foreground pt-6 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-            ✓ Sem cartão de crédito • ✓ Setup em 5 minutos
+            ✓ Sem cartão de crédito • ✓ Setup em 5 minutos • ✓ Suporte em português
           </p>
         </div>
       </div>
@@ -217,7 +291,7 @@ export const HeroSection = () => {
       {/* Bottom Gradient Overlay */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
 
-      {/* Video Modal */}
+      {/* Video Modal - Preparado para upload direto */}
       <Dialog open={isVideoOpen} onOpenChange={setIsVideoOpen}>
         <DialogContent className="max-w-5xl w-[95vw] p-0 bg-transparent border-none shadow-none">
           {/* Close button */}
@@ -228,16 +302,18 @@ export const HeroSection = () => {
             <X className="h-6 w-6 text-white" />
           </button>
           
-          {/* Video container com autoplay */}
+          {/* Video container - Preparado para vídeo direto (MP4/WebM) */}
           <div className="relative aspect-video rounded-xl overflow-hidden bg-black shadow-2xl">
-            {isVideoOpen && (
-              <iframe 
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0&modestbranding=1"
-                title="CompSmart - Vídeo Institucional"
+            {isVideoOpen && hasVideo && (
+              <video 
+                src={videoUrl}
                 className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+                controls
+                autoPlay
+                playsInline
+              >
+                Seu navegador não suporta vídeos HTML5.
+              </video>
             )}
           </div>
         </DialogContent>
