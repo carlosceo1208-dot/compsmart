@@ -284,6 +284,7 @@ Responda de forma clara, estruturada e sempre baseada nos dados fornecidos.`;
     // Salvar conversa
     await supabase.from('salary_assistant_conversations').insert({
       user_id: user.id,
+      session_id: session_id || null,
       question,
       answer,
       context_data: contextData,
