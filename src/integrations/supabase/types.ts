@@ -2826,7 +2826,7 @@ export type Database = {
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "hr_manager" | "manager" | "employee"
+      app_role: "admin" | "hr_manager" | "manager" | "employee" | "super_admin"
       calculation_mode: "manual" | "automatic"
       proficiency_level: "basic" | "intermediate" | "advanced" | "expert"
       user_status: "active" | "inactive"
@@ -2957,7 +2957,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "hr_manager", "manager", "employee"],
+      app_role: ["admin", "hr_manager", "manager", "employee", "super_admin"],
       calculation_mode: ["manual", "automatic"],
       proficiency_level: ["basic", "intermediate", "advanced", "expert"],
       user_status: ["active", "inactive"],
