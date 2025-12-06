@@ -323,15 +323,15 @@ const LegalAssistant = () => {
             </Card>
 
             {currentSessionId && conversations.length > 0 && (
-              <Card className="bg-accent/30 border-accent min-h-0">
+              <Card className="bg-accent/30 border-accent overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
-                <CardContent className="relative">
+                <CardContent className="relative p-0">
                   <div 
                     ref={scrollAreaRef}
                     onScroll={handleScroll}
-                    className="max-h-[70vh] overflow-y-auto pr-4 scroll-smooth scrollbar-thin"
+                    className="max-h-[500px] overflow-y-auto px-6 pb-6 scroll-smooth scrollbar-thin"
                     style={{ scrollbarGutter: 'stable' }}
                   >
                     <div className="space-y-4">
