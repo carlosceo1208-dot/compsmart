@@ -118,6 +118,46 @@ export default {
             transform: "translateY(0)",
           },
         },
+        "scroll-fade-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(40px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "scroll-fade-left": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(-40px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        "scroll-fade-right": {
+          "0%": {
+            opacity: "0",
+            transform: "translateX(40px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        "scroll-zoom-in": {
+          "0%": {
+            opacity: "0",
+            transform: "scale(0.9)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+        },
         "fade-in-down": {
           "0%": {
             opacity: "0",
@@ -227,6 +267,10 @@ export default {
         "particle-sparkle": "particle-sparkle 2s ease-in-out infinite",
         "particle-pulse": "particle-pulse 3s ease-in-out infinite",
         "particle-trail": "particle-trail 1s ease-out forwards",
+        "scroll-fade-up": "scroll-fade-up 0.6s ease-out forwards",
+        "scroll-fade-left": "scroll-fade-left 0.6s ease-out forwards",
+        "scroll-fade-right": "scroll-fade-right 0.6s ease-out forwards",
+        "scroll-zoom-in": "scroll-zoom-in 0.5s ease-out forwards",
       },
     },
   },

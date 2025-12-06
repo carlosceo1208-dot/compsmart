@@ -5,8 +5,11 @@ import { Bot, Briefcase, FileText, Sparkles, Clock, TrendingUp, Shield, Zap } fr
 import avatarWoman2 from "@/assets/avatar-woman-2.png";
 import avatarMan1 from "@/assets/avatar-man-1.png";
 import avatarWoman1 from "@/assets/avatar-woman-1.png";
+import { useScrollReveal, getStaggeredStyle } from "@/hooks/useScrollReveal";
 
 export const SmartAgentsSection = () => {
+  const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
+
   const agents = [
     {
       icon: FileText,
@@ -47,7 +50,7 @@ export const SmartAgentsSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-background relative overflow-hidden" ref={ref}>
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       <div className="absolute top-1/4 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
@@ -55,7 +58,14 @@ export const SmartAgentsSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+          <div 
+            className="text-center mb-16"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? "translateY(0)" : "translateY(30px)",
+              transition: "opacity 0.6s ease-out, transform 0.6s ease-out",
+            }}
+          >
             <Badge className="bg-gradient-primary text-white px-4 py-1.5 mb-6 text-sm">
               <Sparkles className="h-4 w-4 mr-2" />
               Diferencial Tecnológico
@@ -76,6 +86,7 @@ export const SmartAgentsSection = () => {
               <Card 
                 key={index} 
                 className="relative overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-primary/20 hover:border-primary/40 bg-background/80 backdrop-blur-sm group"
+                style={getStaggeredStyle(isVisible, index, 0.15)}
               >
                 {/* Gradient Overlay */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-primary opacity-10 rounded-full blur-2xl group-hover:opacity-20 transition-opacity" />
@@ -134,7 +145,14 @@ export const SmartAgentsSection = () => {
             ))}
           </div>
 
-          <div className="mt-12 text-center space-y-4">
+          <div 
+            className="mt-12 text-center space-y-4"
+            style={{
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? "translateY(0)" : "translateY(20px)",
+              transition: "opacity 0.6s ease-out 0.6s, transform 0.6s ease-out 0.6s",
+            }}
+          >
             <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
               <span className="flex items-center gap-2 hover:text-foreground transition-colors">
                 🔒 <strong>Segurança Corporativa</strong>
