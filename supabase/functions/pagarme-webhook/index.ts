@@ -15,10 +15,20 @@ serve(async (req) => {
     const webhookSecret = Deno.env.get('PAGARME_WEBHOOK_SECRET');
     const signature = req.headers.get('x-hub-signature');
 
-    // Validar assinatura do webhook
-    if (webhookSecret && signature) {
-      // Pagar.me usa HMAC SHA256 para assinatura
-      const body = await req.text();
+    // SECURITY: Verify webhook secret is configured
+    if (!webhookSecret) {
+      console.error('CRITICAL: PAGARME_WEBHOOK_SECRET not configured');
+      return new Response(JSON.stringify({ error: 'Webhook not configured' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Read body for signature validation
+    const body = await req.text();
+
+    // SECURITY: Validate webhook signature - REJECT if invalid
+    if (signature) {
       const encoder = new TextEncoder();
       const key = await crypto.subtle.importKey(
         'raw',
@@ -33,17 +43,28 @@ serve(async (req) => {
         .join('');
 
       if (signature !== computedSignature) {
-        console.warn('Invalid webhook signature');
-        // Em produção, retornar 401. Por enquanto, log apenas.
+        console.error('SECURITY: Invalid webhook signature detected', {
+          timestamp: new Date().toISOString(),
+          signatureLength: signature?.length
+        });
+        return new Response(JSON.stringify({ error: 'Invalid signature' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
-
-      // Parse o body novamente
-      var event = JSON.parse(body);
     } else {
-      event = await req.json();
+      // SECURITY: Reject requests without signature
+      console.error('SECURITY: Missing webhook signature');
+      return new Response(JSON.stringify({ error: 'Missing signature' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    console.log('Webhook event received:', JSON.stringify(event, null, 2));
+    // Parse the validated body
+    const event = JSON.parse(body);
+
+    console.log('Webhook event received:', event.type);
 
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

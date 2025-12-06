@@ -1,10 +1,10 @@
 project_id = "fpkjkqdfufhhicxkyqdw"
 
 [functions.suggest-job-competencies]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-job-description]
-verify_jwt = false
+verify_jwt = true
 
 [functions.legal-assistant]
 verify_jwt = true
@@ -37,4 +37,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.send-budget-deadline-reminder]
+verify_jwt = false
+
+[functions.activate-employee]
 verify_jwt = false
