@@ -11,7 +11,7 @@ import { ContextBadges } from '@/components/assistant/ContextBadges';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { useIncentiveAssistantSessions } from '@/hooks/useIncentiveAssistantSessions';
 import { cn } from '@/lib/utils';
 
@@ -307,7 +307,12 @@ const IncentiveAssistant = () => {
                   <CardTitle className="text-lg">Conversa Atual</CardTitle>
                 </CardHeader>
                 <CardContent className="relative">
-                  <ScrollArea className="h-[500px] pr-4">
+                  <div 
+                    ref={scrollAreaRef}
+                    onScroll={handleScroll}
+                    className="max-h-[600px] overflow-y-auto pr-4 scroll-smooth"
+                    style={{ scrollbarGutter: 'stable' }}
+                  >
                     <div className="space-y-4">
                       {loading && conversations.length > 0 && (
                         <div className="space-y-2 animate-fade-in">
@@ -357,7 +362,7 @@ const IncentiveAssistant = () => {
                       ))}
                       <div ref={messagesEndRef} />
                     </div>
-                  </ScrollArea>
+                  </div>
                   
                   {showScrollButton && (
                     <Button
