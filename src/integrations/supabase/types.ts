@@ -2477,6 +2477,7 @@ export type Database = {
           id: string
           is_active: boolean
           name: string
+          root_company_id: string | null
           updated_at: string
         }
         Insert: {
@@ -2487,6 +2488,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           name: string
+          root_company_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -2497,9 +2499,18 @@ export type Database = {
           id?: string
           is_active?: boolean
           name?: string
+          root_company_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "survey_tables_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       system_labels: {
         Row: {
@@ -2800,6 +2811,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id?: string }; Returns: boolean }
       manage_user_roles: {
         Args: {
           p_roles: Database["public"]["Enums"]["app_role"][]

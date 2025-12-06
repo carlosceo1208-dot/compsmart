@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Shield, Loader2, Save } from "lucide-react";
+import { Shield, Loader2, Save, Crown } from "lucide-react";
 
 interface Permission {
   id: string;
@@ -21,25 +21,35 @@ interface RolePermission {
 }
 
 const roleInfo = {
+  super_admin: {
+    label: "Super Administrador",
+    description: "Acesso global à plataforma CompSmart, gerencia templates, landing page e configurações do sistema",
+    color: "bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30",
+    icon: "crown",
+  },
   admin: {
     label: "Administrador",
-    description: "Acesso total ao sistema, incluindo gestão de usuários e configurações",
+    description: "Acesso total ao sistema da empresa, incluindo gestão de usuários e configurações",
     color: "bg-destructive/10 text-destructive border-destructive/20",
+    icon: "shield",
   },
   hr_manager: {
     label: "Gestor de RH",
     description: "Gerencia usuários, estrutura organizacional e dados de remuneração",
     color: "bg-primary/10 text-primary border-primary/20",
+    icon: "shield",
   },
   manager: {
     label: "Gestor",
     description: "Visualiza e gerencia dados de sua equipe",
     color: "bg-warning/10 text-warning border-warning/20",
+    icon: "shield",
   },
   employee: {
     label: "Colaborador",
     description: "Acesso limitado aos próprios dados",
     color: "bg-success/10 text-success border-success/20",
+    icon: "shield",
   },
 };
 
@@ -68,7 +78,7 @@ const Roles = () => {
     setCurrentUserRoles(roles?.map((r: any) => r.role) || []);
   };
 
-  const isAdmin = () => currentUserRoles.includes("admin");
+  const isAdmin = () => currentUserRoles.includes("admin") || currentUserRoles.includes("super_admin");
 
   const fetchData = async () => {
     try {
@@ -206,10 +216,14 @@ const Roles = () => {
         {Object.entries(roleInfo).map(([role, info]) => (
           <Card key={role}>
             <CardHeader>
-              <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Shield className="w-5 h-5 text-primary" />
+                  <div className={`p-2 rounded-lg ${role === 'super_admin' ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20' : 'bg-primary/10'}`}>
+                    {role === 'super_admin' ? (
+                      <Crown className="w-5 h-5 text-purple-600" />
+                    ) : (
+                      <Shield className="w-5 h-5 text-primary" />
+                    )}
                   </div>
                   <div>
                     <CardTitle className="text-xl">{info.label}</CardTitle>
