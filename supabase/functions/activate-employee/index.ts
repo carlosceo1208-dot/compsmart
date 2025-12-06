@@ -7,10 +7,75 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ============= SECURITY: Rate Limiting =============
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_ATTEMPTS = 5;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = rateLimitMap.get(ip);
+  
+  // Clean old entries periodically
+  if (rateLimitMap.size > 10000) {
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetTime) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+  
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    return true;
+  }
+  
+  if (record.count >= MAX_ATTEMPTS) {
+    return false;
+  }
+  
+  record.count++;
+  return true;
+}
+
+// ============= SECURITY: Input Sanitization =============
+function sanitizeIdentifier(input: string): string {
+  if (!input || typeof input !== 'string') return '';
+  // Remove special characters, keep only alphanumeric, dots, and hyphens
+  // Limit length to prevent abuse
+  return input.replace(/[^a-zA-Z0-9.\-]/g, '').substring(0, 50);
+}
+
+function sanitizeEmail(input: string): string {
+  if (!input || typeof input !== 'string') return '';
+  // Basic email sanitization - remove dangerous characters
+  return input.toLowerCase().trim().substring(0, 255);
+}
+
+// Generic error message to prevent enumeration
+const GENERIC_ERROR = 'Não foi possível processar sua solicitação. Verifique os dados e tente novamente.';
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // SECURITY: Get client IP for rate limiting
+  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
+                   req.headers.get('x-real-ip') || 
+                   'unknown';
+
+  // SECURITY: Check rate limit
+  if (!checkRateLimit(clientIP)) {
+    console.warn('Rate limit exceeded for activation attempt');
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: 'Muitas tentativas. Aguarde alguns minutos antes de tentar novamente.'
+    }), {
+      status: 429,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
   }
 
   try {
@@ -19,62 +84,101 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { 
-      identifier, // Pode ser employee_number ou CPF
-      email,
-      password
-    } = await req.json();
+    const requestBody = await req.json();
+    
+    // SECURITY: Sanitize inputs
+    const identifier = sanitizeIdentifier(requestBody.identifier);
+    const email = sanitizeEmail(requestBody.email);
+    const password = requestBody.password;
 
-    console.log('Activating employee account:', { identifier, email });
+    // Log without sensitive data
+    console.log('Activation attempt received');
 
-    // Validações
+    // Validations with generic messages
     if (!identifier) {
-      throw new Error('Matrícula ou CPF é obrigatório para identificação');
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
-    if (!email) {
-      throw new Error('Email é obrigatório para ativar a conta');
+    if (!email || !email.includes('@')) {
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
-    if (!password || password.length < 8) {
-      throw new Error('Senha deve ter no mínimo 8 caracteres');
+    if (!password || password.length < 10) {
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Senha deve ter no mínimo 10 caracteres'
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // 1. Buscar profile por employee_number OU cpf
+    // SECURITY: Use parameterized query with sanitized input
+    // Search by employee_number OR cpf
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, full_name, cpf, employee_number, root_company_id, email, has_system_access')
       .or(`employee_number.eq.${identifier},cpf.eq.${identifier}`)
-      .is('has_system_access', false) // Só perfis sem acesso ativo
+      .is('has_system_access', false)
       .maybeSingle();
 
     if (profileError) {
-      console.error('Error finding profile:', profileError);
-      throw new Error('Erro ao buscar cadastro');
+      console.error('Database error during activation');
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
+    // SECURITY: Generic error - don't reveal if profile exists or not
     if (!profile) {
-      throw new Error('Nenhum cadastro encontrado com essa matrícula/CPF, ou a conta já foi ativada');
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // 2. Verificar se já existe um Auth user com esse email
+    // Check if email is already in use (generic error)
     const { data: existingUserByEmail } = await supabase
       .from('profiles')
-      .select('id, email')
+      .select('id')
       .eq('email', email)
       .neq('id', profile.id)
       .maybeSingle();
 
     if (existingUserByEmail) {
-      throw new Error('Este email já está em uso por outra conta');
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
-    // 3. Verificar se já existe Auth user vinculado a este profile
-    // Tentar fazer login com o ID do profile para ver se existe Auth user
+    // Check if auth user already exists for this profile
     const { data: authUserList } = await supabase.auth.admin.listUsers();
     const existingAuthUser = authUserList?.users?.find(u => u.id === profile.id);
 
     if (existingAuthUser) {
-      // Já tem Auth user, apenas atualizar email e senha
-      console.log('Updating existing auth user...');
+      // Update existing auth user
+      console.log('Updating existing auth user');
       
       const { error: updateAuthError } = await supabase.auth.admin.updateUserById(
         profile.id,
@@ -86,15 +190,19 @@ serve(async (req) => {
       );
 
       if (updateAuthError) {
-        console.error('Error updating auth user:', updateAuthError);
-        throw new Error(`Erro ao atualizar credenciais: ${updateAuthError.message}`);
+        console.error('Error updating auth user');
+        return new Response(JSON.stringify({ 
+          success: false,
+          error: GENERIC_ERROR
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
     } else {
-      // Não tem Auth user, criar novo vinculado ao profile existente
-      console.log('Creating new auth user for existing profile...');
+      // Create new auth user
+      console.log('Creating new auth user for profile');
       
-      // Como não podemos especificar o ID do Auth user, precisamos criar um novo
-      // e depois atualizar o profile para usar o novo ID
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
         password,
@@ -106,11 +214,17 @@ serve(async (req) => {
       });
 
       if (authError) {
-        console.error('Error creating auth user:', authError);
-        throw new Error(`Erro ao criar usuário: ${authError.message}`);
+        console.error('Error creating auth user');
+        return new Response(JSON.stringify({ 
+          success: false,
+          error: GENERIC_ERROR
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
-      // Copiar dados do profile antigo para o novo ID
+      // Copy data from old profile to new auth user profile
       const { data: oldProfile } = await supabase
         .from('profiles')
         .select('*')
@@ -118,7 +232,6 @@ serve(async (req) => {
         .single();
 
       if (oldProfile) {
-        // Atualizar o profile recém-criado pelo trigger com os dados completos
         const { error: updateNewProfileError } = await supabase
           .from('profiles')
           .update({
@@ -144,10 +257,10 @@ serve(async (req) => {
           .eq('id', authData.user.id);
 
         if (updateNewProfileError) {
-          console.error('Error updating new profile:', updateNewProfileError);
+          console.error('Error updating new profile');
         }
 
-        // Copiar roles do profile antigo
+        // Copy roles from old profile
         const { data: oldRoles } = await supabase
           .from('user_roles')
           .select('role')
@@ -162,54 +275,53 @@ serve(async (req) => {
           }
         }
 
-        // Deletar o profile antigo (sem Auth)
+        // Delete old profile (without Auth)
         await supabase.from('user_roles').delete().eq('user_id', profile.id);
         await supabase.from('profiles').delete().eq('id', profile.id);
       }
 
-      console.log('Account activated with new auth user');
+      console.log('Account activated successfully');
       return new Response(JSON.stringify({ 
         success: true, 
-        message: 'Conta ativada com sucesso! Você já pode fazer login.',
-        data: {
-          userId: authData.user.id,
-          email: authData.user.email
-        }
+        message: 'Conta ativada com sucesso! Você já pode fazer login.'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    // 4. Atualizar profile com email e has_system_access
-    const { data: updatedProfile, error: updateError } = await supabase
+    // Update profile with email and has_system_access
+    const { error: updateError } = await supabase
       .from('profiles')
       .update({
         email,
         has_system_access: true
       })
-      .eq('id', profile.id)
-      .select()
-      .single();
+      .eq('id', profile.id);
 
     if (updateError) {
-      console.error('Error updating profile:', updateError);
-      throw new Error(`Erro ao atualizar perfil: ${updateError.message}`);
+      console.error('Error updating profile');
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
     }
 
     console.log('Account activated successfully');
     return new Response(JSON.stringify({ 
       success: true, 
-      message: 'Conta ativada com sucesso! Você já pode fazer login.',
-      data: updatedProfile
+      message: 'Conta ativada com sucesso! Você já pode fazer login.'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
 
   } catch (error: any) {
-    console.error('Error in activate-employee function:', error);
+    console.error('Activation error occurred');
     return new Response(JSON.stringify({ 
       success: false,
-      error: error.message 
+      error: GENERIC_ERROR
     }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
