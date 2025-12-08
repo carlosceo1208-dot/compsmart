@@ -53,7 +53,7 @@ export const AssistantConversationCard = ({
         <div
           ref={scrollContainerRef}
           onScroll={handleScroll}
-          className="max-h-[500px] overflow-y-auto overscroll-contain px-6 pb-6 scroll-smooth"
+          className="max-h-[600px] overflow-y-auto overscroll-contain px-6 pb-6 scroll-smooth"
           style={{ scrollbarGutter: 'stable' }}
         >
           <div className="space-y-4">

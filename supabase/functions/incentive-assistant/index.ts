@@ -238,7 +238,7 @@ ${document_text ? `\n## DOCUMENTO ANEXADO PARA ANÁLISE\nNome: ${document_name}\
           { role: 'user', content: enhancedQuestion || question }
         ],
         temperature: 0.7,
-        max_tokens: 2500,
+        max_tokens: 8000,
       }),
     });
 

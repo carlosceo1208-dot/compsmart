@@ -267,6 +267,7 @@ Responda de forma clara, estruturada e sempre baseada nos dados fornecidos.`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: question + (document_text ? `\n\n---DOCUMENTO ANEXADO---\n${document_text}` : '') },
         ],
+        max_tokens: 8000,
       }),
     });
 
