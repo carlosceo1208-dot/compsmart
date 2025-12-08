@@ -105,8 +105,10 @@ export default function Settings() {
   const isAdmin = userRole?.isAdmin || false;
   const isSuperAdmin = userRole?.isSuperAdmin || false;
 
-  // Plano de teste R$ 1,00
+  // Plano de teste R$ 1,00 (PIX, Crédito, Débito)
   const TEST_PLAN_ID = 'e486df57-48cf-4ac1-968e-fd26aff0df83';
+  // Plano de teste R$ 5,00 (Boleto - valor mínimo exigido por bancos)
+  const BOLETO_TEST_PLAN_ID = 'cdd92cbb-d800-4306-b88a-e47ef43fe3a5';
 
   const paymentTestButtons = [
     {
@@ -116,6 +118,8 @@ export default function Settings() {
       icon: QrCode,
       color: 'text-green-600',
       bgColor: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+      planId: TEST_PLAN_ID,
+      amount: 'R$ 1,00',
     },
     {
       method: 'credit_card',
@@ -124,6 +128,8 @@ export default function Settings() {
       icon: CreditCard,
       color: 'text-violet-600',
       bgColor: 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800',
+      planId: TEST_PLAN_ID,
+      amount: 'R$ 1,00',
     },
     {
       method: 'debit_card',
@@ -132,14 +138,18 @@ export default function Settings() {
       icon: Wallet,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
+      planId: TEST_PLAN_ID,
+      amount: 'R$ 1,00',
     },
     {
       method: 'boleto',
       label: 'Testar Boleto',
-      description: 'Vencimento em 3 dias',
+      description: 'Vencimento em 3 dias (mín R$5)',
       icon: Landmark,
       color: 'text-amber-600',
       bgColor: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800',
+      planId: BOLETO_TEST_PLAN_ID,
+      amount: 'R$ 5,00',
     },
   ];
 
@@ -228,7 +238,7 @@ export default function Settings() {
               {paymentTestButtons.map((btn) => (
                 <Link
                   key={btn.method}
-                  to={`/checkout?plan=${TEST_PLAN_ID}&cycle=monthly&method=${btn.method}`}
+                  to={`/checkout?plan=${btn.planId}&cycle=monthly&method=${btn.method}`}
                   className={`flex flex-col items-center gap-2 p-4 rounded-lg border ${btn.bgColor} hover:scale-105 transition-all duration-200`}
                 >
                   <btn.icon className={`h-8 w-8 ${btn.color}`} />
@@ -237,7 +247,7 @@ export default function Settings() {
                     {btn.description}
                   </p>
                   <Badge variant="secondary" className="text-xs">
-                    R$ 1,00
+                    {btn.amount}
                   </Badge>
                 </Link>
               ))}
