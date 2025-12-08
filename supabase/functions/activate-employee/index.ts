@@ -38,18 +38,30 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// ============= SECURITY: Input Sanitization =============
+// ============= SECURITY: Input Sanitization (Hardened) =============
 function sanitizeIdentifier(input: string): string {
   if (!input || typeof input !== 'string') return '';
-  // Remove special characters, keep only alphanumeric, dots, and hyphens
-  // Limit length to prevent abuse
-  return input.replace(/[^a-zA-Z0-9.\-]/g, '').substring(0, 50);
+  // SECURITY: Only allow alphanumeric characters - NO dots, hyphens, or special chars
+  // This prevents any SQL injection attempts
+  return input.replace(/[^a-zA-Z0-9]/g, '').substring(0, 20);
 }
 
 function sanitizeEmail(input: string): string {
   if (!input || typeof input !== 'string') return '';
-  // Basic email sanitization - remove dangerous characters
-  return input.toLowerCase().trim().substring(0, 255);
+  const cleaned = input.toLowerCase().trim().substring(0, 255);
+  // SECURITY: Validate email format with regex
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailRegex.test(cleaned) ? cleaned : '';
+}
+
+function isValidCPF(input: string): boolean {
+  // SECURITY: CPF must be exactly 11 numeric digits
+  return /^\d{11}$/.test(input);
+}
+
+function isValidEmployeeNumber(input: string): boolean {
+  // SECURITY: Employee number - alphanumeric, 1-20 chars
+  return /^[a-zA-Z0-9]{1,20}$/.test(input);
 }
 
 // Generic error message to prevent enumeration
@@ -95,7 +107,7 @@ serve(async (req) => {
     console.log('Activation attempt received');
 
     // Validations with generic messages
-    if (!identifier) {
+    if (!identifier || (!isValidCPF(identifier) && !isValidEmployeeNumber(identifier))) {
       return new Response(JSON.stringify({ 
         success: false,
         error: GENERIC_ERROR
@@ -104,7 +116,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
-    if (!email || !email.includes('@')) {
+    
+    if (!email) {
       return new Response(JSON.stringify({ 
         success: false,
         error: GENERIC_ERROR
@@ -113,6 +126,7 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+    
     if (!password || password.length < 10) {
       return new Response(JSON.stringify({ 
         success: false,
@@ -123,24 +137,32 @@ serve(async (req) => {
       });
     }
 
-    // SECURITY: Use parameterized query with sanitized input
-    // Search by employee_number OR cpf
-    const { data: profile, error: profileError } = await supabase
+    // SECURITY: Use SEPARATE queries to avoid string interpolation in filters
+    // This completely prevents SQL injection by never concatenating user input
+    let profile = null;
+
+    // First try employee_number with parameterized query
+    const { data: profileByNumber, error: error1 } = await supabase
       .from('profiles')
       .select('id, full_name, cpf, employee_number, root_company_id, email, has_system_access')
-      .or(`employee_number.eq.${identifier},cpf.eq.${identifier}`)
+      .eq('employee_number', identifier)
       .is('has_system_access', false)
       .maybeSingle();
 
-    if (profileError) {
-      console.error('Database error during activation');
-      return new Response(JSON.stringify({ 
-        success: false,
-        error: GENERIC_ERROR
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+    if (!error1 && profileByNumber) {
+      profile = profileByNumber;
+    } else {
+      // Then try CPF with parameterized query
+      const { data: profileByCpf, error: error2 } = await supabase
+        .from('profiles')
+        .select('id, full_name, cpf, employee_number, root_company_id, email, has_system_access')
+        .eq('cpf', identifier)
+        .is('has_system_access', false)
+        .maybeSingle();
+      
+      if (!error2 && profileByCpf) {
+        profile = profileByCpf;
+      }
     }
 
     // SECURITY: Generic error - don't reveal if profile exists or not
