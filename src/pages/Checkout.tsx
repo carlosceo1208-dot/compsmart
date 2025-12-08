@@ -264,7 +264,29 @@ const planId = searchParams.get('plan');
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Checkout error:', error);
+        
+        // Tentar extrair detalhes do erro
+        let errorDetails = null;
+        try {
+          if (error.context?.body) {
+            errorDetails = JSON.parse(error.context.body);
+          }
+        } catch (e) {
+          console.error('Error parsing error context:', e);
+        }
+        
+        if (errorDetails?.suggestion) {
+          toast.error(errorDetails.details || 'Erro ao processar pagamento', {
+            description: errorDetails.suggestion,
+            duration: 8000
+          });
+        } else {
+          toast.error(errorDetails?.details || errorDetails?.error || error.message || 'Erro ao processar pagamento');
+        }
+        return;
+      }
 
       if (data.status === 'paid') {
         navigate('/checkout/success');
