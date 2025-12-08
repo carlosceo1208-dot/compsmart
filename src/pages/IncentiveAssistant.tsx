@@ -140,6 +140,16 @@ const IncentiveAssistant = () => {
         return;
       }
 
+      // Atualização otimista - adiciona conversa imediatamente
+      const newConversation: Conversation = {
+        question,
+        answer: data.answer,
+        operation_mode: data.operation_mode,
+        document_name: documentName || undefined,
+        created_at: new Date().toISOString(),
+      };
+      setConversations(prev => [...prev, newConversation]);
+
       toast({
         title: 'Resposta recebida',
         description: `Consulta processada com sucesso (${data.tokens_used} tokens)`,
@@ -147,7 +157,6 @@ const IncentiveAssistant = () => {
 
       setQuestion('');
       handleFileRemove();
-      await loadSessionConversations();
       refreshSessions();
     } catch (error: any) {
       toast({
@@ -217,7 +226,7 @@ const IncentiveAssistant = () => {
               </CardContent>
             </Card>
 
-            {currentSessionId && (conversations.length > 0 || loading) && (
+            {currentSessionId && (
               <AssistantConversationCard
                 conversations={conversations}
                 loading={loading}

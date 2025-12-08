@@ -44,12 +44,8 @@ export const AssistantConversationCard = ({
     scrollToBottom();
   }, [conversations]);
 
-  if (conversations.length === 0 && !loading) {
-    return null;
-  }
-
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden min-h-0">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg">Conversa Atual</CardTitle>
       </CardHeader>
