@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck, Briefcase } from "lucide-react";
+import { LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck, Briefcase, Globe } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 import compsmartLogo from "@/assets/compsmart-logo.png";
@@ -177,6 +177,15 @@ export const DashboardLayout = () => {
             >
               <Briefcase className="w-4 h-4 mr-2" />
               Cargos & Salários
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.open('/', '_blank')}
+              className="hidden md:flex items-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300"
+            >
+              <Globe className="w-4 h-4 mr-2" />
+              Ver Site
             </Button>
 
             <ThemeToggle />
