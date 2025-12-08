@@ -269,6 +269,51 @@ serve(async (req) => {
     const charge = pagarmeOrder.charges?.[0];
     const lastTransaction = charge?.last_transaction;
 
+    // Verificar se o pagamento falhou mesmo com HTTP 200
+    if (pagarmeOrder.status === 'failed') {
+      const gatewayError = lastTransaction?.gateway_response?.errors?.[0]?.message 
+        || lastTransaction?.acquirer_message 
+        || 'Pagamento recusado pelo processador';
+      
+      console.error('Payment failed:', gatewayError);
+      
+      let suggestion = null;
+      if (payment_method === 'boleto' && final_amount_cents < 500) {
+        suggestion = 'Boleto requer valor mínimo de R$ 5,00. Tente PIX ou cartão de crédito.';
+      }
+      
+      return new Response(JSON.stringify({ 
+        error: 'Falha ao processar pagamento',
+        details: gatewayError,
+        suggestion: suggestion,
+        payment_method: payment_method
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Validação específica para boleto: garantir que os dados necessários existem
+    if (payment_method === 'boleto') {
+      if (!lastTransaction?.pdf || !lastTransaction?.line) {
+        console.error('Boleto generation incomplete:', { pdf: lastTransaction?.pdf, line: lastTransaction?.line });
+        
+        const suggestion = final_amount_cents < 500 
+          ? 'Boleto requer valor mínimo de R$ 5,00. Tente PIX ou cartão de crédito.'
+          : 'Tente novamente em alguns minutos ou use outro método de pagamento.';
+        
+        return new Response(JSON.stringify({ 
+          error: 'Não foi possível gerar o boleto',
+          details: 'Os dados do boleto não foram gerados corretamente.',
+          suggestion: suggestion,
+          payment_method: 'boleto'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     let checkoutData: any = {
       user_id: user.id,
       company_id: profile?.root_company_id,
