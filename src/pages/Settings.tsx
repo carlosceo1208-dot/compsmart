@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Settings as SettingsIcon, FileEdit, CreditCard, Crown, ChevronRight } from 'lucide-react';
+import { Settings as SettingsIcon, FileEdit, CreditCard, Crown, ChevronRight, TestTube, QrCode, Landmark, Wallet, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
@@ -101,6 +103,45 @@ export default function Settings() {
 
   const { data: userRole } = useCurrentUserRole();
   const isAdmin = userRole?.isAdmin || false;
+  const isSuperAdmin = userRole?.isSuperAdmin || false;
+
+  // Plano de teste R$ 1,00
+  const TEST_PLAN_ID = 'e486df57-48cf-4ac1-968e-fd26aff0df83';
+
+  const paymentTestButtons = [
+    {
+      method: 'pix',
+      label: 'Testar PIX',
+      description: 'QR Code + 5% desconto',
+      icon: QrCode,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+    },
+    {
+      method: 'credit_card',
+      label: 'Testar Cartão Crédito',
+      description: 'Tokenização frontend',
+      icon: CreditCard,
+      color: 'text-violet-600',
+      bgColor: 'bg-violet-50 dark:bg-violet-900/20 border-violet-200 dark:border-violet-800',
+    },
+    {
+      method: 'debit_card',
+      label: 'Testar Cartão Débito',
+      description: 'Débito à vista',
+      icon: Wallet,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
+    },
+    {
+      method: 'boleto',
+      label: 'Testar Boleto',
+      description: 'Vencimento em 3 dias',
+      icon: Landmark,
+      color: 'text-amber-600',
+      bgColor: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800',
+    },
+  ];
 
   const settingsLinks = [
     { 
@@ -167,6 +208,50 @@ export default function Settings() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Payment Testing Area - Super Admin Only */}
+      {isSuperAdmin && (
+        <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/30 dark:bg-amber-900/10">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <TestTube className="w-5 h-5 text-amber-600" />
+              <CardTitle className="text-amber-800 dark:text-amber-200">
+                Área de Testes de Pagamento
+              </CardTitle>
+            </div>
+            <CardDescription>
+              Teste os métodos de pagamento com o plano de R$ 1,00. Visível apenas para Super Admin.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {paymentTestButtons.map((btn) => (
+                <Link
+                  key={btn.method}
+                  to={`/checkout?plan=${TEST_PLAN_ID}&cycle=monthly&method=${btn.method}`}
+                  className={`flex flex-col items-center gap-2 p-4 rounded-lg border ${btn.bgColor} hover:scale-105 transition-all duration-200`}
+                >
+                  <btn.icon className={`h-8 w-8 ${btn.color}`} />
+                  <p className="font-medium text-sm text-center">{btn.label}</p>
+                  <p className="text-xs text-muted-foreground text-center">
+                    {btn.description}
+                  </p>
+                  <Badge variant="secondary" className="text-xs">
+                    R$ 1,00
+                  </Badge>
+                </Link>
+              ))}
+            </div>
+            
+            <Alert className="mt-4 border-amber-300 dark:border-amber-700">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-sm">
+                Estes pagamentos são reais via Pagar.me. Sem assinatura recorrente configurada.
+              </AlertDescription>
+            </Alert>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Labels Section */}
       <Card>
