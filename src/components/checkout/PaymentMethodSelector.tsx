@@ -5,8 +5,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CreditCard, QrCode, Barcode, Check, Zap, Shield, Clock } from 'lucide-react';
 
 interface PaymentMethodSelectorProps {
-  paymentMethod: 'pix' | 'credit_card' | 'boleto';
-  setPaymentMethod: (method: 'pix' | 'credit_card' | 'boleto') => void;
+  paymentMethod: 'pix' | 'credit_card' | 'debit_card' | 'boleto';
+  setPaymentMethod: (method: 'pix' | 'credit_card' | 'debit_card' | 'boleto') => void;
 }
 
 export function PaymentMethodSelector({
@@ -57,6 +57,27 @@ export function PaymentMethodSelector({
       }
     },
     {
+      id: 'debit_card' as const,
+      name: 'Cartão de Débito',
+      description: 'Débito instantâneo • Aprovação imediata',
+      subDescription: 'Visa, Mastercard, Elo com débito habilitado',
+      features: ['Desconta na hora', 'Sem parcelamento'],
+      icon: CreditCard,
+      featureIcon: Zap,
+      badge: null,
+      badgeClass: '',
+      colorClasses: {
+        selected: 'border-teal-500 bg-gradient-to-br from-teal-50 to-cyan-50 shadow-lg shadow-teal-100/50 ring-2 ring-teal-200',
+        hover: 'hover:border-teal-300 hover:bg-teal-50/30',
+        icon: { 
+          selected: 'bg-gradient-to-br from-teal-500 to-cyan-600 text-white shadow-lg shadow-teal-200', 
+          default: 'bg-teal-100 text-teal-600' 
+        },
+        check: 'text-teal-500 bg-teal-100',
+        feature: 'text-teal-600'
+      }
+    },
+    {
       id: 'boleto' as const,
       name: 'Boleto Bancário',
       description: 'Vencimento em 3 dias úteis • Qualquer banco',
@@ -90,7 +111,7 @@ export function PaymentMethodSelector({
       <CardContent>
         <RadioGroup
           value={paymentMethod}
-          onValueChange={(value) => setPaymentMethod(value as 'pix' | 'credit_card' | 'boleto')}
+          onValueChange={(value) => setPaymentMethod(value as 'pix' | 'credit_card' | 'debit_card' | 'boleto')}
           className="space-y-4"
         >
           {methods.map((method) => {

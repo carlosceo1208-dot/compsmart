@@ -208,6 +208,23 @@ serve(async (req) => {
           }
         }
       });
+    } else if (payment_method === 'debit_card' && card_token) {
+      orderPayload.payments.push({
+        payment_method: 'debit_card',
+        debit_card: {
+          card_token: card_token,
+          statement_descriptor: 'COMPSMART',
+          card: {
+            billing_address: {
+              line_1: '123, Av Paulista',
+              zip_code: '01310100',
+              city: 'São Paulo',
+              state: 'SP',
+              country: 'BR'
+            }
+          }
+        }
+      });
     } else if (payment_method === 'boleto') {
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + 3);
@@ -299,7 +316,7 @@ serve(async (req) => {
     }
 
     // Se pagamento com cartão foi aprovado, ativar assinatura
-    if (payment_method === 'credit_card' && pagarmeOrder.status === 'paid') {
+    if ((payment_method === 'credit_card' || payment_method === 'debit_card') && pagarmeOrder.status === 'paid') {
       await activateSubscription(supabaseClient, user.id, profile?.root_company_id, plan, billing_cycle, final_amount_cents / 100);
     }
 

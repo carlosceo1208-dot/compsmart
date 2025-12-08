@@ -61,7 +61,7 @@ export default function Checkout() {
   
   const [plan, setPlan] = useState<Plan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>(cycle as 'monthly' | 'annual');
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'boleto'>('pix');
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'debit_card' | 'boleto'>('pix');
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState<any>(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
@@ -436,7 +436,7 @@ export default function Checkout() {
                   setPaymentMethod={setPaymentMethod}
                 />
 
-                {paymentMethod === 'credit_card' && (
+                {(paymentMethod === 'credit_card' || paymentMethod === 'debit_card') && (
                   <CardPaymentForm
                     onSubmit={handleCheckout}
                     processing={processing}
