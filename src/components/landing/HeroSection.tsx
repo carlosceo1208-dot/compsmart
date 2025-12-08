@@ -23,6 +23,7 @@ export const HeroSection = () => {
   
   // Video URL - Supabase Storage
   const videoUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional.mp4";
+  const thumbnailUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional-thumb.jpg";
   const hasVideo = Boolean(videoUrl);
 
   // Countdown to January 2026
@@ -101,9 +102,9 @@ export const HeroSection = () => {
               <Sparkles className="h-4 w-4" />
               Lançamento Janeiro 2026
             </Badge>
-            <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Vídeo Institucional em Breve
+            <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-green-500/20 transition-colors" onClick={() => setIsVideoOpen(true)}>
+              <Play className="h-4 w-4" />
+              Assista ao Vídeo Institucional
             </Badge>
           </div>
 
@@ -187,6 +188,18 @@ export const HeroSection = () => {
                   onMouseMove={handleMouseMove}
                   onMouseLeave={handleMouseLeave}
                 >
+                  {/* Video Thumbnail */}
+                  <img 
+                    src={thumbnailUrl}
+                    alt="Preview do vídeo institucional CompSmart - Carla apresentando com gráficos"
+                    className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-90"
+                    onError={(e) => {
+                      // Fallback se thumbnail não carregar
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  {/* Overlay gradiente para contraste do botão play */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-900/30 rounded-xl" />
                   {/* Particles ao redor do botão */}
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <div className="relative w-32 h-32">
@@ -249,11 +262,11 @@ export const HeroSection = () => {
                   
                   {/* Text below */}
                   <div className="absolute bottom-6 left-0 right-0 text-center pointer-events-none">
-                    <p className="text-white/90 text-sm font-medium">
-                      {hasVideo ? 'Conheça o CompSmart em 2 minutos' : 'CEO e Head de RH apresentam o CompSmart'}
+                    <p className="text-white text-base font-semibold drop-shadow-lg">
+                      {hasVideo ? 'Veja como a inteligência trabalha COM você' : 'CEO e Head de RH apresentam o CompSmart'}
                     </p>
-                    <p className="text-white/60 text-xs mt-1">
-                      {hasVideo ? '🎬 Vídeo institucional' : '🎬 Vídeo disponível em 08/12'}
+                    <p className="text-white/80 text-sm mt-1 drop-shadow">
+                      {hasVideo ? '🎬 ~5 minutos que podem transformar seu RH' : '🎬 Vídeo disponível em 08/12'}
                     </p>
                   </div>
                 </div>
