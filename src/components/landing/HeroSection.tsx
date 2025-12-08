@@ -184,17 +184,17 @@ export const HeroSection = () => {
               <div className="relative rounded-2xl overflow-visible p-1 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20">
                 <div 
                   ref={playButtonRef}
-                  className="relative aspect-video rounded-xl overflow-visible bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-2xl"
+                  className="group relative aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 shadow-2xl cursor-pointer"
+                  onClick={() => setIsVideoOpen(true)}
                   onMouseMove={handleMouseMove}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {/* Video Thumbnail */}
+                  {/* Video Thumbnail with hover zoom */}
                   <img 
                     src={thumbnailUrl}
                     alt="Preview do vídeo institucional CompSmart - Carla apresentando com gráficos"
-                    className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-90"
+                    className="absolute inset-0 w-full h-full object-cover rounded-xl opacity-90 transition-transform duration-700 ease-out group-hover:scale-110"
                     onError={(e) => {
-                      // Fallback se thumbnail não carregar
                       e.currentTarget.style.display = 'none';
                     }}
                   />
