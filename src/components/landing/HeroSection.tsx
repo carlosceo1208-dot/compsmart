@@ -21,8 +21,8 @@ export const HeroSection = () => {
   const particleIdRef = useRef(0);
   const playButtonRef = useRef<HTMLDivElement>(null);
   
-  // Video URL - será substituído pelo upload direto em 08/12
-  const videoUrl = ""; // Deixar vazio até o vídeo ser carregado
+  // Video URL - Supabase Storage
+  const videoUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional.mp4";
   const hasVideo = Boolean(videoUrl);
 
   // Countdown to January 2026
