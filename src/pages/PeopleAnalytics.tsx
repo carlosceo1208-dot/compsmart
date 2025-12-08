@@ -135,7 +135,7 @@ const PeopleAnalyticsContent = () => {
           {/* Chart: Salary vs Range */}
           <ChartCard
             title="Comparação: Salário Real vs Faixa Salarial"
-            description="Média dos salários reais comparada com a mediana da faixa salarial"
+            description="Média dos salários reais comparada com a média da faixa salarial"
             isLoading={charts.isLoading}
             isEmpty={!charts.salaryVsRange || charts.salaryVsRange.length === 0}
           >
@@ -145,8 +145,8 @@ const PeopleAnalyticsContent = () => {
                   label: 'Salário Real',
                   color: 'hsl(var(--primary))',
                 },
-                faixa_mediana: {
-                  label: 'Faixa Mediana',
+                faixa_media: {
+                  label: 'Faixa Média',
                   color: 'hsl(var(--chart-2))',
                 },
               }}
@@ -165,7 +165,7 @@ const PeopleAnalyticsContent = () => {
                   />
                   <Legend />
                   <Bar dataKey="salario_real" fill="hsl(var(--primary))" name="Salário Real" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="faixa_mediana" fill="hsl(var(--chart-2))" name="Faixa Mediana" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="faixa_media" fill="hsl(var(--chart-2))" name="Faixa Média" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>

@@ -207,7 +207,7 @@ export const usePeopleAnalytics = () => {
           return {
             grade,
             salario_real: Math.round(avgSalary),
-            faixa_mediana: range ? Math.round(range.median_value) : 0,
+            faixa_media: range ? Math.round(range.median_value) : 0,
             faixa_minima: range ? Math.round(range.min_value) : 0,
             faixa_maxima: range ? Math.round(range.max_value) : 0,
           };

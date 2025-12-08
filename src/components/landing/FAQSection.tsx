@@ -23,7 +23,7 @@ export const FAQSection = () => {
     },
     {
       question: "Como funciona a Pesquisa Salarial?",
-      answer: "A Pesquisa Salarial do CompSmart compara seus cargos e salários com dados reais de mercado de mais de 500 pesquisas. Você pode importar templates prontos, participar de surveys colaborativos ou criar pesquisas customizadas. O sistema calcula automaticamente percentis, medianas e recomendações de ajuste.",
+      answer: "A Pesquisa Salarial do CompSmart compara seus cargos e salários com dados reais de mercado de mais de 500 pesquisas. Você pode importar templates prontos, participar de surveys colaborativos ou criar pesquisas customizadas. O sistema calcula automaticamente percentis, médias e recomendações de ajuste.",
       icon: Database,
       isNew: true
     },
