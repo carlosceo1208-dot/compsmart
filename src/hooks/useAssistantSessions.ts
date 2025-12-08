@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+export type AgentType = 'legal' | 'salary' | 'incentive';
+
 interface Session {
   id: string;
   title: string | null;
@@ -21,7 +23,19 @@ interface Conversation {
   legal_references?: any;
 }
 
-export const useLegalSessions = () => {
+const CONVERSATION_TABLES = {
+  legal: 'legal_assistant_conversations',
+  salary: 'salary_assistant_conversations',
+  incentive: 'incentive_assistant_conversations',
+} as const;
+
+const SESSION_TITLES = {
+  legal: 'Nova Consulta Jurídica',
+  salary: 'Nova Análise Salarial',
+  incentive: 'Nova Consulta R&B',
+} as const;
+
+export const useAssistantSessions = (agentType: AgentType) => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -33,7 +47,7 @@ export const useLegalSessions = () => {
       const query = supabase
         .from('conversation_sessions')
         .select('*')
-        .eq('agent_type', 'legal')
+        .eq('agent_type', agentType)
         .order('last_message_at', { ascending: false });
 
       if (!includeArchived) {
@@ -67,8 +81,8 @@ export const useLegalSessions = () => {
         .from('conversation_sessions')
         .insert({
           user_id: user.id,
-          agent_type: 'legal',
-          title: `Nova Consulta - ${new Date().toLocaleDateString('pt-BR')}`,
+          agent_type: agentType,
+          title: `${SESSION_TITLES[agentType]} - ${new Date().toLocaleDateString('pt-BR')}`,
           root_company_id: profile?.root_company_id || null,
         })
         .select()
@@ -148,9 +162,10 @@ export const useLegalSessions = () => {
 
   const fetchSessionConversations = async (sessionId: string): Promise<Conversation[]> => {
     try {
+      const tableName = CONVERSATION_TABLES[agentType];
       const { data, error } = await supabase
-        .from('legal_assistant_conversations')
-        .select('id, question, answer, created_at, document_name, operation_mode, legal_references')
+        .from(tableName)
+        .select('id, question, answer, created_at, document_name, operation_mode')
         .eq('session_id', sessionId)
         .order('created_at', { ascending: true });
 
@@ -164,7 +179,7 @@ export const useLegalSessions = () => {
 
   useEffect(() => {
     fetchSessions(showArchived);
-  }, [showArchived]);
+  }, [showArchived, agentType]);
 
   return {
     sessions,

@@ -1,27 +1,25 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Target, Send, History, FileText, Sparkles, ShieldCheck, ArrowDown, Bot, Archive } from 'lucide-react';
+import { Target, Send, FileText, Sparkles, ShieldCheck } from 'lucide-react';
 import { QuickActions, QuickAction } from '@/components/assistant/QuickActions';
 import { DocumentUpload } from '@/components/assistant/DocumentUpload';
 import { ContextBadges } from '@/components/assistant/ContextBadges';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-
-import { useIncentiveAssistantSessions } from '@/hooks/useIncentiveAssistantSessions';
-import { cn } from '@/lib/utils';
+import { AssistantSessionSidebar } from '@/components/assistant/AssistantSessionSidebar';
+import { AssistantConversationCard } from '@/components/assistant/AssistantConversationCard';
+import { useAssistantSessions } from '@/hooks/useAssistantSessions';
 
 interface Conversation {
-  id: string;
+  id?: string;
   question: string;
   answer: string;
   document_name?: string;
   operation_mode?: string;
-  created_at: string;
+  created_at?: string;
 }
 
 const quickActions: QuickAction[] = [
@@ -58,9 +56,6 @@ const IncentiveAssistant = () => {
   const [documentText, setDocumentText] = useState('');
   const [documentName, setDocumentName] = useState('');
   const [charCount, setCharCount] = useState(0);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const [showScrollButton, setShowScrollButton] = useState(false);
   const { toast } = useToast();
 
   const {
@@ -69,11 +64,14 @@ const IncentiveAssistant = () => {
     setCurrentSessionId,
     showArchived,
     setShowArchived,
+    loading: sessionsLoading,
     createNewSession,
     archiveSession,
+    unarchiveSession,
+    deleteSession,
     fetchSessionConversations,
     refreshSessions,
-  } = useIncentiveAssistantSessions();
+  } = useAssistantSessions('incentive');
 
   const maxChars = 50000;
 
@@ -84,32 +82,10 @@ const IncentiveAssistant = () => {
   useEffect(() => {
     if (currentSessionId) {
       loadSessionConversations();
+    } else {
+      setConversations([]);
     }
   }, [currentSessionId]);
-
-  useEffect(() => {
-    if (conversations.length > 0 && !loading) {
-      setTimeout(() => {
-        if (scrollAreaRef.current) {
-          scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-        }
-      }, 100);
-    }
-  }, [conversations, loading]);
-
-  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
-    const element = event.currentTarget;
-    const scrollBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
-    const isNearBottom = scrollBottom < 100;
-    setShowScrollButton(!isNearBottom && conversations.length > 0);
-  };
-
-  const scrollToBottom = () => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-      setShowScrollButton(false);
-    }
-  };
 
   const loadSessionConversations = async () => {
     if (!currentSessionId) return;
@@ -214,78 +190,18 @@ const IncentiveAssistant = () => {
         </Alert>
 
         <div className="grid lg:grid-cols-[300px_1fr] gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <History className="w-5 h-5" />
-                Sessões
-              </CardTitle>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowArchived(!showArchived)}
-                >
-                  {showArchived ? 'Ativas' : 'Arquivadas'}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={createNewSession}
-                >
-                  + Nova
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[600px] overflow-y-auto scroll-smooth pr-2">
-                <div className="space-y-2">
-                  {sessions.length === 0 ? (
-                    <p className="text-sm text-muted-foreground text-center py-8">
-                      {showArchived ? 'Nenhuma sessão arquivada' : 'Nenhuma sessão ativa'}
-                    </p>
-                  ) : (
-                    sessions.map((session) => (
-                      <Card
-                        key={session.id}
-                        className={cn(
-                          "p-3 cursor-pointer transition-colors",
-                          currentSessionId === session.id 
-                            ? "border-primary bg-accent" 
-                            : "hover:bg-accent"
-                        )}
-                        onClick={() => setCurrentSessionId(session.id)}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium line-clamp-1">
-                              {session.title || 'Sem título'}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {session.message_count} mensagens
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(session.last_message_at).toLocaleDateString('pt-BR')}
-                            </p>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              archiveSession(session.id);
-                            }}
-                            className="shrink-0 h-8 w-8 p-0"
-                          >
-                            <Archive className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </Card>
-                    ))
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <AssistantSessionSidebar
+            sessions={sessions}
+            currentSessionId={currentSessionId}
+            showArchived={showArchived}
+            loading={sessionsLoading}
+            onSelectSession={setCurrentSessionId}
+            onCreateSession={createNewSession}
+            onArchiveSession={archiveSession}
+            onUnarchiveSession={unarchiveSession}
+            onDeleteSession={deleteSession}
+            onToggleArchived={setShowArchived}
+          />
 
           <div className="space-y-4">
             <Card>
@@ -301,82 +217,11 @@ const IncentiveAssistant = () => {
               </CardContent>
             </Card>
 
-            {currentSessionId && conversations.length > 0 && (
-              <Card className="bg-accent/30 border-accent overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="text-lg">Conversa Atual</CardTitle>
-                </CardHeader>
-                <CardContent className="relative p-0">
-                  <div 
-                    ref={scrollAreaRef}
-                    onScroll={handleScroll}
-                    className="max-h-[500px] overflow-y-auto px-6 pb-6 scroll-smooth scrollbar-thin"
-                    style={{ scrollbarGutter: 'stable' }}
-                  >
-                    <div className="space-y-4">
-                      {loading && conversations.length > 0 && (
-                        <div className="space-y-2 animate-fade-in">
-                          <div className="bg-primary/10 p-3 rounded-lg">
-                            <Skeleton className="h-4 w-20 mb-2" />
-                            <Skeleton className="h-12 w-full" />
-                          </div>
-                          <div className="bg-muted p-3 rounded-lg">
-                            <Skeleton className="h-4 w-16 mb-2" />
-                            <div className="flex items-center gap-2">
-                              <span className="animate-pulse text-xs">●</span>
-                              <span className="animate-pulse text-xs" style={{ animationDelay: '0.2s' }}>●</span>
-                              <span className="animate-pulse text-xs" style={{ animationDelay: '0.4s' }}>●</span>
-                              <span className="text-xs text-muted-foreground ml-2">Smart está analisando...</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {conversations.map((conv, index) => (
-                        <div key={conv.id} className="space-y-2 animate-fade-in">
-                          <div className="bg-primary/10 p-3 rounded-lg">
-                            <p className="text-xs font-medium text-muted-foreground mb-1">Você:</p>
-                            <p className="text-sm">{conv.question}</p>
-                            {conv.document_name && (
-                              <div className="flex items-center gap-1 mt-2">
-                                <FileText className="w-3 h-3 text-muted-foreground" />
-                                <p className="text-xs text-muted-foreground">{conv.document_name}</p>
-                              </div>
-                            )}
-                          </div>
-                          <div className="bg-muted p-3 rounded-lg relative">
-                            {index === conversations.length - 1 && !loading && (
-                              <span className="absolute -top-2 -right-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full animate-pulse shadow-lg">
-                                Nova
-                              </span>
-                            )}
-                            <p className="text-xs font-medium text-muted-foreground mb-1">Smart:</p>
-                            <p className="text-sm whitespace-pre-wrap">{conv.answer}</p>
-                            {conv.operation_mode && (
-                              <Badge variant="outline" className="mt-2">
-                                {conv.operation_mode}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                      <div ref={messagesEndRef} />
-                    </div>
-                  </div>
-                  
-                  {showScrollButton && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="absolute bottom-4 right-8 shadow-lg animate-fade-in z-10"
-                      onClick={scrollToBottom}
-                    >
-                      <ArrowDown className="h-4 w-4 mr-2" />
-                      Última mensagem
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+            {currentSessionId && (conversations.length > 0 || loading) && (
+              <AssistantConversationCard
+                conversations={conversations}
+                loading={loading}
+              />
             )}
 
             <Card>
@@ -407,7 +252,7 @@ const IncentiveAssistant = () => {
                     }
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
-                    rows={12}
+                    rows={8}
                     className="resize-none"
                     maxLength={maxChars}
                     disabled={loading}
