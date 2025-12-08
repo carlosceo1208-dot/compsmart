@@ -56,12 +56,17 @@ export default function Checkout() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const planId = searchParams.get('plan');
+const planId = searchParams.get('plan');
   const cycle = searchParams.get('cycle') || 'monthly';
+  const preselectedMethod = searchParams.get('method') as 'pix' | 'credit_card' | 'debit_card' | 'boleto' | null;
   
   const [plan, setPlan] = useState<Plan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>(cycle as 'monthly' | 'annual');
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'debit_card' | 'boleto'>('pix');
+  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit_card' | 'debit_card' | 'boleto'>(
+    preselectedMethod && ['pix', 'credit_card', 'debit_card', 'boleto'].includes(preselectedMethod) 
+      ? preselectedMethod 
+      : 'pix'
+  );
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState<any>(null);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
