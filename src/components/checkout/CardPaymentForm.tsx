@@ -12,7 +12,9 @@ interface CardPaymentFormProps {
   total: number;
 }
 
-const PAGARME_PUBLIC_KEY = 'pk_bGW21WpFxiM5d9Zy';
+// Chave pública do Pagar.me - segura para exposição no frontend
+// Usar variável de ambiente para facilitar rotação de chaves
+const PAGARME_PUBLIC_KEY = import.meta.env.VITE_PAGARME_PUBLIC_KEY || '';
 
 export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentFormProps) {
   const [cardData, setCardData] = useState({
@@ -49,11 +51,12 @@ export function CardPaymentForm({ onSubmit, processing, total }: CardPaymentForm
     const data = await response.json();
     
     if (!response.ok) {
-      console.error('Pagar.me tokenization error:', data);
+      console.error('Pagar.me tokenization error:', data?.message || 'Unknown error');
       throw new Error(data.message || 'Erro ao validar cartão');
     }
     
-    console.log('Card token created:', data.id);
+    // Log sem expor dados sensíveis
+    console.log('Card token created successfully');
     return data.id;
   };
 
