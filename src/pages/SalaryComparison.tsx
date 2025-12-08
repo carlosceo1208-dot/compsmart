@@ -197,7 +197,7 @@ export default function SalaryComparison() {
           {/* Gráfico de Linhas Comparativo */}
           <Card>
             <CardHeader>
-              <CardTitle>Curva Comparativa de Medianas</CardTitle>
+              <CardTitle>Curva Comparativa de Médias</CardTitle>
               <CardDescription>
                 Visualização gráfica da comparação por grade/nível
               </CardDescription>
