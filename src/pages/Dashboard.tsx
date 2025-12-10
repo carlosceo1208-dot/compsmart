@@ -7,6 +7,7 @@ import { DateTimeDisplay } from "@/components/dashboard/DateTimeDisplay";
 import { ExportCard } from "@/components/dashboard/ExportCard";
 import { OrganizationalIdentityCard } from "@/components/dashboard/OrganizationalIdentityCard";
 import { PendingAdjustmentAlert } from "@/components/dashboard/PendingAdjustmentAlert";
+import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
@@ -15,10 +16,11 @@ const Dashboard = () => {
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto">
+      <DashboardTour />
       <div className="grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-4 sm:gap-6 p-4 sm:p-6">
         {/* Coluna Esquerda: KPIs */}
         <div className="space-y-4">
-          <div className="rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-6 md:p-8 border-2 border-primary/30 shadow-primary">
+          <div className="dashboard-welcome rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-6 md:p-8 border-2 border-primary/30 shadow-primary">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-white">CompSmart</h1>
