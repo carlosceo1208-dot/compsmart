@@ -124,6 +124,28 @@ serve(async (req) => {
   }
 });
 
+// Helper function to send payment emails
+async function sendPaymentEmail(supabase: any, type: string, data: Record<string, any>) {
+  try {
+    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-payment-emails`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
+      body: JSON.stringify({ type, ...data }),
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to send email:', await response.text());
+    } else {
+      console.log(`Email sent: ${type}`);
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+}
+
 async function handleOrderPaid(supabase: any, data: any) {
   console.log('Processing order.paid:', data.id);
 
@@ -148,6 +170,16 @@ async function handleOrderPaid(supabase: any, data: any) {
     })
     .eq('id', checkoutSession.id);
 
+  // Check if this is first payment (welcome email)
+  const { data: existingSubscription } = await supabase
+    .from('company_subscriptions')
+    .select('id')
+    .eq('company_id', checkoutSession.company_id)
+    .eq('status', 'active')
+    .maybeSingle();
+
+  const isFirstPayment = !existingSubscription;
+
   // Ativar assinatura
   if (checkoutSession.company_id) {
     await activateSubscription(
@@ -167,7 +199,25 @@ async function handleOrderPaid(supabase: any, data: any) {
   }
 
   // Criar fatura
-  await createInvoice(supabase, checkoutSession, data);
+  const invoice = await createInvoice(supabase, checkoutSession, data);
+
+  // SEND EMAILS
+  const emailData = {
+    userId: checkoutSession.user_id,
+    companyId: checkoutSession.company_id,
+    planName: checkoutSession.subscription_plans?.name,
+    amount: (checkoutSession.amount_cents - (checkoutSession.discount_cents || 0)) / 100,
+    paymentMethod: checkoutSession.payment_method,
+    invoiceNumber: invoice?.invoice_number,
+  };
+
+  // Send payment confirmation email
+  await sendPaymentEmail(supabase, 'payment_confirmed', emailData);
+
+  // Send welcome email for first payment
+  if (isFirstPayment) {
+    await sendPaymentEmail(supabase, 'welcome', emailData);
+  }
 
   console.log('Order paid processed successfully:', data.id);
 }
@@ -180,22 +230,34 @@ async function handlePaymentFailed(supabase: any, data: any) {
     .update({ status: 'failed' })
     .eq('pagarme_order_id', data.id);
 
-  // Incrementar tentativas falhas na assinatura
+  // Buscar checkout session para enviar email
   const { data: checkoutSession } = await supabase
     .from('checkout_sessions')
-    .select('company_id')
+    .select('*, subscription_plans(*)')
     .eq('pagarme_order_id', data.id)
     .single();
 
-  if (checkoutSession?.company_id) {
-    await supabase
-      .from('company_subscriptions')
-      .update({
-        failed_attempts: supabase.sql`failed_attempts + 1`,
-        updated_at: new Date().toISOString()
-      })
-      .eq('company_id', checkoutSession.company_id)
-      .eq('status', 'active');
+  if (checkoutSession) {
+    // Incrementar tentativas falhas na assinatura
+    if (checkoutSession.company_id) {
+      await supabase
+        .from('company_subscriptions')
+        .update({
+          failed_attempts: supabase.sql`failed_attempts + 1`,
+          updated_at: new Date().toISOString()
+        })
+        .eq('company_id', checkoutSession.company_id)
+        .eq('status', 'active');
+    }
+
+    // Send payment failed email
+    await sendPaymentEmail(supabase, 'payment_failed', {
+      userId: checkoutSession.user_id,
+      companyId: checkoutSession.company_id,
+      planName: checkoutSession.subscription_plans?.name,
+      amount: checkoutSession.amount_cents / 100,
+      failureReason: data.last_transaction?.acquirer_message || 'Pagamento recusado',
+    });
   }
 }
 
@@ -298,8 +360,8 @@ async function createInvoice(supabase: any, checkoutSession: any, orderData: any
   const invoiceNumber = `INV-${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
   const subtotal = checkoutSession.amount_cents / 100;
-  const discount = checkoutSession.discount_cents / 100;
-  const total = (checkoutSession.amount_cents - checkoutSession.discount_cents) / 100;
+  const discount = (checkoutSession.discount_cents || 0) / 100;
+  const total = subtotal - discount;
 
   const { data: invoice, error } = await supabase
     .from('invoices')
@@ -333,6 +395,7 @@ async function createInvoice(supabase: any, checkoutSession: any, orderData: any
   }
 
   console.log('Invoice created:', invoiceNumber);
+  return invoice;
 }
 
 // ============= Subscription Event Handlers =============
