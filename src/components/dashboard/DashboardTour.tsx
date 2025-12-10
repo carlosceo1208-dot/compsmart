@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
-import { supabase } from '@/integrations/supabase/client';
-import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+
+const TOUR_STORAGE_KEY = 'compsmart_tour_completed';
 
 const tourSteps: Step[] = [
   {
@@ -103,54 +103,32 @@ interface DashboardTourProps {
 
 export const DashboardTour = ({ onComplete }: DashboardTourProps) => {
   const [runTour, setRunTour] = useState(false);
-  const [hasCompletedTour, setHasCompletedTour] = useState<boolean | null>(null);
-  const { plan } = useFeatureAccess();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const checkTourStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('has_completed_tour')
-        .eq('id', user.id)
-        .single();
-
-      if (profile) {
-        setHasCompletedTour(profile.has_completed_tour ?? false);
-        if (!profile.has_completed_tour) {
-          // Small delay to ensure DOM elements are ready
-          setTimeout(() => setRunTour(true), 1000);
-        }
-      }
-    };
-
-    checkTourStatus();
+    setMounted(true);
+    const hasCompletedTour = localStorage.getItem(TOUR_STORAGE_KEY);
+    
+    if (!hasCompletedTour) {
+      // Small delay to ensure DOM elements are ready
+      const timer = setTimeout(() => setRunTour(true), 1500);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
-  const handleJoyrideCallback = async (data: CallBackProps) => {
+  const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
-      
-      // Mark tour as completed
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from('profiles')
-          .update({ has_completed_tour: true })
-          .eq('id', user.id);
-      }
-      
-      setHasCompletedTour(true);
+      localStorage.setItem(TOUR_STORAGE_KEY, 'true');
       onComplete?.();
     }
   };
 
-  if (hasCompletedTour === null || hasCompletedTour === true) {
+  // Don't render until mounted to avoid SSR issues
+  if (!mounted) {
     return null;
   }
 
