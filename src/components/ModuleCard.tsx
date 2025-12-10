@@ -41,12 +41,18 @@ export const ModuleCard = ({
 }: ModuleCardProps) => {
   const { hasAccess } = useFeatureAccess();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
   const hasFeatureAccess = !requiredPlan || hasAccess(`${title.toLowerCase().replace(/\s+/g, '_')}`);
   const isClickable = status === "active" && onClick && hasFeatureAccess;
+  const isLocked = requiredPlan && !hasFeatureAccess;
   
   const handleClick = () => {
     if (!hasFeatureAccess && requiredPlan) {
-      setShowUpgradeModal(true);
+      setIsShaking(true);
+      setTimeout(() => {
+        setIsShaking(false);
+        setShowUpgradeModal(true);
+      }, 500);
     } else if (onClick) {
       onClick();
     }
@@ -76,9 +82,9 @@ export const ModuleCard = ({
             </Badge>
           </div>
         )}
-        {requiredPlan && !hasFeatureAccess && (
+        {isLocked && (
           <div className="absolute top-3 right-3 z-10">
-            <div className="bg-background/90 backdrop-blur-sm rounded-full p-2 shadow-md">
+            <div className={`bg-background/90 backdrop-blur-sm rounded-full p-2 shadow-md transition-transform ${isShaking ? 'animate-shake' : ''}`}>
               <Lock className="w-4 h-4 text-muted-foreground" />
             </div>
           </div>

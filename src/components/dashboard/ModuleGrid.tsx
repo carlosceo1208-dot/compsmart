@@ -241,10 +241,13 @@ export const ModuleGrid = () => {
     m.category === 'management'
   );
 
+  // Find first locked module for tour target
+  const firstLockedModule = activeModules.find(m => m.requiredPlan);
+
   return (
     <div className="space-y-6">
       {/* Seção 1: Agentes Smart (Destaque Premium) */}
-      <div>
+      <div className="smart-agents-section">
         <div className="flex items-center gap-2 mb-3">
           <Bot className="h-6 w-6 text-primary" />
           <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
@@ -255,24 +258,25 @@ export const ModuleGrid = () => {
           </Badge>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {smartAgents.map((module) => (
-            <ModuleCard
-              key={module.path}
-              title={module.title}
-              description={module.description}
-              icon={module.icon}
-              status={module.status}
-              category={module.category}
-              requiredPlan={module.requiredPlan}
-              onClick={() => navigate(module.path)}
-              isSmartAgent={true}
-            />
+          {smartAgents.map((module, index) => (
+            <div key={module.path} className={index === 0 && module.requiredPlan ? 'locked-module' : ''}>
+              <ModuleCard
+                title={module.title}
+                description={module.description}
+                icon={module.icon}
+                status={module.status}
+                category={module.category}
+                requiredPlan={module.requiredPlan}
+                onClick={() => navigate(module.path)}
+                isSmartAgent={true}
+              />
+            </div>
           ))}
         </div>
       </div>
 
       {/* Seção 2: Analytics & Relatórios */}
-      <div>
+      <div className="analytics-section">
         <div className="flex items-center gap-2 mb-3">
           <BarChart3 className="h-5 w-5 text-blue-600" />
           <h3 className="text-lg font-semibold">Analytics & Relatórios</h3>
@@ -294,7 +298,7 @@ export const ModuleGrid = () => {
       </div>
 
       {/* Seção 3: Gestão e Configuração */}
-      <div>
+      <div className="management-section">
         <div className="flex items-center gap-2 mb-3">
           <Settings className="h-5 w-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold">Gestão e Configuração</h3>
