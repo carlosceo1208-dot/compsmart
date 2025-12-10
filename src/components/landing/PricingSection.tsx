@@ -39,6 +39,7 @@ const planConfigs: Record<string, PlanConfig> = {
     features: [
       { text: "Até 50 funcionários" },
       { text: "Estrutura básica de cargos" },
+      { text: "Pesquisa Salarial", tooltip: "Compare salários com dados reais de mercado" },
       { text: "Dashboards essenciais" },
       { text: "Suporte por email" },
       { text: "2 usuários administradores" }
