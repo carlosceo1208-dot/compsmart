@@ -19,6 +19,8 @@ import { SecurityFooter } from "@/components/SecurityFooter";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { CompanySwitcher } from "@/components/dashboard/CompanySwitcher";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 interface UserProfile {
   full_name: string;
@@ -30,6 +32,7 @@ interface UserProfile {
 export const DashboardLayout = () => {
   const navigate = useNavigate();
   const { getLabel } = useLabels();
+  const { activeCompany, isViewingOtherCompany } = useCompanyContext();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
@@ -64,7 +67,7 @@ export const DashboardLayout = () => {
         return;
       }
 
-      // Fetch company logo
+      // Fetch company logo (will be overridden by context for super_admin)
       const { data: company } = await supabase
         .from("organizational_structure")
         .select("logo_url, name, fantasy_name")
@@ -80,6 +83,14 @@ export const DashboardLayout = () => {
     };
 
     fetchProfile();
+  }, [navigate]);
+
+  // Update logo/name when super_admin switches company
+  useEffect(() => {
+    if (activeCompany) {
+      setCompanyLogo(activeCompany.logo_url || null);
+      setCompanyName(activeCompany.fantasy_name || activeCompany.name);
+    }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
@@ -88,7 +99,7 @@ export const DashboardLayout = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [activeCompany]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -118,6 +129,13 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Viewing Other Company Banner */}
+      {isViewingOtherCompany && (
+        <div className="bg-amber-500/20 border-b border-amber-500/30 py-1.5 text-center text-sm text-amber-700 dark:text-amber-400">
+          Você está visualizando: <strong>{companyName}</strong>
+        </div>
+      )}
+
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="container flex h-20 items-center justify-between px-4">
@@ -188,6 +206,8 @@ export const DashboardLayout = () => {
               Ver Site
             </Button>
 
+            <CompanySwitcher />
+            
             <ThemeToggle />
 
             <DropdownMenu>

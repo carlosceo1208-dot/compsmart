@@ -2340,6 +2340,35 @@ export type Database = {
         }
         Relationships: []
       }
+      super_admin_active_company: {
+        Row: {
+          active_company_id: string
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          active_company_id: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          active_company_id?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "super_admin_active_company_active_company_id_fkey"
+            columns: ["active_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       support_conversations: {
         Row: {
           answer: string
