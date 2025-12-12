@@ -2,16 +2,16 @@ import { AnalyticsFiltersProvider } from '@/contexts/AnalyticsFiltersContext';
 import { FilterPanel } from '@/components/analytics/FilterPanel';
 import { KPICard } from '@/components/analytics/KPICard';
 import { ChartCard } from '@/components/analytics/ChartCard';
-import { EmployeeListCard } from '@/components/analytics/EmployeeListCard';
+import { AllSalariesListCard } from '@/components/analytics/AllSalariesListCard';
 import { SalaryDistributionCard } from '@/components/analytics/SalaryDistributionCard';
 import { usePeopleAnalytics } from '@/hooks/usePeopleAnalytics';
-import { DollarSign, Users, Wallet, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { DollarSign, Users, Wallet } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { formatCurrency } from '@/lib/formatters';
 
 const PeopleAnalyticsContent = () => {
-  const { kpis, charts, topSalaries } = usePeopleAnalytics();
+  const { kpis, charts, allSalaries } = usePeopleAnalytics();
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -172,12 +172,11 @@ const PeopleAnalyticsContent = () => {
           </ChartCard>
         </div>
 
-        {/* Right Panel: Top Salaries */}
+        {/* Right Panel: All Salaries */}
         <div className="lg:col-span-3">
-          <EmployeeListCard
-            employees={topSalaries.data}
-            isLoading={topSalaries.isLoading}
-            limit={10}
+          <AllSalariesListCard
+            employees={allSalaries.data}
+            isLoading={allSalaries.isLoading}
           />
         </div>
       </div>

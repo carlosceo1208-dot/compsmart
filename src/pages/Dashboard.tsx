@@ -7,6 +7,7 @@ import { DateTimeDisplay } from "@/components/dashboard/DateTimeDisplay";
 import { ExportCard } from "@/components/dashboard/ExportCard";
 import { OrganizationalIdentityCard } from "@/components/dashboard/OrganizationalIdentityCard";
 import { PendingAdjustmentAlert } from "@/components/dashboard/PendingAdjustmentAlert";
+import { SalaryTableSetupAlert } from "@/components/dashboard/SalaryTableSetupAlert";
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
@@ -36,6 +37,9 @@ const Dashboard = () => {
           
           {/* Warning de Ajuste Pendente */}
           <PendingAdjustmentAlert />
+          
+          {/* Alerta Educativo - Tabela Salarial */}
+          <SalaryTableSetupAlert />
           
           <OrganizationalIdentityCard />
           
