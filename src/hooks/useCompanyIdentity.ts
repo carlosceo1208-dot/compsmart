@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface CompanyIdentity {
   id: string;
@@ -15,12 +16,17 @@ interface CompanyIdentity {
 }
 
 export const useCompanyIdentity = () => {
+  const { activeCompanyId } = useCompanyContext();
+
   return useQuery({
-    queryKey: ['company-identity'],
+    queryKey: ['company-identity', activeCompanyId],
     queryFn: async () => {
+      if (!activeCompanyId) return null;
+
       const { data, error } = await supabase
         .from('company_identity')
         .select('*')
+        .eq('root_company_id', activeCompanyId)
         .maybeSingle();
       
       if (error) throw error;
@@ -35,6 +41,7 @@ export const useCompanyIdentity = () => {
       
       return data as CompanyIdentity | null;
     },
+    enabled: !!activeCompanyId,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };

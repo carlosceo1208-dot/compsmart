@@ -88,8 +88,24 @@ export const DashboardLayout = () => {
   // Update logo/name when super_admin switches company
   useEffect(() => {
     if (activeCompany) {
+      // Super admin visualizando outra empresa
       setCompanyLogo(activeCompany.logo_url || null);
       setCompanyName(activeCompany.fantasy_name || activeCompany.name);
+    } else if (profile?.root_company_id) {
+      // Voltou para "Minha empresa" - buscar dados da própria empresa
+      const fetchOwnCompany = async () => {
+        const { data: company } = await supabase
+          .from("organizational_structure")
+          .select("logo_url, name, fantasy_name")
+          .eq("id", profile.root_company_id)
+          .single();
+        
+        if (company) {
+          setCompanyLogo(company.logo_url || null);
+          setCompanyName(company.fantasy_name || company.name);
+        }
+      };
+      fetchOwnCompany();
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -99,7 +115,7 @@ export const DashboardLayout = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [activeCompany]);
+  }, [activeCompany, profile?.root_company_id]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
