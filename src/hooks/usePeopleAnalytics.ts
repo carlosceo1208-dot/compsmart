@@ -268,15 +268,14 @@ export const usePeopleAnalytics = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Top 10 Highest Salaries
-  const { data: topSalaries, isLoading: isLoadingTop } = useQuery({
-    queryKey: ['analytics-top-salaries', filters],
+  // All Salaries (ordered highest to lowest)
+  const { data: allSalaries, isLoading: isLoadingAll } = useQuery({
+    queryKey: ['analytics-all-salaries', filters],
     queryFn: async () => {
       const { data, error } = await buildFilterConditions()
         .not('salary', 'is', null)
-        .select('full_name, salary')
-        .order('salary', { ascending: false })
-        .limit(10);
+        .select('full_name, salary, salary_range_percentage, grade, job_title')
+        .order('salary', { ascending: false });
       
       if (error) throw error;
       return data;
@@ -298,9 +297,9 @@ export const usePeopleAnalytics = () => {
       salaryRangeDistribution,
       isLoading: isLoadingByUnit || isLoadingByGrade || isLoadingComparison || isLoadingDistribution,
     },
-    topSalaries: {
-      data: topSalaries,
-      isLoading: isLoadingTop,
+    allSalaries: {
+      data: allSalaries,
+      isLoading: isLoadingAll,
     },
   };
 };
