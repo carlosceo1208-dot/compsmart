@@ -48,6 +48,14 @@ serve(async (req) => {
       throw new Error('Perfil não encontrado');
     }
 
+    // Buscar dados da empresa incluindo industry_sector
+    const { data: companyData } = await supabase
+      .from('organizational_structure')
+      .select('name, fantasy_name, industry_sector')
+      .eq('type', 'company')
+      .eq('id', profile.root_company_id)
+      .single();
+
     // Buscar tabela salarial ativa
     const { data: activeSalaryTable } = await supabase
       .from('salary_tables')
@@ -76,7 +84,7 @@ serve(async (req) => {
       .eq('is_active', true)
       .limit(100);
 
-    // Buscar dados de pesquisas salariais ativas
+    // Buscar dados de pesquisas salariais ativas (cliente + templates CompSmart)
     const { data: surveyTables } = await supabase
       .from('survey_tables')
       .select(`
@@ -95,8 +103,7 @@ serve(async (req) => {
         )
       `)
       .eq('is_active', true)
-      .limit(1)
-      .single();
+      .limit(5);
 
     // Buscar dados COMPLETOS dos funcionários para análise de equidade
     const { data: employeeData } = await supabase
@@ -230,8 +237,39 @@ serve(async (req) => {
       return `| ${grade} | R$ ${range.min.toLocaleString('pt-BR')} | R$ ${range.q1.toLocaleString('pt-BR')} | R$ ${range.median.toLocaleString('pt-BR')} | R$ ${range.q3.toLocaleString('pt-BR')} | R$ ${range.max.toLocaleString('pt-BR')} |`;
     }).join('\n');
 
-    // System prompt otimizado para análise salarial de qualidade executiva AAA
-    const systemPrompt = `Você é o **Agente Smart de Análise Salarial CompSmart**, um consultor sênior especializado em remuneração estratégica para o mundo corporativo.
+    // Formatar pesquisas salariais disponíveis
+    const surveyDataForPrompt = surveyTables?.map((survey: any) => {
+      const dataLines = survey.survey_data?.slice(0, 10).map((d: any) => 
+        `| ${d.job_title} | ${d.grade} | R$ ${d.min_value?.toLocaleString('pt-BR') || 'N/A'} | R$ ${d.median_value?.toLocaleString('pt-BR') || 'N/A'} | R$ ${d.max_value?.toLocaleString('pt-BR') || 'N/A'} |`
+      ).join('\n') || '';
+      return `📊 ${survey.name} (${survey.effective_month}/${survey.effective_year}):\n${dataLines}`;
+    }).join('\n\n') || 'Nenhuma pesquisa salarial configurada';
+
+    // Determinar vocabulário baseado no ramo de atividade
+    const industrySector = companyData?.industry_sector || 'Não informado';
+    const companyName = companyData?.fantasy_name || companyData?.name || 'Empresa';
+
+    const vocabularyGuide = getVocabularyGuide(industrySector);
+
+    // System prompt otimizado com persona Salary Smart
+    const systemPrompt = `Você é o **Salary Smart**, consultor sênior de remuneração estratégica da plataforma CompSmart.
+
+═══════════════════════════════════════════════════════════════════════════════
+                          🤖 SUA PERSONA
+═══════════════════════════════════════════════════════════════════════════════
+
+**PERSONALIDADE:** Você é um equilíbrio preciso entre:
+- **Analítico**: Focado em dados exatos e insights profundos
+- **Proativo**: Sugerindo ações acionáveis para otimizar estruturas salariais
+- **Colaborativo**: Comunicação humanizada, como parceiro de RH experiente
+
+**EMPRESA CLIENTE:** ${companyName}
+**RAMO DE ATIVIDADE:** ${industrySector}
+
+📌 **AJUSTE DE VOCABULÁRIO:**
+${vocabularyGuide}
+
+💡 **"Tempo é dinheiro"** - Seja objetivo, visual e prático. Foque especialmente em "key people" (talentos principais) e análises que economizam tempo e reduzem riscos de perda de colaboradores estratégicos.
 
 ═══════════════════════════════════════════════════════════════════════════════
                           🎯 DIRETRIZ DE QUALIDADE AAA
@@ -280,6 +318,9 @@ ${employeeDataForPrompt || '│ (Nenhum funcionário com salário cadastrado)   
 🔵 111-120% = Competitivo Superior (MONITORAR)
 🟣 >120% = Acima do Mercado (AVALIAR)
 
+**📈 PESQUISAS SALARIAIS DE MERCADO DISPONÍVEIS:**
+${surveyDataForPrompt}
+
 ═══════════════════════════════════════════════════════════════════════════════
                           🚨 REGRAS ABSOLUTAS
 ═══════════════════════════════════════════════════════════════════════════════
@@ -288,12 +329,15 @@ ${employeeDataForPrompt || '│ (Nenhum funcionário com salário cadastrado)   
 ❌ **NUNCA** use dados hipotéticos ou exemplos fictícios
 ❌ **NUNCA** escreva parágrafos longos sem tabelas ou estrutura
 ❌ **NUNCA** deixe de calcular métricas que você pode calcular
+❌ **NUNCA** mencione ou compare dados de outras empresas clientes (confidencialidade)
 
 ✅ **SEMPRE** use os dados REAIS dos funcionários acima
+✅ **SEMPRE** use as pesquisas salariais cadastradas para benchmark de mercado
 ✅ **SEMPRE** calcule Compa-Ratio = (Salário / Mediana da Grade) × 100
 ✅ **SEMPRE** formate em tabelas profissionais
 ✅ **SEMPRE** priorize por urgência: 🔴 > 🟡 > 🟢
 ✅ **SEMPRE** inclua valores monetários específicos nos ajustes
+✅ **PODE** buscar dados públicos de mercado na web para fortalecer análises ou quando solicitado
 
 ═══════════════════════════════════════════════════════════════════════════════
                           📋 FORMATO DE ENTREGA
@@ -355,11 +399,12 @@ ${operationMode === 'analise_equidade' ? `
 
 ${operationMode === 'benchmark_mercado' ? `
 **EXECUTAR ANÁLISE DE COMPETITIVIDADE DE MERCADO:**
-1. Comparar P50 interno vs pesquisas salariais disponíveis
+1. Comparar salários internos vs pesquisas salariais disponíveis acima
 2. Calcular gap percentual por cargo/grade
-3. Identificar cargos críticos (maior defasagem)
+3. Identificar cargos críticos (maior defasagem vs mercado)
 4. Gerar ranking de competitividade
 5. Recomendar ajustes para atingir P50 de mercado
+6. Pode buscar dados públicos complementares na web se necessário
 ` : ''}
 
 ${operationMode === 'recomendacao_ajuste' || operationMode === 'compa_ratio' ? `
@@ -387,7 +432,16 @@ ${document_text ? `
 Analise o documento em conjunto com os dados da empresa para gerar insights.
 ` : ''}
 
-**LEMBRE-SE:** Você está conversando com executivos. Entregue análises de qualidade AAA, com tabelas, métricas calculadas e recomendações acionáveis. NUNCA peça dados - você já os tem.`;
+**ENCERRAMENTO OBRIGATÓRIO DE CADA ANÁLISE:**
+
+⚖️ *Esta análise é baseada em dados internos e pesquisas cadastradas. Não substitui consultoria profissional qualificada em RH, Direito ou Financeira.*
+
+📥 **Próximos Passos Sugeridos:**
+- "Deseja que eu simule um cenário de aumento de X%?"
+- "Precisa de mais detalhes sobre algum funcionário específico?"
+- "Posso gerar uma análise comparativa por unidade/área?"
+
+**LEMBRE-SE:** Você está conversando com executivos. Entregue análises de qualidade AAA, com tabelas, métricas calculadas e recomendações acionáveis. NUNCA peça dados - você já os tem. AJUSTE seu vocabulário ao ramo de atividade da empresa.`;
 
     // ============ BUSCAR HISTÓRICO DA SESSÃO ============
     let conversationHistory: any[] = [];
@@ -403,6 +457,23 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
       conversationHistory = historyData || [];
     }
 
+    // Montar mensagens com histórico
+    const messages: any[] = [
+      { role: 'system', content: systemPrompt },
+    ];
+
+    // Adicionar histórico de conversação
+    for (const conv of conversationHistory) {
+      messages.push({ role: 'user', content: conv.question });
+      messages.push({ role: 'assistant', content: conv.answer });
+    }
+
+    // Adicionar pergunta atual
+    messages.push({ 
+      role: 'user', 
+      content: question + (document_text ? `\n\n---DOCUMENTO ANEXADO---\n${document_text}` : '') 
+    });
+
     const startTime = Date.now();
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -413,10 +484,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: question + (document_text ? `\n\n---DOCUMENTO ANEXADO---\n${document_text}` : '') },
-        ],
+        messages,
         max_tokens: 8000,
       }),
     });
@@ -424,6 +492,20 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('Lovable AI error:', aiResponse.status, errorText);
+      
+      if (aiResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns segundos.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (aiResponse.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Créditos de IA esgotados. Adicione créditos ao workspace.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       throw new Error(`Erro ao processar com IA: ${aiResponse.status}`);
     }
 
@@ -445,7 +527,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
       response_time_ms: responseTime,
     });
 
-    console.log(`✅ Salary Assistant processed successfully for ${profile.email} (${tokensUsed} tokens, ${responseTime}ms)`);
+    console.log(`✅ Salary Smart processed for ${profile.email} (${tokensUsed} tokens, ${responseTime}ms, industry: ${industrySector})`);
 
     return new Response(
       JSON.stringify({
@@ -455,16 +537,17 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
         response_time_ms: responseTime,
         context_summary: {
           has_salary_table: !!activeSalaryTable,
-          has_survey_data: !!surveyTables,
+          has_survey_data: !!surveyTables?.length,
           employee_count: contextData.employee_stats?.total_employees || 0,
           knowledge_docs: knowledgeDocs?.length || 0,
+          industry_sector: industrySector,
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error: any) {
-    console.error('❌ Salary Assistant error:', error);
+    console.error('❌ Salary Smart error:', error);
     return new Response(
       JSON.stringify({ 
         error: error.message || 'Erro ao processar consulta',
@@ -474,3 +557,58 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
     );
   }
 });
+
+// Função auxiliar para determinar vocabulário por ramo de atividade
+function getVocabularyGuide(industrySector: string): string {
+  const sector = industrySector?.toLowerCase() || '';
+  
+  if (sector.includes('tecnologia') || sector.includes('ti') || sector.includes('software')) {
+    return `**Ramo TI/Tecnologia detectado** - Use termos técnicos como: stack, sprint, deploy, SRE, DevOps, tech lead, squad, tribe, chapter, agile, scrum master, product owner, backend, frontend, fullstack, cloud engineer, arquiteto de software.`;
+  }
+  
+  if (sector.includes('marketing') || sector.includes('publicidade') || sector.includes('propaganda')) {
+    return `**Ramo Marketing/Publicidade detectado** - Use termos criativos como: briefing, branding, ROI de campanha, awareness, engajamento, mídia performance, lead generation, copywriter, diretor de arte, planner, atendimento, ROAS, CAC, LTV.`;
+  }
+  
+  if (sector.includes('financeiro') || sector.includes('bancário') || sector.includes('banco') || sector.includes('investimento')) {
+    return `**Ramo Financeiro/Bancário detectado** - Use termos formais como: compliance, hedge, due diligence, asset management, wealth management, private banking, corporate banking, tesouraria, controladoria, auditoria, gestão de risco, regulatório.`;
+  }
+  
+  if (sector.includes('varejo') || sector.includes('comércio') || sector.includes('retail')) {
+    return `**Ramo Varejo/Comércio detectado** - Use termos acessíveis como: PDV, giro de estoque, ruptura, sell-in, sell-out, ticket médio, conversão, visual merchandising, gerente de loja, operador de caixa, repositor, buyer.`;
+  }
+  
+  if (sector.includes('indústria') || sector.includes('manufatura') || sector.includes('fábrica')) {
+    return `**Ramo Indústria/Manufatura detectado** - Use termos operacionais como: OEE, setup, turno, linha de produção, lean manufacturing, qualidade total, manutenção preventiva, engenharia de processos, PCP, supervisor de produção, operador de máquinas.`;
+  }
+  
+  if (sector.includes('saúde') || sector.includes('hospitalar') || sector.includes('clínica')) {
+    return `**Ramo Saúde/Hospitalar detectado** - Use termos específicos como: corpo clínico, plantão, procedimento, prontuário, enfermagem, coordenação médica, gestão hospitalar, hotelaria hospitalar, OPME, farmácia clínica, UTI, centro cirúrgico.`;
+  }
+  
+  if (sector.includes('educação') || sector.includes('ensino') || sector.includes('escola')) {
+    return `**Ramo Educação detectado** - Use termos educacionais como: corpo docente, coordenação pedagógica, grade curricular, carga horária, titulação, dedicação exclusiva, extensão, pesquisa, pós-graduação, secretaria acadêmica.`;
+  }
+  
+  if (sector.includes('logística') || sector.includes('transporte') || sector.includes('supply')) {
+    return `**Ramo Logística/Transportes detectado** - Use termos operacionais como: supply chain, last mile, cross-docking, centro de distribuição, frota, roteirização, picking, packing, WMS, TMS, operador logístico.`;
+  }
+  
+  if (sector.includes('construção') || sector.includes('civil') || sector.includes('engenharia')) {
+    return `**Ramo Construção Civil detectado** - Use termos de obra como: canteiro, empreiteiro, incorporação, BDI, cronograma físico-financeiro, mestre de obras, engenheiro residente, orçamentista, topografia, fundações.`;
+  }
+  
+  if (sector.includes('agro') || sector.includes('agrícola') || sector.includes('agronegócio')) {
+    return `**Ramo Agronegócio detectado** - Use termos rurais como: safra, entressafra, commodity, silo, armazém, manejo, fertilizante, defensivo, agrônomo, operador de máquinas agrícolas, supervisor de campo.`;
+  }
+  
+  if (sector.includes('energia') || sector.includes('utilities') || sector.includes('elétrica')) {
+    return `**Ramo Energia/Utilities detectado** - Use termos do setor como: geração, transmissão, distribuição, subestação, manutenção de redes, eletricista, engenheiro eletricista, regulação ANEEL, mercado livre, comercializadora.`;
+  }
+  
+  if (sector.includes('serviços') || sector.includes('consultoria')) {
+    return `**Ramo Serviços Profissionais detectado** - Use termos corporativos como: projeto, entrega, alocação, utilização, billing, partner, associate, consultant, manager, senior manager, director, engagement.`;
+  }
+  
+  return `**Ramo não especificado** - Use vocabulário corporativo padrão, claro e profissional. Adapte conforme o contexto das perguntas do usuário.`;
+}

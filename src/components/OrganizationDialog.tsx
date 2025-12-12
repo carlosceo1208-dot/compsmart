@@ -49,7 +49,24 @@ interface EntityData {
   union_name: string;
   base_date: string;
   logo_url: string;
+  industry_sector: string;
 }
+
+const INDUSTRY_SECTORS = [
+  { value: "tecnologia", label: "Tecnologia / TI" },
+  { value: "marketing_publicidade", label: "Marketing e Publicidade" },
+  { value: "financeiro_bancario", label: "Financeiro / Bancário" },
+  { value: "varejo_comercio", label: "Varejo / Comércio" },
+  { value: "industria_manufatura", label: "Indústria / Manufatura" },
+  { value: "saude_hospitalar", label: "Saúde / Hospitalar" },
+  { value: "educacao", label: "Educação" },
+  { value: "servicos_profissionais", label: "Serviços Profissionais" },
+  { value: "logistica_transportes", label: "Logística / Transportes" },
+  { value: "construcao_civil", label: "Construção Civil" },
+  { value: "agronegocio", label: "Agronegócio" },
+  { value: "energia_utilities", label: "Energia / Utilities" },
+  { value: "outro", label: "Outro" },
+];
 
 interface ParentOption {
   id: string;
@@ -104,6 +121,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     union_name: "",
     base_date: "",
     logo_url: "",
+    industry_sector: "",
   });
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
@@ -151,6 +169,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
           union_name: data.union_name || "",
           base_date: data.base_date || "",
           logo_url: data.logo_url || "",
+          industry_sector: data.industry_sector || "",
         });
       }
     } catch (error: any) {
@@ -222,6 +241,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       union_name: "",
       base_date: "",
       logo_url: "",
+      industry_sector: "",
     });
   };
 
@@ -323,6 +343,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
         union_name: isCompanyType ? (formData.union_name || null) : null,
         base_date: isCompanyType ? (formData.base_date || null) : null,
         logo_url: formData.type === 'company' ? (formData.logo_url || null) : null,
+        industry_sector: formData.type === 'company' ? (formData.industry_sector || null) : null,
       };
 
       if (entityId) {
@@ -668,6 +689,45 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
                   )}
                 </div>
               </div>
+
+              {/* Ramo de Atividade - apenas para tipo company */}
+              {formData.type === 'company' && (
+                <div className="space-y-2">
+                  <Label htmlFor="industry_sector" className="flex items-center gap-1">
+                    Ramo de Atividade
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs">
+                            O ramo de atividade ajuda o Salary Smart a adaptar o vocabulário e análises ao contexto do seu negócio
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </Label>
+                  <Select
+                    value={formData.industry_sector || ""}
+                    onValueChange={(value) => setFormData({ ...formData, industry_sector: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o ramo de atividade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INDUSTRY_SECTORS.map((sector) => (
+                        <SelectItem key={sector.value} value={sector.value}>
+                          {sector.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    💡 O Salary Smart ajustará seu vocabulário com base neste ramo
+                  </p>
+                </div>
+              )}
             </>
           )}
 

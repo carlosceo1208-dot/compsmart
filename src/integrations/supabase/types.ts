@@ -1791,6 +1791,7 @@ export type Database = {
           description: string | null
           fantasy_name: string | null
           id: string
+          industry_sector: string | null
           logo_url: string | null
           name: string
           parent_id: string | null
@@ -1818,6 +1819,7 @@ export type Database = {
           description?: string | null
           fantasy_name?: string | null
           id?: string
+          industry_sector?: string | null
           logo_url?: string | null
           name: string
           parent_id?: string | null
@@ -1845,6 +1847,7 @@ export type Database = {
           description?: string | null
           fantasy_name?: string | null
           id?: string
+          industry_sector?: string | null
           logo_url?: string | null
           name?: string
           parent_id?: string | null
