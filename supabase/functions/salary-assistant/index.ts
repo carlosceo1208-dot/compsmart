@@ -98,12 +98,29 @@ serve(async (req) => {
       .limit(1)
       .single();
 
-    // Buscar estatísticas de funcionários (sem dados sensíveis individuais)
-    const { data: employeeStats } = await supabase
+    // Buscar dados COMPLETOS dos funcionários para análise de equidade
+    const { data: employeeData } = await supabase
       .from('profiles')
-      .select('grade, salary, job_title, unit_id')
+      .select(`
+        id,
+        full_name,
+        grade,
+        salary,
+        variable_salary,
+        salary_range_percentage,
+        job_title,
+        job_title_id,
+        unit_id
+      `)
       .eq('root_company_id', profile.root_company_id)
+      .eq('status', 'active')
       .not('salary', 'is', null);
+
+    // Buscar nomes de unidades
+    const { data: units } = await supabase
+      .from('organizational_structure')
+      .select('id, description, name')
+      .eq('root_company_id', profile.root_company_id);
 
     // Buscar documentos da base de conhecimento
     const { data: knowledgeDocs } = await supabase
@@ -130,21 +147,62 @@ serve(async (req) => {
       operationMode = 'distorcoes';
     }
 
+    // Mapear dados de unidades para lookup rápido
+    const unitMap = units?.reduce((acc: any, u: any) => {
+      acc[u.id] = u.description || u.name;
+      return acc;
+    }, {}) || {};
+
+    // Criar faixas salariais por grade para lookup
+    const salaryRangesByGrade = activeSalaryTable?.salary_ranges?.reduce((acc: any, sr: any) => {
+      const normalizedGrade = sr.grade.toString().padStart(3, '0');
+      acc[normalizedGrade] = {
+        min: sr.min_value,
+        q1: sr.q1_value,
+        median: sr.median_value,
+        q3: sr.q3_value,
+        max: sr.max_value
+      };
+      return acc;
+    }, {}) || {};
+
+    // Preparar dados detalhados de funcionários para a IA
+    const employeeDetails = employeeData?.map((emp: any, idx: number) => {
+      const normalizedGrade = emp.grade?.toString().padStart(3, '0') || '';
+      const gradeRange = salaryRangesByGrade[normalizedGrade];
+      const compaRatio = gradeRange?.median ? Math.round((emp.salary / gradeRange.median) * 100) : null;
+      
+      return {
+        id: `FUNC_${String(idx + 1).padStart(3, '0')}`,
+        nome: emp.full_name,
+        cargo: emp.job_title || 'N/A',
+        grade: emp.grade,
+        salario_base: emp.salary,
+        salario_variavel: emp.variable_salary || 0,
+        percentual_faixa: emp.salary_range_percentage,
+        compa_ratio: compaRatio,
+        unidade: unitMap[emp.unit_id] || 'N/A',
+        faixa_grade: gradeRange || null,
+      };
+    }) || [];
+
     // Construir contexto
     const contextData = {
       salary_table: activeSalaryTable,
+      salary_ranges_by_grade: salaryRangesByGrade,
       job_titles: jobTitles,
       survey_data: surveyTables,
-      employee_stats: employeeStats ? {
-        total_employees: employeeStats.length,
-        grades_distribution: employeeStats.reduce((acc: any, emp: any) => {
+      employee_details: employeeDetails,
+      employee_stats: employeeData ? {
+        total_employees: employeeData.length,
+        grades_distribution: employeeData.reduce((acc: any, emp: any) => {
           acc[emp.grade] = (acc[emp.grade] || 0) + 1;
           return acc;
         }, {}),
         salary_ranges: {
-          min: Math.min(...employeeStats.map((e: any) => e.salary)),
-          max: Math.max(...employeeStats.map((e: any) => e.salary)),
-          avg: employeeStats.reduce((sum: number, e: any) => sum + e.salary, 0) / employeeStats.length,
+          min: Math.min(...employeeData.map((e: any) => e.salary)),
+          max: Math.max(...employeeData.map((e: any) => e.salary)),
+          avg: employeeData.reduce((sum: number, e: any) => sum + e.salary, 0) / employeeData.length,
         }
       } : null,
       knowledge_base: knowledgeDocs?.map(doc => ({
@@ -154,7 +212,25 @@ serve(async (req) => {
       })),
     };
 
-    // System prompt otimizado para análise salarial
+    // Formatar dados dos funcionários para o prompt
+    const employeeDataForPrompt = employeeDetails.map((emp: any) => {
+      const posicionamento = emp.compa_ratio 
+        ? emp.compa_ratio < 80 ? 'Abaixo do Mercado' 
+          : emp.compa_ratio < 90 ? 'Competitivo Inferior'
+          : emp.compa_ratio <= 110 ? 'Alinhado ao Mercado'
+          : emp.compa_ratio <= 120 ? 'Competitivo Superior'
+          : 'Acima do Mercado'
+        : 'N/A';
+      
+      return `| ${emp.nome} | ${emp.cargo} | ${emp.grade} | R$ ${emp.salario_base.toLocaleString('pt-BR')} | ${emp.compa_ratio || 'N/A'}% | ${posicionamento} | ${emp.unidade} |`;
+    }).join('\n');
+
+    // Formatar faixas salariais por grade
+    const gradeRangesForPrompt = Object.entries(salaryRangesByGrade).map(([grade, range]: [string, any]) => {
+      return `| ${grade} | R$ ${range.min.toLocaleString('pt-BR')} | R$ ${range.q1.toLocaleString('pt-BR')} | R$ ${range.median.toLocaleString('pt-BR')} | R$ ${range.q3.toLocaleString('pt-BR')} | R$ ${range.max.toLocaleString('pt-BR')} |`;
+    }).join('\n');
+
+    // System prompt otimizado para análise salarial com dados reais
     const systemPrompt = `Você é o **Agente Smart de Análise Salarial**, especialista em estrutura de cargos, faixas salariais e benchmarking de mercado.
 
 **📊 CONTEXTO DA EMPRESA:**
@@ -162,16 +238,21 @@ serve(async (req) => {
 - Total de Funcionários: ${contextData.employee_stats?.total_employees || 0}
 - Grades em Uso: ${Object.keys(contextData.employee_stats?.grades_distribution || {}).join(', ')}
 
+**💰 FAIXAS SALARIAIS POR GRADE (TABELA ATIVA):**
+| Grade | Mínimo | Q1 | Mediana (P50) | Q3 | Máximo |
+|-------|--------|----|--------------:|----:|-------:|
+${gradeRangesForPrompt || 'Nenhuma faixa configurada'}
+
+**👥 DADOS COMPLETOS DOS FUNCIONÁRIOS:**
+| Nome | Cargo | Grade | Salário Base | Compa-Ratio | Posicionamento | Unidade |
+|------|-------|-------|-------------:|------------:|----------------|---------|
+${employeeDataForPrompt || 'Nenhum funcionário cadastrado'}
+
 **🎯 MODO DE OPERAÇÃO ATUAL: ${operationMode.toUpperCase()}**
 
 **🔧 INSTRUÇÕES ESSENCIAIS:**
 
-1. **Estrutura de Grades (A-J):**
-   - A (Júnior) → J (Executivo)
-   - Cada grade tem faixa salarial (Mín, Q1, Mediana/P50, Q3, Máx)
-   - P50 = Ponto Médio = Mediana de Mercado
-
-2. **Cálculo de Compa-Ratio:**
+1. **Cálculo de Compa-Ratio:**
    - Compa-Ratio = (Salário Real / P50 da Faixa) × 100
    - < 80%: Abaixo do mercado
    - 80-90%: Competitivo inferior
@@ -179,65 +260,58 @@ serve(async (req) => {
    - 110-120%: Competitivo superior
    - > 120%: Acima do mercado
 
-3. **Análise de Equidade Interna:**
+2. **Análise de Equidade Interna:**
    - Verificar compressão salarial (subordinado ganha mais que gestor)
    - Identificar distorções dentro da mesma grade
    - Calcular dispersão salarial por área/departamento
 
-4. **Benchmarking de Mercado:**
+3. **Benchmarking de Mercado:**
    - Comparar P50 interno vs P50 de pesquisas
-   - Calcular gap percentual: ((P50_Interno - P50_Mercado) / P50_Mercado) × 100
+   - Calcular gap percentual
    - Avaliar competitividade por cargo/área
-
-5. **Posicionamento Competitivo:**
-   - P10-P25: Lead (Líder de mercado)
-   - P25-P50: Match (Alinhado ao mercado)
-   - P50-P75: Lag (Seguidor de mercado)
 
 **📋 QUANDO RECOMENDAR AJUSTES:**
 - Funcionários abaixo de 80% do P50 (prioridade alta)
 - Inversões hierárquicas (urgente)
-- Gaps acima de 15% vs mercado (competitividade)
 - Distorções dentro da mesma grade > 30%
 
-**⚠️ PRIVACIDADE:**
-- Você tem acesso APENAS aos dados da empresa atual
-- NUNCA compartilhe ou compare com dados de outras empresas
-- Mantenha confidencialidade de salários individuais
-
-**💡 TOM E ESTILO:**
-- Use linguagem técnica de R&B (P50, P75, compa-ratio, etc.)
-- Seja objetivo e baseado em dados
-- Forneça recomendações práticas e acionáveis
-- Use bullet points e tabelas quando apropriado
+**⚠️ IMPORTANTE:**
+- USE OS DADOS REAIS ACIMA para fazer análises
+- NÃO peça dados ao usuário - você já tem acesso completo
+- Calcule compa-ratio baseado nos dados fornecidos
+- Identifique distorções e sugira ajustes específicos
 
 ${operationMode === 'analise_equidade' ? `
 **🎯 FOCO ATUAL: ANÁLISE DE EQUIDADE INTERNA**
-- Identifique funcionários fora da faixa ideal
-- Calcule compa-ratio de todos
-- Destaque distorções e inversões
-- Sugira ajustes priorizados por impacto
+USE OS DADOS ACIMA PARA:
+- Listar funcionários fora da faixa ideal (<80% ou >120%)
+- Calcular compa-ratio de cada funcionário
+- Identificar distorções por grade (dispersão >30%)
+- Detectar inversões hierárquicas
+- Sugerir ajustes priorizados por urgência com valores específicos
 ` : ''}
 
 ${operationMode === 'benchmark_mercado' ? `
 **🎯 FOCO ATUAL: BENCHMARKING DE MERCADO**
-- Compare P50 interno vs pesquisas salariais
+USE OS DADOS ACIMA PARA:
+- Compare P50 interno vs pesquisas salariais (se disponíveis)
 - Calcule gap percentual por cargo/grade
-- Identifique cargos críticos (alto gap + turnover)
-- Recomende ajustes baseados em budget
+- Identifique cargos críticos
+- Recomende ajustes baseados em competitividade
 ` : ''}
 
 ${operationMode === 'recomendacao_ajuste' ? `
 **🎯 FOCO ATUAL: RECOMENDAÇÃO DE AJUSTES**
+USE OS DADOS ACIMA PARA:
 - Priorize casos mais críticos (equidade > mercado)
-- Sugira percentuais de aumento realistas
-- Considere impacto orçamentário
+- Sugira percentuais de aumento específicos para cada funcionário
+- Calcule impacto orçamentário mensal e anual
 - Forneça roadmap de implementação
 ` : ''}
 
 ${document_text ? `\n**📄 DOCUMENTO ANEXADO: ${document_name}\nAnalise o documento fornecido para complementar sua resposta.` : ''}
 
-Responda de forma clara, estruturada e sempre baseada nos dados fornecidos.`;
+Responda de forma clara, estruturada e baseada nos dados REAIS fornecidos acima. NÃO solicite informações adicionais.`;
 
     // ============ BUSCAR HISTÓRICO DA SESSÃO ============
     let conversationHistory: any[] = [];
