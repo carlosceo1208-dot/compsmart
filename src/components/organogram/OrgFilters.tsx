@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Search } from "lucide-react";
 
@@ -64,10 +64,13 @@ export function OrgFilters({
           <Label>Filtrar por Unidade</Label>
           <Select value={selectedUnit} onValueChange={onUnitChange}>
             <SelectTrigger>
-              <SelectValue />
+              <SelectValue placeholder="Selecione uma unidade" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as unidades</SelectItem>
+            <SelectContent position="item-aligned">
+              <SelectItem value="all" className="font-medium text-primary">
+                🔄 Todas as unidades
+              </SelectItem>
+              {units.length > 0 && <SelectSeparator />}
               {units.map((unit) => (
                 <SelectItem key={unit.id} value={unit.id}>
                   {unit.name}
