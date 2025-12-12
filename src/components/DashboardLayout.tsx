@@ -32,12 +32,13 @@ interface UserProfile {
 export const DashboardLayout = () => {
   const navigate = useNavigate();
   const { getLabel } = useLabels();
-  const { activeCompany, isViewingOtherCompany } = useCompanyContext();
+  const { activeCompany, activeCompanyId, isViewingOtherCompany, ownCompanyId, isLoading: companyContextLoading } = useCompanyContext();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
 
+  // Fetch user profile only - company data comes from context
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -67,47 +68,47 @@ export const DashboardLayout = () => {
         return;
       }
 
-      // Fetch company logo (will be overridden by context for super_admin)
-      const { data: company } = await supabase
-        .from("organizational_structure")
-        .select("logo_url, name, fantasy_name")
-        .eq("id", data.root_company_id)
-        .single();
-
-      if (company) {
-        setCompanyLogo(company.logo_url || null);
-        setCompanyName(company.fantasy_name || company.name);
-      }
-
       setLoading(false);
     };
 
     fetchProfile();
   }, [navigate]);
 
-  // Update logo/name when super_admin switches company
+  // Update logo/name based on activeCompanyId (source of truth from context)
   useEffect(() => {
-    if (activeCompany) {
-      // Super admin visualizando outra empresa
+    // Wait for context to finish loading
+    if (companyContextLoading) return;
+
+    const companyIdToUse = activeCompanyId || profile?.root_company_id;
+    
+    if (!companyIdToUse) return;
+
+    // If activeCompany data is already available and matches activeCompanyId, use it
+    if (activeCompany && activeCompanyId) {
       setCompanyLogo(activeCompany.logo_url || null);
       setCompanyName(activeCompany.fantasy_name || activeCompany.name);
-    } else if (profile?.root_company_id) {
-      // Voltou para "Minha empresa" - buscar dados da própria empresa
-      const fetchOwnCompany = async () => {
-        const { data: company } = await supabase
-          .from("organizational_structure")
-          .select("logo_url, name, fantasy_name")
-          .eq("id", profile.root_company_id)
-          .single();
-        
-        if (company) {
-          setCompanyLogo(company.logo_url || null);
-          setCompanyName(company.fantasy_name || company.name);
-        }
-      };
-      fetchOwnCompany();
+      return;
     }
 
+    // Fetch company data for the active company ID
+    const fetchCompanyData = async () => {
+      const { data: company } = await supabase
+        .from("organizational_structure")
+        .select("logo_url, name, fantasy_name")
+        .eq("id", companyIdToUse)
+        .single();
+      
+      if (company) {
+        setCompanyLogo(company.logo_url || null);
+        setCompanyName(company.fantasy_name || company.name);
+      }
+    };
+    
+    fetchCompanyData();
+  }, [activeCompanyId, activeCompany, profile?.root_company_id, companyContextLoading]);
+
+  // Auth state change listener
+  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_OUT") {
         navigate("/auth");
@@ -115,7 +116,7 @@ export const DashboardLayout = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [activeCompany, profile?.root_company_id]);
+  }, [navigate]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
