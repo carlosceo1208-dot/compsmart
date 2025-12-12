@@ -138,7 +138,7 @@ export const ModuleGrid = () => {
       category: 'management',
     },
     {
-      title: 'Assistente Jurídico',
+      title: 'Jurídico Smart',
       description: 'Consultoria trabalhista e previdenciária com IA',
       icon: Scale,
       path: '/legal-assistant',
@@ -156,7 +156,7 @@ export const ModuleGrid = () => {
       requiredPlan: 'pro',
     },
     {
-      title: 'Agente de Análise Salarial',
+      title: 'Salary Smart',
       description: 'IA para estruturas, faixas e benchmarking salarial',
       icon: TrendingUp,
       path: '/salary-assistant',
@@ -165,7 +165,7 @@ export const ModuleGrid = () => {
       requiredPlan: 'pro',
     },
     {
-      title: 'Assistente de R&B',
+      title: 'R&B Smart',
       description: 'Consultas sobre Remuneração e Benefícios com IA',
       icon: Bot,
       path: '/incentive-assistant',

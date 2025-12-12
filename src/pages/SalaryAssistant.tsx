@@ -180,7 +180,7 @@ const SalaryAssistant = () => {
           <div className="flex items-center gap-3">
             <Calculator className="w-8 h-8 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Agente de Análise Salarial</h1>
+              <h1 className="text-3xl font-bold">Salary Smart</h1>
               <p className="text-muted-foreground">
                 Estruturas, faixas salariais, compa-ratio e benchmarking
               </p>

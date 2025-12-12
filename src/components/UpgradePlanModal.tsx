@@ -57,7 +57,7 @@ const planConfig: Record<PlanType, {
     color: 'text-blue-600',
     features: [
       'Até 500 funcionários',
-      'Assistentes IA (Jurídico, Salarial, R&B)',
+      'Agentes Smart (Jurídico, Salary, R&B)',
       'Programas de incentivos',
       'Análise salarial avançada',
       'Relatórios personalizados',
