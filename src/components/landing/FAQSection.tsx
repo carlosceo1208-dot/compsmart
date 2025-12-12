@@ -6,7 +6,7 @@ export const FAQSection = () => {
   const faqs = [
     {
       question: "Como funcionam os Agentes Inteligentes de IA?",
-      answer: "Nossos agentes são especialistas virtuais treinados em remuneração brasileira. O Assistente Jurídico gera contratos e analisa compliance, o Agente de Análise Salarial faz benchmarking e calcula compa-ratio, e o Assistente de R&B ajuda a estruturar incentivos. Todos trabalham 24/7, respondem em segundos e aprendem com o contexto da sua empresa.",
+      answer: "Nossos agentes são especialistas virtuais treinados em remuneração brasileira. O Jurídico Smart gera contratos e analisa compliance, o Salary Smart faz benchmarking e calcula compa-ratio, e o R&B Smart ajuda a estruturar incentivos. Todos trabalham 24/7, respondem em segundos e aprendem com o contexto da sua empresa.",
       icon: Bot,
       isNew: true
     },

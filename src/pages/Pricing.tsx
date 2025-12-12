@@ -45,7 +45,7 @@ const Pricing = () => {
         'Tabelas salariais ilimitadas',
         'Pesquisa Salarial avançada',
         'People Analytics avançado',
-        '🎯 Assistente Jurídico com IA',
+        '🎯 Agentes Smart (Jurídico, Salary, R&B)',
         'Exportação completa + API',
         'Suporte prioritário',
       ],

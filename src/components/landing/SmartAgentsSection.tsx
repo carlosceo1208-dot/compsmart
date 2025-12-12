@@ -13,7 +13,7 @@ export const SmartAgentsSection = () => {
   const agents = [
     {
       icon: FileText,
-      title: "Assistente Jurídico Smart",
+      title: "Jurídico Smart",
       description: "Geração automática de contratos, políticas e análise de compliance trabalhista com referências legais atualizadas",
       badge: "Compliance",
       avatar: avatarWoman2,
@@ -25,7 +25,7 @@ export const SmartAgentsSection = () => {
     },
     {
       icon: Briefcase,
-      title: "Agente de Análise Salarial",
+      title: "Salary Smart",
       description: "Benchmarking de mercado, cálculo de compa-ratio e recomendações estratégicas para ajustes salariais",
       badge: "Análise",
       avatar: avatarMan1,
@@ -37,7 +37,7 @@ export const SmartAgentsSection = () => {
     },
     {
       icon: Bot,
-      title: "Assistente de R&B",
+      title: "R&B Smart",
       description: "Consultoria especializada em incentivos de curto e longo prazo, benefícios e políticas de retenção",
       badge: "Consultoria",
       avatar: avatarWoman1,

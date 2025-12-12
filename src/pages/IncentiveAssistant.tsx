@@ -180,7 +180,7 @@ const IncentiveAssistant = () => {
           <div className="flex items-center gap-3">
             <Target className="w-8 h-8 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Assistente de R&B</h1>
+              <h1 className="text-3xl font-bold">R&B Smart</h1>
               <p className="text-muted-foreground">
                 Consultoria em Remuneração, Benefícios e Incentivos
               </p>

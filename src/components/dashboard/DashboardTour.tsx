@@ -28,7 +28,7 @@ const tourSteps: Step[] = [
       <div className="text-left">
         <h3 className="font-semibold text-base mb-1">Agentes Smart</h3>
         <p className="text-sm text-muted-foreground">
-          Assistentes de IA: Jurídico, Análise Salarial e R&B.
+          Assistentes de IA: Jurídico Smart, Salary Smart e R&B Smart.
         </p>
         <p className="text-xs text-amber-600 mt-1">⭐ Plano Pro</p>
       </div>
