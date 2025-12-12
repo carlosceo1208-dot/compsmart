@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Calculator, TrendingUp, Upload, Settings } from 'lucide-react';
 import { SalaryRangeDialog } from '@/components/SalaryRangeDialog';
-import { SalaryTableDialog } from '@/components/SalaryTableDialog';
+import { SalaryTableManager } from '@/components/SalaryTableManager';
 import { SalaryTableSelector } from '@/components/SalaryTableSelector';
 import { SalaryBulkImport } from '@/components/SalaryBulkImport';
 import { useLabels } from '@/contexts/LabelsContext';
@@ -29,8 +29,9 @@ export default function SalaryRanges() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
-  const [tableDialogOpen, setTableDialogOpen] = useState(false);
+  const [tableManagerOpen, setTableManagerOpen] = useState(false);
   const [bulkImportOpen, setBulkImportOpen] = useState(false);
+  const [selectorKey, setSelectorKey] = useState(0);
 
   useEffect(() => {
     fetchRanges();
@@ -76,7 +77,7 @@ export default function SalaryRanges() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setTableDialogOpen(true)}>
+          <Button variant="outline" onClick={() => setTableManagerOpen(true)}>
             <Settings className="w-4 h-4 mr-2" />
             Gerenciar Tabelas
           </Button>
@@ -93,7 +94,7 @@ export default function SalaryRanges() {
 
       <Card className="bg-muted/50">
         <CardContent className="pt-6">
-          <SalaryTableSelector value={selectedTableId} onChange={setSelectedTableId} />
+          <SalaryTableSelector key={selectorKey} value={selectedTableId} onChange={setSelectedTableId} />
         </CardContent>
       </Card>
 
@@ -104,7 +105,7 @@ export default function SalaryRanges() {
               <p className="text-muted-foreground mb-4">
                 Selecione uma tabela salarial para visualizar as faixas
               </p>
-              <Button onClick={() => setTableDialogOpen(true)}>
+              <Button onClick={() => setTableManagerOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Criar Primeira Tabela
               </Button>
@@ -185,13 +186,12 @@ export default function SalaryRanges() {
         onSuccess={fetchRanges}
       />
 
-      <SalaryTableDialog
-        open={tableDialogOpen}
-        onOpenChange={setTableDialogOpen}
-        onSuccess={() => {
-          // Atualizar seletor (forçar re-render)
-          setSelectedTableId(null);
-          setTimeout(() => fetchRanges(), 100);
+      <SalaryTableManager
+        open={tableManagerOpen}
+        onOpenChange={setTableManagerOpen}
+        onTableActivated={() => {
+          setSelectorKey(prev => prev + 1);
+          fetchRanges();
         }}
       />
 
