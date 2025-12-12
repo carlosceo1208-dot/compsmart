@@ -65,20 +65,34 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (currentError) throw currentError;
 
-      // 2. Calcular baseline do ano ATUAL - USANDO MESES DE OPERAÇÃO DA EMPRESA
-      // Empresa CompSmart opera desde novembro/2025 = 2 meses de operação
-      const companyStartMonth = 11; // Novembro
-      const monthsInOperation2025 = Math.max(1, currentMonth - companyStartMonth + 1); // = 2 meses
-      
+      // 2. Calcular baseline do ano ATUAL - POR FUNCIONÁRIO baseado em hire_date
       let currentFixedSalary = 0;
       let currentVariableSalary = 0;
       let currentBenefits = 0;
       
-      // SIMPLES: todos funcionários ativos × meses de operação da empresa
+      // Calcular meses trabalhados POR FUNCIONÁRIO com base na data de admissão
       currentEmployees.forEach(emp => {
-        currentFixedSalary += (emp.salary || 0) * monthsInOperation2025;
-        currentVariableSalary += (emp.variable_salary || 0) * monthsInOperation2025;
-        currentBenefits += (emp.benefits_value || 0) * monthsInOperation2025;
+        let monthsWorked = 12; // Padrão: 12 meses se admitido antes de Jan/2025
+        
+        if (emp.hire_date) {
+          const hireDate = new Date(emp.hire_date);
+          const hireYear = hireDate.getFullYear();
+          const hireMonth = hireDate.getMonth() + 1; // 1-12
+          
+          if (hireYear === currentYear) {
+            // Admitido no ano atual: calcular meses de Jan até mês atual
+            // Ex: admitido em Nov/2025 e estamos em Dez/2025 = 2 meses
+            monthsWorked = Math.max(1, currentMonth - hireMonth + 1);
+          } else if (hireYear > currentYear) {
+            // Admitido no futuro (não deveria acontecer, mas prevenir)
+            monthsWorked = 0;
+          }
+          // Se hireYear < currentYear, mantém 12 meses (funcionário antigo)
+        }
+        
+        currentFixedSalary += (emp.salary || 0) * monthsWorked;
+        currentVariableSalary += (emp.variable_salary || 0) * monthsWorked;
+        currentBenefits += (emp.benefits_value || 0) * monthsWorked;
       });
 
       const currentTotal = currentFixedSalary + currentVariableSalary + currentBenefits;
