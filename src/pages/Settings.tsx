@@ -7,18 +7,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Settings as SettingsIcon, FileEdit, CreditCard, Crown, ChevronRight, TestTube, QrCode, Landmark, Wallet, AlertCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Settings as SettingsIcon, FileEdit, CreditCard, Crown, ChevronRight, TestTube, QrCode, Landmark, Wallet, AlertCircle, PlayCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { resetDashboardTour } from '@/components/dashboard/DashboardTour';
 
 export default function Settings() {
   const { labels, updateLabel } = useLabels();
   const [localLabels, setLocalLabels] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLocalLabels(labels);
   }, [labels]);
+
+  const handleRestartTour = () => {
+    resetDashboardTour();
+    toast.success('Tour reiniciado! Redirecionando...');
+    navigate('/dashboard');
+  };
 
   const handleSave = async (key: string) => {
     setSaving(key);
@@ -198,7 +206,7 @@ export default function Settings() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {settingsLinks
               .filter(link => !link.adminOnly || isAdmin)
               .map((link) => (
@@ -215,6 +223,19 @@ export default function Settings() {
                   <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
               ))}
+            
+            {/* Botão Reiniciar Tour */}
+            <button
+              onClick={handleRestartTour}
+              className="flex items-center gap-3 p-4 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors text-left"
+            >
+              <PlayCircle className="h-5 w-5 text-emerald-600" />
+              <div className="flex-1">
+                <p className="font-medium text-sm text-emerald-800 dark:text-emerald-200">Reiniciar Tour</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400">Ver instruções novamente</p>
+              </div>
+              <ChevronRight className="h-4 w-4 text-emerald-500" />
+            </button>
           </div>
         </CardContent>
       </Card>
