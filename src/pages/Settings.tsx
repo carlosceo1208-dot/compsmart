@@ -162,26 +162,41 @@ export default function Settings() {
   ];
 
   const settingsLinks = [
+    // Meu Plano - visível para todos os admins/hr (não super admin)
     { 
-      title: 'Planos', 
-      description: 'Gerencie os planos de assinatura', 
+      title: 'Meu Plano', 
+      description: 'Visualize e gerencie sua assinatura', 
+      path: '/settings/my-plan', 
+      icon: Crown,
+      adminOnly: true,
+      superAdminOnly: false,
+      hideForSuperAdmin: true // Super Admin usa "Gerenciar Planos"
+    },
+    // Gerenciar Planos - apenas Super Admin
+    { 
+      title: 'Gerenciar Planos', 
+      description: 'Gerencie os planos da plataforma', 
       path: '/settings/plans', 
       icon: Crown,
-      adminOnly: true 
+      adminOnly: false,
+      superAdminOnly: true 
     },
     { 
       title: 'Faturamento', 
       description: 'Visualize faturas e métodos de pagamento', 
       path: '/settings/billing', 
       icon: CreditCard,
-      adminOnly: false 
+      adminOnly: false,
+      superAdminOnly: false
     },
+    // Landing Page - apenas Super Admin
     { 
       title: 'Conteúdo da Landing Page', 
       description: 'Edite os textos da página inicial', 
       path: '/settings/landing-content', 
       icon: FileEdit,
-      adminOnly: true 
+      adminOnly: false,
+      superAdminOnly: true 
     },
   ];
 
@@ -208,7 +223,15 @@ export default function Settings() {
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {settingsLinks
-              .filter(link => !link.adminOnly || isAdmin)
+              .filter(link => {
+                // Super Admin only links
+                if (link.superAdminOnly) return isSuperAdmin;
+                // Hide from Super Admin (ex: Meu Plano)
+                if (link.hideForSuperAdmin && isSuperAdmin) return false;
+                // Admin only links
+                if (link.adminOnly) return isAdmin;
+                return true;
+              })
               .map((link) => (
                 <Link
                   key={link.path}
