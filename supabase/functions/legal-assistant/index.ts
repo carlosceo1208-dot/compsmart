@@ -306,15 +306,22 @@ ${contextFromKB}
 - ❌ Inventar jurisprudências, súmulas ou legislação
 
 ═══════════════════════════════════════════════════════════════════════════════
-                         🔍 BUSCA WEB
+                         🔍 BUSCA WEB E BASE DE CONHECIMENTO
 ═══════════════════════════════════════════════════════════════════════════════
 
-✅ **PERMITIDO buscar na web para:**
-- Fortalecer respostas com jurisprudências atualizadas
-- Verificar alterações legislativas recentes
-- Buscar súmulas e decisões do TST/TRT/STF
-- Confirmar informações quando solicitado pelo usuário
-- Encontrar precedentes relevantes para casos específicos
+📚 **BASE LOCAL:** A base de conhecimento contém resumos de LOPS e todas as 38 NRs.
+   Use-a como referência inicial para visão geral e contexto.
+
+🌐 **BUSCA WEB - USE ATIVAMENTE quando precisar de:**
+- Detalhes específicos de anexos de NRs (ex: limites de tolerância da NR-15)
+- Texto completo de artigos CLT ou súmulas do TST
+- Jurisprudências atualizadas e precedentes recentes
+- Alterações legislativas recentes (última atualização de NRs)
+- Valores atualizados (salário mínimo, teto INSS, alíquotas)
+- Casos específicos de fiscalização ou penalidades da NR-28
+- Informações setoriais detalhadas (NR-32 saúde, NR-18 construção, etc.)
+
+💡 **ESTRATÉGIA:** Use a base local para contexto → busque na web para detalhes específicos
 
 ═══════════════════════════════════════════════════════════════════════════════
                          🔒 SEGURANÇA E COMPLIANCE (LGPD)
