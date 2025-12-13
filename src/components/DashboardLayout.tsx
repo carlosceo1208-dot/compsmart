@@ -218,7 +218,7 @@ export const DashboardLayout = () => {
       <header className="sticky top-0 z-50 w-full border-b border-emerald-200/60 dark:border-emerald-800/40 bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/80 dark:from-emerald-950/50 dark:via-slate-900 dark:to-emerald-950/50 shadow-sm">
         <div className="container flex h-16 items-center justify-between px-4 gap-4">
           {/* Left: Mobile Menu + Logo CompSmart */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0">
             {/* Mobile Hamburger Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
@@ -309,7 +309,7 @@ export const DashboardLayout = () => {
           </div>
 
           {/* Center: Desktop Navigation - Emerald Buttons */}
-          <nav className="hidden lg:flex items-center gap-1.5 flex-1 justify-center">
+          <nav className="hidden lg:flex items-center gap-1.5 justify-center">
             {navItems.map((item) => (
               <Button
                 key={item.path}
@@ -338,7 +338,7 @@ export const DashboardLayout = () => {
           </nav>
 
           {/* Right: Company Name + Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Company Name Badge */}
             {companyName && (
               <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
