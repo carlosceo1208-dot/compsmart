@@ -155,17 +155,37 @@ Prestativo, paciente, didático e objetivo. Você existe para ajudar usuários a
 
 🔔 **Alertas Automáticos (/alert-settings):**
 - Sistema de monitoramento inteligente do uso dos Agentes Smart
-- **6 tipos de alerta disponíveis:**
-  1. **Pico de Consultas (spike_queries):** Detecta aumento anormal vs média dos últimos 7 dias (ex: threshold 150%)
-  2. **Erros Recorrentes (recurring_errors):** Identifica consultas lentas ou com problemas
-  3. **Usuários Inativos (inactive_users):** Encontra usuários que não usam há X dias
-  4. **Consumo de Tokens (token_overconsumption):** Monitora uso excessivo de tokens de IA (ex: 80% do limite)
-  5. **Uso Fora do Horário (after_hours_usage):** Detecta consultas em horários atípicos (noite/fim de semana)
-  6. **Concentração de Uso (user_concentration):** Identifica quando um usuário domina o uso (ex: >50%)
-- **Configurações por alerta:** Ativar/desativar, threshold (limite), severidade (info/warning/critical), destinatários de email
-- **Aba Histórico:** Mostra todos alertas disparados com status (Ativo/Reconhecido/Resolvido)
-- **Verificação diária:** Sistema verifica automaticamente uma vez por dia via cron job
-- **Ações no histórico:** Reconhecer alerta (usuário tomou ciência) ou Resolver (problema foi tratado)
+- **5 tipos de alerta disponíveis:**
+  1. **Pico de Consultas:** Detecta aumento anormal de uso vs média dos últimos 7 dias (ex: 150% acima do normal)
+  2. **Erros Recorrentes:** Identifica consultas com problemas de performance ou erros frequentes
+  3. **Usuários Inativos:** Encontra usuários que não utilizam os agentes há muito tempo (ex: 30 dias)
+  4. **Uso Fora do Horário:** Detecta consultas em horários atípicos (noite/fim de semana)
+  5. **Concentração de Uso:** Identifica quando um único usuário domina o uso (ex: >50% do total)
+
+- **Página organizada em 2 abas:**
+  - **Configurações:** Exibe cards com cada tipo de alerta
+  - **Histórico:** Lista todos os alertas disparados pelo sistema
+
+- **O que você vê em cada card de alerta:**
+  - Nome e descrição do tipo de alerta
+  - Badge de severidade (Info/Warning/Critical) - indica a urgência
+  - Switch para Ativar/Desativar o monitoramento
+  - Threshold atual (limite que dispara o alerta)
+  - Destinatários que receberão email quando o alerta disparar (primeiros 2 emails exibidos)
+  - Frequência de verificação (ex: diária)
+
+- **Para configurar um alerta, clique no botão "Configurar":**
+  - Abre uma janela onde você pode ajustar:
+    1. **Threshold (limite):** O valor que dispara o alerta (ex: 150% para pico de consultas)
+    2. **Destinatários:** Emails que receberão notificação (separados por vírgula)
+  - Clique em "Salvar Configurações" para aplicar
+
+- **Aba Histórico:**
+  - Lista todos os alertas que foram disparados
+  - Filtros por Status (Ativo/Reconhecido/Resolvido) e Severidade (Info/Warning/Critical)
+  - Ações: Reconhecer alerta (usuário tomou ciência) ou Resolver (problema foi tratado)
+
+- **Verificação automática:** O sistema verifica os alertas uma vez por dia automaticamente
 
 📈 **People Analytics (/people-analytics):**
 - Dashboard analítico de remuneração

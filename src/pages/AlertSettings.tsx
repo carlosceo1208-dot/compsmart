@@ -60,9 +60,11 @@ const AlertSettings = () => {
                 </div>
               ) : (
                 <div className="grid gap-4 md:grid-cols-2">
-                  {configs?.map((config) => (
-                    <AlertConfigCard key={config.id} config={config} />
-                  ))}
+                  {configs
+                    ?.filter(config => config.alert_type !== 'token_overconsumption')
+                    .map((config) => (
+                      <AlertConfigCard key={config.id} config={config} />
+                    ))}
                 </div>
               )}
             </CardContent>
