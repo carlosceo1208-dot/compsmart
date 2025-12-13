@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate, Link } from "react-router-dom";
+import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,7 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LogOut, User, Settings, Home, Users as UsersIcon, Network, DollarSign, ShieldCheck, Briefcase, Globe } from "lucide-react";
+import { 
+  LogOut, User, Settings, Home, Users as UsersIcon, Network, 
+  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight 
+} from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 import compsmartLogo from "@/assets/compsmart-logo.png";
@@ -21,6 +24,8 @@ import { SupportWidget } from "@/components/support/SupportWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CompanySwitcher } from "@/components/dashboard/CompanySwitcher";
 import { useCompanyContext } from "@/contexts/CompanyContext";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 
 interface UserProfile {
   full_name: string;
@@ -29,14 +34,50 @@ interface UserProfile {
   avatar_url: string | null;
 }
 
+// Route mapping for breadcrumbs
+const routeLabels: Record<string, string> = {
+  "/dashboard": "Dashboard",
+  "/employees": "Funcionários",
+  "/salary-ranges": "Tabela Salarial",
+  "/organograma": "Organograma",
+  "/job-titles": "Cargos & Salários",
+  "/my-profile": "Meu Perfil",
+  "/settings": "Configurações",
+  "/access-control": "Controle de Acesso",
+  "/people-analytics": "People Analytics",
+  "/benefits": "Benefícios",
+  "/budget": "Orçamento",
+  "/budget-planning": "Planejamento Orçamentário",
+  "/budget-approvals": "Aprovações de Orçamento",
+  "/incentive-programs": "Programas de Incentivos",
+  "/legal-assistant": "Jurídico Smart",
+  "/salary-assistant": "Salary Smart",
+  "/incentive-assistant": "R&B Smart",
+  "/organization": "Estrutura Organizacional",
+  "/roles": "Perfis de Acesso",
+  "/survey-data": "Pesquisas Salariais",
+  "/salary-comparison": "Comparação Salarial",
+  "/salary-analysis-report": "Relatório de Análise",
+  "/alert-settings": "Configuração de Alertas",
+  "/audit-logs": "Logs de Auditoria",
+  "/knowledge-base": "Base de Conhecimento",
+};
+
 export const DashboardLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { getLabel } = useLabels();
   const { activeCompany, activeCompanyId, isViewingOtherCompany, ownCompanyId, isLoading: companyContextLoading } = useCompanyContext();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Get current page label for breadcrumbs
+  const currentPath = location.pathname;
+  const currentPageLabel = routeLabels[currentPath] || currentPath.replace("/", "").replace(/-/g, " ");
+  const isHomePage = currentPath === "/dashboard";
 
   // Fetch user profile only - company data comes from context
   useEffect(() => {
@@ -124,6 +165,11 @@ export const DashboardLayout = () => {
     navigate("/auth");
   };
 
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    setMobileMenuOpen(false);
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -144,6 +190,21 @@ export const DashboardLayout = () => {
     );
   }
 
+  // Navigation items for mobile menu
+  const navItems = [
+    { icon: Home, label: "Dashboard", path: "/dashboard" },
+    { icon: UsersIcon, label: getLabel('employee') + "s", path: "/employees" },
+    { icon: DollarSign, label: "Tabela Salarial", path: "/salary-ranges" },
+    { icon: Network, label: "Organograma", path: "/organograma" },
+    { icon: Briefcase, label: "Cargos & Salários", path: "/job-titles" },
+  ];
+
+  const userItems = [
+    { icon: User, label: "Meu Perfil", path: "/my-profile" },
+    { icon: ShieldCheck, label: "Controle de Acesso", path: "/access-control" },
+    { icon: Settings, label: "Configurações", path: "/settings" },
+  ];
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Viewing Other Company Banner */}
@@ -153,88 +214,135 @@ export const DashboardLayout = () => {
         </div>
       )}
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="container flex h-20 items-center justify-between px-4">
-          <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-            {companyLogo ? (
-              <CompanyLogo logoUrl={companyLogo} companyName={companyName} size="md" />
-            ) : (
-              <img src={compsmartLogo} alt="CompSmart Logo" className="h-12 w-auto object-contain opacity-50" />
-            )}
-            <span className="text-sm text-muted-foreground hidden md:block max-w-[200px] truncate">
-              {companyName || "CompSmart"}
-            </span>
-          </Link>
+      {/* Header - Premium Gradient Style */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-sm">
+        <div className="container flex h-16 items-center justify-between px-4 gap-4">
+          {/* Left: Mobile Menu + Logo */}
+          <div className="flex items-center gap-2">
+            {/* Mobile Hamburger Menu */}
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-72">
+                <SheetHeader className="text-left pb-4">
+                  <SheetTitle className="flex items-center gap-2">
+                    <img src={compsmartLogo} alt="CompSmart" className="h-8 w-auto" />
+                    <span className="text-lg font-semibold">Menu</span>
+                  </SheetTitle>
+                </SheetHeader>
+                
+                <div className="flex flex-col gap-1">
+                  {/* Main Navigation */}
+                  <p className="text-xs font-medium text-muted-foreground px-2 py-2">Navegação</p>
+                  {navItems.map((item) => (
+                    <Button
+                      key={item.path}
+                      variant={currentPath === item.path ? "secondary" : "ghost"}
+                      className="justify-start"
+                      onClick={() => handleNavigate(item.path)}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  ))}
+                  
+                  <Separator className="my-3" />
+                  
+                  {/* User Menu */}
+                  <p className="text-xs font-medium text-muted-foreground px-2 py-2">Conta</p>
+                  {userItems.map((item) => (
+                    <Button
+                      key={item.path}
+                      variant={currentPath === item.path ? "secondary" : "ghost"}
+                      className="justify-start"
+                      onClick={() => handleNavigate(item.path)}
+                    >
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  ))}
+                  
+                  <Separator className="my-3" />
+                  
+                  {/* Site Link */}
+                  <Button
+                    variant="ghost"
+                    className="justify-start text-muted-foreground"
+                    onClick={() => window.open('/', '_blank')}
+                  >
+                    <Globe className="mr-2 h-4 w-4" />
+                    Ver Site
+                  </Button>
+                  
+                  {/* Logout */}
+                  <Button
+                    variant="ghost"
+                    className="justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sair
+                  </Button>
+                </div>
+              </SheetContent>
+            </Sheet>
 
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/dashboard")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
-            >
-              <Home className="w-4 h-4 mr-2" />
-              Dashboard
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/employees")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
-            >
-              <UsersIcon className="w-4 h-4 mr-2" />
-              {getLabel('employee')}s
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/salary-ranges")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
-            >
-              <DollarSign className="w-4 h-4 mr-2" />
-              Tabela Salarial
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/organograma")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
-            >
-              <Network className="w-4 h-4 mr-2" />
-              Organograma
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/job-titles")}
-              className="hidden md:flex items-center hover:bg-gradient-to-r hover:from-purple-100 hover:to-pink-100 hover:text-purple-700 dark:hover:from-purple-900 dark:hover:to-pink-900 dark:hover:text-purple-300 transition-all duration-300"
-            >
-              <Briefcase className="w-4 h-4 mr-2" />
-              Cargos & Salários
-            </Button>
+            {/* Logo */}
+            <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              {companyLogo ? (
+                <CompanyLogo logoUrl={companyLogo} companyName={companyName} size="sm" />
+              ) : (
+                <img src={compsmartLogo} alt="CompSmart Logo" className="h-10 w-auto object-contain" />
+              )}
+            </Link>
+          </div>
+
+          {/* Center: Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
+            {navItems.map((item) => (
+              <Button
+                key={item.path}
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(item.path)}
+                className={`transition-all duration-300 ${
+                  currentPath === item.path 
+                    ? "bg-primary/10 text-primary font-medium" 
+                    : "hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:text-primary"
+                }`}
+              >
+                <item.icon className="w-4 h-4 mr-1.5" />
+                {item.label}
+              </Button>
+            ))}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => window.open('/', '_blank')}
-              className="hidden md:flex items-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300"
+              className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300"
             >
-              <Globe className="w-4 h-4 mr-2" />
+              <Globe className="w-4 h-4 mr-1.5" />
               Ver Site
             </Button>
+          </nav>
 
+          {/* Right: Actions */}
+          <div className="flex items-center gap-2">
             <CompanySwitcher />
-            
             <ThemeToggle />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar className="h-10 w-10">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Avatar className="h-9 w-9">
                     {profile?.avatar_url && (
                       <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
                     )}
-                    <AvatarFallback className="bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                       {profile ? getInitials(profile.full_name) : "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -278,6 +386,25 @@ export const DashboardLayout = () => {
           </div>
         </div>
       </header>
+
+      {/* Breadcrumbs */}
+      {!isHomePage && (
+        <div className="border-b border-border/40 bg-muted/30">
+          <div className="container px-4 py-2">
+            <nav className="flex items-center text-sm text-muted-foreground">
+              <Link 
+                to="/dashboard" 
+                className="flex items-center hover:text-foreground transition-colors"
+              >
+                <Home className="h-3.5 w-3.5 mr-1" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </Link>
+              <ChevronRight className="h-3.5 w-3.5 mx-2" />
+              <span className="font-medium text-foreground">{currentPageLabel}</span>
+            </nav>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="container px-4 py-8 flex-1">
