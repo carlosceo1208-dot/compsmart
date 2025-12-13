@@ -303,13 +303,9 @@ export const DashboardLayout = () => {
             </Sheet>
 
             {/* Logo CompSmart - Always Visible */}
-            <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-              <img src={compsmartLogo} alt="CompSmart Logo" className="h-12 w-auto object-contain" />
-              <div className="hidden sm:flex flex-col">
-                <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400 leading-tight">CompSmart</span>
-                <span className="text-[10px] text-muted-foreground leading-tight">Gestão Inteligente de Remuneração</span>
-              </div>
-            </Link>
+              <Link to="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
+                <img src={compsmartLogo} alt="CompSmart Logo" className="h-14 w-auto object-contain" />
+              </Link>
           </div>
 
           {/* Center: Desktop Navigation - Emerald Buttons */}
