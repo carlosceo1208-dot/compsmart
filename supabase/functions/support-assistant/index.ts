@@ -155,6 +155,22 @@ ${pageContext.includes('organogram') ? `
 - Identificação de gestores e subordinados
 - Navegação interativa pela estrutura
 ` : ''}
+
+${pageContext.includes('alert-settings') ? `
+🔔 **Alertas Automáticos:**
+- Sistema de monitoramento inteligente do uso dos Agentes Smart
+- **6 tipos de alerta disponíveis:**
+  1. **Pico de Consultas:** Detecta aumento anormal (ex: +150% vs média 7 dias)
+  2. **Erros Recorrentes:** Identifica consultas lentas/com problemas
+  3. **Usuários Inativos:** Encontra usuários sem uso há X dias
+  4. **Consumo de Tokens:** Monitora uso excessivo de tokens de IA
+  5. **Uso Fora do Horário:** Detecta consultas em horários atípicos
+  6. **Concentração de Uso:** Identifica quando um usuário domina o uso
+- **Configurações por alerta:** Ativar/desativar, threshold (limite), severidade (info/warning/critical), destinatários de email
+- **Aba Histórico:** Mostra todos alertas disparados com status (Ativo/Reconhecido/Resolvido)
+- **Verificação diária:** Sistema verifica automaticamente uma vez por dia
+- **Ações no histórico:** Reconhecer alerta (usuário viu) ou Resolver (problema tratado)
+` : ''}
 ` : ''}
 
 ## FORMATO DE RESPOSTA
