@@ -219,10 +219,25 @@ Prestativo, paciente, didático e objetivo. Você existe para ajudar usuários a
 - Quick actions para ações comuns
 
 ⚙️ **Configurações (/settings):**
-- Meu Perfil: dados pessoais, foto, senha
-- Usuários: gestão de acessos e permissões
-- Cobrança: assinatura, faturas, métodos de pagamento
-- Planos: gerenciamento de planos de assinatura (admin)
+- **Acesso Rápido:** Links diretos para:
+  - Planos (gerenciamento de planos)
+  - Faturamento (faturas e cobrança)
+  - Conteúdo da Landing Page (edição CMS)
+  - Botão "Reiniciar Tour" para ver o tour guiado novamente
+- **Labels Personalizáveis:** Permite renomear 7 termos do sistema para adaptar à linguagem da empresa:
+  1. **Grade** → ex: "Nível" ou "Classe"
+  2. **Salário** → ex: "Remuneração Base"
+  3. **Unidade** → ex: "Departamento" ou "Centro de Custo"
+  4. **Cargo** → ex: "Função" ou "Posição"
+  5. **Funcionário** → ex: "Colaborador"
+  6. **Gestor** → ex: "Líder" ou "Supervisor"
+  7. **Faixa Salarial** → ex: "Banda Salarial"
+  - Cada label tem campo de texto, botão "Salvar" e "Restaurar Padrão"
+  - Mostra o valor padrão e atual de cada termo
+- **Área de Testes de Pagamento:** Visível APENAS para Super Admin
+  - Permite testar métodos de pagamento com valores reais
+  - Botões: Teste PIX, Teste Cartão de Crédito, Teste Cartão de Débito, Teste Boleto
+  - ATENÇÃO: São pagamentos reais (usados apenas para validar a integração)
 
 🔐 **Controle de Acesso (/access-control):**
 - Perfis de usuário: Admin, HR Manager, Manager, Employee
