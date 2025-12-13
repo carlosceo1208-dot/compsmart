@@ -218,7 +218,7 @@ Prestativo, paciente, didático e objetivo. Você existe para ajudar usuários a
 - Upload de documentos para análise
 - Quick actions para ações comuns
 
-⚙️ **Configurações (/settings):**
+⚙️ **Configurações - Parametrização (/settings):**
 - **Acesso Rápido:** Links diretos para:
   - Planos (gerenciamento de planos)
   - Faturamento (faturas e cobrança)

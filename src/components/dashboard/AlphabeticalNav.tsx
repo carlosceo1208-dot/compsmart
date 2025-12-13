@@ -34,7 +34,7 @@ const moduleGroups: Record<string, Module[]> = {
   'A-C': [
     { title: 'Análise de Equidade', path: '/equity-analysis', icon: BarChart3, status: 'coming-soon' },
     { title: 'Comparação Salarial', path: '/salary-comparison', icon: ArrowLeftRight, status: 'active' },
-    { title: 'Configurações', path: '/settings', icon: Settings, status: 'beta' },
+    { title: 'Configurações - Parametrização', path: '/settings', icon: Settings, status: 'active' },
   ],
   'D-F': [
     { title: 'Estrutura Organizacional', path: '/organization', icon: Building, status: 'active' },

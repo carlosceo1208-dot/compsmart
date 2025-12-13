@@ -219,11 +219,11 @@ export const ModuleGrid = () => {
       requiredPlan: 'medium',
     },
     {
-      title: 'Configurações',
-      description: 'Parametrize o sistema',
+      title: 'Configurações - Parametrização',
+      description: 'Personalize nomenclaturas e ajuste parâmetros do sistema',
       icon: Settings,
       path: '/settings',
-      status: 'beta',
+      status: 'active',
       category: 'management',
     },
   ];
