@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
-  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight 
+  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft 
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
@@ -42,7 +42,7 @@ const routeLabels: Record<string, string> = {
   "/organograma": "Organograma",
   "/job-titles": "Cargos & Salários",
   "/my-profile": "Meu Perfil",
-  "/settings": "Configurações",
+  "/settings": "Configurações - Parametrização",
   "/access-control": "Controle de Acesso",
   "/people-analytics": "People Analytics",
   "/benefits": "Benefícios",
@@ -61,6 +61,18 @@ const routeLabels: Record<string, string> = {
   "/alert-settings": "Configuração de Alertas",
   "/audit-logs": "Logs de Auditoria",
   "/knowledge-base": "Base de Conhecimento",
+  "/settings/plans": "Gerenciar Planos",
+  "/settings/billing": "Faturamento",
+  "/settings/landing-content": "Conteúdo Landing Page",
+};
+
+// Parent route mapping for hierarchical navigation
+const routeParents: Record<string, string> = {
+  "/settings/plans": "/settings",
+  "/settings/billing": "/settings",
+  "/settings/landing-content": "/settings",
+  "/budget-planning": "/budget",
+  "/budget-approvals": "/budget",
 };
 
 export const DashboardLayout = () => {
@@ -404,11 +416,25 @@ export const DashboardLayout = () => {
         </div>
       </header>
 
-      {/* Breadcrumbs */}
+      {/* Breadcrumbs with Back Button */}
       {!isHomePage && (
         <div className="border-b border-border/40 bg-muted/30">
           <div className="container px-4 py-2">
-            <nav className="flex items-center text-sm text-muted-foreground">
+            <nav className="flex items-center text-sm text-muted-foreground gap-2">
+              {/* Back Button - appears on sub-routes */}
+              {routeParents[currentPath] && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate(routeParents[currentPath])}
+                  className="h-7 px-2 mr-2 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-1" />
+                  Voltar
+                </Button>
+              )}
+
+              {/* Dashboard Link */}
               <Link 
                 to="/dashboard" 
                 className="flex items-center hover:text-foreground transition-colors"
@@ -416,7 +442,22 @@ export const DashboardLayout = () => {
                 <Home className="h-3.5 w-3.5 mr-1" />
                 <span className="hidden sm:inline">Dashboard</span>
               </Link>
-              <ChevronRight className="h-3.5 w-3.5 mx-2" />
+
+              {/* Parent Page (if exists) */}
+              {routeParents[currentPath] && (
+                <>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                  <Link 
+                    to={routeParents[currentPath]}
+                    className="hover:text-foreground transition-colors"
+                  >
+                    {routeLabels[routeParents[currentPath]]}
+                  </Link>
+                </>
+              )}
+
+              {/* Current Page */}
+              <ChevronRight className="h-3.5 w-3.5" />
               <span className="font-medium text-foreground">{currentPageLabel}</span>
             </nav>
           </div>
