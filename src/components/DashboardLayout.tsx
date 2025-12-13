@@ -206,10 +206,10 @@ export const DashboardLayout = () => {
 
   // Navigation items for mobile menu
   const navItems = [
-    { icon: Home, label: "Home", path: "/dashboard" },
-    { icon: UsersIcon, label: "Funcs", path: "/employees" },
-    { icon: DollarSign, label: "Tabela", path: "/salary-ranges" },
-    { icon: Network, label: "Organog.", path: "/organograma" },
+    { icon: Home, label: "Dashboard", path: "/dashboard" },
+    { icon: UsersIcon, label: "Funcionários", path: "/employees" },
+    { icon: DollarSign, label: "Tabela Salarial", path: "/salary-ranges" },
+    { icon: Network, label: "Organograma", path: "/organograma" },
     { icon: Briefcase, label: "Cargos", path: "/job-titles" },
   ];
 
