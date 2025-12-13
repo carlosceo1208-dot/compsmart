@@ -214,15 +214,15 @@ export const DashboardLayout = () => {
         </div>
       )}
 
-      {/* Header - Premium Gradient Style */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 shadow-sm">
+      {/* Header - Premium Emerald Gradient Style */}
+      <header className="sticky top-0 z-50 w-full border-b border-emerald-200/60 dark:border-emerald-800/40 bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/80 dark:from-emerald-950/50 dark:via-slate-900 dark:to-emerald-950/50 shadow-sm">
         <div className="container flex h-16 items-center justify-between px-4 gap-4">
-          {/* Left: Mobile Menu + Logo */}
-          <div className="flex items-center gap-2">
+          {/* Left: Mobile Menu + Logo CompSmart */}
+          <div className="flex items-center gap-3">
             {/* Mobile Hamburger Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
+                <Button variant="ghost" size="icon" className="md:hidden hover:bg-emerald-100 dark:hover:bg-emerald-900/50">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Menu</span>
                 </Button>
@@ -230,8 +230,11 @@ export const DashboardLayout = () => {
               <SheetContent side="left" className="w-72">
                 <SheetHeader className="text-left pb-4">
                   <SheetTitle className="flex items-center gap-2">
-                    <img src={compsmartLogo} alt="CompSmart" className="h-8 w-auto" />
-                    <span className="text-lg font-semibold">Menu</span>
+                    <img src={compsmartLogo} alt="CompSmart" className="h-10 w-auto" />
+                    <div className="flex flex-col">
+                      <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">CompSmart</span>
+                      <span className="text-[10px] text-muted-foreground -mt-0.5">Gestão de Remuneração</span>
+                    </div>
                   </SheetTitle>
                 </SheetHeader>
                 
@@ -241,8 +244,12 @@ export const DashboardLayout = () => {
                   {navItems.map((item) => (
                     <Button
                       key={item.path}
-                      variant={currentPath === item.path ? "secondary" : "ghost"}
-                      className="justify-start"
+                      variant={currentPath === item.path ? "default" : "ghost"}
+                      className={`justify-start ${
+                        currentPath === item.path 
+                          ? "bg-emerald-500 text-white hover:bg-emerald-600" 
+                          : "hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-900/50 dark:hover:text-emerald-400"
+                      }`}
                       onClick={() => handleNavigate(item.path)}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
@@ -257,8 +264,12 @@ export const DashboardLayout = () => {
                   {userItems.map((item) => (
                     <Button
                       key={item.path}
-                      variant={currentPath === item.path ? "secondary" : "ghost"}
-                      className="justify-start"
+                      variant={currentPath === item.path ? "default" : "ghost"}
+                      className={`justify-start ${
+                        currentPath === item.path 
+                          ? "bg-emerald-500 text-white hover:bg-emerald-600" 
+                          : "hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-900/50 dark:hover:text-emerald-400"
+                      }`}
                       onClick={() => handleNavigate(item.path)}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
@@ -271,7 +282,7 @@ export const DashboardLayout = () => {
                   {/* Site Link */}
                   <Button
                     variant="ghost"
-                    className="justify-start text-muted-foreground"
+                    className="justify-start text-muted-foreground hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-900/50"
                     onClick={() => window.open('/', '_blank')}
                   >
                     <Globe className="mr-2 h-4 w-4" />
@@ -291,28 +302,28 @@ export const DashboardLayout = () => {
               </SheetContent>
             </Sheet>
 
-            {/* Logo */}
-            <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              {companyLogo ? (
-                <CompanyLogo logoUrl={companyLogo} companyName={companyName} size="sm" />
-              ) : (
-                <img src={compsmartLogo} alt="CompSmart Logo" className="h-10 w-auto object-contain" />
-              )}
+            {/* Logo CompSmart - Always Visible */}
+            <Link to="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+              <img src={compsmartLogo} alt="CompSmart Logo" className="h-12 w-auto object-contain" />
+              <div className="hidden sm:flex flex-col">
+                <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400 leading-tight">CompSmart</span>
+                <span className="text-[10px] text-muted-foreground leading-tight">Gestão Inteligente de Remuneração</span>
+              </div>
             </Link>
           </div>
 
-          {/* Center: Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
+          {/* Center: Desktop Navigation - Emerald Buttons */}
+          <nav className="hidden lg:flex items-center gap-1.5 flex-1 justify-center">
             {navItems.map((item) => (
               <Button
                 key={item.path}
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(item.path)}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 border ${
                   currentPath === item.path 
-                    ? "bg-primary/10 text-primary font-medium" 
-                    : "hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 hover:text-primary"
+                    ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25" 
+                    : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/70"
                 }`}
               >
                 <item.icon className="w-4 h-4 mr-1.5" />
@@ -323,26 +334,36 @@ export const DashboardLayout = () => {
               variant="ghost"
               size="sm"
               onClick={() => window.open('/', '_blank')}
-              className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-300"
+              className="bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700 transition-all duration-300"
             >
               <Globe className="w-4 h-4 mr-1.5" />
               Ver Site
             </Button>
           </nav>
 
-          {/* Right: Actions */}
+          {/* Right: Company Name + Actions */}
           <div className="flex items-center gap-2">
+            {/* Company Name Badge */}
+            {companyName && (
+              <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
+                <span className="text-emerald-600 dark:text-emerald-400">🏢</span>
+                <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 max-w-[120px] truncate">
+                  {companyName}
+                </span>
+              </div>
+            )}
+            
             <CompanySwitcher />
             <ThemeToggle />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-emerald-200 dark:ring-emerald-800 hover:ring-emerald-400 transition-all">
                   <Avatar className="h-9 w-9">
                     {profile?.avatar_url && (
                       <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
                     )}
-                    <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                    <AvatarFallback className="bg-emerald-500 text-white text-sm font-medium">
                       {profile ? getInitials(profile.full_name) : "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -360,19 +381,19 @@ export const DashboardLayout = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                <DropdownMenuItem onClick={() => navigate("/dashboard")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <Home className="mr-2 h-4 w-4" />
                   <span>Dashboard</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/my-profile")}>
+                <DropdownMenuItem onClick={() => navigate("/my-profile")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <User className="mr-2 h-4 w-4" />
                   <span>Meu Perfil</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/access-control")}>
+                <DropdownMenuItem onClick={() => navigate("/access-control")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <ShieldCheck className="mr-2 h-4 w-4" />
                   <span>Controle de Acesso</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <DropdownMenuItem onClick={() => navigate("/settings")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configurações</span>
                 </DropdownMenuItem>
