@@ -64,6 +64,7 @@ const routeLabels: Record<string, string> = {
   "/settings/plans": "Gerenciar Planos",
   "/settings/billing": "Faturamento",
   "/settings/landing-content": "Conteúdo Landing Page",
+  "/settings/my-plan": "Meu Plano",
 };
 
 // Parent route mapping for hierarchical navigation
@@ -71,6 +72,7 @@ const routeParents: Record<string, string> = {
   "/settings/plans": "/settings",
   "/settings/billing": "/settings",
   "/settings/landing-content": "/settings",
+  "/settings/my-plan": "/settings",
   "/budget-planning": "/budget",
   "/budget-approvals": "/budget",
 };

@@ -47,6 +47,7 @@ import CheckoutSuccess from "./pages/checkout/Success";
 import CheckoutProcessing from "./pages/checkout/Processing";
 import Billing from "./pages/settings/Billing";
 import LandingContent from "./pages/settings/LandingContent";
+import MyPlan from "./pages/settings/MyPlan";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -102,6 +103,7 @@ const App = () => (
               <Route path="/settings/plans" element={<Plans />} />
               <Route path="/settings/billing" element={<Billing />} />
               <Route path="/settings/landing-content" element={<LandingContent />} />
+              <Route path="/settings/my-plan" element={<MyPlan />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

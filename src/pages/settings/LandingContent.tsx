@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Loader2, Save, RotateCcw, ExternalLink } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Save, RotateCcw, ExternalLink, ShieldAlert } from "lucide-react";
 import { useAllSiteContent, useUpdateSiteContent } from "@/hooks/useSiteContent";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { toast } from "sonner";
 
 interface ContentField {
@@ -55,10 +58,43 @@ const sectionFields: Record<string, ContentField[]> = {
 };
 
 export default function LandingContent() {
+  const navigate = useNavigate();
+  const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
   const { data: sections, isLoading } = useAllSiteContent();
   const updateContent = useUpdateSiteContent();
   const [editedContent, setEditedContent] = useState<Record<string, Record<string, any>>>({});
   const [savingSection, setSavingSection] = useState<string | null>(null);
+
+  // Verificar se é Super Admin - redirecionar se não for
+  useEffect(() => {
+    if (!roleLoading && !roleData?.isSuperAdmin) {
+      toast.error('Acesso restrito. Apenas Super Admin pode editar a Landing Page.');
+      navigate('/settings');
+    }
+  }, [roleLoading, roleData, navigate]);
+
+  // Mostrar loading enquanto verifica permissão
+  if (roleLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Se não é Super Admin, mostrar mensagem de acesso negado
+  if (!roleData?.isSuperAdmin) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Alert className="max-w-md border-red-300 dark:border-red-700">
+          <ShieldAlert className="h-4 w-4 text-red-600" />
+          <AlertDescription>
+            Acesso restrito. Esta página é exclusiva para Super Administradores da plataforma.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   const handleFieldChange = (sectionKey: string, fieldKey: string, value: string) => {
     setEditedContent(prev => ({

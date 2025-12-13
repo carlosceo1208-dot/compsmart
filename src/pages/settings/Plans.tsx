@@ -43,13 +43,14 @@ export default function Plans() {
   const [view, setView] = useState<'grid' | 'table'>('grid');
 
   useEffect(() => {
-    if (!roleLoading && !roleData?.isAdmin && !roleData?.isHR) {
-      toast.error('Acesso negado. Apenas administradores podem gerenciar planos.');
-      navigate('/dashboard');
+    // Apenas Super Admin pode acessar o gerenciamento de planos
+    if (!roleLoading && !roleData?.isSuperAdmin) {
+      toast.error('Acesso restrito. Apenas Super Admin pode gerenciar planos da plataforma.');
+      navigate('/settings/my-plan');
       return;
     }
     
-    if (!roleLoading) {
+    if (!roleLoading && roleData?.isSuperAdmin) {
       fetchPlans();
     }
   }, [roleLoading, roleData, navigate]);
