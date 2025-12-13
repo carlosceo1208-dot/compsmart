@@ -37,7 +37,7 @@ export const useSalaryTableStatus = () => {
       };
     },
     enabled: !!activeCompanyId,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30 * 1000, // 30 seconds - reduced for better responsiveness
   });
 
   return {
