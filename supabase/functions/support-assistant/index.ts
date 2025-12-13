@@ -202,6 +202,29 @@ Prestativo, paciente, didático e objetivo. Você existe para ajudar usuários a
 - Comparação com posicionamento interno
 - Importação de dados de pesquisas externas
 
+📈 **Análise Salarial e Simulação de Dissídio (/salary-analysis-report):**
+- Acesso: Dashboard → Analytics & Relatórios → Análise Salarial
+- **Passo a passo para simulação de dissídio coletivo:**
+  1. Clique no botão "Nova Simulação" (ícone Calculadora) no topo da página
+  2. No diálogo, preencha:
+     - Nome do cenário (ex: "Dissídio 2026 - 5%")
+     - Ano Fiscal de aplicação
+     - Mês de Vigência (quando o ajuste entra em vigor)
+     - Tipo de Ajuste: "Percentual Fixo" (todos igual) ou "Escalonado por Faixa" (diferentes % por faixa salarial)
+  3. Opcional: Use filtros para restringir por unidade organizacional, grades específicas ou faixa salarial (min/max)
+  4. Clique "Calcular Preview" para visualizar o impacto antes de salvar
+  5. Visualize: quantidade de funcionários afetados, percentual médio de aumento, custo adicional mensal e anual
+  6. Clique "Salvar Cenário" para arquivar a simulação
+  7. Para gerenciar cenários salvos, clique no botão "Cenários" (ícone Pasta)
+  8. Para aprovar um cenário: abra o cenário → clique "Aprovar para Orçamento"
+  9. No mês de vigência configurado, um alerta aparecerá no Dashboard para "Efetivar Salários"
+- **Regras escalonadas (tipo Escalonado por Faixa):** Defina percentuais diferentes por faixa salarial
+  - Exemplo: Até R$ 3.000 → 7%, De R$ 3.001 a R$ 5.000 → 5% + R$ 210 fixo, Acima de R$ 10.000 → 3% + R$ 560 fixo
+  - Cada faixa pode ter: percentual de aumento + valor fixo adicional
+- Dashboard mostra distribuição de funcionários: abaixo/dentro/acima da faixa salarial ideal
+- Exportação CSV disponível para análise externa
+- Após efetivação, os salários reais são atualizados automaticamente no sistema
+
 🎯 **Programas de Incentivos (/incentive-programs):**
 - **ICP (Incentivo de Curto Prazo):** PLR, PPR, Bônus, Comissão
 - **ILP (Incentivo de Longo Prazo):** Stock Options, RSU, Partnership, Phantom Shares, Bônus Diferido, Previdência
