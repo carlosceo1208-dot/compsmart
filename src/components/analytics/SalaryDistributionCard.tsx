@@ -108,8 +108,17 @@ export const SalaryDistributionCard = ({ data, isLoading }: SalaryDistributionCa
                     nameKey="category"
                     cx="50%"
                     cy="50%"
-                    outerRadius={80}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={70}
+                    label={({ name, percent }) => {
+                      const shortLabels: Record<string, string> = {
+                        'Abaixo do Mínimo': 'Abaixo Mín.',
+                        'Início da Faixa': 'Início',
+                        'Próximo ao Mercado': 'Próx. Mercado',
+                        'Acima do Mercado': 'Acima Mercado',
+                        'Acima da Faixa': 'Acima Faixa',
+                      };
+                      return `${shortLabels[name] || name}: ${(percent * 100).toFixed(0)}%`;
+                    }}
                   >
                     {data.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
