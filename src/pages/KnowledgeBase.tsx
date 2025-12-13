@@ -29,7 +29,8 @@ import {
   Scale,
   TrendingUp,
   Loader2,
-  FileQuestion
+  FileQuestion,
+  Users
 } from "lucide-react";
 
 type KnowledgeDocument = Tables<"knowledge_base">;
@@ -53,7 +54,7 @@ const KnowledgeBase = () => {
     is_global: [],
     is_active: []
   });
-  const [stats, setStats] = useState({ total: 0, legal: 0, incentive: 0 });
+  const [stats, setStats] = useState({ total: 0, legal: 0, incentive: 0, shared: 0 });
   
   const [selectedDocument, setSelectedDocument] = useState<KnowledgeDocument | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -101,9 +102,15 @@ const KnowledgeBase = () => {
 
       // Calcular estatísticas
       const total = data?.length || 0;
-      const legal = data?.filter(d => d.agent_type === 'legal' || d.agent_type === 'both').length || 0;
-      const incentive = data?.filter(d => d.agent_type === 'incentive' || d.agent_type === 'both').length || 0;
-      setStats({ total, legal, incentive });
+      const shared = data?.filter(d => d.agent_type === 'both').length || 0;
+      const legalOnly = data?.filter(d => d.agent_type === 'legal').length || 0;
+      const incentiveOnly = data?.filter(d => d.agent_type === 'incentive').length || 0;
+      setStats({ 
+        total, 
+        legal: legalOnly + shared,
+        incentive: incentiveOnly + shared,
+        shared
+      });
     } catch (error: any) {
       console.error("Erro ao buscar documentos:", error);
       toast.error("Erro ao carregar documentos");
@@ -216,7 +223,7 @@ const KnowledgeBase = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
             <FileText className="w-8 h-8 text-primary" />
@@ -243,6 +250,16 @@ const KnowledgeBase = () => {
             <div>
               <p className="text-2xl font-bold">{stats.incentive}</p>
               <p className="text-xs text-muted-foreground">Documentos R&B</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4 flex items-center gap-3">
+            <Users className="w-8 h-8 text-purple-500" />
+            <div>
+              <p className="text-2xl font-bold">{stats.shared}</p>
+              <p className="text-xs text-muted-foreground">Compartilhados</p>
             </div>
           </CardContent>
         </Card>
