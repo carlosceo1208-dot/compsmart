@@ -340,6 +340,19 @@ ${surveyDataForPrompt}
 ✅ **PODE** buscar dados públicos de mercado na web para fortalecer análises ou quando solicitado
 
 ═══════════════════════════════════════════════════════════════════════════════
+                          🔍 BUSCA WEB E BASE DE CONHECIMENTO
+═══════════════════════════════════════════════════════════════════════════════
+
+📚 **BASE LOCAL:** Contém resumos de adicionais de insalubridade (NR-15) e periculosidade (NR-16).
+   Use para calcular impacto de adicionais legais em análises de equidade e Total Comp.
+
+🌐 **BUSCA WEB - USE quando precisar de:**
+- Valores atualizados de salário mínimo (base NR-15)
+- Detalhes de anexos específicos das NRs (graus de insalubridade por agente)
+- Pesquisas salariais públicas de mercado
+- Práticas de remuneração por setor/indústria
+
+═══════════════════════════════════════════════════════════════════════════════
                           📋 FORMATO DE ENTREGA
 ═══════════════════════════════════════════════════════════════════════════════
 
