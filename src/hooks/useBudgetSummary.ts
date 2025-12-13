@@ -213,9 +213,10 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
       });
 
       const yearTotal = monthlyTotals.reduce((sum, m) => sum + m.totalCash, 0);
-      const avgHeadcount = Math.round(monthlyTotals.reduce((sum, m) => sum + m.headcount, 0) / 12);
+      // Use final headcount (December) instead of average for TOTAL row
+      const finalHeadcount = monthlyTotals[11]?.headcount || 0;
 
-      return { monthlyTotals, yearTotal, avgHeadcount };
+      return { monthlyTotals, yearTotal, avgHeadcount: finalHeadcount };
     },
     staleTime: 2 * 60 * 1000,
   });
