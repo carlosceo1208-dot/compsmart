@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Edit, Trash2, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SalaryTableDialog } from './SalaryTableDialog';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface SalaryTable {
   id: string;
@@ -31,6 +32,7 @@ const MONTHS = [
 
 export function SalaryTableManager({ open, onOpenChange, onTableActivated }: SalaryTableManagerProps) {
   const { toast } = useToast();
+  const { activeCompanyId } = useCompanyContext();
   const [tables, setTables] = useState<SalaryTable[]>([]);
   const [loading, setLoading] = useState(true);
   const [activating, setActivating] = useState<string | null>(null);
@@ -40,27 +42,21 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
   const [editingTableId, setEditingTableId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open) {
+    if (open && activeCompanyId) {
       fetchTables();
     }
-  }, [open]);
+  }, [open, activeCompanyId]);
 
   const fetchTables = async () => {
+    if (!activeCompanyId) return;
+    
     setLoading(true);
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('root_company_id')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (!profile?.root_company_id) return;
-
-      // Fetch tables with range count
+      // Fetch tables with range count using activeCompanyId from context
       const { data: tablesData, error } = await supabase
         .from('salary_tables')
         .select('id, name, effective_month, effective_year, is_active')
-        .eq('root_company_id', profile.root_company_id)
+        .eq('root_company_id', activeCompanyId)
         .order('is_active', { ascending: false })
         .order('effective_year', { ascending: false })
         .order('effective_month', { ascending: false });
