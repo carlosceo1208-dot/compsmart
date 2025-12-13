@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ const MONTHS = [
 
 export function SalaryTableManager({ open, onOpenChange, onTableActivated }: SalaryTableManagerProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const { activeCompanyId } = useCompanyContext();
   const [tables, setTables] = useState<SalaryTable[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,6 +104,9 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
         title: 'Tabela ativada',
         description: 'A tabela salarial foi ativada com sucesso.',
       });
+
+      // Invalidate cache to update dashboard alert
+      queryClient.invalidateQueries({ queryKey: ['salary-table-status'] });
 
       await fetchTables();
       onTableActivated?.();

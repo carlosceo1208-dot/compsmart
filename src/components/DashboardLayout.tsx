@@ -23,9 +23,11 @@ import { CompanyLogo } from "@/components/CompanyLogo";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CompanySwitcher } from "@/components/dashboard/CompanySwitcher";
+import { HeaderNotifications } from "@/components/dashboard/HeaderNotifications";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 interface UserProfile {
   full_name: string;
@@ -353,17 +355,38 @@ export const DashboardLayout = () => {
 
           {/* Right: Company Name + Actions */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Company Name Badge */}
+            {/* Company Indicator - Enhanced badge for all users */}
             {companyName && (
-              <div className="hidden md:flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
-                <span className="text-emerald-600 dark:text-emerald-400 text-xs">🏢</span>
-                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 max-w-[80px] truncate">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
+                {companyLogo ? (
+                  <img src={companyLogo} alt={companyName} className="h-5 w-5 rounded-full object-cover" />
+                ) : (
+                  <span className="text-emerald-600 dark:text-emerald-400 text-xs">🏢</span>
+                )}
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 max-w-[150px] truncate">
                   {companyName}
                 </span>
+                {activeCompany?.planName && (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 bg-white/50 dark:bg-black/30 border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400">
+                    {activeCompany.planName}
+                  </Badge>
+                )}
+              </div>
+            )}
+
+            {/* Mobile Company Badge */}
+            {companyName && (
+              <div className="md:hidden flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/50 rounded-full">
+                {companyLogo ? (
+                  <img src={companyLogo} alt={companyName} className="h-4 w-4 rounded-full object-cover" />
+                ) : (
+                  <span className="text-xs">🏢</span>
+                )}
               </div>
             )}
             
             <CompanySwitcher />
+            <HeaderNotifications />
             <ThemeToggle />
 
             <DropdownMenu>
