@@ -85,7 +85,7 @@ export const HRMetricsCard = () => {
   };
 
   return (
-    <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200/50 hover:border-purple-300 hover:shadow-lg transition-all duration-200">
+    <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 border-2 border-purple-200/50 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg transition-all duration-200">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <Users className="h-4 w-4" />
