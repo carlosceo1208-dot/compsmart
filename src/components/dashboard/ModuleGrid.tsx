@@ -257,7 +257,7 @@ export const ModuleGrid = () => {
             IA
           </Badge>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {smartAgents.map((module, index) => (
             <div key={module.path} className={index === 0 && module.requiredPlan ? 'locked-module' : ''}>
               <ModuleCard
@@ -281,7 +281,7 @@ export const ModuleGrid = () => {
           <BarChart3 className="h-5 w-5 text-blue-600" />
           <h3 className="text-lg font-semibold">Analytics & Relatórios</h3>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           {analyticsModules.map((module) => (
             <ModuleCard
               key={module.path}
@@ -303,7 +303,7 @@ export const ModuleGrid = () => {
           <Settings className="h-5 w-5 text-muted-foreground" />
           <h3 className="text-lg font-semibold">Gestão e Configuração</h3>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           {managementModules.map((module) => (
             <ModuleCard
               key={module.path}

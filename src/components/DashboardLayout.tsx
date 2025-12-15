@@ -238,7 +238,7 @@ export const DashboardLayout = () => {
             {/* Mobile Hamburger Menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden hover:bg-emerald-100 dark:hover:bg-emerald-900/50">
+                <Button variant="ghost" size="icon" className="sm:hidden hover:bg-emerald-100 dark:hover:bg-emerald-900/50">
                   <Menu className="h-5 w-5" />
                   <span className="sr-only">Menu</span>
                 </Button>
@@ -324,22 +324,24 @@ export const DashboardLayout = () => {
               </Link>
           </div>
 
-          {/* Center: Desktop Navigation - Emerald Buttons */}
-          <nav className="hidden lg:flex items-center gap-1 justify-center">
+          {/* Center: Tablet & Desktop Navigation - Emerald Buttons */}
+          {/* md: shows compact icons only, lg: shows full labels */}
+          <nav className="hidden md:flex items-center gap-1 justify-center">
             {navItems.map((item) => (
               <Button
                 key={item.path}
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(item.path)}
-                className={`px-2 transition-all duration-300 border ${
+                className={`px-2 lg:px-3 transition-all duration-300 border ${
                   currentPath === item.path 
                     ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25" 
                     : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/70"
                 }`}
+                title={item.label}
               >
-                <item.icon className="w-3.5 h-3.5 mr-1" />
-                {item.label}
+                <item.icon className="w-3.5 h-3.5 lg:mr-1" />
+                <span className="hidden lg:inline">{item.label}</span>
               </Button>
             ))}
             <Button
