@@ -96,7 +96,7 @@ const Auth = () => {
       }
 
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: validation.email,
           password: validation.password,
         });
@@ -108,6 +108,16 @@ const Auth = () => {
         }
 
         rateLimiter.reset();
+
+        // Check if MFA is required
+        const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        
+        if (aalData?.currentLevel === 'aal1' && aalData?.nextLevel === 'aal2') {
+          // User has MFA enabled but needs to verify
+          navigate('/auth/mfa-verify');
+          return;
+        }
+
         toast.success("Login realizado com sucesso!");
       } else {
         const { error } = await supabase.auth.signUp({

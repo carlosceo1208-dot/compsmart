@@ -48,6 +48,7 @@ import CheckoutProcessing from "./pages/checkout/Processing";
 import Billing from "./pages/settings/Billing";
 import LandingContent from "./pages/settings/LandingContent";
 import MyPlan from "./pages/settings/MyPlan";
+import MFAVerify from "./components/auth/MFAVerify";
 import { LabelsProvider } from "./contexts/LabelsContext";
 
 const queryClient = new QueryClient();
@@ -67,6 +68,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/activate" element={<ActivateAccount />} />
+            <Route path="/auth/mfa-verify" element={<MFAVerify />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/termos-de-uso" element={<TermsOfUse />} />
             <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
