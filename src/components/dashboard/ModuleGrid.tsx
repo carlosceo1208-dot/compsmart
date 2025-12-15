@@ -99,7 +99,7 @@ export const ModuleGrid = () => {
     },
     {
       title: 'Meu Perfil',
-      description: 'Gerencie suas informações',
+      description: 'Configure seus dados e acesso seguro 🔐',
       icon: UserCircle,
       path: '/my-profile',
       status: 'active',
