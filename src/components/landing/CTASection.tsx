@@ -10,7 +10,7 @@ export const CTASection = () => {
 
   // Countdown to January 2026
   useEffect(() => {
-    const targetDate = new Date('2026-01-01T00:00:00').getTime();
+    const targetDate = new Date('2026-01-07T00:00:00').getTime();
     
     const updateCountdown = () => {
       const now = new Date().getTime();
