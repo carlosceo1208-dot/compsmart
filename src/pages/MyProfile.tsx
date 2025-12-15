@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useLabels } from '@/contexts/LabelsContext';
 import { format } from 'date-fns';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
+import { SecuritySettings } from '@/components/profile/SecuritySettings';
 
 interface Profile {
   id: string;
@@ -147,6 +148,9 @@ export default function MyProfile() {
           />
         </CardContent>
       </Card>
+
+      {/* Segurança da Conta - NOVO Card Premium */}
+      <SecuritySettings />
 
       {/* Dados Pessoais (Editável) */}
       <Card>
