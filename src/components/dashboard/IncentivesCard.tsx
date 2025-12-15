@@ -21,7 +21,7 @@ export const IncentivesCard = ({ currency }: IncentivesCardProps) => {
 
   return (
     <Card 
-      className="bg-gradient-to-br from-purple-50 to-violet-50 border-2 border-purple-200/50 hover:border-purple-300 hover:shadow-lg transition-all duration-200 cursor-pointer" 
+      className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/50 dark:to-violet-950/50 border-2 border-purple-200/50 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-lg transition-all duration-200 cursor-pointer" 
       onClick={() => navigate('/incentive-programs?tab=kpis')}
     >
       <CardHeader className="pb-3">

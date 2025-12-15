@@ -121,7 +121,7 @@ export const OrganizationalIdentityCard = () => {
 
   if (isLoading) {
     return (
-      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200/50">
+      <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 border-2 border-purple-200/50 dark:border-purple-800/50">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <Skeleton className="h-5 w-48" />
@@ -135,7 +135,7 @@ export const OrganizationalIdentityCard = () => {
   return (
     <Card 
       className={cn(
-        "bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200/50 hover:border-purple-300 transition-all duration-300 overflow-hidden",
+        "bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50 border-2 border-purple-200/50 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 transition-all duration-300 overflow-hidden",
         isExpanded ? "shadow-lg" : "shadow-sm"
       )}
     >
@@ -144,10 +144,10 @@ export const OrganizationalIdentityCard = () => {
         <div className="p-4 flex items-center justify-between">
           <button
             onClick={() => !isEditing && setIsExpanded(!isExpanded)}
-            className="flex items-center gap-2 hover:bg-purple-100/30 transition-colors rounded px-2 py-1"
+            className="flex items-center gap-2 hover:bg-purple-100/30 dark:hover:bg-purple-900/30 transition-colors rounded px-2 py-1"
           >
-            <Target className="h-5 w-5 text-purple-600" />
-            <span className="font-semibold text-purple-900">Identidade Organizacional</span>
+            <Target className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+            <span className="font-semibold text-purple-900 dark:text-purple-100">Identidade Organizacional</span>
           </button>
           
           <div className="flex items-center gap-2">
@@ -175,9 +175,9 @@ export const OrganizationalIdentityCard = () => {
             {!isEditing && (
               <button onClick={() => setIsExpanded(!isExpanded)}>
                 {isExpanded ? (
-                  <ChevronUp className="h-5 w-5 text-purple-600" />
+                  <ChevronUp className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-purple-600" />
+                  <ChevronDown className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 )}
               </button>
             )}
@@ -191,7 +191,7 @@ export const OrganizationalIdentityCard = () => {
               /* Edit Mode */
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="mission" className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                  <Label htmlFor="mission" className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">
                     Missão
                   </Label>
                   <Textarea
@@ -203,13 +203,13 @@ export const OrganizationalIdentityCard = () => {
                     rows={3}
                     className="text-sm"
                   />
-                  <p className="text-xs text-purple-600">
+                  <p className="text-xs text-purple-600 dark:text-purple-400">
                     {formData.mission.length}/500 caracteres
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="vision" className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                  <Label htmlFor="vision" className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">
                     Visão
                   </Label>
                   <Textarea
@@ -221,13 +221,13 @@ export const OrganizationalIdentityCard = () => {
                     rows={3}
                     className="text-sm"
                   />
-                  <p className="text-xs text-purple-600">
+                  <p className="text-xs text-purple-600 dark:text-purple-400">
                     {formData.vision.length}/500 caracteres
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                  <Label className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">
                     Valores (máximo 10)
                   </Label>
                   <div className="flex gap-2">
@@ -249,10 +249,10 @@ export const OrganizationalIdentityCard = () => {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {formData.values.map((value, index) => (
-                      <Badge 
-                        key={index} 
-                        variant="secondary"
-                        className="bg-purple-200/60 text-purple-900 hover:bg-purple-200 text-xs gap-1"
+                        <Badge 
+                          key={index} 
+                          variant="secondary"
+                          className="bg-purple-200/60 dark:bg-purple-800/60 text-purple-900 dark:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-700 text-xs gap-1"
                       >
                         {value}
                         <button onClick={() => handleRemoveValue(index)} className="ml-1 hover:text-destructive">
@@ -264,7 +264,7 @@ export const OrganizationalIdentityCard = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="year" className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                  <Label htmlFor="year" className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">
                     Ano da Meta
                   </Label>
                   <Input
@@ -279,7 +279,7 @@ export const OrganizationalIdentityCard = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="goal" className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                  <Label htmlFor="goal" className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">
                     Descrição da Meta Anual
                   </Label>
                   <Textarea
@@ -291,17 +291,17 @@ export const OrganizationalIdentityCard = () => {
                     rows={2}
                     className="text-sm"
                   />
-                  <p className="text-xs text-purple-600">
+                  <p className="text-xs text-purple-600 dark:text-purple-400">
                     {formData.annual_goal_description.length}/300 caracteres
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between p-3 border border-purple-200 rounded-lg bg-purple-50/30">
+                <div className="flex items-center justify-between p-3 border border-purple-200 dark:border-purple-800 rounded-lg bg-purple-50/30 dark:bg-purple-950/30">
                   <div>
-                    <Label htmlFor="visible" className="text-xs font-bold text-purple-900">
+                    <Label htmlFor="visible" className="text-xs font-bold text-purple-900 dark:text-purple-100">
                       Exibir no Dashboard
                     </Label>
-                    <p className="text-xs text-purple-600">
+                    <p className="text-xs text-purple-600 dark:text-purple-400">
                       Mostrar identidade na página inicial
                     </p>
                   </div>
@@ -312,7 +312,7 @@ export const OrganizationalIdentityCard = () => {
                   />
                 </div>
 
-                <div className="flex justify-end gap-2 pt-2 border-t border-purple-200">
+                <div className="flex justify-end gap-2 pt-2 border-t border-purple-200 dark:border-purple-800">
                   <Button variant="outline" onClick={handleEdit} disabled={updateMutation.isPending}>
                     Cancelar
                   </Button>
@@ -329,10 +329,10 @@ export const OrganizationalIdentityCard = () => {
                 {identity.mission && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1.5">
-                      <Eye className="h-4 w-4 text-purple-600" />
-                      <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wide">Missão</h4>
+                      <Eye className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <h4 className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">Missão</h4>
                     </div>
-                    <p className="text-sm text-purple-800 leading-relaxed">{identity.mission}</p>
+                    <p className="text-sm text-purple-800 dark:text-purple-200 leading-relaxed">{identity.mission}</p>
                   </div>
                 )}
 
@@ -340,10 +340,10 @@ export const OrganizationalIdentityCard = () => {
                 {identity.vision && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1.5">
-                      <TrendingUp className="h-4 w-4 text-purple-600" />
-                      <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wide">Visão</h4>
+                      <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <h4 className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">Visão</h4>
                     </div>
-                    <p className="text-sm text-purple-800 leading-relaxed">{identity.vision}</p>
+                    <p className="text-sm text-purple-800 dark:text-purple-200 leading-relaxed">{identity.vision}</p>
                   </div>
                 )}
 
@@ -351,15 +351,15 @@ export const OrganizationalIdentityCard = () => {
                 {identity.values && identity.values.length > 0 && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-1.5">
-                      <Heart className="h-4 w-4 text-purple-600" />
-                      <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wide">Valores</h4>
+                      <Heart className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <h4 className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">Valores</h4>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {identity.values.map((value, index) => (
                         <Badge 
                           key={index} 
                           variant="secondary"
-                          className="bg-purple-200/60 text-purple-900 hover:bg-purple-200 text-xs"
+                          className="bg-purple-200/60 dark:bg-purple-800/60 text-purple-900 dark:text-purple-100 hover:bg-purple-200 dark:hover:bg-purple-700 text-xs"
                         >
                           {value}
                         </Badge>
@@ -370,14 +370,14 @@ export const OrganizationalIdentityCard = () => {
 
                 {/* Annual Goal */}
                 {identity.annual_goal_year && identity.annual_goal_description && (
-                  <div className="space-y-1.5 pt-2 border-t border-purple-200">
+                  <div className="space-y-1.5 pt-2 border-t border-purple-200 dark:border-purple-800">
                     <div className="flex items-center gap-1.5">
-                      <Target className="h-4 w-4 text-purple-600" />
-                      <h4 className="text-xs font-bold text-purple-900 uppercase tracking-wide">
+                      <Target className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      <h4 className="text-xs font-bold text-purple-900 dark:text-purple-100 uppercase tracking-wide">
                         Meta {identity.annual_goal_year}
                       </h4>
                     </div>
-                    <p className="text-sm text-purple-800 leading-relaxed">
+                    <p className="text-sm text-purple-800 dark:text-purple-200 leading-relaxed">
                       {identity.annual_goal_description}
                     </p>
                   </div>

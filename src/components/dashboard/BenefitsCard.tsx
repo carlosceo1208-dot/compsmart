@@ -18,7 +18,7 @@ export const BenefitsCard = ({ currency }: BenefitsCardProps) => {
   const annualCost = monthlyCost * 12;
 
   return (
-    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200/50 hover:border-blue-300 hover:shadow-lg transition-all duration-200">
+    <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 border-2 border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg transition-all duration-200">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <Gift className="h-4 w-4" />
