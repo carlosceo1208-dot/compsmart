@@ -47,3 +47,9 @@ verify_jwt = false
 
 [functions.send-trial-reminders]
 verify_jwt = false
+
+[functions.create-test-account]
+verify_jwt = false
+
+[functions.notify-budget-submission]
+verify_jwt = true
