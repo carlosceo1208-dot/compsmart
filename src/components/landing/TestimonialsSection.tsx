@@ -54,7 +54,7 @@ export const TestimonialsSection = () => {
     return () => observer.disconnect();
   }, []);
 
-  const empresasCount = useAnimatedCounter(10000, 2500, isVisible);
+  const empresasCount = useAnimatedCounter(1000, 2500, isVisible);
   const horasCount = useAnimatedCounter(40, 2000, isVisible);
   const precisionCount = useAnimatedCounter(99, 2000, isVisible);
 
