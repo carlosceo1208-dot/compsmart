@@ -1982,6 +1982,7 @@ export type Database = {
           salary_range_percentage: number | null
           short_term_incentive: number | null
           status: Database["public"]["Enums"]["user_status"]
+          termination_date: string | null
           unit_id: string | null
           updated_at: string
           variable_salary: number | null
@@ -2010,6 +2011,7 @@ export type Database = {
           salary_range_percentage?: number | null
           short_term_incentive?: number | null
           status?: Database["public"]["Enums"]["user_status"]
+          termination_date?: string | null
           unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
@@ -2038,6 +2040,7 @@ export type Database = {
           salary_range_percentage?: number | null
           short_term_incentive?: number | null
           status?: Database["public"]["Enums"]["user_status"]
+          termination_date?: string | null
           unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
