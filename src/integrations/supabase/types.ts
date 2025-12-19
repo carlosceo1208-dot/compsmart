@@ -1792,7 +1792,9 @@ export type Database = {
           fantasy_name: string | null
           id: string
           industry_sector: string | null
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           name: string
           parent_id: string | null
           payment_method: string | null
@@ -1820,7 +1822,9 @@ export type Database = {
           fantasy_name?: string | null
           id?: string
           industry_sector?: string | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name: string
           parent_id?: string | null
           payment_method?: string | null
@@ -1848,7 +1852,9 @@ export type Database = {
           fantasy_name?: string | null
           id?: string
           industry_sector?: string | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
           parent_id?: string | null
           payment_method?: string | null
