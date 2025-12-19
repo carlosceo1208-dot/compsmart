@@ -28,6 +28,7 @@ const userSchema = z.object({
     }, { message: "CPF deve ter 11 dígitos (xxxxxxxxxxx) ou formato xxx.xxx.xxx-xx" }),
   birth_date: z.string().optional(),
   hire_date: z.string().optional(),
+  termination_date: z.string().optional(),
   job_title: z.string().optional(),
   grade: z.string().optional(),
   salary: z.string().optional(),
@@ -64,6 +65,7 @@ interface UserData {
   cpf?: string;
   birth_date?: string;
   hire_date?: string;
+  termination_date?: string;
   job_title?: string;
   grade?: string;
   salary?: string;
@@ -93,6 +95,7 @@ interface Profile {
   cpf: string | null;
   birth_date: string | null;
   hire_date: string | null;
+  termination_date: string | null;
   job_title: string | null;
   grade: string | null;
   salary: number | null;
@@ -123,6 +126,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     cpf: "",
     birth_date: "",
     hire_date: "",
+    termination_date: "",
     job_title: "",
     grade: "",
     salary: "",
@@ -271,7 +275,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, employee_number, phone, cpf, birth_date, hire_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .select("id, full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
         .eq("status", "active")
         .order("full_name", { ascending: true });
 
@@ -307,6 +311,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       cpf: employee.cpf || "",
       birth_date: employee.birth_date || "",
       hire_date: employee.hire_date || "",
+      termination_date: employee.termination_date || "",
       job_title: employee.job_title || "",
       grade: employee.grade || "",
       salary: employee.salary 
@@ -331,7 +336,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, employee_number, phone, cpf, birth_date, hire_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .select("full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
         .eq("id", userId)
         .single();
 
@@ -348,6 +353,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         ...profile,
         employee_number: profile.employee_number || "",
         hire_date: profile.hire_date || "",
+        termination_date: profile.termination_date || "",
         password: "",
         salary: profile.salary 
           ? profile.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -386,6 +392,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       cpf: "",
       birth_date: "",
       hire_date: "",
+      termination_date: "",
       job_title: "",
       grade: "",
       salary: "",
@@ -496,6 +503,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             cpf: formData.cpf || null,
             birth_date: formData.birth_date || null,
             hire_date: formData.hire_date || null,
+            termination_date: formData.termination_date || null,
             job_title: formData.job_title || null,
             grade: formData.grade || null,
             salary: parseBRCurrency(formData.salary),
@@ -789,6 +797,25 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   onChange={(e) => setFormData({ ...formData, hire_date: e.target.value })}
                   disabled={loading}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="termination_date" className="flex items-center gap-2">
+                  Data de Desligamento
+                  {formData.termination_date && (
+                    <span className="text-xs text-destructive font-normal">(Status será alterado para Inativo)</span>
+                  )}
+                </Label>
+                <Input
+                  id="termination_date"
+                  type="date"
+                  value={formData.termination_date}
+                  onChange={(e) => setFormData({ ...formData, termination_date: e.target.value })}
+                  disabled={loading}
+                  className={formData.termination_date ? "border-destructive" : ""}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Ao informar a data de desligamento, o status do funcionário será alterado automaticamente para "Inativo"
+                </p>
               </div>
             </div>
 

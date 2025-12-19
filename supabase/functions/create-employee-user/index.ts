@@ -27,6 +27,7 @@ serve(async (req) => {
       cpf,
       birth_date,
       hire_date,
+      termination_date,
       job_title,
       job_title_id,
       grade,
@@ -75,6 +76,7 @@ serve(async (req) => {
         cpf: cpf || null,
         birth_date: birth_date || null,
         hire_date: hire_date || null,
+        termination_date: termination_date || null,
         job_title: job_title || null,
         job_title_id: job_title_id || null,
         grade: grade || null,
@@ -153,6 +155,7 @@ serve(async (req) => {
           cpf: cpf || null,
           birth_date: birth_date || null,
           hire_date: hire_date || null,
+          termination_date: termination_date || null,
           job_title: job_title || null,
           job_title_id: job_title_id || null,
           grade: grade || null,
@@ -229,6 +232,7 @@ serve(async (req) => {
         cpf: cpf || null,
         birth_date: birth_date || null,
         hire_date: hire_date || null,
+        termination_date: termination_date || null,
         job_title: job_title || null,
         job_title_id: job_title_id || null,
         grade: grade || null,
@@ -287,6 +291,7 @@ serve(async (req) => {
         cpf: cpf || null,
         birth_date: birth_date || null,
         hire_date: hire_date || null,
+        termination_date: termination_date || null,
         job_title: job_title || null,
         job_title_id: job_title_id || null,
         grade: grade || null,
@@ -298,7 +303,7 @@ serve(async (req) => {
         manager_id: manager_id || null,
         root_company_id: root_company_id || null,
         has_system_access: false, // Sem email = sem acesso ao sistema
-        status: 'active'
+        status: termination_date ? 'inactive' : 'active'
       };
 
       const { data, error } = await supabase
