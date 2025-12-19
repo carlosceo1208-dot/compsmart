@@ -9,6 +9,7 @@ import { OrganizationalIdentityCard } from "@/components/dashboard/Organizationa
 import { PendingAdjustmentAlert } from "@/components/dashboard/PendingAdjustmentAlert";
 import { SalaryTableSetupAlert } from "@/components/dashboard/SalaryTableSetupAlert";
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
+import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
@@ -40,6 +41,9 @@ const Dashboard = () => {
           
           {/* Alerta Educativo - Tabela Salarial */}
           <SalaryTableSetupAlert />
+          
+          {/* Mapa de Localização das Unidades */}
+          <CompanyMapCard />
           
           <OrganizationalIdentityCard />
           
