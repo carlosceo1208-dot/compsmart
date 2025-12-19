@@ -1,22 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Building2, ChevronDown, ChevronUp, Loader2, MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useCompanyLocations } from "@/hooks/useCompanyLocations";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix para ícones do Leaflet no React
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
-
-// Ícone personalizado para Matriz (azul)
+// Fix para ícones do Leaflet
 const headquartersIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
@@ -26,7 +17,6 @@ const headquartersIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Ícone personalizado para Filial (verde)
 const branchIcon = new L.Icon({
   iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
   shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
@@ -36,37 +26,87 @@ const branchIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-// Componente para ajustar o zoom automaticamente
-const FitBounds = ({ locations }: { locations: { latitude: number; longitude: number }[] }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (locations.length === 0) return;
-
-    if (locations.length === 1) {
-      map.setView([locations[0].latitude, locations[0].longitude], 10);
-    } else {
-      const bounds = L.latLngBounds(
-        locations.map(loc => [loc.latitude, loc.longitude] as [number, number])
-      );
-      map.fitBounds(bounds, { padding: [50, 50] });
-    }
-  }, [locations, map]);
-
-  return null;
-};
-
 export const CompanyMapCard = () => {
   const [isOpen, setIsOpen] = useState(true);
   const { locations, allLocations, isLoading } = useCompanyLocations();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
   // Contar unidades sem localização
   const missingLocations = allLocations.filter(
     loc => !loc.latitude || !loc.longitude
   ).length;
 
-  // Centro padrão: Brasil
-  const defaultCenter: [number, number] = [-15.7801, -47.9292];
+  // Inicializar mapa com Leaflet puro (sem react-leaflet)
+  useEffect(() => {
+    if (!mapContainerRef.current || isLoading || locations.length === 0) return;
+    
+    // Destruir mapa existente se houver
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
+
+    // Criar novo mapa
+    const map = L.map(mapContainerRef.current, {
+      scrollWheelZoom: false,
+      zoomControl: true
+    });
+
+    mapRef.current = map;
+
+    // Adicionar tile layer
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Adicionar marcadores
+    const markers: L.Marker[] = [];
+    
+    locations.forEach((location) => {
+      if (location.latitude && location.longitude) {
+        const icon = location.type === "headquarters" ? headquartersIcon : branchIcon;
+        const typeLabel = location.type === "headquarters" ? "MATRIZ" : "FILIAL";
+        
+        const marker = L.marker([location.latitude, location.longitude], { icon })
+          .addTo(map)
+          .bindPopup(`
+            <div style="text-align: center; min-width: 120px;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 4px;">
+                <span style="font-weight: 600; font-size: 11px; text-transform: uppercase;">
+                  ${typeLabel}
+                </span>
+              </div>
+              <div style="font-size: 13px; font-weight: 500;">
+                ${location.name}
+              </div>
+              ${location.description ? `<div style="font-size: 11px; color: #666; margin-top: 4px;">${location.description}</div>` : ''}
+            </div>
+          `);
+        
+        markers.push(marker);
+      }
+    });
+
+    // Ajustar zoom para mostrar todos os marcadores
+    if (markers.length === 1 && locations[0].latitude && locations[0].longitude) {
+      map.setView([locations[0].latitude, locations[0].longitude], 10);
+    } else if (markers.length > 1) {
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds(), { padding: [30, 30] });
+    } else {
+      // Centro padrão: Brasil
+      map.setView([-15.7801, -47.9292], 4);
+    }
+
+    // Cleanup
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, [locations, isLoading]);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -111,53 +151,11 @@ export const CompanyMapCard = () => {
               </div>
             ) : (
               <div className="space-y-2">
-                <div className="h-48 rounded-lg overflow-hidden border border-border/50">
-                  <MapContainer
-                    center={defaultCenter}
-                    zoom={4}
-                    style={{ height: "100%", width: "100%" }}
-                    scrollWheelZoom={false}
-                  >
-                    <TileLayer
-                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    
-                    <FitBounds 
-                      locations={locations.map(loc => ({
-                        latitude: loc.latitude!,
-                        longitude: loc.longitude!
-                      }))} 
-                    />
-
-                    {locations.map((location) => (
-                      <Marker
-                        key={location.id}
-                        position={[location.latitude!, location.longitude!]}
-                        icon={location.type === "headquarters" ? headquartersIcon : branchIcon}
-                      >
-                        <Popup>
-                          <div className="text-center min-w-[120px]">
-                            <div className="flex items-center justify-center gap-1 mb-1">
-                              <Building2 className="h-3 w-3" />
-                              <span className="font-semibold text-xs uppercase">
-                                {location.type === "headquarters" ? "Matriz" : "Filial"}
-                              </span>
-                            </div>
-                            <div className="text-sm font-medium">
-                              {location.name}
-                            </div>
-                            {location.description && (
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {location.description}
-                              </div>
-                            )}
-                          </div>
-                        </Popup>
-                      </Marker>
-                    ))}
-                  </MapContainer>
-                </div>
+                <div 
+                  ref={mapContainerRef}
+                  className="h-48 rounded-lg overflow-hidden border border-border/50"
+                  style={{ zIndex: 0 }}
+                />
 
                 {/* Legenda */}
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
