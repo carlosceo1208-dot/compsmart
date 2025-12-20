@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { Loader2, Shield, AlertCircle } from 'lucide-react';
 import compsmartLogo from '@/assets/compsmart-logo.png';
 import { SecurityFooter } from '@/components/SecurityFooter';
+import { useAuthLogger } from '@/hooks/useAuthLogger';
 
 export default function MFAVerify() {
   const navigate = useNavigate();
@@ -15,6 +16,9 @@ export default function MFAVerify() {
   const [loading, setLoading] = useState(false);
   const [factorId, setFactorId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  
+  const { logAuthAttempt } = useAuthLogger();
 
   useEffect(() => {
     checkMFAStatus();
@@ -29,6 +33,9 @@ export default function MFAVerify() {
         navigate('/auth');
         return;
       }
+
+      // Store email for logging
+      setUserEmail(session.user.email || null);
 
       // Check AAL level
       const { data: aalData, error: aalError } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -99,10 +106,30 @@ export default function MFAVerify() {
       });
 
       if (verifyError) {
+        // Log failed MFA attempt
+        if (userEmail) {
+          logAuthAttempt({
+            email: userEmail,
+            attemptType: "mfa_verify",
+            success: false,
+            failureReason: "invalid_code",
+          });
+        }
         setError('Código inválido. Verifique e tente novamente.');
         console.error('Verify error:', verifyError);
         setCode('');
         return;
+      }
+
+      // Log successful MFA verification
+      const { data: { session } } = await supabase.auth.getSession();
+      if (userEmail) {
+        logAuthAttempt({
+          email: userEmail,
+          attemptType: "mfa_verify",
+          success: true,
+          userId: session?.user?.id,
+        });
       }
 
       toast.success('Verificação concluída!');

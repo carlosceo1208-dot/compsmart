@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.notify-budget-submission]
 verify_jwt = true
+
+[functions.log-auth-attempt]
+verify_jwt = false
