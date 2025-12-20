@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Button } from "@/components/ui/button";
 import { Network, Download, ZoomIn, ZoomOut, FileImage, FileText } from "lucide-react";
 import { OrgTree } from "@/components/organogram/OrgTree";
@@ -36,6 +37,7 @@ interface Employee {
 }
 
 export default function Organogram() {
+  const { activeCompanyId } = useCompanyContext();
   const [loading, setLoading] = useState(true);
   const [entities, setEntities] = useState<OrgEntity[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -50,24 +52,36 @@ export default function Organogram() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [activeCompanyId]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
 
-      const { data: entitiesData, error: entitiesError } = await supabase
+      // Filtrar entidades por empresa ativa
+      let entitiesQuery = supabase
         .from('organizational_structure')
-        .select('id, name, description, type, code, parent_id')
-        .order('name');
+        .select('id, name, description, type, code, parent_id, root_company_id');
+      
+      if (activeCompanyId) {
+        entitiesQuery = entitiesQuery.or(`root_company_id.eq.${activeCompanyId},id.eq.${activeCompanyId}`);
+      }
+      
+      const { data: entitiesData, error: entitiesError } = await entitiesQuery.order('name');
 
       if (entitiesError) throw entitiesError;
 
-      const { data: employeesData, error: employeesError } = await supabase
+      // Filtrar funcionários por empresa ativa
+      let employeesQuery = supabase
         .from('profiles')
         .select('id, full_name, email, phone, job_title, grade, avatar_url, unit_id, manager_id')
-        .eq('status', 'active')
-        .order('full_name');
+        .eq('status', 'active');
+      
+      if (activeCompanyId) {
+        employeesQuery = employeesQuery.eq('root_company_id', activeCompanyId);
+      }
+      
+      const { data: employeesData, error: employeesError } = await employeesQuery.order('full_name');
 
       if (employeesError) throw employeesError;
 
