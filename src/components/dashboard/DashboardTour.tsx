@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
+import { useTheme } from 'next-themes';
 
 const TOUR_STORAGE_KEY = 'compsmart_tour_completed';
 
@@ -90,12 +91,15 @@ interface DashboardTourProps {
 }
 
 export const DashboardTour = ({ onComplete }: DashboardTourProps) => {
+  const { theme, setTheme } = useTheme();
+  
   // Verifica localStorage imediatamente na inicialização
   const [hasCompletedTour] = useState(() => 
     localStorage.getItem(TOUR_STORAGE_KEY) === 'true'
   );
   const [runTour, setRunTour] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [originalTheme, setOriginalTheme] = useState<string | undefined>();
 
   useEffect(() => {
     setMounted(true);
@@ -107,12 +111,26 @@ export const DashboardTour = ({ onComplete }: DashboardTourProps) => {
     }
   }, [hasCompletedTour]);
 
+  // Quando o tour começa, salvar tema original e mudar para dark
+  useEffect(() => {
+    if (runTour && !originalTheme) {
+      setOriginalTheme(theme);
+      setTheme('dark');
+    }
+  }, [runTour, theme, setTheme, originalTheme]);
+
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
     if (finishedStatuses.includes(status)) {
       setRunTour(false);
+      
+      // Restaurar tema original do usuário
+      if (originalTheme) {
+        setTheme(originalTheme);
+      }
+      
       localStorage.setItem(TOUR_STORAGE_KEY, 'true');
       onComplete?.();
     }
@@ -141,21 +159,22 @@ export const DashboardTour = ({ onComplete }: DashboardTourProps) => {
       styles={{
         options: {
           primaryColor: '#10b981',
-          textColor: '#1f2937',
-          backgroundColor: '#ffffff',
-          arrowColor: '#ffffff',
-          overlayColor: 'rgba(0, 0, 0, 0.65)',
+          textColor: '#ffffff',
+          backgroundColor: '#1f2937',
+          arrowColor: '#1f2937',
+          overlayColor: 'rgba(0, 0, 0, 0.85)',
           zIndex: 10000,
         },
         tooltip: {
           borderRadius: '10px',
           padding: '14px',
           border: '2px solid #10b981',
-          boxShadow: '0 4px 20px rgba(16, 185, 129, 0.25)',
+          boxShadow: '0 4px 20px rgba(16, 185, 129, 0.4)',
           maxWidth: '320px',
         },
         tooltipContent: {
           padding: '0',
+          color: '#ffffff',
         },
         buttonNext: {
           backgroundColor: '#10b981',
