@@ -667,6 +667,14 @@ const Organization = () => {
         onOpenChange={setDialogOpen}
         entityId={selectedEntityId}
         onSuccess={fetchEntities}
+        existingStats={{
+          hasCompany: stats.companies > 0,
+          hasHeadquarters: stats.headquarters > 0,
+          hasBranch: stats.branches > 0,
+          hasArea: stats.areas > 0,
+          hasDepartment: stats.departments > 0,
+          hasSector: stats.sectors > 0,
+        }}
       />
 
       <AlertDialog open={!!deleteEntityId} onOpenChange={() => setDeleteEntityId(null)}>
