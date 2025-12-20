@@ -30,11 +30,21 @@ import { toast } from "sonner";
 import { Loader2, HelpCircle } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
 
+interface ExistingStats {
+  hasCompany: boolean;
+  hasHeadquarters: boolean;
+  hasBranch: boolean;
+  hasArea: boolean;
+  hasDepartment: boolean;
+  hasSector: boolean;
+}
+
 interface OrganizationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   entityId: string | null;
   onSuccess: () => void;
+  existingStats?: ExistingStats;
 }
 
 interface EntityData {
@@ -107,7 +117,7 @@ const VALID_CHILDREN: Record<string, string[]> = {
   project: [], // No children (leaf node)
 };
 
-export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: OrganizationDialogProps) {
+export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, existingStats }: OrganizationDialogProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<EntityData>({
     name: "",
@@ -131,11 +141,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
       if (entityId) {
         fetchEntityData();
       } else {
-        resetForm();
+        resetForm(existingStats);
       }
       fetchParentOptions();
     }
-  }, [open, entityId]);
+  }, [open, entityId, existingStats]);
 
   useEffect(() => {
     if (formData.type) {
@@ -228,11 +238,29 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess }: 
     }
   };
 
-  const resetForm = () => {
+  const resetForm = (stats?: ExistingStats) => {
+    // Determinar tipo padrão baseado na estrutura existente
+    let defaultType = "";
+    
+    if (!stats?.hasCompany) {
+      defaultType = "company";
+    } else if (!stats?.hasHeadquarters && !stats?.hasBranch) {
+      defaultType = "headquarters";
+    } else if (!stats?.hasArea) {
+      defaultType = "area";
+    } else if (!stats?.hasDepartment) {
+      defaultType = "department";
+    } else if (!stats?.hasSector) {
+      defaultType = "sector";
+    } else {
+      // Se já tem tudo, default para projeto ou departamento
+      defaultType = "department";
+    }
+    
     setFormData({
       name: "",
       code: "",
-      type: "company",
+      type: defaultType,
       description: "",
       parent_id: "",
       fantasy_name: "",
