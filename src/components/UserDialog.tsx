@@ -518,13 +518,22 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (updateError) throw updateError;
 
-        // Update roles using secure function
-        const { error: rolesError } = await supabase.rpc('manage_user_roles', {
-          p_user_id: userId,
-          p_roles: formData.roles as Database["public"]["Enums"]["app_role"][]
-        });
+        // Só atualiza roles se o funcionário tiver conta no auth.users (email cadastrado)
+        // Funcionários sem email não existem em auth.users
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('id', userId)
+          .single();
 
-        if (rolesError) throw rolesError;
+        if (profileData?.email) {
+          const { error: rolesError } = await supabase.rpc('manage_user_roles', {
+            p_user_id: userId,
+            p_roles: formData.roles as Database["public"]["Enums"]["app_role"][]
+          });
+
+          if (rolesError) throw rolesError;
+        }
 
         if (!formData.unit_id) {
           toast.info("Funcionário atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
@@ -592,7 +601,12 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       } else if (error.message?.includes('deve ser um')) {
         toast.error("A unidade selecionada deve ser uma Área, Departamento, Setor ou Projeto válido");
       } else if (error.code === '23503') {
-        toast.error("Unidade organizacional não encontrada. Ela pode ter sido excluída.");
+        // Distinguir entre diferentes tipos de violação de FK
+        if (error.message?.includes('user_roles')) {
+          toast.warning("Funcionário salvo, mas sem roles (não possui conta de acesso ao sistema).");
+        } else {
+          toast.error("Unidade organizacional não encontrada. Ela pode ter sido excluída.");
+        }
       } else {
         toast.error(error.message || "Erro ao salvar funcionário");
       }
