@@ -24,6 +24,7 @@ import {
   Bot,
   Gift,
   LucideIcon,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface ModuleDefinition {
@@ -205,6 +206,15 @@ export const ModuleGrid = () => {
       description: 'Logs e relatórios de uso dos Agentes Smart',
       icon: Shield,
       path: '/audit-logs',
+      status: 'active',
+      category: 'management',
+      requiredPlan: 'medium',
+    },
+    {
+      title: 'Auditoria de Dados',
+      description: 'Verificar e corrigir inconsistências de dados',
+      icon: AlertTriangle,
+      path: '/data-audit',
       status: 'active',
       category: 'management',
       requiredPlan: 'medium',
