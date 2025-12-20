@@ -10,6 +10,7 @@ import { Loader2, ArrowLeft, AlertTriangle } from "lucide-react";
 import { z } from "zod";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { useRateLimiter } from "@/hooks/useRateLimiter";
+import { useAuthLogger } from "@/hooks/useAuthLogger";
 
 const emailSchema = z.object({
   email: z.string().email("Email inválido").max(255, "Email muito longo"),
@@ -26,6 +27,8 @@ const ForgotPassword = () => {
     windowMs: 60000,
     cooldownMs: 60000, // 1 minute cooldown for password recovery
   });
+
+  const { logAuthAttempt } = useAuthLogger();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +55,24 @@ const ForgotPassword = () => {
       });
 
       if (error) {
+        // Log failed password reset attempt
+        logAuthAttempt({
+          email: validation.email,
+          attemptType: "password_reset",
+          success: false,
+          failureReason: error.message,
+        });
         // Generic message to prevent email enumeration
         toast.error("Não foi possível processar sua solicitação. Tente novamente.");
         return;
       }
+
+      // Log password reset attempt (success - email sent if exists)
+      logAuthAttempt({
+        email: validation.email,
+        attemptType: "password_reset",
+        success: true,
+      });
 
       // Always show success to prevent email enumeration
       setEmailSent(true);

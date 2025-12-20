@@ -13,6 +13,7 @@ import compsmartLogo from "@/assets/compsmart-logo.png";
 import { SecurityFooter } from "@/components/SecurityFooter";
 import { PasswordStrengthIndicator, validatePassword } from "@/components/auth/PasswordStrengthIndicator";
 import { useRateLimiter } from "@/hooks/useRateLimiter";
+import { useAuthLogger } from "@/hooks/useAuthLogger";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido").max(255, "Email muito longo"),
@@ -37,6 +38,8 @@ const Auth = () => {
     windowMs: 60000,
     cooldownMs: 30000,
   });
+
+  const { logAuthAttempt } = useAuthLogger();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -102,10 +105,25 @@ const Auth = () => {
         });
 
         if (error) {
+          // Log failed login attempt
+          logAuthAttempt({
+            email: validation.email,
+            attemptType: "login",
+            success: false,
+            failureReason: "invalid_credentials",
+          });
           // Generic error message to prevent user enumeration
           toast.error("Credenciais inválidas. Verifique seu email e senha.");
           return;
         }
+
+        // Log successful login
+        logAuthAttempt({
+          email: validation.email,
+          attemptType: "login",
+          success: true,
+          userId: data.user?.id,
+        });
 
         rateLimiter.reset();
 
@@ -120,7 +138,7 @@ const Auth = () => {
 
         toast.success("Login realizado com sucesso!");
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: validation.email,
           password: validation.password,
           options: {
@@ -132,10 +150,25 @@ const Auth = () => {
         });
 
         if (error) {
+          // Log failed signup attempt
+          logAuthAttempt({
+            email: validation.email,
+            attemptType: "signup",
+            success: false,
+            failureReason: error.message,
+          });
           // Generic error message to prevent user enumeration
           toast.error("Não foi possível criar a conta. Tente novamente.");
           return;
         }
+
+        // Log successful signup
+        logAuthAttempt({
+          email: validation.email,
+          attemptType: "signup",
+          success: true,
+          userId: data.user?.id,
+        });
 
         rateLimiter.reset();
         toast.success("Cadastro realizado! Você já pode fazer login.");

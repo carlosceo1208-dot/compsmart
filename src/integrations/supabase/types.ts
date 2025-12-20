@@ -182,6 +182,45 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_attempt_logs: {
+        Row: {
+          attempt_type: string
+          created_at: string | null
+          email: string
+          failure_reason: string | null
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          success: boolean
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          attempt_type: string
+          created_at?: string | null
+          email: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          success: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          attempt_type?: string
+          created_at?: string | null
+          email?: string
+          failure_reason?: string | null
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          success?: boolean
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       benefit_eligibility: {
         Row: {
           benefit_id: string | null
