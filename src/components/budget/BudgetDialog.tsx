@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface BudgetDialogProps {
   open: boolean;
@@ -42,6 +43,7 @@ const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
 
 export const BudgetDialog = ({ open, onOpenChange, budgetData, mode }: BudgetDialogProps) => {
   const queryClient = useQueryClient();
+  const { activeCompanyId } = useCompanyContext();
   const [formData, setFormData] = useState({
     fiscal_year: currentYear,
     month: new Date().getMonth() + 1,
@@ -71,14 +73,19 @@ export const BudgetDialog = ({ open, onOpenChange, budgetData, mode }: BudgetDia
   }, [budgetData, mode, open]);
 
   const { data: units } = useQuery({
-    queryKey: ['organizational-units'],
+    queryKey: ['organizational-units', activeCompanyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('organizational_structure')
-        .select('id, description, type')
-        .in('type', ['area', 'department', 'sector', 'project'])
-        .order('description');
+        .select('id, description, type, root_company_id')
+        .in('type', ['area', 'department', 'sector', 'project']);
       
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.or(`root_company_id.eq.${activeCompanyId},id.eq.${activeCompanyId}`);
+      }
+      
+      const { data, error } = await query.order('description');
       if (error) throw error;
       return data;
     },

@@ -30,6 +30,7 @@ import {
 } from "@/hooks/useCollectiveAdjustments";
 import { ScaledRulesEditor } from "./ScaledRulesEditor";
 import { formatCurrency } from "@/lib/formatters";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 interface SalarySimulationDialogProps {
   open: boolean;
@@ -54,6 +55,7 @@ const MONTH_OPTIONS = [
 export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationDialogProps) {
   const currentYear = new Date().getFullYear();
   const { createAdjustment } = useCollectiveAdjustments();
+  const { activeCompanyId } = useCompanyContext();
 
   // Form state
   const [adjustmentName, setAdjustmentName] = useState('');
@@ -81,13 +83,19 @@ export function SalarySimulationDialog({ open, onOpenChange }: SalarySimulationD
 
   // Fetch units
   const { data: units } = useQuery({
-    queryKey: ['organizational-units'],
+    queryKey: ['organizational-units', activeCompanyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('organizational_structure')
-        .select('id, description, code, type')
-        .in('type', ['area', 'department', 'sector', 'project'])
-        .order('description');
+        .select('id, description, code, type, root_company_id')
+        .in('type', ['area', 'department', 'sector', 'project']);
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.or(`root_company_id.eq.${activeCompanyId},id.eq.${activeCompanyId}`);
+      }
+      
+      const { data, error } = await query.order('description');
       if (error) throw error;
       return data;
     },

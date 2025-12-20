@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 // Helper para normalizar strings removendo acentos e convertendo para minúsculas
 const normalizeString = (value: string) => {
@@ -30,6 +31,7 @@ const defaultFilters: FilterState = {
 };
 
 export const useEmployeeFilters = () => {
+  const { activeCompanyId } = useCompanyContext();
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -42,7 +44,7 @@ export const useEmployeeFilters = () => {
   }, [filters]);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['employees-filtered', filters, page, pageSize, sortBy, sortOrder],
+    queryKey: ['employees-filtered', filters, page, pageSize, sortBy, sortOrder, activeCompanyId],
     queryFn: async () => {
       // Decidir se usaremos paginação no banco ou em memória
       const useDbPagination = !filters.search.trim();
@@ -68,6 +70,11 @@ export const useEmployeeFilters = () => {
           { count: 'exact' }
         )
         .eq('status', 'active');
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.eq('root_company_id', activeCompanyId);
+      }
 
       // Filtro por unidades específicas
       if (filters.unit_id.length > 0) {

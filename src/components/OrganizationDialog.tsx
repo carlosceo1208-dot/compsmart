@@ -45,6 +45,7 @@ interface OrganizationDialogProps {
   entityId: string | null;
   onSuccess: () => void;
   existingStats?: ExistingStats;
+  rootCompanyId?: string;
 }
 
 interface EntityData {
@@ -117,7 +118,7 @@ const VALID_CHILDREN: Record<string, string[]> = {
   project: [], // No children (leaf node)
 };
 
-export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, existingStats }: OrganizationDialogProps) {
+export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, existingStats, rootCompanyId }: OrganizationDialogProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<EntityData>({
     name: "",
@@ -193,10 +194,17 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
   const fetchParentOptions = async () => {
     try {
       setLoadingParents(true);
-      const { data, error } = await supabase
+      
+      let query = supabase
         .from("organizational_structure")
-        .select("id, name, code, type")
-        .order("code");
+        .select("id, name, code, type, root_company_id");
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (rootCompanyId) {
+        query = query.or(`root_company_id.eq.${rootCompanyId},id.eq.${rootCompanyId}`);
+      }
+      
+      const { data, error } = await query.order("code");
 
       if (error) throw error;
 

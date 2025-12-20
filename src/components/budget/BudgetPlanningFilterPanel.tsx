@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface BudgetPlanningFilterPanelProps {
   fiscalYear: number;
@@ -25,16 +26,23 @@ export const BudgetPlanningFilterPanel = ({
   isAdmin,
   isHR,
 }: BudgetPlanningFilterPanelProps) => {
+  const { activeCompanyId } = useCompanyContext();
+  
   // Buscar unidades organizacionais (apenas para Admin/HR)
   const { data: units, isLoading: unitsLoading } = useQuery({
-    queryKey: ['organizational-units'],
+    queryKey: ['organizational-units', activeCompanyId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('organizational_structure')
-        .select('id, code, description, type')
-        .in('type', ['area', 'department', 'sector', 'project'])
-        .order('code');
+        .select('id, code, description, type, root_company_id')
+        .in('type', ['area', 'department', 'sector', 'project']);
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.or(`root_company_id.eq.${activeCompanyId},id.eq.${activeCompanyId}`);
+      }
 
+      const { data, error } = await query.order('code');
       if (error) throw error;
       return data || [];
     },
