@@ -62,6 +62,7 @@ const routeLabels: Record<string, string> = {
   "/salary-analysis-report": "Relatório de Análise",
   "/alert-settings": "Configuração de Alertas",
   "/audit-logs": "Logs de Auditoria",
+  "/data-audit": "Auditoria de Dados",
   "/knowledge-base": "Base de Conhecimento",
   "/settings/plans": "Gerenciar Planos",
   "/settings/billing": "Faturamento",

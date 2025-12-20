@@ -38,6 +38,7 @@ import Benefits from "./pages/Benefits";
 import KnowledgeBase from "./pages/KnowledgeBase";
 import AuditLogs from "./pages/AuditLogs";
 import AlertSettings from "./pages/AlertSettings";
+import DataAudit from "./pages/DataAudit";
 import Onboarding from "./pages/Onboarding";
 import Organogram from "./pages/Organogram";
 import TermsOfUse from "./pages/TermsOfUse";
@@ -101,6 +102,7 @@ const App = () => (
               <Route path="/knowledge-base" element={<KnowledgeBase />} />
               <Route path="/audit-logs" element={<AuditLogs />} />
               <Route path="/alert-settings" element={<AlertSettings />} />
+              <Route path="/data-audit" element={<DataAudit />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/settings/plans" element={<Plans />} />
               <Route path="/settings/billing" element={<Billing />} />
