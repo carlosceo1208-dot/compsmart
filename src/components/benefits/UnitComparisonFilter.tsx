@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Filter, X } from 'lucide-react';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 interface UnitComparisonFilterProps {
   onFilterChange: (filters: {
@@ -24,24 +25,29 @@ interface UnitComparisonFilterProps {
 }
 
 export const UnitComparisonFilter = ({ onFilterChange }: UnitComparisonFilterProps) => {
+  const { activeCompanyId } = useCompanyContext();
   const [unitType, setUnitType] = useState<string | null>(null);
   const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [monthsBack, setMonthsBack] = useState(12);
 
   const { data: units } = useQuery({
-    queryKey: ['organizational-units', unitType],
+    queryKey: ['organizational-units', unitType, activeCompanyId],
     queryFn: async () => {
       let query = supabase
         .from('organizational_structure')
-        .select('id, name, type, code, description')
-        .in('type', ['area', 'department', 'sector', 'project'])
-        .order('description');
+        .select('id, name, type, code, description, root_company_id')
+        .in('type', ['area', 'department', 'sector', 'project']);
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.or(`root_company_id.eq.${activeCompanyId},id.eq.${activeCompanyId}`);
+      }
 
       if (unitType) {
         query = query.eq('type', unitType);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.order('description');
       if (error) throw error;
       return data;
     },

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Loader2, ChevronsUpDown } from "lucide-react";
 import { calculateSalaryRangePercentage, formatSalaryPercentage, getSalaryStatusBadge } from "@/lib/salaryCalculations";
 import { z } from "zod";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 const userSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -115,6 +116,7 @@ const roleOptions = [
 ];
 
 export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialogProps) => {
+  const { activeCompanyId } = useCompanyContext();
   const [loading, setLoading] = useState(false);
   const [openUnits, setOpenUnits] = useState(false);
   const [formData, setFormData] = useState<UserData>({
@@ -227,10 +229,17 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
   const fetchPositions = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("organizational_structure")
-        .select("id, name, code, type, description")
-        .in("type", ["area", "department", "sector", "project"])
+        .select("id, name, code, type, description, root_company_id")
+        .in("type", ["area", "department", "sector", "project"]);
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.or(`root_company_id.eq.${activeCompanyId},id.eq.${activeCompanyId}`);
+      }
+      
+      const { data, error } = await query
         .order("type", { ascending: true })
         .order("code", { ascending: true, nullsFirst: true })
         .order("name", { ascending: true });
@@ -258,11 +267,17 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
   const fetchManagers = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("profiles")
         .select("id, full_name")
-        .eq("status", "active")
-        .order("full_name", { ascending: true });
+        .eq("status", "active");
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.eq("root_company_id", activeCompanyId);
+      }
+      
+      const { data, error } = await query.order("full_name", { ascending: true });
 
       if (error) throw error;
       setManagers(data || []);
@@ -273,11 +288,17 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
   const fetchEmployees = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("profiles")
         .select("id, full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
-        .eq("status", "active")
-        .order("full_name", { ascending: true });
+        .eq("status", "active");
+      
+      // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
+      if (activeCompanyId) {
+        query = query.eq("root_company_id", activeCompanyId);
+      }
+      
+      const { data, error } = await query.order("full_name", { ascending: true });
 
       if (error) throw error;
       setEmployees(data || []);
