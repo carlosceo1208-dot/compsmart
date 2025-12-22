@@ -1,5 +1,5 @@
 import compsmartLogo from "@/assets/compsmart-logo.png";
-import { Linkedin, Instagram, Mail, MapPin, Phone } from "lucide-react";
+import { Linkedin, Instagram, Mail, MapPin } from "lucide-react";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -13,7 +13,7 @@ export const Footer = () => {
           <div>
             <img src={compsmartLogo} alt="CompSmart" className="h-20 w-auto object-contain mb-4" />
             <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Plataforma de gestão estratégica de remuneração e benefícios com inteligência artificial.
+              Plataforma de gestão estratégica de remuneração e benefícios com apoio da inteligência artificial.
             </p>
             <div className="flex gap-3">
               <a 
@@ -95,13 +95,15 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <Mail className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <a href="mailto:contato@compsmart.com.br" className="hover:text-primary transition-colors">
-                  contato@compsmart.com.br
+                <a href="mailto:contato@compsmart.ia.br" className="hover:text-primary transition-colors">
+                  contato@compsmart.ia.br
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                <Phone className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                <span>+55 (11) 9999-9999</span>
+                <Mail className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <a href="mailto:suporte@compsmart.ia.br" className="hover:text-primary transition-colors">
+                  suporte@compsmart.ia.br
+                </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
                 <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
