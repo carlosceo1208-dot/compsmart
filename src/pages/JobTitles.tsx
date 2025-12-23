@@ -15,6 +15,7 @@ import { JobTitleDialog } from "@/components/JobTitleDialog";
 import { JobTitleBulkImport } from "@/components/JobTitleBulkImport";
 import { JobTitlePreview } from "@/components/JobTitlePreview";
 import { JobFamilyManager } from "@/components/JobFamilyManager";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 import {
   Plus, 
   Upload, 
@@ -78,6 +79,7 @@ const formatCurrency = (value: number) => {
 };
 
 export default function JobTitlesPage() {
+  const { activeCompanyId } = useCompanyContext();
   const [jobTitles, setJobTitles] = useState<any[]>([]);
   const [jobFamilies, setJobFamilies] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -116,11 +118,15 @@ export default function JobTitlesPage() {
   const [inactivateAlert, setInactivateAlert] = useState<{ id: string; title: string; linkedCount: number } | null>(null);
 
   useEffect(() => {
-    fetchJobTitles();
-    fetchJobFamilies();
-  }, []);
+    if (activeCompanyId) {
+      fetchJobTitles();
+      fetchJobFamilies();
+    }
+  }, [activeCompanyId]);
 
   const fetchJobFamilies = async () => {
+    if (!activeCompanyId) return;
+    
     const { data } = await supabase
       .from('job_families')
       .select('name')
@@ -132,37 +138,19 @@ export default function JobTitlesPage() {
     }
   };
 
-  // Helper to get current user's company ID
-  const getUserCompanyId = async (): Promise<string | null> => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
-    
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('root_company_id')
-      .eq('id', user.id)
-      .single();
-    
-    return profile?.root_company_id || null;
-  };
-
   useEffect(() => {
     calculateStats();
   }, [jobTitles]);
 
   const fetchJobTitles = async () => {
+    if (!activeCompanyId) {
+      toast.error("Nenhuma empresa selecionada");
+      setJobTitles([]);
+      return;
+    }
+    
     setLoading(true);
     try {
-      // Get current user's company ID for explicit filtering
-      const companyId = await getUserCompanyId();
-      
-      if (!companyId) {
-        toast.error("Usuário não vinculado a uma empresa");
-        setJobTitles([]);
-        setLoading(false);
-        return;
-      }
-
       const { data, error } = await supabase
         .from("job_titles")
         .select(`
@@ -172,7 +160,7 @@ export default function JobTitlesPage() {
             max_value
           )
         `)
-        .eq("root_company_id", companyId)
+        .eq("root_company_id", activeCompanyId)
         .order("title");
 
       if (error) throw error;
