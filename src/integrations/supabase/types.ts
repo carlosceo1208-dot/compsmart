@@ -1276,6 +1276,42 @@ export type Database = {
           },
         ]
       }
+      glossary_terms: {
+        Row: {
+          category: string
+          created_at: string | null
+          definition: string
+          id: string
+          is_active: boolean | null
+          related_terms: string[] | null
+          synonyms: string[] | null
+          term: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          definition: string
+          id?: string
+          is_active?: boolean | null
+          related_terms?: string[] | null
+          synonyms?: string[] | null
+          term: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          definition?: string
+          id?: string
+          is_active?: boolean | null
+          related_terms?: string[] | null
+          synonyms?: string[] | null
+          term?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       incentive_assistant_conversations: {
         Row: {
           answer: string
