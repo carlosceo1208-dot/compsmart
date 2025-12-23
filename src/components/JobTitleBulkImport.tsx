@@ -22,10 +22,18 @@ interface ParsedRow {
   grade: string;
   cbo: string;
   is_active: boolean;
-  median_points: number;
+  hay_total_points: number;
 }
 
 // Job families are now managed dynamically in the database
+
+// Mapeamento de pontos Hay por grade
+const GRADE_POINTS_MAP: Record<string, number> = {
+  '001': 115, '002': 150, '003': 190, '004': 235, '005': 290,
+  '006': 355, '007': 435, '008': 535, '009': 655, '010': 800,
+  '011': 980, '012': 1200, '013': 1470, '014': 1800, '015': 2190,
+  '016': 2660, '017': 3240, '018': 3940,
+};
 
 const familyColors: Record<string, string> = {
   'Analistas': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -84,17 +92,44 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
         let grade: string;
         let cbo: string;
         let is_active = true; // Default to active
+        let hay_total_points: number | null = null;
 
         // Detect format based on column count and content
-        if (parts.length >= 6) {
-          // 6 columns: Código | Família | Título | Grade | CBO | Ativo
-          const [codeCol, familyCol, titleCol, gradeCol, cboCol, activeCol] = parts.map(p => p.trim());
+        if (parts.length >= 7) {
+          // 7 columns: Código | Família | Título | Grade | CBO | Ativo | Pontos
+          const [codeCol, familyCol, titleCol, gradeCol, cboCol, activeCol, pointsCol] = parts.map(p => p.trim());
           code = codeCol;
           job_family = familyCol;
           title = titleCol;
           grade = gradeCol;
           cbo = cboCol;
           is_active = ['sim', 'ativo', 's', 'true', '1'].includes(activeCol.toLowerCase());
+          hay_total_points = pointsCol ? parseInt(pointsCol) : null;
+        } else if (parts.length === 6) {
+          // Check if last column is points (numeric) or status (text)
+          const lastCol = parts[5].trim();
+          const isLastColNumericPoints = /^\d+$/.test(lastCol) && parseInt(lastCol) > 50;
+          
+          if (isLastColNumericPoints) {
+            // Format: Código | Família | Título | Grade | CBO | Pontos (sem status)
+            const [codeCol, familyCol, titleCol, gradeCol, cboCol, pointsCol] = parts.map(p => p.trim());
+            code = codeCol;
+            job_family = familyCol;
+            title = titleCol;
+            grade = gradeCol;
+            cbo = cboCol;
+            is_active = true;
+            hay_total_points = parseInt(pointsCol);
+          } else {
+            // Format: Código | Família | Título | Grade | CBO | Ativo
+            const [codeCol, familyCol, titleCol, gradeCol, cboCol, activeCol] = parts.map(p => p.trim());
+            code = codeCol;
+            job_family = familyCol;
+            title = titleCol;
+            grade = gradeCol;
+            cbo = cboCol;
+            is_active = ['sim', 'ativo', 's', 'true', '1'].includes(activeCol.toLowerCase());
+          }
         } else if (parts.length === 5) {
           // Check if 2nd column is numeric (code) or if 5th is status text
           const secondCol = parts[1].trim();
@@ -126,6 +161,9 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           return;
         }
 
+        // Auto-atribuir pontos pela grade se não informados
+        const finalPoints = hay_total_points || GRADE_POINTS_MAP[grade] || 0;
+
         parsed.push({
           code: code || null,
           job_family,
@@ -133,7 +171,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           grade,
           cbo,
           is_active,
-          median_points: 0
+          hay_total_points: finalPoints
         });
       }
 
@@ -196,9 +234,20 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
 
       // Import rows with code using upsert
       if (rowsWithCode.length > 0) {
+        const upsertData = rowsWithCode.map(row => ({
+          code: row.code,
+          job_family: row.job_family,
+          title: row.title,
+          grade: row.grade,
+          cbo: row.cbo,
+          is_active: row.is_active,
+          median_points: 0,
+          hay_total_points: row.hay_total_points
+        }));
+        
         const { data: upsertedData, error: upsertError } = await supabase
           .from('job_titles')
-          .upsert(rowsWithCode, {
+          .upsert(upsertData, {
             onConflict: 'code',
             ignoreDuplicates: false
           })
@@ -225,7 +274,8 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
             .from('job_titles')
             .update({
               cbo: row.cbo,
-              is_active: row.is_active
+              is_active: row.is_active,
+              hay_total_points: row.hay_total_points
             } as any)
             .eq('id', existing.id);
 
@@ -240,7 +290,8 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
               grade: row.grade,
               cbo: row.cbo,
               is_active: row.is_active,
-              median_points: 0
+              median_points: 0,
+              hay_total_points: row.hay_total_points
             } as any);
 
           if (insertError) throw insertError;
@@ -268,9 +319,10 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           <DialogTitle>Importação em Massa de Cargos</DialogTitle>
           <DialogDescription>
             Cole os dados do Excel com as colunas:<br />
-            • <strong>Família | Código | Título | Grade | CBO</strong> (status padrão: Ativo)<br />
-            • <strong>Família | Título | Grade | CBO | Ativo</strong><br />
-            • <strong>Código | Família | Título | Grade | CBO | Ativo</strong>
+            • <strong>Código | Família | Título | Grade | CBO</strong> (status: Ativo, pontos: automático)<br />
+            • <strong>Código | Família | Título | Grade | CBO | Pontos</strong> (status: Ativo)<br />
+            • <strong>Código | Família | Título | Grade | CBO | Ativo | Pontos</strong><br />
+            <span className="text-xs mt-1 block">💡 Se não informar pontos, serão atribuídos automaticamente pela grade.</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -312,6 +364,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
                       <TableHead>Título</TableHead>
                       <TableHead>Grade</TableHead>
                       <TableHead className="whitespace-nowrap">CBO</TableHead>
+                      <TableHead className="text-center">Pontos</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -329,6 +382,11 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
                         <TableCell className="font-medium">{row.title}</TableCell>
                         <TableCell>{row.grade}</TableCell>
                         <TableCell className="font-mono text-xs whitespace-nowrap">{row.cbo}</TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant="outline" className="bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-xs">
+                            {row.hay_total_points}
+                          </Badge>
+                        </TableCell>
                         <TableCell>
                           <Badge variant={row.is_active ? "success" : "destructive"}>
                             {row.is_active ? "Ativo" : "Inativo"}
