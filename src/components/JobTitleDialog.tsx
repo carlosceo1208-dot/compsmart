@@ -281,9 +281,24 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
         if (error) throw error;
         toast.success("Cargo atualizado com sucesso");
       } else {
+        // Get user's company ID for new job titles
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("Usuário não autenticado");
+        
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('root_company_id')
+          .eq('id', user.id)
+          .single();
+        
+        if (!profile?.root_company_id) throw new Error("Empresa não encontrada");
+
         const { error } = await supabase
           .from("job_titles")
-          .insert(formData);
+          .insert({
+            ...formData,
+            root_company_id: profile.root_company_id
+          });
 
         if (error) throw error;
         toast.success("Cargo criado com sucesso");
