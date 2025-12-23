@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
 import { CompetencyManager } from "./CompetencyManager";
 import { CBOSearchInput } from "./CBOSearchInput";
-import { HayEvaluationTab } from "./HayEvaluationTab";
+import { PointsEvaluationTab } from "./PointsEvaluationTab";
 
 interface JobTitleDialogProps {
   open: boolean;
@@ -315,7 +315,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
               <TabsTrigger value="description">📄 Descrição</TabsTrigger>
               <TabsTrigger value="competencies">🧩 Competências</TabsTrigger>
               <TabsTrigger value="requirements">🎓 Requisitos</TabsTrigger>
-              <TabsTrigger value="hay">⚖️ Hay</TabsTrigger>
+              <TabsTrigger value="hay">⚖️ Avaliação</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basics" className="space-y-4 mt-4">
@@ -544,7 +544,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
             </TabsContent>
 
             <TabsContent value="hay" className="mt-4">
-              <HayEvaluationTab
+              <PointsEvaluationTab
                 jobTitle={formData.title}
                 grade={formData.grade}
                 jobFamily={formData.job_family}

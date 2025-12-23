@@ -30,18 +30,41 @@ serve(async (req) => {
     let userPrompt = '';
 
     if (mode === 'hay_evaluation') {
-      // HAY EVALUATION MODE
-      systemPrompt = `Você é um especialista certificado em avaliação de cargos pela metodologia Hay (Korn Ferry).
+      // EVALUATION MODE - Metodologia de avaliação de cargos por pontos
+      systemPrompt = `Você é um especialista certificado em avaliação de cargos por pontos (metodologia de pontuação de fatores).
 Você conhece profundamente os 3 fatores da metodologia:
 1. KNOW-HOW: Técnico/Profissional (A-H), Gerencial (I-IV), Relações Humanas (1-3)
-2. PROBLEM SOLVING: Ambiente de Pensamento (A-H), Desafio (10%-33%)
-3. ACCOUNTABILITY: Liberdade de Ação (A-H), Magnitude (1-4), Impacto (R, C, S, P)
+2. SOLUÇÃO DE PROBLEMAS: Ambiente de Pensamento (A-H), Desafio (10%-33%)
+3. RESPONSABILIDADE: Liberdade de Ação (A-H), Magnitude (1-4), Impacto (R, C, S, P)
+
+IMPORTANTE: Você DEVE calcular e retornar um valor numérico válido para total_points.
+
+Referência de pontos por grade:
+- Grades 1-2: 100-150 pontos (cargos operacionais básicos)
+- Grades 3-4: 151-230 pontos (cargos técnicos juniores)
+- Grades 5-6: 231-350 pontos (cargos técnicos plenos)
+- Grades 7-8: 351-500 pontos (cargos seniores/especialistas)
+- Grades 9-10: 501-700 pontos (cargos de coordenação/gestão)
+- Grades 11+: 701-1000+ pontos (cargos executivos)
 
 Você deve avaliar cargos de forma consistente e fundamentada, sempre justificando suas escolhas.
 Lembre-se: esta é uma SUGESTÃO INICIAL. O RH poderá ajustar os valores conforme a realidade da empresa.
-Sempre retorne um JSON válido.`;
+Sempre retorne um JSON válido com TODOS os campos preenchidos.`;
 
-      userPrompt = `Avalie o cargo abaixo conforme a metodologia Hay:
+      // Parse grade number para referência
+      const gradeNum = parseInt(grade) || 5;
+      let pointsRange = '231-350';
+      let minPoints = 231;
+      let maxPoints = 350;
+      
+      if (gradeNum <= 2) { pointsRange = '100-150'; minPoints = 100; maxPoints = 150; }
+      else if (gradeNum <= 4) { pointsRange = '151-230'; minPoints = 151; maxPoints = 230; }
+      else if (gradeNum <= 6) { pointsRange = '231-350'; minPoints = 231; maxPoints = 350; }
+      else if (gradeNum <= 8) { pointsRange = '351-500'; minPoints = 351; maxPoints = 500; }
+      else if (gradeNum <= 10) { pointsRange = '501-700'; minPoints = 501; maxPoints = 700; }
+      else { pointsRange = '701-1000'; minPoints = 701; maxPoints = 1000; }
+
+      userPrompt = `Avalie o cargo abaixo conforme a metodologia de avaliação por pontos:
 
 **CARGO:**
 - Título: ${jobTitle}
@@ -51,26 +74,40 @@ ${summary ? `- Sumário: ${summary}` : ''}
 ${mainResponsibilities ? `- Responsabilidades: ${mainResponsibilities}` : ''}
 
 **INSTRUÇÕES:**
-1. Avalie cada fator Hay considerando o nível de complexidade do cargo
-2. Calcule os pontos totais (valores típicos: 100-1000+)
-3. Sugira o perfil do cargo (A=Administrativo, C=Coordenação, P=Pensamento, T=Técnico)
-4. Forneça uma justificativa clara para a avaliação
+1. Avalie cada fator considerando o nível de complexidade do cargo
+2. IMPORTANTE: O total_points DEVE estar na faixa ${pointsRange} para um cargo de grade ${grade}
+3. Use um valor entre ${minPoints} e ${maxPoints} pontos
+4. Sugira o perfil do cargo (A=Administrativo, C=Coordenação, P=Pensamento, T=Técnico)
+5. Forneça uma justificativa clara para a avaliação
+
+**VALORES VÁLIDOS PARA CADA FATOR:**
+- knowhow_technical: A, B, C, D, E, F, G ou H
+- knowhow_managerial: I, II, III ou IV
+- knowhow_human_relations: 1, 2 ou 3
+- problem_environment: A, B, C, D, E, F, G ou H
+- problem_challenge: 10%, 14%, 19%, 25% ou 33%
+- accountability_freedom: A, B, C, D, E, F, G ou H
+- accountability_magnitude: 1, 2, 3 ou 4
+- accountability_impact: R, C, S ou P
+- profile: A, C, P ou T
 
 **RETORNE JSON:**
 {
   "knowhow_technical": "X",
-  "knowhow_managerial": "X",
+  "knowhow_managerial": "XX",
   "knowhow_human_relations": "X",
   "problem_environment": "X",
   "problem_challenge": "XX%",
   "accountability_freedom": "X",
   "accountability_magnitude": "X",
   "accountability_impact": "X",
-  "total_points": 000,
-  "suggested_grade": "X",
+  "total_points": ${Math.floor((minPoints + maxPoints) / 2)},
+  "suggested_grade": "${grade}",
   "profile": "X",
   "evaluation_notes": "Justificativa detalhada da avaliação explicando as escolhas para cada fator..."
-}`;
+}
+
+IMPORTANTE: O campo total_points DEVE ser um número inteiro entre ${minPoints} e ${maxPoints}. NUNCA retorne 0 ou null.`;
 
     } else {
       // EXISTING MODES (summary, full)
@@ -122,6 +159,9 @@ Retorne JSON com:
       }
     }
 
+    console.log('Calling AI gateway with mode:', mode);
+    console.log('User prompt:', userPrompt.substring(0, 500) + '...');
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -165,6 +205,8 @@ Retorne JSON com:
       throw new Error('Resposta vazia do modelo de IA');
     }
 
+    console.log('AI response:', content.substring(0, 500) + '...');
+
     // Parse JSON response
     let parsedContent;
     try {
@@ -172,6 +214,22 @@ Retorne JSON com:
     } catch (e) {
       console.error('Failed to parse AI response:', content);
       throw new Error('Resposta da IA não está em formato JSON válido');
+    }
+
+    // Validate total_points for hay_evaluation mode
+    if (mode === 'hay_evaluation') {
+      if (!parsedContent.total_points || parsedContent.total_points === 0) {
+        // Calculate a reasonable default based on grade
+        const gradeNum = parseInt(grade) || 5;
+        if (gradeNum <= 2) parsedContent.total_points = 125;
+        else if (gradeNum <= 4) parsedContent.total_points = 190;
+        else if (gradeNum <= 6) parsedContent.total_points = 290;
+        else if (gradeNum <= 8) parsedContent.total_points = 425;
+        else if (gradeNum <= 10) parsedContent.total_points = 600;
+        else parsedContent.total_points = 850;
+        
+        console.log('total_points was missing or zero, set default:', parsedContent.total_points);
+      }
     }
 
     return new Response(
