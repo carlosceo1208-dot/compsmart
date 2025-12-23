@@ -563,8 +563,8 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
                   hay_profile: formData.hay_profile || '',
                   hay_evaluation_notes: formData.hay_evaluation_notes || '',
                 }}
-                onHayDataChange={(data) => setFormData({ ...formData, ...data })}
-                onMedianPointsChange={(points) => setFormData({ ...formData, median_points: points })}
+                onHayDataChange={(data) => setFormData(prev => ({ ...prev, ...data }))}
+                onMedianPointsChange={(points) => setFormData(prev => ({ ...prev, median_points: points }))}
               />
             </TabsContent>
           </Tabs>
