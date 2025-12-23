@@ -1657,6 +1657,7 @@ export type Database = {
           median_points: number
           required_education: string | null
           required_experience: string | null
+          root_company_id: string
           salary_range_id: string | null
           soft_skills: string | null
           summary: string | null
@@ -1689,6 +1690,7 @@ export type Database = {
           median_points: number
           required_education?: string | null
           required_experience?: string | null
+          root_company_id: string
           salary_range_id?: string | null
           soft_skills?: string | null
           summary?: string | null
@@ -1721,6 +1723,7 @@ export type Database = {
           median_points?: number
           required_education?: string | null
           required_experience?: string | null
+          root_company_id?: string
           salary_range_id?: string | null
           soft_skills?: string | null
           summary?: string | null
@@ -1728,6 +1731,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "job_titles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "job_titles_salary_range_id_fkey"
             columns: ["salary_range_id"]

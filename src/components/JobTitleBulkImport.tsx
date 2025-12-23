@@ -191,6 +191,19 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
 
     setLoading(true);
     try {
+      // Get user's company ID for isolation
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('root_company_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (!profile?.root_company_id) throw new Error("Empresa não encontrada");
+      const rootCompanyId = profile.root_company_id;
+
       // First, ensure all job families exist
       const uniqueFamilies = [...new Set(parsedRows.map(row => row.job_family))];
       
@@ -232,7 +245,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
       let insertedCount = 0;
       let updatedCount = 0;
 
-      // Import rows with code using upsert
+      // Import rows with code using upsert - include root_company_id
       if (rowsWithCode.length > 0) {
         const upsertData = rowsWithCode.map(row => ({
           code: row.code,
@@ -242,7 +255,8 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           cbo: row.cbo,
           is_active: row.is_active,
           median_points: 0,
-          hay_total_points: row.hay_total_points
+          hay_total_points: row.hay_total_points,
+          root_company_id: rootCompanyId
         }));
         
         const { data: upsertedData, error: upsertError } = await supabase
@@ -257,7 +271,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
         if (upsertedData) insertedCount += upsertedData.length;
       }
 
-      // Import rows without code - check for existing by (title, grade)
+      // Import rows without code - check for existing by (title, grade) within same company
       for (const row of rowsWithoutCode) {
         const { data: existing, error: searchError } = await supabase
           .from('job_titles')
@@ -282,16 +296,18 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           if (updateError) throw updateError;
           updatedCount++;
         } else {
-          // Insert new (without code)
+          // Insert new (without code) - include root_company_id
           const { error: insertError } = await supabase
             .from('job_titles')
             .insert({
               title: row.title,
+              job_family: row.job_family,
               grade: row.grade,
               cbo: row.cbo,
               is_active: row.is_active,
               median_points: 0,
-              hay_total_points: row.hay_total_points
+              hay_total_points: row.hay_total_points,
+              root_company_id: rootCompanyId
             } as any);
 
           if (insertError) throw insertError;
