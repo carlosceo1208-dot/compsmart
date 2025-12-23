@@ -1637,6 +1637,17 @@ export type Database = {
           created_at: string
           grade: string
           hard_skills: string | null
+          hay_accountability_freedom: string | null
+          hay_accountability_impact: string | null
+          hay_accountability_magnitude: string | null
+          hay_evaluation_notes: string | null
+          hay_knowhow_human_relations: string | null
+          hay_knowhow_managerial: string | null
+          hay_knowhow_technical: string | null
+          hay_problem_challenge: string | null
+          hay_problem_environment: string | null
+          hay_profile: string | null
+          hay_total_points: number | null
           id: string
           is_active: boolean
           job_family: string
@@ -1658,6 +1669,17 @@ export type Database = {
           created_at?: string
           grade: string
           hard_skills?: string | null
+          hay_accountability_freedom?: string | null
+          hay_accountability_impact?: string | null
+          hay_accountability_magnitude?: string | null
+          hay_evaluation_notes?: string | null
+          hay_knowhow_human_relations?: string | null
+          hay_knowhow_managerial?: string | null
+          hay_knowhow_technical?: string | null
+          hay_problem_challenge?: string | null
+          hay_problem_environment?: string | null
+          hay_profile?: string | null
+          hay_total_points?: number | null
           id?: string
           is_active?: boolean
           job_family: string
@@ -1679,6 +1701,17 @@ export type Database = {
           created_at?: string
           grade?: string
           hard_skills?: string | null
+          hay_accountability_freedom?: string | null
+          hay_accountability_impact?: string | null
+          hay_accountability_magnitude?: string | null
+          hay_evaluation_notes?: string | null
+          hay_knowhow_human_relations?: string | null
+          hay_knowhow_managerial?: string | null
+          hay_knowhow_technical?: string | null
+          hay_problem_challenge?: string | null
+          hay_problem_environment?: string | null
+          hay_profile?: string | null
+          hay_total_points?: number | null
           id?: string
           is_active?: boolean
           job_family?: string
@@ -2220,6 +2253,7 @@ export type Database = {
           min_value: number
           q1_value: number
           q3_value: number
+          reference_points: number | null
           salary_table_id: string | null
           updated_at: string
         }
@@ -2235,6 +2269,7 @@ export type Database = {
           min_value: number
           q1_value: number
           q3_value: number
+          reference_points?: number | null
           salary_table_id?: string | null
           updated_at?: string
         }
@@ -2250,6 +2285,7 @@ export type Database = {
           min_value?: number
           q1_value?: number
           q3_value?: number
+          reference_points?: number | null
           salary_table_id?: string | null
           updated_at?: string
         }

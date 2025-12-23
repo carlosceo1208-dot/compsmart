@@ -15,6 +15,7 @@ interface SalaryRange {
   id: string;
   grade: string;
   calculation_mode: 'manual' | 'automatic';
+  reference_points: number | null;
   min_value: number;
   q1_value: number;
   median_value: number;
@@ -128,6 +129,7 @@ export default function SalaryRanges() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{getLabel('grade')}</TableHead>
+                    <TableHead className="text-center">Pontos</TableHead>
                     <TableHead>Modo</TableHead>
                     <TableHead className="text-right">Mínimo</TableHead>
                     <TableHead className="text-right">1º Quartil</TableHead>
@@ -141,6 +143,13 @@ export default function SalaryRanges() {
                   {ranges.map((range) => (
                     <TableRow key={range.id}>
                       <TableCell className="font-semibold">{range.grade}</TableCell>
+                      <TableCell className="text-center">
+                        {range.reference_points ? (
+                          <Badge variant="secondary">{range.reference_points}</Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={range.calculation_mode === 'automatic' ? 'default' : 'outline'}>
                           {range.calculation_mode === 'automatic' ? (
