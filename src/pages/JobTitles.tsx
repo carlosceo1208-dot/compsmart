@@ -60,6 +60,7 @@ interface JobTitle {
   cbo: string;
   is_active: boolean;
   summary?: string | null;
+  hay_total_points?: number | null;
   salary_ranges?: {
     min_value: number;
     max_value: number;
@@ -366,6 +367,15 @@ export default function JobTitlesPage() {
         />
       </TableCell>
       <TableCell className="text-center py-2">{job.grade}</TableCell>
+      <TableCell className="text-center py-2">
+        {job.hay_total_points ? (
+          <Badge variant="outline" className="bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-xs px-2">
+            {job.hay_total_points}
+          </Badge>
+        ) : (
+          <span className="text-xs text-muted-foreground">—</span>
+        )}
+      </TableCell>
       <TableCell className="font-mono text-xs whitespace-nowrap py-2">{job.cbo}</TableCell>
       <TableCell className="py-2">
         {job.salary_ranges ? (
@@ -626,6 +636,7 @@ export default function JobTitlesPage() {
                             sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
                           )}
                         </TableHead>
+                        <TableHead className="text-center">Pontos</TableHead>
                         <TableHead className="whitespace-nowrap">CBO</TableHead>
                         <TableHead>Faixa Salarial</TableHead>
                         <TableHead>Status</TableHead>
@@ -635,7 +646,7 @@ export default function JobTitlesPage() {
                     <TableBody>
                       {pageItems.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={8} className="text-center text-muted-foreground">
+                          <TableCell colSpan={9} className="text-center text-muted-foreground">
                             Nenhum cargo encontrado
                           </TableCell>
                         </TableRow>
@@ -771,6 +782,7 @@ export default function JobTitlesPage() {
                             sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
                           )}
                         </TableHead>
+                        <TableHead className="text-center">Pontos</TableHead>
                         <TableHead className="whitespace-nowrap">CBO</TableHead>
                         <TableHead>Faixa Salarial</TableHead>
                         <TableHead>Status</TableHead>
@@ -780,7 +792,7 @@ export default function JobTitlesPage() {
                     <TableBody>
                       {jobs.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={8} className="text-center text-muted-foreground">
+                          <TableCell colSpan={9} className="text-center text-muted-foreground">
                             Nenhum cargo encontrado
                           </TableCell>
                         </TableRow>
