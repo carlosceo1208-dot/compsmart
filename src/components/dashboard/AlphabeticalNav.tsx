@@ -47,7 +47,7 @@ const moduleGroups: Record<string, Module[]> = {
     { title: 'Orçamento', path: '/budget', icon: PiggyBank, status: 'active' },
     { title: 'People Analytics', path: '/people-analytics', icon: BarChart3, status: 'active' },
     { title: 'Pesquisa Salarial', path: '/survey-data', icon: TrendingUp, status: 'active' },
-    { title: 'Plano de Cargos', path: '/job-titles', icon: Briefcase, status: 'active' },
+    { title: 'Plano de Cargos e Avaliação', path: '/job-titles', icon: Briefcase, status: 'active' },
   ],
   'R-S': [
     { title: 'Relatórios Gerenciais', path: '/reports', icon: FileText, status: 'coming-soon' },

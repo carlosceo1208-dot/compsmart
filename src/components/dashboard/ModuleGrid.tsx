@@ -123,7 +123,7 @@ export const ModuleGrid = () => {
       category: 'management',
     },
     {
-      title: 'Plano de Cargos',
+      title: 'Plano de Cargos e Avaliação',
       description: 'Configure estrutura de cargos',
       icon: Briefcase,
       path: '/job-titles',
