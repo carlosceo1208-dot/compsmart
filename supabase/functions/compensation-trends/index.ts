@@ -26,13 +26,18 @@ IMPORTANTE: Retorne APENAS um JSON válido sem markdown, com este formato exato:
       "title": "Título curto da tendência (máx 50 caracteres)",
       "summary": "Resumo em 1-2 frases explicando a tendência",
       "source": "Fonte provável (ex: Robert Half, Michael Page, mercado)",
-      "category": "salários|benefícios|trabalho_remoto|tecnologia|liderança"
+      "category": "salários|benefícios|trabalho_remoto|tecnologia|liderança",
+      "detailed_analysis": "Análise detalhada em 2-3 parágrafos explicando a tendência, seu contexto histórico e por que está ganhando força no mercado brasileiro. Inclua dados estatísticos quando relevante.",
+      "impact": "Descrição do impacto desta tendência para empresas brasileiras, incluindo aspectos de competitividade, retenção de talentos e custos.",
+      "recommendations": ["Recomendação prática 1", "Recomendação prática 2", "Recomendação prática 3"],
+      "search_terms": ["termo de busca 1 Brasil 2026", "termo de busca 2 remuneração"]
     }
   ]
 }
 
 Categorias permitidas: salários, benefícios, trabalho_remoto, tecnologia, liderança
-Foque em tendências práticas e aplicáveis ao mercado brasileiro.`;
+Foque em tendências práticas e aplicáveis ao mercado brasileiro.
+Cada tendência deve ter análise detalhada, impacto, 3 recomendações práticas e 2 termos de busca.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCompensationTrends, CompensationTrend } from "@/hooks/useCompensationTrends";
+import { TrendDetailDialog } from "./TrendDetailDialog";
 import { 
   TrendingUp, 
   RefreshCw, 
@@ -11,7 +13,8 @@ import {
   Home, 
   Cpu, 
   Users,
-  AlertCircle
+  AlertCircle,
+  ChevronRight
 } from "lucide-react";
 
 const categoryConfig: Record<string, { icon: React.ElementType; color: string; label: string }> = {
@@ -22,12 +25,15 @@ const categoryConfig: Record<string, { icon: React.ElementType; color: string; l
   liderança: { icon: Users, color: "bg-pink-500/20 text-pink-600", label: "Liderança" },
 };
 
-const TrendItem = ({ trend }: { trend: CompensationTrend }) => {
+const TrendItem = ({ trend, onClick }: { trend: CompensationTrend; onClick: () => void }) => {
   const config = categoryConfig[trend.category] || categoryConfig.salários;
   const IconComponent = config.icon;
 
   return (
-    <div className="flex gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+    <div 
+      className="flex gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer group"
+      onClick={onClick}
+    >
       <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${config.color}`}>
         <IconComponent className="h-5 w-5" />
       </div>
@@ -40,6 +46,9 @@ const TrendItem = ({ trend }: { trend: CompensationTrend }) => {
           </Badge>
           <span className="text-xs text-muted-foreground">• {trend.source}</span>
         </div>
+      </div>
+      <div className="flex items-center">
+        <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
     </div>
   );
@@ -75,43 +84,62 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 
 export const CompensationTrendsCard = () => {
   const { trends, isLoading, isError, refetch, isFetching } = useCompensationTrends();
+  const [selectedTrend, setSelectedTrend] = useState<CompensationTrend | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleTrendClick = (trend: CompensationTrend) => {
+    setSelectedTrend(trend);
+    setDialogOpen(true);
+  };
 
   return (
-    <Card className="border-border/50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            Tendências de Remuneração 2025/2026
-          </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-8 w-8"
-            onClick={refetch}
-            disabled={isFetching}
-          >
-            <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <LoadingSkeleton />
-        ) : isError ? (
-          <ErrorState onRetry={refetch} />
-        ) : trends.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground text-sm">
-            Nenhuma tendência disponível
+    <>
+      <Card className="border-border/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              Tendências de Remuneração 2025/2026
+            </CardTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8"
+              onClick={refetch}
+              disabled={isFetching}
+            >
+              <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
-        ) : (
-          <div className="space-y-2">
-            {trends.slice(0, 5).map((trend, index) => (
-              <TrendItem key={index} trend={trend} />
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <LoadingSkeleton />
+          ) : isError ? (
+            <ErrorState onRetry={refetch} />
+          ) : trends.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              Nenhuma tendência disponível
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {trends.slice(0, 5).map((trend, index) => (
+                <TrendItem 
+                  key={index} 
+                  trend={trend} 
+                  onClick={() => handleTrendClick(trend)}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <TrendDetailDialog 
+        trend={selectedTrend}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+    </>
   );
 };

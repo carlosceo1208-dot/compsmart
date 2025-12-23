@@ -7,6 +7,10 @@ export interface CompensationTrend {
   summary: string;
   source: string;
   category: "salários" | "benefícios" | "trabalho_remoto" | "tecnologia" | "liderança";
+  detailed_analysis?: string;
+  impact?: string;
+  recommendations?: string[];
+  search_terms?: string[];
 }
 
 interface TrendsResponse {
