@@ -153,6 +153,16 @@ export default function JobTitlesPage() {
   const fetchJobTitles = async () => {
     setLoading(true);
     try {
+      // Get current user's company ID for explicit filtering
+      const companyId = await getUserCompanyId();
+      
+      if (!companyId) {
+        toast.error("Usuário não vinculado a uma empresa");
+        setJobTitles([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("job_titles")
         .select(`
@@ -162,6 +172,7 @@ export default function JobTitlesPage() {
             max_value
           )
         `)
+        .eq("root_company_id", companyId)
         .order("title");
 
       if (error) throw error;
