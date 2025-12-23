@@ -205,7 +205,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
             )}
 
             <div>
-              <Label>Pontos de Referência Hay (opcional)</Label>
+              <Label>Pontos de Referência (opcional)</Label>
               <Input
                 type="number"
                 value={referencePoints}
@@ -213,7 +213,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
                 placeholder="Ex: 350"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Pontos de avaliação Hay associados a este grade
+                Pontos de avaliação associados a este grade
               </p>
             </div>
 

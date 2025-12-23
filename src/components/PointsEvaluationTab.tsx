@@ -11,7 +11,7 @@ import { Sparkles, Loader2, AlertTriangle, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-interface HayEvaluationData {
+interface EvaluationData {
   hay_knowhow_technical: string;
   hay_knowhow_managerial: string;
   hay_knowhow_human_relations: string;
@@ -25,18 +25,102 @@ interface HayEvaluationData {
   hay_evaluation_notes: string;
 }
 
-interface HayEvaluationTabProps {
+interface PointsEvaluationTabProps {
   jobTitle: string;
   grade: string;
   jobFamily: string;
   summary?: string;
   mainResponsibilities?: string;
-  hayData: HayEvaluationData;
-  onHayDataChange: (data: Partial<HayEvaluationData>) => void;
+  hayData: EvaluationData;
+  onHayDataChange: (data: Partial<EvaluationData>) => void;
   onMedianPointsChange: (points: number) => void;
 }
 
-// Hay factor options
+// Labels descritivos para KNOW-HOW Técnico/Profissional
+const KNOWHOW_TECHNICAL_LABELS: Record<string, string> = {
+  'A': 'A - Tarefas simples e repetitivas',
+  'B': 'B - Procedimentos padronizados básicos',
+  'C': 'C - Conhecimento técnico elementar',
+  'D': 'D - Conhecimento técnico intermediário',
+  'E': 'E - Conhecimento técnico avançado',
+  'F': 'F - Especialização profissional',
+  'G': 'G - Domínio especializado amplo',
+  'H': 'H - Autoridade técnica/científica',
+};
+
+// Labels descritivos para KNOW-HOW Gerencial
+const KNOWHOW_MANAGERIAL_LABELS: Record<string, string> = {
+  'I': 'I - Nenhuma ou mínima',
+  'II': 'II - Homogênea (equipes pequenas)',
+  'III': 'III - Heterogênea (áreas diversas)',
+  'IV': 'IV - Ampla (organização ou unidade)',
+};
+
+// Labels descritivos para KNOW-HOW Relações Humanas
+const KNOWHOW_HUMAN_LABELS: Record<string, string> = {
+  '1': '1 - Básica (cortesia normal)',
+  '2': '2 - Importante (influenciar/orientar)',
+  '3': '3 - Crítica (negociar/motivar equipes)',
+};
+
+// Labels descritivos para PROBLEM SOLVING - Ambiente
+const PROBLEM_ENVIRONMENT_LABELS: Record<string, string> = {
+  'A': 'A - Rotina estrita (instruções detalhadas)',
+  'B': 'B - Rotina com variações (procedimentos definidos)',
+  'C': 'C - Semi-rotineiro (padrões estabelecidos)',
+  'D': 'D - Padrões claramente definidos',
+  'E': 'E - Definidos de forma ampla',
+  'F': 'F - Geralmente definidos',
+  'G': 'G - Conceitos abstratos',
+  'H': 'H - Estratégico/Inovador',
+};
+
+// Labels descritivos para PROBLEM SOLVING - Desafio
+const PROBLEM_CHALLENGE_LABELS: Record<string, string> = {
+  '10%': '10% - Repetitivo (soluções prontas)',
+  '14%': '14% - Padronizado (escolha entre opções)',
+  '19%': '19% - Interpolativo (adaptar soluções)',
+  '25%': '25% - Adaptativo (criar soluções parciais)',
+  '33%': '33% - Criativo (inovar completamente)',
+};
+
+// Labels descritivos para ACCOUNTABILITY - Liberdade de Ação
+const ACCOUNTABILITY_FREEDOM_LABELS: Record<string, string> = {
+  'A': 'A - Prescrita/Detalhada (instruções específicas)',
+  'B': 'B - Controlada (supervisão direta)',
+  'C': 'C - Padronizada (procedimentos definidos)',
+  'D': 'D - Regulamentada (políticas gerais)',
+  'E': 'E - Diretiva definida (objetivos específicos)',
+  'F': 'F - Diretiva geral (metas amplas)',
+  'G': 'G - Orientação ampla (estratégia)',
+  'H': 'H - Estratégica (visão organizacional)',
+};
+
+// Labels descritivos para ACCOUNTABILITY - Magnitude
+const ACCOUNTABILITY_MAGNITUDE_LABELS: Record<string, string> = {
+  '1': '1 - Mínima (impacto individual)',
+  '2': '2 - Pequena (impacto em equipe)',
+  '3': '3 - Média (impacto em área/departamento)',
+  '4': '4 - Grande (impacto organizacional)',
+};
+
+// Labels descritivos para ACCOUNTABILITY - Impacto
+const ACCOUNTABILITY_IMPACT_LABELS: Record<string, string> = {
+  'R': 'R - Remoto (contribuição indireta)',
+  'C': 'C - Contribuinte (apoio a resultados)',
+  'S': 'S - Compartilhado (co-responsável)',
+  'P': 'P - Primário (responsável principal)',
+};
+
+// Labels para perfil do cargo
+const PROFILE_LABELS: Record<string, string> = {
+  'A': 'A - Administrativo',
+  'C': 'C - Coordenação',
+  'P': 'P - Pensamento Estratégico',
+  'T': 'T - Técnico Especializado',
+};
+
+// Factor options arrays
 const KNOWHOW_TECHNICAL = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const KNOWHOW_MANAGERIAL = ['I', 'II', 'III', 'IV'];
 const KNOWHOW_HUMAN = ['1', '2', '3'];
@@ -46,21 +130,7 @@ const ACCOUNTABILITY_FREEDOM = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const ACCOUNTABILITY_MAGNITUDE = ['1', '2', '3', '4'];
 const ACCOUNTABILITY_IMPACT = ['R', 'C', 'S', 'P'];
 
-const PROFILE_LABELS: Record<string, string> = {
-  'A': 'Administrativo',
-  'C': 'Coordenação',
-  'P': 'Pensamento Estratégico',
-  'T': 'Técnico Especializado',
-};
-
-const IMPACT_LABELS: Record<string, string> = {
-  'R': 'Remoto',
-  'C': 'Contribuinte',
-  'S': 'Compartilhado',
-  'P': 'Primário',
-};
-
-export function HayEvaluationTab({
+export function PointsEvaluationTab({
   jobTitle,
   grade,
   jobFamily,
@@ -69,10 +139,10 @@ export function HayEvaluationTab({
   hayData,
   onHayDataChange,
   onMedianPointsChange,
-}: HayEvaluationTabProps) {
+}: PointsEvaluationTabProps) {
   const [aiLoading, setAiLoading] = useState(false);
 
-  const handleGenerateHayEvaluation = async () => {
+  const handleGenerateEvaluation = async () => {
     if (!jobTitle || !grade) {
       toast.error('Preencha título e grade antes de gerar avaliação');
       return;
@@ -98,8 +168,8 @@ export function HayEvaluationTab({
         return;
       }
 
-      // Update Hay data
-      const hayUpdate: Partial<HayEvaluationData> = {
+      // Update evaluation data
+      const evalUpdate: Partial<EvaluationData> = {
         hay_knowhow_technical: data.knowhow_technical || '',
         hay_knowhow_managerial: data.knowhow_managerial || '',
         hay_knowhow_human_relations: data.knowhow_human_relations || '',
@@ -113,20 +183,20 @@ export function HayEvaluationTab({
         hay_evaluation_notes: data.evaluation_notes || '',
       };
 
-      onHayDataChange(hayUpdate);
+      onHayDataChange(evalUpdate);
       
-      // Update median_points with hay_total_points
+      // Update median_points with total_points
       if (data.total_points) {
         onMedianPointsChange(data.total_points);
       }
 
-      toast.success('Avaliação Hay gerada! Você pode ajustar os valores conforme necessário.', {
+      toast.success('Avaliação gerada! Você pode ajustar os valores conforme necessário.', {
         description: `Grade sugerido: ${data.suggested_grade || grade}`,
         duration: 5000,
       });
     } catch (error: any) {
-      console.error('Hay evaluation error:', error);
-      toast.error('Erro ao gerar avaliação Hay');
+      console.error('Evaluation generation error:', error);
+      toast.error('Erro ao gerar avaliação');
     } finally {
       setAiLoading(false);
     }
@@ -153,7 +223,7 @@ export function HayEvaluationTab({
 
       <div className="flex justify-end">
         <Button
-          onClick={handleGenerateHayEvaluation}
+          onClick={handleGenerateEvaluation}
           disabled={aiLoading || !jobTitle || !grade}
           variant="outline"
         >
@@ -180,11 +250,10 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {KNOWHOW_TECHNICAL.map(opt => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{KNOWHOW_TECHNICAL_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">A (básico) → H (especialista)</p>
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Gerencial (Amplitude)</Label>
@@ -197,11 +266,10 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {KNOWHOW_MANAGERIAL.map(opt => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{KNOWHOW_MANAGERIAL_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">I (nenhuma) → IV (máxima)</p>
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Relações Humanas</Label>
@@ -214,9 +282,7 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {KNOWHOW_HUMAN.map(opt => (
-                    <SelectItem key={opt} value={opt}>
-                      {opt} - {opt === '1' ? 'Básica' : opt === '2' ? 'Importante' : 'Crítica'}
-                    </SelectItem>
+                    <SelectItem key={opt} value={opt}>{KNOWHOW_HUMAN_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -229,7 +295,7 @@ export function HayEvaluationTab({
       <Card>
         <CardContent className="pt-4">
           <h4 className="font-semibold mb-3 flex items-center gap-2">
-            🧩 PROBLEM SOLVING (Solução de Problemas)
+            🧩 SOLUÇÃO DE PROBLEMAS
           </h4>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -243,11 +309,10 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {PROBLEM_ENVIRONMENT.map(opt => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{PROBLEM_ENVIRONMENT_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">A (rotineiro) → H (abstrato)</p>
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Desafio do Pensamento</Label>
@@ -260,11 +325,10 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {PROBLEM_CHALLENGE.map(opt => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{PROBLEM_CHALLENGE_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">% do Know-How aplicado</p>
             </div>
           </div>
         </CardContent>
@@ -274,7 +338,7 @@ export function HayEvaluationTab({
       <Card>
         <CardContent className="pt-4">
           <h4 className="font-semibold mb-3 flex items-center gap-2">
-            📈 ACCOUNTABILITY (Responsabilidade)
+            📈 RESPONSABILIDADE
           </h4>
           <div className="grid grid-cols-3 gap-4">
             <div>
@@ -288,11 +352,10 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {ACCOUNTABILITY_FREEDOM.map(opt => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{ACCOUNTABILITY_FREEDOM_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground mt-1">A (mínima) → H (máxima)</p>
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Magnitude ($)</Label>
@@ -305,9 +368,7 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {ACCOUNTABILITY_MAGNITUDE.map(opt => (
-                    <SelectItem key={opt} value={opt}>
-                      {opt} - {opt === '1' ? 'Mínima' : opt === '2' ? 'Pequena' : opt === '3' ? 'Média' : 'Grande'}
-                    </SelectItem>
+                    <SelectItem key={opt} value={opt}>{ACCOUNTABILITY_MAGNITUDE_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -323,7 +384,7 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {ACCOUNTABILITY_IMPACT.map(opt => (
-                    <SelectItem key={opt} value={opt}>{opt} - {IMPACT_LABELS[opt]}</SelectItem>
+                    <SelectItem key={opt} value={opt}>{ACCOUNTABILITY_IMPACT_LABELS[opt]}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -365,7 +426,7 @@ export function HayEvaluationTab({
                 </SelectTrigger>
                 <SelectContent>
                   {Object.entries(PROFILE_LABELS).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{key} - {label}</SelectItem>
+                    <SelectItem key={key} value={key}>{label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -386,12 +447,12 @@ export function HayEvaluationTab({
 
       {/* Evaluation Notes */}
       <div>
-        <Label htmlFor="hay_notes" className="flex items-center gap-2">
+        <Label htmlFor="evaluation_notes" className="flex items-center gap-2">
           📝 Justificativa da Avaliação
           <Info className="w-3 h-3 text-muted-foreground" />
         </Label>
         <Textarea
-          id="hay_notes"
+          id="evaluation_notes"
           value={hayData.hay_evaluation_notes || ''}
           onChange={(e) => onHayDataChange({ hay_evaluation_notes: e.target.value })}
           placeholder="Documente aqui as razões para a pontuação atribuída ou divergências da sugestão da IA..."
