@@ -10,6 +10,7 @@ import { PendingAdjustmentAlert } from "@/components/dashboard/PendingAdjustment
 import { SalaryTableSetupAlert } from "@/components/dashboard/SalaryTableSetupAlert";
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
+import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrendsCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
@@ -60,6 +61,8 @@ const Dashboard = () => {
             showWithCharges={showWithCharges}
             onShowWithChargesChange={setShowWithCharges}
           />
+          
+          <CompensationTrendsCard />
           
           <AlphabeticalNav />
           
