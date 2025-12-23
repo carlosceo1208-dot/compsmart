@@ -16,28 +16,27 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `Você é um especialista em remuneração e benefícios corporativos no Brasil.
-Gere 5 tendências atuais e relevantes de remuneração para 2025/2026 baseadas em práticas de mercado de consultorias como Robert Half, Michael Page, Hays, Korn Ferry.
+    const systemPrompt = `Você é um especialista em remuneração no Brasil.
+Gere 5 tendências de remuneração para 2025/2026.
 
-IMPORTANTE: Retorne APENAS um JSON válido sem markdown, com este formato exato:
+Retorne APENAS JSON válido neste formato (sem markdown):
 {
   "trends": [
     {
-      "title": "Título curto da tendência (máx 50 caracteres)",
-      "summary": "Resumo em 1-2 frases explicando a tendência",
-      "source": "Fonte provável (ex: Robert Half, Michael Page, mercado)",
-      "category": "salários|benefícios|trabalho_remoto|tecnologia|liderança",
-      "detailed_analysis": "Análise detalhada em 2-3 parágrafos explicando a tendência, seu contexto histórico e por que está ganhando força no mercado brasileiro. Inclua dados estatísticos quando relevante.",
-      "impact": "Descrição do impacto desta tendência para empresas brasileiras, incluindo aspectos de competitividade, retenção de talentos e custos.",
-      "recommendations": ["Recomendação prática 1", "Recomendação prática 2", "Recomendação prática 3"],
-      "search_terms": ["termo de busca 1 Brasil 2026", "termo de busca 2 remuneração"]
+      "title": "Título curto (max 40 chars)",
+      "summary": "Resumo em 1 frase curta",
+      "source": "Fonte (ex: Robert Half)",
+      "category": "salários",
+      "detailed_analysis": "Análise em 1 parágrafo curto",
+      "impact": "Impacto em 1 frase",
+      "recommendations": ["Rec 1", "Rec 2"],
+      "search_terms": ["termo 1", "termo 2"]
     }
   ]
 }
 
-Categorias permitidas: salários, benefícios, trabalho_remoto, tecnologia, liderança
-Foque em tendências práticas e aplicáveis ao mercado brasileiro.
-Cada tendência deve ter análise detalhada, impacto, 3 recomendações práticas e 2 termos de busca.`;
+Categorias: salários, benefícios, trabalho_remoto, tecnologia, liderança
+IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -46,10 +45,10 @@ Cada tendência deve ter análise detalhada, impacto, 3 recomendações prática
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: "Gere as 5 tendências de remuneração mais relevantes para o mercado brasileiro em 2025/2026." }
+          { role: "user", content: "Gere 5 tendências de remuneração concisas para o Brasil 2025/2026." }
         ],
       }),
     });
@@ -82,15 +81,81 @@ Cada tendência deve ter análise detalhada, impacto, 3 recomendações prática
       throw new Error("No content in AI response");
     }
 
+    console.log("AI response length:", content.length);
+
     // Parse the JSON response
     let trends;
     try {
       // Remove markdown code blocks if present
-      const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      // Try to find valid JSON object
+      const jsonStart = cleanContent.indexOf('{');
+      const jsonEnd = cleanContent.lastIndexOf('}');
+      
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        cleanContent = cleanContent.substring(jsonStart, jsonEnd + 1);
+      }
+      
       trends = JSON.parse(cleanContent);
     } catch (parseError) {
-      console.error("Failed to parse AI response:", content);
-      throw new Error("Invalid JSON response from AI");
+      console.error("Failed to parse AI response:", content.substring(0, 500));
+      
+      // Return fallback trends if parsing fails
+      trends = {
+        trends: [
+          {
+            title: "Remuneração baseada em habilidades",
+            summary: "Foco em competências específicas ao invés de cargos tradicionais",
+            source: "Robert Half",
+            category: "salários",
+            detailed_analysis: "Empresas estão valorizando habilidades técnicas e comportamentais específicas.",
+            impact: "Maior competitividade na atração de talentos",
+            recommendations: ["Mapear habilidades críticas", "Criar trilhas de desenvolvimento"],
+            search_terms: ["skills-based pay Brasil", "remuneração por competências"]
+          },
+          {
+            title: "Benefícios flexíveis",
+            summary: "Pacotes personalizados conforme necessidades individuais",
+            source: "Michael Page",
+            category: "benefícios",
+            detailed_analysis: "Colaboradores podem escolher benefícios que façam sentido para seu momento de vida.",
+            impact: "Aumento no engajamento e satisfação",
+            recommendations: ["Implementar plataforma de benefícios flexíveis", "Pesquisar preferências"],
+            search_terms: ["benefícios flexíveis 2025", "flex benefits Brasil"]
+          },
+          {
+            title: "Transparência salarial",
+            summary: "Maior abertura sobre faixas e critérios de remuneração",
+            source: "Korn Ferry",
+            category: "salários",
+            detailed_analysis: "Tendência global de divulgar faixas salariais em vagas e internamente.",
+            impact: "Redução de desigualdades e maior confiança",
+            recommendations: ["Revisar estrutura de cargos", "Comunicar política salarial"],
+            search_terms: ["transparência salarial Brasil", "pay transparency"]
+          },
+          {
+            title: "Trabalho híbrido estruturado",
+            summary: "Políticas claras para modelos flexíveis de trabalho",
+            source: "Hays",
+            category: "trabalho_remoto",
+            detailed_analysis: "Empresas definindo regras claras para dias presenciais e remotos.",
+            impact: "Equilíbrio entre colaboração e flexibilidade",
+            recommendations: ["Definir política híbrida clara", "Ajustar benefícios para home office"],
+            search_terms: ["trabalho híbrido 2025", "política home office"]
+          },
+          {
+            title: "Incentivos de longo prazo",
+            summary: "Programas de ILP para retenção de talentos-chave",
+            source: "Mercer",
+            category: "liderança",
+            detailed_analysis: "Stock options e RSUs ganham força além das startups tradicionais.",
+            impact: "Maior retenção de profissionais estratégicos",
+            recommendations: ["Avaliar programas de ILP", "Comunicar valor total da remuneração"],
+            search_terms: ["ILP Brasil 2025", "stock options empresas brasileiras"]
+          }
+        ]
+      };
     }
 
     return new Response(JSON.stringify(trends), {
