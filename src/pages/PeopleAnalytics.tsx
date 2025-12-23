@@ -4,6 +4,7 @@ import { KPICard } from '@/components/analytics/KPICard';
 import { ChartCard } from '@/components/analytics/ChartCard';
 import { AllSalariesListCard } from '@/components/analytics/AllSalariesListCard';
 import { SalaryDistributionCard } from '@/components/analytics/SalaryDistributionCard';
+import { PointsDistributionSection } from '@/components/analytics/PointsDistributionSection';
 import { usePeopleAnalytics } from '@/hooks/usePeopleAnalytics';
 import { DollarSign, Users, Wallet } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
@@ -170,6 +171,9 @@ const PeopleAnalyticsContent = () => {
               </ResponsiveContainer>
             </ChartContainer>
           </ChartCard>
+
+          {/* Points Distribution Section */}
+          <PointsDistributionSection />
         </div>
 
         {/* Right Panel: All Salaries */}
