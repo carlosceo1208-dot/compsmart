@@ -27,7 +27,8 @@ import {
   XCircle,
   Briefcase,
   Building2,
-  Settings
+  Settings,
+  Zap
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -322,6 +323,48 @@ export default function JobTitlesPage() {
     }
   };
 
+  // Mapeamento de pontos Hay por grade
+  const GRADE_POINTS_MAP: Record<string, number> = {
+    '001': 115, '002': 150, '003': 190, '004': 235, '005': 290,
+    '006': 355, '007': 435, '008': 535, '009': 655, '010': 800,
+    '011': 980, '012': 1200, '013': 1470, '014': 1800, '015': 2190,
+    '016': 2660, '017': 3240, '018': 3940,
+  };
+
+  const handleAssignPointsByGrade = async () => {
+    const jobsWithoutPoints = jobTitles.filter(j => !j.hay_total_points || j.hay_total_points === 0);
+    
+    if (jobsWithoutPoints.length === 0) {
+      toast.info("Todos os cargos já possuem pontos atribuídos!");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      let updatedCount = 0;
+
+      for (const job of jobsWithoutPoints) {
+        const points = GRADE_POINTS_MAP[job.grade];
+        if (points) {
+          const { error } = await supabase
+            .from("job_titles")
+            .update({ hay_total_points: points } as any)
+            .eq("id", job.id);
+
+          if (!error) updatedCount++;
+        }
+      }
+
+      toast.success(`${updatedCount} cargos atualizados com pontos Hay!`);
+      fetchJobTitles();
+    } catch (error: any) {
+      console.error("Error assigning points:", error);
+      toast.error("Erro ao atribuir pontos");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const uniqueGrades = Array.from(new Set(jobTitles.map(j => j.grade))).sort();
 
   // Group data by selected grouping
@@ -552,7 +595,7 @@ export default function JobTitlesPage() {
       </Card>
 
       {/* Actions */}
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Button onClick={handleAddNew}>
           <Plus className="w-4 h-4 mr-2" />
           Novo Cargo
@@ -564,6 +607,14 @@ export default function JobTitlesPage() {
         <Button variant="outline" onClick={() => setFamilyManagerOpen(true)}>
           <Settings className="w-4 h-4 mr-2" />
           Gerenciar Famílias
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={handleAssignPointsByGrade}
+          className="text-purple-700 border-purple-300 hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900"
+        >
+          <Zap className="w-4 h-4 mr-2" />
+          Atribuir Pontos por Grade
         </Button>
       </div>
 
