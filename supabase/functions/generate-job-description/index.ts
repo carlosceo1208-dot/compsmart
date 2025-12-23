@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { jobTitle, grade, cbo, jobFamily, mode = 'full' } = await req.json();
+    const { jobTitle, grade, cbo, jobFamily, mode = 'full', summary, mainResponsibilities } = await req.json();
     
     // CBO agora é opcional - IA vai sugerir se não fornecido
     if (!jobTitle || !grade) {
@@ -26,21 +26,66 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY não configurada');
     }
 
-    // Build prompt based on mode
-    const systemPrompt = `Você é um especialista em RH e estruturação de cargos no Brasil.
+    let systemPrompt = '';
+    let userPrompt = '';
+
+    if (mode === 'hay_evaluation') {
+      // HAY EVALUATION MODE
+      systemPrompt = `Você é um especialista certificado em avaliação de cargos pela metodologia Hay (Korn Ferry).
+Você conhece profundamente os 3 fatores da metodologia:
+1. KNOW-HOW: Técnico/Profissional (A-H), Gerencial (I-IV), Relações Humanas (1-3)
+2. PROBLEM SOLVING: Ambiente de Pensamento (A-H), Desafio (10%-33%)
+3. ACCOUNTABILITY: Liberdade de Ação (A-H), Magnitude (1-4), Impacto (R, C, S, P)
+
+Você deve avaliar cargos de forma consistente e fundamentada, sempre justificando suas escolhas.
+Lembre-se: esta é uma SUGESTÃO INICIAL. O RH poderá ajustar os valores conforme a realidade da empresa.
+Sempre retorne um JSON válido.`;
+
+      userPrompt = `Avalie o cargo abaixo conforme a metodologia Hay:
+
+**CARGO:**
+- Título: ${jobTitle}
+- Grade Atual: ${grade}
+- Família: ${jobFamily || 'Não informada'}
+${summary ? `- Sumário: ${summary}` : ''}
+${mainResponsibilities ? `- Responsabilidades: ${mainResponsibilities}` : ''}
+
+**INSTRUÇÕES:**
+1. Avalie cada fator Hay considerando o nível de complexidade do cargo
+2. Calcule os pontos totais (valores típicos: 100-1000+)
+3. Sugira o perfil do cargo (A=Administrativo, C=Coordenação, P=Pensamento, T=Técnico)
+4. Forneça uma justificativa clara para a avaliação
+
+**RETORNE JSON:**
+{
+  "knowhow_technical": "X",
+  "knowhow_managerial": "X",
+  "knowhow_human_relations": "X",
+  "problem_environment": "X",
+  "problem_challenge": "XX%",
+  "accountability_freedom": "X",
+  "accountability_magnitude": "X",
+  "accountability_impact": "X",
+  "total_points": 000,
+  "suggested_grade": "X",
+  "profile": "X",
+  "evaluation_notes": "Justificativa detalhada da avaliação explicando as escolhas para cada fator..."
+}`;
+
+    } else {
+      // EXISTING MODES (summary, full)
+      systemPrompt = `Você é um especialista em RH e estruturação de cargos no Brasil.
 Gere descrições profissionais e objetivas baseadas nas melhores práticas de mercado.
 Você conhece profundamente a Classificação Brasileira de Ocupações (CBO) e sabe identificar o código mais adequado para cada cargo.
 Sempre retorne um JSON válido com as chaves solicitadas.`;
 
-    let userPrompt = '';
-    
-    // Instrução sobre CBO
-    const cboInstruction = cbo 
-      ? `- CBO informado: ${cbo}` 
-      : `- CBO: NÃO INFORMADO - você DEVE sugerir o código CBO mais adequado baseado no título, família e nível do cargo`;
-    
-    if (mode === 'summary') {
-      userPrompt = `Gere um sumário executivo para o cargo:
+      // Instrução sobre CBO
+      const cboInstruction = cbo 
+        ? `- CBO informado: ${cbo}` 
+        : `- CBO: NÃO INFORMADO - você DEVE sugerir o código CBO mais adequado baseado no título, família e nível do cargo`;
+      
+      if (mode === 'summary') {
+        userPrompt = `Gere um sumário executivo para o cargo:
 - Título: ${jobTitle}
 - Família: ${jobFamily || 'Não informada'}
 - Grade: ${grade}
@@ -53,8 +98,8 @@ Retorne JSON com:
   "cbo_reasoning": "Breve justificativa (1-2 frases) explicando a escolha do CBO",` : ''}
   "summary": "2-3 frases descrevendo o propósito e escopo do cargo"
 }`;
-    } else {
-      userPrompt = `Gere a descrição completa para o cargo:
+      } else {
+        userPrompt = `Gere a descrição completa para o cargo:
 - Título: ${jobTitle}
 - Família: ${jobFamily || 'Não informada'}
 - Grade: ${grade}
@@ -74,6 +119,7 @@ Retorne JSON com:
   "required_experience": "Anos e tipo de experiência necessária",
   "required_education": "Formação acadêmica mínima requerida"
 }`;
+      }
     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

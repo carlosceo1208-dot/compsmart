@@ -33,6 +33,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<CalculationMode>('manual');
   const [gradeInput, setGradeInput] = useState('');
+  const [referencePoints, setReferencePoints] = useState('');
   
   const [manualValues, setManualValues] = useState<SalaryValues>({
     min: '',
@@ -69,6 +70,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
       if (data) {
         setGradeInput(data.grade);
         setMode(data.calculation_mode);
+        setReferencePoints(data.reference_points?.toString() || '');
         setManualValues({
           min: data.min_value.toString(),
           q1: data.q1_value.toString(),
@@ -89,6 +91,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
   const resetForm = () => {
     setGradeInput('');
     setMode('manual');
+    setReferencePoints('');
     setManualValues({ min: '', q1: '', median: '', q3: '', max: '' });
     setAutoMedian('');
     setCalculatedValues(null);
@@ -141,6 +144,7 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
         salary_table_id: salaryTableId,
         grade: gradeInput || grade,
         calculation_mode: mode,
+        reference_points: referencePoints ? parseInt(referencePoints) : null,
         min_value: parseFloat(values.min),
         q1_value: parseFloat(values.q1),
         median_value: parseFloat(values.median),
@@ -199,6 +203,19 @@ export const SalaryRangeDialog = ({ open, onOpenChange, grade, salaryTableId, on
                 />
               </div>
             )}
+
+            <div>
+              <Label>Pontos de Referência Hay (opcional)</Label>
+              <Input
+                type="number"
+                value={referencePoints}
+                onChange={(e) => setReferencePoints(e.target.value)}
+                placeholder="Ex: 350"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Pontos de avaliação Hay associados a este grade
+              </p>
+            </div>
 
             <div>
               <Label>Modo de Definição</Label>

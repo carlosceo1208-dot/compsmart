@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
 import { CompetencyManager } from "./CompetencyManager";
 import { CBOSearchInput } from "./CBOSearchInput";
+import { HayEvaluationTab } from "./HayEvaluationTab";
 
 interface JobTitleDialogProps {
   open: boolean;
@@ -39,6 +40,18 @@ interface JobTitleData {
   required_experience?: string | null;
   required_education?: string | null;
   median_points: number;
+  // Hay evaluation fields
+  hay_knowhow_technical?: string | null;
+  hay_knowhow_managerial?: string | null;
+  hay_knowhow_human_relations?: string | null;
+  hay_problem_environment?: string | null;
+  hay_problem_challenge?: string | null;
+  hay_accountability_freedom?: string | null;
+  hay_accountability_magnitude?: string | null;
+  hay_accountability_impact?: string | null;
+  hay_total_points?: number | null;
+  hay_profile?: string | null;
+  hay_evaluation_notes?: string | null;
 }
 
 export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: JobTitleDialogProps) {
@@ -61,6 +74,18 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
     required_experience: "",
     required_education: "",
     median_points: 0,
+    // Hay fields
+    hay_knowhow_technical: "",
+    hay_knowhow_managerial: "",
+    hay_knowhow_human_relations: "",
+    hay_problem_environment: "",
+    hay_problem_challenge: "",
+    hay_accountability_freedom: "",
+    hay_accountability_magnitude: "",
+    hay_accountability_impact: "",
+    hay_total_points: 0,
+    hay_profile: "",
+    hay_evaluation_notes: "",
   });
   const [salaryRangeInfo, setSalaryRangeInfo] = useState<string>("");
 
@@ -160,6 +185,17 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
       required_experience: "",
       required_education: "",
       median_points: 0,
+      hay_knowhow_technical: "",
+      hay_knowhow_managerial: "",
+      hay_knowhow_human_relations: "",
+      hay_problem_environment: "",
+      hay_problem_challenge: "",
+      hay_accountability_freedom: "",
+      hay_accountability_magnitude: "",
+      hay_accountability_impact: "",
+      hay_total_points: 0,
+      hay_profile: "",
+      hay_evaluation_notes: "",
     });
     setSalaryRangeInfo("");
   };
@@ -274,11 +310,12 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
 
         <div className="overflow-y-auto flex-1 pr-2 -mr-2">
           <Tabs defaultValue="basics" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basics">📌 Dados Básicos</TabsTrigger>
               <TabsTrigger value="description">📄 Descrição</TabsTrigger>
               <TabsTrigger value="competencies">🧩 Competências</TabsTrigger>
               <TabsTrigger value="requirements">🎓 Requisitos</TabsTrigger>
+              <TabsTrigger value="hay">⚖️ Hay</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basics" className="space-y-4 mt-4">
@@ -504,6 +541,31 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
                   </CardContent>
                 </Card>
               )}
+            </TabsContent>
+
+            <TabsContent value="hay" className="mt-4">
+              <HayEvaluationTab
+                jobTitle={formData.title}
+                grade={formData.grade}
+                jobFamily={formData.job_family}
+                summary={formData.summary || ''}
+                mainResponsibilities={formData.main_responsibilities || ''}
+                hayData={{
+                  hay_knowhow_technical: formData.hay_knowhow_technical || '',
+                  hay_knowhow_managerial: formData.hay_knowhow_managerial || '',
+                  hay_knowhow_human_relations: formData.hay_knowhow_human_relations || '',
+                  hay_problem_environment: formData.hay_problem_environment || '',
+                  hay_problem_challenge: formData.hay_problem_challenge || '',
+                  hay_accountability_freedom: formData.hay_accountability_freedom || '',
+                  hay_accountability_magnitude: formData.hay_accountability_magnitude || '',
+                  hay_accountability_impact: formData.hay_accountability_impact || '',
+                  hay_total_points: formData.hay_total_points || 0,
+                  hay_profile: formData.hay_profile || '',
+                  hay_evaluation_notes: formData.hay_evaluation_notes || '',
+                }}
+                onHayDataChange={(data) => setFormData({ ...formData, ...data })}
+                onMedianPointsChange={(points) => setFormData({ ...formData, median_points: points })}
+              />
             </TabsContent>
           </Tabs>
         </div>
