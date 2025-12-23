@@ -65,6 +65,8 @@ interface Profile {
   status: string;
   created_at: string;
   job_title: string | null;
+  job_title_id: string | null;
+  job_title_hay_points: number | null;
   grade: string | null;
   salary: number | null;
   variable_salary: number | null;
@@ -169,8 +171,27 @@ const Users = () => {
     try {
       const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:organizational_structure!profiles_position_id_fkey(id, name, code, type, description)")
+        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, job_title_id, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:organizational_structure!profiles_position_id_fkey(id, name, code, type, description)")
         .order("created_at", { ascending: false });
+
+      // Fetch hay_total_points for job titles
+      const jobTitleIds = [...new Set((profilesData || []).map(p => p.job_title_id).filter(Boolean))];
+      let hayPointsMap: Record<string, number> = {};
+      if (jobTitleIds.length > 0) {
+        const { data: jobTitlesData } = await supabase
+          .from("job_titles")
+          .select("id, hay_total_points")
+          .in("id", jobTitleIds);
+        
+        if (jobTitlesData) {
+          hayPointsMap = jobTitlesData.reduce((acc, jt) => {
+            if (jt.hay_total_points) {
+              acc[jt.id] = jt.hay_total_points;
+            }
+            return acc;
+          }, {} as Record<string, number>);
+        }
+      }
 
       if (profilesError) throw profilesError;
 
@@ -203,6 +224,7 @@ const Users = () => {
 
           return {
             ...profile,
+            job_title_hay_points: profile.job_title_id ? hayPointsMap[profile.job_title_id] || null : null,
             user_roles: rolesData || [],
             org_breadcrumb: orgBreadcrumb,
             org_label: orgLabel,
@@ -641,6 +663,7 @@ const Users = () => {
                     <TableHead className="min-w-[120px] text-xs">Estrutura Org</TableHead>
                     <TableHead className="min-w-[130px] text-xs">Cargo</TableHead>
                     <TableHead className="w-[60px] text-xs text-center">Grade</TableHead>
+                    <TableHead className="w-[50px] text-xs text-center">Pontos</TableHead>
                     <TableHead className="w-[100px] text-right text-xs">Fixo</TableHead>
                     <TableHead className="w-[100px] text-right text-xs">Variável</TableHead>
                     <TableHead className="w-[110px] text-right text-xs font-semibold">Total Cash</TableHead>
@@ -684,6 +707,17 @@ const Users = () => {
                         {/* Grade */}
                         <TableCell className="text-xs text-center font-semibold">
                           {profile.grade || "-"}
+                        </TableCell>
+
+                        {/* Pontos Hay */}
+                        <TableCell className="text-xs text-center">
+                          {profile.job_title_hay_points ? (
+                            <Badge variant="outline" className="bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200 text-[10px] px-1">
+                              {profile.job_title_hay_points}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
                         </TableCell>
                         
                         {/* Salário Fixo */}
@@ -804,6 +838,7 @@ const Users = () => {
                       <TableCell></TableCell>
                       <TableCell></TableCell>
                       <TableCell></TableCell>
+                      <TableCell></TableCell>
                       <TableCell className="text-right text-xs text-muted-foreground font-semibold">
                         {formatCurrency(pageSubtotal.fixedSalary)}
                       </TableCell>
@@ -841,6 +876,7 @@ const Users = () => {
                     <TableRow className="bg-primary/10 border-t-2 border-primary/30 font-bold">
                       <TableCell className="text-xs font-bold text-primary">TOTAL GERAL</TableCell>
                       <TableCell className="text-xs font-bold">{grandTotal.count} funcionário(s)</TableCell>
+                      <TableCell></TableCell>
                       <TableCell></TableCell>
                       <TableCell></TableCell>
                       <TableCell></TableCell>
