@@ -141,7 +141,7 @@ export const HeroSection = () => {
 
           {/* Headline - Pain vs. Solution */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-            Acabe com o caos das planilhas de remuneração{" "}
+            Diga adeus ao caos das planilhas:{" "}
             <span 
               className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-gradient-shift"
               style={{ 
@@ -149,13 +149,13 @@ export const HeroSection = () => {
                 willChange: "background-position"
               }}
             >
-              com inteligência artificial.
+              Inteligência de Dados e IA para sua Gestão de Remuneração.
             </span>
           </h1>
 
           {/* Subtitle - Animated Entry */}
           <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            Gerencie tabelas salariais, benefícios e planejamento de headcount em uma única plataforma segura. Potencializado por <span className="font-semibold text-primary">Smart IA</span> para análise profunda de documentos e mercado.
+            Tabelas salariais, planejamento de headcount e análise de mercado em uma única plataforma segura. Experimente grátis por 14 dias e transforme sua gestão hoje.
           </p>
 
           {/* CTAs - Animated Entry with Enhanced Hover Effects */}
@@ -165,7 +165,7 @@ export const HeroSection = () => {
               className="cta-action text-lg px-8 shadow-lg w-full sm:w-auto transition-all duration-300 will-change-transform group"
               onClick={() => navigate("/auth")}
             >
-              Começar Trial Grátis 14 dias
+              Começar Teste Grátis de 14 Dias
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button 
@@ -180,6 +180,19 @@ export const HeroSection = () => {
 
           {/* Video Preview Section - Animated Entry */}
           <div className="pt-12 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+            {/* Video Section Header */}
+            <div className="text-center mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                Planilhas ou Inteligência?{" "}
+                <span className="bg-gradient-primary bg-clip-text text-transparent">
+                  Veja como a CompSmart elimina o trabalho exaustivo da revisão salarial.
+                </span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Assista ao diálogo entre um CEO e uma HR Manager e descubra por que empresas de alto crescimento estão abandonando os processos manuais.
+              </p>
+            </div>
+            
             <div className="relative max-w-3xl mx-auto">
               <div className="relative rounded-2xl overflow-visible p-1 bg-gradient-to-br from-primary/20 via-secondary/20 to-accent/20">
                 <div 
@@ -294,9 +307,21 @@ export const HeroSection = () => {
             </div>
           </div>
 
+          {/* Secondary CTA below video */}
+          <div className="flex justify-center pt-4 animate-fade-in-up" style={{ animationDelay: "0.55s" }}>
+            <Button 
+              size="lg"
+              className="cta-action text-lg px-8 shadow-lg transition-all duration-300 will-change-transform group"
+              onClick={() => navigate("/auth")}
+            >
+              Quero meu teste grátis
+              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+            </Button>
+          </div>
+
           {/* Trust Badge - Animated Entry */}
           <p className="text-sm text-muted-foreground pt-6 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-            ✓ Sem cartão de crédito • ✓ Setup em 5 minutos • ✓ Suporte em português
+            Sem necessidade de cartão de crédito. Configuração em 2 minutos.
           </p>
         </div>
       </div>
