@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { AIShowcaseSection } from "@/components/landing/AIShowcaseSection";
 import { PainPointsSection } from "@/components/landing/PainPointsSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
 import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
+import { SecuritySection } from "@/components/landing/SecuritySection";
 import { TargetAudienceSection } from "@/components/landing/TargetAudienceSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { DifferentialsSection } from "@/components/landing/DifferentialsSection";
@@ -30,9 +32,11 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={isLoggedIn} />
       <HeroSection />
+      <AIShowcaseSection />
       <PainPointsSection />
       <SolutionSection />
       <SmartAgentsSection />
+      <SecuritySection />
       <TargetAudienceSection />
       <HowItWorksSection />
       <DifferentialsSection />

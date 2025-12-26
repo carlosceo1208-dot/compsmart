@@ -139,9 +139,9 @@ export const HeroSection = () => {
             </div>
           </div>
 
-          {/* Headline - Animated Entry with Gradient Shift */}
+          {/* Headline - Pain vs. Solution */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-            Gestão Inteligente em Remuneração{" "}
+            Acabe com o caos das planilhas de remuneração{" "}
             <span 
               className="bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent animate-gradient-shift"
               style={{ 
@@ -149,32 +149,32 @@ export const HeroSection = () => {
                 willChange: "background-position"
               }}
             >
-              para decisões mais rápidas, justas e estratégicas.
+              com inteligência artificial.
             </span>
           </h1>
 
           {/* Subtitle - Animated Entry */}
           <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            Estruture salários, Programas de Incentivos, Benefícios, PLR e todo o orçamento de pessoas com precisão e inteligência. Uma plataforma completa que leva empresas de qualquer porte — de startups a grandes corporações — a uma gestão de remuneração verdadeiramente estratégica e em total compliance com a legislação vigente.
+            Gerencie tabelas salariais, benefícios e planejamento de headcount em uma única plataforma segura. Potencializado por <span className="font-semibold text-primary">Smart IA</span> para análise profunda de documentos e mercado.
           </p>
 
           {/* CTAs - Animated Entry with Enhanced Hover Effects */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
             <Button 
               size="lg"
-              className="bg-gradient-primary hover:opacity-90 hover:shadow-primary hover:scale-105 text-lg px-8 shadow-lg w-full sm:w-auto transition-all duration-300 will-change-transform group"
+              className="cta-action text-lg px-8 shadow-lg w-full sm:w-auto transition-all duration-300 will-change-transform group"
               onClick={() => navigate("/auth")}
             >
-              Começar Grátis
+              Começar Trial Grátis 14 dias
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button 
               size="lg"
               variant="outline"
               className="glass-effect hover:bg-primary/10 hover:scale-105 text-lg px-8 w-full sm:w-auto transition-all duration-300 will-change-transform"
-              onClick={() => navigate("/auth")}
+              onClick={() => document.getElementById('solution')?.scrollIntoView({ behavior: 'smooth' })}
             >
-              Seja Empresa Pioneira
+              Ver como funciona
             </Button>
           </div>
 
