@@ -64,11 +64,11 @@ export const Footer = () => {
 
           {/* Company */}
           <div>
-            <h3 className="font-semibold mb-4">Empresa</h3>
+            <h3 className="font-semibold mb-4">Recursos</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Sobre Nós
+                <a href="/glossary" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Glossário de C&S
                 </a>
               </li>
               <li>
@@ -78,7 +78,7 @@ export const Footer = () => {
               </li>
               <li>
                 <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Carreiras
+                  Sobre Nós
                 </a>
               </li>
               <li>

@@ -33,8 +33,8 @@ export const DifferentialsSection = () => {
     },
     {
       icon: Award,
-      title: "Metodologia Comprovada",
-      description: "Construído sobre as melhores práticas e metodologias consolidadas do mercado"
+      title: "Metodologias de Mercado",
+      description: "Avaliação de cargos por fatores e pontos baseada nas melhores práticas e metodologias reconhecidas pelo mercado"
     }
   ];
 

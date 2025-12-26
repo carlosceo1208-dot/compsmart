@@ -42,6 +42,12 @@ export const SolutionSection = () => {
           title: "Gestão de Funcionários",
           description: "Cadastro completo com foto, dados e histórico de movimentações salariais",
           isNew: false
+        },
+        {
+          icon: Calculator,
+          title: "Avaliação de Cargos por Pontos",
+          description: "Avaliação de cargos por fatores e pontos — alinhada às melhores metodologias de mercado",
+          isNew: true
         }
       ]
     },
