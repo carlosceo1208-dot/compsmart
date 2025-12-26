@@ -104,7 +104,7 @@ export const HeroSection = () => {
             </Badge>
             <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-green-500/20 transition-colors" onClick={() => setIsVideoOpen(true)}>
               <Play className="h-4 w-4" />
-              Assista ao Diálogo CEO + RH
+              Assista o CompSmart na prática
             </Badge>
           </div>
 
