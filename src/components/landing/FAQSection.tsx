@@ -1,9 +1,15 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Bot, Shield, Database, Upload, Zap } from "lucide-react";
+import { HelpCircle, Bot, Shield, Database, Upload, Zap, Calculator } from "lucide-react";
 
 export const FAQSection = () => {
   const faqs = [
+    {
+      question: "Como funciona a avaliação de cargos por pontos?",
+      answer: "O CompSmart utiliza uma metodologia de avaliação por fatores e pontos baseada nas melhores práticas de mercado. Você define fatores como Know-how, Responsabilidade e Solução de Problemas, atribui pesos e graus, e o sistema calcula automaticamente a pontuação de cada cargo para criar uma estrutura salarial consistente e defensável.",
+      icon: Calculator,
+      isNew: true
+    },
     {
       question: "Como funcionam os Agentes Inteligentes de IA?",
       answer: "Nossos agentes são especialistas virtuais treinados em remuneração brasileira. O Jurídico Smart gera contratos e analisa compliance, o Salary Smart faz benchmarking e calcula compa-ratio, e o R&B Smart ajuda a estruturar incentivos. Todos trabalham 24/7, respondem em segundos e aprendem com o contexto da sua empresa.",
