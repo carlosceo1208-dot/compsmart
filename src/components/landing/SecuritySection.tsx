@@ -71,9 +71,9 @@ export const SecuritySection = () => {
               Segurança Enterprise
             </Badge>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Segurança e Compliance de{" "}
+              Segurança de{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
-                Nível Corporativo
+                Nível Enterprise
               </span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

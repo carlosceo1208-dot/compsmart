@@ -39,9 +39,9 @@ export const AIShowcaseSection = () => {
     {
       type: "error",
       icon: AlertTriangle,
-      label: "Análise IA",
-      message: "Gap salarial de 15% detectado no Dept. Tecnologia",
-      detail: "12 colaboradores abaixo da faixa ideal",
+      label: "Insight",
+      message: "Detectada distorção salarial de 12% no departamento comercial em relação ao benchmark de mercado",
+      detail: "Ação recomendada: revisar faixas salariais",
       color: "text-red-500",
       bg: "bg-red-500/10",
       border: "border-red-500/30"
