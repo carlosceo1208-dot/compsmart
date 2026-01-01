@@ -10,6 +10,7 @@ import { IncentivesCard } from './IncentivesCard';
 import { BudgetCard } from './BudgetCard';
 import { HRMetricsCard } from './HRMetricsCard';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface KPIDashboardProps {
   currency: Currency;
@@ -17,6 +18,7 @@ interface KPIDashboardProps {
 }
 
 export const KPIDashboard = ({ currency, showWithCharges = false }: KPIDashboardProps) => {
+  const { t } = useTranslation();
   const { convert } = useCurrencyConverter();
   const { socialChargesPercentage } = useCompanySettings();
 
@@ -68,16 +70,16 @@ export const KPIDashboard = ({ currency, showWithCharges = false }: KPIDashboard
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <h3 className="text-lg font-semibold">KPIs Principais</h3>
+        <h3 className="text-lg font-semibold">{t('kpi.main')}</h3>
         {showWithCharges && socialChargesPercentage > 0 && (
           <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
-            Com Encargos (+{socialChargesPercentage}%)
+            {t('kpi.with_charges')} (+{socialChargesPercentage}%)
           </Badge>
         )}
       </div>
       
       <KPICard
-        title="Funcionários Ativos"
+        title={t('kpi.active_employees')}
         value={totalEmployees}
         icon={Users}
         format="number"
@@ -86,7 +88,7 @@ export const KPIDashboard = ({ currency, showWithCharges = false }: KPIDashboard
       />
       
       <KPICard
-        title={showWithCharges && socialChargesPercentage > 0 ? "Massa Salarial (c/ Encargos)" : "Massa Salarial Total"}
+        title={showWithCharges && socialChargesPercentage > 0 ? t('kpi.salary_mass_with_charges') : t('kpi.salary_mass')}
         value={totalSalary}
         icon={DollarSign}
         format="compact-currency"
@@ -96,7 +98,7 @@ export const KPIDashboard = ({ currency, showWithCharges = false }: KPIDashboard
       />
       
       <KPICard
-        title={showWithCharges && socialChargesPercentage > 0 ? "Média Salarial (c/ Encargos)" : "Média Salarial"}
+        title={showWithCharges && socialChargesPercentage > 0 ? t('kpi.avg_salary_with_charges') : t('kpi.avg_salary')}
         value={avgSalary}
         icon={TrendingUp}
         format="currency"
