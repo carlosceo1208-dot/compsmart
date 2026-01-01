@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,38 +38,38 @@ interface UserProfile {
   avatar_url: string | null;
 }
 
-// Route mapping for breadcrumbs
-const routeLabels: Record<string, string> = {
-  "/dashboard": "Dashboard",
-  "/employees": "Funcionários",
-  "/salary-ranges": "Tabela Salarial",
-  "/organograma": "Organograma",
-  "/job-titles": "Cargos & Salários",
-  "/my-profile": "Meu Perfil",
-  "/settings": "Configurações - Parametrização",
-  "/access-control": "Controle de Acesso",
-  "/people-analytics": "People Analytics",
-  "/benefits": "Benefícios",
-  "/budget": "Orçamento",
-  "/budget-planning": "Planejamento Orçamentário",
-  "/budget-approvals": "Aprovações de Orçamento",
-  "/incentive-programs": "Programas de Incentivos",
-  "/legal-assistant": "Jurídico Smart",
-  "/salary-assistant": "Salary Smart",
-  "/incentive-assistant": "R&B Smart",
-  "/organization": "Estrutura Organizacional",
-  "/roles": "Perfis de Acesso",
-  "/survey-data": "Pesquisas Salariais",
-  "/salary-comparison": "Comparação Salarial",
-  "/salary-analysis-report": "Relatório de Análise",
-  "/alert-settings": "Configuração de Alertas",
-  "/audit-logs": "Logs de Auditoria",
-  "/data-audit": "Auditoria de Dados",
-  "/knowledge-base": "Base de Conhecimento",
-  "/settings/plans": "Gerenciar Planos",
-  "/settings/billing": "Faturamento",
-  "/settings/landing-content": "Conteúdo Landing Page",
-  "/settings/my-plan": "Meu Plano",
+// Route mapping for breadcrumbs - now using i18n keys
+const routeLabelKeys: Record<string, string> = {
+  "/dashboard": "menu.dashboard",
+  "/employees": "menu.employees",
+  "/salary-ranges": "menu.salary_table",
+  "/organograma": "menu.organogram",
+  "/job-titles": "menu.job_titles",
+  "/my-profile": "menu.profile",
+  "/settings": "menu.settings",
+  "/access-control": "menu.access_control",
+  "/people-analytics": "modules.people_analytics",
+  "/benefits": "benefits.title",
+  "/budget": "budget.title",
+  "/budget-planning": "budget_planning.title",
+  "/budget-approvals": "budget_approvals.title",
+  "/incentive-programs": "incentives.title",
+  "/legal-assistant": "modules.legal_smart",
+  "/salary-assistant": "modules.salary_smart",
+  "/incentive-assistant": "modules.rb_smart",
+  "/organization": "modules.org_management",
+  "/roles": "modules.profile_management",
+  "/survey-data": "modules.salary_survey",
+  "/salary-comparison": "modules.salary_comparison",
+  "/salary-analysis-report": "modules.salary_analysis",
+  "/alert-settings": "modules.auto_alerts",
+  "/audit-logs": "modules.access_audit",
+  "/data-audit": "modules.data_audit",
+  "/knowledge-base": "modules.knowledge_base",
+  "/settings/plans": "menu.settings",
+  "/settings/billing": "menu.settings",
+  "/settings/landing-content": "menu.settings",
+  "/settings/my-plan": "menu.settings",
 };
 
 // Parent route mapping for hierarchical navigation
@@ -84,6 +85,7 @@ const routeParents: Record<string, string> = {
 export const DashboardLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { getLabel } = useLabels();
   const { activeCompany, activeCompanyId, isViewingOtherCompany, ownCompanyId, isLoading: companyContextLoading } = useCompanyContext();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -94,7 +96,8 @@ export const DashboardLayout = () => {
 
   // Get current page label for breadcrumbs
   const currentPath = location.pathname;
-  const currentPageLabel = routeLabels[currentPath] || currentPath.replace("/", "").replace(/-/g, " ");
+  const currentPageLabelKey = routeLabelKeys[currentPath];
+  const currentPageLabel = currentPageLabelKey ? t(currentPageLabelKey) : currentPath.replace("/", "").replace(/-/g, " ");
   const isHomePage = currentPath === "/dashboard";
 
   // Fetch user profile only - company data comes from context
@@ -179,7 +182,7 @@ export const DashboardLayout = () => {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success("Logout realizado com sucesso");
+    toast.success(t('message.success'));
     navigate("/auth");
   };
 
@@ -202,25 +205,25 @@ export const DashboardLayout = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <img src={compsmartLogo} alt="CompSmart Logo" className="w-32 h-auto md:w-40 mx-auto animate-pulse object-contain" />
-          <p className="text-muted-foreground">Carregando...</p>
+          <p className="text-muted-foreground">{t('app.loading')}</p>
         </div>
       </div>
     );
   }
 
-  // Navigation items for mobile menu
+  // Navigation items for mobile menu - using i18n keys
   const navItems = [
-    { icon: Home, label: "Dashboard", path: "/dashboard" },
-    { icon: UsersIcon, label: "Funcionários", path: "/employees" },
-    { icon: DollarSign, label: "Tabela Salarial", path: "/salary-ranges" },
-    { icon: Network, label: "Organograma", path: "/organograma" },
-    { icon: Briefcase, label: "Cargos", path: "/job-titles" },
+    { icon: Home, labelKey: "menu.dashboard", path: "/dashboard" },
+    { icon: UsersIcon, labelKey: "menu.employees", path: "/employees" },
+    { icon: DollarSign, labelKey: "menu.salary_table", path: "/salary-ranges" },
+    { icon: Network, labelKey: "menu.organogram", path: "/organograma" },
+    { icon: Briefcase, labelKey: "menu.job_titles", path: "/job-titles" },
   ];
 
   const userItems = [
-    { icon: User, label: "Meu Perfil", path: "/my-profile" },
-    { icon: ShieldCheck, label: "Controle de Acesso", path: "/access-control" },
-    { icon: Settings, label: "Configurações", path: "/settings" },
+    { icon: User, labelKey: "menu.profile", path: "/my-profile" },
+    { icon: ShieldCheck, labelKey: "menu.access_control", path: "/access-control" },
+    { icon: Settings, labelKey: "menu.settings", path: "/settings" },
   ];
 
   return (
@@ -228,7 +231,7 @@ export const DashboardLayout = () => {
       {/* Viewing Other Company Banner */}
       {isViewingOtherCompany && (
         <div className="bg-amber-500/20 border-b border-amber-500/30 py-1.5 text-center text-sm text-amber-700 dark:text-amber-400">
-          Você está visualizando: <strong>{companyName}</strong>
+          {t('dashboard.viewing_company')}: <strong>{companyName}</strong>
         </div>
       )}
 
@@ -251,14 +254,14 @@ export const DashboardLayout = () => {
                     <img src={compsmartLogo} alt="CompSmart" className="h-10 w-auto" />
                     <div className="flex flex-col">
                       <span className="text-lg font-bold text-emerald-700 dark:text-emerald-400">CompSmart</span>
-                      <span className="text-[10px] text-muted-foreground -mt-0.5">Gestão de Remuneração</span>
+                      <span className="text-[10px] text-muted-foreground -mt-0.5">{t('app.tagline')}</span>
                     </div>
                   </SheetTitle>
                 </SheetHeader>
                 
                 <div className="flex flex-col gap-1">
                   {/* Main Navigation */}
-                  <p className="text-xs font-medium text-muted-foreground px-2 py-2">Navegação</p>
+                  <p className="text-xs font-medium text-muted-foreground px-2 py-2">{t('menu.navigation')}</p>
                   {navItems.map((item) => (
                     <Button
                       key={item.path}
@@ -271,14 +274,14 @@ export const DashboardLayout = () => {
                       onClick={() => handleNavigate(item.path)}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {item.label}
+                      {t(item.labelKey)}
                     </Button>
                   ))}
                   
                   <Separator className="my-3" />
                   
                   {/* User Menu */}
-                  <p className="text-xs font-medium text-muted-foreground px-2 py-2">Conta</p>
+                  <p className="text-xs font-medium text-muted-foreground px-2 py-2">{t('menu.account')}</p>
                   {userItems.map((item) => (
                     <Button
                       key={item.path}
@@ -291,7 +294,7 @@ export const DashboardLayout = () => {
                       onClick={() => handleNavigate(item.path)}
                     >
                       <item.icon className="mr-2 h-4 w-4" />
-                      {item.label}
+                      {t(item.labelKey)}
                     </Button>
                   ))}
                   
@@ -304,7 +307,7 @@ export const DashboardLayout = () => {
                     onClick={() => window.open('/', '_blank')}
                   >
                     <Globe className="mr-2 h-4 w-4" />
-                    Ver Site
+                    {t('menu.view_site')}
                   </Button>
                   
                   {/* Logout */}
@@ -314,7 +317,7 @@ export const DashboardLayout = () => {
                     onClick={handleLogout}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Sair
+                    {t('menu.logout')}
                   </Button>
                 </div>
               </SheetContent>
@@ -340,17 +343,17 @@ export const DashboardLayout = () => {
                     ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25" 
                     : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/70"
                 }`}
-                title={item.label}
+                title={t(item.labelKey)}
               >
                 <item.icon className="w-3.5 h-3.5 lg:mr-1" />
-                <span className="hidden lg:inline">{item.label}</span>
+                <span className="hidden lg:inline">{t(item.labelKey)}</span>
               </Button>
             ))}
             <Button
               variant="ghost"
               size="sm"
               onClick={() => window.open('/', '_blank')}
-              title="Ver Site"
+              title={t('menu.view_site')}
               className="px-2 bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700 transition-all duration-300"
             >
               <Globe className="w-3.5 h-3.5" />
@@ -416,7 +419,7 @@ export const DashboardLayout = () => {
                 <DropdownMenuLabel>
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {profile?.full_name || "Usuário"}
+                      {profile?.full_name || t('label.employee')}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {profile?.email}
@@ -426,24 +429,24 @@ export const DashboardLayout = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate("/dashboard")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <Home className="mr-2 h-4 w-4" />
-                  <span>Dashboard</span>
+                  <span>{t('menu.dashboard')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/my-profile")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Meu Perfil</span>
+                  <span>{t('menu.profile')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/access-control")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <ShieldCheck className="mr-2 h-4 w-4" />
-                  <span>Controle de Acesso</span>
+                  <span>{t('menu.access_control')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/settings")} className="hover:bg-emerald-50 dark:hover:bg-emerald-900/50">
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Configurações</span>
+                  <span>{t('menu.settings')}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
+                  <span>{t('menu.logout')}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -465,7 +468,7 @@ export const DashboardLayout = () => {
                   className="h-7 px-2 mr-2 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400"
                 >
                   <ArrowLeft className="h-4 w-4 mr-1" />
-                  Voltar
+                  {t('action.back')}
                 </Button>
               )}
 
@@ -475,7 +478,7 @@ export const DashboardLayout = () => {
                 className="flex items-center hover:text-foreground transition-colors"
               >
                 <Home className="h-3.5 w-3.5 mr-1" />
-                <span className="hidden sm:inline">Dashboard</span>
+                <span className="hidden sm:inline">{t('menu.dashboard')}</span>
               </Link>
 
               {/* Parent Page (if exists) */}
@@ -486,7 +489,7 @@ export const DashboardLayout = () => {
                     to={routeParents[currentPath]}
                     className="hover:text-foreground transition-colors"
                   >
-                    {routeLabels[routeParents[currentPath]]}
+                    {routeLabelKeys[routeParents[currentPath]] ? t(routeLabelKeys[routeParents[currentPath]]) : routeParents[currentPath]}
                   </Link>
                 </>
               )}

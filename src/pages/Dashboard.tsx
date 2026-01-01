@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { EconomicIndicators } from "@/components/dashboard/EconomicIndicators";
 import { KPIDashboard } from "@/components/dashboard/KPIDashboard";
 import { AlphabeticalNav } from "@/components/dashboard/AlphabeticalNav";
@@ -14,6 +15,7 @@ import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrend
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const { currency, setCurrency } = useCurrencyConverter();
   const [showWithCharges, setShowWithCharges] = useState(false);
 
@@ -28,7 +30,7 @@ const Dashboard = () => {
               <div>
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white">CompSmart</h1>
                 <p className="text-xs sm:text-sm text-white/90 font-medium">
-                  Dashboard Executivo
+                  {t('dashboard.title')}
                 </p>
               </div>
               <div className="flex-shrink-0">
