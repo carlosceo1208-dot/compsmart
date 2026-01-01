@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -396,6 +397,11 @@ export const DashboardLayout = () => {
             <div className="hidden xl:flex items-center gap-1">
               <CompanySwitcher />
               <HeaderNotifications />
+            </div>
+
+            {/* DEBUG: Language indicator - TEMPORARY */}
+            <div className="hidden md:flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/50 rounded text-[10px] font-mono border border-amber-300 dark:border-amber-700">
+              <span className="text-amber-700 dark:text-amber-300">i18n: {i18n.language}</span>
             </div>
             
             {/* Essential items - ALWAYS visible */}
