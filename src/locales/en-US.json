@@ -85,7 +85,12 @@
     "cta": "Start 14-Day Free Trial",
     "watch_video": "Watch CompSmart in action",
     "login": "Login",
-    "signup": "Sign Up"
+    "signup": "Sign Up",
+    "features": "Features",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "start_free": "Start Free",
+    "go_to_dashboard": "Go to Dashboard"
   },
   "kpi": {
     "main": "Main KPIs",

@@ -85,7 +85,12 @@
     "cta": "Começar Teste Grátis de 14 Dias",
     "watch_video": "Assista o CompSmart na prática",
     "login": "Entrar",
-    "signup": "Cadastrar"
+    "signup": "Cadastrar",
+    "features": "Funcionalidades",
+    "pricing": "Preços",
+    "faq": "FAQ",
+    "start_free": "Começar Grátis",
+    "go_to_dashboard": "Ir para Dashboard"
   },
   "kpi": {
     "main": "KPIs Principais",

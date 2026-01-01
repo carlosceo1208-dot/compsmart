@@ -73,7 +73,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     loadUserLanguage();
-  }, [userId, i18n]);
+  }, [userId]);
 
   // Load company default language as fallback
   useEffect(() => {
@@ -122,13 +122,17 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     loadCompanyDefaultLanguage();
-  }, [userId, i18n]);
+  }, [userId]);
 
   const changeLanguage = useCallback(async (lang: SupportedLanguage) => {
     setIsLoading(true);
     try {
       // Always update i18n and localStorage
       await i18n.changeLanguage(lang);
+      
+      // Force state update to trigger re-renders
+      setCurrentLang(lang);
+      
       localStorage.setItem(STORAGE_KEY, lang);
 
       // If authenticated, also save to database
@@ -144,7 +148,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } finally {
       setIsLoading(false);
     }
-  }, [i18n, isAuthenticated, userId]);
+  }, [isAuthenticated, userId]);
 
   const value: LanguageContextType = {
     currentLanguage: currentLang,
