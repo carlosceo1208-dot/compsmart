@@ -125,15 +125,21 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [userId]);
 
   const changeLanguage = useCallback(async (lang: SupportedLanguage) => {
+    console.log('[i18n] changeLanguage called with:', lang);
+    console.log('[i18n] Current i18n.language BEFORE:', i18n.language);
+    
     setIsLoading(true);
     try {
       // Always update i18n and localStorage
       await i18n.changeLanguage(lang);
       
+      console.log('[i18n] i18n.language AFTER changeLanguage:', i18n.language);
+      
       // Force state update to trigger re-renders
       setCurrentLang(lang);
       
       localStorage.setItem(STORAGE_KEY, lang);
+      console.log('[i18n] localStorage set to:', localStorage.getItem(STORAGE_KEY));
 
       // If authenticated, also save to database
       if (isAuthenticated && userId) {
@@ -142,9 +148,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           .from('profiles')
           .update({ preferred_language: lang } as any)
           .eq('id', userId);
+        console.log('[i18n] Saved to database for user:', userId);
       }
+      
+      console.log('[i18n] Language change complete. Final i18n.language:', i18n.language);
     } catch (error) {
-      console.error('Error changing language:', error);
+      console.error('[i18n] Error changing language:', error);
     } finally {
       setIsLoading(false);
     }

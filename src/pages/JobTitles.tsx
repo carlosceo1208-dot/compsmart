@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -69,16 +70,19 @@ interface JobTitle {
   } | null;
 }
 
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
-
 export default function JobTitlesPage() {
+  const { t, i18n } = useTranslation();
+  
+  const formatCurrency = (value: number) => {
+    const locale = i18n.language === 'en-US' ? 'en-US' : i18n.language === 'es-LATAM' ? 'es-AR' : 'pt-BR';
+    const currency = i18n.language === 'en-US' ? 'USD' : 'BRL';
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
   const { activeCompanyId } = useCompanyContext();
   const [jobTitles, setJobTitles] = useState<any[]>([]);
   const [jobFamilies, setJobFamilies] = useState<string[]>([]);
@@ -144,7 +148,7 @@ export default function JobTitlesPage() {
 
   const fetchJobTitles = async () => {
     if (!activeCompanyId) {
-      toast.error("Nenhuma empresa selecionada");
+      toast.error(t('job_titles.no_company'));
       setJobTitles([]);
       return;
     }
@@ -167,7 +171,7 @@ export default function JobTitlesPage() {
       setJobTitles(data || []);
     } catch (error: any) {
       console.error("Error fetching job titles:", error);
-      toast.error("Erro ao carregar cargos");
+      toast.error(t('job_titles.error_loading'));
     } finally {
       setLoading(false);
     }
@@ -263,7 +267,7 @@ export default function JobTitlesPage() {
       .eq("job_title_id", id);
 
     if (empError) {
-      toast.error("Erro ao verificar colaboradores vinculados");
+      toast.error(t('job_titles.error_check_employees'));
       return;
     }
 
@@ -290,11 +294,11 @@ export default function JobTitlesPage() {
 
       if (error) throw error;
 
-      toast.success(newStatus ? "Cargo ativado" : "Cargo inativado");
+      toast.success(newStatus ? t('job_titles.activated') : t('job_titles.inactivated'));
       fetchJobTitles();
     } catch (error: any) {
       console.error("Error updating status:", error);
-      toast.error("Erro ao atualizar status");
+      toast.error(t('job_titles.error_update_status'));
     }
   };
 
@@ -328,11 +332,11 @@ export default function JobTitlesPage() {
 
       if (updateError) throw updateError;
 
-      toast.success("Sumário gerado com sucesso!");
+      toast.success(t('job_titles.summary_generated'));
       fetchJobTitles();
     } catch (error: any) {
       console.error("AI generation error:", error);
-      toast.error("Erro ao gerar sumário");
+      toast.error(t('job_titles.error_generate_summary'));
     }
   };
 
@@ -348,7 +352,7 @@ export default function JobTitlesPage() {
     const jobsWithoutPoints = jobTitles.filter(j => !j.hay_total_points || j.hay_total_points === 0);
     
     if (jobsWithoutPoints.length === 0) {
-      toast.info("Todos os cargos já possuem pontos atribuídos!");
+      toast.info(t('job_titles.all_have_points'));
       return;
     }
 
@@ -368,11 +372,11 @@ export default function JobTitlesPage() {
         }
       }
 
-      toast.success(`${updatedCount} cargos atualizados com pontos Hay!`);
+      toast.success(t('job_titles.points_assigned', { count: updatedCount }));
       fetchJobTitles();
     } catch (error: any) {
       console.error("Error assigning points:", error);
-      toast.error("Erro ao atribuir pontos");
+      toast.error(t('job_titles.error_assign_points'));
     } finally {
       setLoading(false);
     }
@@ -445,7 +449,7 @@ export default function JobTitlesPage() {
       <TableCell className="py-2">
         <Badge variant={job.is_active ? "success" : "destructive"}>
           {job.is_active ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
-          {job.is_active ? "Ativo" : "Inativo"}
+          {job.is_active ? t('label.active') : t('label.inactive')}
         </Badge>
       </TableCell>
       <TableCell className="py-2">
@@ -456,16 +460,16 @@ export default function JobTitlesPage() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleEdit(job.id)}>
               <Eye className="w-4 h-4 mr-2" />
-              Ver Detalhes
+              {t('job_titles.view_details')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleEdit(job.id)}>
               <Edit className="w-4 h-4 mr-2" />
-              Editar Cargo
+              {t('job_titles.edit_job')}
             </DropdownMenuItem>
             {!job.summary && (
               <DropdownMenuItem onClick={() => handleGenerateAI(job.id)}>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Gerar Descrição com IA
+                {t('job_titles.generate_ai')}
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
@@ -475,12 +479,12 @@ export default function JobTitlesPage() {
                 className="text-destructive"
               >
                 <XCircle className="w-4 h-4 mr-2" />
-                Inativar
+                {t('job_titles.inactivate')}
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem onClick={() => toggleActiveStatus(job.id, true)}>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                Ativar
+                {t('job_titles.activate')}
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -492,9 +496,9 @@ export default function JobTitlesPage() {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">🏢 Plano de Cargos & Salários</h1>
+        <h1 className="text-3xl font-bold">🏢 {t('job_titles.title')}</h1>
         <p className="text-muted-foreground mt-2">
-          Gerencie cargos, descrições e competências
+          {t('job_titles.subtitle')}
         </p>
       </div>
 
@@ -504,7 +508,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total de Cargos</p>
+                <p className="text-sm text-muted-foreground">{t('job_titles.total_jobs')}</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
               <Briefcase className="h-8 w-8 text-muted-foreground" />
@@ -515,7 +519,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Cargos Ativos</p>
+                <p className="text-sm text-muted-foreground">{t('job_titles.active_jobs')}</p>
                 <p className="text-2xl font-bold text-green-600">{stats.active}</p>
               </div>
               <CheckCircle2 className="h-8 w-8 text-green-600" />
@@ -526,7 +530,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Cargos Inativos</p>
+                <p className="text-sm text-muted-foreground">{t('job_titles.inactive_jobs')}</p>
                 <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
               </div>
               <XCircle className="h-8 w-8 text-red-600" />
@@ -537,7 +541,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Famílias</p>
+                <p className="text-sm text-muted-foreground">{t('job_titles.families')}</p>
                 <p className="text-2xl font-bold">{stats.families}</p>
               </div>
               <Building2 className="h-8 w-8 text-muted-foreground" />
@@ -551,21 +555,21 @@ export default function JobTitlesPage() {
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label>🔍 Buscar</Label>
+              <Label>🔍 {t('action.search')}</Label>
               <Input
-                placeholder="Título, código ou CBO..."
+                placeholder={t('job_titles.search_placeholder')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div>
-              <Label>📂 Família</Label>
+              <Label>📂 {t('job_titles.family')}</Label>
               <Select value={familyFilter} onValueChange={setFamilyFilter}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
                   {jobFamilies.map(family => (
                     <SelectItem key={family} value={family}>{family}</SelectItem>
                   ))}
@@ -573,13 +577,13 @@ export default function JobTitlesPage() {
               </Select>
             </div>
             <div>
-              <Label>🎚️ Grade</Label>
+              <Label>🎚️ {t('label.grade')}</Label>
               <Select value={gradeFilter} onValueChange={setGradeFilter}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
                   {uniqueGrades.map(grade => (
                     <SelectItem key={grade} value={grade}>{grade}</SelectItem>
                   ))}
@@ -587,19 +591,19 @@ export default function JobTitlesPage() {
               </Select>
             </div>
             <div>
-              <Label>🚦 Status</Label>
+              <Label>🚦 {t('job_titles.status')}</Label>
               <RadioGroup value={statusFilter} onValueChange={setStatusFilter} className="flex gap-4 mt-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="all" id="all" />
-                  <Label htmlFor="all" className="cursor-pointer">Todos</Label>
+                  <Label htmlFor="all" className="cursor-pointer">{t('common.all')}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="active" id="active" />
-                  <Label htmlFor="active" className="cursor-pointer">Ativos</Label>
+                  <Label htmlFor="active" className="cursor-pointer">{t('job_titles.active_plural')}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="inactive" id="inactive" />
-                  <Label htmlFor="inactive" className="cursor-pointer">Inativos</Label>
+                  <Label htmlFor="inactive" className="cursor-pointer">{t('job_titles.inactive_plural')}</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -611,15 +615,15 @@ export default function JobTitlesPage() {
       <div className="flex flex-wrap gap-3">
         <Button onClick={handleAddNew}>
           <Plus className="w-4 h-4 mr-2" />
-          Novo Cargo
+          {t('job_titles.new_job')}
         </Button>
         <Button variant="outline" onClick={() => setBulkImportOpen(true)}>
           <Upload className="w-4 h-4 mr-2" />
-          Importação em Massa
+          {t('job_titles.bulk_import')}
         </Button>
         <Button variant="outline" onClick={() => setFamilyManagerOpen(true)}>
           <Settings className="w-4 h-4 mr-2" />
-          Gerenciar Famílias
+          {t('job_titles.manage_families')}
         </Button>
         <Button 
           variant="outline" 
@@ -627,16 +631,16 @@ export default function JobTitlesPage() {
           className="text-purple-700 border-purple-300 hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900"
         >
           <Zap className="w-4 h-4 mr-2" />
-          Atribuir Pontos por Grade
+          {t('job_titles.assign_points')}
         </Button>
       </div>
 
       {/* Grouping Tabs */}
       <Tabs value={groupBy} onValueChange={(v) => setGroupBy(v as any)}>
         <TabsList>
-          <TabsTrigger value="family">📂 Por Família</TabsTrigger>
-          <TabsTrigger value="alphabetic">🔤 Alfabético</TabsTrigger>
-          <TabsTrigger value="grade">📊 Por Grade</TabsTrigger>
+          <TabsTrigger value="family">📂 {t('job_titles.by_family')}</TabsTrigger>
+          <TabsTrigger value="alphabetic">🔤 {t('job_titles.alphabetic')}</TabsTrigger>
+          <TabsTrigger value="grade">📊 {t('job_titles.by_grade')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={groupBy} className="space-y-4">
@@ -832,32 +836,32 @@ export default function JobTitlesPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Família</TableHead>
-                        <TableHead>Código</TableHead>
+                        <TableHead>{t('job_titles.family')}</TableHead>
+                        <TableHead>{t('job_titles.code')}</TableHead>
                         <TableHead className="cursor-pointer" onClick={() => handleSort("title")}>
-                          Título do Cargo
+                          {t('job_titles.job_title')}
                           {sortField === "title" && (
                             sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
                           )}
                         </TableHead>
                         <TableHead className="cursor-pointer text-center" onClick={() => handleSort("grade")}>
-                          Grade
+                          {t('label.grade')}
                           {sortField === "grade" && (
                             sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
                           )}
                         </TableHead>
-                        <TableHead className="text-center">Pontos</TableHead>
+                        <TableHead className="text-center">{t('job_titles.points')}</TableHead>
                         <TableHead className="whitespace-nowrap">CBO</TableHead>
-                        <TableHead>Faixa Salarial</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Ações</TableHead>
+                        <TableHead>{t('job_titles.salary_range')}</TableHead>
+                        <TableHead>{t('job_titles.status')}</TableHead>
+                        <TableHead>{t('job_titles.actions')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {jobs.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={9} className="text-center text-muted-foreground">
-                            Nenhum cargo encontrado
+                            {t('job_titles.no_jobs_found')}
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -889,16 +893,13 @@ export default function JobTitlesPage() {
       <AlertDialog open={!!inactivateAlert} onOpenChange={() => setInactivateAlert(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Inativar Cargo</AlertDialogTitle>
+            <AlertDialogTitle>{t('job_titles.inactivate_job')}</AlertDialogTitle>
             <AlertDialogDescription>
-              ⚠️ Este cargo possui <strong>{inactivateAlert?.linkedCount} colaborador(es)</strong> vinculado(s). 
-              Deseja realmente inativar o cargo <strong>"{inactivateAlert?.title}"</strong>?
-              <br /><br />
-              Os colaboradores continuarão vinculados ao cargo, mas ele não aparecerá mais para novos cadastros.
+              ⚠️ {t('job_titles.inactivate_warning', { count: inactivateAlert?.linkedCount || 0, title: inactivateAlert?.title || '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => {
                 if (inactivateAlert) {
@@ -907,7 +908,7 @@ export default function JobTitlesPage() {
                 }
               }}
             >
-              Inativar
+              {t('job_titles.inactivate')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
