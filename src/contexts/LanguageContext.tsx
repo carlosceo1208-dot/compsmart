@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { SUPPORTED_LANGUAGES, SupportedLanguage } from '@/lib/i18n';
+import i18n, { SUPPORTED_LANGUAGES, SupportedLanguage } from '@/lib/i18n';
 
 interface LanguageContextType {
   currentLanguage: SupportedLanguage;
@@ -15,8 +14,19 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const STORAGE_KEY = 'compsmart-language';
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { i18n } = useTranslation();
+  const [currentLang, setCurrentLang] = useState<SupportedLanguage>(i18n.language as SupportedLanguage);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Sync state with i18n language changes
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+      setCurrentLang(lng as SupportedLanguage);
+    };
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -137,7 +147,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [i18n, isAuthenticated, userId]);
 
   const value: LanguageContextType = {
-    currentLanguage: i18n.language as SupportedLanguage,
+    currentLanguage: currentLang,
     changeLanguage,
     isLoading,
     supportedLanguages: SUPPORTED_LANGUAGES,
