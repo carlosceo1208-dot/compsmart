@@ -13,6 +13,7 @@ import { Currency } from '@/types/economic';
 import { useState, useEffect } from 'react';
 import { formatCurrencyCustom } from '@/lib/formatters';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 interface EconomicIndicatorsProps {
   currency: Currency;
@@ -27,6 +28,7 @@ export const EconomicIndicators = ({
   showWithCharges, 
   onShowWithChargesChange 
 }: EconomicIndicatorsProps) => {
+  const { t } = useTranslation();
   const [inpcPeriod, setInpcPeriod] = useState<number>(12);
   const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   const [localCharges, setLocalCharges] = useState<string>('');
@@ -50,7 +52,7 @@ export const EconomicIndicators = ({
     
     setTimeout(() => {
       setIsManualRefreshing(false);
-      toast.success('Dados atualizados com sucesso!');
+      toast.success(t('economic.updated_success'));
     }, 800);
   };
 
@@ -70,7 +72,7 @@ export const EconomicIndicators = ({
     <Card className="border-2 border-primary/30 bg-gradient-to-br from-background via-primary/3 to-primary/8 shadow-lg hover:shadow-primary transition-all duration-300">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-bold text-foreground">Indicadores Econômicos</h3>
+          <h3 className="text-base font-bold text-foreground">{t('economic.title')}</h3>
           <Button
             variant="outline"
             size="sm"
@@ -79,7 +81,7 @@ export const EconomicIndicators = ({
             className="bg-primary/10 border-primary/30 hover:bg-primary/20 hover:border-primary text-primary gap-2 shadow-sm h-8"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${isRefreshingAny ? 'animate-spin' : ''}`} />
-            <span className="text-xs font-medium">Atualizar</span>
+            <span className="text-xs font-medium">{t('economic.refresh')}</span>
           </Button>
         </div>
 
@@ -89,7 +91,7 @@ export const EconomicIndicators = ({
           <div className="space-y-1 p-3 rounded-lg bg-background/50 border border-border/50">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
               <DollarSign className="h-4 w-4" />
-              <span>Dólar (USD/BRL)</span>
+              <span>{t('economic.usd_brl')}</span>
             </div>
             {!economicData.usd && economicData.isLoading ? (
               <Skeleton className="h-7 w-20" />
@@ -113,7 +115,7 @@ export const EconomicIndicators = ({
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-amber-600">⚠️ Indisponível</p>
+              <p className="text-xs text-amber-600">⚠️ {t('economic.unavailable')}</p>
             )}
           </div>
 
@@ -129,14 +131,14 @@ export const EconomicIndicators = ({
               <div>
                 <p className="text-xl font-bold">{(economicData.inpc.monthly ?? 0).toFixed(2)}%</p>
                 <p className="text-xs text-muted-foreground">
-                  Acum: <span className="font-semibold">{(economicData.inpc.accumulated ?? 0).toFixed(2)}%</span>
+                  {t('economic.accumulated')}: <span className="font-semibold">{(economicData.inpc.accumulated ?? 0).toFixed(2)}%</span>
                 </p>
                 <p className="text-[10px] text-muted-foreground">
                   {economicData.inpc.referenceMonth}
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-amber-600">⚠️ Indisponível</p>
+              <p className="text-xs text-amber-600">⚠️ {t('economic.unavailable')}</p>
             )}
           </div>
 
@@ -144,16 +146,16 @@ export const EconomicIndicators = ({
           <div className="space-y-1 p-3 rounded-lg bg-background/50 border border-border/50">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
               <Wallet className="h-4 w-4" />
-              <span>Salário Mínimo</span>
+              <span>{t('economic.minimum_wage')}</span>
             </div>
             {economicData.minimumWage ? (
               <div>
                 <p className="text-xl font-bold">{formatCurrencyCustom(economicData.minimumWage.value, 'BRL')}</p>
                 <p className="text-xs text-muted-foreground">
-                  Vigência: {economicData.minimumWage.year}
+                  {t('economic.validity')}: {economicData.minimumWage.year}
                 </p>
                 <p className="text-[10px] text-muted-foreground">
-                  Desde {economicData.minimumWage.effectiveDate}
+                  {t('economic.since')} {economicData.minimumWage.effectiveDate}
                 </p>
               </div>
             ) : (
@@ -164,7 +166,7 @@ export const EconomicIndicators = ({
           {/* Configurações */}
           <div className="space-y-2 p-3 rounded-lg bg-background/50 border border-border/50">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-              <span>Configurações</span>
+              <span>{t('economic.settings')}</span>
             </div>
             <div className="space-y-2">
               <Select value={currency} onValueChange={(value) => onCurrencyChange(value as Currency)}>
@@ -196,22 +198,22 @@ export const EconomicIndicators = ({
         <div className="border-t border-border/50 pt-4">
           <div className="flex items-center gap-2 mb-3">
             <Building2 className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">Encargos Sociais</span>
+            <span className="text-sm font-semibold text-foreground">{t('economic.social_charges')}</span>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent side="right" className="max-w-[280px]">
-                  <p className="text-xs font-semibold mb-1">Valores típicos de encargos:</p>
+                  <p className="text-xs font-semibold mb-1">{t('economic.typical_values')}:</p>
                   <ul className="text-xs space-y-0.5">
-                    <li>• Simples Nacional: 27-31%</li>
-                    <li>• Lucro Presumido: 35-40%</li>
-                    <li>• Lucro Real: 60-80%</li>
-                    <li>• CLT Completo: 70-100%+</li>
+                    <li>• {t('economic.simples_nacional')}: 27-31%</li>
+                    <li>• {t('economic.lucro_presumido')}: 35-40%</li>
+                    <li>• {t('economic.lucro_real')}: 60-80%</li>
+                    <li>• {t('economic.clt_full')}: 70-100%+</li>
                   </ul>
                   <p className="text-xs mt-2 text-muted-foreground">
-                    Inclui INSS, FGTS, 13º, Férias, etc.
+                    {t('economic.includes')}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -222,7 +224,7 @@ export const EconomicIndicators = ({
             {/* Input de percentual */}
             <div className="flex items-center gap-2">
               <Label htmlFor="charges" className="text-xs text-muted-foreground whitespace-nowrap">
-                Percentual:
+                {t('economic.percentage')}:
               </Label>
               <div className="flex items-center gap-1">
                 <Input
@@ -246,7 +248,7 @@ export const EconomicIndicators = ({
                   disabled={isUpdating}
                   className="h-8 text-xs"
                 >
-                  {isUpdating ? 'Salvando...' : 'Salvar'}
+                  {isUpdating ? t('economic.saving') : t('common.save')}
                 </Button>
               )}
             </div>
@@ -254,7 +256,7 @@ export const EconomicIndicators = ({
             {/* Toggle Com/Sem Encargos */}
             <div className="flex items-center gap-2 ml-auto">
               <Label htmlFor="with-charges" className="text-xs text-muted-foreground">
-                Sem Encargos
+                {t('economic.without_charges')}
               </Label>
               <Switch
                 id="with-charges"
@@ -263,7 +265,7 @@ export const EconomicIndicators = ({
                 disabled={socialChargesPercentage === 0}
               />
               <Label htmlFor="with-charges" className="text-xs font-medium">
-                Com Encargos
+                {t('economic.with_charges')}
               </Label>
               {showWithCharges && socialChargesPercentage > 0 && (
                 <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
@@ -275,7 +277,7 @@ export const EconomicIndicators = ({
           
           {socialChargesPercentage === 0 && (
             <p className="text-[10px] text-muted-foreground mt-2">
-              Configure o percentual de encargos para habilitar a visualização "Com Encargos"
+              {t('economic.configure_percentage')}
             </p>
           )}
         </div>

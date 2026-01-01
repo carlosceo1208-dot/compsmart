@@ -28,9 +28,11 @@ import { ptBR } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { useTranslation } from 'react-i18next';
 
 const BudgetApprovals = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [fiscalYear, setFiscalYear] = useState(2026);
   const [statusFilter, setStatusFilter] = useState('submitted');
   const [unitFilter, setUnitFilter] = useState<string>('all');
@@ -169,9 +171,9 @@ const BudgetApprovals = () => {
       
       const fileName = `aprovacoes_orcamento_${fiscalYear}_${statusFilter}_${new Date().toISOString().split('T')[0]}.xlsx`;
       XLSX.writeFile(wb, fileName);
-      toast.success('Relatório Excel exportado com sucesso!');
+      toast.success(t('budget_history.export_success'));
     } catch (error) {
-      toast.error('Erro ao exportar relatório Excel');
+      toast.error(t('budget_history.export_error'));
       console.error(error);
     }
   };
@@ -210,9 +212,9 @@ const BudgetApprovals = () => {
       
       const fileName = `aprovacoes_orcamento_${fiscalYear}_${statusFilter}_${new Date().toISOString().split('T')[0]}.pdf`;
       doc.save(fileName);
-      toast.success('Relatório PDF exportado com sucesso!');
+      toast.success(t('budget_history.export_success'));
     } catch (error) {
-      toast.error('Erro ao exportar relatório PDF');
+      toast.error(t('budget_history.export_error'));
       console.error(error);
     }
   };
@@ -222,9 +224,9 @@ const BudgetApprovals = () => {
       <div className="p-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Acesso Negado</AlertTitle>
+          <AlertTitle>{t('budget_approvals.access_denied')}</AlertTitle>
           <AlertDescription>
-            Apenas RH Managers e Admins podem acessar aprovações de orçamento.
+            {t('budget_approvals.access_denied_message')}
           </AlertDescription>
         </Alert>
       </div>
@@ -243,12 +245,12 @@ const BudgetApprovals = () => {
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
+            {t('budget_planning.back_dashboard')}
           </Button>
           <div>
-            <h1 className="text-3xl font-bold mb-2">Aprovações de Orçamento</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('budget_approvals.title')}</h1>
             <p className="text-muted-foreground">
-              Revise e aprove os orçamentos submetidos pelas unidades
+              {t('budget_approvals.subtitle')}
             </p>
           </div>
         </div>
@@ -256,7 +258,7 @@ const BudgetApprovals = () => {
         {userData?.isAdmin && (
           <Button variant="outline" onClick={() => setShowApproversConfig(true)}>
             <UserCog className="w-4 h-4 mr-2" />
-            Configurar Aprovadores
+            {t('budget_approvals.configure_approvers')}
           </Button>
         )}
       </div>
@@ -266,13 +268,13 @@ const BudgetApprovals = () => {
         <Alert className={`mb-4 ${deadlineData.isOverdue ? 'bg-red-50 dark:bg-red-950/30 border-red-300' : 'bg-amber-50 dark:bg-amber-950/30 border-amber-300'}`}>
           <AlertTriangle className={`h-4 w-4 ${deadlineData.isOverdue ? 'text-red-600' : 'text-amber-600'}`} />
           <AlertTitle className={deadlineData.isOverdue ? 'text-red-800 dark:text-red-200' : 'text-amber-800 dark:text-amber-200'}>
-            🚨 Prazo de Submissão {deadlineData.isOverdue ? 'VENCIDO!' : 'Crítico!'}
+            🚨 {deadlineData.isOverdue ? t('budget_approvals.deadline_overdue') : t('budget_approvals.deadline_critical')}
           </AlertTitle>
           <AlertDescription className={deadlineData.isOverdue ? 'text-red-700 dark:text-red-300' : 'text-amber-700 dark:text-amber-300'}>
             {deadlineData.isOverdue 
-              ? `O prazo venceu há ${Math.abs(deadlineData.daysRemaining)} dia(s)!`
-              : `Faltam apenas ${deadlineData.daysRemaining} dia(s) para o prazo.`}
-            {' '}<strong>{statsData.totalNotSubmitted} unidade(s)</strong> ainda não enviaram seus orçamentos.
+              ? t('budget_approvals.deadline_warning', { days: Math.abs(deadlineData.daysRemaining) })
+              : t('budget_approvals.days_remaining', { days: deadlineData.daysRemaining })}
+            {' '}<strong>{t('budget_approvals.units_pending', { count: statsData.totalNotSubmitted })}</strong>
           </AlertDescription>
         </Alert>
       )}
@@ -281,9 +283,9 @@ const BudgetApprovals = () => {
       {totalPending > 0 && (
         <Alert className="mb-4 bg-yellow-50 dark:bg-yellow-900/10 border-yellow-200">
           <Clock className="h-4 w-4 text-yellow-600" />
-          <AlertTitle>⚠️ Submissões Pendentes Requerem Atenção</AlertTitle>
+          <AlertTitle>⚠️ {t('budget_approvals.pending_alert')}</AlertTitle>
           <AlertDescription>
-            Há <strong>{totalPending}</strong> orçamento(s) aguardando sua revisão e aprovação.
+            {t('budget_approvals.pending_count', { count: totalPending })}
           </AlertDescription>
         </Alert>
       )}
@@ -294,10 +296,10 @@ const BudgetApprovals = () => {
         <Card className={`cursor-pointer transition-all hover:shadow-md ${statsData.totalNotSubmitted > 0 ? 'border-red-200 bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20' : ''}`}
           onClick={() => setIsUnitsListOpen(!isUnitsListOpen)}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Não Submetido</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('budget_approvals.not_submitted')}</CardTitle>
             <div className="flex items-center gap-2">
               {deadlineData.isUrgent && statsData.totalNotSubmitted > 0 && (
-                <Badge variant="destructive" className="text-xs animate-pulse">Urgente</Badge>
+                <Badge variant="destructive" className="text-xs animate-pulse">{t('common.urgent')}</Badge>
               )}
               <AlertTriangle className={`h-4 w-4 ${statsData.totalNotSubmitted > 0 ? 'text-red-600' : 'text-muted-foreground'}`} />
             </div>
@@ -306,10 +308,10 @@ const BudgetApprovals = () => {
             <div className={`text-2xl font-bold ${statsData.totalNotSubmitted > 0 ? 'text-red-600' : ''}`}>
               {deadlineLoading ? <Skeleton className="h-8 w-12" /> : statsData.totalNotSubmitted}
             </div>
-            <p className="text-xs text-muted-foreground">Unidades sem orçamento</p>
+            <p className="text-xs text-muted-foreground">{t('budget_approvals.units_without_budget')}</p>
             {statsData.totalNotSubmitted > 0 && (
               <p className="text-xs text-red-600 mt-1 flex items-center gap-1">
-                <ChevronDown className="h-3 w-3" /> Clique para ver
+                <ChevronDown className="h-3 w-3" /> {t('common.click_to_see')}
               </p>
             )}
           </CardContent>
@@ -318,31 +320,31 @@ const BudgetApprovals = () => {
         {/* Card Pendentes */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pendentes</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('budget_approvals.pending')}</CardTitle>
             <Clock className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalPending}</div>
-            <p className="text-xs text-muted-foreground">Aguardando revisão</p>
+            <p className="text-xs text-muted-foreground">{t('budget_approvals.awaiting_review')}</p>
           </CardContent>
         </Card>
 
         {/* Card Aprovados */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Aprovados</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('budget_approvals.approved')}</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalApproved}</div>
-            <p className="text-xs text-muted-foreground">Orçamentos aprovados</p>
+            <p className="text-xs text-muted-foreground">{t('budget_approvals.approved_budgets')}</p>
           </CardContent>
         </Card>
 
         {/* Card Total Aprovado */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Aprovado</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('budget_approvals.total_approved')}</CardTitle>
             <FileCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -350,7 +352,7 @@ const BudgetApprovals = () => {
               {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact' })
                 .format(totalBudget)}
             </div>
-            <p className="text-xs text-muted-foreground">Valor anual consolidado</p>
+            <p className="text-xs text-muted-foreground">{t('budget_approvals.annual_consolidated')}</p>
           </CardContent>
         </Card>
       </div>
@@ -363,10 +365,10 @@ const BudgetApprovals = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-red-600" />
-                  Unidades sem Orçamento Submetido
+                  {t('budget_approvals.units_without_submission')}
                 </CardTitle>
                 <CardDescription>
-                  {statsData.totalNotSubmitted} de {statsData.totalUnits} unidades ainda não submeteram
+                  {t('budget_approvals.units_count', { submitted: statsData.totalNotSubmitted, total: statsData.totalUnits })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -381,7 +383,7 @@ const BudgetApprovals = () => {
                         {unit.managerName ? (
                           <span>{unit.managerName}</span>
                         ) : (
-                          <span className="text-amber-600">Sem gestor definido</span>
+                          <span className="text-amber-600">{t('budget_approvals.no_manager')}</span>
                         )}
                       </div>
                     </div>
@@ -399,7 +401,7 @@ const BudgetApprovals = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 text-purple-600" />
-              <CardTitle className="text-lg">Data Limite para Submissão - Ano Fiscal {fiscalYear}</CardTitle>
+              <CardTitle className="text-lg">{t('budget_approvals.deadline_title')} - {t('budget_planning.fiscal_year')} {fiscalYear}</CardTitle>
             </div>
             {statsData.totalNotSubmitted > 0 && (
               <Button 
