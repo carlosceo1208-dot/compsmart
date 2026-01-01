@@ -46,13 +46,16 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       try {
         const { data: profile } = await supabase
           .from('profiles')
-          .select('preferred_language')
+          .select('*')
           .eq('id', userId)
           .single();
 
-        if (profile?.preferred_language && profile.preferred_language !== i18n.language) {
-          await i18n.changeLanguage(profile.preferred_language);
-          localStorage.setItem(STORAGE_KEY, profile.preferred_language);
+        // Cast to access new column that may not be in types yet
+        const preferredLanguage = (profile as any)?.preferred_language as string | null;
+        
+        if (preferredLanguage && preferredLanguage !== i18n.language) {
+          await i18n.changeLanguage(preferredLanguage);
+          localStorage.setItem(STORAGE_KEY, preferredLanguage);
         }
       } catch (error) {
         console.error('Error loading user language preference:', error);
@@ -80,21 +83,27 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // Check if user has a preference set
         const { data: userProfile } = await supabase
           .from('profiles')
-          .select('preferred_language')
+          .select('*')
           .eq('id', userId)
           .single();
 
+        // Cast to access new column
+        const userPreferredLang = (userProfile as any)?.preferred_language as string | null;
+
         // If user has no preference, use company default
-        if (!userProfile?.preferred_language) {
+        if (!userPreferredLang) {
           const { data: company } = await supabase
             .from('organizational_structure')
-            .select('default_language')
+            .select('*')
             .eq('id', profile.root_company_id)
             .single();
 
-          if (company?.default_language) {
-            await i18n.changeLanguage(company.default_language);
-            localStorage.setItem(STORAGE_KEY, company.default_language);
+          // Cast to access new column
+          const companyDefaultLang = (company as any)?.default_language as string | null;
+
+          if (companyDefaultLang) {
+            await i18n.changeLanguage(companyDefaultLang);
+            localStorage.setItem(STORAGE_KEY, companyDefaultLang);
           }
         }
       } catch (error) {
@@ -114,9 +123,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
       // If authenticated, also save to database
       if (isAuthenticated && userId) {
+        // Use raw update to handle new column not in types
         await supabase
           .from('profiles')
-          .update({ preferred_language: lang })
+          .update({ preferred_language: lang } as any)
           .eq('id', userId);
       }
     } catch (error) {

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { Badge } from "@/components/ui/badge";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -125,6 +126,9 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 </Button>
               </>
             )}
+            
+            {/* Language Selector */}
+            <LanguageSelector />
           </nav>
 
           {/* Mobile Menu Button */}
