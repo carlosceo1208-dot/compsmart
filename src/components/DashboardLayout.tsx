@@ -322,13 +322,13 @@ export const DashboardLayout = () => {
 
             {/* Logo CompSmart - Always Visible */}
               <Link to="/dashboard" className="flex items-center hover:opacity-90 transition-opacity">
-                <img src={compsmartLogo} alt="CompSmart Logo" className="h-14 w-auto object-contain" />
+                <img src={compsmartLogo} alt="CompSmart Logo" className="h-10 md:h-12 w-auto object-contain" />
               </Link>
           </div>
 
-          {/* Center: Tablet & Desktop Navigation - Emerald Buttons */}
-          {/* md: shows compact icons only, lg: shows full labels */}
-          <nav className="hidden md:flex items-center gap-1 justify-center">
+          {/* Center: Desktop Navigation - Emerald Buttons */}
+          {/* xl: shows full labels, lg: shows icons only, hidden below lg */}
+          <nav className="hidden lg:flex items-center gap-1 justify-center flex-1 min-w-0">
             {navItems.map((item) => (
               <Button
                 key={item.path}
@@ -359,15 +359,15 @@ export const DashboardLayout = () => {
 
           {/* Right: Company Name + Actions */}
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
-            {/* Company Indicator - Enhanced badge for all users */}
+            {/* Company Indicator - Enhanced badge for all users - only on xl+ */}
             {companyName && (
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
                 {companyLogo ? (
                   <img src={companyLogo} alt={companyName} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
                   <span className="text-emerald-600 dark:text-emerald-400 text-xs">🏢</span>
                 )}
-                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 max-w-[150px] truncate">
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300 max-w-[120px] truncate">
                   {companyName}
                 </span>
                 {activeCompany?.planName && (
@@ -378,9 +378,9 @@ export const DashboardLayout = () => {
               </div>
             )}
 
-            {/* Mobile Company Badge */}
+            {/* Mobile/Tablet Company Badge */}
             {companyName && (
-              <div className="md:hidden flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/50 rounded-full">
+              <div className="xl:hidden flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/50 rounded-full">
                 {companyLogo ? (
                   <img src={companyLogo} alt={companyName} className="h-4 w-4 rounded-full object-cover" />
                 ) : (
@@ -389,10 +389,15 @@ export const DashboardLayout = () => {
               </div>
             )}
             
-            <CompanySwitcher />
-            <HeaderNotifications />
-            <LanguageSelector />
-            <ThemeToggle />
+            {/* These items hidden on smaller screens */}
+            <div className="hidden xl:flex items-center gap-1">
+              <CompanySwitcher />
+              <HeaderNotifications />
+            </div>
+            
+            {/* Essential items - ALWAYS visible */}
+            <LanguageSelector className="flex-shrink-0" />
+            <ThemeToggle className="flex-shrink-0" />
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
