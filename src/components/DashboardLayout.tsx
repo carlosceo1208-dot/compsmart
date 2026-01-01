@@ -22,6 +22,7 @@ import { SecurityFooter } from "@/components/SecurityFooter";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { CompanySwitcher } from "@/components/dashboard/CompanySwitcher";
 import { HeaderNotifications } from "@/components/dashboard/HeaderNotifications";
 import { useCompanyContext } from "@/contexts/CompanyContext";
@@ -390,6 +391,7 @@ export const DashboardLayout = () => {
             
             <CompanySwitcher />
             <HeaderNotifications />
+            <LanguageSelector />
             <ThemeToggle />
 
             <DropdownMenu>

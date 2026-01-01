@@ -1906,6 +1906,7 @@ export type Database = {
           created_at: string
           custom_annual_price: number | null
           custom_monthly_price: number | null
+          default_language: string | null
           description: string | null
           fantasy_name: string | null
           id: string
@@ -1936,6 +1937,7 @@ export type Database = {
           created_at?: string
           custom_annual_price?: number | null
           custom_monthly_price?: number | null
+          default_language?: string | null
           description?: string | null
           fantasy_name?: string | null
           id?: string
@@ -1966,6 +1968,7 @@ export type Database = {
           created_at?: string
           custom_annual_price?: number | null
           custom_monthly_price?: number | null
+          default_language?: string | null
           description?: string | null
           fantasy_name?: string | null
           id?: string
@@ -2101,6 +2104,7 @@ export type Database = {
           manager_id: string | null
           performance_rating: number | null
           phone: string | null
+          preferred_language: string | null
           root_company_id: string | null
           salary: number | null
           salary_range_percentage: number | null
@@ -2130,6 +2134,7 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
+          preferred_language?: string | null
           root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
@@ -2159,6 +2164,7 @@ export type Database = {
           manager_id?: string | null
           performance_rating?: number | null
           phone?: string | null
+          preferred_language?: string | null
           root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
