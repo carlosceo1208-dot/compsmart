@@ -28,7 +28,7 @@ export const LanguageSelector = ({ variant = 'compact', className }: LanguageSel
             variant={currentLanguage === lang.code ? 'default' : 'outline'}
             className={cn(
               'w-full justify-start gap-3',
-              currentLanguage === lang.code && 'bg-emerald-500 hover:bg-emerald-600'
+              currentLanguage === lang.code && 'bg-blue-600 hover:bg-blue-700'
             )}
             onClick={() => changeLanguage(lang.code)}
             disabled={isLoading}
@@ -51,7 +51,7 @@ export const LanguageSelector = ({ variant = 'compact', className }: LanguageSel
           variant="ghost"
           size="icon"
           className={cn(
-            'h-8 w-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/25 ring-2 ring-emerald-300 dark:ring-emerald-700 transition-all duration-300 hover:scale-105 flex-shrink-0',
+            'h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/25 ring-2 ring-blue-400 dark:ring-blue-600 transition-all duration-300 hover:scale-105 flex-shrink-0',
             className
           )}
           disabled={isLoading}
@@ -61,20 +61,20 @@ export const LanguageSelector = ({ variant = 'compact', className }: LanguageSel
           <span className="sr-only">Change language</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-800 border-emerald-200 dark:border-emerald-700 shadow-xl z-50">
+      <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-800 border-blue-200 dark:border-blue-600 shadow-xl z-50">
         {supportedLanguages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => changeLanguage(lang.code)}
             className={cn(
-              'flex items-center gap-3 cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-900/30',
-              currentLanguage === lang.code && 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300'
+              'flex items-center gap-3 cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30',
+              currentLanguage === lang.code && 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
             )}
           >
             <span className="text-lg">{lang.flag}</span>
             <span className="flex-1">{lang.name}</span>
             {currentLanguage === lang.code && (
-              <Check className="h-4 w-4 text-emerald-600" />
+              <Check className="h-4 w-4 text-blue-600" />
             )}
           </DropdownMenuItem>
         ))}

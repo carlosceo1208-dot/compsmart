@@ -85,7 +85,12 @@
     "cta": "Iniciar Prueba Gratuita de 14 Días",
     "watch_video": "Mira CompSmart en acción",
     "login": "Ingresar",
-    "signup": "Registrarse"
+    "signup": "Registrarse",
+    "features": "Funcionalidades",
+    "pricing": "Precios",
+    "faq": "FAQ",
+    "start_free": "Comenzar Gratis",
+    "go_to_dashboard": "Ir al Dashboard"
   },
   "kpi": {
     "main": "KPIs Principales",

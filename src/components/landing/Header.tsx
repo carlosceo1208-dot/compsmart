@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, LayoutDashboard, LogOut, Rocket } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export const Header = ({ isLoggedIn = false }: HeaderProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -73,21 +75,21 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               onClick={() => scrollToSection("solution")} 
               className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-200 group"
             >
-              Funcionalidades
+              {t('landing.features')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
             </button>
             <button 
               onClick={() => scrollToSection("pricing")} 
               className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-200 group"
             >
-              Preços
+              {t('landing.pricing')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
             </button>
             <button 
               onClick={() => scrollToSection("faq")} 
               className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-200 group"
             >
-              FAQ
+              {t('landing.faq')}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
             </button>
             
@@ -100,11 +102,11 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
                   className="border-primary/30 hover:border-primary hover:bg-primary/5"
                 >
                   <LayoutDashboard className="h-4 w-4 mr-2" />
-                  Ir para Dashboard
+                  {t('landing.go_to_dashboard')}
                 </Button>
                 <Button variant="ghost" onClick={handleLogout} size="sm">
                   <LogOut className="h-4 w-4 mr-2" />
-                  Sair
+                  {t('menu.logout')}
                 </Button>
               </>
             ) : (
@@ -115,14 +117,14 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
                   size="sm"
                   className="border-primary/30 hover:border-primary hover:bg-primary/5 font-medium"
                 >
-                  Entrar
+                  {t('landing.login')}
                 </Button>
                 <Button 
                   onClick={() => navigate("/auth")} 
                   size="sm" 
                   className="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-300"
                 >
-                  Começar Grátis
+                  {t('landing.start_free')}
                 </Button>
               </>
             )}
@@ -155,19 +157,19 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               onClick={() => scrollToSection("solution")} 
               className="text-left text-sm font-medium text-muted-foreground hover:text-primary py-2 border-b border-border/50"
             >
-              Funcionalidades
+              {t('landing.features')}
             </button>
             <button 
               onClick={() => scrollToSection("pricing")} 
               className="text-left text-sm font-medium text-muted-foreground hover:text-primary py-2 border-b border-border/50"
             >
-              Preços
+              {t('landing.pricing')}
             </button>
             <button 
               onClick={() => scrollToSection("faq")} 
               className="text-left text-sm font-medium text-muted-foreground hover:text-primary py-2 border-b border-border/50"
             >
-              FAQ
+              {t('landing.faq')}
             </button>
             
             <div className="flex flex-col gap-2 mt-2">
@@ -175,23 +177,23 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
                 <>
                   <Button variant="outline" onClick={() => navigate("/dashboard")} className="w-full">
                     <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Ir para Dashboard
+                    {t('landing.go_to_dashboard')}
                   </Button>
                   <Button variant="ghost" onClick={handleLogout} className="w-full">
                     <LogOut className="h-4 w-4 mr-2" />
-                    Sair
+                    {t('menu.logout')}
                   </Button>
                 </>
               ) : (
                 <>
                   <Button variant="outline" onClick={() => navigate("/auth")} className="w-full">
-                    Entrar
+                    {t('landing.login')}
                   </Button>
                   <Button 
                     onClick={() => navigate("/auth")} 
                     className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-semibold shadow-lg shadow-emerald-500/25"
                   >
-                    Começar Grátis
+                    {t('landing.start_free')}
                   </Button>
                 </>
               )}
