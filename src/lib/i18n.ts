@@ -8,7 +8,7 @@ import enUS from '@/locales/en-US.json';
 
 export const SUPPORTED_LANGUAGES = [
   { code: 'pt-BR', name: 'Português (Brasil)', flag: '🇧🇷' },
-  { code: 'es-LATAM', name: 'Español (Latinoamérica)', flag: '🇲🇽' },
+  { code: 'es-LATAM', name: 'Español (LATAM)', flag: '🇪🇸' },
   { code: 'en-US', name: 'English (US)', flag: '🇺🇸' },
 ] as const;
 

@@ -234,7 +234,7 @@ export const DashboardLayout = () => {
 
       {/* Header - Premium Emerald Gradient Style */}
       <header className="sticky top-0 z-50 w-full border-b border-emerald-200/60 dark:border-emerald-800/40 bg-gradient-to-r from-emerald-50/80 via-white to-emerald-50/80 dark:from-emerald-950/50 dark:via-slate-900 dark:to-emerald-950/50 shadow-sm">
-        <div className="container flex h-16 items-center justify-between px-4 gap-4">
+        <div className="w-full flex h-16 items-center justify-between px-2 md:px-4 gap-2 md:gap-4 max-w-none">
           {/* Left: Mobile Menu + Logo CompSmart */}
           <div className="flex items-center gap-3 flex-shrink-0">
             {/* Mobile Hamburger Menu */}
@@ -358,10 +358,10 @@ export const DashboardLayout = () => {
           </nav>
 
           {/* Right: Company Name + Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             {/* Company Indicator - Enhanced badge for all users */}
             {companyName && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
                 {companyLogo ? (
                   <img src={companyLogo} alt={companyName} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
