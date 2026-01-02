@@ -31,28 +31,27 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
   const { data: budgetThreshold } = useBudgetThreshold();
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  // Priorizar exibição do ano atual aprovado
   const isApproved = data?.hasCurrentYearApproved || data?.submissionStatus === 'approved';
-  const displayYear = data?.hasCurrentYearApproved ? data?.currentYear : data?.projectedYear;
 
-  // Valores separados convertidos para moeda selecionada
+  // Valores de 2025 (baseline) convertidos
+  const previousFixed = data ? convert(data.previousFixedSalary, 'BRL', currency) : 0;
+  const previousVariable = data ? convert(data.previousVariableSalary, 'BRL', currency) : 0;
+  const previousBenefits = data ? convert(data.previousBenefits, 'BRL', currency) : 0;
+  const previousTotal = data ? convert(data.previousTotal, 'BRL', currency) : 0;
+  
+  // Valores de 2026 (aprovado) convertidos
   const currentFixed = data ? convert(data.currentFixedSalary, 'BRL', currency) : 0;
   const currentVariable = data ? convert(data.currentVariableSalary, 'BRL', currency) : 0;
   const currentBenefits = data ? convert(data.currentBenefits, 'BRL', currency) : 0;
   const currentTotal = data ? convert(data.currentTotal, 'BRL', currency) : 0;
-  
-  const projectedFixed = data ? convert(data.projectedFixedSalary, 'BRL', currency) : 0;
-  const projectedVariable = data ? convert(data.projectedVariableSalary, 'BRL', currency) : 0;
-  const projectedBenefits = data ? convert(data.projectedBenefits, 'BRL', currency) : 0;
-  const projectedTotal = data ? convert(data.projectedTotal, 'BRL', currency) : 0;
 
   const adjustmentCost = data?.approvedAdjustment ? convert(data.approvedAdjustment.annualCost, 'BRL', currency) : 0;
 
-  // Usar variações calculadas pelo hook em base comparável (ano vs ano)
+  // Variações 2025 vs 2026
   const fixedVariance = data?.fixedVariancePercent || 0;
   const variableVariance = data?.variableVariancePercent || 0;
   const benefitsVariance = data?.benefitsVariancePercent || 0;
-  const totalVariance = data?.salaryVariancePercent || 0;
+  const totalVariance = data?.totalVariancePercent || 0;
 
   const getStatusBadge = () => {
     if (!data?.submissionStatus) return null;
@@ -102,27 +101,27 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
     // Título
     doc.setFontSize(18);
     if (isApproved) {
-      doc.setTextColor(34, 139, 34); // Verde
-      doc.text(`✓ Orçamento Aprovado ${data.projectedYear}`, 20, 20);
+      doc.setTextColor(34, 139, 34);
+      doc.text(`✓ Orçamento Aprovado ${data.currentYear}`, 20, 20);
     } else {
       doc.setTextColor(0, 0, 0);
-      doc.text(`Planejamento Orçamentário ${data.projectedYear}`, 20, 20);
+      doc.text(`Planejamento Orçamentário ${data.currentYear}`, 20, 20);
     }
     
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Comparativo ${data.currentYear} vs ${data.projectedYear}`, 20, 30);
+    doc.text(`Comparativo ${data.previousYear} vs ${data.currentYear}`, 20, 30);
 
-    // Tabela comparativa
+    // Tabela comparativa 2025 vs 2026
     autoTable(doc, {
       startY: 40,
-      head: [['Categoria', `${data.currentYear}`, `${data.projectedYear}`, 'Variação']],
+      head: [['Categoria', `${data.previousYear}`, `${data.currentYear}`, 'Variação']],
       body: [
-        ['Headcount', formatNumber(data.currentHeadcount), formatNumber(data.projectedHeadcount), formatPercentageSafe(data.headcountVariancePercent, 1, true)],
-        ['Salário Fixo', formatCurrency(currentFixed), formatCurrency(projectedFixed), formatPercentageSafe(fixedVariance, 1, true)],
-        ['Variável', formatCurrency(currentVariable), formatCurrency(projectedVariable), formatPercentageSafe(variableVariance, 1, true)],
-        ['Benefícios', formatCurrency(currentBenefits), formatCurrency(projectedBenefits), formatPercentageSafe(benefitsVariance, 1, true)],
-        ['TOTAL', formatCurrency(currentTotal), formatCurrency(projectedTotal), formatPercentageSafe(totalVariance, 1, true)],
+        ['Headcount', formatNumber(data.previousHeadcount), formatNumber(data.currentHeadcount), formatPercentageSafe(data.headcountVariancePercent, 1, true)],
+        ['Salário Fixo', formatCurrency(previousFixed), formatCurrency(currentFixed), formatPercentageSafe(fixedVariance, 1, true)],
+        ['Variável', formatCurrency(previousVariable), formatCurrency(currentVariable), formatPercentageSafe(variableVariance, 1, true)],
+        ['Benefícios', formatCurrency(previousBenefits), formatCurrency(currentBenefits), formatPercentageSafe(benefitsVariance, 1, true)],
+        ['TOTAL', formatCurrency(previousTotal), formatCurrency(currentTotal), formatPercentageSafe(totalVariance, 1, true)],
       ],
       theme: 'striped',
       headStyles: { fillColor: isApproved ? [34, 139, 34] : [59, 130, 246] },
@@ -143,7 +142,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
     doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}`, 20, 280);
     doc.text('CompSmart - Sistema de Gestão de Remuneração', 20, 286);
     
-    doc.save(`orcamento-${isApproved ? 'aprovado' : 'planejamento'}-${data.projectedYear}.pdf`);
+    doc.save(`orcamento-${isApproved ? 'aprovado' : 'planejamento'}-${data.currentYear}.pdf`);
     toast.success('PDF exportado com sucesso!');
   };
 
@@ -160,14 +159,14 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
             <>
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <span className="text-green-700 dark:text-green-400">
-                Orçamento Aprovado {displayYear}
+                Orçamento Aprovado {data?.currentYear}
               </span>
             </>
           ) : (
             <>
               <PiggyBank className="h-4 w-4 text-muted-foreground" />
               <span className="text-muted-foreground">
-                Planejamento Orçamentário {data?.projectedYear || new Date().getFullYear() + 1}
+                Planejamento Orçamentário {data?.currentYear || new Date().getFullYear()}
               </span>
             </>
           )}
@@ -176,33 +175,33 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
       <CardContent className="space-y-3">
         {isLoading ? (
           <Skeleton className="h-40 w-full" />
-        ) : !data?.hasPlanning && !data?.hasCurrentYearApproved ? (
-          // Estado: Sem planejamento e sem ano atual aprovado
+        ) : !data?.hasCurrentYearApproved && !data?.submissionStatus ? (
+          // Estado: Sem orçamento aprovado para o ano atual
           <div className="space-y-3">
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-muted-foreground">Dados Atuais (Baseline)</p>
+              <p className="text-xs font-semibold text-muted-foreground">Dados de {data?.previousYear} (Baseline)</p>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Headcount:</span>
-                <span className="font-semibold text-sm">{formatNumber(data?.currentHeadcount || 0)}</span>
+                <span className="font-semibold text-sm">{formatNumber(data?.previousHeadcount || 0)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-xs text-muted-foreground">Custo Anual:</span>
-                <span className="font-semibold text-sm">{formatCurrency(currentTotal)}</span>
+                <span className="font-semibold text-sm">{formatCurrency(previousTotal)}</span>
               </div>
             </div>
 
             <Badge variant="outline" className="w-full justify-center text-xs border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-400">
-              ⚠️ Nenhum planejamento iniciado para {data?.projectedYear}
+              ⚠️ Nenhum orçamento aprovado para {data?.currentYear}
             </Badge>
             
             <Button asChild className="w-full" size="sm">
               <Link to="/budget-planning">
-                📝 Iniciar Planejamento {data?.projectedYear}
+                📝 Iniciar Planejamento {data?.currentYear}
               </Link>
             </Button>
           </div>
         ) : (
-          // Estado: Com planejamento - Comparação Detalhada
+          // Estado: Com orçamento - Comparação 2025 vs 2026
           <div className="space-y-3">
             {/* Alerta de Variação Acima do Limite */}
             {varianceAlert?.exceedsThreshold && (
@@ -217,15 +216,15 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </Alert>
             )}
 
-            {/* Tabela de Comparação */}
+            {/* Tabela de Comparação 2025 vs 2026 */}
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full text-[10px]">
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="text-left p-1.5 font-medium"></th>
-                    <th className="text-center p-1.5 font-medium">{data.currentYear}</th>
+                    <th className="text-center p-1.5 font-medium">{data.previousYear}</th>
                     <th className={`text-center p-1.5 font-medium ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {isApproved ? `✓ ${data.projectedYear}` : data.projectedYear}
+                      {isApproved ? `✓ ${data.currentYear}` : data.currentYear}
                     </th>
                     <th className="text-center p-1.5 font-medium">Var.</th>
                   </tr>
@@ -234,9 +233,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Headcount */}
                   <tr className="border-t">
                     <td className="p-1.5 font-medium">Headcount</td>
-                    <td className="text-center p-1.5">{formatNumber(data.currentHeadcount)}</td>
+                    <td className="text-center p-1.5">{formatNumber(data.previousHeadcount)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatNumber(data.projectedHeadcount)}
+                      {formatNumber(data.currentHeadcount)}
                     </td>
                     <td className="text-center p-1.5">
                       {renderVariance(data.headcountVariancePercent)}
@@ -245,9 +244,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Salário Fixo */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Fixo</td>
-                    <td className="text-center p-1.5">{formatCurrency(currentFixed)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(previousFixed)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(projectedFixed)}
+                      {formatCurrency(currentFixed)}
                     </td>
                     <td className="text-center p-1.5">
                       {renderVariance(fixedVariance, true)}
@@ -256,9 +255,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Variável */}
                   <tr className="border-t">
                     <td className="p-1.5 font-medium">Variável</td>
-                    <td className="text-center p-1.5">{formatCurrency(currentVariable)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(previousVariable)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(projectedVariable)}
+                      {formatCurrency(currentVariable)}
                     </td>
                     <td className="text-center p-1.5">
                       {renderVariance(variableVariance, true)}
@@ -267,9 +266,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Benefícios */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Benefícios</td>
-                    <td className="text-center p-1.5">{formatCurrency(currentBenefits)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(previousBenefits)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(projectedBenefits)}
+                      {formatCurrency(currentBenefits)}
                     </td>
                     <td className="text-center p-1.5">
                       {renderVariance(benefitsVariance, true)}
@@ -278,9 +277,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* TOTAL */}
                   <tr className={`border-t font-bold ${isApproved ? 'bg-green-100/50 dark:bg-green-900/20' : 'bg-primary/10'}`}>
                     <td className="p-1.5">TOTAL</td>
-                    <td className="text-center p-1.5">{formatCurrency(currentTotal)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(previousTotal)}</td>
                     <td className={`text-center p-1.5 ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(projectedTotal)}
+                      {formatCurrency(currentTotal)}
                     </td>
                     <td className="text-center p-1.5">
                       {renderVariance(totalVariance, true)}
@@ -299,7 +298,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                 </AlertTitle>
                 <AlertDescription className="text-[10px] text-amber-700 dark:text-amber-300 ml-1 space-y-0.5">
                   <div className="font-medium">"{data.approvedAdjustment.name}" ({data.approvedAdjustment.percentage}%)</div>
-                  <div>Vigência: {MONTHS[data.approvedAdjustment.effectiveMonth - 1]}/{data.projectedYear}</div>
+                  <div>Vigência: {MONTHS[data.approvedAdjustment.effectiveMonth - 1]}/{data.currentYear}</div>
                   <div className="font-semibold">
                     Impacto: +{formatCurrency(adjustmentCost)} ({data.approvedAdjustment.employeesAffected} func.)
                   </div>
@@ -307,10 +306,24 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </Alert>
             )}
 
-            {/* Status da Submissão */}
+            {/* Status da Submissão do Ano Atual */}
             {data.submissionStatus && (
               <div className="flex justify-center">
                 {getStatusBadge()}
+              </div>
+            )}
+
+            {/* Botão para Planejamento 2027 */}
+            {!data.hasNextYearPlanning && (
+              <div className="border-t pt-3 space-y-2">
+                <Badge variant="outline" className="w-full justify-center text-xs border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-400">
+                  📅 Planejamento {data.nextYear} não iniciado
+                </Badge>
+                <Button asChild className="w-full" size="sm" variant="outline">
+                  <Link to="/budget-planning">
+                    📝 Iniciar Planejamento {data.nextYear}
+                  </Link>
+                </Button>
               </div>
             )}
 
