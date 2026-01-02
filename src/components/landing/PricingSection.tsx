@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { planFeatures, PlanFeature } from "@/config/planFeatures";
 
 interface ColorClasses {
   gradient: string;
@@ -22,7 +23,6 @@ interface ColorClasses {
 interface PlanConfig {
   name: string;
   description: string;
-  features: { text: string; tooltip?: string; isNew?: boolean }[];
   cta: string;
   highlighted: boolean;
   badge?: string;
@@ -36,14 +36,6 @@ const planConfigs: Record<string, PlanConfig> = {
     name: "Starter",
     description: "Ideal para pequenas empresas começando a organizar remuneração",
     employeeLimit: "Até 50 funcionários",
-    features: [
-      { text: "Até 50 funcionários" },
-      { text: "Estrutura básica de cargos" },
-      { text: "Pesquisa Salarial", tooltip: "Compare salários com dados reais de mercado" },
-      { text: "Dashboards essenciais" },
-      { text: "Suporte por email" },
-      { text: "2 usuários administradores" }
-    ],
     cta: "Começar Grátis",
     highlighted: false,
     icon: Rocket,
@@ -64,16 +56,6 @@ const planConfigs: Record<string, PlanConfig> = {
     description: "Para empresas que querem crescer com inteligência e compliance",
     employeeLimit: "Até 200 funcionários",
     badge: "Mais Popular",
-    features: [
-      { text: "Até 200 funcionários" },
-      { text: "Agentes Inteligentes IA", tooltip: "3 agentes especializados: Jurídico, Análise Salarial e R&B", isNew: true },
-      { text: "Pesquisa Salarial", tooltip: "Compare salários com dados reais de mercado", isNew: true },
-      { text: "Gestão de PLR e incentivos" },
-      { text: "Compliance automático" },
-      { text: "Relatórios avançados" },
-      { text: "5 usuários" },
-      { text: "Suporte prioritário" }
-    ],
     cta: "Começar Teste Grátis",
     highlighted: true,
     icon: TrendingUp,
@@ -93,16 +75,6 @@ const planConfigs: Record<string, PlanConfig> = {
     name: "Pro",
     description: "Solução robusta para empresas em expansão que precisam de tudo",
     employeeLimit: "Até 500 funcionários",
-    features: [
-      { text: "Até 500 funcionários" },
-      { text: "Tudo do Medium incluído" },
-      { text: "Análise de equidade interna", tooltip: "Comparações por área, nível, faixa e gênero" },
-      { text: "Simulações de política salarial", tooltip: "Ajuste automático de tabelas salariais", isNew: true },
-      { text: "Modelagem preditiva", tooltip: "Forecast de 12-36 meses", isNew: true },
-      { text: "Dashboard de riscos trabalhistas" },
-      { text: "Usuários ilimitados" },
-      { text: "Treinamento online" }
-    ],
     cta: "Começar Teste Grátis",
     highlighted: false,
     icon: Building2,
@@ -122,16 +94,6 @@ const planConfigs: Record<string, PlanConfig> = {
     name: "Enterprise",
     description: "Solução completa para grandes empresas e consultorias especializadas",
     employeeLimit: "+500 funcionários",
-    features: [
-      { text: "+500 funcionários" },
-      { text: "Tudo do Pro incluído" },
-      { text: "Consultoria dedicada" },
-      { text: "Integrações customizadas" },
-      { text: "API e webhooks" },
-      { text: "SLA garantido" },
-      { text: "Treinamento personalizado" },
-      { text: "Gerente de conta" }
-    ],
     cta: "Falar com Vendas",
     highlighted: false,
     icon: Crown,
@@ -251,7 +213,6 @@ export const PricingSection = () => {
             const config = planConfigs[dbPlan.name] || {
               name: dbPlan.name,
               description: "",
-              features: [],
               cta: "Começar",
               highlighted: false,
               icon: Rocket,
@@ -259,13 +220,16 @@ export const PricingSection = () => {
               employeeLimit: ""
             };
 
+            // Usar features do config centralizado
+            const features = planFeatures[dbPlan.name] || [];
+
             return {
               id: dbPlan.id,
               name: config.name,
               monthlyPrice: dbPlan.monthly_price || 0,
               annualPrice: dbPlan.annual_price || 0,
               description: config.description,
-              features: config.features,
+              features: features,
               cta: config.cta,
               highlighted: config.highlighted,
               badge: config.badge,
