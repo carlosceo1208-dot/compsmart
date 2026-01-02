@@ -216,31 +216,27 @@ const planId = searchParams.get('plan');
   const calculateTotal = () => {
     if (!plan) return 0;
     
-    // Preço base mensal
-    let monthlyBase = plan.monthly_price;
+    // Preço base conforme ciclo selecionado (anual já inclui 10% de desconto)
+    let baseAmount = billingCycle === 'annual' ? plan.annual_price : plan.monthly_price;
     
-    // Aplicar desconto do cupom (percentual)
+    // Aplicar desconto do cupom sobre o preço do ciclo
     if (couponApplied?.coupon?.discount_type === 'percentage') {
-      monthlyBase = roundToTwoDecimals(monthlyBase * (1 - couponApplied.coupon.discount_value / 100));
-    } else if (couponApplied?.calculated_discount && billingCycle === 'monthly') {
-      monthlyBase = roundToTwoDecimals(monthlyBase - couponApplied.calculated_discount);
-    }
-    
-    let amount: number;
-    
-    if (billingCycle === 'annual') {
-      // Anual: preço mensal com desconto do cupom + 10% adicional × 12
-      amount = roundToTwoDecimals(roundToTwoDecimals(monthlyBase * 0.90) * 12);
-    } else {
-      amount = monthlyBase;
+      const discountPercent = couponApplied.coupon.discount_value / 100;
+      baseAmount = roundToTwoDecimals(baseAmount * (1 - discountPercent));
+    } else if (couponApplied?.calculated_discount) {
+      // Desconto fixo - recalcular proporcional se anual
+      const fixedDiscount = billingCycle === 'annual' 
+        ? couponApplied.calculated_discount * 12 
+        : couponApplied.calculated_discount;
+      baseAmount = roundToTwoDecimals(baseAmount - fixedDiscount);
     }
     
     // PIX desconto adicional 5%
     if (paymentMethod === 'pix') {
-      amount = roundToTwoDecimals(amount * 0.95);
+      baseAmount = roundToTwoDecimals(baseAmount * 0.95);
     }
     
-    return Math.max(amount, 1);
+    return Math.max(baseAmount, 1);
   };
 
   const getDocumentToUse = (): { type: 'cpf' | 'cnpj'; value: string } | null => {

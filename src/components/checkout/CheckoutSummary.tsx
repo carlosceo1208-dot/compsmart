@@ -51,6 +51,26 @@ export function CheckoutSummary({
   const total = calculateTotal();
   const savings = roundToTwoDecimals(basePrice - total);
 
+  // Calcular desconto do cupom dinamicamente baseado no ciclo atual
+  const calculateCouponDiscount = () => {
+    if (!couponApplied?.coupon) return 0;
+    
+    const coupon = couponApplied.coupon;
+    
+    if (coupon.discount_type === 'percentage') {
+      // Aplica percentual sobre o preço base atual (mensal ou anual)
+      return roundToTwoDecimals(basePrice * (coupon.discount_value / 100));
+    } else {
+      // Desconto fixo - ajustar para anual se necessário
+      const fixedDiscount = billingCycle === 'annual'
+        ? (couponApplied.calculated_discount || 0) * 12
+        : (couponApplied.calculated_discount || 0);
+      return roundToTwoDecimals(fixedDiscount);
+    }
+  };
+
+  const couponDiscount = calculateCouponDiscount();
+
   // Usar features do config centralizado
   const features = planFeatures[plan.name] || [];
 
@@ -169,27 +189,27 @@ export function CheckoutSummary({
             <span>R$ {basePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
           </div>
           
-          {couponApplied?.calculated_discount > 0 && (
-            <div className="flex justify-between text-green-600">
-              <span>Desconto do cupom ({couponApplied.coupon?.discount_value}%)</span>
-              <span>-R$ {couponApplied.calculated_discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-            </div>
-          )}
+        {couponApplied?.coupon && couponDiscount > 0 && (
+          <div className="flex justify-between text-green-600">
+            <span>Desconto do cupom ({couponApplied.coupon?.discount_value}%)</span>
+            <span>-R$ {couponDiscount.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        )}
 
-          {billingCycle === 'annual' && (
-            <div className="flex justify-between text-green-600">
-              <span>Desconto Anual (10%)</span>
-              <span>incluso</span>
-            </div>
-          )}
-          
-          {paymentMethod === 'pix' && (
-            <div className="flex justify-between text-green-600">
-              <span>Desconto PIX (5%)</span>
-              <span>-R$ {roundToTwoDecimals((basePrice - (couponApplied?.calculated_discount || 0)) * 0.05).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-            </div>
-          )}
-        </div>
+        {billingCycle === 'annual' && (
+          <div className="flex justify-between text-green-600">
+            <span>Desconto Anual (10%)</span>
+            <span>incluso</span>
+          </div>
+        )}
+        
+        {paymentMethod === 'pix' && (
+          <div className="flex justify-between text-green-600">
+            <span>Desconto PIX (5%)</span>
+            <span>-R$ {roundToTwoDecimals((basePrice - couponDiscount) * 0.05).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        )}
+      </div>
 
         <Separator />
 
