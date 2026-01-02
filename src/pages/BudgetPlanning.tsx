@@ -17,11 +17,9 @@ import { PlannedHireDialog } from '@/components/budget/PlannedHireDialog';
 import { EditPlannedHireDialog } from '@/components/budget/EditPlannedHireDialog';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { useTranslation } from 'react-i18next';
 
 const BudgetPlanning = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [fiscalYear, setFiscalYear] = useState(2026);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
@@ -247,9 +245,9 @@ const BudgetPlanning = () => {
     <div className="h-[calc(100vh-8rem)] overflow-auto p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">{t('budget_planning.title')}</h1>
+          <h1 className="text-3xl font-bold mb-2">Planejamento de Orçamento</h1>
           <p className="text-muted-foreground">
-            {t('budget_planning.subtitle')}
+            Configure projeções salariais e de headcount por unidade
           </p>
         </div>
         {getStatusBadge()}
@@ -322,13 +320,13 @@ const BudgetPlanning = () => {
           <div className="flex gap-4">
             <Button variant="outline" onClick={() => navigate('/employees')}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('budget_planning.back_dashboard')}
+              Voltar
             </Button>
 
             {canEdit && (
               <Button onClick={handleSubmit}>
                 <Send className="w-4 h-4 mr-2" />
-                {t('budget_planning.submit_budget')}
+                Submeter para Aprovação
               </Button>
             )}
           </div>
