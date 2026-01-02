@@ -148,18 +148,21 @@ export const HRMetricsCard = () => {
                 ].filter(item => item.value > 0) : [];
 
                 return ageChartData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={140}>
+                  <ResponsiveContainer width="100%" height={160}>
                     <PieChart>
                       <Pie
                         data={ageChartData}
                         cx="50%"
-                        cy="50%"
-                        innerRadius={25}
-                        outerRadius={45}
+                        cy="45%"
+                        innerRadius={22}
+                        outerRadius={40}
                         paddingAngle={2}
                         dataKey="value"
                         label={({ value }) => `${value.toFixed(0)}%`}
                         labelLine={false}
+                        animationBegin={0}
+                        animationDuration={800}
+                        animationEasing="ease-out"
                       >
                         {ageChartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
@@ -175,7 +178,7 @@ export const HRMetricsCard = () => {
                       />
                       <Legend 
                         verticalAlign="bottom"
-                        height={36}
+                        height={28}
                         iconSize={8}
                         formatter={(value) => <span className="text-xs text-muted-foreground">{value}</span>}
                       />
