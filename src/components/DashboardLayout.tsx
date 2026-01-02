@@ -377,19 +377,8 @@ export const DashboardLayout = () => {
               </div>
             )}
 
-            {/* Mobile/Tablet Company Badge */}
-            {companyName && (
-              <div className="xl:hidden flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/50 rounded-full">
-                {companyLogo ? (
-                  <img src={companyLogo} alt={companyName} className="h-4 w-4 rounded-full object-cover" />
-                ) : (
-                  <span className="text-xs">🏢</span>
-                )}
-              </div>
-            )}
-            
-            {/* These items hidden on smaller screens */}
-            <div className="hidden xl:flex items-center gap-1">
+            {/* Company Switcher and Notifications - visible on md+ screens */}
+            <div className="hidden md:flex items-center gap-1">
               <CompanySwitcher />
               <HeaderNotifications />
             </div>
