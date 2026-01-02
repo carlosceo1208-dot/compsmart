@@ -10,18 +10,16 @@ import { DollarSign, Users, Wallet } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { formatCurrency } from '@/lib/formatters';
-import { useTranslation } from 'react-i18next';
 
 const PeopleAnalyticsContent = () => {
-  const { t } = useTranslation();
   const { kpis, charts, allSalaries } = usePeopleAnalytics();
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{t('analytics.title')}</h1>
+        <h1 className="text-3xl font-bold mb-2">People Analytics</h1>
         <p className="text-muted-foreground">
-          {t('analytics.subtitle')}
+          Análise detalhada de dados salariais e distribuição por unidade e grade
         </p>
       </div>
 
@@ -36,21 +34,21 @@ const PeopleAnalyticsContent = () => {
           {/* KPIs Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <KPICard
-              title={t('analytics.avg_salary')}
+              title="Salário Médio"
               value={kpis.avgSalary}
               icon={DollarSign}
               format="compact-currency"
               isLoading={kpis.isLoading}
             />
             <KPICard
-              title={t('analytics.total_employees')}
+              title="Total de Colaboradores"
               value={kpis.totalEmployees}
               icon={Users}
               format="number"
               isLoading={kpis.isLoading}
             />
             <KPICard
-              title={t('analytics.salary_mass')}
+              title="Massa Salarial"
               value={kpis.totalSalary}
               icon={Wallet}
               format="compact-currency"
@@ -66,8 +64,8 @@ const PeopleAnalyticsContent = () => {
 
           {/* Chart: Distribution by Unit */}
           <ChartCard
-            title={t('analytics.distribution_by_unit')}
-            description={t('analytics.distribution_by_unit_desc')}
+            title="Distribuição por Unidade"
+            description="Massa salarial por unidade organizacional"
             isLoading={charts.isLoading}
             isEmpty={!charts.distributionByUnit || charts.distributionByUnit.length === 0}
           >
@@ -105,8 +103,8 @@ const PeopleAnalyticsContent = () => {
 
           {/* Chart: Distribution by Grade */}
           <ChartCard
-            title={t('analytics.distribution_by_grade')}
-            description={t('analytics.distribution_by_grade_desc')}
+            title="Distribuição por Grade"
+            description="Quantidade de funcionários e média salarial por grade"
             isLoading={charts.isLoading}
             isEmpty={!charts.distributionByGrade || charts.distributionByGrade.length === 0}
           >
@@ -137,8 +135,8 @@ const PeopleAnalyticsContent = () => {
 
           {/* Chart: Salary vs Range */}
           <ChartCard
-            title={t('analytics.salary_vs_range')}
-            description={t('analytics.salary_vs_range_desc')}
+            title="Salário Real vs Faixa"
+            description="Comparação entre salário real médio e faixa salarial por grade"
             isLoading={charts.isLoading}
             isEmpty={!charts.salaryVsRange || charts.salaryVsRange.length === 0}
           >
