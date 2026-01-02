@@ -27,19 +27,86 @@ interface BudgetMultiYearChartProps {
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
-    const total = payload.reduce((sum: number, entry: any) => sum + (entry.value || 0), 0);
+    // Encontrar dados do ano
+    const data = payload[0]?.payload;
+    const fixo = data?.fixo || 0;
+    const variavel = data?.variavel || 0;
+    const beneficios = data?.beneficios || 0;
+    const total = fixo + variavel + beneficios;
+    const headcount = data?.headcount || 0;
+    const status = data?.status || 'none';
+    
+    // Calcular percentuais
+    const pctFixo = total > 0 ? ((fixo / total) * 100).toFixed(1) : '0.0';
+    const pctVariavel = total > 0 ? ((variavel / total) * 100).toFixed(1) : '0.0';
+    const pctBeneficios = total > 0 ? ((beneficios / total) * 100).toFixed(1) : '0.0';
+    
+    // Status labels
+    const statusLabels: Record<string, string> = {
+      approved: 'Aprovado',
+      pending: 'Pendente',
+      draft: 'Rascunho',
+      rejected: 'Rejeitado',
+      none: 'Sem dados',
+    };
+    
     return (
-      <div className="bg-background border rounded-lg p-3 shadow-lg">
-        <p className="font-semibold text-sm mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex justify-between gap-4 text-xs">
-            <span style={{ color: entry.color }}>{entry.name}:</span>
-            <span className="font-medium">{formatCurrency(entry.value)}</span>
+      <div className="bg-background border rounded-lg p-4 shadow-lg min-w-[240px]">
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-bold text-base">Orçamento {label}</p>
+          <Badge variant="outline" className="text-xs">
+            {statusLabels[status]}
+          </Badge>
+        </div>
+        
+        <div className="space-y-2">
+          {/* Salário Fixo */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(var(--primary))' }} />
+              <span className="text-sm">Salário Fixo</span>
+            </div>
+            <div className="text-right">
+              <div className="font-semibold text-sm">{formatCurrency(fixo)}</div>
+              <div className="text-xs text-muted-foreground">{pctFixo}%</div>
+            </div>
           </div>
-        ))}
-        <div className="border-t mt-2 pt-2 flex justify-between gap-4 text-xs font-bold">
-          <span>Total:</span>
-          <span>{formatCurrency(total)}</span>
+          
+          {/* Variável */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(24, 95%, 53%)' }} />
+              <span className="text-sm">Variável</span>
+            </div>
+            <div className="text-right">
+              <div className="font-semibold text-sm">{formatCurrency(variavel)}</div>
+              <div className="text-xs text-muted-foreground">{pctVariavel}%</div>
+            </div>
+          </div>
+          
+          {/* Benefícios */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'hsl(142, 71%, 45%)' }} />
+              <span className="text-sm">Benefícios</span>
+            </div>
+            <div className="text-right">
+              <div className="font-semibold text-sm">{formatCurrency(beneficios)}</div>
+              <div className="text-xs text-muted-foreground">{pctBeneficios}%</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Separador e Total */}
+        <div className="border-t mt-3 pt-3">
+          <div className="flex justify-between items-center">
+            <span className="font-bold">Total</span>
+            <span className="font-bold text-base">{formatCurrency(total)}</span>
+          </div>
+          <div className="flex justify-between items-center mt-1 text-xs text-muted-foreground">
+            <span>Headcount</span>
+            <span>{headcount} funcionários</span>
+          </div>
         </div>
       </div>
     );

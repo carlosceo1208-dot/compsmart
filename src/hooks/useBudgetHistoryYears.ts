@@ -85,10 +85,66 @@ export const useBudgetHistoryYears = (unitId?: string | null) => {
           }
         }
 
-        // Calcular totais
-        const totalFixed = projections?.reduce((sum, p) => sum + Number(p.projected_fixed_salary || 0), 0) || 0;
-        const totalVariable = projections?.reduce((sum, p) => sum + Number(p.projected_variable_salary || 0), 0) || 0;
-        const totalBenefits = projections?.reduce((sum, p) => sum + Number(p.projected_benefits || 0), 0) || 0;
+        // Para anos sem projeções, calcular baseado em profiles (dados históricos)
+        if (!projections || projections.length === 0) {
+          const endOfYear = `${year}-12-31`;
+          
+          let employeesQuery = supabase
+            .from('profiles')
+            .select('id, salary, variable_salary, benefits_value, hire_date')
+            .eq('root_company_id', activeCompanyId)
+            .lte('hire_date', endOfYear)
+            .not('salary', 'is', null);
+          
+          if (unitId) {
+            employeesQuery = employeesQuery.eq('unit_id', unitId);
+          }
+          
+          const { data: histEmployees } = await employeesQuery;
+          
+          // Calcular valores anuais baseado nos funcionários
+          let calcFixed = 0;
+          let calcVariable = 0;
+          let calcBenefits = 0;
+          
+          histEmployees?.forEach(emp => {
+            let monthsWorked = 12;
+            
+            if (emp.hire_date) {
+              const hireDate = new Date(emp.hire_date);
+              if (hireDate.getFullYear() === year) {
+                monthsWorked = Math.max(1, 12 - hireDate.getMonth());
+              }
+            }
+            
+            calcFixed += (Number(emp.salary) || 0) * monthsWorked;
+            calcVariable += (Number(emp.variable_salary) || 0) * monthsWorked;
+            calcBenefits += (Number(emp.benefits_value) || 0) * monthsWorked;
+          });
+          
+          // Anos anteriores são considerados aprovados automaticamente
+          const histStatus = year < currentYear ? 'approved' : 'none';
+          
+          results.push({
+            year,
+            totalFixed: calcFixed,
+            totalVariable: calcVariable,
+            totalBenefits: calcBenefits,
+            totalCost: calcFixed + calcVariable + calcBenefits,
+            headcount: histEmployees?.length || 0,
+            status: histStatus as BudgetYearSummary['status'],
+            approvedAt: undefined,
+            unitId: unitId || undefined,
+            unitName: unitId ? unitMap.get(unitId) : undefined,
+          });
+          
+          continue; // Pular para o próximo ano
+        }
+
+        // Calcular totais das projeções (valores já são por mês, somamos todos os meses)
+        const totalFixed = projections.reduce((sum, p) => sum + Number(p.projected_fixed_salary || 0), 0);
+        const totalVariable = projections.reduce((sum, p) => sum + Number(p.projected_variable_salary || 0), 0);
+        const totalBenefits = projections.reduce((sum, p) => sum + Number(p.projected_benefits || 0), 0);
         
         // Contar headcount
         let headcount = 0;
@@ -96,7 +152,7 @@ export const useBudgetHistoryYears = (unitId?: string | null) => {
         // Contar contratações planejadas por nome único (não por linha mensal)
         const uniquePlannedHires = new Set(
           projections
-            ?.filter(p => p.is_planned_hire && p.planned_employee_name)
+            .filter(p => p.is_planned_hire && p.planned_employee_name)
             .map(p => p.planned_employee_name)
         );
         const plannedHiresCount = uniquePlannedHires.size;
@@ -137,22 +193,18 @@ export const useBudgetHistoryYears = (unitId?: string | null) => {
         } else {
           // Para anos futuros, usar contagem de projeções
           const uniqueEmployees = new Set(
-            projections?.filter(p => p.employee_id).map(p => p.employee_id)
+            projections.filter(p => p.employee_id).map(p => p.employee_id)
           );
           headcount = uniqueEmployees.size + plannedHiresCount;
         }
 
-        // Multiplicar por 12 para obter valor anual
-        const annualFixed = totalFixed * 12;
-        const annualVariable = totalVariable * 12;
-        const annualBenefits = totalBenefits * 12;
-
+        // Valores já são a soma anual (cada linha de projeção é um mês)
         results.push({
           year,
-          totalFixed: annualFixed,
-          totalVariable: annualVariable,
-          totalBenefits: annualBenefits,
-          totalCost: annualFixed + annualVariable + annualBenefits,
+          totalFixed,
+          totalVariable,
+          totalBenefits,
+          totalCost: totalFixed + totalVariable + totalBenefits,
           headcount,
           status,
           approvedAt,
