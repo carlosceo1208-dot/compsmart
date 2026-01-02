@@ -85,7 +85,7 @@ const planId = searchParams.get('plan');
     if (planId) {
       fetchPlanAndUserData();
     } else {
-      navigate('/pricing');
+      navigate('/#pricing');
     }
   }, [planId]);
 
@@ -134,7 +134,7 @@ const planId = searchParams.get('plan');
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('Plano não encontrado');
-      navigate('/pricing');
+      navigate('/#pricing');
     } finally {
       setLoading(false);
     }
@@ -328,7 +328,7 @@ const planId = searchParams.get('plan');
       <div className="max-w-5xl mx-auto">
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/pricing')}
+          onClick={() => navigate('/#pricing')}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
