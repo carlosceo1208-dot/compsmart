@@ -16,6 +16,8 @@ import { useEconomicData } from "@/hooks/useEconomicData";
 import { formatCurrency, formatCurrencyCustom } from "@/lib/formatters";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 type ReportType = 
   | 'executive-consolidated' 
@@ -267,7 +269,7 @@ export const ExportCard = () => {
       ['Média Salarial', formatCurrencyCustom(convert(salaryData?.avg || 0, 'BRL', currency), currency)],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Indicador', 'Valor']],
       body: kpiData,
       startY: 50,
@@ -295,7 +297,7 @@ export const ExportCard = () => {
       ],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Categoria', 'Orçado', 'Real', 'Variação']],
       body: budgetData,
       startY: finalY1 + 5,
@@ -316,7 +318,7 @@ export const ExportCard = () => {
       ['Total Incentivos', formatCurrencyCustom(convert(incentivesKPI?.total || 0, 'BRL', currency), currency)],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Item', 'Valor']],
       body: benefitsData,
       startY: finalY2 + 5,
@@ -335,7 +337,7 @@ export const ExportCard = () => {
       ['USD (Cotação)', economicData?.usd?.value ? formatCurrency(economicData.usd.value) : 'N/A'],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Indicador', 'Valor']],
       body: economicDataTable,
       startY: finalY3 + 5,
@@ -364,7 +366,7 @@ export const ExportCard = () => {
       ['Média Salarial', formatCurrencyCustom(convert(salaryData?.avg || 0, 'BRL', currency), currency)],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Métrica', 'Valor']],
       body: summaryData,
       startY: 50,
@@ -385,7 +387,7 @@ export const ExportCard = () => {
       formatCurrencyCustom(convert(g.max, 'BRL', currency), currency),
     ]);
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Grade', 'Qtd', 'Média', 'Mínimo', 'Máximo']],
       body: gradeData,
       startY: finalY1 + 5,
@@ -405,7 +407,7 @@ export const ExportCard = () => {
       formatCurrencyCustom(convert(u.avg, 'BRL', currency), currency),
     ]);
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Unidade', 'Qtd', 'Total', 'Média']],
       body: unitData,
       startY: finalY2 + 5,
@@ -434,7 +436,7 @@ export const ExportCard = () => {
       ['Massa Salarial', formatCurrencyCustom(convert(salaryData?.total || 0, 'BRL', currency), currency)],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Métrica', 'Valor']],
       body: metricsData,
       startY: 50,
@@ -454,7 +456,7 @@ export const ExportCard = () => {
       formatCurrencyCustom(convert(emp.salary || 0, 'BRL', currency), currency),
     ]);
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['#', 'Nome', 'Cargo', 'Salário']],
       body: topData,
       startY: finalY1 + 5,
@@ -473,7 +475,7 @@ export const ExportCard = () => {
       formatCurrencyCustom(convert(g.avg, 'BRL', currency), currency),
     ]);
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Grade', 'Quantidade', 'Média Salarial']],
       body: gradeData,
       startY: finalY2 + 5,
@@ -502,7 +504,7 @@ export const ExportCard = () => {
       ['Funcionários Ativos', totalEmployees?.toString() || '0'],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Item', 'Valor']],
       body: benefitsSummary,
       startY: 50,
@@ -521,7 +523,7 @@ export const ExportCard = () => {
       formatCurrencyCustom(convert(b.value_per_employee || 0, 'BRL', currency), currency),
     ]);
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Nome', 'Tipo', 'Valor/Funcionário']],
       body: benefitsData,
       startY: finalY1 + 5,
@@ -540,7 +542,7 @@ export const ExportCard = () => {
       ['Total de Incentivos', formatCurrencyCustom(convert(incentivesKPI?.total || 0, 'BRL', currency), currency)],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Programa', 'Provisão']],
       body: incentivesData,
       startY: finalY2 + 5,
@@ -561,7 +563,7 @@ export const ExportCard = () => {
         p.payment_frequency || 'N/A',
       ]);
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: [['Nome', 'Tipo', '% Alvo', 'Frequência']],
         body: programsData,
         startY: finalY3 + 5,
@@ -606,7 +608,7 @@ export const ExportCard = () => {
       ],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Categoria', 'Orçado', 'Real', 'Variação', '% Variação']],
       body: budgetComparison,
       startY: 50,
@@ -644,7 +646,7 @@ export const ExportCard = () => {
       );
     }
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Item', 'Status', 'Desvio']],
       body: varianceAnalysis,
       startY: finalY1 + 5,
@@ -968,7 +970,7 @@ export const ExportCard = () => {
       ['Custo Médio por Funcionário/Mês', headcount > 0 ? formatCurrencyCustom(convert(grandTotal / headcount / 12, 'BRL', currency), currency) : 'N/A'],
     ];
     
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [['Indicador', 'Valor']],
       body: kpiData,
       startY: 25,
@@ -1078,7 +1080,7 @@ export const ExportCard = () => {
           formatCurrencyCustom(convert(p.projected_benefits || 0, 'BRL', currency), currency),
         ]);
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: [['Funcionário', 'Cargo', 'Grade', 'Fixo', 'Variável', 'Benefícios']],
         body: employeeRows,
         startY: currentY + 3,
@@ -1112,7 +1114,7 @@ export const ExportCard = () => {
         (p.justification || 'N/A').substring(0, 40),
       ]);
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: [['Nome', 'Unidade', 'Mês Contratação', 'Grade', 'Salário', 'Justificativa']],
         body: hiresRows,
         startY: 25,
@@ -1154,7 +1156,7 @@ export const ExportCard = () => {
         ];
       });
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: [['Funcionário', 'Tipo', 'Mês', 'Salário Atual', 'Salário Novo', '% Aumento']],
         body: changesRows,
         startY: finalY5 + 5,
@@ -1201,7 +1203,7 @@ export const ExportCard = () => {
         ];
       });
       
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: [['Funcionário', 'Cargo Atual', 'Novo Cargo', 'Mês', 'Salário Atual', 'Salário Novo']],
         body: promoRows,
         startY: finalY6 > 250 ? 25 : finalY6 + 5,

@@ -46,6 +46,10 @@ export interface BudgetPlanningAnnualKPI {
   hasPlanning: boolean;
   submissionStatus?: 'draft' | 'pending' | 'approved' | 'rejected';
   fiscalYear: number;
+  
+  // Status do ano atual aprovado
+  hasCurrentYearApproved?: boolean;
+  currentYearSubmissionStatus?: 'approved';
 }
 
 export const useBudgetPlanningAnnualKPI = () => {
@@ -54,7 +58,7 @@ export const useBudgetPlanningAnnualKPI = () => {
   const nextYear = currentYear + 1;
 
   return useQuery({
-    queryKey: ['budget-planning-annual-kpi', nextYear],
+    queryKey: ['budget-planning-annual-kpi', currentYear, nextYear],
     queryFn: async () => {
       // 1. Buscar funcionários atuais com data de admissão
       const { data: currentEmployees, error: currentError } = await supabase
@@ -107,7 +111,7 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       if (projectionsError) throw projectionsError;
 
-      // 4. Verificar status de submissão
+      // 4. Verificar status de submissão para o próximo ano
       const { data: submissions, error: submissionsError } = await supabase
         .from('budget_submissions')
         .select('status')
@@ -116,6 +120,19 @@ export const useBudgetPlanningAnnualKPI = () => {
         .limit(1);
 
       if (submissionsError) throw submissionsError;
+
+      // 4b. NOVO: Verificar se há orçamento APROVADO para o ANO ATUAL
+      const { data: currentYearSubmissions, error: currentYearSubmissionsError } = await supabase
+        .from('budget_submissions')
+        .select('status, fiscal_year')
+        .eq('fiscal_year', currentYear)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (currentYearSubmissionsError) throw currentYearSubmissionsError;
+
+      const hasCurrentYearApproved = currentYearSubmissions && currentYearSubmissions.length > 0;
 
       // 5. Buscar ajuste coletivo aprovado para o próximo ano
       const { data: approvedAdjustments, error: adjustmentError } = await supabase
@@ -291,6 +308,9 @@ export const useBudgetPlanningAnnualKPI = () => {
         hasPlanning,
         submissionStatus,
         fiscalYear: nextYear,
+        // NOVO: Dados do ano atual aprovado
+        hasCurrentYearApproved,
+        currentYearSubmissionStatus: hasCurrentYearApproved ? 'approved' : undefined,
       } as BudgetPlanningAnnualKPI;
     },
     staleTime: 2 * 60 * 1000, // 2 minutos
