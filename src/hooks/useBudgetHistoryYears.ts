@@ -90,12 +90,34 @@ export const useBudgetHistoryYears = (unitId?: string | null) => {
         const totalVariable = projections?.reduce((sum, p) => sum + Number(p.projected_variable_salary || 0), 0) || 0;
         const totalBenefits = projections?.reduce((sum, p) => sum + Number(p.projected_benefits || 0), 0) || 0;
         
-        // Contar headcount único (employees + planned hires)
-        const uniqueEmployees = new Set(
-          projections?.filter(p => p.employee_id).map(p => p.employee_id)
-        );
-        const plannedHires = projections?.filter(p => p.is_planned_hire).length || 0;
-        const headcount = uniqueEmployees.size + plannedHires;
+        // Contar headcount - para ano atual, usar funcionários ativos da profiles
+        let headcount = 0;
+        
+        if (year === currentYear) {
+          // Para o ano atual, buscar funcionários ativos da tabela profiles
+          let employeesQuery = supabase
+            .from('profiles')
+            .select('id')
+            .eq('root_company_id', activeCompanyId)
+            .eq('status', 'active')
+            .not('salary', 'is', null);
+          
+          if (unitId) {
+            employeesQuery = employeesQuery.eq('unit_id', unitId);
+          }
+          
+          const { data: activeEmployees } = await employeesQuery;
+          const activeCount = activeEmployees?.length || 0;
+          const plannedHires = projections?.filter(p => p.is_planned_hire).length || 0;
+          headcount = activeCount + plannedHires;
+        } else {
+          // Para anos anteriores/futuros, usar contagem de projeções
+          const uniqueEmployees = new Set(
+            projections?.filter(p => p.employee_id).map(p => p.employee_id)
+          );
+          const plannedHires = projections?.filter(p => p.is_planned_hire).length || 0;
+          headcount = uniqueEmployees.size + plannedHires;
+        }
 
         // Multiplicar por 12 para obter valor anual
         const annualFixed = totalFixed * 12;
