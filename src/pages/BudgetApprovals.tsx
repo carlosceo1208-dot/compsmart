@@ -17,7 +17,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, 
-  FileText, Mail, UserCog, AlertTriangle, CalendarIcon, Send, ChevronDown, ChevronUp 
+  FileText, Mail, UserCog, AlertTriangle, CalendarIcon, Send, ChevronDown, ChevronUp,
+  FileEdit
 } from 'lucide-react';
 import { SubmissionReviewDialog } from '@/components/budget/SubmissionReviewDialog';
 import { SendReportDialog } from '@/components/budget/SendReportDialog';
@@ -399,17 +400,35 @@ const BudgetApprovals = () => {
               <CardContent>
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
                   {statsData.unitsWithoutSubmission.map((unit) => (
-                    <div key={unit.id} className="flex items-center justify-between p-2 bg-background rounded-md border">
+                    <div 
+                      key={unit.id} 
+                      className="flex items-center justify-between p-3 bg-background rounded-md border hover:bg-muted/50 transition-colors cursor-pointer group"
+                      onClick={() => navigate(`/budget-planning?unit=${unit.id}&year=${fiscalYear}`)}
+                    >
                       <div>
                         <span className="font-medium">{unit.code}</span>
                         <span className="text-muted-foreground"> - {unit.description}</span>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {unit.managerName ? (
-                          <span>{unit.managerName}</span>
-                        ) : (
-                          <span className="text-amber-600">Sem gestor definido</span>
-                        )}
+                      <div className="flex items-center gap-3">
+                        <div className="text-sm text-muted-foreground">
+                          {unit.managerName ? (
+                            <span>{unit.managerName}</span>
+                          ) : (
+                            <span className="text-amber-600">Sem gestor definido</span>
+                          )}
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/budget-planning?unit=${unit.id}&year=${fiscalYear}`);
+                          }}
+                        >
+                          <FileEdit className="w-4 h-4 mr-1" />
+                          Criar Orçamento
+                        </Button>
                       </div>
                     </div>
                   ))}

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Send } from 'lucide-react';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
@@ -20,22 +20,34 @@ import { toast } from 'sonner';
 
 const BudgetPlanning = () => {
   const navigate = useNavigate();
-  const [fiscalYear, setFiscalYear] = useState(2026);
+  const [searchParams] = useSearchParams();
+  
+  // Ler parâmetros da URL
+  const urlUnitId = searchParams.get('unit');
+  const urlYear = searchParams.get('year');
+  
+  const [fiscalYear, setFiscalYear] = useState(urlYear ? parseInt(urlYear) : 2026);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
-  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [selectedUnitId, setSelectedUnitId] = useState<string | null>(urlUnitId || null);
   const [plannedHireDialogOpen, setPlannedHireDialogOpen] = useState(false);
   const [editPlannedHireId, setEditPlannedHireId] = useState<string | null>(null);
   
   const { data: userData } = useCurrentUserRole();
   
-  // Definir unidade selecionada baseado no role
-  useState(() => {
-    if (userData?.isAdmin || userData?.isHR) {
-      setSelectedUnitId(null); // Empresa toda
-    } else {
-      setSelectedUnitId(userData?.unitId || null);
+  // Atualizar unidade quando URL mudar ou quando userData carregar
+  useEffect(() => {
+    if (urlUnitId) {
+      // Se veio da URL, usar o unitId da URL
+      setSelectedUnitId(urlUnitId);
+    } else if (userData && !urlUnitId) {
+      // Caso contrário, definir baseado no role
+      if (userData?.isAdmin || userData?.isHR) {
+        setSelectedUnitId(null); // Empresa toda
+      } else {
+        setSelectedUnitId(userData?.unitId || null);
+      }
     }
-  });
+  }, [urlUnitId, userData]);
 
   const { data: summary, isLoading: summaryLoading } = useBudgetSummary(
     selectedUnitId,
