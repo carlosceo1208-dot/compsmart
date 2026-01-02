@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { useBudgetSubmissions } from '@/hooks/useBudgetSubmissions';
 import { useBudgetDeadline } from '@/hooks/useBudgetDeadline';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,7 @@ import 'jspdf-autotable';
 
 const BudgetApprovals = () => {
   const navigate = useNavigate();
+  const { activeCompanyId } = useCompanyContext();
   const [fiscalYear, setFiscalYear] = useState(2026);
   const [statusFilter, setStatusFilter] = useState('submitted');
   const [unitFilter, setUnitFilter] = useState<string>('all');
@@ -41,7 +43,7 @@ const BudgetApprovals = () => {
   const [isUnitsListOpen, setIsUnitsListOpen] = useState(false);
 
   const { data: userData } = useCurrentUserRole();
-  const { data: submissions, isLoading } = useBudgetSubmissions(fiscalYear, statusFilter);
+  const { data: submissions, isLoading } = useBudgetSubmissions(fiscalYear, statusFilter, activeCompanyId);
   const { 
     deadlineData, 
     statsData, 
@@ -52,23 +54,29 @@ const BudgetApprovals = () => {
     isSendingReminders 
   } = useBudgetDeadline(fiscalYear);
 
-  // Buscar todas as unidades e identificar quais têm submissões
+  // Buscar todas as unidades e identificar quais têm submissões - FILTRADO POR EMPRESA
   const { data: units, isLoading: unitsLoading } = useQuery({
-    queryKey: ['organizational-units-with-flags', fiscalYear],
+    queryKey: ['organizational-units-with-flags', fiscalYear, activeCompanyId],
     queryFn: async () => {
+      if (!activeCompanyId) return [];
+      
       const { data: allUnits, error: unitsError } = await supabase
         .from('organizational_structure')
         .select('id, code, description, type')
+        .eq('root_company_id', activeCompanyId)
         .in('type', ['area', 'department', 'sector', 'project'])
         .order('code');
       
       if (unitsError) throw unitsError;
       if (!allUnits) return [];
 
+      // Buscar submissões apenas das unidades desta empresa
+      const unitIds = allUnits.map(u => u.id);
       const { data: submissionsData } = await supabase
         .from('budget_submissions')
         .select('unit_id')
-        .eq('fiscal_year', fiscalYear);
+        .eq('fiscal_year', fiscalYear)
+        .in('unit_id', unitIds.length > 0 ? unitIds : ['00000000-0000-0000-0000-000000000000']);
       
       const unitIdsWithSubmissions = new Set(
         submissionsData?.map(s => s.unit_id).filter(Boolean) || []
@@ -79,36 +87,54 @@ const BudgetApprovals = () => {
         hasSubmissions: unitIdsWithSubmissions.has(unit.id)
       }));
     },
+    enabled: !!activeCompanyId,
   });
 
-  // Query separada para KPIs consolidados (independente do filtro de status)
+  // Query separada para KPIs consolidados (independente do filtro de status) - FILTRADO POR EMPRESA
   const { data: kpiData } = useQuery({
-    queryKey: ['budget-submissions-kpi', fiscalYear],
+    queryKey: ['budget-submissions-kpi', fiscalYear, activeCompanyId],
     queryFn: async () => {
-      // Buscar todas as submissões do ano fiscal
+      if (!activeCompanyId) return { totalPending: 0, totalApproved: 0, totalApprovedBudget: 0 };
+      
+      // Primeiro buscar unidades da empresa ativa
+      const { data: companyUnits } = await supabase
+        .from('organizational_structure')
+        .select('id')
+        .eq('root_company_id', activeCompanyId)
+        .in('type', ['area', 'department', 'sector', 'project']);
+      
+      const unitIds = companyUnits?.map(u => u.id) || [];
+      
+      // Buscar submissões apenas das unidades desta empresa
       const { data: allSubmissions, error } = await supabase
         .from('budget_submissions')
         .select('id, status, unit_id')
-        .eq('fiscal_year', fiscalYear);
+        .eq('fiscal_year', fiscalYear)
+        .or(`unit_id.in.(${unitIds.length > 0 ? unitIds.join(',') : '00000000-0000-0000-0000-000000000000'}),unit_id.is.null`);
       
       if (error) throw error;
       
-      const pending = allSubmissions?.filter(s => s.status === 'submitted').length || 0;
-      const approved = allSubmissions?.filter(s => s.status === 'approved') || [];
+      // Filtrar para garantir que submissões "empresa toda" são da empresa correta
+      const filteredSubmissions = allSubmissions?.filter(s => 
+        s.unit_id === null || unitIds.includes(s.unit_id)
+      ) || [];
       
-      // CORREÇÃO: Verificar se existe submissão "Empresa toda" aprovada (unit_id = NULL)
+      const pending = filteredSubmissions.filter(s => s.status === 'submitted').length;
+      const approved = filteredSubmissions.filter(s => s.status === 'approved');
+      
+      // Verificar se existe submissão "Empresa toda" aprovada (unit_id = NULL)
       const companyWideApproved = approved.find(s => s.unit_id === null);
       
       let totalApprovedBudget = 0;
       
       if (companyWideApproved) {
-        // Se existe "Empresa toda", buscar TODAS as projeções (sem filtro de unidade)
-        // Isso evita duplicação pois a submissão "Empresa toda" já representa 100%
+        // Se existe "Empresa toda", buscar projeções das unidades da empresa
         const { data: projections } = await supabase
           .from('budget_employee_projections')
           .select('projected_fixed_salary, projected_variable_salary, projected_benefits')
           .eq('fiscal_year', fiscalYear)
-          .eq('is_active', true);
+          .eq('is_active', true)
+          .in('projected_unit_id', unitIds.length > 0 ? unitIds : ['00000000-0000-0000-0000-000000000000']);
         
         totalApprovedBudget = projections?.reduce((sum, p) => 
           sum + (p.projected_fixed_salary || 0) + 
@@ -117,7 +143,7 @@ const BudgetApprovals = () => {
       } else {
         // Caso contrário, somar apenas unidades específicas aprovadas
         for (const sub of approved) {
-          if (sub.unit_id) {
+          if (sub.unit_id && unitIds.includes(sub.unit_id)) {
             const { data: projections } = await supabase
               .from('budget_employee_projections')
               .select('projected_fixed_salary, projected_variable_salary, projected_benefits')
@@ -139,6 +165,7 @@ const BudgetApprovals = () => {
         totalApprovedBudget
       };
     },
+    enabled: !!activeCompanyId,
   });
 
   // Aplicar filtro de unidade
