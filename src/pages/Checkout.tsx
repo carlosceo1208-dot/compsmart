@@ -209,6 +209,10 @@ const planId = searchParams.get('plan');
     }
   };
 
+  const roundToTwoDecimals = (value: number): number => {
+    return Math.round(value * 100) / 100;
+  };
+
   const calculateTotal = () => {
     if (!plan) return 0;
     
@@ -217,23 +221,23 @@ const planId = searchParams.get('plan');
     
     // Aplicar desconto do cupom (percentual)
     if (couponApplied?.coupon?.discount_type === 'percentage') {
-      monthlyBase *= (1 - couponApplied.coupon.discount_value / 100);
+      monthlyBase = roundToTwoDecimals(monthlyBase * (1 - couponApplied.coupon.discount_value / 100));
     } else if (couponApplied?.calculated_discount && billingCycle === 'monthly') {
-      monthlyBase -= couponApplied.calculated_discount;
+      monthlyBase = roundToTwoDecimals(monthlyBase - couponApplied.calculated_discount);
     }
     
     let amount: number;
     
     if (billingCycle === 'annual') {
       // Anual: preço mensal com desconto do cupom + 10% adicional × 12
-      amount = monthlyBase * 0.90 * 12;
+      amount = roundToTwoDecimals(roundToTwoDecimals(monthlyBase * 0.90) * 12);
     } else {
       amount = monthlyBase;
     }
     
     // PIX desconto adicional 5%
     if (paymentMethod === 'pix') {
-      amount *= 0.95;
+      amount = roundToTwoDecimals(amount * 0.95);
     }
     
     return Math.max(amount, 1);

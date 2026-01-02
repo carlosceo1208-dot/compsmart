@@ -30,6 +30,10 @@ interface CheckoutSummaryProps {
   calculateTotal: () => number;
 }
 
+const roundToTwoDecimals = (value: number): number => {
+  return Math.round(value * 100) / 100;
+};
+
 export function CheckoutSummary({
   plan,
   billingCycle,
@@ -45,7 +49,7 @@ export function CheckoutSummary({
 }: CheckoutSummaryProps) {
   const basePrice = billingCycle === 'annual' ? plan.annual_price : plan.monthly_price;
   const total = calculateTotal();
-  const savings = basePrice - total;
+  const savings = roundToTwoDecimals(basePrice - total);
 
   // Usar features do config centralizado
   const features = planFeatures[plan.name] || [];
@@ -182,7 +186,7 @@ export function CheckoutSummary({
           {paymentMethod === 'pix' && (
             <div className="flex justify-between text-green-600">
               <span>Desconto PIX (5%)</span>
-              <span>-R$ {((basePrice - (couponApplied?.calculated_discount || 0)) * 0.05).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+              <span>-R$ {roundToTwoDecimals((basePrice - (couponApplied?.calculated_discount || 0)) * 0.05).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
             </div>
           )}
         </div>
@@ -193,20 +197,20 @@ export function CheckoutSummary({
         <div className="flex justify-between items-center">
           <div>
             <span className="text-lg font-semibold">Total</span>
-            {billingCycle === 'annual' && (
+          {billingCycle === 'annual' && (
               <p className="text-xs text-muted-foreground">
-                (R$ {(total / 12).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/mês)
+                (R$ {roundToTwoDecimals(total / 12).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mês)
               </p>
             )}
           </div>
           <span className="text-2xl font-bold text-primary">
-            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            R$ {total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
 
         {savings > 0 && (
           <Badge variant="secondary" className="w-full justify-center bg-green-100 text-green-700">
-            Você economiza R$ {savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            Você economiza R$ {savings.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </Badge>
         )}
 
