@@ -31,7 +31,9 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
   const { data: budgetThreshold } = useBudgetThreshold();
   const [historyOpen, setHistoryOpen] = useState(false);
 
-  const isApproved = data?.submissionStatus === 'approved';
+  // Priorizar exibição do ano atual aprovado
+  const isApproved = data?.hasCurrentYearApproved || data?.submissionStatus === 'approved';
+  const displayYear = data?.hasCurrentYearApproved ? data?.currentYear : data?.projectedYear;
 
   // Valores separados convertidos para moeda selecionada
   const currentFixed = data ? convert(data.currentFixedSalary, 'BRL', currency) : 0;
@@ -158,7 +160,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
             <>
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <span className="text-green-700 dark:text-green-400">
-                Orçamento Aprovado {data?.projectedYear}
+                Orçamento Aprovado {displayYear}
               </span>
             </>
           ) : (
@@ -174,8 +176,8 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
       <CardContent className="space-y-3">
         {isLoading ? (
           <Skeleton className="h-40 w-full" />
-        ) : !data?.hasPlanning ? (
-          // Estado: Sem planejamento
+        ) : !data?.hasPlanning && !data?.hasCurrentYearApproved ? (
+          // Estado: Sem planejamento e sem ano atual aprovado
           <div className="space-y-3">
             <div className="space-y-2">
               <p className="text-xs font-semibold text-muted-foreground">Dados Atuais (Baseline)</p>
