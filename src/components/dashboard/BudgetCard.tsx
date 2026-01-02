@@ -1,18 +1,17 @@
-import { useState } from 'react';
-import { PiggyBank, ExternalLink, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Download, History, ChevronDown } from 'lucide-react';
+import { PiggyBank, ExternalLink, TrendingUp, TrendingDown, AlertTriangle, CheckCircle2, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+
 import { useBudgetPlanningAnnualKPI } from '@/hooks/useBudgetPlanningAnnualKPI';
 import { useBudgetVarianceAlert, useBudgetThreshold } from '@/hooks/useBudgetVarianceAlert';
 import { formatCurrency, formatNumber, formatPercentageSafe } from '@/lib/formatters';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
 import { Currency } from '@/types/economic';
 import { Link } from 'react-router-dom';
-import { BudgetMultiYearChart } from '@/components/budget/BudgetMultiYearChart';
+
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -29,7 +28,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
   const { convert } = useCurrencyConverter();
   const { data: varianceAlert } = useBudgetVarianceAlert();
   const { data: budgetThreshold } = useBudgetThreshold();
-  const [historyOpen, setHistoryOpen] = useState(false);
+  
 
   const isApproved = data?.hasCurrentYearApproved || data?.submissionStatus === 'approved';
 
@@ -350,19 +349,6 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </Button>
             </div>
 
-            {/* Histórico de Orçamentos Multi-Ano */}
-            <Collapsible open={historyOpen} onOpenChange={setHistoryOpen} className="border-t pt-2">
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-xs text-muted-foreground hover:text-foreground transition-colors">
-                <span className="flex items-center gap-1">
-                  <History className="h-3 w-3" />
-                  Histórico de Orçamentos
-                </span>
-                <ChevronDown className={`h-3 w-3 transition-transform ${historyOpen ? 'rotate-180' : ''}`} />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="pt-3">
-                <BudgetMultiYearChart compact />
-              </CollapsibleContent>
-            </Collapsible>
           </div>
         )}
       </CardContent>
