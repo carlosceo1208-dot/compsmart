@@ -3,6 +3,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 import { 
   TrendingUp, 
   Gift, 
@@ -13,9 +21,61 @@ import {
   Target,
   Lightbulb,
   BookOpen,
-  CheckCircle2
+  CheckCircle2,
+  Search,
+  Globe,
+  Briefcase,
+  Newspaper,
+  ChevronDown
 } from "lucide-react";
+import { toast } from "sonner";
 import type { CompensationTrend } from "@/hooks/useCompensationTrends";
+
+// Configuração das fontes de pesquisa
+const searchSources = [
+  {
+    name: 'Google',
+    icon: Globe,
+    description: 'Pesquisa geral na web',
+    buildUrl: (terms: string) => 
+      `https://www.google.com/search?q=${encodeURIComponent(terms)}`,
+  },
+  {
+    name: 'Glassdoor',
+    icon: Search,
+    description: 'Salários e avaliações',
+    buildUrl: (terms: string) => 
+      `https://www.glassdoor.com.br/Pesquisa/index.htm?keyword=${encodeURIComponent(terms)}`,
+  },
+  {
+    name: 'LinkedIn',
+    icon: Users,
+    description: 'Artigos e tendências',
+    buildUrl: (terms: string) => 
+      `https://www.linkedin.com/search/results/content/?keywords=${encodeURIComponent(terms)}`,
+  },
+  {
+    name: 'Indeed',
+    icon: Briefcase,
+    description: 'Comparativo de salários',
+    buildUrl: (terms: string) => 
+      `https://br.indeed.com/cmp/_/salaries?q=${encodeURIComponent(terms)}`,
+  },
+  {
+    name: 'Exame',
+    icon: Newspaper,
+    description: 'Notícias de negócios',
+    buildUrl: (terms: string) => 
+      `https://exame.com/noticias-sobre/${encodeURIComponent(terms.replace(/ /g, '-'))}`,
+  },
+  {
+    name: 'InfoMoney',
+    icon: TrendingUp,
+    description: 'Economia e mercado',
+    buildUrl: (terms: string) => 
+      `https://www.infomoney.com.br/busca/?s=${encodeURIComponent(terms)}`,
+  },
+];
 
 interface TrendDetailDialogProps {
   trend: CompensationTrend | null;
@@ -37,12 +97,26 @@ export const TrendDetailDialog = ({ trend, open, onOpenChange }: TrendDetailDial
   const config = categoryConfig[trend.category] || categoryConfig.salários;
   const CategoryIcon = config.icon;
 
-  const handleSearchMore = () => {
-    const searchTerms = trend.search_terms?.length 
+  const getSearchTerms = () => {
+    return trend.search_terms?.length 
       ? trend.search_terms.join(" ") 
       : `${trend.title} remuneração Brasil 2026`;
-    const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(searchTerms)}`;
-    window.open(searchUrl, "_blank", "noopener,noreferrer");
+  };
+
+  const openSearchSource = (source: typeof searchSources[0]) => {
+    const searchTerms = getSearchTerms();
+    const url = source.buildUrl(searchTerms);
+    
+    // Criar link temporário para evitar bloqueio de popup em iframes
+    const link = document.createElement('a');
+    link.href = url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success(`Abrindo pesquisa no ${source.name}...`);
   };
 
   return (
@@ -125,16 +199,41 @@ export const TrendDetailDialog = ({ trend, open, onOpenChange }: TrendDetailDial
               </div>
             )}
 
-            {/* Botão Pesquisar Mais */}
+            {/* Menu de Fontes de Pesquisa */}
             <div className="pt-2">
-              <Button 
-                onClick={handleSearchMore}
-                className="w-full"
-                variant="outline"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Pesquisar mais sobre este tema
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button className="w-full" variant="outline">
+                    <Search className="h-4 w-4 mr-2" />
+                    Pesquisar mais sobre este tema
+                    <ChevronDown className="h-4 w-4 ml-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-64">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    Escolha a fonte de pesquisa
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {searchSources.map((source) => {
+                    const SourceIcon = source.icon;
+                    return (
+                      <DropdownMenuItem
+                        key={source.name}
+                        onClick={() => openSearchSource(source)}
+                        className="cursor-pointer"
+                      >
+                        <SourceIcon className="h-4 w-4 mr-2" />
+                        <div className="flex-1">
+                          <span className="font-medium">{source.name}</span>
+                          <p className="text-xs text-muted-foreground">
+                            {source.description}
+                          </p>
+                        </div>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </ScrollArea>
