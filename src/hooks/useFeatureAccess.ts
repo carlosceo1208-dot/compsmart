@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type PlanType = 'starter' | 'medium' | 'pro' | 'enterprise';
 
-export type SubscriptionStatus = 'active' | 'trial' | 'canceled' | 'expired' | 'past_due';
+export type SubscriptionStatus = 'active' | 'trial' | 'canceled' | 'expired' | 'past_due' | 'deleted';
 
 interface FeatureAccessResult {
   plan: PlanType;
@@ -16,6 +16,10 @@ interface FeatureAccessResult {
   canAddUsers: (currentCount: number) => boolean;
   trialEndsAt: string | null;
   daysLeftInTrial: number | null;
+  // New fields for blocking system
+  isBlocked: boolean;
+  daysUntilDeletion: number | null;
+  dataDeletionScheduledAt: string | null;
 }
 
 // Feature map: which plans have access to each feature
@@ -113,6 +117,10 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   const [maxUsers, setMaxUsers] = useState<number | null>(null);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [daysLeftInTrial, setDaysLeftInTrial] = useState<number | null>(null);
+  // New state for blocking system
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [daysUntilDeletion, setDaysUntilDeletion] = useState<number | null>(null);
+  const [dataDeletionScheduledAt, setDataDeletionScheduledAt] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
@@ -160,11 +168,12 @@ export const useFeatureAccess = (): FeatureAccessResult => {
           setStatus(subscription.status as SubscriptionStatus);
           setMaxEmployees(planData.max_employees);
           setMaxUsers(planData.max_users);
+          setIsBlocked(false);
         } else {
-          // Check for trial status in organizational_structure
+          // Check for trial/expired status in organizational_structure
           const { data: company } = await supabase
             .from('organizational_structure')
-            .select('subscription_status, trial_ends_at, subscription_plan_id')
+            .select('subscription_status, trial_ends_at, subscription_plan_id, data_deletion_scheduled_at')
             .eq('id', profile.root_company_id)
             .single();
 
@@ -172,6 +181,7 @@ export const useFeatureAccess = (): FeatureAccessResult => {
             if (company.subscription_status === 'trial' && company.trial_ends_at) {
               setStatus('trial');
               setTrialEndsAt(company.trial_ends_at);
+              setIsBlocked(false);
               
               // Calculate days left in trial
               const trialEnd = new Date(company.trial_ends_at);
@@ -185,6 +195,20 @@ export const useFeatureAccess = (): FeatureAccessResult => {
             } else if (company.subscription_status === 'expired') {
               setStatus('expired');
               setPlan('starter');
+              setIsBlocked(true); // BLOCKED!
+              
+              // Calculate days until deletion
+              if (company.data_deletion_scheduled_at) {
+                setDataDeletionScheduledAt(company.data_deletion_scheduled_at);
+                const deletionDate = new Date(company.data_deletion_scheduled_at);
+                const now = new Date();
+                const diffTime = deletionDate.getTime() - now.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                setDaysUntilDeletion(diffDays > 0 ? diffDays : 0);
+              }
+            } else if (company.subscription_status === 'deleted') {
+              setStatus('deleted' as SubscriptionStatus);
+              setIsBlocked(true);
             }
           }
         }
@@ -234,5 +258,8 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     canAddUsers,
     trialEndsAt,
     daysLeftInTrial,
+    isBlocked,
+    daysUntilDeletion,
+    dataDeletionScheduledAt,
   };
 };

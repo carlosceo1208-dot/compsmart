@@ -158,26 +158,125 @@ const getTrialReminderTemplate = (daysLeft: number, data: Record<string, any>): 
   };
 };
 
+// Grace period email template (for expired accounts before deletion)
+const getGracePeriodReminderTemplate = (daysLeft: number, data: Record<string, any>): { subject: string; html: string } => {
+  const urgencyColor = daysLeft <= 1 ? '#dc2626' : daysLeft <= 3 ? '#dc2626' : '#f59e0b';
+  
+  const baseStyles = `
+    <style>
+      body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f5; }
+      .container { max-width: 600px; margin: 0 auto; background: white; }
+      .header { background: linear-gradient(135deg, ${urgencyColor} 0%, ${urgencyColor}dd 100%); padding: 40px 30px; text-align: center; }
+      .header h1 { color: white; margin: 0; font-size: 28px; }
+      .header p { color: rgba(255,255,255,0.9); margin: 10px 0 0; }
+      .content { padding: 40px 30px; }
+      .content h2 { color: #18181b; margin-top: 0; }
+      .content p { color: #52525b; line-height: 1.6; }
+      .alert-box { background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; padding: 30px; margin: 20px 0; text-align: center; }
+      .alert-box .icon { font-size: 48px; margin-bottom: 10px; }
+      .alert-box .countdown { font-size: 64px; font-weight: bold; color: ${urgencyColor}; line-height: 1; }
+      .alert-box .label { font-size: 18px; color: #52525b; margin-top: 5px; }
+      .button { display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; margin: 20px 0; font-size: 16px; }
+      .discount-box { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
+      .discount-box .code { font-size: 24px; font-weight: bold; letter-spacing: 2px; background: white; color: #059669; padding: 10px 20px; border-radius: 4px; display: inline-block; margin-top: 10px; }
+      .footer { background: #18181b; padding: 30px; text-align: center; }
+      .footer p { color: #a1a1aa; font-size: 12px; margin: 5px 0; }
+      .footer a { color: #a1a1aa; }
+    </style>
+  `;
+
+  const footer = `
+    <div class="footer">
+      <p><strong>CompSmart</strong> - Gestão Inteligente em Remuneração</p>
+      <p>Este email foi enviado automaticamente. Por favor, não responda.</p>
+      <p>Em conformidade com a LGPD | <a href="https://compsmart.com.br/privacy">Política de Privacidade</a></p>
+    </div>
+  `;
+
+  const urgencyPrefix = daysLeft <= 1 ? '🚨 [ÚLTIMO DIA] ' : daysLeft <= 3 ? '⚠️ [URGENTE] ' : '⏰ ';
+
+  return {
+    subject: `${urgencyPrefix}Seus dados serão excluídos em ${daysLeft} dia${daysLeft > 1 ? 's' : ''}!`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>${baseStyles}</head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>⚠️ Exclusão de Dados Programada</h1>
+            <p>Ação necessária para manter seus dados</p>
+          </div>
+          <div class="content">
+            <h2>Olá, ${data.userName}!</h2>
+            <p>Seu período de teste do CompSmart expirou e sua conta está <strong>bloqueada</strong>.</p>
+            
+            <div class="alert-box">
+              <div class="icon">🗑️</div>
+              <p style="margin: 0; font-size: 18px; color: #dc2626; font-weight: bold;">
+                Seus dados serão PERMANENTEMENTE excluídos em:
+              </p>
+              <div class="countdown">${daysLeft}</div>
+              <div class="label">dia${daysLeft > 1 ? 's' : ''}</div>
+            </div>
+            
+            <p><strong>O que será excluído:</strong></p>
+            <ul style="color: #52525b;">
+              <li>Todos os perfis de colaboradores</li>
+              <li>Tabelas salariais e faixas</li>
+              <li>Cargos e estrutura organizacional</li>
+              <li>Histórico de conversas com assistentes IA</li>
+              <li>Todas as configurações e preferências</li>
+            </ul>
+            
+            <p>Data de exclusão: <strong>${data.deletionDate}</strong></p>
+            
+            <div class="discount-box">
+              <p style="margin: 0; font-size: 18px;">🎁 Oferta de Recuperação!</p>
+              <p style="margin: 5px 0; font-size: 14px;">Assine agora e ganhe <strong>25% OFF</strong> no primeiro pagamento:</p>
+              <div class="code">RECUPERAR25</div>
+            </div>
+            
+            <center>
+              <a href="https://compsmart.com.br/pricing" class="button">Assinar e Manter Meus Dados</a>
+            </center>
+            
+            <p style="font-size: 14px; color: #71717a;">
+              Precisa de ajuda? Entre em contato: comercial@compsmart.com.br
+            </p>
+          </div>
+          ${footer}
+        </div>
+      </body>
+      </html>
+    `
+  };
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Starting trial reminder check...');
+    console.log('Starting trial and grace period reminder check...');
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Find companies in trial that need reminders
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const reminderDays = [7, 3, 1, 0]; // Days before trial ends to send reminders
+    const trialReminderDays = [7, 3, 1, 0]; // Days before trial ends
+    const gracePeriodReminderDays = [7, 3, 1, 0]; // Days before data deletion
 
-    const { data: trialCompanies, error } = await supabase
+    let emailsSent = 0;
+    const results: any[] = [];
+
+    // ===== PART 1: Trial Reminders =====
+    const { data: trialCompanies, error: trialError } = await supabase
       .from('organizational_structure')
       .select(`
         id,
@@ -188,15 +287,11 @@ serve(async (req) => {
       .eq('subscription_status', 'trial')
       .not('trial_ends_at', 'is', null);
 
-    if (error) {
-      console.error('Error fetching trial companies:', error);
-      throw error;
+    if (trialError) {
+      console.error('Error fetching trial companies:', trialError);
     }
 
     console.log(`Found ${trialCompanies?.length || 0} companies in trial`);
-
-    let emailsSent = 0;
-    const results: any[] = [];
 
     for (const company of trialCompanies || []) {
       const trialEnd = new Date(company.trial_ends_at);
@@ -205,12 +300,10 @@ serve(async (req) => {
       const diffTime = trialEnd.getTime() - today.getTime();
       const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      // Check if we should send a reminder for this company
-      if (!reminderDays.includes(daysLeft)) {
+      if (!trialReminderDays.includes(daysLeft)) {
         continue;
       }
 
-      // Get admin user for this company
       const { data: adminProfile } = await supabase
         .from('profiles')
         .select('id, full_name, email')
@@ -219,7 +312,6 @@ serve(async (req) => {
         .single();
 
       if (!adminProfile?.email) {
-        console.log(`No admin email for company ${company.id}`);
         continue;
       }
 
@@ -234,7 +326,7 @@ serve(async (req) => {
       const { subject, html } = getTrialReminderTemplate(daysLeft, emailData);
 
       try {
-        const emailResponse = await resend.emails.send({
+        await resend.emails.send({
           from: "CompSmart <noreply@compsmart.com.br>",
           to: [recipientEmail],
           subject,
@@ -246,14 +338,16 @@ serve(async (req) => {
         results.push({
           companyId: company.id,
           email: recipientEmail,
+          type: 'trial_reminder',
           daysLeft,
           status: 'sent'
         });
       } catch (emailError: any) {
-        console.error(`Failed to send email to ${recipientEmail}:`, emailError);
+        console.error(`Failed to send trial email to ${recipientEmail}:`, emailError);
         results.push({
           companyId: company.id,
           email: recipientEmail,
+          type: 'trial_reminder',
           daysLeft,
           status: 'failed',
           error: emailError.message
@@ -261,7 +355,87 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Trial reminder job complete. Emails sent: ${emailsSent}`);
+    // ===== PART 2: Grace Period Reminders (Expired companies before deletion) =====
+    const { data: expiredCompanies, error: expiredError } = await supabase
+      .from('organizational_structure')
+      .select(`
+        id,
+        name,
+        billing_email,
+        data_deletion_scheduled_at
+      `)
+      .eq('subscription_status', 'expired')
+      .not('data_deletion_scheduled_at', 'is', null);
+
+    if (expiredError) {
+      console.error('Error fetching expired companies:', expiredError);
+    }
+
+    console.log(`Found ${expiredCompanies?.length || 0} expired companies in grace period`);
+
+    for (const company of expiredCompanies || []) {
+      const deletionDate = new Date(company.data_deletion_scheduled_at);
+      deletionDate.setHours(0, 0, 0, 0);
+      
+      const diffTime = deletionDate.getTime() - today.getTime();
+      const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (!gracePeriodReminderDays.includes(daysLeft) || daysLeft < 0) {
+        continue;
+      }
+
+      const { data: adminProfile } = await supabase
+        .from('profiles')
+        .select('id, full_name, email')
+        .eq('root_company_id', company.id)
+        .limit(1)
+        .single();
+
+      if (!adminProfile?.email) {
+        continue;
+      }
+
+      const recipientEmail = company.billing_email || adminProfile.email;
+      
+      const emailData = {
+        userName: adminProfile.full_name || 'Cliente',
+        companyName: company.name,
+        deletionDate: formatDate(company.data_deletion_scheduled_at),
+      };
+
+      const { subject, html } = getGracePeriodReminderTemplate(daysLeft, emailData);
+
+      try {
+        await resend.emails.send({
+          from: "CompSmart <noreply@compsmart.com.br>",
+          to: [recipientEmail],
+          subject,
+          html,
+        });
+
+        console.log(`Grace period reminder sent to ${recipientEmail} (${daysLeft} days until deletion)`);
+        emailsSent++;
+        results.push({
+          companyId: company.id,
+          email: recipientEmail,
+          type: 'grace_period_reminder',
+          daysLeft,
+          status: 'sent'
+        });
+      } catch (emailError: any) {
+        console.error(`Failed to send grace period email to ${recipientEmail}:`, emailError);
+        results.push({
+          companyId: company.id,
+          email: recipientEmail,
+          type: 'grace_period_reminder',
+          daysLeft,
+          status: 'failed',
+          error: emailError.message
+        });
+      }
+    }
+
+    console.log(`Reminder job complete. Emails sent: ${emailsSent}`);
 
     return new Response(JSON.stringify({ 
       success: true, 
