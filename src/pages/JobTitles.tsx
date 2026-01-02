@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -41,8 +40,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
-// Job families are now loaded dynamically from the database
-
 const familyColors: Record<string, string> = {
   'Analistas': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   'Profissionais': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
@@ -71,14 +68,10 @@ interface JobTitle {
 }
 
 export default function JobTitlesPage() {
-  const { t, i18n } = useTranslation();
-  
   const formatCurrency = (value: number) => {
-    const locale = i18n.language === 'en-US' ? 'en-US' : i18n.language === 'es-LATAM' ? 'es-AR' : 'pt-BR';
-    const currency = i18n.language === 'en-US' ? 'USD' : 'BRL';
-    return new Intl.NumberFormat(locale, {
+    return new Intl.NumberFormat('pt-BR', {
       style: "currency",
-      currency,
+      currency: 'BRL',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(value);
@@ -148,7 +141,7 @@ export default function JobTitlesPage() {
 
   const fetchJobTitles = async () => {
     if (!activeCompanyId) {
-      toast.error(t('job_titles.no_company'));
+      toast.error("Selecione uma empresa para visualizar os cargos");
       setJobTitles([]);
       return;
     }
@@ -171,7 +164,7 @@ export default function JobTitlesPage() {
       setJobTitles(data || []);
     } catch (error: any) {
       console.error("Error fetching job titles:", error);
-      toast.error(t('job_titles.error_loading'));
+      toast.error("Erro ao carregar cargos");
     } finally {
       setLoading(false);
     }
@@ -260,14 +253,13 @@ export default function JobTitlesPage() {
   };
 
   const handleInactivate = async (id: string) => {
-    // Check for linked employees
     const { data: employees, error: empError } = await supabase
       .from("profiles")
       .select("id")
       .eq("job_title_id", id);
 
     if (empError) {
-      toast.error(t('job_titles.error_check_employees'));
+      toast.error("Erro ao verificar colaboradores vinculados");
       return;
     }
 
@@ -294,11 +286,11 @@ export default function JobTitlesPage() {
 
       if (error) throw error;
 
-      toast.success(newStatus ? t('job_titles.activated') : t('job_titles.inactivated'));
+      toast.success(newStatus ? "Cargo ativado com sucesso!" : "Cargo inativado com sucesso!");
       fetchJobTitles();
     } catch (error: any) {
       console.error("Error updating status:", error);
-      toast.error(t('job_titles.error_update_status'));
+      toast.error("Erro ao atualizar status do cargo");
     }
   };
 
@@ -324,7 +316,6 @@ export default function JobTitlesPage() {
         return;
       }
 
-      // Update with summary
       const { error: updateError } = await supabase
         .from("job_titles")
         .update({ summary: data.summary } as any)
@@ -332,15 +323,14 @@ export default function JobTitlesPage() {
 
       if (updateError) throw updateError;
 
-      toast.success(t('job_titles.summary_generated'));
+      toast.success("Resumo gerado com sucesso!");
       fetchJobTitles();
     } catch (error: any) {
       console.error("AI generation error:", error);
-      toast.error(t('job_titles.error_generate_summary'));
+      toast.error("Erro ao gerar resumo com IA");
     }
   };
 
-  // Mapeamento de pontos Hay por grade
   const GRADE_POINTS_MAP: Record<string, number> = {
     '001': 115, '002': 150, '003': 190, '004': 235, '005': 290,
     '006': 355, '007': 435, '008': 535, '009': 655, '010': 800,
@@ -352,7 +342,7 @@ export default function JobTitlesPage() {
     const jobsWithoutPoints = jobTitles.filter(j => !j.hay_total_points || j.hay_total_points === 0);
     
     if (jobsWithoutPoints.length === 0) {
-      toast.info(t('job_titles.all_have_points'));
+      toast.info("Todos os cargos já possuem pontos atribuídos");
       return;
     }
 
@@ -372,11 +362,11 @@ export default function JobTitlesPage() {
         }
       }
 
-      toast.success(t('job_titles.points_assigned', { count: updatedCount }));
+      toast.success(`Pontos atribuídos a ${updatedCount} cargos`);
       fetchJobTitles();
     } catch (error: any) {
       console.error("Error assigning points:", error);
-      toast.error(t('job_titles.error_assign_points'));
+      toast.error("Erro ao atribuir pontos aos cargos");
     } finally {
       setLoading(false);
     }
@@ -449,7 +439,7 @@ export default function JobTitlesPage() {
       <TableCell className="py-2">
         <Badge variant={job.is_active ? "success" : "destructive"}>
           {job.is_active ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}
-          {job.is_active ? t('label.active') : t('label.inactive')}
+          {job.is_active ? "Ativo" : "Inativo"}
         </Badge>
       </TableCell>
       <TableCell className="py-2">
@@ -460,16 +450,16 @@ export default function JobTitlesPage() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => handleEdit(job.id)}>
               <Eye className="w-4 h-4 mr-2" />
-              {t('job_titles.view_details')}
+              Ver detalhes
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleEdit(job.id)}>
               <Edit className="w-4 h-4 mr-2" />
-              {t('job_titles.edit_job')}
+              Editar cargo
             </DropdownMenuItem>
             {!job.summary && (
               <DropdownMenuItem onClick={() => handleGenerateAI(job.id)}>
                 <Sparkles className="w-4 h-4 mr-2" />
-                {t('job_titles.generate_ai')}
+                Gerar resumo com IA
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
@@ -479,12 +469,12 @@ export default function JobTitlesPage() {
                 className="text-destructive"
               >
                 <XCircle className="w-4 h-4 mr-2" />
-                {t('job_titles.inactivate')}
+                Inativar
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem onClick={() => toggleActiveStatus(job.id, true)}>
                 <CheckCircle2 className="w-4 h-4 mr-2" />
-                {t('job_titles.activate')}
+                Ativar
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>
@@ -496,9 +486,9 @@ export default function JobTitlesPage() {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">🏢 {t('job_titles.title')}</h1>
+        <h1 className="text-3xl font-bold">🏢 Plano de Cargos e Salários</h1>
         <p className="text-muted-foreground mt-2">
-          {t('job_titles.subtitle')}
+          Gerencie os cargos, famílias e estrutura salarial da sua empresa
         </p>
       </div>
 
@@ -508,7 +498,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('job_titles.total_jobs')}</p>
+                <p className="text-sm text-muted-foreground">Total de Cargos</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
               <Briefcase className="h-8 w-8 text-muted-foreground" />
@@ -519,7 +509,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('job_titles.active_jobs')}</p>
+                <p className="text-sm text-muted-foreground">Cargos Ativos</p>
                 <p className="text-2xl font-bold text-green-600">{stats.active}</p>
               </div>
               <CheckCircle2 className="h-8 w-8 text-green-600" />
@@ -530,7 +520,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('job_titles.inactive_jobs')}</p>
+                <p className="text-sm text-muted-foreground">Cargos Inativos</p>
                 <p className="text-2xl font-bold text-red-600">{stats.inactive}</p>
               </div>
               <XCircle className="h-8 w-8 text-red-600" />
@@ -541,7 +531,7 @@ export default function JobTitlesPage() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">{t('job_titles.families')}</p>
+                <p className="text-sm text-muted-foreground">Famílias</p>
                 <p className="text-2xl font-bold">{stats.families}</p>
               </div>
               <Building2 className="h-8 w-8 text-muted-foreground" />
@@ -555,21 +545,21 @@ export default function JobTitlesPage() {
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label>🔍 {t('action.search')}</Label>
+              <Label>🔍 Buscar</Label>
               <Input
-                placeholder={t('job_titles.search_placeholder')}
+                placeholder="Título, código ou CBO..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div>
-              <Label>📂 {t('job_titles.family')}</Label>
+              <Label>📂 Família</Label>
               <Select value={familyFilter} onValueChange={setFamilyFilter}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  <SelectItem value="all">Todas</SelectItem>
                   {jobFamilies.map(family => (
                     <SelectItem key={family} value={family}>{family}</SelectItem>
                   ))}
@@ -577,13 +567,13 @@ export default function JobTitlesPage() {
               </Select>
             </div>
             <div>
-              <Label>🎚️ {t('label.grade')}</Label>
+              <Label>🎚️ Grade</Label>
               <Select value={gradeFilter} onValueChange={setGradeFilter}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  <SelectItem value="all">Todas</SelectItem>
                   {uniqueGrades.map(grade => (
                     <SelectItem key={grade} value={grade}>{grade}</SelectItem>
                   ))}
@@ -591,19 +581,19 @@ export default function JobTitlesPage() {
               </Select>
             </div>
             <div>
-              <Label>🚦 {t('job_titles.status')}</Label>
+              <Label>🚦 Status</Label>
               <RadioGroup value={statusFilter} onValueChange={setStatusFilter} className="flex gap-4 mt-2">
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="all" id="all" />
-                  <Label htmlFor="all" className="cursor-pointer">{t('common.all')}</Label>
+                  <Label htmlFor="all" className="cursor-pointer">Todos</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="active" id="active" />
-                  <Label htmlFor="active" className="cursor-pointer">{t('job_titles.active_plural')}</Label>
+                  <Label htmlFor="active" className="cursor-pointer">Ativos</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="inactive" id="inactive" />
-                  <Label htmlFor="inactive" className="cursor-pointer">{t('job_titles.inactive_plural')}</Label>
+                  <Label htmlFor="inactive" className="cursor-pointer">Inativos</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -615,15 +605,15 @@ export default function JobTitlesPage() {
       <div className="flex flex-wrap gap-3">
         <Button onClick={handleAddNew}>
           <Plus className="w-4 h-4 mr-2" />
-          {t('job_titles.new_job')}
+          Novo Cargo
         </Button>
         <Button variant="outline" onClick={() => setBulkImportOpen(true)}>
           <Upload className="w-4 h-4 mr-2" />
-          {t('job_titles.bulk_import')}
+          Importar em Massa
         </Button>
         <Button variant="outline" onClick={() => setFamilyManagerOpen(true)}>
           <Settings className="w-4 h-4 mr-2" />
-          {t('job_titles.manage_families')}
+          Gerenciar Famílias
         </Button>
         <Button 
           variant="outline" 
@@ -631,16 +621,16 @@ export default function JobTitlesPage() {
           className="text-purple-700 border-purple-300 hover:bg-purple-50 dark:text-purple-300 dark:border-purple-700 dark:hover:bg-purple-900"
         >
           <Zap className="w-4 h-4 mr-2" />
-          {t('job_titles.assign_points')}
+          Atribuir Pontos por Grade
         </Button>
       </div>
 
       {/* Grouping Tabs */}
       <Tabs value={groupBy} onValueChange={(v) => setGroupBy(v as any)}>
         <TabsList>
-          <TabsTrigger value="family">📂 {t('job_titles.by_family')}</TabsTrigger>
-          <TabsTrigger value="alphabetic">🔤 {t('job_titles.alphabetic')}</TabsTrigger>
-          <TabsTrigger value="grade">📊 {t('job_titles.by_grade')}</TabsTrigger>
+          <TabsTrigger value="family">📂 Por Família</TabsTrigger>
+          <TabsTrigger value="alphabetic">🔤 Alfabético</TabsTrigger>
+          <TabsTrigger value="grade">📊 Por Grade</TabsTrigger>
         </TabsList>
 
         <TabsContent value={groupBy} className="space-y-4">
@@ -648,7 +638,6 @@ export default function JobTitlesPage() {
             const totalItems = sortedData.length;
             const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
             
-            // Reset page if out of bounds when filters change
             if (page > totalPages) {
               setTimeout(() => setPage(1), 0);
             }
@@ -836,32 +825,32 @@ export default function JobTitlesPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>{t('job_titles.family')}</TableHead>
-                        <TableHead>{t('job_titles.code')}</TableHead>
+                        <TableHead>Família</TableHead>
+                        <TableHead>Código</TableHead>
                         <TableHead className="cursor-pointer" onClick={() => handleSort("title")}>
-                          {t('job_titles.job_title')}
+                          Título do Cargo
                           {sortField === "title" && (
                             sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
                           )}
                         </TableHead>
                         <TableHead className="cursor-pointer text-center" onClick={() => handleSort("grade")}>
-                          {t('label.grade')}
+                          Grade
                           {sortField === "grade" && (
                             sortDirection === "asc" ? <ArrowUp className="inline w-3 h-3 ml-1" /> : <ArrowDown className="inline w-3 h-3 ml-1" />
                           )}
                         </TableHead>
-                        <TableHead className="text-center">{t('job_titles.points')}</TableHead>
+                        <TableHead className="text-center">Pontos</TableHead>
                         <TableHead className="whitespace-nowrap">CBO</TableHead>
-                        <TableHead>{t('job_titles.salary_range')}</TableHead>
-                        <TableHead>{t('job_titles.status')}</TableHead>
-                        <TableHead>{t('job_titles.actions')}</TableHead>
+                        <TableHead>Faixa Salarial</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {jobs.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={9} className="text-center text-muted-foreground">
-                            {t('job_titles.no_jobs_found')}
+                            Nenhum cargo encontrado
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -893,13 +882,13 @@ export default function JobTitlesPage() {
       <AlertDialog open={!!inactivateAlert} onOpenChange={() => setInactivateAlert(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('job_titles.inactivate_job')}</AlertDialogTitle>
+            <AlertDialogTitle>Inativar Cargo</AlertDialogTitle>
             <AlertDialogDescription>
-              ⚠️ {t('job_titles.inactivate_warning', { count: inactivateAlert?.linkedCount || 0, title: inactivateAlert?.title || '' })}
+              ⚠️ O cargo "{inactivateAlert?.title}" possui {inactivateAlert?.linkedCount} colaborador(es) vinculado(s). Deseja realmente inativar?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('action.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => {
                 if (inactivateAlert) {
@@ -908,7 +897,7 @@ export default function JobTitlesPage() {
                 }
               }}
             >
-              {t('job_titles.inactivate')}
+              Inativar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
