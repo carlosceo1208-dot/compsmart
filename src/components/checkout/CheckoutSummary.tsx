@@ -5,7 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Tag, Check, Loader2 } from 'lucide-react';
+import { Tag, Check, Loader2, X } from 'lucide-react';
+import { planFeatures } from '@/config/planFeatures';
 
 interface Plan {
   id: string;
@@ -21,6 +22,7 @@ interface CheckoutSummaryProps {
   setBillingCycle: (cycle: 'monthly' | 'annual') => void;
   paymentMethod: string;
   couponApplied: any;
+  setCouponApplied?: (coupon: any) => void;
   couponCode: string;
   setCouponCode: (code: string) => void;
   validateCoupon: () => void;
@@ -34,6 +36,7 @@ export function CheckoutSummary({
   setBillingCycle,
   paymentMethod,
   couponApplied,
+  setCouponApplied,
   couponCode,
   setCouponCode,
   validateCoupon,
@@ -43,6 +46,16 @@ export function CheckoutSummary({
   const basePrice = billingCycle === 'annual' ? plan.annual_price : plan.monthly_price;
   const total = calculateTotal();
   const savings = basePrice - total;
+
+  // Usar features do config centralizado
+  const features = planFeatures[plan.name] || [];
+
+  const handleRemoveCoupon = () => {
+    if (setCouponApplied) {
+      setCouponApplied(null);
+      setCouponCode('');
+    }
+  };
 
   return (
     <Card className="sticky top-8">
@@ -85,7 +98,7 @@ export function CheckoutSummary({
             >
               <RadioGroupItem value="annual" id="annual" className="sr-only" />
               <Badge className="absolute -top-2 -right-2 bg-green-500 text-xs">
-                Economize 20%
+                Economize 10%
               </Badge>
               <span className="font-medium">Anual</span>
               <span className="text-sm text-muted-foreground">
@@ -123,10 +136,23 @@ export function CheckoutSummary({
             </Button>
           </div>
           {couponApplied && (
-            <p className="text-sm text-green-600 flex items-center gap-1">
-              <Check className="h-3 w-3" />
-              {couponApplied.coupon.description}
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-green-600 flex items-center gap-1">
+                <Check className="h-3 w-3" />
+                {couponApplied.coupon?.code}: {couponApplied.coupon?.discount_value}% OFF
+              </p>
+              {setCouponApplied && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleRemoveCoupon}
+                  className="text-xs text-muted-foreground p-1 h-auto hover:text-destructive"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Remover
+                </Button>
+              )}
+            </div>
           )}
         </div>
 
@@ -141,8 +167,15 @@ export function CheckoutSummary({
           
           {couponApplied?.calculated_discount > 0 && (
             <div className="flex justify-between text-green-600">
-              <span>Desconto do cupom</span>
+              <span>Desconto do cupom ({couponApplied.coupon?.discount_value}%)</span>
               <span>-R$ {couponApplied.calculated_discount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+            </div>
+          )}
+
+          {billingCycle === 'annual' && (
+            <div className="flex justify-between text-green-600">
+              <span>Desconto Anual (10%)</span>
+              <span>incluso</span>
             </div>
           )}
           
@@ -177,14 +210,19 @@ export function CheckoutSummary({
           </Badge>
         )}
 
-        {/* Features */}
+        {/* Features - usando config centralizado */}
         <div className="pt-4 space-y-2">
           <p className="text-sm font-medium">Incluso no plano:</p>
           <ul className="text-sm text-muted-foreground space-y-1">
-            {(plan.features as string[])?.slice(0, 5).map((feature, i) => (
+            {features.slice(0, 6).map((feature, i) => (
               <li key={i} className="flex items-center gap-2">
-                <Check className="h-3 w-3 text-green-500" />
-                {feature}
+                <Check className="h-3 w-3 text-green-500 flex-shrink-0" />
+                <span>{feature.text}</span>
+                {feature.isNew && (
+                  <Badge variant="secondary" className="text-[10px] px-1 py-0 bg-primary/10 text-primary">
+                    Novo
+                  </Badge>
+                )}
               </li>
             ))}
           </ul>

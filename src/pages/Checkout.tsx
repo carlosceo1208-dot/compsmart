@@ -73,6 +73,7 @@ const planId = searchParams.get('plan');
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [checkoutResult, setCheckoutResult] = useState<any>(null);
+  const [autoAppliedLaunchCoupon, setAutoAppliedLaunchCoupon] = useState(false);
 
   // Estados para documento
   const [documentType, setDocumentType] = useState<'cpf' | 'cnpj'>('cnpj');
@@ -88,6 +89,41 @@ const planId = searchParams.get('plan');
       navigate('/#pricing');
     }
   }, [planId]);
+
+  // Auto-aplicar cupom LANCAMENTO30 durante período de lançamento
+  useEffect(() => {
+    const autoApplyLaunchCoupon = async () => {
+      if (!plan || autoAppliedLaunchCoupon || couponApplied) return;
+      
+      const launchEndDate = new Date('2026-02-06T23:59:59-03:00');
+      const now = new Date();
+      
+      if (now <= launchEndDate) {
+        try {
+          const amount = billingCycle === 'annual' ? plan.annual_price : plan.monthly_price;
+          
+          const { data, error } = await supabase.functions.invoke('validate-coupon', {
+            body: {
+              coupon_code: 'LANCAMENTO30',
+              plan_id: planId,
+              billing_cycle: billingCycle,
+              amount: amount
+            }
+          });
+
+          if (!error && data.valid) {
+            setCouponCode('LANCAMENTO30');
+            setCouponApplied(data);
+            setAutoAppliedLaunchCoupon(true);
+          }
+        } catch (error) {
+          console.error('Erro ao auto-aplicar cupom de lançamento:', error);
+        }
+      }
+    };
+
+    autoApplyLaunchCoupon();
+  }, [plan, autoAppliedLaunchCoupon, couponApplied, billingCycle, planId]);
 
   const fetchPlanAndUserData = async () => {
     try {
@@ -176,15 +212,28 @@ const planId = searchParams.get('plan');
   const calculateTotal = () => {
     if (!plan) return 0;
     
-    let amount = billingCycle === 'annual' ? plan.annual_price : plan.monthly_price;
+    // Preço base mensal
+    let monthlyBase = plan.monthly_price;
     
-    if (couponApplied?.calculated_discount) {
-      amount -= couponApplied.calculated_discount;
+    // Aplicar desconto do cupom (percentual)
+    if (couponApplied?.coupon?.discount_type === 'percentage') {
+      monthlyBase *= (1 - couponApplied.coupon.discount_value / 100);
+    } else if (couponApplied?.calculated_discount && billingCycle === 'monthly') {
+      monthlyBase -= couponApplied.calculated_discount;
     }
     
-    // PIX desconto adicional
+    let amount: number;
+    
+    if (billingCycle === 'annual') {
+      // Anual: preço mensal com desconto do cupom + 10% adicional × 12
+      amount = monthlyBase * 0.90 * 12;
+    } else {
+      amount = monthlyBase;
+    }
+    
+    // PIX desconto adicional 5%
     if (paymentMethod === 'pix') {
-      amount *= 0.95; // 5% desconto
+      amount *= 0.95;
     }
     
     return Math.max(amount, 1);
@@ -289,7 +338,7 @@ const planId = searchParams.get('plan');
       }
 
       if (data.status === 'paid') {
-        navigate('/checkout/success');
+        navigate(`/checkout/success?session=${data.session_id}`);
       } else {
         setCheckoutResult(data);
       }
@@ -344,6 +393,7 @@ const planId = searchParams.get('plan');
               setBillingCycle={setBillingCycle}
               paymentMethod={paymentMethod}
               couponApplied={couponApplied}
+              setCouponApplied={setCouponApplied}
               couponCode={couponCode}
               setCouponCode={setCouponCode}
               validateCoupon={validateCoupon}
