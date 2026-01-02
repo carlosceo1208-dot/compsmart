@@ -123,9 +123,9 @@ export const BudgetMultiYearChart = ({ compact = false }: BudgetMultiYearChartPr
       </div>
 
       {/* Gráfico */}
-      <div className={compact ? 'h-40' : 'h-56'}>
+      <div className={compact ? 'h-44' : 'h-60'}>
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
+          <ComposedChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
             <XAxis 
               dataKey="year" 
