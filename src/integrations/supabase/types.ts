@@ -1906,6 +1906,7 @@ export type Database = {
           created_at: string
           custom_annual_price: number | null
           custom_monthly_price: number | null
+          data_deletion_scheduled_at: string | null
           default_language: string | null
           description: string | null
           fantasy_name: string | null
@@ -1937,6 +1938,7 @@ export type Database = {
           created_at?: string
           custom_annual_price?: number | null
           custom_monthly_price?: number | null
+          data_deletion_scheduled_at?: string | null
           default_language?: string | null
           description?: string | null
           fantasy_name?: string | null
@@ -1968,6 +1970,7 @@ export type Database = {
           created_at?: string
           custom_annual_price?: number | null
           custom_monthly_price?: number | null
+          data_deletion_scheduled_at?: string | null
           default_language?: string | null
           description?: string | null
           fantasy_name?: string | null

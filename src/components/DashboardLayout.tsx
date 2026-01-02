@@ -28,6 +28,9 @@ import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { TrialBanner } from "@/components/dashboard/TrialBanner";
+import { TrialExpiredBlockScreen } from "@/components/dashboard/TrialExpiredBlockScreen";
+import { useFeatureAccess } from "@/hooks/useFeatureAccess";
 
 interface UserProfile {
   full_name: string;
@@ -90,6 +93,16 @@ export const DashboardLayout = () => {
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // Feature access hook for trial/blocking
+  const { 
+    status, 
+    daysLeftInTrial, 
+    trialEndsAt, 
+    isBlocked, 
+    daysUntilDeletion,
+    loading: featureLoading 
+  } = useFeatureAccess();
 
   // Get current page label for breadcrumbs
   const currentPath = location.pathname;
@@ -196,7 +209,7 @@ export const DashboardLayout = () => {
       .slice(0, 2);
   };
 
-  if (loading) {
+  if (loading || featureLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -204,6 +217,16 @@ export const DashboardLayout = () => {
           <p className="text-muted-foreground">Carregando...</p>
         </div>
       </div>
+    );
+  }
+
+  // If blocked (trial expired), show block screen
+  if (isBlocked) {
+    return (
+      <TrialExpiredBlockScreen 
+        daysUntilDeletion={daysUntilDeletion} 
+        companyName={companyName || "Sua empresa"} 
+      />
     );
   }
 
@@ -224,6 +247,11 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+      {/* Trial Banner - shows during trial period */}
+      {status === 'trial' && daysLeftInTrial !== null && trialEndsAt && (
+        <TrialBanner daysLeft={daysLeftInTrial} trialEndsAt={trialEndsAt} />
+      )}
+
       {/* Viewing Other Company Banner */}
       {isViewingOtherCompany && (
         <div className="bg-amber-500/20 border-b border-amber-500/30 py-1.5 text-center text-sm text-amber-700 dark:text-amber-400">
