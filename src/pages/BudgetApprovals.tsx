@@ -169,6 +169,12 @@ const BudgetApprovals = () => {
     enabled: !!activeCompanyId,
   });
 
+  // Verificar se orçamento está completamente aprovado
+  const isBudgetComplete = 
+    (statsData?.unitsWithoutSubmission?.length || 0) === 0 && 
+    (kpiData?.totalPending || 0) === 0 && 
+    (kpiData?.totalApproved || 0) > 0;
+
   // Aplicar filtro de unidade
   const filteredSubmissions = submissions?.filter(sub => {
     if (unitFilter === 'all') return true;
@@ -500,14 +506,30 @@ const BudgetApprovals = () => {
             {deadlineData.deadline && (
               <div className="flex items-center gap-2">
                 <Badge 
-                  variant={deadlineData.isOverdue ? 'destructive' : deadlineData.isUrgent ? 'default' : 'secondary'}
-                  className={`text-sm px-3 py-1 ${deadlineData.isUrgent && !deadlineData.isOverdue ? 'bg-amber-500' : ''}`}
+                  variant={
+                    isBudgetComplete 
+                      ? 'default' 
+                      : deadlineData.isOverdue 
+                        ? 'destructive' 
+                        : deadlineData.isUrgent 
+                          ? 'default' 
+                          : 'secondary'
+                  }
+                  className={`text-sm px-3 py-1 ${
+                    isBudgetComplete 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : deadlineData.isUrgent && !deadlineData.isOverdue 
+                        ? 'bg-amber-500' 
+                        : ''
+                  }`}
                 >
-                  {deadlineData.isOverdue 
-                    ? `⚠️ Vencido há ${Math.abs(deadlineData.daysRemaining)} dias`
-                    : deadlineData.daysRemaining === 0 
-                      ? '🚨 Prazo é HOJE!'
-                      : `📅 Faltam ${deadlineData.daysRemaining} dias`
+                  {isBudgetComplete
+                    ? '✅ Orçamento Concluído'
+                    : deadlineData.isOverdue 
+                      ? `⚠️ Vencido há ${Math.abs(deadlineData.daysRemaining)} dias`
+                      : deadlineData.daysRemaining === 0 
+                        ? '🚨 Prazo é HOJE!'
+                        : `📅 Faltam ${deadlineData.daysRemaining} dias`
                   }
                 </Badge>
               </div>
