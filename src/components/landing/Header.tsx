@@ -24,6 +24,14 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
   }, []);
 
   const scrollToSection = (id: string) => {
+    // If not on landing page, navigate with hash
+    if (window.location.pathname !== '/') {
+      navigate(`/#${id}`);
+      setIsMenuOpen(false);
+      return;
+    }
+    
+    // If on landing page, scroll directly
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });

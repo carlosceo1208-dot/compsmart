@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -19,6 +20,7 @@ import { FloatingTrialBanner } from "@/components/landing/FloatingTrialBanner";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const checkSession = async () => {
@@ -27,6 +29,19 @@ const Index = () => {
     };
     checkSession();
   }, []);
+
+  // Handle hash-based scrolling (e.g., /#pricing from checkout)
+  useEffect(() => {
+    const hash = location.hash;
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 150);
+    }
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-background">
