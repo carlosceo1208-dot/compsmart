@@ -185,7 +185,7 @@ export const ModuleGrid = () => {
     },
     {
       title: 'Aprovações de Orçamento',
-      description: 'Revise e aprove orçamentos',
+      description: 'Revise, Aprove Orçamentos e Consulte evolução orçamentária',
       icon: FileCheck,
       path: '/budget-approvals',
       status: 'active',

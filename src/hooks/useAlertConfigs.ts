@@ -8,7 +8,8 @@ export type AlertType =
   | 'inactive_users'
   | 'token_overconsumption'
   | 'after_hours_usage'
-  | 'user_concentration';
+  | 'user_concentration'
+  | 'budget_variance';
 
 export interface AlertConfig {
   id: string;
@@ -95,5 +96,10 @@ export const alertTypeLabels: Record<AlertType, { title: string; description: st
     title: 'Concentração de Uso',
     description: 'Identifica quando um usuário domina o uso dos agentes',
     icon: '👤'
+  },
+  budget_variance: {
+    title: 'Variação Orçamentária',
+    description: 'Alerta quando orçamento aprovado ultrapassa limite % em relação ao ano anterior',
+    icon: '💰'
   }
 };
