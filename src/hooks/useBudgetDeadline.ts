@@ -96,20 +96,39 @@ export const useBudgetDeadline = (fiscalYear: number) => {
   const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ['budget-deadline-stats', fiscalYear],
     queryFn: async (): Promise<BudgetDeadlineStats> => {
-      // Buscar todas as unidades
+      // Primeiro buscar o root_company_id do usuário
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('root_company_id')
+        .eq('id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (!profile?.root_company_id) {
+        return {
+          totalUnits: 0,
+          totalSubmitted: 0,
+          totalNotSubmitted: 0,
+          unitsWithoutSubmission: [],
+        };
+      }
+
+      // Buscar apenas unidades da empresa do usuário
       const { data: allUnits, error: unitsError } = await supabase
         .from('organizational_structure')
         .select('id, code, description, type')
+        .eq('root_company_id', profile.root_company_id)
         .in('type', ['area', 'department', 'sector', 'project'])
         .order('code');
 
       if (unitsError) throw unitsError;
 
-      // Buscar submissões do ano fiscal
+      // Buscar submissões do ano fiscal (apenas de unidades da empresa)
+      const unitIds = allUnits?.map(u => u.id) || [];
       const { data: submissions, error: subsError } = await supabase
         .from('budget_submissions')
         .select('unit_id')
-        .eq('fiscal_year', fiscalYear);
+        .eq('fiscal_year', fiscalYear)
+        .in('unit_id', unitIds.length > 0 ? unitIds : ['00000000-0000-0000-0000-000000000000']);
 
       if (subsError) throw subsError;
 
