@@ -24,7 +24,7 @@ interface FeatureAccessResult {
 
 // Feature map: which plans have access to each feature
 const featureMap: Record<string, PlanType[]> = {
-  // All plans (Starter+)
+  // === TODOS OS PLANOS (Starter+) ===
   employees: ['starter', 'medium', 'pro', 'enterprise'],
   job_titles: ['starter', 'medium', 'pro', 'enterprise'],
   salary_ranges: ['starter', 'medium', 'pro', 'enterprise'],
@@ -37,24 +37,35 @@ const featureMap: Record<string, PlanType[]> = {
   settings: ['starter', 'medium', 'pro', 'enterprise'],
   benefits_basic: ['starter', 'medium', 'pro', 'enterprise'],
   
-  // Medium+ plans
-  salary_comparison: ['medium', 'pro', 'enterprise'],
+  // NOVOS para Starter (agora disponíveis para todos)
+  legal_assistant: ['starter', 'medium', 'pro', 'enterprise'], // IA Jurídico para TODOS
+  salary_comparison: ['starter', 'medium', 'pro', 'enterprise'], // Comparação Salarial Avançada
+  points_evaluation: ['starter', 'medium', 'pro', 'enterprise'], // Avaliação de Cargos por Pontos
+  currency_converter: ['starter', 'medium', 'pro', 'enterprise'], // Conversão de Moeda
+  charges_calculator: ['starter', 'medium', 'pro', 'enterprise'], // Calculadora de Encargos
+  salary_tables: ['starter', 'medium', 'pro', 'enterprise'], // Tabela Salarial
+  
+  // === MEDIUM+ ===
+  salary_assistant: ['medium', 'pro', 'enterprise'], // IA Salary Smart
+  organogram: ['medium', 'pro', 'enterprise'], // Organograma Interativo
+  budget_planning: ['medium', 'pro', 'enterprise'], // Planejamento Orçamentário
+  budget_approvals: ['medium', 'pro', 'enterprise'],
+  manager_access: ['medium', 'pro', 'enterprise'], // Acesso do Gestor à própria área
+  salary_simulation: ['medium', 'pro', 'enterprise'], // Simulação de Políticas Salariais
   advanced_analytics: ['medium', 'pro', 'enterprise'],
   alerts: ['medium', 'pro', 'enterprise'],
   audit_logs: ['medium', 'pro', 'enterprise'],
   knowledge_base: ['medium', 'pro', 'enterprise'],
-  budget_planning: ['medium', 'pro', 'enterprise'],
-  budget_approvals: ['medium', 'pro', 'enterprise'],
   
-  // Pro+ plans
-  legal_assistant: ['pro', 'enterprise'],
-  salary_assistant: ['pro', 'enterprise'],
-  incentive_assistant: ['pro', 'enterprise'],
+  // === PRO+ ===
+  incentive_assistant: ['pro', 'enterprise'], // IA Rem.&Benef Smart
   incentive_programs: ['pro', 'enterprise'],
   benefits_advanced: ['pro', 'enterprise'],
   salary_analysis_report: ['pro', 'enterprise'],
+  employee_portal: ['pro', 'enterprise'], // Portal do Funcionário (opcional)
+  employee_self_edit: ['pro', 'enterprise'], // Edição pelo funcionário (telefone, email, endereço)
   
-  // Enterprise only
+  // === ENTERPRISE ONLY ===
   api_access: ['enterprise'],
   white_label: ['enterprise'],
   sso: ['enterprise'],
@@ -85,6 +96,7 @@ const pathToFeatureMap: Record<string, string> = {
   '/incentive-assistant': 'incentive_assistant',
   '/incentive-programs': 'incentive_programs',
   '/salary-analysis-report': 'salary_analysis_report',
+  '/organogram': 'organogram',
 };
 
 // Get required plan for a feature
