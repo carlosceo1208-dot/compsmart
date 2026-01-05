@@ -1599,6 +1599,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           name: string
+          root_company_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -1608,6 +1609,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name: string
+          root_company_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -1617,9 +1619,18 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           name?: string
+          root_company_id?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "job_families_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_title_competencies: {
         Row: {
