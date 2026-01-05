@@ -17,7 +17,7 @@ export const Footer = () => {
             </p>
             <div className="flex gap-3">
               <a 
-                href="https://www.linkedin.com/company/compsmart-tecnologia-servicos-de-rh/about/" 
+                href="https://www.linkedin.com/company/compsmart-tecnologia-servicos-de-rh/" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors"
