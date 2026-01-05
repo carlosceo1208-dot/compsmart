@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
-  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft 
+  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { TrialBanner } from "@/components/dashboard/TrialBanner";
 import { TrialExpiredBlockScreen } from "@/components/dashboard/TrialExpiredBlockScreen";
 import { useFeatureAccess } from "@/hooks/useFeatureAccess";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 interface UserProfile {
   full_name: string;
@@ -71,6 +72,7 @@ const routeLabels: Record<string, string> = {
   "/settings/billing": "Configurações",
   "/settings/landing-content": "Configurações",
   "/settings/my-plan": "Configurações",
+  "/super-admin": "Painel Super Admin",
 };
 
 // Parent route mapping for hierarchical navigation
@@ -104,6 +106,8 @@ export const DashboardLayout = () => {
     loading: featureLoading 
   } = useFeatureAccess();
 
+  // Check if user is super admin
+  const { data: roleData } = useCurrentUserRole();
   // Get current page label for breadcrumbs
   const currentPath = location.pathname;
   const currentPageLabel = routeLabels[currentPath] || currentPath.replace("/", "").replace(/-/g, " ");
@@ -455,6 +459,15 @@ export const DashboardLayout = () => {
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configurações</span>
                 </DropdownMenuItem>
+                {roleData?.isSuperAdmin && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/super-admin")} className="hover:bg-purple-50 dark:hover:bg-purple-900/50">
+                      <Shield className="mr-2 h-4 w-4 text-purple-600" />
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">Painel Plataforma</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                   <LogOut className="mr-2 h-4 w-4" />

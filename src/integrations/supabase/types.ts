@@ -2097,6 +2097,7 @@ export type Database = {
           email: string | null
           employee_number: string | null
           full_name: string
+          gender: string | null
           grade: string | null
           has_system_access: boolean | null
           hire_date: string | null
@@ -2127,6 +2128,7 @@ export type Database = {
           email?: string | null
           employee_number?: string | null
           full_name: string
+          gender?: string | null
           grade?: string | null
           has_system_access?: boolean | null
           hire_date?: string | null
@@ -2157,6 +2159,7 @@ export type Database = {
           email?: string | null
           employee_number?: string | null
           full_name?: string
+          gender?: string | null
           grade?: string | null
           has_system_access?: boolean | null
           hire_date?: string | null
