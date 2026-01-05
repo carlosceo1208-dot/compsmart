@@ -96,7 +96,7 @@ export const CTASection = () => {
               size="lg"
               variant="outline"
               className="text-lg px-8 w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white/10 hover:scale-105 transition-all duration-300"
-              onClick={() => window.location.href = "mailto:contato@compsmart.com.br"}
+              onClick={() => window.location.href = "mailto:contato@compsmart.ia.br"}
             >
               <Mail className="mr-2 h-5 w-5" />
               Falar com Consultor
