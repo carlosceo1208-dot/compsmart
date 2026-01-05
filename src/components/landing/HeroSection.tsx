@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ArrowRight, Sparkles, Play, X, Shield, Lock, ShieldCheck, MapPin, Calendar, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLaunchDay } from "@/hooks/useLaunchDay";
+import { LaunchBanner } from "@/components/launch/LaunchBanner";
 
 interface TrailParticle {
   id: number;
@@ -15,6 +17,7 @@ interface TrailParticle {
 
 export const HeroSection = () => {
   const navigate = useNavigate();
+  const { isLaunchDay } = useLaunchDay();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [trailParticles, setTrailParticles] = useState<TrailParticle[]>([]);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -26,9 +29,9 @@ export const HeroSection = () => {
   const thumbnailUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional-thumb.jpg";
   const hasVideo = Boolean(videoUrl);
 
-  // Countdown to January 2026
+  // Countdown to February 7, 2026
   useEffect(() => {
-    const targetDate = new Date('2026-01-07T00:00:00').getTime();
+    const targetDate = new Date('2026-02-07T00:00:00').getTime();
     
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -100,7 +103,7 @@ export const HeroSection = () => {
           <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in-down">
             <Badge className="bg-gradient-primary text-white px-4 py-1.5 text-sm flex items-center gap-2 shadow-primary">
               <Sparkles className="h-4 w-4" />
-              Lançamento Janeiro 2026
+              {isLaunchDay ? 'Lançamento Oficial!' : 'Lançamento Fevereiro 2026'}
             </Badge>
             <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-green-500/20 transition-colors" onClick={() => setIsVideoOpen(true)}>
               <Play className="h-4 w-4" />
@@ -108,36 +111,42 @@ export const HeroSection = () => {
             </Badge>
           </div>
 
-          {/* Countdown Timer */}
-          <div className="flex items-center justify-center gap-4 animate-fade-in-down" style={{ animationDelay: "0.05s" }}>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {countdown.days}
-              </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider">Dias</div>
+          {/* Launch Banner OR Countdown Timer */}
+          {isLaunchDay ? (
+            <div className="animate-fade-in-down" style={{ animationDelay: "0.05s" }}>
+              <LaunchBanner />
             </div>
-            <span className="text-2xl text-muted-foreground">:</span>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {countdown.hours.toString().padStart(2, '0')}
+          ) : (
+            <div className="flex items-center justify-center gap-4 animate-fade-in-down" style={{ animationDelay: "0.05s" }}>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {countdown.days}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Dias</div>
               </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider">Horas</div>
-            </div>
-            <span className="text-2xl text-muted-foreground">:</span>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {countdown.minutes.toString().padStart(2, '0')}
+              <span className="text-2xl text-muted-foreground">:</span>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {countdown.hours.toString().padStart(2, '0')}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Horas</div>
               </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider">Min</div>
-            </div>
-            <span className="text-2xl text-muted-foreground">:</span>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {countdown.seconds.toString().padStart(2, '0')}
+              <span className="text-2xl text-muted-foreground">:</span>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {countdown.minutes.toString().padStart(2, '0')}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Min</div>
               </div>
-              <div className="text-xs text-muted-foreground uppercase tracking-wider">Seg</div>
+              <span className="text-2xl text-muted-foreground">:</span>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                  {countdown.seconds.toString().padStart(2, '0')}
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wider">Seg</div>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Headline - Pain vs. Solution */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
