@@ -2741,6 +2741,62 @@ export type Database = {
           },
         ]
       }
+      user_feedback: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          internal_notes: string | null
+          nps_score: number | null
+          page_url: string | null
+          root_company_id: string | null
+          status: string | null
+          title: string
+          type: string
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          internal_notes?: string | null
+          nps_score?: number | null
+          page_url?: string | null
+          root_company_id?: string | null
+          status?: string | null
+          title: string
+          type: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          internal_notes?: string | null
+          nps_score?: number | null
+          page_url?: string | null
+          root_company_id?: string | null
+          status?: string | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_feedback_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
