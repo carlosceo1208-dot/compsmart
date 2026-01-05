@@ -258,7 +258,6 @@ export default {
             opacity: "0",
           },
         },
-        },
         "confetti-fall": {
           "0%": {
             transform: "translateY(-10vh) rotate(0deg)",

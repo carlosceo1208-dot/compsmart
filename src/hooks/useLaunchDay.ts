@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const LAUNCH_DATE = '2026-02-07';
+const LAUNCH_DATE = '2026-01-07';
 
 export const useLaunchDay = () => {
   const [hasSeenConfetti, setHasSeenConfetti] = useState(true);
