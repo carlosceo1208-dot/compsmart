@@ -12,10 +12,13 @@ import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
 import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrendsCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
+import { useFounderStatus } from "@/hooks/useFounderStatus";
+import { FounderBadge } from "@/components/launch/FounderBadge";
 
 const Dashboard = () => {
   const { currency, setCurrency } = useCurrencyConverter();
   const [showWithCharges, setShowWithCharges] = useState(false);
+  const { data: isFounder } = useFounderStatus();
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto">
@@ -26,7 +29,10 @@ const Dashboard = () => {
           <div className="dashboard-welcome rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-4 md:p-6 lg:p-8 border-2 border-primary/30 shadow-primary">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
               <div>
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white">CompSmart</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white">CompSmart</h1>
+                  {isFounder && <FounderBadge className="mb-2" />}
+                </div>
                 <p className="text-xs sm:text-sm text-white/90 font-medium">
                   Dashboard Executivo
                 </p>

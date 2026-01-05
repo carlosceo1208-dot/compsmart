@@ -1912,6 +1912,7 @@ export type Database = {
           fantasy_name: string | null
           id: string
           industry_sector: string | null
+          is_founder: boolean | null
           latitude: number | null
           logo_url: string | null
           longitude: number | null
@@ -1944,6 +1945,7 @@ export type Database = {
           fantasy_name?: string | null
           id?: string
           industry_sector?: string | null
+          is_founder?: boolean | null
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
@@ -1976,6 +1978,7 @@ export type Database = {
           fantasy_name?: string | null
           id?: string
           industry_sector?: string | null
+          is_founder?: boolean | null
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null

@@ -19,6 +19,7 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { FloatingTrialBanner } from "@/components/landing/FloatingTrialBanner";
+import { LaunchConfetti } from "@/components/launch/LaunchConfetti";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -47,6 +48,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <LaunchConfetti />
       <Header isLoggedIn={isLoggedIn} />
       <HeroSection />
       <TrustBar />

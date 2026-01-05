@@ -258,6 +258,41 @@ export default {
             opacity: "0",
           },
         },
+        },
+        "confetti-fall": {
+          "0%": {
+            transform: "translateY(-10vh) rotate(0deg)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "translateY(110vh) rotate(720deg)",
+            opacity: "0",
+          },
+        },
+        "confetti-spin": {
+          "0%": {
+            transform: "rotateX(0deg) rotateY(0deg)",
+          },
+          "100%": {
+            transform: "rotateX(360deg) rotateY(360deg)",
+          },
+        },
+        "bounce-slow": {
+          "0%, 100%": {
+            transform: "translateY(0)",
+          },
+          "50%": {
+            transform: "translateY(-8px)",
+          },
+        },
+        "pulse-slow": {
+          "0%, 100%": {
+            opacity: "1",
+          },
+          "50%": {
+            opacity: "0.7",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -276,6 +311,10 @@ export default {
         "scroll-fade-left": "scroll-fade-left 0.6s ease-out forwards",
         "scroll-fade-right": "scroll-fade-right 0.6s ease-out forwards",
         "scroll-zoom-in": "scroll-zoom-in 0.5s ease-out forwards",
+        "confetti-fall": "confetti-fall 4s ease-out forwards",
+        "confetti-spin": "confetti-spin 3s linear infinite",
+        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 3s ease-in-out infinite",
       },
     },
   },
