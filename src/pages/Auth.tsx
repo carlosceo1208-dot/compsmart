@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,7 @@ import { SecurityFooter } from "@/components/SecurityFooter";
 import { PasswordStrengthIndicator, validatePassword } from "@/components/auth/PasswordStrengthIndicator";
 import { useRateLimiter } from "@/hooks/useRateLimiter";
 import { useAuthLogger } from "@/hooks/useAuthLogger";
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 
 const authSchema = z.object({
   email: z.string().email("Email inválido").max(255, "Email muito longo"),
@@ -27,6 +28,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,6 +43,20 @@ const Auth = () => {
   });
 
   const { logAuthAttempt } = useAuthLogger();
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setTurnstileError(false);
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileError(true);
+  }, []);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -80,9 +97,27 @@ const Auth = () => {
       return;
     }
 
+    // Validate Turnstile CAPTCHA
+    if (!turnstileToken) {
+      toast.error("Aguarde a verificação de segurança...");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // Verify Turnstile token with backend
+      const turnstileResponse = await supabase.functions.invoke("verify-turnstile", {
+        body: { token: turnstileToken },
+      });
+
+      if (turnstileResponse.error || !turnstileResponse.data?.success) {
+        console.error("Turnstile verification failed:", turnstileResponse.error);
+        toast.error("Falha na verificação de segurança. Tente novamente.");
+        setTurnstileToken(null);
+        setLoading(false);
+        return;
+      }
       const validation = authSchema.parse({
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
@@ -175,6 +210,7 @@ const Auth = () => {
         setIsLogin(true);
         setFormData({ email: "", password: "", full_name: "" });
         setAcceptedTerms(false);
+        setTurnstileToken(null);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -341,10 +377,23 @@ const Auth = () => {
                 </div>
               )}
 
+              {/* Turnstile invisible CAPTCHA */}
+              <TurnstileWidget
+                onVerify={handleTurnstileVerify}
+                onError={handleTurnstileError}
+                onExpire={handleTurnstileExpire}
+              />
+
+              {turnstileError && (
+                <p className="text-xs text-destructive text-center">
+                  Erro na verificação de segurança. Recarregue a página.
+                </p>
+              )}
+
               <Button
                 type="submit"
                 className="w-full bg-gradient-primary hover:opacity-90"
-                disabled={loading || rateLimiter.isBlocked || (!isLogin && !acceptedTerms)}
+                disabled={loading || rateLimiter.isBlocked || (!isLogin && !acceptedTerms) || !turnstileToken}
               >
                 {loading ? (
                   <>
