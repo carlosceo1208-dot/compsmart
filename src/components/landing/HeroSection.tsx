@@ -29,9 +29,9 @@ export const HeroSection = () => {
   const thumbnailUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional-thumb.jpg";
   const hasVideo = Boolean(videoUrl);
 
-  // Countdown to February 7, 2026
+  // Countdown to January 7, 2026
   useEffect(() => {
-    const targetDate = new Date('2026-02-07T00:00:00').getTime();
+    const targetDate = new Date('2026-01-07T00:00:00').getTime();
     
     const updateCountdown = () => {
       const now = new Date().getTime();
@@ -103,7 +103,7 @@ export const HeroSection = () => {
           <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in-down">
             <Badge className="bg-gradient-primary text-white px-4 py-1.5 text-sm flex items-center gap-2 shadow-primary">
               <Sparkles className="h-4 w-4" />
-              {isLaunchDay ? 'Lançamento Oficial!' : 'Lançamento Fevereiro 2026'}
+              {isLaunchDay ? 'Lançamento Oficial!' : 'Lançamento Janeiro 2026'}
             </Badge>
             <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-green-500/20 transition-colors" onClick={() => setIsVideoOpen(true)}>
               <Play className="h-4 w-4" />
