@@ -21,6 +21,7 @@ import compsmartLogo from "@/assets/compsmart-logo.png";
 import { SecurityFooter } from "@/components/SecurityFooter";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { SupportWidget } from "@/components/support/SupportWidget";
+import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CompanySwitcher } from "@/components/dashboard/CompanySwitcher";
 import { HeaderNotifications } from "@/components/dashboard/HeaderNotifications";
@@ -534,6 +535,9 @@ export const DashboardLayout = () => {
 
       {/* Security Footer */}
       <SecurityFooter />
+      
+      {/* Feedback Widget - coleta sugestões dos usuários */}
+      <FeedbackWidget />
       
       {/* Support Widget - sempre visível */}
       <SupportWidget />

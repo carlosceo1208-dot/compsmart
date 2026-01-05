@@ -6,8 +6,10 @@ import { SuperAdminKPICards } from '@/components/super-admin/SuperAdminKPICards'
 import { CompanyDistributionCharts } from '@/components/super-admin/CompanyDistributionCharts';
 import { ClientsTable } from '@/components/super-admin/ClientsTable';
 import { TenureMetricsCard } from '@/components/super-admin/TenureMetricsCard';
+import { FeedbackDashboard } from '@/components/super-admin/FeedbackDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Shield, AlertTriangle } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
@@ -82,6 +84,12 @@ const SuperAdminDashboard = () => {
 
       {/* Clients Table */}
       <ClientsTable companies={metrics?.companies || []} isLoading={metricsLoading} />
+
+      {/* Separator */}
+      <Separator className="my-8" />
+
+      {/* Feedback Dashboard */}
+      <FeedbackDashboard />
     </div>
   );
 };
