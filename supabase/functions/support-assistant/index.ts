@@ -348,6 +348,78 @@ Se a pergunta é sobre:
 - **Políticas de incentivos, ILP, ICP:** "Para análise de políticas de remuneração, use o R&B Smart no menu Agentes Smart."
 - **Análise de equidade, Compa-Ratio:** "Para análises salariais detalhadas, use o Salary Smart no menu Agentes Smart."
 
+## GUIA DE IMPLANTAÇÃO - PRIMEIROS PASSOS
+
+Este guia ajuda novos clientes a configurar o CompSmart corretamente desde o início.
+
+### ORDEM RECOMENDADA DE CONFIGURAÇÃO (MUITO IMPORTANTE!)
+
+**Etapa 1: Estrutura Organizacional (/organization)**
+Crie a hierarquia da empresa ANTES de qualquer outra coisa:
+1. Acesse Menu > Estrutura Organizacional
+2. Clique em "Nova Unidade"
+3. Comece pela Matriz (tipo: Matriz/Filial)
+4. Depois crie Áreas, Departamentos e Setores
+5. Ordem hierárquica: Empresa > Matriz/Filial > Área > Departamento > Setor > Projeto
+
+**Etapa 2: Cargos (/job-titles)**
+Configure os cargos ANTES da tabela salarial:
+1. Acesse Menu > Cargos
+2. Clique em "Novo Cargo"
+3. Preencha: Título, Código CBO (com sugestão automática), Família de Cargos
+4. A Grade será vinculada após criar a tabela salarial
+5. Dica: Use "Gerar Descrição com IA" para criar descrições completas automaticamente
+
+**Etapa 3: Tabela Salarial (/salary-ranges)**
+Defina as faixas salariais por Grade:
+1. Acesse Menu > Tabelas Salariais
+2. Clique em "Nova Tabela"
+3. Defina vigência (mês/ano de início)
+4. Crie Grades (ex: A, B, C ou 1, 2, 3 ou Júnior, Pleno, Sênior)
+5. Para cada Grade, defina: Mínimo, Q1, Mediana, Q3, Máximo
+6. **IMPORTANTE:** Clique em "Ativar" para que a tabela seja usada nos cálculos
+7. Apenas UMA tabela pode estar ativa por vez
+
+**Etapa 4: Colaboradores (/employees)**
+Cadastre os funcionários:
+1. Acesse Menu > Funcionários
+2. Opção A: Cadastro individual via "Novo Funcionário"
+3. Opção B: Importação em lote via Excel (baixe o template primeiro)
+4. Vincule: Cargo, Grade, Unidade Organizacional, Salário Atual
+5. O sistema calculará automaticamente o percentual na faixa salarial
+
+**Etapa 5: Benefícios (/benefits)**
+Configure o pacote de benefícios:
+1. Acesse Menu > Benefícios
+2. Crie os tipos de benefício (VR, VA, Plano de Saúde, etc.)
+3. Defina elegibilidade: Sem restrição, Por Grade ou Por Faixa Salarial
+4. Atribua aos colaboradores: automaticamente por regras ou manualmente
+
+### DICAS IMPORTANTES PARA NOVOS USUÁRIOS
+
+1. **Comece simples:** Cadastre primeiro a estrutura básica, depois refine
+2. **Use importação Excel:** Para empresas com muitos funcionários, é mais rápido
+3. **Ative o Tour:** Em Configurações, clique em "Reiniciar Tour" para ver o guia visual
+4. **Agentes Smart:** Use para dúvidas específicas de legislação, salários ou benefícios
+5. **Suporte:** Estamos aqui para ajudar! Use este chat ou email suporte@compsmart.ia.br
+
+### ERROS COMUNS NA IMPLANTAÇÃO
+
+**Erro:** Tentar cadastrar funcionário sem unidade organizacional
+**Solução:** Crie a estrutura organizacional primeiro (/organization)
+
+**Erro:** Salário fora da faixa mostrando alerta
+**Solução:** Normal! Isso indica que o colaborador está acima ou abaixo da faixa ideal da grade
+
+**Erro:** Tabela salarial não refletindo nos cálculos
+**Solução:** Verifique se a tabela está ATIVA (apenas uma pode estar ativa por vez)
+
+**Erro:** Grade não aparece no cargo
+**Solução:** Vincule a Grade ao cargo após criar e ativar a tabela salarial
+
+**Erro:** Percentual na faixa não calculando
+**Solução:** Verifique se o funcionário tem salário, cargo com grade, e tabela salarial ativa
+
 ## TOM E LINGUAGEM
 
 - Use emojis com moderação para dar personalidade

@@ -274,7 +274,7 @@ export const HeroSection = () => {
                           ) : (
                             <div className="flex flex-col items-center">
                               <Upload className="h-6 w-6 text-white/70" />
-                              <span className="text-[8px] text-white/50 mt-1">08/12</span>
+                              <span className="text-[8px] text-white/50 mt-1">Em breve</span>
                             </div>
                           )}
                         </div>
@@ -288,7 +288,7 @@ export const HeroSection = () => {
                       {hasVideo ? 'Veja como a inteligência trabalha COM você' : 'CEO e Head de RH apresentam o CompSmart'}
                     </p>
                     <p className="text-white/80 text-sm mt-1 drop-shadow">
-                      {hasVideo ? '🎬 ~5 minutos que podem transformar seu RH' : '🎬 Vídeo disponível em 08/12'}
+                      {hasVideo ? '🎬 ~5 minutos que podem transformar seu RH' : '🎬 Assista ao vídeo institucional'}
                     </p>
                   </div>
                 </div>

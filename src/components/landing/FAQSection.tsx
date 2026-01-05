@@ -1,26 +1,62 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { HelpCircle, Bot, Shield, Database, Upload, Zap, Calculator } from "lucide-react";
+import { HelpCircle, Bot, Shield, Database, Upload, Zap, Calculator, CreditCard, Clock, Settings, TrendingUp, Bell } from "lucide-react";
 
 export const FAQSection = () => {
   const faqs = [
+    // NOVOS - Lançamento e Preços
     {
-      question: "Como funciona a avaliação de cargos por pontos?",
-      answer: "O CompSmart utiliza uma metodologia de avaliação por fatores e pontos baseada nas melhores práticas de mercado. Você define fatores como Know-how, Responsabilidade e Solução de Problemas, atribui pesos e graus, e o sistema calcula automaticamente a pontuação de cada cargo para criar uma estrutura salarial consistente e defensável.",
+      question: "Quanto custa o CompSmart e quais são os planos disponíveis?",
+      answer: "Oferecemos 4 planos: Starter (até 50 funcionários) a partir de R$ 199/mês, Medium (até 200 func.) a partir de R$ 499/mês, Pro (até 500 func.) a partir de R$ 899/mês e Enterprise (acima de 500 func.) sob consulta. Aproveite o desconto de 30% no lançamento até 06/02/2026 e economize ainda mais com o plano anual (2 meses grátis).",
+      icon: CreditCard,
+      isNew: true
+    },
+    {
+      question: "O que está incluso no período de teste grátis?",
+      answer: "O teste grátis de 14 dias dá acesso completo ao plano escolhido, sem restrições de funcionalidades. Você pode cadastrar sua estrutura organizacional, colaboradores, tabela salarial e testar todos os Agentes Smart de IA. Não é necessário cartão de crédito para começar e o suporte está disponível durante todo o período.",
+      icon: Clock,
+      isNew: true
+    },
+    // NOVOS - Recursos Avançados
+    {
+      question: "Como funciona a simulação de dissídio coletivo?",
+      answer: "Acesse Menu > Analytics > Análise Salarial > clique em 'Nova Simulação'. Escolha entre percentual fixo (todos recebem o mesmo %) ou escalonado por faixa (% diferentes por faixa salarial). O sistema calcula automaticamente o impacto: funcionários afetados, custo mensal e anual. Salve cenários para comparação e, quando aprovado, efetive os ajustes com um clique.",
       icon: Calculator,
       isNew: true
     },
     {
+      question: "Quais tipos de incentivos posso gerenciar no CompSmart?",
+      answer: "ICP (Curto Prazo): PLR, PPR, Bônus por Metas, Comissões de Vendas. ILP (Longo Prazo): Stock Options, RSU (Ações Restritas), Partnership, Phantom Shares, Bônus Diferido e Previdência Corporativa com vesting/cliff configurável. Cada programa pode ter elegibilidade por grade e atribuição individual ou em lote.",
+      icon: TrendingUp,
+      isNew: true
+    },
+    {
+      question: "Como funcionam os alertas automáticos do sistema?",
+      answer: "O CompSmart monitora 5 tipos de situações: Pico de Consultas (uso acima do normal), Erros Recorrentes, Usuários Inativos, Uso Fora do Horário e Concentração de Uso. Configure thresholds, destinatários de email e severidade (Info/Warning/Critical). A verificação é diária e automática. Acesse em Menu > Configurações > Alertas.",
+      icon: Bell,
+      isNew: true
+    },
+    {
+      question: "Qual a ordem recomendada para configurar o sistema?",
+      answer: "1) Estrutura Organizacional (empresa, filiais, áreas, departamentos); 2) Cargos (com código CBO e família); 3) Tabela Salarial (faixas por grade - ative após criar); 4) Colaboradores (individual ou importação Excel); 5) Benefícios e Incentivos. Seguindo esta ordem, tudo se integra automaticamente.",
+      icon: Settings,
+      isNew: true
+    },
+    // EXISTENTES - Atualizados (removido isNew de alguns)
+    {
+      question: "Como funciona a avaliação de cargos por pontos?",
+      answer: "O CompSmart utiliza uma metodologia de avaliação por fatores e pontos baseada nas melhores práticas de mercado. Você define fatores como Know-how, Responsabilidade e Solução de Problemas, atribui pesos e graus, e o sistema calcula automaticamente a pontuação de cada cargo para criar uma estrutura salarial consistente e defensável.",
+      icon: Calculator
+    },
+    {
       question: "Como funcionam os Agentes Inteligentes de IA?",
       answer: "Nossos agentes são especialistas virtuais treinados em remuneração brasileira. O Jurídico Smart gera contratos e analisa compliance, o Salary Smart faz benchmarking e calcula compa-ratio, e o R&B Smart ajuda a estruturar incentivos. Todos trabalham 24/7, respondem em segundos e aprendem com o contexto da sua empresa.",
-      icon: Bot,
-      isNew: true
+      icon: Bot
     },
     {
       question: "Meus dados estão seguros com a IA?",
       answer: "Absolutamente. Utilizamos criptografia de nível enterprise (AES-256), somos 100% LGPD compliant e seus dados nunca são usados para treinar modelos externos. A IA processa localmente e os resultados pertencem exclusivamente à sua empresa. Temos certificações de segurança e auditorias regulares.",
-      icon: Shield,
-      isNew: true
+      icon: Shield
     },
     {
       question: "Como funciona o benchmark de mercado com IA?",
@@ -30,14 +66,12 @@ export const FAQSection = () => {
     {
       question: "Como funciona a Pesquisa Salarial?",
       answer: "A Pesquisa Salarial do CompSmart compara seus cargos e salários com dados reais de mercado de mais de 500 pesquisas. Você pode importar templates prontos, participar de surveys colaborativos ou criar pesquisas customizadas. O sistema calcula automaticamente percentis, médias e recomendações de ajuste.",
-      icon: Database,
-      isNew: true
+      icon: Database
     },
     {
       question: "Posso importar dados de outras plataformas?",
       answer: "Sim! Oferecemos importação via Excel/CSV para funcionários, cargos, salários e estrutura organizacional. O sistema valida os dados, identifica inconsistências e sugere correções. Também temos templates prontos para facilitar a migração de outras ferramentas de RH.",
-      icon: Upload,
-      isNew: true
+      icon: Upload
     },
     {
       question: "É seguro armazenar dados dos colaboradores?",
@@ -126,8 +160,8 @@ export const FAQSection = () => {
           <div className="mt-12 text-center">
             <p className="text-sm text-muted-foreground">
               Ainda tem dúvidas? Entre em contato com nossa equipe pelo email{" "}
-              <a href="mailto:contato@compsmart.com.br" className="text-primary hover:underline font-semibold">
-                contato@compsmart.com.br
+              <a href="mailto:contato@compsmart.ia.br" className="text-primary hover:underline font-semibold">
+                contato@compsmart.ia.br
               </a>
             </p>
           </div>
