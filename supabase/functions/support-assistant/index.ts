@@ -348,60 +348,107 @@ Se a pergunta é sobre:
 - **Políticas de incentivos, ILP, ICP:** "Para análise de políticas de remuneração, use o R&B Smart no menu Agentes Smart."
 - **Análise de equidade, Compa-Ratio:** "Para análises salariais detalhadas, use o Salary Smart no menu Agentes Smart."
 
-## GUIA DE IMPLANTAÇÃO - PRIMEIROS PASSOS
+## ROTEIRO COMPLETO DE IMPLANTAÇÃO
 
-Este guia ajuda novos clientes a configurar o CompSmart corretamente desde o início.
+Este guia ajuda novos clientes a configurar o CompSmart corretamente desde o primeiro acesso.
 
-### ORDEM RECOMENDADA DE CONFIGURAÇÃO (MUITO IMPORTANTE!)
+### PASSO 0: CRIAR CONTA E ESCOLHER PLANO
+1. Acesse compsmart.ia.br
+2. Clique em "Começar Grátis" ou "Criar Conta"
+3. Preencha: Nome, Email, Telefone, Empresa
+4. Escolha o plano: Starter, Medium, Pro ou Enterprise
+5. Você tem **14 dias de teste grátis** com acesso completo a todas funcionalidades
 
-**Etapa 1: Estrutura Organizacional (/organization)**
-Crie a hierarquia da empresa ANTES de qualquer outra coisa:
+### PASSO 1: DADOS DA EMPRESA (Onboarding)
+Após criar conta, o sistema guia você pelo onboarding automático:
+1. Nome da Empresa e CNPJ (obrigatório)
+2. Nome Fantasia
+3. Upload do Logo da empresa (aparece no sistema todo)
+4. Endereço completo
+5. Setor de atuação (indústria, serviços, etc.)
+6. Sindicato e Data-Base (para cálculos de dissídio)
+
+### PASSO 2: CRIAR PRIMEIRO USUÁRIO ADMIN
+O criador da conta automaticamente recebe perfil **Admin**.
+Para adicionar mais usuários:
+1. Acesse Menu > **Controle de Acesso** (/access-control)
+2. Clique em "Novo Usuário"
+3. Preencha dados e selecione o perfil adequado:
+   - **Admin:** Acesso total a todas funcionalidades
+   - **HR Manager:** Gestão completa de RH (sem super admin)
+   - **Manager:** Visualiza apenas sua equipe/unidade
+   - **Employee:** Acesso limitado aos próprios dados
+
+### PASSO 3: ESTRUTURA ORGANIZACIONAL (/organization)
+**OBRIGATÓRIO antes de cadastrar funcionários!**
 1. Acesse Menu > Estrutura Organizacional
-2. Clique em "Nova Unidade"
-3. Comece pela Matriz (tipo: Matriz/Filial)
-4. Depois crie Áreas, Departamentos e Setores
-5. Ordem hierárquica: Empresa > Matriz/Filial > Área > Departamento > Setor > Projeto
+2. Crie a hierarquia completa:
+   - Empresa (raiz)
+   - Matriz/Filial
+   - Área (ex: Comercial, Operações, TI)
+   - Departamento (ex: Vendas Norte, Vendas Sul)
+   - Setor (ex: Pré-vendas, Pós-vendas)
+   - Projeto (opcional)
+3. Cada unidade pode ter código e descrição
+4. Vincule endereço/localização se aplicável
 
-**Etapa 2: Cargos (/job-titles)**
-Configure os cargos ANTES da tabela salarial:
+### PASSO 4: CARGOS (/job-titles)
 1. Acesse Menu > Cargos
-2. Clique em "Novo Cargo"
-3. Preencha: Título, Código CBO (com sugestão automática), Família de Cargos
-4. A Grade será vinculada após criar a tabela salarial
-5. Dica: Use "Gerar Descrição com IA" para criar descrições completas automaticamente
+2. Clique "Novo Cargo"
+3. Preencha:
+   - Título do cargo
+   - Código CBO (sugestão automática por IA)
+   - Família de cargos (agrupamento)
+4. **Dica:** Use "Gerar Descrição com IA" para criar descrição completa automaticamente
+5. A Grade será vinculada APÓS criar a tabela salarial
 
-**Etapa 3: Tabela Salarial (/salary-ranges)**
-Defina as faixas salariais por Grade:
+### PASSO 5: TABELA SALARIAL (/salary-ranges)
 1. Acesse Menu > Tabelas Salariais
-2. Clique em "Nova Tabela"
-3. Defina vigência (mês/ano de início)
-4. Crie Grades (ex: A, B, C ou 1, 2, 3 ou Júnior, Pleno, Sênior)
+2. Clique "Nova Tabela"
+3. Defina nome e vigência (mês/ano de início)
+4. Crie as Grades (ex: A, B, C ou 1, 2, 3 ou Júnior, Pleno, Sênior)
 5. Para cada Grade, defina: Mínimo, Q1, Mediana, Q3, Máximo
-6. **IMPORTANTE:** Clique em "Ativar" para que a tabela seja usada nos cálculos
-7. Apenas UMA tabela pode estar ativa por vez
+6. **IMPORTANTE:** Clique em **"ATIVAR"** para a tabela funcionar
+7. Apenas UMA tabela pode estar ativa por vez no sistema
 
-**Etapa 4: Colaboradores (/employees)**
-Cadastre os funcionários:
+### PASSO 6: COLABORADORES (/employees)
 1. Acesse Menu > Funcionários
 2. Opção A: Cadastro individual via "Novo Funcionário"
 3. Opção B: Importação em lote via Excel (baixe o template primeiro)
-4. Vincule: Cargo, Grade, Unidade Organizacional, Salário Atual
-5. O sistema calculará automaticamente o percentual na faixa salarial
+4. Dados obrigatórios: Nome, Email, Cargo, Grade, Unidade, Salário
+5. O sistema calcula automaticamente o **percentual na faixa salarial**
+6. Opcional: Foto, dados pessoais, data de nascimento, CPF
 
-**Etapa 5: Benefícios (/benefits)**
-Configure o pacote de benefícios:
+### PASSO 7: BENEFÍCIOS (/benefits)
 1. Acesse Menu > Benefícios
-2. Crie os tipos de benefício (VR, VA, Plano de Saúde, etc.)
+2. Crie os tipos de benefício:
+   - VR (Vale Refeição)
+   - VA (Vale Alimentação)
+   - Plano de Saúde
+   - Plano Odontológico
+   - Previdência Privada
+   - Seguro de Vida
+   - etc.
 3. Defina elegibilidade: Sem restrição, Por Grade ou Por Faixa Salarial
-4. Atribua aos colaboradores: automaticamente por regras ou manualmente
+4. Configure contribuição: valor empresa + valor colaborador (fixo ou %)
+5. Atribua aos colaboradores: automaticamente por regras ou manualmente
 
-### DICAS IMPORTANTES PARA NOVOS USUÁRIOS
+### PASSO 8: CONFIGURAÇÕES FINAIS
+1. **Configurações > Labels:** Personalize termos do sistema
+   - Grade → Nível, Classe, etc.
+   - Funcionário → Colaborador, etc.
+2. **Configurações > Reiniciar Tour:** Veja o guia visual novamente
+3. **Alertas:** Configure monitoramento dos Agentes Smart (/alert-settings)
+4. **Orçamento:** Configure aprovadores e deadlines (/budget-approvals)
 
-1. **Comece simples:** Cadastre primeiro a estrutura básica, depois refine
-2. **Use importação Excel:** Para empresas com muitos funcionários, é mais rápido
-3. **Ative o Tour:** Em Configurações, clique em "Reiniciar Tour" para ver o guia visual
-4. **Agentes Smart:** Use para dúvidas específicas de legislação, salários ou benefícios
-5. **Suporte:** Estamos aqui para ajudar! Use este chat ou email suporte@compsmart.ia.br
+### CHECKLIST DE SEGURANÇA (Para Administradores)
+- [ ] Apenas pessoas confiáveis com perfil Admin
+- [ ] HR Managers para equipe de RH
+- [ ] Managers para gestores de equipe apenas
+- [ ] Employees para colaboradores comuns
+- [ ] Revisar lista de usuários periodicamente
+- [ ] Remover acessos de desligados IMEDIATAMENTE
+- [ ] Dados de empresas são 100% isolados entre si
 
 ### ERROS COMUNS NA IMPLANTAÇÃO
 
@@ -409,16 +456,22 @@ Configure o pacote de benefícios:
 **Solução:** Crie a estrutura organizacional primeiro (/organization)
 
 **Erro:** Salário fora da faixa mostrando alerta
-**Solução:** Normal! Isso indica que o colaborador está acima ou abaixo da faixa ideal da grade
+**Solução:** Normal! Isso indica que o colaborador está acima ou abaixo da faixa ideal
 
 **Erro:** Tabela salarial não refletindo nos cálculos
-**Solução:** Verifique se a tabela está ATIVA (apenas uma pode estar ativa por vez)
+**Solução:** Verifique se a tabela está ATIVA (apenas uma pode estar ativa)
 
 **Erro:** Grade não aparece no cargo
 **Solução:** Vincule a Grade ao cargo após criar e ativar a tabela salarial
 
 **Erro:** Percentual na faixa não calculando
-**Solução:** Verifique se o funcionário tem salário, cargo com grade, e tabela salarial ativa
+**Solução:** Verifique: salário preenchido + cargo com grade + tabela salarial ativa
+
+**Erro:** Não consigo ver dados de outra empresa
+**Solução:** Correto! Cada empresa tem dados 100% isolados por segurança
+
+**Erro:** Usuário não consegue acessar funcionalidade
+**Solução:** Verifique o perfil de acesso do usuário (Admin, HR, Manager, Employee)
 
 ## TOM E LINGUAGEM
 
