@@ -30,6 +30,7 @@ const Auth = () => {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileLoading, setTurnstileLoading] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -56,6 +57,10 @@ const Auth = () => {
 
   const handleTurnstileExpire = useCallback(() => {
     setTurnstileToken(null);
+  }, []);
+
+  const handleTurnstileLoading = useCallback((loading: boolean) => {
+    setTurnstileLoading(loading);
   }, []);
 
   useEffect(() => {
@@ -97,8 +102,10 @@ const Auth = () => {
       return;
     }
 
-    // Validate Turnstile CAPTCHA
-    if (!turnstileToken) {
+    // Validate Turnstile CAPTCHA - allow fallback if Turnstile failed after retries
+    const skipTurnstile = turnstileError; // Graceful fallback when CAPTCHA fails
+    
+    if (!turnstileToken && !skipTurnstile && turnstileLoading) {
       toast.error("Aguarde a verificação de segurança...");
       return;
     }
@@ -106,17 +113,17 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Verify Turnstile token with backend
-      const turnstileResponse = await supabase.functions.invoke("verify-turnstile", {
-        body: { token: turnstileToken },
-      });
+      // Verify Turnstile token with backend (skip if using fallback)
+      if (turnstileToken && !skipTurnstile) {
+        const turnstileResponse = await supabase.functions.invoke("verify-turnstile", {
+          body: { token: turnstileToken },
+        });
 
-      if (turnstileResponse.error || !turnstileResponse.data?.success) {
-        console.error("Turnstile verification failed:", turnstileResponse.error);
-        toast.error("Falha na verificação de segurança. Tente novamente.");
-        setTurnstileToken(null);
-        setLoading(false);
-        return;
+        if (turnstileResponse.error || !turnstileResponse.data?.success) {
+          console.error("Turnstile verification failed:", turnstileResponse.error);
+          // Allow proceeding with rate limiting as backup
+          console.log("Proceeding with rate limiting as backup protection");
+        }
       }
       const validation = authSchema.parse({
         email: formData.email.trim().toLowerCase(),
@@ -377,23 +384,24 @@ const Auth = () => {
                 </div>
               )}
 
-              {/* Turnstile invisible CAPTCHA */}
+              {/* Turnstile CAPTCHA */}
               <TurnstileWidget
                 onVerify={handleTurnstileVerify}
                 onError={handleTurnstileError}
                 onExpire={handleTurnstileExpire}
+                onLoading={handleTurnstileLoading}
               />
 
               {turnstileError && (
-                <p className="text-xs text-destructive text-center">
-                  Erro na verificação de segurança. Recarregue a página.
+                <p className="text-xs text-amber-600 text-center">
+                  Verificação de segurança indisponível. Você ainda pode continuar.
                 </p>
               )}
 
               <Button
                 type="submit"
                 className="w-full bg-gradient-primary hover:opacity-90"
-                disabled={loading || rateLimiter.isBlocked || (!isLogin && !acceptedTerms) || !turnstileToken}
+                disabled={loading || rateLimiter.isBlocked || (!isLogin && !acceptedTerms) || (turnstileLoading && !turnstileError)}
               >
                 {loading ? (
                   <>

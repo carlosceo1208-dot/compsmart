@@ -1,11 +1,14 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const TURNSTILE_SITE_KEY = "0x4AAAAAACKfutEiGcNZieDn";
+const MAX_RETRIES = 3;
 
 interface TurnstileWidgetProps {
   onVerify: (token: string) => void;
   onError?: () => void;
   onExpire?: () => void;
+  onLoading?: (isLoading: boolean) => void;
 }
 
 declare global {
@@ -26,24 +29,46 @@ declare global {
   }
 }
 
-export function TurnstileWidget({ onVerify, onError, onExpire }: TurnstileWidgetProps) {
+export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
+
+  const updateLoading = useCallback((loading: boolean) => {
+    setIsLoading(loading);
+    onLoading?.(loading);
+  }, [onLoading]);
 
   const handleVerify = useCallback((token: string) => {
+    updateLoading(false);
+    setRetryCount(0);
     onVerify(token);
-  }, [onVerify]);
+  }, [onVerify, updateLoading]);
 
   const handleError = useCallback(() => {
-    console.error("Turnstile error occurred");
-    onError?.();
-  }, [onError]);
+    console.error("Turnstile error occurred, retry:", retryCount + 1);
+    
+    if (retryCount < MAX_RETRIES - 1) {
+      setRetryCount(prev => prev + 1);
+      // Retry after a short delay
+      setTimeout(() => {
+        if (widgetIdRef.current && window.turnstile) {
+          window.turnstile.reset(widgetIdRef.current);
+        }
+      }, 1000);
+    } else {
+      updateLoading(false);
+      onError?.();
+    }
+  }, [retryCount, onError, updateLoading]);
 
   const handleExpire = useCallback(() => {
     console.log("Turnstile token expired");
+    updateLoading(false);
     onExpire?.();
-  }, [onExpire]);
+  }, [onExpire, updateLoading]);
 
   // Load Turnstile script
   useEffect(() => {
@@ -82,18 +107,30 @@ export function TurnstileWidget({ onVerify, onError, onExpire }: TurnstileWidget
       window.turnstile.remove(widgetIdRef.current);
     }
 
-    // Render invisible widget
+    updateLoading(true);
+
+    // Render normal (compact) widget - more reliable than invisible
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: TURNSTILE_SITE_KEY,
       callback: handleVerify,
       'error-callback': handleError,
       'expired-callback': handleExpire,
-      size: 'invisible',
+      size: 'normal',
       theme: 'auto',
     });
-  }, [scriptLoaded, handleVerify, handleError, handleExpire]);
+  }, [scriptLoaded, handleVerify, handleError, handleExpire, updateLoading]);
 
-  return <div ref={containerRef} className="cf-turnstile" />;
+  return (
+    <div className="flex flex-col items-center gap-2">
+      {isLoading && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Verificando segurança...</span>
+        </div>
+      )}
+      <div ref={containerRef} className="cf-turnstile" />
+    </div>
+  );
 }
 
 export function useTurnstileReset() {
