@@ -52,6 +52,7 @@ import MyPlan from "./pages/settings/MyPlan";
 import MFAVerify from "./components/auth/MFAVerify";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import SecurityDashboard from "./pages/SecurityDashboard";
 import AboutUs from "./pages/AboutUs";
 import Glossary from "./pages/Glossary";
 const queryClient = new QueryClient();
@@ -113,6 +114,7 @@ const App = () => (
               <Route path="/settings/landing-content" element={<LandingContent />} />
               <Route path="/settings/my-plan" element={<MyPlan />} />
               <Route path="/super-admin" element={<SuperAdminDashboard />} />
+              <Route path="/security-dashboard" element={<SecurityDashboard />} />
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
