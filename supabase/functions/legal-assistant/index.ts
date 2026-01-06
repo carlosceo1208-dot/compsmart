@@ -6,6 +6,150 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ============ FUNÇÃO DE EXTRAÇÃO ROBUSTA DE FONTES LEGAIS ============
+interface LegalSource {
+  source_type: string;
+  source_reference: string;
+  source_category: string;
+  citation_context: string;
+}
+
+function extractLegalSources(text: string): LegalSource[] {
+  const sources: LegalSource[] = [];
+  const seen = new Set<string>();
+
+  // 1. Artigos com parágrafos e incisos (CLT, CF, Leis específicas)
+  const artRegex = /(?:Art(?:igo)?\.?\s*)(\d+)(?:\s*,?\s*§\s*(\d+º?))?(?:\s*,?\s*(?:inciso\s+)?([IVXLCDM]+|\d+))?(?:\s*(?:,?\s*(?:alínea\s+)?([a-z])))?(?:\s*(?:da|do|dos|das)?\s*(CLT|CF(?:\/88)?|Lei\s*(?:nº?\s*)?[\d\.]+(?:\/\d{4})?|C[óo]digo\s+Civil))?/gi;
+  let match;
+  while ((match = artRegex.exec(text)) !== null) {
+    const article = match[1];
+    const paragraph = match[2] || null;
+    const inciso = match[3] || null;
+    const alinea = match[4] || null;
+    const lei = match[5] || 'CLT';
+    
+    let ref = `Art. ${article}`;
+    if (paragraph) ref += `, §${paragraph}`;
+    if (inciso) ref += `, ${inciso}`;
+    if (alinea) ref += `, ${alinea}`;
+    ref += ` - ${lei.toUpperCase()}`;
+    
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      sources.push({
+        source_type: 'legislacao',
+        source_reference: ref,
+        source_category: lei.toUpperCase().includes('CLT') ? 'CLT' : 
+                         lei.toUpperCase().includes('CF') ? 'CF/88' : 'Lei Específica',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 2. Súmulas do TST, STF, STJ
+  const sumulaRegex = /Súmula\s*(?:nº?\s*)?(\d+)\s*(?:do\s*)?(TST|STF|STJ)/gi;
+  while ((match = sumulaRegex.exec(text)) !== null) {
+    const ref = `Súmula ${match[1]} do ${match[2].toUpperCase()}`;
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      sources.push({
+        source_type: 'jurisprudencia',
+        source_reference: ref,
+        source_category: `Súmula ${match[2].toUpperCase()}`,
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 3. OJs do TST (SDI-1, SDI-2, SBDI)
+  const ojRegex = /OJ[-\s]*(?:SDI[-\s]?([12])|SBDI[-\s]?([12]))?[-\s]*(\d+)/gi;
+  while ((match = ojRegex.exec(text)) !== null) {
+    const sdi = match[1] || match[2] || '1';
+    const num = match[3];
+    const ref = `OJ-SDI${sdi}-${num}`;
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      sources.push({
+        source_type: 'jurisprudencia',
+        source_reference: ref,
+        source_category: 'OJ TST',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 4. Súmulas Vinculantes do STF
+  const svRegex = /Súmula\s+Vinculante\s*(?:nº?\s*)?(\d+)/gi;
+  while ((match = svRegex.exec(text)) !== null) {
+    const ref = `Súmula Vinculante ${match[1]}`;
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      sources.push({
+        source_type: 'jurisprudencia',
+        source_reference: ref,
+        source_category: 'Súmula Vinculante STF',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 5. NRs (Normas Regulamentadoras)
+  const nrRegex = /NR[-\s]*(\d+)(?:\s*,?\s*(?:Anexo|item)\s*([A-Z\d]+(?:\.\d+)?))?/gi;
+  while ((match = nrRegex.exec(text)) !== null) {
+    let ref = `NR-${match[1]}`;
+    if (match[2]) ref += `, ${match[2]}`;
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      sources.push({
+        source_type: 'regulamentacao',
+        source_reference: ref,
+        source_category: 'NR',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 6. Leis específicas (Lei 10.101, Lei 13.467, etc.)
+  const leiRegex = /Lei\s*(?:nº?\s*)?([\d\.]+)(?:\s*\/\s*(\d{4}))?(?:\s*\(([^)]+)\))?/gi;
+  while ((match = leiRegex.exec(text)) !== null) {
+    const num = match[1];
+    const ano = match[2] || '';
+    const nome = match[3] || '';
+    let ref = `Lei ${num}`;
+    if (ano) ref += `/${ano}`;
+    if (nome) ref += ` (${nome})`;
+    const key = ref.toLowerCase().replace(/\s/g, '');
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 50);
+      const end = Math.min(text.length, match.index + match[0].length + 50);
+      sources.push({
+        source_type: 'legislacao',
+        source_reference: ref,
+        source_category: 'Lei Federal',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  return sources;
+}
+
 // Guia de vocabulário adaptado por ramo de atividade para contexto jurídico
 function getVocabularyGuide(industrySector: string | null): string {
   const guides: Record<string, string> = {
@@ -131,7 +275,7 @@ serve(async (req) => {
         .select('question, answer')
         .eq('session_id', session_id)
         .order('created_at', { ascending: true })
-        .limit(8);
+        .limit(15);
 
       conversationHistory = historyData || [];
     }
@@ -685,18 +829,24 @@ Inclua SEMPRE ao final das respostas:
     
     const tokensUsed = aiData.usage?.total_tokens || 0;
 
-    const legalReferences: any[] = [];
-    const artRegex = /art\.?\s*(\d+)/gi;
-    let match;
-    while ((match = artRegex.exec(answer)) !== null) {
-      legalReferences.push({ type: 'CLT', article: match[1] });
-    }
+    // ============ EXTRAÇÃO ROBUSTA DE FONTES LEGAIS ============
+    const extractedSources = extractLegalSources(answer);
+    
+    // Converter para formato legacy (compatibilidade)
+    const legalReferences = extractedSources.map(s => ({
+      type: s.source_category,
+      reference: s.source_reference
+    }));
 
     const responseTime = Date.now() - startTime;
+
+    // Gerar ID da conversa para vincular às citações
+    const conversationId = crypto.randomUUID();
 
     const { error: insertError } = await supabase
       .from('legal_assistant_conversations')
       .insert({
+        id: conversationId,
         user_id: user.id,
         session_id: session_id || null,
         question,
@@ -711,6 +861,29 @@ Inclua SEMPRE ao final das respostas:
 
     if (insertError) {
       console.error('Error saving conversation:', insertError);
+    }
+
+    // ============ SALVAR FONTES NA TABELA DE AUDITORIA ============
+    if (extractedSources.length > 0) {
+      const sourcesToInsert = extractedSources.map(source => ({
+        conversation_id: conversationId,
+        agent_type: 'legal',
+        source_type: source.source_type,
+        source_reference: source.source_reference,
+        source_category: source.source_category,
+        citation_context: source.citation_context.substring(0, 500),
+        verified: false
+      }));
+
+      const { error: citationError } = await supabase
+        .from('agent_source_citations')
+        .insert(sourcesToInsert);
+
+      if (citationError) {
+        console.error('Error saving source citations:', citationError);
+      } else {
+        console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes legais para auditoria`);
+      }
     }
 
     return new Response(
