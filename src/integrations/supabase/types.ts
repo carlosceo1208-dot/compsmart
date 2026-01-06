@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_source_citations: {
+        Row: {
+          agent_type: string
+          citation_context: string | null
+          conversation_id: string | null
+          created_at: string | null
+          id: string
+          source_category: string | null
+          source_reference: string
+          source_type: string
+          verified: boolean | null
+        }
+        Insert: {
+          agent_type: string
+          citation_context?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          source_category?: string | null
+          source_reference: string
+          source_type: string
+          verified?: boolean | null
+        }
+        Update: {
+          agent_type?: string
+          citation_context?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          id?: string
+          source_category?: string | null
+          source_reference?: string
+          source_type?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       alert_configurations: {
         Row: {
           alert_type: string
