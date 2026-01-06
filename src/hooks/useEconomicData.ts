@@ -1,11 +1,44 @@
 import { useQuery } from '@tanstack/react-query';
 import { EconomicData, USDData, INPCData, MinimumWageData } from '@/types/economic';
+import { supabase } from '@/integrations/supabase/client';
 
-// Salário Mínimo 2025 - Decreto nº 12.342/2024
-const MINIMUM_WAGE_DATA: MinimumWageData = {
-  value: 1518.00,
-  effectiveDate: '01/01/2025',
-  year: 2025,
+// Fallback para salário mínimo caso o banco esteja indisponível
+const FALLBACK_MINIMUM_WAGE: MinimumWageData = {
+  value: 1621.00,
+  effectiveDate: '01/01/2026',
+  year: 2026,
+};
+
+const fetchMinimumWage = async (): Promise<MinimumWageData> => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const { data, error } = await supabase
+      .from('economic_parameters')
+      .select('*')
+      .eq('parameter_key', 'minimum_wage')
+      .lte('effective_date', today)
+      .order('effective_date', { ascending: false })
+      .limit(1)
+      .single();
+    
+    if (error || !data) {
+      console.warn('Erro ao buscar salário mínimo do banco, usando fallback:', error);
+      return FALLBACK_MINIMUM_WAGE;
+    }
+    
+    const effectiveDate = new Date(data.effective_date);
+    const metadata = data.metadata as { year?: number } | null;
+    
+    return {
+      value: Number(data.value),
+      effectiveDate: effectiveDate.toLocaleDateString('pt-BR'),
+      year: metadata?.year || effectiveDate.getFullYear(),
+    };
+  } catch (error) {
+    console.error('Falha ao buscar salário mínimo:', error);
+    return FALLBACK_MINIMUM_WAGE;
+  }
 };
 
 const fetchUSDRate = async (): Promise<USDData> => {
@@ -154,12 +187,20 @@ export const useEconomicData = (inpcMonths: number = 12) => {
     refetchOnWindowFocus: false,
   });
 
+  const minimumWageQuery = useQuery({
+    queryKey: ['minimum-wage'],
+    queryFn: fetchMinimumWage,
+    staleTime: 24 * 60 * 60 * 1000, // 24 horas - valor não muda frequentemente
+    retry: 1,
+    refetchOnWindowFocus: false,
+  });
+
   const economicData: EconomicData = {
     usd: usdQuery.data || null,
     inpc: inpcQuery.data || null,
-    minimumWage: MINIMUM_WAGE_DATA,
-    isLoading: usdQuery.isLoading || inpcQuery.isLoading,
-    isRefreshing: usdQuery.isFetching || inpcQuery.isFetching,
+    minimumWage: minimumWageQuery.data || FALLBACK_MINIMUM_WAGE,
+    isLoading: usdQuery.isLoading || inpcQuery.isLoading || minimumWageQuery.isLoading,
+    isRefreshing: usdQuery.isFetching || inpcQuery.isFetching || minimumWageQuery.isFetching,
     error: usdQuery.error || inpcQuery.error || null,
     refetchUsd: () => usdQuery.refetch(),
     refetchInpc: () => inpcQuery.refetch(),

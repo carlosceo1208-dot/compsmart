@@ -1188,6 +1188,39 @@ export type Database = {
         }
         Relationships: []
       }
+      economic_parameters: {
+        Row: {
+          created_at: string | null
+          effective_date: string
+          end_date: string | null
+          id: string
+          metadata: Json | null
+          parameter_key: string
+          updated_at: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          effective_date: string
+          end_date?: string | null
+          id?: string
+          metadata?: Json | null
+          parameter_key: string
+          updated_at?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          effective_date?: string
+          end_date?: string | null
+          id?: string
+          metadata?: Json | null
+          parameter_key?: string
+          updated_at?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
       employee_benefits: {
         Row: {
           benefit_id: string
