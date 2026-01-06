@@ -221,6 +221,7 @@ export type Database = {
       auth_attempt_logs: {
         Row: {
           attempt_type: string
+          company_id: string | null
           created_at: string | null
           email: string
           failure_reason: string | null
@@ -233,6 +234,7 @@ export type Database = {
         }
         Insert: {
           attempt_type: string
+          company_id?: string | null
           created_at?: string | null
           email: string
           failure_reason?: string | null
@@ -245,6 +247,7 @@ export type Database = {
         }
         Update: {
           attempt_type?: string
+          company_id?: string | null
           created_at?: string | null
           email?: string
           failure_reason?: string | null
@@ -255,7 +258,15 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "auth_attempt_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       benefit_eligibility: {
         Row: {
@@ -2442,6 +2453,62 @@ export type Database = {
           {
             foreignKeyName: "salary_tables_root_company_id_fkey"
             columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          alert_type: string
+          company_id: string | null
+          created_at: string | null
+          details: Json | null
+          id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          severity: string
+          source_ip: string | null
+          status: string | null
+          target_email: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type: string
+          company_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity: string
+          source_ip?: string | null
+          status?: string | null
+          target_email?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          alert_type?: string
+          company_id?: string | null
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          source_ip?: string | null
+          status?: string | null
+          target_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "security_alerts_company_id_fkey"
+            columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]

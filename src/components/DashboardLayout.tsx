@@ -74,6 +74,7 @@ const routeLabels: Record<string, string> = {
   "/settings/landing-content": "Configurações",
   "/settings/my-plan": "Configurações",
   "/super-admin": "Painel Super Admin",
+  "/security-dashboard": "Monitoramento de Segurança",
 };
 
 // Parent route mapping for hierarchical navigation
@@ -248,6 +249,7 @@ export const DashboardLayout = () => {
     { icon: User, label: "Meu Perfil", path: "/my-profile" },
     { icon: ShieldCheck, label: "Controle de Acesso", path: "/access-control" },
     { icon: Settings, label: "Configurações", path: "/settings" },
+    ...(roleData?.isSuperAdmin ? [{ icon: Shield, label: "Segurança", path: "/security-dashboard" }] : []),
   ];
 
   return (
