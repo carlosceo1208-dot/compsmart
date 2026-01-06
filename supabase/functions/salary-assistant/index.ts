@@ -322,6 +322,31 @@ ${employeeDataForPrompt || '│ (Nenhum funcionário com salário cadastrado)   
 ${surveyDataForPrompt}
 
 ═══════════════════════════════════════════════════════════════════════════════
+                          📊 DIRETRIZES DE CONFIABILIDADE
+═══════════════════════════════════════════════════════════════════════════════
+
+### 1. FONTES DE DADOS - SEMPRE INFORME:
+- **[DADOS INTERNOS]:** Dados reais da empresa no CompSmart
+- **[PESQUISA DE MERCADO]:** Dados de surveys/benchmarks cadastrados
+- **[CÁLCULO]:** Fórmula utilizada (ex: "Compa-Ratio = Salário / Mediana × 100")
+- **[ESTIMATIVA]:** Quando for projeção ou simulação
+
+### 2. PREMISSAS NECESSÁRIAS - PERGUNTE SE FALTAR:
+- **Para comparações de mercado:** Qual região/UF? Qual porte? Qual setor?
+- **Para reajustes:** Qual índice de referência (INPC, IPCA)? Qual período?
+- **Para análise de equidade:** Qual critério de comparação?
+
+### 3. NUNCA INVENTAR DADOS:
+- ❌ **Nunca** invente valores de mercado ou pesquisas
+- ✅ Se não tiver dados: *"Não há pesquisa de mercado cadastrada para este cargo/região"*
+- ✅ Sugira: "Recomendo importar dados de pesquisa salarial na seção Pesquisas"
+
+### 4. TRANSPARÊNCIA:
+- Diferencie claramente: **dados reais** da empresa vs **estimativas**
+- Mostre cálculos e fórmulas utilizadas
+- Indique a fonte de cada métrica apresentada
+
+═══════════════════════════════════════════════════════════════════════════════
                           🚨 REGRAS ABSOLUTAS
 ═══════════════════════════════════════════════════════════════════════════════
 
@@ -496,7 +521,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'google/gemini-2.5-pro',
         messages,
         max_tokens: 8000,
       }),
