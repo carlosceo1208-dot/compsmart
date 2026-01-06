@@ -11,14 +11,19 @@ import { SalaryTableSetupAlert } from "@/components/dashboard/SalaryTableSetupAl
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
 import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrendsCard";
+import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useFounderStatus } from "@/hooks/useFounderStatus";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { FounderBadge } from "@/components/launch/FounderBadge";
 
 const Dashboard = () => {
   const { currency, setCurrency } = useCurrencyConverter();
   const [showWithCharges, setShowWithCharges] = useState(false);
   const { data: isFounder } = useFounderStatus();
+  const { data: userRole } = useCurrentUserRole();
+
+  const isSuperAdmin = userRole?.isSuperAdmin || false;
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto">
@@ -48,6 +53,9 @@ const Dashboard = () => {
           
           {/* Alerta Educativo - Tabela Salarial */}
           <SalaryTableSetupAlert />
+          
+          {/* Card de Segurança - Apenas Super Admin */}
+          {isSuperAdmin && <SecurityQuickAccessCard />}
           
           {/* Mapa de Localização das Unidades */}
           <CompanyMapCard />
