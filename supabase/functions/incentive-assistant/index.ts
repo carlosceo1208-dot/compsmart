@@ -6,6 +6,130 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ============ FUNÇÃO DE EXTRAÇÃO DE FONTES DE INCENTIVOS ============
+interface IncentiveSource {
+  source_type: string;
+  source_reference: string;
+  source_category: string;
+  citation_context: string;
+}
+
+function extractIncentiveSources(text: string): IncentiveSource[] {
+  const sources: IncentiveSource[] = [];
+  const seen = new Set<string>();
+
+  // 1. PLR / PPR - Lei 10.101
+  const plrRegex = /\b(?:PLR|PPR)\b|\bLei\s*10\.?101\b|\bparticipação\s+(?:nos\s+)?(?:lucros|resultados)\b/gi;
+  let match;
+  while ((match = plrRegex.exec(text)) !== null) {
+    const ref = 'Lei 10.101/2000 (PLR)';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'legislacao',
+        source_reference: ref,
+        source_category: 'PLR',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 2. Programas de ILP (Stock Options, RSU, Phantom)
+  const ilpRegex = /\b(?:stock\s*options?|RSU|ações?\s+restritas?|phantom\s*shares?|previdência\s+corporativa|bônus\s+diferido)\b/gi;
+  while ((match = ilpRegex.exec(text)) !== null) {
+    const ref = 'Programa de ILP Cadastrado';
+    const key = `ilp_${match[0].toLowerCase()}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'programa_ilp',
+        source_reference: match[0],
+        source_category: 'ILP',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 3. Programas de ICP (Bônus, Comissão)
+  const icpRegex = /\b(?:bônus\s+anual|comissão|premiação|metas?\s+(?:individuais?|coletivas?))\b/gi;
+  while ((match = icpRegex.exec(text)) !== null) {
+    const ref = 'Programa de ICP Cadastrado';
+    const key = `icp_${match[0].toLowerCase()}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'programa_icp',
+        source_reference: match[0],
+        source_category: 'ICP',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 4. Práticas de mercado
+  const marketRegex = /\bpráticas?\s+de\s+mercado\b|\bbenchmark(?:ing)?\b|\bpesquisa\s+(?:de\s+)?(?:remuneração|benefícios)\b/gi;
+  while ((match = marketRegex.exec(text)) !== null) {
+    const ref = 'Práticas de Mercado';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'mercado',
+        source_reference: ref,
+        source_category: 'Benchmark',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 5. Vesting e Cliff
+  const vestingRegex = /\b(?:vesting|cliff)\s*(?:de\s*)?(\d+\s*(?:meses?|anos?))?/gi;
+  while ((match = vestingRegex.exec(text)) !== null) {
+    const ref = 'Regras de Vesting/Cliff';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'mecanismo',
+        source_reference: ref,
+        source_category: 'ILP',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 6. Dados da empresa cadastrados
+  const dataRegex = /\bprogramas?\s+(?:ativos?|cadastrados?)\b|\bdados?\s+da\s+empresa\b|\bbenefícios?\s+ativos?\b/gi;
+  while ((match = dataRegex.exec(text)) !== null) {
+    const ref = 'Dados CompSmart';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'dados_internos',
+        source_reference: ref,
+        source_category: 'CompSmart',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  return sources;
+}
+
 // Função para ajustar vocabulário por ramo de atividade
 function getVocabularyGuide(industrySector: string | null): string {
   const guides: Record<string, string> = {
@@ -120,7 +244,7 @@ serve(async (req) => {
         .select('question, answer')
         .eq('session_id', session_id)
         .order('created_at', { ascending: true })
-        .limit(8);
+        .limit(15);
 
       conversationHistory = historyData || [];
     }
@@ -595,6 +719,9 @@ ${document_text.substring(0, 15000)}
 
     const responseTime = Date.now() - startTime;
 
+    // ============ EXTRAÇÃO DE FONTES DE INCENTIVOS ============
+    const extractedSources = extractIncentiveSources(answer);
+
     // Build context data for storage
     const contextData = {
       active_salary_table: activeSalaryTable?.name,
@@ -606,10 +733,14 @@ ${document_text.substring(0, 15000)}
       company_name: companyName,
     };
 
+    // Gerar ID da conversa para vincular às citações
+    const conversationId = crypto.randomUUID();
+
     // Save conversation to database
     const { error: insertError } = await supabase
       .from('incentive_assistant_conversations')
       .insert({
+        id: conversationId,
         user_id: user.id,
         session_id: session_id || null,
         question,
@@ -624,6 +755,29 @@ ${document_text.substring(0, 15000)}
 
     if (insertError) {
       console.error('Error saving conversation:', insertError);
+    }
+
+    // ============ SALVAR FONTES NA TABELA DE AUDITORIA ============
+    if (extractedSources.length > 0) {
+      const sourcesToInsert = extractedSources.map(source => ({
+        conversation_id: conversationId,
+        agent_type: 'incentive',
+        source_type: source.source_type,
+        source_reference: source.source_reference,
+        source_category: source.source_category,
+        citation_context: source.citation_context.substring(0, 500),
+        verified: false
+      }));
+
+      const { error: citationError } = await supabase
+        .from('agent_source_citations')
+        .insert(sourcesToInsert);
+
+      if (citationError) {
+        console.error('Error saving source citations:', citationError);
+      } else {
+        console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes de incentivos para auditoria`);
+      }
     }
 
     return new Response(

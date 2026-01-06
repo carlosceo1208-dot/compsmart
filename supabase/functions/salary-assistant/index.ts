@@ -7,6 +7,112 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ============ FUNÇÃO DE EXTRAÇÃO DE FONTES SALARIAIS ============
+interface SalarySource {
+  source_type: string;
+  source_reference: string;
+  source_category: string;
+  citation_context: string;
+}
+
+function extractSalarySources(text: string): SalarySource[] {
+  const sources: SalarySource[] = [];
+  const seen = new Set<string>();
+
+  // 1. Dados internos da empresa
+  const internalRegex = /\[DADOS?\s*INTERNO?S?\]|\bfuncionários?\s+(?:da empresa|internos?)\b|\bfolha\s+de\s+pagamento\b|\bdados?\s+reais?\b/gi;
+  let match;
+  while ((match = internalRegex.exec(text)) !== null) {
+    const ref = 'Dados Internos da Empresa';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'dados_internos',
+        source_reference: ref,
+        source_category: 'CompSmart',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 2. Pesquisas de mercado / surveys
+  const surveyRegex = /\[PESQUISA\s*(?:DE\s*)?MERCADO\]|\bpesquisa\s+salarial\b|\bsurvey\b|\bbenchmark(?:ing)?\b|\bdados?\s+de\s+mercado\b/gi;
+  while ((match = surveyRegex.exec(text)) !== null) {
+    const ref = 'Pesquisa Salarial de Mercado';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'pesquisa_mercado',
+        source_reference: ref,
+        source_category: 'Benchmark',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 3. Cálculos e fórmulas
+  const calcRegex = /\[CÁLCULO\]|\bcompa[-\s]?ratio\b|\bCR\s*[=:]\s*\d+%?|\bpercentual\s+(?:da\s+)?faixa\b|\b(?:mínimo|mediana|máximo)\s+da\s+faixa\b/gi;
+  while ((match = calcRegex.exec(text)) !== null) {
+    const ref = 'Cálculo CompSmart';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'calculo',
+        source_reference: ref,
+        source_category: 'Fórmula',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 4. Tabela salarial ativa
+  const tableRegex = /\btabela\s+salarial\b|\bfaixa(?:s)?\s+salarial(?:is)?\b|\bgrades?\s+(?:\d+|[A-Z]+)\b/gi;
+  while ((match = tableRegex.exec(text)) !== null) {
+    const ref = 'Tabela Salarial Ativa';
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'tabela_salarial',
+        source_reference: ref,
+        source_category: 'CompSmart',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  // 5. Índices econômicos
+  const indexRegex = /\b(INPC|IPCA|IGP-M|IGPM|IPC(?:A)?)\b\s*(?:acumulado|mensal|anual)?/gi;
+  while ((match = indexRegex.exec(text)) !== null) {
+    const ref = `Índice ${match[1].toUpperCase()}`;
+    const key = ref.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      const start = Math.max(0, match.index - 30);
+      const end = Math.min(text.length, match.index + match[0].length + 30);
+      sources.push({
+        source_type: 'indice_economico',
+        source_reference: ref,
+        source_category: 'Economia',
+        citation_context: text.substring(start, end).trim()
+      });
+    }
+  }
+
+  return sources;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -490,7 +596,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
         .select('question, answer')
         .eq('session_id', session_id)
         .order('created_at', { ascending: true })
-        .limit(8);
+        .limit(15);
 
       conversationHistory = historyData || [];
     }
@@ -552,8 +658,15 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
     const tokensUsed = aiData.usage?.total_tokens || 0;
     const responseTime = Date.now() - startTime;
 
+    // ============ EXTRAÇÃO DE FONTES SALARIAIS ============
+    const extractedSources = extractSalarySources(answer);
+
+    // Gerar ID da conversa para vincular às citações
+    const conversationId = crypto.randomUUID();
+
     // Salvar conversa
     await supabase.from('salary_assistant_conversations').insert({
+      id: conversationId,
       user_id: user.id,
       session_id: session_id || null,
       question,
@@ -564,6 +677,29 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
       tokens_used: tokensUsed,
       response_time_ms: responseTime,
     });
+
+    // ============ SALVAR FONTES NA TABELA DE AUDITORIA ============
+    if (extractedSources.length > 0) {
+      const sourcesToInsert = extractedSources.map(source => ({
+        conversation_id: conversationId,
+        agent_type: 'salary',
+        source_type: source.source_type,
+        source_reference: source.source_reference,
+        source_category: source.source_category,
+        citation_context: source.citation_context.substring(0, 500),
+        verified: false
+      }));
+
+      const { error: citationError } = await supabase
+        .from('agent_source_citations')
+        .insert(sourcesToInsert);
+
+      if (citationError) {
+        console.error('Error saving source citations:', citationError);
+      } else {
+        console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes salariais para auditoria`);
+      }
+    }
 
     console.log(`✅ Salary Smart processed for ${profile.email} (${tokensUsed} tokens, ${responseTime}ms, industry: ${industrySector})`);
 
