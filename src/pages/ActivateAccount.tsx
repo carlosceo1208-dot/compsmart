@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Loader2, User, Mail, Lock, Search, CheckCircle2, Building2 } from "lucide-react";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
-
+import { TurnstileWidget } from "@/components/auth/TurnstileWidget";
 interface FoundProfile {
   id: string;
   full_name: string;
@@ -28,6 +28,27 @@ export default function ActivateAccount() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [foundProfile, setFoundProfile] = useState<FoundProfile | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
+  const [turnstileLoading, setTurnstileLoading] = useState(true);
+
+  const handleTurnstileVerify = useCallback((token: string) => {
+    setTurnstileToken(token);
+    setTurnstileError(false);
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setTurnstileToken(null);
+    setTurnstileError(true);
+  }, []);
+
+  const handleTurnstileExpire = useCallback(() => {
+    setTurnstileToken(null);
+  }, []);
+
+  const handleTurnstileLoading = useCallback((loading: boolean) => {
+    setTurnstileLoading(loading);
+  }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,13 +127,22 @@ export default function ActivateAccount() {
       return;
     }
 
+    // Validate Turnstile CAPTCHA - allow fallback if Turnstile failed after retries
+    const skipTurnstile = turnstileError;
+    
+    if (!turnstileToken && !skipTurnstile && turnstileLoading) {
+      toast.error("Aguarde a verificação de segurança...");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("activate-employee", {
         body: {
           identifier: identifier.trim(),
           email: email.trim(),
-          password
+          password,
+          turnstileToken: turnstileToken || undefined
         }
       });
 
@@ -281,7 +311,17 @@ export default function ActivateAccount() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              {/* Turnstile CAPTCHA */}
+              <div className="flex justify-center">
+                <TurnstileWidget
+                  onVerify={handleTurnstileVerify}
+                  onError={handleTurnstileError}
+                  onExpire={handleTurnstileExpire}
+                  onLoading={handleTurnstileLoading}
+                />
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading || (turnstileLoading && !turnstileError && !turnstileToken)}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
