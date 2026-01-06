@@ -52,6 +52,8 @@ import MyPlan from "./pages/settings/MyPlan";
 import MFAVerify from "./components/auth/MFAVerify";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import AboutUs from "./pages/AboutUs";
+import Glossary from "./pages/Glossary";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -73,6 +75,8 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/termos-de-uso" element={<TermsOfUse />} />
             <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
+            <Route path="/sobre-nos" element={<AboutUs />} />
+            <Route path="/glossario" element={<Glossary />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route path="/checkout/processing" element={<CheckoutProcessing />} />

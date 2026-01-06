@@ -17,7 +17,7 @@ export const Footer = () => {
             </p>
             <div className="flex gap-3">
               <a 
-                href="https://www.linkedin.com/company/compsmart-tecnologia-servicos-de-rh/" 
+                href="https://www.linkedin.com/company/compsmart-tecnologia-servi%C3%A7os-de-rh/?viewAsMember=true" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 bg-primary/10 rounded-lg hover:bg-primary/20 transition-colors"
@@ -67,23 +67,13 @@ export const Footer = () => {
             <h3 className="font-semibold mb-4">Recursos</h3>
             <ul className="space-y-2">
               <li>
-                <a href="/glossary" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <a href="/glossario" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Glossário de C&S
                 </a>
               </li>
               <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                <a href="/sobre-nos" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   Sobre Nós
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Contato
                 </a>
               </li>
             </ul>
