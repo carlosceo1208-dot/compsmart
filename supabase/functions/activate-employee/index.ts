@@ -93,6 +93,7 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const turnstileSecretKey = Deno.env.get('TURNSTILE_SECRET_KEY');
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -102,9 +103,54 @@ serve(async (req) => {
     const identifier = sanitizeIdentifier(requestBody.identifier);
     const email = sanitizeEmail(requestBody.email);
     const password = requestBody.password;
+    const turnstileToken = requestBody.turnstileToken;
 
     // Log without sensitive data
     console.log('Activation attempt received');
+
+    // SECURITY: Verify Turnstile CAPTCHA token if provided
+    if (turnstileSecretKey && turnstileToken) {
+      try {
+        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            secret: turnstileSecretKey,
+            response: turnstileToken,
+            remoteip: clientIP
+          })
+        });
+        
+        const turnstileResult = await turnstileResponse.json();
+        
+        if (!turnstileResult.success) {
+          console.warn('Turnstile verification failed');
+          return new Response(JSON.stringify({ 
+            success: false,
+            error: 'Verificação de segurança falhou. Por favor, tente novamente.'
+          }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        console.log('Turnstile verification passed');
+      } catch (turnstileError) {
+        console.error('Turnstile verification error');
+        // Continue without blocking - rate limiting is still in place
+      }
+    } else if (!turnstileToken) {
+      // If no token provided and we have the secret key, require it
+      if (turnstileSecretKey) {
+        console.warn('No Turnstile token provided');
+        return new Response(JSON.stringify({ 
+          success: false,
+          error: 'Verificação de segurança necessária. Por favor, complete o captcha.'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
 
     // Validations with generic messages
     if (!identifier || (!isValidCPF(identifier) && !isValidEmployeeNumber(identifier))) {
