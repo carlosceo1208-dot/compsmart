@@ -29,9 +29,9 @@ export const HeroSection = () => {
   const thumbnailUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional-thumb.jpg";
   const hasVideo = Boolean(videoUrl);
 
-  // Countdown to January 7, 2026
+  // Countdown to January 7, 2026 (São Paulo timezone UTC-3)
   useEffect(() => {
-    const targetDate = new Date('2026-01-07T00:00:00').getTime();
+    const targetDate = new Date('2026-01-07T00:00:00-03:00').getTime();
     
     const updateCountdown = () => {
       const now = new Date().getTime();

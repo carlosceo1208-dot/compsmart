@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { EconomicData, USDData, INPCData, MinimumWageData } from '@/types/economic';
 import { supabase } from '@/integrations/supabase/client';
+import { getBrazilDateString } from '@/lib/timezone';
 
 // Fallback para salário mínimo caso o banco esteja indisponível
 const FALLBACK_MINIMUM_WAGE: MinimumWageData = {
@@ -11,7 +12,7 @@ const FALLBACK_MINIMUM_WAGE: MinimumWageData = {
 
 const fetchMinimumWage = async (): Promise<MinimumWageData> => {
   try {
-    const today = new Date().toISOString().split('T')[0];
+    const today = getBrazilDateString();
     
     const { data, error } = await supabase
       .from('economic_parameters')
