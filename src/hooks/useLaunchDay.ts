@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getBrazilDateString } from '@/lib/timezone';
 
 const LAUNCH_DATE = '2026-01-07';
 
@@ -10,7 +11,7 @@ export const useLaunchDay = () => {
     setHasSeenConfetti(!!seen);
   }, []);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getBrazilDateString();
   const isLaunchDay = today === LAUNCH_DATE;
   
   const shouldShowConfetti = isLaunchDay && !hasSeenConfetti;
