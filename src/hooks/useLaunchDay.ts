@@ -13,6 +13,7 @@ export const useLaunchDay = () => {
 
   const today = getBrazilDateString();
   const isLaunchDay = today === LAUNCH_DATE;
+  const isLaunched = today >= LAUNCH_DATE;
   
   const shouldShowConfetti = isLaunchDay && !hasSeenConfetti;
   
@@ -22,7 +23,8 @@ export const useLaunchDay = () => {
   };
   
   return { 
-    isLaunchDay, 
+    isLaunchDay,
+    isLaunched,
     shouldShowConfetti, 
     markConfettiSeen,
     launchDate: LAUNCH_DATE

@@ -17,10 +17,9 @@ interface TrailParticle {
 
 export const HeroSection = () => {
   const navigate = useNavigate();
-  const { isLaunchDay } = useLaunchDay();
+  const { isLaunchDay, isLaunched } = useLaunchDay();
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [trailParticles, setTrailParticles] = useState<TrailParticle[]>([]);
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const particleIdRef = useRef(0);
   const playButtonRef = useRef<HTMLDivElement>(null);
   
@@ -28,29 +27,6 @@ export const HeroSection = () => {
   const videoUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional.mp4";
   const thumbnailUrl = "https://fpkjkqdfufhhicxkyqdw.supabase.co/storage/v1/object/public/videos/institucional-thumb.jpg";
   const hasVideo = Boolean(videoUrl);
-
-  // Countdown to January 7, 2026 (São Paulo timezone UTC-3)
-  useEffect(() => {
-    const targetDate = new Date('2026-01-07T00:00:00-03:00').getTime();
-    
-    const updateCountdown = () => {
-      const now = new Date().getTime();
-      const difference = targetDate - now;
-      
-      if (difference > 0) {
-        setCountdown({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((difference % (1000 * 60)) / 1000)
-        });
-      }
-    };
-    
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (!playButtonRef.current) return;
@@ -103,7 +79,7 @@ export const HeroSection = () => {
           <div className="flex items-center justify-center gap-3 flex-wrap animate-fade-in-down">
             <Badge className="bg-gradient-primary text-white px-4 py-1.5 text-sm flex items-center gap-2 shadow-primary">
               <Sparkles className="h-4 w-4" />
-              {isLaunchDay ? 'Lançamento Oficial!' : 'Lançamento Janeiro 2026'}
+              {isLaunchDay ? 'Lançamento Oficial!' : isLaunched ? 'Novo! Disponível Agora' : 'Em breve'}
             </Badge>
             <Badge className="bg-green-500/10 text-green-600 border-green-500/20 px-3 py-1.5 text-sm flex items-center gap-2 cursor-pointer hover:bg-green-500/20 transition-colors" onClick={() => setIsVideoOpen(true)}>
               <Play className="h-4 w-4" />
@@ -111,40 +87,10 @@ export const HeroSection = () => {
             </Badge>
           </div>
 
-          {/* Launch Banner OR Countdown Timer */}
-          {isLaunchDay ? (
+          {/* Launch Banner - only on launch day */}
+          {isLaunchDay && (
             <div className="animate-fade-in-down" style={{ animationDelay: "0.05s" }}>
               <LaunchBanner />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-4 animate-fade-in-down" style={{ animationDelay: "0.05s" }}>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {countdown.days}
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Dias</div>
-              </div>
-              <span className="text-2xl text-muted-foreground">:</span>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {countdown.hours.toString().padStart(2, '0')}
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Horas</div>
-              </div>
-              <span className="text-2xl text-muted-foreground">:</span>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {countdown.minutes.toString().padStart(2, '0')}
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Min</div>
-              </div>
-              <span className="text-2xl text-muted-foreground">:</span>
-              <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  {countdown.seconds.toString().padStart(2, '0')}
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wider">Seg</div>
-              </div>
             </div>
           )}
 

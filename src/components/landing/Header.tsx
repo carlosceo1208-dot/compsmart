@@ -67,10 +67,10 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
             />
             <Badge 
               variant="outline" 
-              className="hidden sm:flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 px-3 py-1.5 animate-pulse"
+              className="hidden sm:flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 px-3 py-1.5"
             >
               <Rocket className="h-3.5 w-3.5" />
-              <span className="text-xs font-semibold">Janeiro 2026</span>
+              <span className="text-xs font-semibold">Novo!</span>
             </Badge>
           </div>
 
@@ -155,7 +155,7 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               className="w-fit flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 px-3 py-1.5 mb-2"
             >
               <Rocket className="h-3.5 w-3.5" />
-              <span className="text-xs font-semibold">Lançamento Janeiro 2026</span>
+              <span className="text-xs font-semibold">Novo! Disponível Agora</span>
             </Badge>
             
             <button 

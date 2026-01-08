@@ -6,6 +6,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { TrustBar } from "@/components/landing/TrustBar";
 import { LogoSlider } from "@/components/landing/LogoSlider";
 import { AIShowcaseSection } from "@/components/landing/AIShowcaseSection";
+import { WhatsNewSection } from "@/components/landing/WhatsNewSection";
 import { PainPointsSection } from "@/components/landing/PainPointsSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
 import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
@@ -19,6 +20,7 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { FloatingTrialBanner } from "@/components/landing/FloatingTrialBanner";
+import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
 import { LaunchConfetti } from "@/components/launch/LaunchConfetti";
 
 const Index = () => {
@@ -54,6 +56,7 @@ const Index = () => {
       <TrustBar />
       <LogoSlider />
       <AIShowcaseSection />
+      <WhatsNewSection />
       <PainPointsSection />
       <SolutionSection />
       <SmartAgentsSection />
@@ -67,6 +70,7 @@ const Index = () => {
       <CTASection />
       <Footer />
       <FloatingTrialBanner />
+      <LaunchPromoBanner />
     </div>
   );
 };
