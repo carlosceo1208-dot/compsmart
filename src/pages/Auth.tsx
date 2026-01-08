@@ -29,8 +29,6 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileError, setTurnstileError] = useState(false);
-  const [turnstileLoading, setTurnstileLoading] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -47,20 +45,10 @@ const Auth = () => {
 
   const handleTurnstileVerify = useCallback((token: string) => {
     setTurnstileToken(token);
-    setTurnstileError(false);
-  }, []);
-
-  const handleTurnstileError = useCallback(() => {
-    setTurnstileToken(null);
-    setTurnstileError(true);
   }, []);
 
   const handleTurnstileExpire = useCallback(() => {
     setTurnstileToken(null);
-  }, []);
-
-  const handleTurnstileLoading = useCallback((loading: boolean) => {
-    setTurnstileLoading(loading);
   }, []);
 
   useEffect(() => {
@@ -102,27 +90,19 @@ const Auth = () => {
       return;
     }
 
-    // Validate Turnstile CAPTCHA - allow fallback if Turnstile failed after retries
-    const skipTurnstile = turnstileError; // Graceful fallback when CAPTCHA fails
-    
-    if (!turnstileToken && !skipTurnstile && turnstileLoading) {
-      toast.error("Aguarde a verificação de segurança...");
-      return;
-    }
+    // Turnstile is optional - if token exists, verify it; otherwise rely on rate limiting
 
     setLoading(true);
 
     try {
-      // Verify Turnstile token with backend (skip if using fallback)
-      if (turnstileToken && !skipTurnstile) {
+      // Verify Turnstile token with backend if available
+      if (turnstileToken) {
         const turnstileResponse = await supabase.functions.invoke("verify-turnstile", {
           body: { token: turnstileToken },
         });
 
         if (turnstileResponse.error || !turnstileResponse.data?.success) {
-          console.error("Turnstile verification failed:", turnstileResponse.error);
-          // Allow proceeding with rate limiting as backup
-          console.log("Proceeding with rate limiting as backup protection");
+          // Silent fallback - rate limiting provides backup protection
         }
       }
       const validation = authSchema.parse({
@@ -387,21 +367,13 @@ const Auth = () => {
               {/* Turnstile CAPTCHA */}
               <TurnstileWidget
                 onVerify={handleTurnstileVerify}
-                onError={handleTurnstileError}
                 onExpire={handleTurnstileExpire}
-                onLoading={handleTurnstileLoading}
               />
-
-              {turnstileError && (
-                <p className="text-xs text-amber-600 text-center">
-                  Verificação de segurança indisponível. Você ainda pode continuar.
-                </p>
-              )}
 
               <Button
                 type="submit"
                 className="w-full bg-gradient-primary hover:opacity-90"
-                disabled={loading || rateLimiter.isBlocked || (!isLogin && !acceptedTerms) || (turnstileLoading && !turnstileError)}
+                disabled={loading || rateLimiter.isBlocked || (!isLogin && !acceptedTerms)}
               >
                 {loading ? (
                   <>

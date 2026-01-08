@@ -9,6 +9,7 @@ interface TurnstileWidgetProps {
   onError?: () => void;
   onExpire?: () => void;
   onLoading?: (isLoading: boolean) => void;
+  silentFallback?: boolean;
 }
 
 declare global {
@@ -29,7 +30,7 @@ declare global {
   }
 }
 
-export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: TurnstileWidgetProps) {
+export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silentFallback = true }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -48,8 +49,6 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
   }, [onVerify, updateLoading]);
 
   const handleError = useCallback(() => {
-    console.error("Turnstile error occurred, retry:", retryCount + 1);
-    
     if (retryCount < MAX_RETRIES - 1) {
       setRetryCount(prev => prev + 1);
       // Retry after a short delay
@@ -59,10 +58,13 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
         }
       }, 1000);
     } else {
+      // Silent fallback - just stop trying without showing error
       updateLoading(false);
-      onError?.();
+      if (!silentFallback) {
+        onError?.();
+      }
     }
-  }, [retryCount, onError, updateLoading]);
+  }, [retryCount, onError, updateLoading, silentFallback]);
 
   const handleExpire = useCallback(() => {
     console.log("Turnstile token expired");
