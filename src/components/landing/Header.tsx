@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X, LayoutDashboard, LogOut, Rocket } from "lucide-react";
+import { Menu, X, LayoutDashboard, LogOut, Rocket, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { Badge } from "@/components/ui/badge";
+import { useChangelogVisibility } from "@/hooks/useChangelogVisibility";
 
 interface HeaderProps {
   isLoggedIn?: boolean;
@@ -14,6 +15,7 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isChangelogVisible } = useChangelogVisibility();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,6 +99,16 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               FAQ
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
             </button>
+            {isChangelogVisible && (
+              <button 
+                onClick={() => navigate('/changelog')} 
+                className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-200 group flex items-center gap-1.5"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Novidades
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
+              </button>
+            )}
             
             {isLoggedIn ? (
               <>
@@ -176,6 +188,15 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
             >
               FAQ
             </button>
+            {isChangelogVisible && (
+              <button 
+                onClick={() => { navigate('/changelog'); setIsMenuOpen(false); }} 
+                className="text-left text-sm font-medium text-muted-foreground hover:text-primary py-2 border-b border-border/50 flex items-center gap-1.5"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                Novidades
+              </button>
+            )}
             
             <div className="flex flex-col gap-2 mt-2">
               {isLoggedIn ? (

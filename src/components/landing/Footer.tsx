@@ -1,8 +1,10 @@
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { Linkedin, Instagram, Mail, MapPin } from "lucide-react";
+import { useChangelogVisibility } from "@/hooks/useChangelogVisibility";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { isChangelogVisible } = useChangelogVisibility();
 
   return (
     <footer className="bg-muted/50 border-t border-border">
@@ -76,6 +78,13 @@ export const Footer = () => {
                   Sobre Nós
                 </a>
               </li>
+              {isChangelogVisible && (
+                <li>
+                  <a href="/changelog" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    Changelog
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 
