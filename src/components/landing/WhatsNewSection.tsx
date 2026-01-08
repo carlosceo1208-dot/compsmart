@@ -1,61 +1,16 @@
-import { Rocket, Brain, BarChart3, Shield, Users, Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { changelogEntries, categoryStyles, categoryLabels } from "@/data/changelog";
+import { useChangelogVisibility } from "@/hooks/useChangelogVisibility";
 
-interface Update {
-  date: string;
-  title: string;
-  description: string;
-  category: 'lancamento' | 'novo' | 'melhoria';
-  icon: React.ElementType;
-}
-
-const updates: Update[] = [
-  {
-    date: '2026-01-07',
-    title: 'Lançamento Oficial CompSmart',
-    description: 'Plataforma completa de gestão de remuneração estratégica com inteligência artificial integrada.',
-    category: 'lancamento',
-    icon: Rocket
-  },
-  {
-    date: '2026-01-07',
-    title: 'Assistentes de IA Integrados',
-    description: 'Chatbots especializados para análise salarial, benefícios, incentivos e legislação trabalhista.',
-    category: 'novo',
-    icon: Brain
-  },
-  {
-    date: '2026-01-07',
-    title: 'Dashboard de People Analytics',
-    description: 'Visualização completa de métricas de remuneração, competitividade e tendências salariais.',
-    category: 'novo',
-    icon: BarChart3
-  },
-  {
-    date: '2026-01-07',
-    title: 'Segurança LGPD Compliant',
-    description: 'Criptografia ponta-a-ponta, controle de acesso granular e auditoria completa de operações.',
-    category: 'novo',
-    icon: Shield
-  }
-];
-
-const categoryStyles = {
-  lancamento: 'bg-gradient-to-r from-primary to-secondary text-white',
-  novo: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-  melhoria: 'bg-blue-500/10 text-blue-600 border-blue-500/20'
-};
-
-const categoryLabels = {
-  lancamento: 'Lançamento',
-  novo: 'Novo',
-  melhoria: 'Melhoria'
-};
+// Show only first 4 entries on landing page
+const updates = changelogEntries.slice(0, 4);
 
 export const WhatsNewSection = () => {
   const navigate = useNavigate();
+  const { isChangelogVisible } = useChangelogVisibility();
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T12:00:00');
@@ -135,7 +90,7 @@ export const WhatsNewSection = () => {
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
             variant="outline" 
             onClick={() => navigate('/auth')}
@@ -144,6 +99,16 @@ export const WhatsNewSection = () => {
             Comece agora e aproveite todas as novidades
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
+          {isChangelogVisible && (
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/changelog')}
+              className="group text-muted-foreground hover:text-primary"
+            >
+              <History className="mr-2 h-4 w-4" />
+              Ver histórico completo
+            </Button>
+          )}
         </div>
       </div>
     </section>

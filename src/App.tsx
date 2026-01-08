@@ -55,6 +55,7 @@ import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import SecurityDashboard from "./pages/SecurityDashboard";
 import AboutUs from "./pages/AboutUs";
 import Glossary from "./pages/Glossary";
+import Changelog from "./pages/Changelog";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -78,6 +79,7 @@ const App = () => (
             <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
             <Route path="/sobre-nos" element={<AboutUs />} />
             <Route path="/glossario" element={<Glossary />} />
+            <Route path="/changelog" element={<Changelog />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/checkout/success" element={<CheckoutSuccess />} />
             <Route path="/checkout/processing" element={<CheckoutProcessing />} />
