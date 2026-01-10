@@ -28,7 +28,7 @@ export const FloatingTrialBanner = () => {
     // Show banner after scroll/time
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 18000); // 18 seconds
+    }, 8000); // 8 seconds
 
     // Also show on scroll
     const handleScroll = () => {
