@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { planFeatures, PlanFeature } from "@/config/planFeatures";
-
+import { DiscountCalculator } from "./DiscountCalculator";
 interface ColorClasses {
   gradient: string;
   border: string;
@@ -127,10 +127,9 @@ interface PlanData {
 }
 
 // Configuração do período de lançamento - UTC-3 Brasil
-const LAUNCH_END_DATE = new Date('2026-02-06T23:59:59-03:00');
+const LAUNCH_END_DATE = new Date('2026-02-22T23:59:59-03:00');
 const LAUNCH_DISCOUNT = 0.30; // 30% de desconto
 const ANNUAL_DISCOUNT = 0.10; // 10% adicional para anual
-
 export const PricingSection = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -403,6 +402,20 @@ export const PricingSection = () => {
                   </div>
                 </div>
               )}
+
+              {/* Calculadora de Desconto Interativa */}
+              <div className="max-w-2xl mx-auto">
+                <DiscountCalculator 
+                  isLaunchPeriod={isLaunchPeriod}
+                  plans={plans
+                    .filter(p => p.name !== 'Enterprise' && p.monthlyPrice > 0)
+                    .map(p => ({
+                      id: p.id,
+                      name: p.name,
+                      price: p.monthlyPrice
+                    }))}
+                />
+              </div>
             </div>
 
             <div 

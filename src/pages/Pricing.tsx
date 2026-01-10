@@ -6,12 +6,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { PlanBadge } from '@/components/PlanBadge';
+import { DiscountCalculator } from '@/components/landing/DiscountCalculator';
 
 // Configuração do período de lançamento - UTC-3 Brasil
-const LAUNCH_END_DATE = new Date('2026-02-06T23:59:59-03:00');
+const LAUNCH_END_DATE = new Date('2026-02-22T23:59:59-03:00');
 const LAUNCH_DISCOUNT = 0.30; // 30% de desconto
 const ANNUAL_DISCOUNT = 0.10; // 10% adicional para anual
-
 const Pricing = () => {
   const { plan } = useFeatureAccess();
   const navigate = useNavigate();
@@ -200,6 +200,18 @@ const Pricing = () => {
           </div>
         )}
 
+        {/* Calculadora de Desconto Interativa */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <DiscountCalculator 
+            isLaunchPeriod={isLaunchPeriod}
+            plans={plans.map(p => ({
+              id: p.id,
+              name: p.name,
+              price: p.basePrice
+            }))}
+          />
+        </div>
+
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           {plans.map((planItem) => (
             <Card
@@ -260,7 +272,7 @@ const Pricing = () => {
                   )}
                   {isLaunchPeriod && (
                     <p className="text-xs text-primary font-medium">
-                      Desconto válido até 06/02/2026
+                      Desconto válido até 22/02/2026
                     </p>
                   )}
                 </div>
