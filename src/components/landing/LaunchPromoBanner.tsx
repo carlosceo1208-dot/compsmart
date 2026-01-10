@@ -23,10 +23,10 @@ export const LaunchPromoBanner = () => {
       }
     }
     
-    // Show after 5 seconds
+    // Show after 2 seconds
     const timer = setTimeout(() => {
       setIsVisible(true);
-    }, 5000);
+    }, 2000);
     
     return () => clearTimeout(timer);
   }, []);
