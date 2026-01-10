@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 
-const LAUNCH_END_DATE = '2026-02-06';
+const LAUNCH_END_DATE = '2026-02-22';
 const STORAGE_KEY = 'launch_promo_dismissed';
 const DISMISS_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -121,7 +121,7 @@ export const LaunchPromoBanner = () => {
 
         {/* Fine print */}
         <p className="text-white/50 text-[10px] text-center mt-2">
-          Válido para novos assinantes até 06/02/2026
+          Válido para novos assinantes até 22/02/2026
         </p>
       </div>
     </div>
