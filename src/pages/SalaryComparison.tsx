@@ -6,9 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SalaryTableSelector } from "@/components/SalaryTableSelector";
 import { SurveyTableSelector } from "@/components/SurveyTableSelector";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp, ArrowDown, TrendingUp } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { formatCompactCurrency } from "@/lib/formatters";
+import { RegressionAnalysisDialog } from "@/components/salary/RegressionAnalysisDialog";
 
 interface ComparisonRow {
   grade: string;
@@ -52,6 +53,7 @@ export default function SalaryComparison() {
   const [surveyTableId, setSurveyTableId] = useState<string | undefined>();
   const [comparisonData, setComparisonData] = useState<ComparisonRow[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showRegressionDialog, setShowRegressionDialog] = useState(false);
 
   useEffect(() => {
     if (salaryTableId && surveyTableId) {
@@ -261,6 +263,26 @@ export default function SalaryComparison() {
             </CardContent>
           </Card>
 
+          {/* Card de Análise Regressiva */}
+          {comparisonData.length > 0 && (
+            <Card 
+              className="p-6 cursor-pointer hover:bg-accent/50 transition-colors border-purple-200 dark:border-purple-800"
+              onClick={() => setShowRegressionDialog(true)}
+            >
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                  <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Análise Regressiva das Curvas Salariais</h3>
+                  <p className="text-muted-foreground">
+                    Análise estatística completa com comparação de tendências e exportação PDF
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Tabela Comparativa */}
           <Card>
             <CardHeader>
@@ -333,6 +355,13 @@ export default function SalaryComparison() {
             )}
           </CardContent>
           </Card>
+
+          {/* Dialog de Análise Regressiva */}
+          <RegressionAnalysisDialog
+            open={showRegressionDialog}
+            onOpenChange={setShowRegressionDialog}
+            comparisonData={comparisonData}
+          />
         </>
       )}
     </div>
