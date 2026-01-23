@@ -49,7 +49,7 @@ export const useCompensationTrends = () => {
       await queryClient.invalidateQueries({ queryKey: ["compensation-trends"] });
       toast({
         title: "Tendências atualizadas",
-        description: "As tendências de remuneração foram atualizadas com sucesso.",
+        description: "As tendências de gestão de remuneração foram atualizadas com sucesso.",
       });
     } catch (error) {
       toast({
