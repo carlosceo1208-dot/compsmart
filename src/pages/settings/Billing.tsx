@@ -18,7 +18,7 @@ import {
   FileText,
   AlertCircle
 } from 'lucide-react';
-import { DashboardLayout } from '@/components/DashboardLayout';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 interface Subscription {
   id: string;
@@ -50,10 +50,11 @@ export default function Billing() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: roleData } = useCurrentUserRole();
 
   useEffect(() => {
     fetchBillingData();
-  }, []);
+  }, [roleData?.isAdmin, roleData?.isHR]);
 
   const fetchBillingData = async () => {
     try {
@@ -81,16 +82,18 @@ export default function Billing() {
         setSubscription(subData as any);
       }
 
-      // Fetch invoices
-      const { data: invoiceData } = await supabase
-        .from('invoices')
-        .select('*')
-        .eq('company_id', profile.root_company_id)
-        .order('issue_date', { ascending: false })
-        .limit(10);
+      // Fetch invoices (somente Admin/RH)
+      if (roleData?.isAdmin || roleData?.isHR) {
+        const { data: invoiceData } = await supabase
+          .from('invoices')
+          .select('*')
+          .eq('company_id', profile.root_company_id)
+          .order('issue_date', { ascending: false })
+          .limit(10);
 
-      if (invoiceData) {
-        setInvoices(invoiceData);
+        if (invoiceData) {
+          setInvoices(invoiceData);
+        }
       }
     } catch (error) {
       console.error('Error fetching billing data:', error);
@@ -221,7 +224,12 @@ export default function Billing() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {invoices.length > 0 ? (
+            {!(roleData?.isAdmin || roleData?.isHR) ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p>Somente Admin/RH podem visualizar faturas.</p>
+              </div>
+            ) : invoices.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
