@@ -4,7 +4,7 @@ import { Mail, Phone, Briefcase, Building2 } from "lucide-react";
 
 interface PersonTooltipProps {
   name: string;
-  email: string;
+  email?: string;
   phone?: string | null;
   jobTitle?: string | null;
   grade?: string | null;
@@ -67,10 +67,12 @@ export function PersonTooltip({
           </div>
         )}
         
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Mail className="h-4 w-4 flex-shrink-0" />
-          <span className="truncate">{email}</span>
-        </div>
+        {email && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Mail className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{email}</span>
+          </div>
+        )}
         
         {phone && (
           <div className="flex items-center gap-2 text-muted-foreground">

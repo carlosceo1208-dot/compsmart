@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { OrgNode } from "./OrgNode";
 import { PersonTooltip } from "./PersonTooltip";
 import {
@@ -21,7 +20,7 @@ interface OrgEntity {
 interface Employee {
   id: string;
   full_name: string;
-  email: string;
+  email?: string;
   phone?: string | null;
   job_title?: string | null;
   grade?: string | null;

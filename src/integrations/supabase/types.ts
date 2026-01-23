@@ -2306,6 +2306,42 @@ export type Database = {
           },
         ]
       }
+      profiles_directory: {
+        Row: {
+          avatar_url: string | null
+          full_name: string
+          grade: string | null
+          job_title: string | null
+          root_company_id: string | null
+          status: Database["public"]["Enums"]["user_status"] | null
+          unit_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          full_name: string
+          grade?: string | null
+          job_title?: string | null
+          root_company_id?: string | null
+          status?: Database["public"]["Enums"]["user_status"] | null
+          unit_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          full_name?: string
+          grade?: string | null
+          job_title?: string | null
+          root_company_id?: string | null
+          status?: Database["public"]["Enums"]["user_status"] | null
+          unit_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           created_at: string
