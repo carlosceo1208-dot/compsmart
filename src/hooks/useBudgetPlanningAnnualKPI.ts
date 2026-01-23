@@ -78,6 +78,9 @@ export const useBudgetPlanningAnnualKPI = () => {
   const previousYear = currentYear - 1;           // 2025
   const nextYear = currentYear + 1;               // 2027
 
+  const startOfYearISO = (year: number) => `${year}-01-01`;
+  const endOfYearISO = (year: number) => `${year}-12-31`;
+
   const getYearMonthFromDate = (date: string | null | undefined) => {
     if (!date) return null;
     // date vem do backend como DATE (YYYY-MM-DD). Evitar Date() por timezone.
@@ -88,29 +91,61 @@ export const useBudgetPlanningAnnualKPI = () => {
     return { year, month };
   };
 
-  const monthsWorkedInYear = (hireDate: string | null | undefined, year: number) => {
-    const ym = getYearMonthFromDate(hireDate);
-    if (!ym) return 12;
-    if (ym.year < year) return 12;
-    if (ym.year > year) return 0;
-    // admitido no ano
-    return Math.max(1, 12 - ym.month + 1);
+  const monthsWorkedInYear = (
+    hireDate: string | null | undefined,
+    terminationDate: string | null | undefined,
+    year: number
+  ) => {
+    // Regra (mês calendário, inclusivo):
+    // início = max(hire_date, 01/01/ano)
+    // fim = min(termination_date (se existir), 31/12/ano)
+    // meses = fimMes - inicioMes + 1
+    const start = getYearMonthFromDate(hireDate) ?? getYearMonthFromDate(startOfYearISO(year));
+    const end = getYearMonthFromDate(terminationDate) ?? getYearMonthFromDate(endOfYearISO(year));
+
+    if (!start || !end) return 12;
+
+    // Clamp
+    const startClamped = start.year < year ? { year, month: 1 } : start.year > year ? { year, month: 13 } : start;
+    const endClamped = end.year > year ? { year, month: 12 } : end.year < year ? { year, month: 0 } : end;
+
+    if (startClamped.month > 12 || endClamped.month < 1) return 0;
+    if (startClamped.month > endClamped.month) return 0;
+
+    return Math.max(0, endClamped.month - startClamped.month + 1);
+  };
+
+  const isActiveOnDate = (
+    hireDate: string | null | undefined,
+    terminationDate: string | null | undefined,
+    dateISO: string
+  ) => {
+    if (!hireDate) return true;
+    // Comparação lexicográfica funciona para ISO (YYYY-MM-DD)
+    const hired = hireDate <= dateISO;
+    const notTerminated = !terminationDate || terminationDate > dateISO;
+    return hired && notTerminated;
   };
 
   return useQuery({
     queryKey: ['budget-planning-annual-kpi', activeCompanyId, previousYear, currentYear, nextYear],
     queryFn: async () => {
-      // 1. Buscar funcionários atuais
+      // 1. Buscar funcionários relevantes para baseline (ano anterior) e ano atual
+      // Inclui desligados que trabalharam em qualquer parte do período (evita subestimar "Atual" e baseline).
       let employeesQuery = supabase
         .from('profiles')
-        .select('id, full_name, salary, variable_salary, benefits_value, hire_date')
-        .eq('status', 'active')
+        .select('id, full_name, salary, variable_salary, benefits_value, hire_date, termination_date')
         .not('salary', 'is', null);
 
       // Escopo por empresa ativa (segurança + consistência de números)
       if (activeCompanyId) {
         employeesQuery = employeesQuery.eq('root_company_id', activeCompanyId);
       }
+
+      // Trabalhou em baseline ou em ano atual
+      employeesQuery = employeesQuery
+        .lte('hire_date', endOfYearISO(currentYear))
+        .or(`termination_date.is.null,termination_date.gte.${startOfYearISO(previousYear)}`);
 
       const { data: employees, error: employeesError } = await employeesQuery;
 
@@ -122,7 +157,7 @@ export const useBudgetPlanningAnnualKPI = () => {
       let previousBenefits = 0;
       
       employees.forEach(emp => {
-        const monthsWorked = monthsWorkedInYear(emp.hire_date, previousYear);
+        const monthsWorked = monthsWorkedInYear(emp.hire_date, emp.termination_date, previousYear);
         
         previousFixedSalary += (emp.salary || 0) * monthsWorked;
         previousVariableSalary += (emp.variable_salary || 0) * monthsWorked;
@@ -130,11 +165,9 @@ export const useBudgetPlanningAnnualKPI = () => {
       });
 
       const previousTotal = previousFixedSalary + previousVariableSalary + previousBenefits;
-      const previousHeadcount = employees.filter(emp => {
-        const ym = getYearMonthFromDate(emp.hire_date);
-        if (!ym) return true;
-        return ym.year <= previousYear;
-      }).length;
+      const previousHeadcount = employees.filter((emp) =>
+        isActiveOnDate(emp.hire_date, emp.termination_date, endOfYearISO(previousYear))
+      ).length;
 
       // 3. Buscar projeções aprovadas do ANO ATUAL (2026)
       const { data: currentYearProjections, error: currentProjectionsError } = await supabase
@@ -308,7 +341,7 @@ export const useBudgetPlanningAnnualKPI = () => {
           return ym.year === currentYear && !employeeIdsInBudget.has(emp.id);
         })
         .map((emp) => {
-          const monthsWorked = monthsWorkedInYear(emp.hire_date, currentYear);
+          const monthsWorked = monthsWorkedInYear(emp.hire_date, emp.termination_date, currentYear);
           const annualFixed = (emp.salary || 0) * monthsWorked;
           const annualVariable = (emp.variable_salary || 0) * monthsWorked;
           const annualBenefits = (emp.benefits_value || 0) * monthsWorked;
@@ -324,7 +357,7 @@ export const useBudgetPlanningAnnualKPI = () => {
         });
 
       employees.forEach((emp) => {
-        const monthsWorked = monthsWorkedInYear(emp.hire_date, currentYear);
+        const monthsWorked = monthsWorkedInYear(emp.hire_date, emp.termination_date, currentYear);
         actualFixedSalary += (emp.salary || 0) * monthsWorked;
         actualVariableSalary += (emp.variable_salary || 0) * monthsWorked;
         actualBenefits += (emp.benefits_value || 0) * monthsWorked;
@@ -340,7 +373,10 @@ export const useBudgetPlanningAnnualKPI = () => {
       const currentActualVariableSalary = actualVariableSalary;
       const currentActualBenefits = actualBenefits;
       const currentActualTotal = currentActualFixedSalary + currentActualVariableSalary + currentActualBenefits;
-      const currentActualHeadcount = employees.length;
+      // "2026 Atual" = posição em 31/12/2026 (headcount em 31/12)
+      const currentActualHeadcount = employees.filter((emp) =>
+        isActiveOnDate(emp.hire_date, emp.termination_date, endOfYearISO(currentYear))
+      ).length;
 
       // Mantemos campos atuais (compatibilidade) apontando para o ORÇADO (aprovado)
       const currentFixedSalary = currentBudgetedFixedSalary;

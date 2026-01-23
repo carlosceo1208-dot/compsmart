@@ -286,8 +286,8 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
             )}
 
             {/* Tabela: 2025 + 2026 (Orçado vs Atual) */}
-            <div className="border rounded-lg overflow-hidden">
-              <table className="w-full text-[10px]">
+            <div className="border rounded-lg overflow-x-auto">
+              <table className="w-full min-w-[640px] text-[10px]">
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="text-left p-1.5 font-medium"></th>
@@ -295,7 +295,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                     <th className={`text-center p-1.5 font-medium ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
                       {data.currentYear} Orçado
                     </th>
-                    <th className="text-center p-1.5 font-medium">{data.currentYear} Atual</th>
+                    <th className="text-center p-1.5 font-medium whitespace-nowrap">{data.currentYear} Atual (31/12)</th>
                     <th className="text-center p-1.5 font-medium">Δ</th>
                     <th className="text-center p-1.5 font-medium">Δ%</th>
                   </tr>
@@ -315,45 +315,45 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                   {/* Salário Fixo */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Fixo</td>
-                    <td className="text-center p-1.5">{formatCurrency(previousFixed)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(previousFixed)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(budgetedFixed)}
+                      <span className="whitespace-nowrap">{formatCurrency(budgetedFixed)}</span>
                     </td>
-                    <td className="text-center p-1.5 font-semibold">{formatCurrency(actualFixed)}</td>
-                    <td className="text-center p-1.5">{formatCurrency(diff(actualFixed, budgetedFixed))}</td>
+                    <td className="text-center p-1.5 font-semibold whitespace-nowrap">{formatCurrency(actualFixed)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(diff(actualFixed, budgetedFixed))}</td>
                     <td className="text-center p-1.5">{renderVariance(pct(actualFixed, budgetedFixed), true)}</td>
                   </tr>
                   {/* Variável */}
                   <tr className="border-t">
                     <td className="p-1.5 font-medium">Variável</td>
-                    <td className="text-center p-1.5">{formatCurrency(previousVariable)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(previousVariable)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(budgetedVariable)}
+                      <span className="whitespace-nowrap">{formatCurrency(budgetedVariable)}</span>
                     </td>
-                    <td className="text-center p-1.5 font-semibold">{formatCurrency(actualVariable)}</td>
-                    <td className="text-center p-1.5">{formatCurrency(diff(actualVariable, budgetedVariable))}</td>
+                    <td className="text-center p-1.5 font-semibold whitespace-nowrap">{formatCurrency(actualVariable)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(diff(actualVariable, budgetedVariable))}</td>
                     <td className="text-center p-1.5">{renderVariance(pct(actualVariable, budgetedVariable), true)}</td>
                   </tr>
                   {/* Benefícios */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Benefícios</td>
-                    <td className="text-center p-1.5">{formatCurrency(previousBenefits)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(previousBenefits)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(budgetedBenefits)}
+                      <span className="whitespace-nowrap">{formatCurrency(budgetedBenefits)}</span>
                     </td>
-                    <td className="text-center p-1.5 font-semibold">{formatCurrency(actualBenefits)}</td>
-                    <td className="text-center p-1.5">{formatCurrency(diff(actualBenefits, budgetedBenefits))}</td>
+                    <td className="text-center p-1.5 font-semibold whitespace-nowrap">{formatCurrency(actualBenefits)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(diff(actualBenefits, budgetedBenefits))}</td>
                     <td className="text-center p-1.5">{renderVariance(pct(actualBenefits, budgetedBenefits), true)}</td>
                   </tr>
                   {/* TOTAL */}
                   <tr className={`border-t font-bold ${isApproved ? 'bg-green-100/50 dark:bg-green-900/20' : 'bg-primary/10'}`}>
                     <td className="p-1.5">TOTAL</td>
-                    <td className="text-center p-1.5">{formatCurrency(previousTotal)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(previousTotal)}</td>
                     <td className={`text-center p-1.5 ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(budgetedTotal)}
+                      <span className="whitespace-nowrap">{formatCurrency(budgetedTotal)}</span>
                     </td>
-                    <td className="text-center p-1.5">{formatCurrency(actualTotal)}</td>
-                    <td className="text-center p-1.5">{formatCurrency(diff(actualTotal, budgetedTotal))}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(actualTotal)}</td>
+                    <td className="text-center p-1.5 whitespace-nowrap">{formatCurrency(diff(actualTotal, budgetedTotal))}</td>
                     <td className="text-center p-1.5">{renderVariance(pct(actualTotal, budgetedTotal), true)}</td>
                   </tr>
                 </tbody>
