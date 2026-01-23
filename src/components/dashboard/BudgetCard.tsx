@@ -44,6 +44,20 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
   const currentBenefits = data ? convert(data.currentBenefits, 'BRL', currency) : 0;
   const currentTotal = data ? convert(data.currentTotal, 'BRL', currency) : 0;
 
+  // 2026 (Orçado vs Atual)
+  const budgetedFixed = data ? convert(data.currentBudgetedFixedSalary, 'BRL', currency) : 0;
+  const budgetedVariable = data ? convert(data.currentBudgetedVariableSalary, 'BRL', currency) : 0;
+  const budgetedBenefits = data ? convert(data.currentBudgetedBenefits, 'BRL', currency) : 0;
+  const budgetedTotal = data ? convert(data.currentBudgetedTotal, 'BRL', currency) : 0;
+
+  const actualFixed = data ? convert(data.currentActualFixedSalary, 'BRL', currency) : 0;
+  const actualVariable = data ? convert(data.currentActualVariableSalary, 'BRL', currency) : 0;
+  const actualBenefits = data ? convert(data.currentActualBenefits, 'BRL', currency) : 0;
+  const actualTotal = data ? convert(data.currentActualTotal, 'BRL', currency) : 0;
+
+  const diff = (a: number, b: number) => a - b;
+  const pct = (a: number, b: number) => (b !== 0 ? ((a - b) / b) * 100 : 0);
+
   const adjustmentCost = data?.approvedAdjustment ? convert(data.approvedAdjustment.annualCost, 'BRL', currency) : 0;
 
   // Variações 2025 vs 2026
@@ -109,22 +123,77 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
     
     doc.setFontSize(12);
     doc.setTextColor(100, 100, 100);
-    doc.text(`Comparativo ${data.previousYear} vs ${data.currentYear}`, 20, 30);
+    doc.text(`${data.currentYear} (Orçado vs Atual) + baseline ${data.previousYear}`, 20, 30);
 
-    // Tabela comparativa 2025 vs 2026
+    // Tabela comparativa 2025 + 2026 (Orçado vs Atual)
     autoTable(doc, {
       startY: 40,
-      head: [['Categoria', `${data.previousYear}`, `${data.currentYear}`, 'Variação']],
+      head: [['Categoria', `${data.previousYear}`, `${data.currentYear} Orçado`, `${data.currentYear} Atual`, 'Δ (Atual-Orçado)', 'Δ%']],
       body: [
-        ['Headcount', formatNumber(data.previousHeadcount), formatNumber(data.currentHeadcount), formatPercentageSafe(data.headcountVariancePercent, 1, true)],
-        ['Salário Fixo', formatCurrency(previousFixed), formatCurrency(currentFixed), formatPercentageSafe(fixedVariance, 1, true)],
-        ['Variável', formatCurrency(previousVariable), formatCurrency(currentVariable), formatPercentageSafe(variableVariance, 1, true)],
-        ['Benefícios', formatCurrency(previousBenefits), formatCurrency(currentBenefits), formatPercentageSafe(benefitsVariance, 1, true)],
-        ['TOTAL', formatCurrency(previousTotal), formatCurrency(currentTotal), formatPercentageSafe(totalVariance, 1, true)],
+        [
+          'Headcount',
+          formatNumber(data.previousHeadcount),
+          formatNumber(data.currentBudgetedHeadcount),
+          formatNumber(data.currentActualHeadcount),
+          formatNumber(data.currentActualHeadcount - data.currentBudgetedHeadcount),
+          formatPercentageSafe(pct(data.currentActualHeadcount, data.currentBudgetedHeadcount), 1, true),
+        ],
+        [
+          'Fixo',
+          formatCurrency(previousFixed),
+          formatCurrency(budgetedFixed),
+          formatCurrency(actualFixed),
+          formatCurrency(diff(actualFixed, budgetedFixed)),
+          formatPercentageSafe(pct(actualFixed, budgetedFixed), 1, true),
+        ],
+        [
+          'Variável',
+          formatCurrency(previousVariable),
+          formatCurrency(budgetedVariable),
+          formatCurrency(actualVariable),
+          formatCurrency(diff(actualVariable, budgetedVariable)),
+          formatPercentageSafe(pct(actualVariable, budgetedVariable), 1, true),
+        ],
+        [
+          'Benefícios',
+          formatCurrency(previousBenefits),
+          formatCurrency(budgetedBenefits),
+          formatCurrency(actualBenefits),
+          formatCurrency(diff(actualBenefits, budgetedBenefits)),
+          formatPercentageSafe(pct(actualBenefits, budgetedBenefits), 1, true),
+        ],
+        [
+          'TOTAL',
+          formatCurrency(previousTotal),
+          formatCurrency(budgetedTotal),
+          formatCurrency(actualTotal),
+          formatCurrency(diff(actualTotal, budgetedTotal)),
+          formatPercentageSafe(pct(actualTotal, budgetedTotal), 1, true),
+        ],
       ],
       theme: 'striped',
       headStyles: { fillColor: isApproved ? [34, 139, 34] : [59, 130, 246] },
     });
+
+    // Contratações fora do orçamento
+    if (data.unplannedHires?.length) {
+      const finalY = (doc as any).lastAutoTable.finalY || 120;
+      doc.setFontSize(11);
+      doc.setTextColor(180, 60, 0);
+      doc.text(`Contratações fora do orçamento: ${data.unplannedHires.length}`, 20, finalY + 12);
+
+      autoTable(doc, {
+        startY: finalY + 18,
+        head: [['Nome', 'Admissão', 'Impacto Anual (Total)']],
+        body: data.unplannedHires.map((h) => [
+          h.fullName,
+          h.hireDate ? new Date(h.hireDate).toLocaleDateString('pt-BR') : '-',
+          formatCurrency(convert(h.annualTotal, 'BRL', currency)),
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [180, 60, 0] },
+      });
+    }
 
     // Ajuste coletivo se houver
     if (data.approvedAdjustment) {
@@ -215,7 +284,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
               </Alert>
             )}
 
-            {/* Tabela de Comparação 2025 vs 2026 */}
+            {/* Tabela: 2025 + 2026 (Orçado vs Atual) */}
             <div className="border rounded-lg overflow-hidden">
               <table className="w-full text-[10px]">
                 <thead className="bg-muted/50">
@@ -223,9 +292,11 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                     <th className="text-left p-1.5 font-medium"></th>
                     <th className="text-center p-1.5 font-medium">{data.previousYear}</th>
                     <th className={`text-center p-1.5 font-medium ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {isApproved ? `✓ ${data.currentYear}` : data.currentYear}
+                      {data.currentYear} Orçado
                     </th>
-                    <th className="text-center p-1.5 font-medium">Var.</th>
+                    <th className="text-center p-1.5 font-medium">{data.currentYear} Atual</th>
+                    <th className="text-center p-1.5 font-medium">Δ</th>
+                    <th className="text-center p-1.5 font-medium">Δ%</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -234,59 +305,82 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                     <td className="p-1.5 font-medium">Headcount</td>
                     <td className="text-center p-1.5">{formatNumber(data.previousHeadcount)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatNumber(data.currentHeadcount)}
+                      {formatNumber(data.currentBudgetedHeadcount)}
                     </td>
-                    <td className="text-center p-1.5">
-                      {renderVariance(data.headcountVariancePercent)}
-                    </td>
+                    <td className="text-center p-1.5 font-semibold">{formatNumber(data.currentActualHeadcount)}</td>
+                    <td className="text-center p-1.5">{formatNumber(data.currentActualHeadcount - data.currentBudgetedHeadcount)}</td>
+                    <td className="text-center p-1.5">{renderVariance(pct(data.currentActualHeadcount, data.currentBudgetedHeadcount))}</td>
                   </tr>
                   {/* Salário Fixo */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Fixo</td>
                     <td className="text-center p-1.5">{formatCurrency(previousFixed)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(currentFixed)}
+                      {formatCurrency(budgetedFixed)}
                     </td>
-                    <td className="text-center p-1.5">
-                      {renderVariance(fixedVariance, true)}
-                    </td>
+                    <td className="text-center p-1.5 font-semibold">{formatCurrency(actualFixed)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(diff(actualFixed, budgetedFixed))}</td>
+                    <td className="text-center p-1.5">{renderVariance(pct(actualFixed, budgetedFixed), true)}</td>
                   </tr>
                   {/* Variável */}
                   <tr className="border-t">
                     <td className="p-1.5 font-medium">Variável</td>
                     <td className="text-center p-1.5">{formatCurrency(previousVariable)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(currentVariable)}
+                      {formatCurrency(budgetedVariable)}
                     </td>
-                    <td className="text-center p-1.5">
-                      {renderVariance(variableVariance, true)}
-                    </td>
+                    <td className="text-center p-1.5 font-semibold">{formatCurrency(actualVariable)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(diff(actualVariable, budgetedVariable))}</td>
+                    <td className="text-center p-1.5">{renderVariance(pct(actualVariable, budgetedVariable), true)}</td>
                   </tr>
                   {/* Benefícios */}
                   <tr className="border-t bg-muted/20">
                     <td className="p-1.5 font-medium">Benefícios</td>
                     <td className="text-center p-1.5">{formatCurrency(previousBenefits)}</td>
                     <td className={`text-center p-1.5 font-semibold ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(currentBenefits)}
+                      {formatCurrency(budgetedBenefits)}
                     </td>
-                    <td className="text-center p-1.5">
-                      {renderVariance(benefitsVariance, true)}
-                    </td>
+                    <td className="text-center p-1.5 font-semibold">{formatCurrency(actualBenefits)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(diff(actualBenefits, budgetedBenefits))}</td>
+                    <td className="text-center p-1.5">{renderVariance(pct(actualBenefits, budgetedBenefits), true)}</td>
                   </tr>
                   {/* TOTAL */}
                   <tr className={`border-t font-bold ${isApproved ? 'bg-green-100/50 dark:bg-green-900/20' : 'bg-primary/10'}`}>
                     <td className="p-1.5">TOTAL</td>
                     <td className="text-center p-1.5">{formatCurrency(previousTotal)}</td>
                     <td className={`text-center p-1.5 ${isApproved ? 'text-green-700 dark:text-green-400' : ''}`}>
-                      {formatCurrency(currentTotal)}
+                      {formatCurrency(budgetedTotal)}
                     </td>
-                    <td className="text-center p-1.5">
-                      {renderVariance(totalVariance, true)}
-                    </td>
+                    <td className="text-center p-1.5">{formatCurrency(actualTotal)}</td>
+                    <td className="text-center p-1.5">{formatCurrency(diff(actualTotal, budgetedTotal))}</td>
+                    <td className="text-center p-1.5">{renderVariance(pct(actualTotal, budgetedTotal), true)}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
+
+            {/* Alerta: Contratações fora do orçamento */}
+            {!!data.unplannedHires?.length && (
+              <Alert className="bg-amber-50 border-amber-300 dark:bg-amber-950/30 dark:border-amber-800 py-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-amber-600" />
+                <AlertTitle className="text-[10px] font-semibold text-amber-800 dark:text-amber-400 ml-1">
+                  Contratações fora do orçamento ({data.unplannedHires.length})
+                </AlertTitle>
+                <AlertDescription className="text-[10px] text-amber-700 dark:text-amber-300 ml-1 space-y-0.5">
+                  {data.unplannedHires.slice(0, 3).map((h) => (
+                    <div key={h.id} className="flex items-center justify-between gap-2">
+                      <span className="truncate">{h.fullName} — {h.hireDate ? new Date(h.hireDate).toLocaleDateString('pt-BR') : '-'}</span>
+                      <span className="font-semibold whitespace-nowrap">+{formatCurrency(convert(h.annualTotal, 'BRL', currency))}</span>
+                    </div>
+                  ))}
+                  {data.unplannedHires.length > 3 && (
+                    <div className="text-[10px] text-amber-700/90 dark:text-amber-300/90">
+                      +{data.unplannedHires.length - 3} outras contratações
+                    </div>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
 
             {/* Alerta de Ajuste Coletivo Aprovado */}
             {data.approvedAdjustment && (
