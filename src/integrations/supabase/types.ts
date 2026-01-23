@@ -3223,8 +3223,6 @@ export type Database = {
           status: string
         }[]
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
       suggest_next_employee_number: { Args: never; Returns: string }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
