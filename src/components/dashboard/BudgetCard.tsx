@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useBudgetPlanningAnnualKPI } from '@/hooks/useBudgetPlanningAnnualKPI';
 import { useBudgetVarianceAlert, useBudgetThreshold } from '@/hooks/useBudgetVarianceAlert';
 import { formatCurrency, formatNumber, formatPercentageSafe } from '@/lib/formatters';
+import { formatDateBRFromISODate } from '@/lib/date';
 import { useCurrencyConverter } from '@/hooks/useCurrencyConverter';
 import { Currency } from '@/types/economic';
 import { Link } from 'react-router-dom';
@@ -187,7 +188,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
         head: [['Nome', 'Admissão', 'Impacto Anual (Total)']],
         body: data.unplannedHires.map((h) => [
           h.fullName,
-          h.hireDate ? new Date(h.hireDate).toLocaleDateString('pt-BR') : '-',
+          formatDateBRFromISODate(h.hireDate),
           formatCurrency(convert(h.annualTotal, 'BRL', currency)),
         ]),
         theme: 'striped',
@@ -369,7 +370,7 @@ export const BudgetCard = ({ currency }: BudgetCardProps) => {
                 <AlertDescription className="text-[10px] text-amber-700 dark:text-amber-300 ml-1 space-y-0.5">
                   {data.unplannedHires.slice(0, 3).map((h) => (
                     <div key={h.id} className="flex items-center justify-between gap-2">
-                      <span className="truncate">{h.fullName} — {h.hireDate ? new Date(h.hireDate).toLocaleDateString('pt-BR') : '-'}</span>
+                      <span className="truncate">{h.fullName} — {formatDateBRFromISODate(h.hireDate)}</span>
                       <span className="font-semibold whitespace-nowrap">+{formatCurrency(convert(h.annualTotal, 'BRL', currency))}</span>
                     </div>
                   ))}
