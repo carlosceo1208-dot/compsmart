@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 export interface ApprovedAdjustment {
   id: string;
@@ -30,6 +31,29 @@ export interface BudgetPlanningAnnualKPI {
   currentBenefits: number;
   currentTotal: number;
   currentHeadcount: number;
+
+  // Comparação 2026 (Orçado vs Atual)
+  currentBudgetedFixedSalary: number;
+  currentBudgetedVariableSalary: number;
+  currentBudgetedBenefits: number;
+  currentBudgetedTotal: number;
+  currentBudgetedHeadcount: number;
+
+  currentActualFixedSalary: number;
+  currentActualVariableSalary: number;
+  currentActualBenefits: number;
+  currentActualTotal: number;
+  currentActualHeadcount: number;
+
+  unplannedHires?: Array<{
+    id: string;
+    fullName: string;
+    hireDate: string | null;
+    annualFixed: number;
+    annualVariable: number;
+    annualBenefits: number;
+    annualTotal: number;
+  }>;
   
   // Variações 2025 vs 2026
   fixedVariancePercent: number;
@@ -49,19 +73,46 @@ export interface BudgetPlanningAnnualKPI {
 }
 
 export const useBudgetPlanningAnnualKPI = () => {
+  const { activeCompanyId } = useCompanyContext();
   const currentYear = new Date().getFullYear();  // 2026
   const previousYear = currentYear - 1;           // 2025
   const nextYear = currentYear + 1;               // 2027
 
+  const getYearMonthFromDate = (date: string | null | undefined) => {
+    if (!date) return null;
+    // date vem do backend como DATE (YYYY-MM-DD). Evitar Date() por timezone.
+    const [y, m] = date.split('-');
+    const year = Number(y);
+    const month = Number(m);
+    if (!Number.isFinite(year) || !Number.isFinite(month)) return null;
+    return { year, month };
+  };
+
+  const monthsWorkedInYear = (hireDate: string | null | undefined, year: number) => {
+    const ym = getYearMonthFromDate(hireDate);
+    if (!ym) return 12;
+    if (ym.year < year) return 12;
+    if (ym.year > year) return 0;
+    // admitido no ano
+    return Math.max(1, 12 - ym.month + 1);
+  };
+
   return useQuery({
-    queryKey: ['budget-planning-annual-kpi', previousYear, currentYear, nextYear],
+    queryKey: ['budget-planning-annual-kpi', activeCompanyId, previousYear, currentYear, nextYear],
     queryFn: async () => {
       // 1. Buscar funcionários atuais
-      const { data: employees, error: employeesError } = await supabase
+      let employeesQuery = supabase
         .from('profiles')
-        .select('id, salary, variable_salary, benefits_value, hire_date')
+        .select('id, full_name, salary, variable_salary, benefits_value, hire_date')
         .eq('status', 'active')
         .not('salary', 'is', null);
+
+      // Escopo por empresa ativa (segurança + consistência de números)
+      if (activeCompanyId) {
+        employeesQuery = employeesQuery.eq('root_company_id', activeCompanyId);
+      }
+
+      const { data: employees, error: employeesError } = await employeesQuery;
 
       if (employeesError) throw employeesError;
 
@@ -71,19 +122,7 @@ export const useBudgetPlanningAnnualKPI = () => {
       let previousBenefits = 0;
       
       employees.forEach(emp => {
-        let monthsWorked = 12;
-        
-        if (emp.hire_date) {
-          const hireDate = new Date(emp.hire_date);
-          const hireYear = hireDate.getFullYear();
-          const hireMonth = hireDate.getMonth() + 1;
-          
-          if (hireYear === previousYear) {
-            monthsWorked = Math.max(1, 12 - hireMonth + 1);
-          } else if (hireYear > previousYear) {
-            monthsWorked = 0; // Não estava na empresa em 2025
-          }
-        }
+        const monthsWorked = monthsWorkedInYear(emp.hire_date, previousYear);
         
         previousFixedSalary += (emp.salary || 0) * monthsWorked;
         previousVariableSalary += (emp.variable_salary || 0) * monthsWorked;
@@ -92,9 +131,9 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       const previousTotal = previousFixedSalary + previousVariableSalary + previousBenefits;
       const previousHeadcount = employees.filter(emp => {
-        if (!emp.hire_date) return true;
-        const hireYear = new Date(emp.hire_date).getFullYear();
-        return hireYear <= previousYear;
+        const ym = getYearMonthFromDate(emp.hire_date);
+        if (!ym) return true;
+        return ym.year <= previousYear;
       }).length;
 
       // 3. Buscar projeções aprovadas do ANO ATUAL (2026)
@@ -151,10 +190,11 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       // 7. Calcular dados do ANO ATUAL (2026) - com projeções
       const employeeIdsWithProjection = new Set<string>();
+      const employeeIdsInBudget = new Set<string>();
       const plannedHireNames = new Set<string>();
-      let currentFixedSalary = 0;
-      let currentVariableSalary = 0;
-      let currentBenefits = 0;
+      let budgetedFixedSalary = 0;
+      let budgetedVariableSalary = 0;
+      let budgetedBenefits = 0;
 
       // Contratações planejadas para 2026
       currentYearProjections?.filter(p => p.is_planned_hire).forEach(proj => {
@@ -162,9 +202,9 @@ export const useBudgetPlanningAnnualKPI = () => {
         if (!plannedHireNames.has(key)) {
           plannedHireNames.add(key);
         }
-        currentFixedSalary += (proj.projected_fixed_salary || 0);
-        currentVariableSalary += (proj.projected_variable_salary || 0);
-        currentBenefits += (proj.projected_benefits || 0);
+        budgetedFixedSalary += (proj.projected_fixed_salary || 0);
+        budgetedVariableSalary += (proj.projected_variable_salary || 0);
+        budgetedBenefits += (proj.projected_benefits || 0);
       });
 
       // Funcionários com projeções (mérito/promoção)
@@ -177,6 +217,7 @@ export const useBudgetPlanningAnnualKPI = () => {
 
       employeeProjectionsMap.forEach((projList, empId) => {
         employeeIdsWithProjection.add(empId);
+        employeeIdsInBudget.add(empId);
         const emp = employees.find(e => e.id === empId);
         
         if (emp) {
@@ -199,9 +240,9 @@ export const useBudgetPlanningAnnualKPI = () => {
               monthlySalary = lastKnownSalary * (1 + percentage / 100);
             }
             
-            currentFixedSalary += monthlySalary;
-            currentVariableSalary += lastKnownVariable;
-            currentBenefits += lastKnownBenefits;
+            budgetedFixedSalary += monthlySalary;
+            budgetedVariableSalary += lastKnownVariable;
+            budgetedBenefits += lastKnownBenefits;
           }
         }
       });
@@ -209,6 +250,17 @@ export const useBudgetPlanningAnnualKPI = () => {
       // Funcionários sem projeção específica
       employees.forEach(emp => {
         if (!employeeIdsWithProjection.has(emp.id)) {
+          // Regras para incluir no ORÇADO:
+          // - quem já estava no ano anterior (baseline), ou
+          // - quem tem projeção explícita (já tratado acima)
+          // (evita contar admissões em 2026 que não existiam no orçamento aprovado)
+          const hireYM = getYearMonthFromDate(emp.hire_date);
+          const isBaselineEmployee = !hireYM ? true : hireYM.year <= previousYear;
+          if (!isBaselineEmployee) {
+            return;
+          }
+
+          employeeIdsInBudget.add(emp.id);
           const baseSalary = emp.salary || 0;
           const baseVariable = emp.variable_salary || 0;
           const baseBenefits = emp.benefits_value || 0;
@@ -221,9 +273,9 @@ export const useBudgetPlanningAnnualKPI = () => {
               monthlySalary = baseSalary * (1 + percentage / 100);
             }
             
-            currentFixedSalary += monthlySalary;
-            currentVariableSalary += baseVariable;
-            currentBenefits += baseBenefits;
+            budgetedFixedSalary += monthlySalary;
+            budgetedVariableSalary += baseVariable;
+            budgetedBenefits += baseBenefits;
           }
         }
       });
@@ -244,8 +296,58 @@ export const useBudgetPlanningAnnualKPI = () => {
         };
       }
 
-      const currentTotal = currentFixedSalary + currentVariableSalary + currentBenefits;
-      const currentHeadcount = employees.length + plannedHireNames.size;
+      // 7.1) Calcular ATUAL (real) para 2026 (annualizado por meses trabalhados em 2026)
+      let actualFixedSalary = 0;
+      let actualVariableSalary = 0;
+      let actualBenefits = 0;
+
+      const unplannedHires = employees
+        .filter((emp) => {
+          const ym = getYearMonthFromDate(emp.hire_date);
+          if (!ym) return false;
+          return ym.year === currentYear && !employeeIdsInBudget.has(emp.id);
+        })
+        .map((emp) => {
+          const monthsWorked = monthsWorkedInYear(emp.hire_date, currentYear);
+          const annualFixed = (emp.salary || 0) * monthsWorked;
+          const annualVariable = (emp.variable_salary || 0) * monthsWorked;
+          const annualBenefits = (emp.benefits_value || 0) * monthsWorked;
+          return {
+            id: emp.id,
+            fullName: emp.full_name || 'Sem nome',
+            hireDate: emp.hire_date,
+            annualFixed,
+            annualVariable,
+            annualBenefits,
+            annualTotal: annualFixed + annualVariable + annualBenefits,
+          };
+        });
+
+      employees.forEach((emp) => {
+        const monthsWorked = monthsWorkedInYear(emp.hire_date, currentYear);
+        actualFixedSalary += (emp.salary || 0) * monthsWorked;
+        actualVariableSalary += (emp.variable_salary || 0) * monthsWorked;
+        actualBenefits += (emp.benefits_value || 0) * monthsWorked;
+      });
+
+      const currentBudgetedFixedSalary = budgetedFixedSalary;
+      const currentBudgetedVariableSalary = budgetedVariableSalary;
+      const currentBudgetedBenefits = budgetedBenefits;
+      const currentBudgetedTotal = currentBudgetedFixedSalary + currentBudgetedVariableSalary + currentBudgetedBenefits;
+      const currentBudgetedHeadcount = employeeIdsInBudget.size + plannedHireNames.size;
+
+      const currentActualFixedSalary = actualFixedSalary;
+      const currentActualVariableSalary = actualVariableSalary;
+      const currentActualBenefits = actualBenefits;
+      const currentActualTotal = currentActualFixedSalary + currentActualVariableSalary + currentActualBenefits;
+      const currentActualHeadcount = employees.length;
+
+      // Mantemos campos atuais (compatibilidade) apontando para o ORÇADO (aprovado)
+      const currentFixedSalary = currentBudgetedFixedSalary;
+      const currentVariableSalary = currentBudgetedVariableSalary;
+      const currentBenefits = currentBudgetedBenefits;
+      const currentTotal = currentBudgetedTotal;
+      const currentHeadcount = currentBudgetedHeadcount;
 
       // 9. Calcular variações 2025 vs 2026
       const fixedVariancePercent = previousFixedSalary > 0 
@@ -278,6 +380,20 @@ export const useBudgetPlanningAnnualKPI = () => {
         currentBenefits,
         currentTotal,
         currentHeadcount,
+
+        currentBudgetedFixedSalary,
+        currentBudgetedVariableSalary,
+        currentBudgetedBenefits,
+        currentBudgetedTotal,
+        currentBudgetedHeadcount,
+
+        currentActualFixedSalary,
+        currentActualVariableSalary,
+        currentActualBenefits,
+        currentActualTotal,
+        currentActualHeadcount,
+
+        unplannedHires,
         fixedVariancePercent,
         variableVariancePercent,
         benefitsVariancePercent,
