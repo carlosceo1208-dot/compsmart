@@ -99,7 +99,7 @@ export const CompensationTrendsCard = () => {
           <div className="flex items-center justify-between">
             <CardTitle className="text-base font-semibold flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Tendências de Remuneração 2025/2026
+              <span className="text-primary">Tendências de Gestão de Remuneração 2026</span>
             </CardTitle>
             <Button 
               variant="ghost" 
