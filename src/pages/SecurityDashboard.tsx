@@ -6,6 +6,7 @@ import { SecurityKPICards } from '@/components/security/SecurityKPICards';
 import { SecurityTimeline } from '@/components/security/SecurityTimeline';
 import { BruteForceAlerts } from '@/components/security/BruteForceAlerts';
 import { SecurityLogsTable } from '@/components/security/SecurityLogsTable';
+import { SecurityStatusPanel } from '@/components/security/SecurityStatusPanel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Shield, AlertTriangle } from 'lucide-react';
 
@@ -58,6 +59,9 @@ const SecurityDashboard = () => {
           </p>
         </div>
       </div>
+
+      {/* Security Status (Super Admin only) */}
+      <SecurityStatusPanel />
 
       {/* KPI Cards */}
       <SecurityKPICards metrics={metrics} isLoading={metricsLoading} />
