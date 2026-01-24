@@ -102,6 +102,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "alert_configurations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "alert_configurations_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -175,6 +182,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_history_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "alert_history_root_company_id_fkey"
@@ -550,6 +564,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "budget_deadline_settings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "budget_deadline_settings_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -626,6 +647,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_employee_projections_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "budget_employee_projections_projected_job_title_id_fkey"
@@ -908,6 +936,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_salary_adjustments_effectuated_by_fkey"
+            columns: ["effectuated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "collective_salary_adjustments_filter_unit_id_fkey"
@@ -1300,6 +1335,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "employee_benefits_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
         ]
       }
       employee_incentive_assignments: {
@@ -1346,6 +1388,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_incentive_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
           },
           {
             foreignKeyName: "employee_incentive_assignments_program_id_fkey"
@@ -1582,6 +1631,13 @@ export type Database = {
             columns: ["invoice_id"]
             isOneToOne: false
             referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices_redacted_for_hr"
             referencedColumns: ["id"]
           },
           {
@@ -2291,6 +2347,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
             foreignKeyName: "profiles_position_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
@@ -2425,6 +2488,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salary_assistant_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -3019,6 +3089,144 @@ export type Database = {
       }
     }
     Views: {
+      invoices_redacted_for_hr: {
+        Row: {
+          company_id: string | null
+          created_at: string | null
+          discount: number | null
+          due_date: string | null
+          id: string | null
+          invoice_number: string | null
+          issue_date: string | null
+          paid_at: string | null
+          payment_method: string | null
+          status: string | null
+          subtotal: number | null
+          tax: number | null
+          total: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string | null
+          discount?: number | null
+          due_date?: string | null
+          id?: string | null
+          invoice_number?: string | null
+          issue_date?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string | null
+          subtotal?: number | null
+          tax?: number | null
+          total?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string | null
+          discount?: number | null
+          due_date?: string | null
+          id?: string | null
+          invoice_number?: string | null
+          issue_date?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          status?: string | null
+          subtotal?: number | null
+          tax?: number | null
+          total?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles_compensation_directory: {
+        Row: {
+          avatar_url: string | null
+          benefits_value: number | null
+          full_name: string | null
+          grade: string | null
+          job_title: string | null
+          job_title_id: string | null
+          long_term_incentive: number | null
+          root_company_id: string | null
+          salary: number | null
+          salary_range_percentage: number | null
+          short_term_incentive: number | null
+          status: Database["public"]["Enums"]["user_status"] | null
+          unit_id: string | null
+          updated_at: string | null
+          user_id: string | null
+          variable_salary: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          benefits_value?: number | null
+          full_name?: never
+          grade?: string | null
+          job_title?: string | null
+          job_title_id?: string | null
+          long_term_incentive?: number | null
+          root_company_id?: string | null
+          salary?: number | null
+          salary_range_percentage?: number | null
+          short_term_incentive?: number | null
+          status?: Database["public"]["Enums"]["user_status"] | null
+          unit_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          variable_salary?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          benefits_value?: number | null
+          full_name?: never
+          grade?: string | null
+          job_title?: string | null
+          job_title_id?: string | null
+          long_term_incentive?: number | null
+          root_company_id?: string | null
+          salary?: number | null
+          salary_range_percentage?: number | null
+          short_term_incentive?: number | null
+          status?: Database["public"]["Enums"]["user_status"] | null
+          unit_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          variable_salary?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_job_title_id_fkey"
+            columns: ["job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       v_agent_conversations: {
         Row: {
           agent_type: string | null
