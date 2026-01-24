@@ -61,20 +61,16 @@ export default function Billing() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get user's company
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('root_company_id')
-        .eq('id', user.id)
-        .single();
-
-      if (!profile?.root_company_id) return;
+      // Get user's company (avoid reading PII-bearing tables here)
+      const { data: companyId, error: companyError } = (await supabase.rpc('get_user_company_id')) as any;
+      if (companyError) throw companyError;
+      if (!companyId) return;
 
       // Fetch subscription
       const { data: subData } = await supabase
         .from('company_subscriptions')
         .select('*, subscription_plans(*)')
-        .eq('company_id', profile.root_company_id)
+        .eq('company_id', companyId)
         .eq('status', 'active')
         .single();
 
@@ -84,16 +80,15 @@ export default function Billing() {
 
       // Fetch invoices (somente Admin/RH)
       if (roleData?.isAdmin || roleData?.isHR) {
-        const { data: invoiceData } = await supabase
-          .from('invoices')
-          .select('*')
-          .eq('company_id', profile.root_company_id)
+        const invoicesSource = roleData?.isAdmin ? 'invoices' : 'invoices_redacted_for_hr';
+        const { data: invoiceData } = await (supabase as any)
+          .from(invoicesSource)
+          .select('id, invoice_number, total, status, issue_date, paid_at, payment_method')
+          .eq('company_id', companyId)
           .order('issue_date', { ascending: false })
           .limit(10);
 
-        if (invoiceData) {
-          setInvoices(invoiceData);
-        }
+        if (invoiceData) setInvoices(invoiceData as Invoice[]);
       }
     } catch (error) {
       console.error('Error fetching billing data:', error);
