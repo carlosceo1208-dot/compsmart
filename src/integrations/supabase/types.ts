@@ -2654,6 +2654,30 @@ export type Database = {
           },
         ]
       }
+      security_scan_snapshots: {
+        Row: {
+          active_error_count: number
+          created_at: string
+          created_by: string | null
+          id: string
+          ignored_findings: Json
+        }
+        Insert: {
+          active_error_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ignored_findings?: Json
+        }
+        Update: {
+          active_error_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ignored_findings?: Json
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           content: Json
@@ -3226,6 +3250,16 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      security_scan_latest: {
+        Row: {
+          active_error_count: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string | null
+          ignored_findings: Json | null
+        }
+        Relationships: []
       }
       v_agent_conversations: {
         Row: {
