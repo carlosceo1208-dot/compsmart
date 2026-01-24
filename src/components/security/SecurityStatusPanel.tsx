@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ShieldCheck } from 'lucide-react';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import {
-  DEFAULT_IGNORED_FINDINGS,
+  DEFAULT_ERROR_FINDINGS,
   useRegisterSecurityScanSnapshot,
   useSecurityStatus,
 } from '@/hooks/useSecurityStatus';
@@ -28,7 +28,9 @@ export function SecurityStatusPanel() {
   if (!roleData?.isSuperAdmin) return null;
 
   const activeErrors = latest?.active_error_count ?? 0;
-  const ignored = (latest?.ignored_findings?.length ? latest.ignored_findings : DEFAULT_IGNORED_FINDINGS) ?? [];
+  const errorFindings = (latest?.ignored_findings?.length ? latest.ignored_findings : DEFAULT_ERROR_FINDINGS) ?? [];
+  const ignored = errorFindings.filter(f => f.level === 'error' && f.ignore);
+  const active = errorFindings.filter(f => f.level === 'error' && !f.ignore);
   const lastScanLabel = latest?.created_at
     ? new Date(latest.created_at).toLocaleString('pt-BR')
     : 'Sem registro';
@@ -64,7 +66,12 @@ export function SecurityStatusPanel() {
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <div className="text-sm font-medium text-foreground">Findings ignorados (com justificativa)</div>
+        <div className="space-y-1">
+          <div className="text-sm font-medium text-foreground">Erros do scan (level: error)</div>
+          <div className="text-xs text-muted-foreground">
+            Exibe apenas itens <span className="font-mono">level=error</span>. Outros níveis são ignorados neste painel.
+          </div>
+        </div>
 
         {isLoading ? (
           <div className="space-y-2">
@@ -72,35 +79,64 @@ export function SecurityStatusPanel() {
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </div>
-        ) : ignored.length === 0 ? (
-          <div className="text-sm text-muted-foreground">Nenhum finding ignorado registrado.</div>
+        ) : active.length === 0 && ignored.length === 0 ? (
+          <div className="text-sm text-muted-foreground">Nenhum erro (level=error) registrado.</div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Internal ID</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Nível</TableHead>
-                <TableHead>Justificativa</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {ignored.map((f, idx) => (
-                <TableRow key={(f.internal_id || f.id || 'ignored') + '-' + idx}>
-                  <TableCell className="font-mono text-xs">
-                    {f.internal_id || f.id || '-'}
-                  </TableCell>
-                  <TableCell className="text-sm">{f.name || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{f.level || 'info'}</Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {f.ignore_reason || '-'}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="space-y-4">
+            {active.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-foreground">Erros ativos</div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Internal ID</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Nível</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {active.map((f, idx) => (
+                      <TableRow key={(f.internal_id || f.id || 'active') + '-' + idx}>
+                        <TableCell className="font-mono text-xs">{f.internal_id || f.id || '-'}</TableCell>
+                        <TableCell className="text-sm">{f.name || '-'}</TableCell>
+                        <TableCell>
+                          <Badge variant="destructive">{f.level || 'error'}</Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {ignored.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-foreground">Erros ignorados (com justificativa)</div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Internal ID</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Nível</TableHead>
+                      <TableHead>Justificativa</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ignored.map((f, idx) => (
+                      <TableRow key={(f.internal_id || f.id || 'ignored') + '-' + idx}>
+                        <TableCell className="font-mono text-xs">{f.internal_id || f.id || '-'}</TableCell>
+                        <TableCell className="text-sm">{f.name || '-'}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{f.level || 'error'}</Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{f.ignore_reason || '-'}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
         )}
       </CardContent>
     </Card>

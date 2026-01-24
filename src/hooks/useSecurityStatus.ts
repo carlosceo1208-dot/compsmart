@@ -7,6 +7,7 @@ export type SecurityIgnoredFinding = {
   internal_id?: string;
   name?: string;
   level?: 'info' | 'warn' | 'error';
+  ignore?: boolean;
   ignore_reason?: string;
 };
 
@@ -18,24 +19,27 @@ export type SecurityScanSnapshot = {
   ignored_findings: SecurityIgnoredFinding[];
 };
 
-// Lista base (fallback) para registrar/mostrar quando ainda não há snapshot.
-// Você pode ajustar/expandir esta lista conforme seus ignores evoluírem.
-export const DEFAULT_IGNORED_FINDINGS: SecurityIgnoredFinding[] = [
+// Fallback baseado no resultado atual do scanner (somente itens level="error").
+// Observação: o scanner pode retornar outros níveis (warn/info), mas por decisão
+// do produto, este painel ignora tudo que não for "error".
+export const DEFAULT_ERROR_FINDINGS: SecurityIgnoredFinding[] = [
   {
-    id: 'react_18_3_1_xss_vuln',
+    id: 'KNOWN_DEPENDENCY_VULNERABILITIES',
     internal_id: 'react_18_3_1_xss_vuln',
     name: 'React 18.3.1 XSS vulnerability (false positive)',
-    level: 'info',
+    level: 'error',
+    ignore: true,
     ignore_reason:
-      'Falso positivo: app é CSR (Vite) e não usa React Server Components; não há vetor aplicável no contexto atual.',
+      'False positive: React 18.3.2 não existe; CVEs citados afetam React 19 RSC. Este app é React 18 client-side (Vite).',
   },
   {
-    id: 'INFO_LEAKAGE',
-    internal_id: 'public_reference_data_review',
-    name: 'Public Reference Data Tables - Acceptable by Design',
-    level: 'info',
+    id: 'vulnerable_dependencies_critical',
+    internal_id: 'vulnerable_dependencies_critical',
+    name: 'Critical vulnerabilities in application dependencies (jsPDF)',
+    level: 'error',
+    ignore: true,
     ignore_reason:
-      'Tabelas públicas são intencionais (marketing/SEO/compliance). Não há dados sensíveis expostos. Aceitável por design.',
+      'Not applicable: vulnerabilidade do jsPDF afeta build Node.js (path traversal). Este app usa jsPDF somente no browser (Vite/React).',
   },
 ];
 
@@ -72,17 +76,16 @@ export function useRegisterSecurityScanSnapshot() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('Not authenticated');
 
-      // Observação: este snapshot é uma evidência "registrada".
-      // O count de erros ativos aqui segue o que você decidir monitorar como erro "bloqueante".
-      // No estado atual do projeto, estamos registrando como 0 (painel é focado em "erros ativos").
-      const active_error_count = 0;
+      // Somente itens level="error" entram no snapshot.
+      const errorFindings = DEFAULT_ERROR_FINDINGS.filter(f => (f.level ?? 'error') === 'error');
+      const active_error_count = errorFindings.filter(f => !f.ignore).length;
 
       const { data, error } = await supabase
         .from('security_scan_snapshots')
         .insert({
           created_by: userData.user.id,
           active_error_count,
-          ignored_findings: DEFAULT_IGNORED_FINDINGS,
+          ignored_findings: errorFindings,
         })
         .select('*')
         .single();
