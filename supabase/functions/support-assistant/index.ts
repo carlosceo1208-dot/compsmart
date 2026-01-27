@@ -35,6 +35,28 @@ serve(async (req) => {
       throw new Error('Unauthorized');
     }
 
+    // ============ RATE LIMITING (50 requests/hora - mais generoso para suporte) ============
+    const { data: allowed, error: rlError } = await supabase.rpc('check_rate_limit', {
+      p_user_id: user.id,
+      p_function_name: 'support-assistant',
+      p_max_requests: 50,
+      p_window_minutes: 60
+    });
+
+    if (rlError) {
+      console.error('[Rate Limit Error]', rlError);
+    }
+
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Limite de requisições excedido. Aguarde alguns minutos antes de tentar novamente.',
+          retry_after: 60 
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { question, pageContext } = await req.json();
 
     if (!question) {

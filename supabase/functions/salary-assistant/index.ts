@@ -141,6 +141,29 @@ serve(async (req) => {
       throw new Error('Usuário não autenticado');
     }
 
+    // ============ RATE LIMITING (30 requests/hora) ============
+    const serviceSupabase = createClient(supabaseUrl, supabaseKey);
+    const { data: allowed, error: rlError } = await serviceSupabase.rpc('check_rate_limit', {
+      p_user_id: user.id,
+      p_function_name: 'salary-assistant',
+      p_max_requests: 30,
+      p_window_minutes: 60
+    });
+
+    if (rlError) {
+      console.error('[Rate Limit Error]', rlError);
+    }
+
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Limite de requisições excedido. Aguarde alguns minutos antes de tentar novamente.',
+          retry_after: 60 
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { question, document_text, document_name, session_id } = await req.json();
 
     // Buscar perfil do usuário e dados da empresa
