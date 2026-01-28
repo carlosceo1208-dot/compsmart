@@ -1,249 +1,142 @@
 
-# Plano de Hardening de Seguranca - CompSmart
+# Plano: Permitir Edição de Email de Funcionários
 
-## Resumo Executivo
+## Contexto do Problema
 
-Este plano aborda 3 vulnerabilidades de seguranca identificadas na analise focada:
+O campo de email está **bloqueado** no diálogo de edição de funcionários (linha 749 do `UserDialog.tsx`):
+```tsx
+disabled={loading || !!userId}
+```
 
-1. **RLS budget_submissions** - Managers podem modificar submissoes apos aprovacao
-2. **Rate Limiting em Edge Functions de IA** - Prevenir abuso de consumo de tokens
-3. **Auditoria de Operacoes Sensiveis** - Melhorar rastreabilidade de acoes criticas
+Isso impede que Admin, RH e Gestores atualizem o email dos colaboradores. Além disso, na página "Meu Perfil" (`MyProfile.tsx`), o próprio colaborador também não consegue alterar seu email.
+
+## Desafio Técnico
+
+O email está vinculado a dois lugares:
+1. **Tabela `profiles`** - dados do funcionário
+2. **Tabela `auth.users`** - sistema de autenticação
+
+Se alterarmos apenas o `profiles.email`, o funcionário não conseguirá fazer login com o novo email. Precisamos atualizar **ambos** simultaneamente.
+
+## Solução Proposta
+
+### Parte 1: Nova Edge Function para Atualizar Email
+
+Criar uma edge function `update-employee-email` que:
+- Recebe `userId` e `newEmail`
+- Valida se o usuário chamador tem permissão (Admin, RH, ou o próprio funcionário)
+- Atualiza o email no `auth.users` usando `supabase.auth.admin.updateUserById()`
+- Atualiza o email no `profiles`
+- Envia email de confirmação (opcional)
+
+### Parte 2: Habilitar Campo Email no UserDialog
+
+Modificar `UserDialog.tsx` para:
+- Remover `disabled={!!userId}` do campo email
+- Adicionar chamada à edge function ao salvar
+- Mostrar aviso sobre impacto na autenticação
+
+### Parte 3: Permitir Colaborador Editar Próprio Email
+
+Modificar `MyProfile.tsx` para:
+- Habilitar campo email
+- Adicionar lógica de atualização via edge function
+- Exigir confirmação por segurança
 
 ---
 
-## 1. Correcao RLS budget_submissions
+## Detalhes Técnicos
 
-### Problema Identificado
-A politica atual permite que managers facam UPDATE em qualquer submissao da sua unidade, independente do status. Isso permite modificar orcamentos ja aprovados.
+### Nova Edge Function: `update-employee-email`
 
-### Politica Atual
-```sql
-Policy: Update submissions policy
-USING: (has_any_role(..., ARRAY['admin', 'hr_manager']) 
-   OR (has_role(..., 'manager') AND unit_id = user.unit_id))
+```
+supabase/functions/update-employee-email/index.ts
 ```
 
-### Solucao
-Adicionar restricao de status para managers - permitir UPDATE apenas quando status IN ('draft', 'rejected', 'unlocked').
+Fluxo:
+1. Receber `targetUserId` e `newEmail`
+2. Validar token do chamador
+3. Verificar permissões:
+   - Admin/HR pode alterar qualquer funcionário da empresa
+   - Funcionário pode alterar apenas seu próprio email
+4. Verificar se novo email já está em uso
+5. Atualizar `auth.users.email` via `admin.updateUserById()`
+6. Atualizar `profiles.email`
+7. Retornar sucesso
 
-```sql
--- Corrigir politica UPDATE para managers
-DROP POLICY IF EXISTS "Update submissions policy" ON budget_submissions;
+### Modificação em UserDialog.tsx
 
-CREATE POLICY "Update submissions policy" ON budget_submissions
-FOR UPDATE USING (
-  -- Admin/HR podem atualizar qualquer submissao
-  has_any_role(auth.uid(), ARRAY['admin'::app_role, 'hr_manager'::app_role])
-  OR
-  -- Managers so podem atualizar sua unidade E apenas em status editaveis
-  (
-    has_role(auth.uid(), 'manager'::app_role) 
-    AND unit_id = (SELECT unit_id FROM profiles WHERE id = auth.uid())
-    AND status IN ('draft', 'rejected', 'unlocked')
-  )
-);
+Linha 749:
+```tsx
+// ANTES
+disabled={loading || !!userId}
+
+// DEPOIS
+disabled={loading}
 ```
 
-### Impacto
-- Managers nao poderao mais modificar submissoes em status 'pending', 'approved' ou 'submitted'
-- Admin/HR mantem controle total para unlock e ajustes emergenciais
+Linha 518-540 (handleSubmit):
+Adicionar chamada à edge function para atualizar email se foi alterado.
+
+### Modificação em MyProfile.tsx
+
+Linha 171:
+```tsx
+// ANTES
+<Input value={profile.email} disabled />
+
+// DEPOIS
+<Input 
+  value={profile.email} 
+  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+/>
+```
+
+Modificar `handleSave()` para incluir lógica de atualização de email.
 
 ---
 
-## 2. Rate Limiting Server-Side para Edge Functions de IA
+## Considerações de Segurança
 
-### Problema Identificado
-As edge functions de IA (salary-assistant, legal-assistant, incentive-assistant) nao possuem rate limiting server-side, permitindo abuso de consumo de tokens via chamadas automatizadas.
-
-### Solucao
-Criar tabela de controle e funcao de rate limiting.
-
-### Passo 1: Criar tabela de rate limiting
-```sql
-CREATE TABLE IF NOT EXISTS rate_limit_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  function_name text NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-
-CREATE INDEX idx_rate_limit_user_function 
-ON rate_limit_log(user_id, function_name, created_at DESC);
-
--- Limpar logs antigos automaticamente (retention 24h)
-CREATE OR REPLACE FUNCTION cleanup_rate_limit_logs()
-RETURNS void
-LANGUAGE sql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-  DELETE FROM rate_limit_log WHERE created_at < now() - interval '24 hours';
-$$;
-```
-
-### Passo 2: Criar funcao de verificacao
-```sql
-CREATE OR REPLACE FUNCTION check_rate_limit(
-  p_user_id uuid,
-  p_function_name text,
-  p_max_requests int DEFAULT 30,
-  p_window_minutes int DEFAULT 60
-)
-RETURNS boolean
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  request_count int;
-BEGIN
-  -- Contar requisicoes na janela de tempo
-  SELECT COUNT(*) INTO request_count
-  FROM rate_limit_log
-  WHERE user_id = p_user_id
-    AND function_name = p_function_name
-    AND created_at > now() - (p_window_minutes || ' minutes')::interval;
-  
-  -- Se dentro do limite, registrar e permitir
-  IF request_count < p_max_requests THEN
-    INSERT INTO rate_limit_log (user_id, function_name)
-    VALUES (p_user_id, p_function_name);
-    RETURN true;
-  END IF;
-  
-  RETURN false;
-END;
-$$;
-```
-
-### Passo 3: Integrar nas Edge Functions
-
-Adicionar verificacao no inicio de cada edge function de IA:
-
-```typescript
-// Verificar rate limit (30 requests/hora por usuario)
-const { data: allowed, error: rlError } = await supabase.rpc('check_rate_limit', {
-  p_user_id: user.id,
-  p_function_name: 'salary-assistant',
-  p_max_requests: 30,
-  p_window_minutes: 60
-});
-
-if (!allowed) {
-  return new Response(
-    JSON.stringify({ 
-      error: 'Limite de requisicoes excedido. Aguarde alguns minutos.',
-      retry_after: 60 
-    }),
-    { status: 429, headers: corsHeaders }
-  );
-}
-```
-
-### Limites Propostos
-| Edge Function | Max Requests | Janela |
-|--------------|--------------|--------|
-| salary-assistant | 30 | 60 min |
-| legal-assistant | 30 | 60 min |
-| incentive-assistant | 30 | 60 min |
-| support-assistant | 50 | 60 min |
+1. **Rate Limiting**: A edge function usará rate limiting (5 alterações de email por hora)
+2. **Validação de Email**: Formato válido obrigatório
+3. **Empresa Correta**: Verificar que Admin/RH só altera funcionários da própria empresa
+4. **Auditoria**: Registrar alterações de email no audit_log
 
 ---
 
-## 3. Auditoria de Operacoes Sensiveis
+## Impacto no Sistema
 
-### Problema Identificado
-Operacoes criticas como aprovacao de orcamentos e alteracoes salariais nao geram logs detalhados suficientes para auditoria.
-
-### Solucao
-Criar trigger de auditoria automatica para tabelas sensiveis.
-
-### Tabelas a Auditar
-- budget_submissions (aprovacoes, rejeicoes)
-- profiles (alteracoes salariais)
-- collective_salary_adjustments (efetivacao de ajustes)
-
-### Implementacao
-```sql
--- Trigger para budget_submissions
-CREATE OR REPLACE FUNCTION audit_budget_submissions()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-BEGIN
-  IF TG_OP = 'UPDATE' THEN
-    -- Registrar apenas mudancas de status
-    IF OLD.status IS DISTINCT FROM NEW.status THEN
-      INSERT INTO audit_logs (
-        user_id, 
-        table_name, 
-        action, 
-        record_id, 
-        old_data, 
-        new_data
-      ) VALUES (
-        auth.uid(),
-        'budget_submissions',
-        'status_change',
-        NEW.id,
-        jsonb_build_object(
-          'status', OLD.status,
-          'unit_id', OLD.unit_id,
-          'fiscal_year', OLD.fiscal_year
-        ),
-        jsonb_build_object(
-          'status', NEW.status,
-          'unit_id', NEW.unit_id,
-          'fiscal_year', NEW.fiscal_year,
-          'review_notes', NEW.review_notes
-        )
-      );
-    END IF;
-  END IF;
-  RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_audit_budget_submissions
-AFTER UPDATE ON budget_submissions
-FOR EACH ROW
-EXECUTE FUNCTION audit_budget_submissions();
-```
+| Componente | Alteração |
+|------------|-----------|
+| `supabase/functions/update-employee-email/index.ts` | **Novo arquivo** |
+| `src/components/UserDialog.tsx` | Habilitar campo email, chamar edge function |
+| `src/pages/MyProfile.tsx` | Habilitar campo email, chamar edge function |
 
 ---
 
-## Checklist de Implementacao
+## Fluxo de Uso
 
-| Item | Prioridade | Risco Atual |
-|------|------------|-------------|
-| Corrigir RLS budget_submissions | Alta | Medio |
-| Rate limiting edge functions | Media | Medio |
-| Triggers de auditoria | Media | Baixo |
+### Admin/RH editando funcionário:
+1. Abre diálogo de edição
+2. Altera campo email
+3. Clica "Salvar"
+4. Sistema atualiza auth.users + profiles
+5. Funcionário pode fazer login com novo email
+
+### Colaborador editando próprio email:
+1. Acessa "Meu Perfil"
+2. Altera campo email
+3. Clica "Salvar Alterações"
+4. Sistema solicita confirmação
+5. Email atualizado em ambas as tabelas
 
 ---
 
-## Secao Tecnica
+## Próximos Passos
 
-### Arquivos a Modificar
+1. Criar edge function `update-employee-email`
+2. Modificar `UserDialog.tsx` para habilitar e usar a edge function
+3. Modificar `MyProfile.tsx` para permitir edição de email
+4. Testar fluxo completo
 
-**Migrations (SQL)**
-- Nova migration para RLS budget_submissions
-- Nova migration para tabela rate_limit_log
-- Nova migration para triggers de auditoria
-
-**Edge Functions**
-- supabase/functions/salary-assistant/index.ts
-- supabase/functions/legal-assistant/index.ts
-- supabase/functions/incentive-assistant/index.ts
-
-### Consideracoes de Rollback
-- Todas as alteracoes sao reversiveis via DROP POLICY / DROP FUNCTION
-- Rate limiting pode ser desabilitado alterando a funcao para sempre retornar true
-- Triggers de auditoria podem ser removidos sem impacto funcional
-
-### Testes Recomendados
-1. Tentar UPDATE em budget_submissions com status='approved' como manager (deve falhar)
-2. Fazer 31 chamadas consecutivas ao salary-assistant (deve retornar 429 na 31a)
-3. Verificar audit_logs apos mudanca de status em budget_submissions
