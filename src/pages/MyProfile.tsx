@@ -28,9 +28,13 @@ interface Profile {
   avatar_url: string | null;
 }
 
+interface ProfileFormState extends Profile {
+  originalEmail: string;
+}
+
 export default function MyProfile() {
   const { getLabel } = useLabels();
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileFormState | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [unitName, setUnitName] = useState<string>('');
@@ -52,7 +56,7 @@ export default function MyProfile() {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      setProfile({ ...data, originalEmail: data.email || '' });
 
       // Buscar nome da unidade
       if (data.unit_id) {
@@ -88,6 +92,32 @@ export default function MyProfile() {
     setSaving(true);
 
     try {
+      // Check if email changed
+      const emailChanged = profile.email?.toLowerCase() !== profile.originalEmail?.toLowerCase();
+      
+      if (emailChanged && profile.email) {
+        // Update email via edge function
+        const { data: emailResult, error: emailError } = await supabase.functions.invoke('update-employee-email', {
+          body: {
+            targetUserId: profile.id,
+            newEmail: profile.email
+          }
+        });
+
+        if (emailError) {
+          throw new Error(emailError.message || 'Erro ao atualizar email');
+        }
+        
+        if (!emailResult?.success) {
+          throw new Error(emailResult?.error || 'Falha ao atualizar email');
+        }
+        
+        toast.success(emailResult.message || 'Email atualizado! Use o novo email para fazer login.');
+        // Update original email after successful change
+        setProfile(prev => prev ? { ...prev, originalEmail: profile.email } : null);
+      }
+
+      // Update other profile fields
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -98,13 +128,18 @@ export default function MyProfile() {
         .eq('id', profile.id);
 
       if (error) throw error;
-      toast.success('Dados atualizados com sucesso!');
+      
+      if (!emailChanged) {
+        toast.success('Dados atualizados com sucesso!');
+      }
     } catch (error: any) {
       console.error('Error updating profile:', error);
       if (error.message?.includes('campos sensíveis')) {
         toast.error('Você não pode modificar campos sensíveis como salário ou cargo');
+      } else if (error.message?.includes('Limite')) {
+        toast.error(error.message);
       } else {
-        toast.error('Erro ao atualizar dados');
+        toast.error(error.message || 'Erro ao atualizar dados');
       }
     } finally {
       setSaving(false);
@@ -168,7 +203,14 @@ export default function MyProfile() {
             </div>
             <div>
               <Label>Email</Label>
-              <Input value={profile.email} disabled />
+              <Input 
+                type="email"
+                value={profile.email || ''} 
+                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                ⚠️ Alterar o email irá atualizar também seu login
+              </p>
             </div>
             <div>
               <Label>Telefone</Label>

@@ -119,6 +119,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
   const { activeCompanyId } = useCompanyContext();
   const [loading, setLoading] = useState(false);
   const [openUnits, setOpenUnits] = useState(false);
+  const [originalEmail, setOriginalEmail] = useState("");
   const [formData, setFormData] = useState<UserData>({
     full_name: "",
     email: "",
@@ -390,6 +391,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         roles: userRoles.map((r: any) => r.role),
       });
 
+      // Store original email to detect changes
+      setOriginalEmail(profile.email || "");
+
       // Buscar breadcrumb se tiver unit_id
       if (profile.unit_id) {
         const { data: breadcrumbData } = await supabase.rpc('get_org_breadcrumb', { 
@@ -427,6 +431,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     });
     setSelectedUnitBreadcrumb("");
     setSelectedEmployee(null);
+    setOriginalEmail("");
   };
 
   const handleRoleToggle = (role: string) => {
@@ -514,7 +519,30 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       }
 
       if (userId) {
-        // Update existing user
+        // Check if email was changed
+        const emailChanged = formData.email?.toLowerCase() !== originalEmail?.toLowerCase();
+        
+        if (emailChanged && formData.email) {
+          // Update email via edge function (handles auth.users + profiles)
+          const { data: emailResult, error: emailError } = await supabase.functions.invoke('update-employee-email', {
+            body: {
+              targetUserId: userId,
+              newEmail: formData.email
+            }
+          });
+
+          if (emailError) {
+            throw new Error(emailError.message || 'Erro ao atualizar email');
+          }
+          
+          if (!emailResult?.success) {
+            throw new Error(emailResult?.error || 'Falha ao atualizar email');
+          }
+          
+          toast.success(emailResult.message || 'Email atualizado com sucesso!');
+        }
+
+        // Update existing user (other fields)
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
@@ -558,7 +586,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (!formData.unit_id) {
           toast.info("Funcionário atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
-        } else {
+        } else if (!emailChanged) {
           toast.success("Funcionário atualizado com sucesso!");
         }
       } else {
@@ -746,10 +774,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  disabled={loading || !!userId}
+                  disabled={loading}
                   placeholder="funcionario@empresa.com"
                 />
-                {!userId && (
+                {userId ? (
+                  <p className="text-xs text-muted-foreground">
+                    ⚠️ Alterar o email irá atualizar também o login do funcionário
+                  </p>
+                ) : (
                   <p className="text-xs text-muted-foreground">
                     {formData.email 
                       ? "✅ Funcionário terá acesso ao sistema" 
