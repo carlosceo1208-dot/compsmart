@@ -454,6 +454,10 @@ para o gestor de RH da empresa ${companyName}.
 
 ${vocabularyGuide}
 
+⚠️ **TERMINOLOGIA OBRIGATÓRIA:** 
+- Sempre use "**colaborador(es)**" ao invés de "funcionário(s)"
+- Trate as pessoas como "colaboradores" em todas as análises, relatórios e comunicações
+
 ═══════════════════════════════════════════════════════════════════
                      🎯 OBJETIVO PRINCIPAL
 ═══════════════════════════════════════════════════════════════════

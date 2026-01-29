@@ -20,7 +20,7 @@ function extractSalarySources(text: string): SalarySource[] {
   const seen = new Set<string>();
 
   // 1. Dados internos da empresa
-  const internalRegex = /\[DADOS?\s*INTERNO?S?\]|\bfuncionários?\s+(?:da empresa|internos?)\b|\bfolha\s+de\s+pagamento\b|\bdados?\s+reais?\b/gi;
+  const internalRegex = /\[DADOS?\s*INTERNO?S?\]|\bcolaboradores?\s+(?:da empresa|internos?)\b|\bfolha\s+de\s+pagamento\b|\bdados?\s+reais?\b/gi;
   let match;
   while ((match = internalRegex.exec(text)) !== null) {
     const ref = 'Dados Internos da Empresa';
@@ -398,6 +398,10 @@ serve(async (req) => {
 📌 **AJUSTE DE VOCABULÁRIO:**
 ${vocabularyGuide}
 
+⚠️ **TERMINOLOGIA OBRIGATÓRIA:** 
+- Sempre use "**colaborador(es)**" ao invés de "funcionário(s)"
+- Trate as pessoas como "colaboradores" em todas as análises, relatórios e comunicações
+
 💡 **"Tempo é dinheiro"** - Seja objetivo, visual e prático. Foque especialmente em "key people" (talentos principais) e análises que economizam tempo e reduzem riscos de perda de colaboradores estratégicos.
 
 ═══════════════════════════════════════════════════════════════════════════════
@@ -423,7 +427,7 @@ ${vocabularyGuide}
 ═══════════════════════════════════════════════════════════════════════════════
 
 **TABELA SALARIAL ATIVA:** ${activeSalaryTable ? `✅ ${activeSalaryTable.name} (Vigência: ${activeSalaryTable.effective_month}/${activeSalaryTable.effective_year})` : '⚠️ NÃO CONFIGURADA - Análise limitada'}
-**TOTAL DE FUNCIONÁRIOS:** ${contextData.employee_stats?.total_employees || 0}
+**TOTAL DE COLABORADORES:** ${contextData.employee_stats?.total_employees || 0}
 **GRADES EM USO:** ${Object.keys(contextData.employee_stats?.grades_distribution || {}).join(', ') || 'Nenhuma'}
 
 **💰 FAIXAS SALARIAIS POR GRADE:**
@@ -433,11 +437,11 @@ ${vocabularyGuide}
 ${gradeRangesForPrompt || '│ (Nenhuma faixa configurada)                                              │'}
 └─────────┴──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
 
-**👥 DADOS INDIVIDUAIS DOS FUNCIONÁRIOS:**
+**👥 DADOS INDIVIDUAIS DOS COLABORADORES:**
 ┌────────────────────────────────────┬─────────────────────────────────────┬───────┬──────────────┬────────┬──────────────────────┬───────────────────┐
 │ Nome                               │ Cargo                               │ Grade │ Salário Base │ CR%    │ Posicionamento       │ Unidade           │
 ├────────────────────────────────────┼─────────────────────────────────────┼───────┼──────────────┼────────┼──────────────────────┼───────────────────┤
-${employeeDataForPrompt || '│ (Nenhum funcionário com salário cadastrado)                                                                                    │'}
+${employeeDataForPrompt || '│ (Nenhum colaborador com salário cadastrado)                                                                                    │'}
 └────────────────────────────────────┴─────────────────────────────────────┴───────┴──────────────┴────────┴──────────────────────┴───────────────────┘
 
 **LEGENDA COMPA-RATIO (CR%):**
@@ -485,7 +489,7 @@ ${surveyDataForPrompt}
 ❌ **NUNCA** deixe de calcular métricas que você pode calcular
 ❌ **NUNCA** mencione ou compare dados de outras empresas clientes (confidencialidade)
 
-✅ **SEMPRE** use os dados REAIS dos funcionários acima
+✅ **SEMPRE** use os dados REAIS dos colaboradores acima
 ✅ **SEMPRE** use as pesquisas salariais cadastradas para benchmark de mercado
 ✅ **SEMPRE** calcule Compa-Ratio = (Salário / Mediana da Grade) × 100
 ✅ **SEMPRE** formate em tabelas profissionais
@@ -518,9 +522,9 @@ ${surveyDataForPrompt}
 ## 📈 ANÁLISE QUANTITATIVA
 
 ### Distribuição por Posicionamento (Compa-Ratio)
-[Tabela + gráfico de barras ASCII mostrando quantos funcionários em cada faixa]
+[Tabela + gráfico de barras ASCII mostrando quantos colaboradores em cada faixa]
 
-### Funcionários Fora da Faixa Ideal
+### Colaboradores Fora da Faixa Ideal
 [Tabela com: Nome | Cargo | Grade | Salário Atual | CR% | Status | Ajuste Sugerido | Novo Salário]
 
 ### Dispersão por Grade
@@ -537,10 +541,10 @@ ${surveyDataForPrompt}
 ## 💰 PLANO DE AJUSTES
 
 ### Prioridade Alta 🔴 (Implementar em 30 dias)
-[Tabela com funcionários abaixo de 80% e inversões]
+[Tabela com colaboradores abaixo de 80% e inversões]
 
 ### Prioridade Média 🟡 (Implementar em 90 dias)
-[Tabela com funcionários entre 80-90%]
+[Tabela com colaboradores entre 80-90%]
 
 ### Impacto Orçamentário
 | Categoria        | Custo Mensal   | Custo Anual    |
@@ -555,9 +559,9 @@ ${surveyDataForPrompt}
 
 ${operationMode === 'analise_equidade' ? `
 **EXECUTAR ANÁLISE COMPLETA DE EQUIDADE INTERNA:**
-1. Calcular Compa-Ratio de TODOS os funcionários listados acima
+1. Calcular Compa-Ratio de TODOS os colaboradores listados acima
 2. Classificar cada um por posicionamento (🔴🟡🟢🔵🟣)
-3. Identificar funcionários fora da faixa ideal (<80% ou >120%)
+3. Identificar colaboradores fora da faixa ideal (<80% ou >120%)
 4. Detectar inversões hierárquicas (comparar grades e salários)
 5. Calcular dispersão por grade e identificar distorções >30%
 6. Gerar plano de ajustes priorizado com valores específicos
@@ -576,7 +580,7 @@ ${operationMode === 'benchmark_mercado' ? `
 
 ${operationMode === 'recomendacao_ajuste' || operationMode === 'compa_ratio' ? `
 **GERAR RECOMENDAÇÕES ESPECÍFICAS DE AJUSTE:**
-1. Listar todos funcionários que precisam de ajuste
+1. Listar todos colaboradores que precisam de ajuste
 2. Calcular valor exato do ajuste para atingir meta (ex: CR 90%)
 3. Priorizar por criticidade e impacto
 4. Calcular custo total mensal e anual
@@ -605,7 +609,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
 
 📥 **Próximos Passos Sugeridos:**
 - "Deseja que eu simule um cenário de aumento de X%?"
-- "Precisa de mais detalhes sobre algum funcionário específico?"
+- "Precisa de mais detalhes sobre algum colaborador específico?"
 - "Posso gerar uma análise comparativa por unidade/área?"
 
 **LEMBRE-SE:** Você está conversando com executivos. Entregue análises de qualidade AAA, com tabelas, métricas calculadas e recomendações acionáveis. NUNCA peça dados - você já os tem. AJUSTE seu vocabulário ao ramo de atividade da empresa.`;
