@@ -2585,6 +2585,7 @@ export type Database = {
           effective_year: number
           id: string
           is_active: boolean
+          modality: Database["public"]["Enums"]["salary_modality"]
           name: string
           root_company_id: string
           updated_at: string
@@ -2595,6 +2596,7 @@ export type Database = {
           effective_year: number
           id?: string
           is_active?: boolean
+          modality?: Database["public"]["Enums"]["salary_modality"]
           name: string
           root_company_id: string
           updated_at?: string
@@ -2605,6 +2607,7 @@ export type Database = {
           effective_year?: number
           id?: string
           is_active?: boolean
+          modality?: Database["public"]["Enums"]["salary_modality"]
           name?: string
           root_company_id?: string
           updated_at?: string
@@ -2951,6 +2954,7 @@ export type Database = {
           effective_year: number
           id: string
           is_active: boolean
+          modality: Database["public"]["Enums"]["salary_modality"]
           name: string
           root_company_id: string | null
           updated_at: string
@@ -2962,6 +2966,7 @@ export type Database = {
           effective_year: number
           id?: string
           is_active?: boolean
+          modality?: Database["public"]["Enums"]["salary_modality"]
           name: string
           root_company_id?: string | null
           updated_at?: string
@@ -2973,6 +2978,7 @@ export type Database = {
           effective_year?: number
           id?: string
           is_active?: boolean
+          modality?: Database["public"]["Enums"]["salary_modality"]
           name?: string
           root_company_id?: string | null
           updated_at?: string
@@ -3539,6 +3545,7 @@ export type Database = {
       app_role: "admin" | "hr_manager" | "manager" | "employee" | "super_admin"
       calculation_mode: "manual" | "automatic"
       proficiency_level: "basic" | "intermediate" | "advanced" | "expert"
+      salary_modality: "fixed_salary" | "total_cash" | "total_compensation"
       user_status: "active" | "inactive"
     }
     CompositeTypes: {
@@ -3670,6 +3677,7 @@ export const Constants = {
       app_role: ["admin", "hr_manager", "manager", "employee", "super_admin"],
       calculation_mode: ["manual", "automatic"],
       proficiency_level: ["basic", "intermediate", "advanced", "expert"],
+      salary_modality: ["fixed_salary", "total_cash", "total_compensation"],
       user_status: ["active", "inactive"],
     },
   },

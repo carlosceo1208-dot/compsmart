@@ -7,6 +7,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { Badge } from '@/components/ui/badge';
+import { Lock } from 'lucide-react';
+import { MODALITY_OPTIONS, type SalaryModality, getModalityConfig } from '@/lib/salaryModality';
 
 interface SalaryTableDialogProps {
   open: boolean;
@@ -21,6 +25,7 @@ interface SalaryTable {
   effective_month: number;
   effective_year: number;
   is_active: boolean;
+  modality?: SalaryModality;
 }
 
 const MONTHS = [
@@ -40,11 +45,16 @@ const MONTHS = [
 
 export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: SalaryTableDialogProps) {
   const { toast } = useToast();
+  const { hasAccess, plan } = useFeatureAccess();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [effectiveMonth, setEffectiveMonth] = useState<number>(new Date().getMonth() + 1);
   const [effectiveYear, setEffectiveYear] = useState<number>(new Date().getFullYear());
   const [isActive, setIsActive] = useState(false);
+  const [modality, setModality] = useState<SalaryModality>('fixed_salary');
+
+  // Check if user has access to advanced modalities (Pro/Enterprise)
+  const hasAdvancedModalities = hasAccess('salary_analysis_report'); // Pro+ feature proxy
 
   useEffect(() => {
     if (open && tableId) {
@@ -72,6 +82,7 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
         setEffectiveMonth(data.effective_month);
         setEffectiveYear(data.effective_year);
         setIsActive(data.is_active);
+        setModality((data.modality as SalaryModality) || 'fixed_salary');
       }
     } catch (error) {
       console.error('Error fetching salary table:', error);
@@ -90,6 +101,7 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
     setEffectiveMonth(new Date().getMonth() + 1);
     setEffectiveYear(new Date().getFullYear());
     setIsActive(false);
+    setModality('fixed_salary');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,6 +111,16 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
       toast({
         title: 'Erro',
         description: 'Nome da tabela é obrigatório',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Check modality access
+    if (modality !== 'fixed_salary' && !hasAdvancedModalities) {
+      toast({
+        title: 'Plano Insuficiente',
+        description: 'Total Cash e Total Compensation requerem plano Pro ou Enterprise',
         variant: 'destructive',
       });
       return;
@@ -125,6 +147,7 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
         effective_year: effectiveYear,
         is_active: isActive,
         root_company_id: userProfile.root_company_id,
+        modality: modality,
       };
 
       if (tableId) {
@@ -161,6 +184,10 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
     }
   };
 
+  const isModalityLocked = (mod: SalaryModality) => {
+    return mod !== 'fixed_salary' && !hasAdvancedModalities;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
@@ -180,6 +207,48 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
               placeholder="Ex: Pequenas & Médias Empresas"
               required
             />
+          </div>
+
+          {/* Modality Selection */}
+          <div className="space-y-2">
+            <Label>Modalidade de Remuneração *</Label>
+            <div className="grid grid-cols-1 gap-2">
+              {MODALITY_OPTIONS.map((opt) => {
+                const config = getModalityConfig(opt.value);
+                const locked = isModalityLocked(opt.value);
+                const isSelected = modality === opt.value;
+                
+                return (
+                  <div
+                    key={opt.value}
+                    onClick={() => !locked && setModality(opt.value)}
+                    className={`
+                      relative flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all
+                      ${isSelected ? `${config.borderColor} ${config.bgColor}` : 'border-muted hover:border-muted-foreground/50'}
+                      ${locked ? 'opacity-60 cursor-not-allowed' : ''}
+                    `}
+                  >
+                    <div className={`w-3 h-3 rounded-full ${isSelected ? config.bgColor.replace('100', '500').replace('900', '400') : 'bg-muted'}`} 
+                      style={{ backgroundColor: isSelected ? (opt.value === 'fixed_salary' ? '#2563eb' : opt.value === 'total_cash' ? '#059669' : '#9333ea') : undefined }}
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-medium ${isSelected ? config.color : ''}`}>
+                          {opt.label}
+                        </span>
+                        {locked && (
+                          <Badge variant="outline" className="text-xs gap-1">
+                            <Lock className="w-3 h-3" />
+                            Pro+
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{opt.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -220,7 +289,7 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
             <div className="space-y-0.5">
               <Label htmlFor="active">Tabela Ativa</Label>
               <p className="text-sm text-muted-foreground">
-                Apenas uma tabela pode estar ativa por vez
+                Apenas uma tabela pode estar ativa por modalidade
               </p>
             </div>
             <Switch

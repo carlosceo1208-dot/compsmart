@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { type SalaryModality } from "@/lib/salaryModality";
 
 interface SurveyData {
   id: string;
@@ -45,6 +46,7 @@ interface SurveyTable {
   is_active: boolean;
   default_amplitude: number | null;
   root_company_id: string | null;
+  modality: SalaryModality;
 }
 
 const formatCurrency = (value: number) => {
@@ -134,12 +136,15 @@ export default function SurveyDataPage() {
     try {
       const { data, error } = await supabase
         .from("survey_tables")
-        .select("id, name, effective_month, effective_year, is_active, default_amplitude, root_company_id")
+        .select("id, name, effective_month, effective_year, is_active, default_amplitude, root_company_id, modality")
         .eq("id", selectedTableId)
         .single();
 
       if (error) throw error;
-      setSelectedTable(data);
+      setSelectedTable({
+        ...data,
+        modality: (data.modality as SalaryModality) || 'fixed_salary'
+      });
     } catch (error) {
       console.error("Error fetching selected table:", error);
     }

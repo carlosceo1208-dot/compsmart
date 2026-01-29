@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { type SalaryModality, getModalityConfig } from '@/lib/salaryModality';
 
 interface SalaryTable {
   id: string;
@@ -10,44 +11,58 @@ interface SalaryTable {
   effective_month: number;
   effective_year: number;
   is_active: boolean;
+  modality: SalaryModality;
 }
 
 interface SalaryTableSelectorProps {
   value: string | null;
   onChange: (tableId: string) => void;
+  filterModality?: SalaryModality;
 }
 
 const MONTHS_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-export function SalaryTableSelector({ value, onChange }: SalaryTableSelectorProps) {
+export function SalaryTableSelector({ value, onChange, filterModality }: SalaryTableSelectorProps) {
   const { toast } = useToast();
   const [tables, setTables] = useState<SalaryTable[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchTables();
-  }, []);
+  }, [filterModality]);
 
   const fetchTables = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('salary_tables')
         .select('*')
         .order('is_active', { ascending: false })
         .order('effective_year', { ascending: false })
         .order('effective_month', { ascending: false });
 
+      if (filterModality) {
+        query = query.eq('modality', filterModality);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
 
-      setTables(data || []);
+      // Map modality with fallback
+      const mappedData = (data || []).map(t => ({
+        ...t,
+        modality: (t.modality as SalaryModality) || 'fixed_salary'
+      }));
+
+      setTables(mappedData);
 
       // Se não houver seleção e existir uma tabela ativa, selecionar automaticamente
-      if (!value && data) {
-        const activeTable = data.find(t => t.is_active);
+      if (!value && mappedData.length > 0) {
+        const activeTable = mappedData.find(t => t.is_active);
         if (activeTable) {
           onChange(activeTable.id);
-        } else if (data.length > 0) {
-          onChange(data[0].id);
+        } else {
+          onChange(mappedData[0].id);
         }
       }
     } catch (error) {
@@ -81,25 +96,34 @@ export function SalaryTableSelector({ value, onChange }: SalaryTableSelectorProp
   return (
     <div className="flex items-center gap-3">
       <Select value={value || ''} onValueChange={onChange}>
-        <SelectTrigger className="w-[350px]">
+        <SelectTrigger className="w-[400px]">
           <SelectValue placeholder="Selecione uma tabela salarial" />
         </SelectTrigger>
         <SelectContent>
-          {tables.map((table) => (
-            <SelectItem key={table.id} value={table.id}>
-              <div className="flex items-center gap-2">
-                <span>{table.name}</span>
-                <span className="text-muted-foreground text-xs">
-                  ({formatVigencia(table.effective_month, table.effective_year)})
-                </span>
-                {table.is_active && (
-                  <Badge variant="default" className="ml-2 text-xs">
-                    Ativa
+          {tables.map((table) => {
+            const modalityConfig = getModalityConfig(table.modality);
+            return (
+              <SelectItem key={table.id} value={table.id}>
+                <div className="flex items-center gap-2">
+                  <span>{table.name}</span>
+                  <span className="text-muted-foreground text-xs">
+                    ({formatVigencia(table.effective_month, table.effective_year)})
+                  </span>
+                  <Badge 
+                    variant="outline" 
+                    className={`text-xs ${modalityConfig.color} ${modalityConfig.borderColor}`}
+                  >
+                    {modalityConfig.shortLabel}
                   </Badge>
-                )}
-              </div>
-            </SelectItem>
-          ))}
+                  {table.is_active && (
+                    <Badge variant="default" className="text-xs">
+                      Ativa
+                    </Badge>
+                  )}
+                </div>
+              </SelectItem>
+            );
+          })}
         </SelectContent>
       </Select>
     </div>
