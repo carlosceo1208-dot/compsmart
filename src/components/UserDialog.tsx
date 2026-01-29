@@ -539,17 +539,20 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           if (response.error) {
             // Edge function returned an error - try to get message from data first
             const errorMessage = responseData?.error || response.error.message || 'Erro ao atualizar email';
-            throw new Error(errorMessage);
+            toast.error(errorMessage);
+            return;
           }
           
           // Check if response.data contains an error (non-2xx status codes)
           if (responseData?.error) {
-            throw new Error(responseData.error);
+            toast.error(responseData.error);
+            return;
           }
           
           // Finally check for success flag
           if (!responseData?.success) {
-            throw new Error(responseData?.error || 'Falha ao atualizar email');
+            toast.error(responseData?.error || 'Falha ao atualizar email');
+            return;
           }
           
           toast.success(responseData.message || 'Email atualizado com sucesso!');
