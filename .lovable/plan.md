@@ -1,145 +1,58 @@
 
-# Plano: Permitir Edição de Email de Funcionários
+# Plano de Correção: Edge Function update-employee-email
 
-## Contexto do Problema
+## Problema Identificado
 
-O campo de email está **bloqueado** no diálogo de edição de funcionários (linha 749 do `UserDialog.tsx`):
-```tsx
-disabled={loading || !!userId}
-```
+A Edge Function `update-employee-email` está falhando com "Edge Function returned a non-2xx status code" porque usa o método `auth.getClaims(token)` que **não existe** na versão atual do supabase-js usada em Edge Functions.
 
-Isso impede que Admin, RH e Gestores atualizem o email dos colaboradores. Além disso, na página "Meu Perfil" (`MyProfile.tsx`), o próprio colaborador também não consegue alterar seu email.
-
-## Desafio Técnico
-
-O email está vinculado a dois lugares:
-1. **Tabela `profiles`** - dados do funcionário
-2. **Tabela `auth.users`** - sistema de autenticação
-
-Se alterarmos apenas o `profiles.email`, o funcionário não conseguirá fazer login com o novo email. Precisamos atualizar **ambos** simultaneamente.
+O método `getClaims()` é uma feature experimental introduzida apenas em julho de 2025 para suporte a JWTs assimétricos, e não está disponível na importação padrão `https://esm.sh/@supabase/supabase-js@2`.
 
 ## Solução Proposta
 
-### Parte 1: Nova Edge Function para Atualizar Email
+Substituir o método `getClaims()` pelo método padrão e estável `getUser(token)`, que é a abordagem recomendada oficialmente pelo Supabase para Edge Functions.
 
-Criar uma edge function `update-employee-email` que:
-- Recebe `userId` e `newEmail`
-- Valida se o usuário chamador tem permissão (Admin, RH, ou o próprio funcionário)
-- Atualiza o email no `auth.users` usando `supabase.auth.admin.updateUserById()`
-- Atualiza o email no `profiles`
-- Envia email de confirmação (opcional)
+## Alterações Necessárias
 
-### Parte 2: Habilitar Campo Email no UserDialog
+### Arquivo: `supabase/functions/update-employee-email/index.ts`
 
-Modificar `UserDialog.tsx` para:
-- Remover `disabled={!!userId}` do campo email
-- Adicionar chamada à edge function ao salvar
-- Mostrar aviso sobre impacto na autenticação
+**Antes (linhas 38-48):**
+```typescript
+// Verify user token
+const token = authHeader.replace('Bearer ', '');
+const { data: claims, error: claimsError } = await supabaseUser.auth.getClaims(token);
+if (claimsError || !claims?.claims) {
+  return new Response(
+    JSON.stringify({ error: 'Token inválido' }),
+    { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
 
-### Parte 3: Permitir Colaborador Editar Próprio Email
-
-Modificar `MyProfile.tsx` para:
-- Habilitar campo email
-- Adicionar lógica de atualização via edge function
-- Exigir confirmação por segurança
-
----
-
-## Detalhes Técnicos
-
-### Nova Edge Function: `update-employee-email`
-
-```
-supabase/functions/update-employee-email/index.ts
+const callerId = claims.claims.sub as string;
 ```
 
-Fluxo:
-1. Receber `targetUserId` e `newEmail`
-2. Validar token do chamador
-3. Verificar permissões:
-   - Admin/HR pode alterar qualquer funcionário da empresa
-   - Funcionário pode alterar apenas seu próprio email
-4. Verificar se novo email já está em uso
-5. Atualizar `auth.users.email` via `admin.updateUserById()`
-6. Atualizar `profiles.email`
-7. Retornar sucesso
+**Depois:**
+```typescript
+// Verify user token using getUser (stable API)
+const token = authHeader.replace('Bearer ', '');
+const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+if (userError || !user) {
+  return new Response(
+    JSON.stringify({ error: 'Token inválido' }),
+    { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
 
-### Modificação em UserDialog.tsx
-
-Linha 749:
-```tsx
-// ANTES
-disabled={loading || !!userId}
-
-// DEPOIS
-disabled={loading}
+const callerId = user.id;
 ```
 
-Linha 518-540 (handleSubmit):
-Adicionar chamada à edge function para atualizar email se foi alterado.
+## Detalhes Adicionais
 
-### Modificação em MyProfile.tsx
+- Mover a criação do `supabaseAdmin` para antes da verificação do token (para usar o service role key na validação)
+- O método `getUser(token)` faz uma chamada ao Supabase Auth para verificar a validade do token
+- Retorna o objeto `user` completo com `id`, `email`, etc.
 
-Linha 171:
-```tsx
-// ANTES
-<Input value={profile.email} disabled />
+## Impacto
 
-// DEPOIS
-<Input 
-  value={profile.email} 
-  onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-/>
-```
-
-Modificar `handleSave()` para incluir lógica de atualização de email.
-
----
-
-## Considerações de Segurança
-
-1. **Rate Limiting**: A edge function usará rate limiting (5 alterações de email por hora)
-2. **Validação de Email**: Formato válido obrigatório
-3. **Empresa Correta**: Verificar que Admin/RH só altera funcionários da própria empresa
-4. **Auditoria**: Registrar alterações de email no audit_log
-
----
-
-## Impacto no Sistema
-
-| Componente | Alteração |
-|------------|-----------|
-| `supabase/functions/update-employee-email/index.ts` | **Novo arquivo** |
-| `src/components/UserDialog.tsx` | Habilitar campo email, chamar edge function |
-| `src/pages/MyProfile.tsx` | Habilitar campo email, chamar edge function |
-
----
-
-## Fluxo de Uso
-
-### Admin/RH editando funcionário:
-1. Abre diálogo de edição
-2. Altera campo email
-3. Clica "Salvar"
-4. Sistema atualiza auth.users + profiles
-5. Funcionário pode fazer login com novo email
-
-### Colaborador editando próprio email:
-1. Acessa "Meu Perfil"
-2. Altera campo email
-3. Clica "Salvar Alterações"
-4. Sistema solicita confirmação
-5. Email atualizado em ambas as tabelas
-
----
-
-## Status: ✅ IMPLEMENTADO
-
-Todas as etapas foram concluídas:
-
-1. ✅ Edge function `update-employee-email` criada e deployada
-2. ✅ `UserDialog.tsx` modificado para habilitar edição de email
-3. ✅ `MyProfile.tsx` modificado para permitir edição de email pelo colaborador
-4. ✅ Auditoria de alterações de email no audit_logs
-5. ✅ Rate limiting (5 alterações por hora)
-
+- Correção imediata do erro ao atualizar email de colaboradores
+- Compatibilidade garantida com todas as versões do Supabase
+- Sem alteração de comportamento funcional
