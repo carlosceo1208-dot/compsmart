@@ -20,6 +20,8 @@ interface FeatureAccessResult {
   isBlocked: boolean;
   daysUntilDeletion: number | null;
   dataDeletionScheduledAt: string | null;
+  // Admin override
+  isAdminOrSuperAdmin: boolean;
 }
 
 // Feature map: which plans have access to each feature
@@ -64,6 +66,7 @@ const featureMap: Record<string, PlanType[]> = {
   salary_analysis_report: ['pro', 'enterprise'],
   employee_portal: ['pro', 'enterprise'], // Portal do Funcionário (opcional)
   employee_self_edit: ['pro', 'enterprise'], // Edição pelo funcionário (telefone, email, endereço)
+  salary_modality_advanced: ['pro', 'enterprise'], // Total Cash e Total Compensation
   
   // === ENTERPRISE ONLY ===
   api_access: ['enterprise'],
@@ -133,6 +136,8 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [daysUntilDeletion, setDaysUntilDeletion] = useState<number | null>(null);
   const [dataDeletionScheduledAt, setDataDeletionScheduledAt] = useState<string | null>(null);
+  // Admin override - admins/super_admins bypass plan restrictions
+  const [isAdminOrSuperAdmin, setIsAdminOrSuperAdmin] = useState(false);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
@@ -143,6 +148,16 @@ export const useFeatureAccess = (): FeatureAccessResult => {
           setLoading(false);
           return;
         }
+
+        // Check if user is admin or super_admin - they bypass all plan restrictions
+        const { data: userRoles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id);
+
+        const roles = userRoles?.map(r => r.role) || [];
+        const hasAdminRole = roles.includes('admin') || roles.includes('super_admin');
+        setIsAdminOrSuperAdmin(hasAdminRole);
 
         // Get user's profile to find their company
         const { data: profile } = await supabase
@@ -235,6 +250,11 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   }, []);
 
   const hasAccess = (feature: string): boolean => {
+    // ADMIN OVERRIDE: Admins and Super Admins always have access to all features
+    if (isAdminOrSuperAdmin) {
+      return true;
+    }
+    
     // During trial, grant Pro-level access
     if (status === 'trial' && daysLeftInTrial && daysLeftInTrial > 0) {
       const trialPlan: PlanType = 'pro';
@@ -273,5 +293,6 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     isBlocked,
     daysUntilDeletion,
     dataDeletionScheduledAt,
+    isAdminOrSuperAdmin,
   };
 };

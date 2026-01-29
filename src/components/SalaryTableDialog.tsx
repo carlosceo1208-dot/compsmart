@@ -45,7 +45,7 @@ const MONTHS = [
 
 export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: SalaryTableDialogProps) {
   const { toast } = useToast();
-  const { hasAccess, plan } = useFeatureAccess();
+  const { hasAccess, plan, isAdminOrSuperAdmin } = useFeatureAccess();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState('');
   const [effectiveMonth, setEffectiveMonth] = useState<number>(new Date().getMonth() + 1);
@@ -53,8 +53,8 @@ export function SalaryTableDialog({ open, onOpenChange, tableId, onSuccess }: Sa
   const [isActive, setIsActive] = useState(false);
   const [modality, setModality] = useState<SalaryModality>('fixed_salary');
 
-  // Check if user has access to advanced modalities (Pro/Enterprise)
-  const hasAdvancedModalities = hasAccess('salary_analysis_report'); // Pro+ feature proxy
+  // Check if user has access to advanced modalities (Pro/Enterprise OR admin/super_admin)
+  const hasAdvancedModalities = hasAccess('salary_modality_advanced');
 
   useEffect(() => {
     if (open && tableId) {
