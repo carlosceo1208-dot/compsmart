@@ -131,45 +131,78 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation for profiles)
-    const { data: existingProfile } = await supabaseAdmin
+    // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation)
+    // This is the ONLY validation needed - each company has its own namespace
+    const { data: existingInCompany } = await supabaseAdmin
       .from('profiles')
-      .select('id, full_name, root_company_id')
+      .select('id, full_name')
       .eq('email', newEmail.toLowerCase())
+      .eq('root_company_id', targetProfile.root_company_id)
       .neq('id', targetUserId)
       .maybeSingle();
 
-    // Only block if the existing profile belongs to the SAME company
-    if (existingProfile && existingProfile.root_company_id === targetProfile.root_company_id) {
+    if (existingInCompany) {
       return new Response(
-        JSON.stringify({ error: `Este email já está em uso por: ${existingProfile.full_name}` }),
+        JSON.stringify({ error: `Este email já está em uso por outro colaborador: ${existingInCompany.full_name}` }),
         { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // IMPORTANT: Check if email exists in auth.users (global constraint)
-    // auth.users has a unique constraint on email - we cannot have duplicate emails there
-    const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1 });
-    // Use a direct query to check for the email
-    const { data: existingAuthUser } = await supabaseAdmin
-      .from('profiles')
-      .select('id, full_name')
-      .eq('email', newEmail.toLowerCase())
-      .neq('id', targetUserId)
-      .maybeSingle();
-    
-    // If email exists in another user's profile (any company) and that user has auth access,
-    // we need to check if they have an auth.users entry
+    // For auth.users: we need to check if email exists AND belongs to someone else
+    // If it exists as a lead/external user, we'll need to handle that case
+    const { data: authUserWithEmail } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+    const existingAuthUser = authUserWithEmail?.users?.find(
+      u => u.email?.toLowerCase() === newEmail.toLowerCase() && u.id !== targetUserId
+    );
+
     if (existingAuthUser) {
-      const { data: authCheck } = await supabaseAdmin.auth.admin.getUserById(existingAuthUser.id);
-      if (authCheck?.user) {
+      // Check if this auth user belongs to same company (conflict) or different (allowed - we won't touch their auth)
+      const { data: authUserProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('root_company_id, full_name')
+        .eq('id', existingAuthUser.id)
+        .maybeSingle();
+
+      // If same company - block (shouldn't happen if above check passed, but safety)
+      if (authUserProfile && authUserProfile.root_company_id === targetProfile.root_company_id) {
         return new Response(
-          JSON.stringify({ 
-            error: `Este email já está vinculado a outra conta de acesso no sistema. Cada email de login deve ser único.` 
-          }),
+          JSON.stringify({ error: `Este email já está em uso por: ${authUserProfile.full_name || 'outro colaborador'}` }),
           { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+
+      // Different company or lead - we can update profiles but NOT auth.users
+      // Just update the profiles table, don't touch auth
+      const { error: profileOnlyError } = await supabaseAdmin
+        .from('profiles')
+        .update({ email: newEmail.toLowerCase() })
+        .eq('id', targetUserId);
+
+      if (profileOnlyError) {
+        console.error('Profile update error:', profileOnlyError);
+        return new Response(
+          JSON.stringify({ error: 'Erro ao atualizar email no perfil' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Log to audit
+      await supabaseAdmin.from('audit_logs').insert({
+        user_id: callerId,
+        table_name: 'profiles',
+        action: 'email_change',
+        record_id: targetUserId,
+        old_data: { email: targetProfile.email },
+        new_data: { email: newEmail.toLowerCase(), note: 'profile_only_external_conflict' }
+      });
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          message: 'Email do perfil atualizado. Nota: este email já existe como conta externa, login permanece com email anterior.' 
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Check if target has an auth.users entry
