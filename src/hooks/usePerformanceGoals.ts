@@ -10,7 +10,7 @@ export type PerformanceGoalUpdate = TablesUpdate<"performance_goals">;
 export type GoalLevel = Enums<"performance_goal_level">;
 export type GoalStatus = Enums<"performance_goal_status">;
 
-interface GoalWithRelations extends PerformanceGoal {
+export interface GoalWithRelations extends PerformanceGoal {
   employee?: { full_name: string; avatar_url: string | null } | null;
   unit?: { description: string; code: string } | null;
   cycle?: { name: string } | null;

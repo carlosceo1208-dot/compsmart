@@ -8,7 +8,7 @@ export type PerformanceKudos = Tables<"performance_kudos">;
 export type PerformanceKudosInsert = TablesInsert<"performance_kudos">;
 export type KudosCategory = Enums<"performance_kudos_category">;
 
-interface KudosWithRelations extends PerformanceKudos {
+export interface KudosWithRelations extends PerformanceKudos {
   from_employee?: { full_name: string; avatar_url: string | null; job_title: string | null } | null;
   to_employee?: { full_name: string; avatar_url: string | null; job_title: string | null } | null;
 }

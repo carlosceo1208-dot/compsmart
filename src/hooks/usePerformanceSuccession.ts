@@ -9,7 +9,7 @@ export type PerformanceSuccessionInsert = TablesInsert<"performance_succession">
 export type PerformanceSuccessionUpdate = TablesUpdate<"performance_succession">;
 export type Readiness = Enums<"performance_readiness">;
 
-interface SuccessionWithRelations extends PerformanceSuccession {
+export interface SuccessionWithRelations extends PerformanceSuccession {
   key_position?: { title: string; grade: string; code: string } | null;
   successor?: { full_name: string; avatar_url: string | null; job_title: string | null; grade: string | null } | null;
   created_by_user?: { full_name: string } | null;
