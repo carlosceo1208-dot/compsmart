@@ -169,10 +169,42 @@ const Users = () => {
 
   const fetchProfiles = async () => {
     try {
-      const { data: profilesData, error: profilesError } = await supabase
+      // CRITICAL: Primeiro obter o root_company_id do usuário logado
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Usuário não autenticado");
+        setLoading(false);
+        return;
+      }
+
+      // Buscar o root_company_id do usuário atual
+      const { data: currentProfile } = await supabase
+        .from("profiles")
+        .select("root_company_id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const userCompanyId = currentProfile?.root_company_id;
+
+      // CRITICAL: Filtrar APENAS colaboradores da mesma empresa
+      // e que tenham employee_number (são colaboradores reais, não apenas usuários)
+      let query = supabase
         .from("profiles")
         .select("id, full_name, email, employee_number, phone, status, created_at, job_title, job_title_id, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:organizational_structure!profiles_position_id_fkey(id, name, code, type, description)")
+        .not("employee_number", "is", null) // Exclui perfis sem número de registro
         .order("created_at", { ascending: false });
+
+      // Filtrar por empresa se o usuário pertence a uma
+      if (userCompanyId) {
+        query = query.eq("root_company_id", userCompanyId);
+      } else {
+        // Se usuário não tem empresa, não mostrar nenhum colaborador de outras empresas
+        query = query.eq("root_company_id", userCompanyId);
+      }
+
+      const { data: profilesData, error: profilesError } = await query;
+
+      if (profilesError) throw profilesError;
 
       // Fetch hay_total_points for job titles
       const jobTitleIds = [...new Set((profilesData || []).map(p => p.job_title_id).filter(Boolean))];
@@ -192,8 +224,6 @@ const Users = () => {
           }, {} as Record<string, number>);
         }
       }
-
-      if (profilesError) throw profilesError;
 
       // Fetch roles and breadcrumb for each profile
       const profilesWithRoles = await Promise.all(
