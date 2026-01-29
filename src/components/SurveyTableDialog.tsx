@@ -6,10 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
-import { AlertTriangle } from "lucide-react";
+import { useFeatureAccess } from "@/hooks/useFeatureAccess";
+import { AlertTriangle, Lock } from "lucide-react";
+import { MODALITY_OPTIONS, type SalaryModality, getModalityConfig } from '@/lib/salaryModality';
 
 interface SurveyTableDialogProps {
   open: boolean;
@@ -22,6 +25,7 @@ interface SurveyTableDialogProps {
     is_active: boolean;
     default_amplitude: number | null;
     root_company_id?: string | null;
+    modality?: SalaryModality;
   };
   onSuccess: () => void;
 }
@@ -34,6 +38,7 @@ export function SurveyTableDialog({
 }: SurveyTableDialogProps) {
   const { toast } = useToast();
   const { data: userRole } = useCurrentUserRole();
+  const { hasAccess } = useFeatureAccess();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [effectiveMonth, setEffectiveMonth] = useState("1");
@@ -41,6 +46,10 @@ export function SurveyTableDialog({
   const [isActive, setIsActive] = useState(false);
   const [defaultAmplitude, setDefaultAmplitude] = useState("");
   const [isGlobalTemplate, setIsGlobalTemplate] = useState(false);
+  const [modality, setModality] = useState<SalaryModality>('fixed_salary');
+
+  // Check if user has access to advanced modalities (Pro/Enterprise)
+  const hasAdvancedModalities = hasAccess('salary_analysis_report');
 
   useEffect(() => {
     if (surveyTable) {
@@ -50,6 +59,7 @@ export function SurveyTableDialog({
       setIsActive(surveyTable.is_active);
       setDefaultAmplitude(surveyTable.default_amplitude?.toString() || "");
       setIsGlobalTemplate(surveyTable.root_company_id === null);
+      setModality((surveyTable.modality as SalaryModality) || 'fixed_salary');
     } else {
       setName("");
       setEffectiveMonth("1");
@@ -57,6 +67,7 @@ export function SurveyTableDialog({
       setIsActive(false);
       setDefaultAmplitude("");
       setIsGlobalTemplate(false);
+      setModality('fixed_salary');
     }
   }, [surveyTable, open]);
 
@@ -76,6 +87,16 @@ export function SurveyTableDialog({
         title: "Erro",
         description: "Ano inválido",
         variant: "destructive",
+      });
+      return;
+    }
+
+    // Check modality access
+    if (modality !== 'fixed_salary' && !hasAdvancedModalities) {
+      toast({
+        title: 'Plano Insuficiente',
+        description: 'Total Cash e Total Compensation requerem plano Pro ou Enterprise',
+        variant: 'destructive',
       });
       return;
     }
@@ -105,6 +126,7 @@ export function SurveyTableDialog({
         effective_year: year,
         is_active: isActive,
         default_amplitude: defaultAmplitude ? parseFloat(defaultAmplitude) : null,
+        modality: modality,
       };
 
       if (surveyTable) {
@@ -156,9 +178,13 @@ export function SurveyTableDialog({
 
   const isEditingTemplate = surveyTable?.root_company_id === null;
 
+  const isModalityLocked = (mod: SalaryModality) => {
+    return mod !== 'fixed_salary' && !hasAdvancedModalities;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {surveyTable ? "Editar Pesquisa" : "Nova Pesquisa Salarial"}
@@ -181,9 +207,52 @@ export function SurveyTableDialog({
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Ex: Pesquisa Agronegócio 2024"
+              placeholder="Ex: Pesquisa Agronegócio 2024 - Total Cash"
               disabled={isEditingTemplate && !userRole?.isSuperAdmin}
             />
+          </div>
+
+          {/* Modality Selection */}
+          <div className="space-y-2">
+            <Label>Modalidade de Remuneração *</Label>
+            <div className="grid grid-cols-1 gap-2">
+              {MODALITY_OPTIONS.map((opt) => {
+                const config = getModalityConfig(opt.value);
+                const locked = isModalityLocked(opt.value);
+                const isSelected = modality === opt.value;
+                const disabled = (isEditingTemplate && !userRole?.isSuperAdmin) || locked;
+                
+                return (
+                  <div
+                    key={opt.value}
+                    onClick={() => !disabled && setModality(opt.value)}
+                    className={`
+                      relative flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all
+                      ${isSelected ? `${config.borderColor} ${config.bgColor}` : 'border-muted hover:border-muted-foreground/50'}
+                      ${disabled ? 'opacity-60 cursor-not-allowed' : ''}
+                    `}
+                  >
+                    <div className={`w-3 h-3 rounded-full`} 
+                      style={{ backgroundColor: isSelected ? (opt.value === 'fixed_salary' ? '#2563eb' : opt.value === 'total_cash' ? '#059669' : '#9333ea') : '#d1d5db' }}
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-medium ${isSelected ? config.color : ''}`}>
+                          {opt.label}
+                        </span>
+                        {locked && (
+                          <Badge variant="outline" className="text-xs gap-1">
+                            <Lock className="w-3 h-3" />
+                            Pro+
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{opt.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

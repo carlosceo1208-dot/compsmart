@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Building2, FolderOpen } from "lucide-react";
+import { type SalaryModality, getModalityConfig } from '@/lib/salaryModality';
 
 interface SurveyTable {
   id: string;
@@ -18,13 +19,16 @@ interface SurveyTable {
   effective_month: number;
   effective_year: number;
   is_active: boolean;
+  default_amplitude: number | null;
   root_company_id: string | null;
+  modality: SalaryModality;
 }
 
 interface SurveyTableSelectorProps {
   value: string | undefined;
   onChange: (value: string) => void;
   onTableChange?: (table: SurveyTable | null) => void;
+  filterModality?: SalaryModality;
 }
 
 const formatVigencia = (month: number, year: number) => {
@@ -35,7 +39,7 @@ const formatVigencia = (month: number, year: number) => {
   return `${monthNames[month - 1]}/${year}`;
 };
 
-export function SurveyTableSelector({ value, onChange, onTableChange }: SurveyTableSelectorProps) {
+export function SurveyTableSelector({ value, onChange, onTableChange, filterModality }: SurveyTableSelectorProps) {
   const [tables, setTables] = useState<SurveyTable[]>([]);
   const [loading, setLoading] = useState(true);
   const [userCompanyId, setUserCompanyId] = useState<string | null>(null);
@@ -43,7 +47,7 @@ export function SurveyTableSelector({ value, onChange, onTableChange }: SurveyTa
   useEffect(() => {
     fetchUserCompany();
     fetchTables();
-  }, []);
+  }, [filterModality]);
 
   const fetchUserCompany = async () => {
     try {
@@ -64,24 +68,36 @@ export function SurveyTableSelector({ value, onChange, onTableChange }: SurveyTa
 
   const fetchTables = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from("survey_tables")
-        .select("id, name, effective_month, effective_year, is_active, root_company_id")
+        .select("id, name, effective_month, effective_year, is_active, root_company_id, modality, default_amplitude")
         .order("is_active", { ascending: false })
         .order("effective_year", { ascending: false })
         .order("effective_month", { ascending: false });
 
+      if (filterModality) {
+        query = query.eq('modality', filterModality);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
 
-      setTables(data || []);
+      // Map modality with fallback
+      const mappedData = (data || []).map(t => ({
+        ...t,
+        modality: (t.modality as SalaryModality) || 'fixed_salary'
+      }));
+
+      setTables(mappedData);
 
       // Auto-select active table or first table if no value is set
-      if (!value && data && data.length > 0) {
-        const activeTable = data.find((t) => t.is_active);
-        const selectedId = activeTable?.id || data[0].id;
+      if (!value && mappedData.length > 0) {
+        const activeTable = mappedData.find((t) => t.is_active);
+        const selectedId = activeTable?.id || mappedData[0].id;
         onChange(selectedId);
         if (onTableChange) {
-          onTableChange(activeTable || data[0]);
+          onTableChange(activeTable || mappedData[0]);
         }
       }
     } catch (error) {
@@ -123,6 +139,31 @@ export function SurveyTableSelector({ value, onChange, onTableChange }: SurveyTa
     );
   }
 
+  const renderTableItem = (table: SurveyTable) => {
+    const modalityConfig = getModalityConfig(table.modality);
+    return (
+      <SelectItem key={table.id} value={table.id}>
+        <div className="flex items-center gap-2">
+          <span>{table.name}</span>
+          <span className="text-muted-foreground text-sm">
+            - {formatVigencia(table.effective_month, table.effective_year)}
+          </span>
+          <Badge 
+            variant="outline" 
+            className={`text-xs ${modalityConfig.color} ${modalityConfig.borderColor}`}
+          >
+            {modalityConfig.shortLabel}
+          </Badge>
+          {table.is_active && (
+            <Badge variant="default" className="ml-1">
+              Ativa
+            </Badge>
+          )}
+        </div>
+      </SelectItem>
+    );
+  };
+
   return (
     <Select value={value} onValueChange={handleChange}>
       <SelectTrigger className="w-full">
@@ -135,21 +176,7 @@ export function SurveyTableSelector({ value, onChange, onTableChange }: SurveyTa
               <FolderOpen className="h-4 w-4" />
               MINHAS PESQUISAS
             </SelectLabel>
-            {myTables.map((table) => (
-              <SelectItem key={table.id} value={table.id}>
-                <div className="flex items-center gap-2">
-                  <span>{table.name}</span>
-                  <span className="text-muted-foreground text-sm">
-                    - {formatVigencia(table.effective_month, table.effective_year)}
-                  </span>
-                  {table.is_active && (
-                    <Badge variant="default" className="ml-2">
-                      Ativa
-                    </Badge>
-                  )}
-                </div>
-              </SelectItem>
-            ))}
+            {myTables.map(renderTableItem)}
           </SelectGroup>
         )}
 
@@ -159,19 +186,28 @@ export function SurveyTableSelector({ value, onChange, onTableChange }: SurveyTa
               <Building2 className="h-4 w-4" />
               PESQUISAS COMPSMART
             </SelectLabel>
-            {compsmartTemplates.map((table) => (
-              <SelectItem key={table.id} value={table.id}>
-                <div className="flex items-center gap-2">
-                  <span>{table.name}</span>
-                  <span className="text-muted-foreground text-sm">
-                    - {formatVigencia(table.effective_month, table.effective_year)}
-                  </span>
-                  <Badge variant="outline" className="ml-2 border-amber-500 text-amber-600 dark:text-amber-400">
-                    Template
-                  </Badge>
-                </div>
-              </SelectItem>
-            ))}
+            {compsmartTemplates.map((table) => {
+              const modalityConfig = getModalityConfig(table.modality);
+              return (
+                <SelectItem key={table.id} value={table.id}>
+                  <div className="flex items-center gap-2">
+                    <span>{table.name}</span>
+                    <span className="text-muted-foreground text-sm">
+                      - {formatVigencia(table.effective_month, table.effective_year)}
+                    </span>
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs ${modalityConfig.color} ${modalityConfig.borderColor}`}
+                    >
+                      {modalityConfig.shortLabel}
+                    </Badge>
+                    <Badge variant="outline" className="ml-1 border-amber-500 text-amber-600 dark:text-amber-400">
+                      Template
+                    </Badge>
+                  </div>
+                </SelectItem>
+              );
+            })}
           </SelectGroup>
         )}
       </SelectContent>
