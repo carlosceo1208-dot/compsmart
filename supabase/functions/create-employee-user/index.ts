@@ -1,11 +1,105 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Helper function to send welcome/invitation email
+async function sendWelcomeEmail(
+  email: string, 
+  fullName: string, 
+  companyName: string,
+  activationUrl: string
+) {
+  const resendApiKey = Deno.env.get('RESEND_API_KEY');
+  if (!resendApiKey) {
+    console.warn('RESEND_API_KEY not configured - skipping welcome email');
+    return false;
+  }
+
+  const resend = new Resend(resendApiKey);
+  
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'CompSmart <noreply@compsmart.com.br>',
+      to: [email],
+      subject: `Bem-vindo(a) ao CompSmart - ${companyName}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f5;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 16px 16px 0 0; padding: 32px; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">
+                🎉 Bem-vindo(a) ao CompSmart!
+              </h1>
+            </div>
+            
+            <div style="background: white; padding: 32px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+              <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 16px;">
+                Olá <strong>${fullName}</strong>,
+              </p>
+              
+              <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 16px;">
+                Você foi cadastrado(a) como colaborador(a) na empresa <strong>${companyName}</strong> no sistema CompSmart.
+              </p>
+              
+              <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
+                Para acessar a plataforma, você precisa definir sua senha clicando no botão abaixo:
+              </p>
+              
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${activationUrl}" 
+                   style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
+                          color: white; 
+                          padding: 16px 32px; 
+                          text-decoration: none; 
+                          border-radius: 8px; 
+                          font-weight: 600;
+                          font-size: 16px;
+                          display: inline-block;
+                          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+                  🔐 Ativar Minha Conta
+                </a>
+              </div>
+              
+              <p style="color: #6b7280; font-size: 14px; line-height: 1.5; margin-top: 24px;">
+                <strong>Importante:</strong> Este link expira em 24 horas. Se expirar, você pode solicitar um novo link na página de login.
+              </p>
+              
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
+              
+              <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+                Se você não esperava este email, pode ignorá-lo com segurança.<br>
+                CompSmart - Gestão Inteligente de Remuneração
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    });
+
+    if (error) {
+      console.error('Resend error:', error);
+      return false;
+    }
+
+    console.log('Welcome email sent successfully:', data?.id);
+    return true;
+  } catch (err) {
+    console.error('Error sending welcome email:', err);
+    return false;
+  }
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -268,11 +362,49 @@ serve(async (req) => {
         }
       }
 
+      // Buscar nome da empresa para o email de boas-vindas
+      let companyName = 'sua empresa';
+      if (root_company_id) {
+        const { data: company } = await supabase
+          .from('organizational_structure')
+          .select('name')
+          .eq('id', root_company_id)
+          .single();
+        if (company?.name) companyName = company.name;
+      }
+
+      // Gerar link de redefinição de senha (ativação) via Supabase Auth
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const activationUrl = `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/reset-password`;
+      
+      // Gerar token de reset de senha para o novo usuário
+      const { data: resetData, error: resetError } = await supabase.auth.admin.generateLink({
+        type: 'recovery',
+        email: email,
+        options: {
+          redirectTo: activationUrl
+        }
+      });
+
+      if (resetError) {
+        console.warn('Could not generate activation link:', resetError.message);
+      } else {
+        // Enviar email de boas-vindas com link de ativação
+        const emailSent = await sendWelcomeEmail(
+          email,
+          full_name,
+          companyName,
+          resetData.properties?.action_link || activationUrl
+        );
+        console.log('Welcome email sent:', emailSent);
+      }
+
       console.log('New employee with email created successfully');
       return new Response(JSON.stringify({ 
         success: true, 
         data,
-        action: 'created'
+        action: 'created',
+        emailSent: true
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
