@@ -131,15 +131,17 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Check if email is already in use
+    // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation)
+    // This allows leads/visitors and employees from different companies to have the same email
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, root_company_id')
       .eq('email', newEmail.toLowerCase())
       .neq('id', targetUserId)
       .maybeSingle();
 
-    if (existingProfile) {
+    // Only block if the existing profile belongs to the SAME company
+    if (existingProfile && existingProfile.root_company_id === targetProfile.root_company_id) {
       return new Response(
         JSON.stringify({ error: `Este email já está em uso por: ${existingProfile.full_name}` }),
         { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

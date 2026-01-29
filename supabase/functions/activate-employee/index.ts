@@ -222,15 +222,16 @@ serve(async (req) => {
       });
     }
 
-    // Check if email is already in use (generic error)
+    // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation)
     const { data: existingUserByEmail } = await supabase
       .from('profiles')
-      .select('id')
+      .select('id, root_company_id')
       .eq('email', email)
       .neq('id', profile.id)
       .maybeSingle();
 
-    if (existingUserByEmail) {
+    // Only block if the existing profile belongs to the SAME company
+    if (existingUserByEmail && existingUserByEmail.root_company_id === profile.root_company_id) {
       return new Response(JSON.stringify({ 
         success: false,
         error: GENERIC_ERROR
