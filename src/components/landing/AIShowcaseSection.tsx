@@ -69,7 +69,7 @@ export const AIShowcaseSection = () => {
   ];
 
   const miniMetrics = [
-    { label: "Funcionários", value: "1,247", icon: Users, change: "+12" },
+    { label: "Colaboradores", value: "1,247", icon: Users, change: "+12" },
     { label: "Folha Mensal", value: "R$ 4.2M", icon: BarChart3, change: "+3%" },
     { label: "Alinhamento", value: "87%", icon: Activity, change: "+5%" }
   ];

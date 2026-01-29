@@ -35,7 +35,7 @@ const planConfigs: Record<string, PlanConfig> = {
   "Starter": {
     name: "Starter",
     description: "Ideal para pequenas empresas começando a organizar remuneração",
-    employeeLimit: "Até 50 funcionários",
+    employeeLimit: "Até 50 colaboradores",
     cta: "Começar Grátis",
     highlighted: false,
     icon: Rocket,
@@ -54,7 +54,7 @@ const planConfigs: Record<string, PlanConfig> = {
   "Medium": {
     name: "Medium",
     description: "Para empresas que querem crescer com inteligência e compliance",
-    employeeLimit: "Até 200 funcionários",
+    employeeLimit: "Até 200 colaboradores",
     badge: "Mais Popular",
     cta: "Começar Teste Grátis",
     highlighted: true,
@@ -74,7 +74,7 @@ const planConfigs: Record<string, PlanConfig> = {
   "Pro": {
     name: "Pro",
     description: "Solução robusta para empresas em expansão que precisam de tudo",
-    employeeLimit: "Até 500 funcionários",
+    employeeLimit: "Até 500 colaboradores",
     cta: "Começar Teste Grátis",
     highlighted: false,
     icon: Building2,
@@ -93,7 +93,7 @@ const planConfigs: Record<string, PlanConfig> = {
   "Enterprise": {
     name: "Enterprise",
     description: "Solução completa para grandes empresas e consultorias especializadas",
-    employeeLimit: "+500 funcionários",
+    employeeLimit: "+500 colaboradores",
     cta: "Falar com Vendas",
     highlighted: false,
     icon: Crown,

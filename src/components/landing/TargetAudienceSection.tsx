@@ -9,7 +9,7 @@ export const TargetAudienceSection = () => {
     {
       icon: Building2,
       size: "Pequena Empresa",
-      range: "Até 99 funcionários",
+      range: "Até 99 colaboradores",
       revenue: "Até R$ 4,8 milhões/ano",
       description: "Estrutura simples com foco em organização e crescimento controlado",
       color: "from-green-500 to-emerald-600"
@@ -17,7 +17,7 @@ export const TargetAudienceSection = () => {
     {
       icon: Factory,
       size: "Média Empresa",
-      range: "100 a 499 funcionários",
+      range: "100 a 499 colaboradores",
       revenue: "R$ 4,8 a 300 milhões/ano",
       description: "Áreas funcionais claras com necessidade de especialização e compliance",
       color: "from-blue-500 to-cyan-600",
@@ -26,7 +26,7 @@ export const TargetAudienceSection = () => {
     {
       icon: Landmark,
       size: "Grande Empresa",
-      range: "500+ funcionários",
+      range: "500+ colaboradores",
       revenue: "Acima de R$ 300 milhões/ano",
       description: "Estrutura consolidada com foco em equidade e competitividade estratégica",
       color: "from-purple-500 to-violet-600"
