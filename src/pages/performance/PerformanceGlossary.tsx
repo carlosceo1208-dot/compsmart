@@ -15,6 +15,10 @@ const glossaryTerms = [
     definition: "Avaliação completa incluindo gestor, pares, subordinados e autoavaliação.",
   },
   {
+    term: "Avaliação de Desempenho",
+    definition: "Processo formal e estruturado de mensuração do desempenho dos colaboradores, alinhando expectativas, identificando gaps de competência e direcionando o desenvolvimento profissional. É fundamental para a gestão de talentos, retenção, meritocracia e tomada de decisões sobre promoções e remuneração.",
+  },
+  {
     term: "Calibração",
     definition: "Processo de alinhamento das notas entre gestores para garantir equidade.",
   },
@@ -33,6 +37,10 @@ const glossaryTerms = [
   {
     term: "Gap de Competência",
     definition: "Diferença entre o nível esperado e o nível avaliado de uma competência.",
+  },
+  {
+    term: "Kudos",
+    definition: "Ferramenta de reconhecimento contínuo que valoriza o trabalho bem feito e fortalece as relações de trabalho. Diferente da avaliação anual, o kudo é instantâneo, reconhecendo comportamentos no momento em que ocorrem. Benefícios: (1) Combate o desengajamento - supre a necessidade de reconhecimento, principal motivo de desmotivação; (2) Reconhecimento contínuo - valoriza comportamentos em tempo real; (3) Reforço de valores - evidencia quando colaboradores vivenciam os valores da empresa; (4) Colaboração peer-to-peer - promove reconhecimento entre pares, não apenas de gestores. Exemplos: agradecer esforço extra em projetos, reconhecer aprendizado com erros, elogiar proatividade e empatia.",
   },
   {
     term: "Matriz 9Box",
