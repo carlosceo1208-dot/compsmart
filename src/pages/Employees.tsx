@@ -29,9 +29,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Search, UserPlus, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2,
-  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, ChevronDown
+  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, ChevronDown, Mail, Send, AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -59,7 +60,7 @@ import {
 interface Profile {
   id: string;
   full_name: string;
-  email: string;
+  email: string | null;
   employee_number: string | null;
   phone: string | null;
   status: string;
@@ -75,6 +76,7 @@ interface Profile {
   benefits_value: number | null;
   short_term_incentive: number | null;
   long_term_incentive: number | null;
+  has_system_access: boolean;
   unit: { id: string; name: string; code: string; type: string; description: string | null } | null;
   org_breadcrumb: string;
   org_label: string;
@@ -113,6 +115,11 @@ const Users = () => {
   const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  
+  // Seleção em lote para convites
+  const [selectedEmployees, setSelectedEmployees] = useState<Set<string>>(new Set());
+  const [sendingInvitations, setSendingInvitations] = useState(false);
+  const [confirmBulkInvite, setConfirmBulkInvite] = useState(false);
 
   useEffect(() => {
     checkUserPermissions();
@@ -190,7 +197,7 @@ const Users = () => {
       // e que tenham employee_number (são colaboradores reais, não apenas usuários)
       let query = supabase
         .from("profiles")
-        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, job_title_id, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, unit:organizational_structure!profiles_position_id_fkey(id, name, code, type, description)")
+        .select("id, full_name, email, employee_number, phone, status, created_at, job_title, job_title_id, grade, salary, variable_salary, salary_range_percentage, performance_rating, benefits_value, short_term_incentive, long_term_incentive, has_system_access, unit:organizational_structure!profiles_position_id_fkey(id, name, code, type, description)")
         .not("employee_number", "is", null) // Exclui perfis sem número de registro
         .order("created_at", { ascending: false });
 
@@ -254,6 +261,7 @@ const Users = () => {
 
           return {
             ...profile,
+            has_system_access: profile.has_system_access ?? false,
             job_title_hay_points: profile.job_title_id ? hayPointsMap[profile.job_title_id] || null : null,
             user_roles: rolesData || [],
             org_breadcrumb: orgBreadcrumb,
@@ -323,6 +331,138 @@ const Users = () => {
     setUserDialogOpen(true);
   };
 
+  // === FUNÇÕES DE ENVIO DE CONVITE ===
+  const handleSendInvitation = async (employeeId: string, employeeName: string, hasAccess: boolean, hasEmail: boolean) => {
+    if (!hasEmail) {
+      toast.error(`${employeeName} não possui email cadastrado`);
+      return;
+    }
+
+    if (!hasAccess) {
+      toast.warning(`${employeeName} não tem "Acesso ao Sistema" habilitado. Deseja enviar mesmo assim?`, {
+        action: {
+          label: "Enviar mesmo assim",
+          onClick: () => sendInvitationToEmployee(employeeId, employeeName, true)
+        }
+      });
+      return;
+    }
+
+    await sendInvitationToEmployee(employeeId, employeeName, false);
+  };
+
+  const sendInvitationToEmployee = async (employeeId: string, employeeName: string, forceSend: boolean) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Sessão expirada. Faça login novamente.");
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-employee-invitation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          employee_ids: [employeeId],
+          force_send: forceSend
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao enviar convite');
+      }
+
+      if (result.results.sent.length > 0) {
+        toast.success(`Convite enviado para ${employeeName}`);
+      } else if (result.results.skipped_no_email.length > 0) {
+        toast.error(`${employeeName} não possui email cadastrado`);
+      } else if (result.results.skipped_no_access.length > 0) {
+        toast.warning(`${employeeName} não tem acesso ao sistema habilitado`);
+      } else if (result.results.errors.length > 0) {
+        toast.error(`Erro: ${result.results.errors[0].error}`);
+      }
+    } catch (error: any) {
+      toast.error(`Erro ao enviar convite: ${error.message}`);
+    }
+  };
+
+  const handleBulkInvitation = async () => {
+    if (selectedEmployees.size === 0) {
+      toast.error("Selecione pelo menos um colaborador");
+      return;
+    }
+
+    setSendingInvitations(true);
+    setConfirmBulkInvite(false);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Sessão expirada. Faça login novamente.");
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-employee-invitation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          employee_ids: Array.from(selectedEmployees),
+          force_send: true // Em lote, força envio
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'Erro ao enviar convites');
+      }
+
+      const { summary } = result;
+      
+      if (summary.sent > 0) {
+        toast.success(`${summary.sent} convite(s) enviado(s) com sucesso!`);
+      }
+      if (summary.skipped_no_email > 0) {
+        toast.warning(`${summary.skipped_no_email} colaborador(es) sem email foram ignorados`);
+      }
+      if (summary.errors > 0) {
+        toast.error(`${summary.errors} erro(s) ao enviar convites`);
+      }
+
+      setSelectedEmployees(new Set());
+    } catch (error: any) {
+      toast.error(`Erro ao enviar convites: ${error.message}`);
+    } finally {
+      setSendingInvitations(false);
+    }
+  };
+
+  const toggleEmployeeSelection = (employeeId: string) => {
+    const newSelection = new Set(selectedEmployees);
+    if (newSelection.has(employeeId)) {
+      newSelection.delete(employeeId);
+    } else {
+      newSelection.add(employeeId);
+    }
+    setSelectedEmployees(newSelection);
+  };
+
+  const toggleSelectAll = (profiles: Profile[]) => {
+    if (selectedEmployees.size === profiles.length) {
+      setSelectedEmployees(new Set());
+    } else {
+      setSelectedEmployees(new Set(profiles.map(p => p.id)));
+    }
+  };
+
   // Função para formatar % da faixa com cores
   const formatSalaryRangePercentage = (percentage: number | null) => {
     if (percentage === null) return '-';
@@ -361,8 +501,9 @@ const Users = () => {
 
   // Filtros e paginação
   const filteredProfiles = profiles.filter((profile) => {
+    const emailStr = profile.email || '';
     const matchesSearch = profile.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      profile.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      emailStr.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (profile.employee_number && profile.employee_number.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (profile.org_breadcrumb && profile.org_breadcrumb.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (profile.org_label && profile.org_label.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -380,6 +521,10 @@ const Users = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Contadores para o botão de envio em lote (após paginatedProfiles estar definido)
+  const selectedWithEmail = paginatedProfiles.filter(p => selectedEmployees.has(p.id) && p.email).length;
+  const selectedWithoutAccess = paginatedProfiles.filter(p => selectedEmployees.has(p.id) && p.email && !p.has_system_access).length;
 
   // Resetar para página 1 quando filtros mudarem
   useEffect(() => {
@@ -513,7 +658,29 @@ const Users = () => {
             )}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {/* Botão de Enviar Convites em Lote */}
+          {selectedEmployees.size > 0 && (
+            <Button 
+              variant="default"
+              className="gap-2 bg-green-600 hover:bg-green-700"
+              onClick={() => setConfirmBulkInvite(true)}
+              disabled={sendingInvitations || selectedWithEmail === 0}
+            >
+              {sendingInvitations ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              Enviar Convites ({selectedWithEmail})
+              {selectedWithoutAccess > 0 && (
+                <span className="ml-1 text-yellow-200 text-xs">
+                  ⚠️ {selectedWithoutAccess} sem acesso
+                </span>
+              )}
+            </Button>
+          )}
+          
           <Button 
             variant="outline" 
             className="gap-2"
@@ -688,6 +855,12 @@ const Users = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="text-xs">
+                    <TableHead className="w-[40px]">
+                      <Checkbox 
+                        checked={selectedEmployees.size === paginatedProfiles.length && paginatedProfiles.length > 0}
+                        onCheckedChange={() => toggleSelectAll(paginatedProfiles)}
+                      />
+                    </TableHead>
                     <TableHead className="w-[90px] text-xs"># Registro</TableHead>
                     <TableHead className="min-w-[180px] text-xs">Nome</TableHead>
                     <TableHead className="min-w-[120px] text-xs">Estrutura Org</TableHead>
@@ -713,6 +886,14 @@ const Users = () => {
 
                     return (
                       <TableRow key={profile.id} className="hover:bg-muted/50 text-xs">
+                        {/* Checkbox de seleção */}
+                        <TableCell>
+                          <Checkbox 
+                            checked={selectedEmployees.has(profile.id)}
+                            onCheckedChange={() => toggleEmployeeSelection(profile.id)}
+                          />
+                        </TableCell>
+                        
                         {/* # Registro */}
                         <TableCell className="font-mono font-bold text-primary text-xs">
                           {profile.employee_number || '-'}
@@ -836,6 +1017,28 @@ const Users = () => {
                                 <Edit className="w-4 h-4 mr-2" />
                                 Editar
                               </DropdownMenuItem>
+                              
+                              {/* Botão Enviar Convite Individual */}
+                              <DropdownMenuItem 
+                                onClick={() => handleSendInvitation(
+                                  profile.id, 
+                                  profile.full_name, 
+                                  profile.has_system_access,
+                                  !!profile.email
+                                )}
+                                className={profile.email ? "text-green-600" : "text-muted-foreground"}
+                                disabled={!profile.email}
+                              >
+                                <Mail className="w-4 h-4 mr-2" />
+                                Enviar Convite
+                                {!profile.email && (
+                                  <span className="ml-1 text-xs">(sem email)</span>
+                                )}
+                                {profile.email && !profile.has_system_access && (
+                                  <AlertCircle className="w-3 h-3 ml-1 text-yellow-500" />
+                                )}
+                              </DropdownMenuItem>
+                              
                               {profile.status === "active" ? (
                                 <DropdownMenuItem
                                   onClick={() => setInactivateUserId(profile.id)}
@@ -863,6 +1066,7 @@ const Users = () => {
                   {/* Linha de SUBTOTAL da página */}
                   {paginatedProfiles.length > 0 && (
                     <TableRow className="bg-muted/50 border-t border-border font-semibold">
+                      <TableCell></TableCell>
                       <TableCell className="text-xs font-semibold">SUBTOTAL</TableCell>
                       <TableCell className="text-xs">{pageSubtotal.count} funcionário(s) nesta página</TableCell>
                       <TableCell></TableCell>
@@ -904,6 +1108,7 @@ const Users = () => {
                   {/* Linha de TOTAL GERAL - apenas na última página */}
                   {isLastPage && filteredProfiles.length > 0 && (
                     <TableRow className="bg-primary/10 border-t-2 border-primary/30 font-bold">
+                      <TableCell></TableCell>
                       <TableCell className="text-xs font-bold text-primary">TOTAL GERAL</TableCell>
                       <TableCell className="text-xs font-bold">{grandTotal.count} funcionário(s)</TableCell>
                       <TableCell></TableCell>
@@ -1044,6 +1249,48 @@ const Users = () => {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleReactivateUser} className="bg-success hover:bg-success/90">
               Reativar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirmação de Envio em Lote */}
+      <AlertDialog open={confirmBulkInvite} onOpenChange={setConfirmBulkInvite}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Send className="w-5 h-5 text-green-600" />
+              Confirmar Envio de Convites
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p>
+                Você está prestes a enviar convites por email para <strong>{selectedWithEmail}</strong> colaborador(es).
+              </p>
+              {selectedWithoutAccess > 0 && (
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 text-yellow-800 dark:text-yellow-200">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4" />
+                    <span className="font-medium">Atenção:</span>
+                  </div>
+                  <p className="text-sm mt-1">
+                    {selectedWithoutAccess} colaborador(es) selecionado(s) não possuem "Acesso ao Sistema" habilitado. 
+                    O convite será enviado mesmo assim.
+                  </p>
+                </div>
+              )}
+              <p className="text-sm">
+                Cada colaborador receberá um email com link para definir sua senha e acessar o sistema.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleBulkInvitation}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Send className="w-4 h-4 mr-2" />
+              Enviar {selectedWithEmail} Convite(s)
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
