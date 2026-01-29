@@ -524,17 +524,24 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         
         if (emailChanged && formData.email) {
           // Update email via edge function (handles auth.users + profiles)
-          const { data: emailResult, error: emailError } = await supabase.functions.invoke('update-employee-email', {
+          const response = await supabase.functions.invoke('update-employee-email', {
             body: {
               targetUserId: userId,
               newEmail: formData.email
             }
           });
 
-          if (emailError) {
-            throw new Error(emailError.message || 'Erro ao atualizar email');
+          // Handle rate limiting (429) and other edge function errors
+          if (response.error) {
+            // Check if it's a FunctionsHttpError with status in the response
+            const errorData = response.data as { error?: string } | null;
+            if (errorData?.error) {
+              throw new Error(errorData.error);
+            }
+            throw new Error(response.error.message || 'Erro ao atualizar email');
           }
           
+          const emailResult = response.data as { success?: boolean; error?: string; message?: string } | null;
           if (!emailResult?.success) {
             throw new Error(emailResult?.error || 'Falha ao atualizar email');
           }
