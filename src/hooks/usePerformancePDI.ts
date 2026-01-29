@@ -17,7 +17,7 @@ export interface PDIActionItem {
   completed?: boolean;
 }
 
-interface PDIWithRelations extends PerformancePDI {
+export interface PDIWithRelations extends PerformancePDI {
   employee?: { full_name: string; avatar_url: string | null; job_title: string | null } | null;
   competency?: { name: string; type: string } | null;
   evaluation?: { final_score: number | null; cycle_id: string } | null;

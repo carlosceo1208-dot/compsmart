@@ -22,7 +22,7 @@ export interface ActionItem {
   completed?: boolean;
 }
 
-interface OneOnOneWithRelations extends PerformanceOneOnOne {
+export interface OneOnOneWithRelations extends PerformanceOneOnOne {
   employee?: { full_name: string; avatar_url: string | null; job_title: string | null } | null;
   manager?: { full_name: string; avatar_url: string | null } | null;
 }
