@@ -531,22 +531,28 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             }
           });
 
-          // Handle rate limiting (429) and other edge function errors
+          // Handle edge function errors - Supabase SDK may return error in different ways
+          // Case 1: HTTP error with error object
+          // Case 2: Non-2xx response with data containing error message
+          const responseData = response.data as { success?: boolean; error?: string; message?: string } | null;
+          
           if (response.error) {
-            // Check if it's a FunctionsHttpError with status in the response
-            const errorData = response.data as { error?: string } | null;
-            if (errorData?.error) {
-              throw new Error(errorData.error);
-            }
-            throw new Error(response.error.message || 'Erro ao atualizar email');
+            // Edge function returned an error - try to get message from data first
+            const errorMessage = responseData?.error || response.error.message || 'Erro ao atualizar email';
+            throw new Error(errorMessage);
           }
           
-          const emailResult = response.data as { success?: boolean; error?: string; message?: string } | null;
-          if (!emailResult?.success) {
-            throw new Error(emailResult?.error || 'Falha ao atualizar email');
+          // Check if response.data contains an error (non-2xx status codes)
+          if (responseData?.error) {
+            throw new Error(responseData.error);
           }
           
-          toast.success(emailResult.message || 'Email atualizado com sucesso!');
+          // Finally check for success flag
+          if (!responseData?.success) {
+            throw new Error(responseData?.error || 'Falha ao atualizar email');
+          }
+          
+          toast.success(responseData.message || 'Email atualizado com sucesso!');
         }
 
         // Update existing user (other fields)
