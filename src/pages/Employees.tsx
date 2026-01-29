@@ -234,7 +234,7 @@ const Users = () => {
 
       setProfiles(profilesWithRoles);
     } catch (error: any) {
-      toast.error("Erro ao carregar funcionários");
+      toast.error("Erro ao carregar colaboradores");
       console.error("Error fetching profiles:", error);
     } finally {
       setLoading(false);
@@ -252,10 +252,10 @@ const Users = () => {
 
       if (error) throw error;
 
-      toast.success("Funcionário inativado com sucesso");
+      toast.success("Colaborador inativado com sucesso");
       fetchProfiles();
     } catch (error: any) {
-      toast.error("Erro ao inativar funcionário");
+      toast.error("Erro ao inativar colaborador");
       console.error(error);
     } finally {
       setInactivateUserId(null);
@@ -273,10 +273,10 @@ const Users = () => {
 
       if (error) throw error;
 
-      toast.success("Funcionário reativado com sucesso");
+      toast.success("Colaborador reativado com sucesso");
       fetchProfiles();
     } catch (error: any) {
-      toast.error("Erro ao reativar funcionário");
+      toast.error("Erro ao reativar colaborador");
       console.error(error);
     } finally {
       setReactivateUserId(null);
@@ -473,9 +473,9 @@ const Users = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Gestão de Funcionários</h1>
+          <h1 className="text-3xl font-bold">Gestão de Colaboradores</h1>
           <p className="text-muted-foreground mt-1">
-            Gerencie informações de funcionários, cargos e vínculos empregatícios
+            Gerencie informações de colaboradores, cargos e vínculos empregatícios
             {baseDataDate && (
               <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">
                 Base: {baseDataDate}
@@ -490,7 +490,7 @@ const Users = () => {
             onClick={() => setBulkImportOpen(true)}
           >
             <Upload className="w-4 h-4" />
-            Atualizar Funcionários
+            Atualizar Colaboradores
           </Button>
           {(currentUserRoles.includes('manager') || currentUserRoles.includes('hr_manager') || currentUserRoles.includes('admin')) && (
             <Button 
@@ -504,7 +504,7 @@ const Users = () => {
           )}
           <Button onClick={handleNewUser} className="bg-primary hover:bg-primary-hover gap-2 shadow-sm hover:shadow-md">
             <UserPlus className="w-4 h-4" />
-            Novo Funcionário
+            Novo Colaborador
           </Button>
         </div>
       </div>
@@ -515,7 +515,7 @@ const Users = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Total de Funcionários
+                Total de Colaboradores
               </CardTitle>
               <div className="p-2 rounded-lg bg-primary/10">
                 <UsersIcon className="w-4 h-4 text-primary" />
@@ -533,7 +533,7 @@ const Users = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Funcionários Ativos
+                Colaboradores Ativos
               </CardTitle>
               <div className="p-2 rounded-lg bg-success/10">
                 <UserCheck2 className="w-4 h-4 text-success" />
@@ -553,7 +553,7 @@ const Users = () => {
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                Funcionários Inativos
+                Colaboradores Inativos
               </CardTitle>
               <div className="p-2 rounded-lg bg-muted">
                 <UserMinus className="w-4 h-4 text-muted-foreground" />
@@ -638,7 +638,7 @@ const Users = () => {
 
             <div className="flex items-center justify-between text-sm text-muted-foreground">
               <span>
-                Exibindo {paginatedProfiles.length} de {filteredProfiles.length} usuário(s)
+                Exibindo {paginatedProfiles.length} de {filteredProfiles.length} colaborador(es)
                 {filteredProfiles.length !== totalProfiles && ` (${totalProfiles} total)`}
               </span>
             </div>
@@ -647,11 +647,11 @@ const Users = () => {
         <CardContent>
           {loading ? (
             <div className="text-center py-8 text-muted-foreground">
-              Carregando usuários...
+              Carregando colaboradores...
             </div>
           ) : filteredProfiles.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              Nenhum usuário encontrado
+              Nenhum colaborador encontrado
             </div>
           ) : (
             <div className="border rounded-lg">
@@ -990,7 +990,7 @@ const Users = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Inativação</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja inativar este usuário? Ele não poderá mais acessar o sistema.
+              Tem certeza que deseja inativar este colaborador? Ele não poderá mais acessar o sistema.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1007,7 +1007,7 @@ const Users = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Reativação</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja reativar este usuário? Ele poderá acessar o sistema novamente.
+              Tem certeza que deseja reativar este colaborador? Ele poderá acessar o sistema novamente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
