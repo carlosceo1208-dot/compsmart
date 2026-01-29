@@ -27,25 +27,24 @@ Deno.serve(async (req) => {
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-    // Create client with user's token for permission checks
-    const supabaseUser = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } }
+    // Create admin client for privileged operations (moved up for token verification)
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
     });
 
-    // Verify user token
+    // Verify user token using getUser (stable API)
     const token = authHeader.replace('Bearer ', '');
-    const { data: claims, error: claimsError } = await supabaseUser.auth.getClaims(token);
-    if (claimsError || !claims?.claims) {
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+    if (userError || !user) {
       return new Response(
         JSON.stringify({ error: 'Token inválido' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const callerId = claims.claims.sub as string;
+    const callerId = user.id;
 
     // Parse request body
     const { targetUserId, newEmail }: UpdateEmailRequest = await req.json();
@@ -66,11 +65,6 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // Create admin client for privileged operations
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    });
 
     // Check rate limiting (5 changes per hour)
     const { data: rateLimitOk } = await supabaseAdmin.rpc('check_rate_limit', {
