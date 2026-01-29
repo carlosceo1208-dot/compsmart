@@ -119,7 +119,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
   const { activeCompanyId } = useCompanyContext();
   const [loading, setLoading] = useState(false);
   const [openUnits, setOpenUnits] = useState(false);
-  const [originalEmail, setOriginalEmail] = useState("");
+  // null = ainda não carregou o perfil (evita disparar update de email por engano)
+  const [originalEmail, setOriginalEmail] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserData>({
     full_name: "",
     email: "",
@@ -431,7 +432,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     });
     setSelectedUnitBreadcrumb("");
     setSelectedEmployee(null);
-    setOriginalEmail("");
+    setOriginalEmail(null);
   };
 
   const handleRoleToggle = (role: string) => {
@@ -489,6 +490,13 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Evita submit enquanto o perfil ainda não carregou (modo edição)
+    if (userId && originalEmail === null) {
+      toast.info("Aguarde o carregamento do funcionário antes de salvar.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -520,7 +528,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
       if (userId) {
         // Check if email was changed
-        const emailChanged = formData.email?.toLowerCase() !== originalEmail?.toLowerCase();
+        const emailChanged =
+          originalEmail !== null &&
+          (formData.email || "").toLowerCase() !== (originalEmail || "").toLowerCase();
         
         if (emailChanged && formData.email) {
           // Update email via edge function (handles auth.users + profiles)

@@ -66,11 +66,11 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check rate limiting (5 changes per hour)
+    // Check rate limiting (evita abuso; ajuste conservador para reduzir falsos positivos)
     const { data: rateLimitOk } = await supabaseAdmin.rpc('check_rate_limit', {
       p_user_id: callerId,
       p_function_name: 'update-employee-email',
-      p_max_requests: 5,
+      p_max_requests: 20,
       p_window_minutes: 60
     });
 
