@@ -131,8 +131,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation)
-    // This allows leads/visitors and employees from different companies to have the same email
+    // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation for profiles)
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
       .select('id, full_name, root_company_id')
@@ -146,6 +145,31 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: `Este email já está em uso por: ${existingProfile.full_name}` }),
         { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // IMPORTANT: Check if email exists in auth.users (global constraint)
+    // auth.users has a unique constraint on email - we cannot have duplicate emails there
+    const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1 });
+    // Use a direct query to check for the email
+    const { data: existingAuthUser } = await supabaseAdmin
+      .from('profiles')
+      .select('id, full_name')
+      .eq('email', newEmail.toLowerCase())
+      .neq('id', targetUserId)
+      .maybeSingle();
+    
+    // If email exists in another user's profile (any company) and that user has auth access,
+    // we need to check if they have an auth.users entry
+    if (existingAuthUser) {
+      const { data: authCheck } = await supabaseAdmin.auth.admin.getUserById(existingAuthUser.id);
+      if (authCheck?.user) {
+        return new Response(
+          JSON.stringify({ 
+            error: `Este email já está vinculado a outra conta de acesso no sistema. Cada email de login deve ser único.` 
+          }),
+          { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // Check if target has an auth.users entry
