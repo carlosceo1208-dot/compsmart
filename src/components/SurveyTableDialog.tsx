@@ -38,7 +38,7 @@ export function SurveyTableDialog({
 }: SurveyTableDialogProps) {
   const { toast } = useToast();
   const { data: userRole } = useCurrentUserRole();
-  const { hasAccess } = useFeatureAccess();
+  const { hasAccess, isAdminOrSuperAdmin } = useFeatureAccess();
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [effectiveMonth, setEffectiveMonth] = useState("1");
@@ -48,8 +48,8 @@ export function SurveyTableDialog({
   const [isGlobalTemplate, setIsGlobalTemplate] = useState(false);
   const [modality, setModality] = useState<SalaryModality>('fixed_salary');
 
-  // Check if user has access to advanced modalities (Pro/Enterprise)
-  const hasAdvancedModalities = hasAccess('salary_analysis_report');
+  // Check if user has access to advanced modalities (Pro/Enterprise OR admin/super_admin)
+  const hasAdvancedModalities = hasAccess('salary_modality_advanced');
 
   useEffect(() => {
     if (surveyTable) {
