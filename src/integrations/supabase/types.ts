@@ -2216,6 +2216,1165 @@ export type Database = {
           },
         ]
       }
+      performai_conversations: {
+        Row: {
+          answer: string
+          context_data: Json | null
+          created_at: string
+          document_name: string | null
+          document_text: string | null
+          id: string
+          operation_mode: string | null
+          question: string
+          response_time_ms: number | null
+          session_id: string | null
+          tokens_used: number | null
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          context_data?: Json | null
+          created_at?: string
+          document_name?: string | null
+          document_text?: string | null
+          id?: string
+          operation_mode?: string | null
+          question: string
+          response_time_ms?: number | null
+          session_id?: string | null
+          tokens_used?: number | null
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          context_data?: Json | null
+          created_at?: string
+          document_name?: string | null
+          document_text?: string | null
+          id?: string
+          operation_mode?: string | null
+          question?: string
+          response_time_ms?: number | null
+          session_id?: string | null
+          tokens_used?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performai_conversations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performai_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performai_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      performance_competency_scores: {
+        Row: {
+          comments: string | null
+          competency_id: string
+          created_at: string
+          evaluated_level: string | null
+          evaluation_id: string
+          expected_level: string | null
+          id: string
+          score: number | null
+        }
+        Insert: {
+          comments?: string | null
+          competency_id: string
+          created_at?: string
+          evaluated_level?: string | null
+          evaluation_id: string
+          expected_level?: string | null
+          id?: string
+          score?: number | null
+        }
+        Update: {
+          comments?: string | null
+          competency_id?: string
+          created_at?: string
+          evaluated_level?: string | null
+          evaluation_id?: string
+          expected_level?: string | null
+          id?: string
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_competency_scores_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_competency_scores_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_cycles: {
+        Row: {
+          competency_weight: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string
+          evaluation_angle: Database["public"]["Enums"]["performance_evaluation_angle"]
+          evaluation_end_date: string | null
+          evaluation_start_date: string | null
+          fiscal_year: number
+          goals_end_date: string | null
+          goals_start_date: string | null
+          goals_weight: number | null
+          id: string
+          incentive_weight_percentage: number | null
+          include_competencies: boolean | null
+          include_probationary: boolean | null
+          is_active: boolean | null
+          linked_incentive_program_id: string | null
+          name: string
+          root_company_id: string
+          scale_type: Database["public"]["Enums"]["performance_scale_type"]
+          start_date: string
+          status: Database["public"]["Enums"]["performance_cycle_status"]
+          updated_at: string
+        }
+        Insert: {
+          competency_weight?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date: string
+          evaluation_angle?: Database["public"]["Enums"]["performance_evaluation_angle"]
+          evaluation_end_date?: string | null
+          evaluation_start_date?: string | null
+          fiscal_year: number
+          goals_end_date?: string | null
+          goals_start_date?: string | null
+          goals_weight?: number | null
+          id?: string
+          incentive_weight_percentage?: number | null
+          include_competencies?: boolean | null
+          include_probationary?: boolean | null
+          is_active?: boolean | null
+          linked_incentive_program_id?: string | null
+          name: string
+          root_company_id: string
+          scale_type?: Database["public"]["Enums"]["performance_scale_type"]
+          start_date: string
+          status?: Database["public"]["Enums"]["performance_cycle_status"]
+          updated_at?: string
+        }
+        Update: {
+          competency_weight?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string
+          evaluation_angle?: Database["public"]["Enums"]["performance_evaluation_angle"]
+          evaluation_end_date?: string | null
+          evaluation_start_date?: string | null
+          fiscal_year?: number
+          goals_end_date?: string | null
+          goals_start_date?: string | null
+          goals_weight?: number | null
+          id?: string
+          incentive_weight_percentage?: number | null
+          include_competencies?: boolean | null
+          include_probationary?: boolean | null
+          is_active?: boolean | null
+          linked_incentive_program_id?: string | null
+          name?: string
+          root_company_id?: string
+          scale_type?: Database["public"]["Enums"]["performance_scale_type"]
+          start_date?: string
+          status?: Database["public"]["Enums"]["performance_cycle_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_cycles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_cycles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_cycles_linked_incentive_program_id_fkey"
+            columns: ["linked_incentive_program_id"]
+            isOneToOne: false
+            referencedRelation: "incentive_programs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_cycles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_evaluations: {
+        Row: {
+          ai_feedback: string | null
+          approved_at: string | null
+          approved_by: string | null
+          competency_score: number | null
+          created_at: string
+          cycle_id: string
+          employee_comments: string | null
+          employee_id: string
+          evaluator_id: string
+          evaluator_type: Database["public"]["Enums"]["performance_evaluator_type"]
+          final_score: number | null
+          goals_score: number | null
+          id: string
+          improvement_areas: string | null
+          is_probationary: boolean | null
+          manager_comments: string | null
+          potential_score: number | null
+          probationary_decision: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          root_company_id: string
+          status: Database["public"]["Enums"]["performance_evaluation_status"]
+          strengths: string | null
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_feedback?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          competency_score?: number | null
+          created_at?: string
+          cycle_id: string
+          employee_comments?: string | null
+          employee_id: string
+          evaluator_id: string
+          evaluator_type?: Database["public"]["Enums"]["performance_evaluator_type"]
+          final_score?: number | null
+          goals_score?: number | null
+          id?: string
+          improvement_areas?: string | null
+          is_probationary?: boolean | null
+          manager_comments?: string | null
+          potential_score?: number | null
+          probationary_decision?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id: string
+          status?: Database["public"]["Enums"]["performance_evaluation_status"]
+          strengths?: string | null
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_feedback?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
+          competency_score?: number | null
+          created_at?: string
+          cycle_id?: string
+          employee_comments?: string | null
+          employee_id?: string
+          evaluator_id?: string
+          evaluator_type?: Database["public"]["Enums"]["performance_evaluator_type"]
+          final_score?: number | null
+          goals_score?: number | null
+          id?: string
+          improvement_areas?: string | null
+          is_probationary?: boolean | null
+          manager_comments?: string | null
+          potential_score?: number | null
+          probationary_decision?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id?: string
+          status?: Database["public"]["Enums"]["performance_evaluation_status"]
+          strengths?: string | null
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "performance_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_glossary_terms: {
+        Row: {
+          category: string
+          created_at: string
+          definition: string
+          id: string
+          is_active: boolean | null
+          related_terms: string[] | null
+          synonyms: string[] | null
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          definition: string
+          id?: string
+          is_active?: boolean | null
+          related_terms?: string[] | null
+          synonyms?: string[] | null
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          definition?: string
+          id?: string
+          is_active?: boolean | null
+          related_terms?: string[] | null
+          synonyms?: string[] | null
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      performance_goals: {
+        Row: {
+          achieved_at: string | null
+          created_at: string
+          created_by: string | null
+          current_value: number | null
+          cycle_id: string
+          description: string | null
+          due_date: string | null
+          employee_id: string | null
+          id: string
+          job_title_id: string | null
+          level: Database["public"]["Enums"]["performance_goal_level"]
+          parent_goal_id: string | null
+          root_company_id: string
+          status: Database["public"]["Enums"]["performance_goal_status"]
+          target_value: number | null
+          title: string
+          unit_id: string | null
+          unit_of_measure: string | null
+          updated_at: string
+          weight: number | null
+        }
+        Insert: {
+          achieved_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          cycle_id: string
+          description?: string | null
+          due_date?: string | null
+          employee_id?: string | null
+          id?: string
+          job_title_id?: string | null
+          level: Database["public"]["Enums"]["performance_goal_level"]
+          parent_goal_id?: string | null
+          root_company_id: string
+          status?: Database["public"]["Enums"]["performance_goal_status"]
+          target_value?: number | null
+          title: string
+          unit_id?: string | null
+          unit_of_measure?: string | null
+          updated_at?: string
+          weight?: number | null
+        }
+        Update: {
+          achieved_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_value?: number | null
+          cycle_id?: string
+          description?: string | null
+          due_date?: string | null
+          employee_id?: string | null
+          id?: string
+          job_title_id?: string | null
+          level?: Database["public"]["Enums"]["performance_goal_level"]
+          parent_goal_id?: string | null
+          root_company_id?: string
+          status?: Database["public"]["Enums"]["performance_goal_status"]
+          target_value?: number | null
+          title?: string
+          unit_id?: string | null
+          unit_of_measure?: string | null
+          updated_at?: string
+          weight?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_goals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_goals_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_goals_job_title_id_fkey"
+            columns: ["job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_parent_goal_id_fkey"
+            columns: ["parent_goal_id"]
+            isOneToOne: false
+            referencedRelation: "performance_goals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_kudos: {
+        Row: {
+          category: Database["public"]["Enums"]["performance_kudos_category"]
+          created_at: string
+          from_employee_id: string
+          id: string
+          is_public: boolean | null
+          message: string
+          root_company_id: string
+          to_employee_id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["performance_kudos_category"]
+          created_at?: string
+          from_employee_id: string
+          id?: string
+          is_public?: boolean | null
+          message: string
+          root_company_id: string
+          to_employee_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["performance_kudos_category"]
+          created_at?: string
+          from_employee_id?: string
+          id?: string
+          is_public?: boolean | null
+          message?: string
+          root_company_id?: string
+          to_employee_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_kudos_from_employee_id_fkey"
+            columns: ["from_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_kudos_from_employee_id_fkey"
+            columns: ["from_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_kudos_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_kudos_to_employee_id_fkey"
+            columns: ["to_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_kudos_to_employee_id_fkey"
+            columns: ["to_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      performance_merit_recommendations: {
+        Row: {
+          applied_to_budget: boolean | null
+          approved_at: string | null
+          approved_by: string | null
+          budget_projection_id: string | null
+          created_at: string
+          employee_id: string
+          evaluation_id: string
+          id: string
+          notes: string | null
+          recommended_new_job_title_id: string | null
+          recommended_percentage: number
+          recommended_type: Database["public"]["Enums"]["performance_merit_type"]
+          status: Database["public"]["Enums"]["performance_merit_status"]
+          updated_at: string
+        }
+        Insert: {
+          applied_to_budget?: boolean | null
+          approved_at?: string | null
+          approved_by?: string | null
+          budget_projection_id?: string | null
+          created_at?: string
+          employee_id: string
+          evaluation_id: string
+          id?: string
+          notes?: string | null
+          recommended_new_job_title_id?: string | null
+          recommended_percentage: number
+          recommended_type?: Database["public"]["Enums"]["performance_merit_type"]
+          status?: Database["public"]["Enums"]["performance_merit_status"]
+          updated_at?: string
+        }
+        Update: {
+          applied_to_budget?: boolean | null
+          approved_at?: string | null
+          approved_by?: string | null
+          budget_projection_id?: string | null
+          created_at?: string
+          employee_id?: string
+          evaluation_id?: string
+          id?: string
+          notes?: string | null
+          recommended_new_job_title_id?: string | null
+          recommended_percentage?: number
+          recommended_type?: Database["public"]["Enums"]["performance_merit_type"]
+          status?: Database["public"]["Enums"]["performance_merit_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_merit_recommendat_recommended_new_job_title_id_fkey"
+            columns: ["recommended_new_job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_budget_projection_id_fkey"
+            columns: ["budget_projection_id"]
+            isOneToOne: false
+            referencedRelation: "budget_employee_projections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_merit_rules: {
+        Row: {
+          created_at: string
+          cycle_id: string | null
+          id: string
+          is_active: boolean | null
+          max_score: number
+          merit_percentage: number
+          min_score: number
+          promotion_eligible: boolean | null
+          root_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cycle_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_score: number
+          merit_percentage: number
+          min_score: number
+          promotion_eligible?: boolean | null
+          root_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cycle_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_score?: number
+          merit_percentage?: number
+          min_score?: number
+          promotion_eligible?: boolean | null
+          root_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_merit_rules_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_merit_rules_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_one_on_ones: {
+        Row: {
+          action_items: Json | null
+          agenda_items: Json | null
+          completed_at: string | null
+          created_at: string
+          employee_id: string
+          id: string
+          is_completed: boolean | null
+          manager_id: string
+          notes: string | null
+          root_company_id: string
+          scheduled_date: string
+          updated_at: string
+        }
+        Insert: {
+          action_items?: Json | null
+          agenda_items?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          employee_id: string
+          id?: string
+          is_completed?: boolean | null
+          manager_id: string
+          notes?: string | null
+          root_company_id: string
+          scheduled_date: string
+          updated_at?: string
+        }
+        Update: {
+          action_items?: Json | null
+          agenda_items?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          employee_id?: string
+          id?: string
+          is_completed?: boolean | null
+          manager_id?: string
+          notes?: string | null
+          root_company_id?: string
+          scheduled_date?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_one_on_ones_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_one_on_ones_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_one_on_ones_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_one_on_ones_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_one_on_ones_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_pdi: {
+        Row: {
+          action_items: Json | null
+          competency_id: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          employee_id: string
+          evaluation_id: string | null
+          id: string
+          progress_percentage: number | null
+          root_company_id: string
+          status: Database["public"]["Enums"]["performance_pdi_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          action_items?: Json | null
+          competency_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          employee_id: string
+          evaluation_id?: string | null
+          id?: string
+          progress_percentage?: number | null
+          root_company_id: string
+          status?: Database["public"]["Enums"]["performance_pdi_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          action_items?: Json | null
+          competency_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          employee_id?: string
+          evaluation_id?: string | null
+          id?: string
+          progress_percentage?: number | null
+          root_company_id?: string
+          status?: Database["public"]["Enums"]["performance_pdi_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_pdi_competency_id_fkey"
+            columns: ["competency_id"]
+            isOneToOne: false
+            referencedRelation: "competencies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_succession: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          development_plan: string | null
+          id: string
+          key_position_id: string
+          notes: string | null
+          readiness: Database["public"]["Enums"]["performance_readiness"]
+          root_company_id: string
+          successor_employee_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          development_plan?: string | null
+          id?: string
+          key_position_id: string
+          notes?: string | null
+          readiness?: Database["public"]["Enums"]["performance_readiness"]
+          root_company_id: string
+          successor_employee_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          development_plan?: string | null
+          id?: string
+          key_position_id?: string
+          notes?: string | null
+          readiness?: Database["public"]["Enums"]["performance_readiness"]
+          root_company_id?: string
+          successor_employee_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_succession_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_succession_key_position_id_fkey"
+            columns: ["key_position_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      performance_templates: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          indicators: Json | null
+          is_active: boolean | null
+          is_global: boolean | null
+          name: string
+          root_company_id: string | null
+          suggested_competency_ids: string[] | null
+          template_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          indicators?: Json | null
+          is_active?: boolean | null
+          is_global?: boolean | null
+          name: string
+          root_company_id?: string | null
+          suggested_competency_ids?: string[] | null
+          template_type?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          indicators?: Json | null
+          is_active?: boolean | null
+          is_global?: boolean | null
+          name?: string
+          root_company_id?: string | null
+          suggested_competency_ids?: string[] | null
+          template_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_templates_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      performance_variable_link: {
+        Row: {
+          calculated_multiplier: number
+          created_at: string
+          evaluation_id: string
+          id: string
+          incentive_program_id: string
+          notes: string | null
+          weight_percentage: number
+        }
+        Insert: {
+          calculated_multiplier?: number
+          created_at?: string
+          evaluation_id: string
+          id?: string
+          incentive_program_id: string
+          notes?: string | null
+          weight_percentage?: number
+        }
+        Update: {
+          calculated_multiplier?: number
+          created_at?: string
+          evaluation_id?: string
+          id?: string
+          incentive_program_id?: string
+          notes?: string | null
+          weight_percentage?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_variable_link_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_variable_link_incentive_program_id_fkey"
+            columns: ["incentive_program_id"]
+            isOneToOne: false
+            referencedRelation: "incentive_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       permissions: {
         Row: {
           created_at: string
@@ -3544,6 +4703,56 @@ export type Database = {
     Enums: {
       app_role: "admin" | "hr_manager" | "manager" | "employee" | "super_admin"
       calculation_mode: "manual" | "automatic"
+      performance_cycle_status:
+        | "draft"
+        | "goals"
+        | "monitoring"
+        | "insights"
+        | "closing"
+        | "closed"
+      performance_evaluation_angle: "90" | "180" | "360"
+      performance_evaluation_status:
+        | "draft"
+        | "pending_review"
+        | "reviewed"
+        | "approved"
+        | "returned"
+      performance_evaluator_type:
+        | "self"
+        | "manager"
+        | "superior"
+        | "peer"
+        | "hr"
+      performance_goal_level:
+        | "company"
+        | "area"
+        | "department"
+        | "position"
+        | "individual"
+      performance_goal_status:
+        | "pending"
+        | "in_progress"
+        | "achieved"
+        | "not_achieved"
+      performance_kudos_category:
+        | "teamwork"
+        | "innovation"
+        | "leadership"
+        | "customer_focus"
+        | "excellence"
+      performance_merit_status: "pending" | "approved" | "rejected" | "applied"
+      performance_merit_type: "merit_increase" | "promotion" | "none"
+      performance_pdi_status:
+        | "pending"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+      performance_readiness:
+        | "ready_now"
+        | "ready_1_year"
+        | "ready_2_years"
+        | "development"
+      performance_scale_type: "numeric_1_5" | "conceptual" | "percentage"
       proficiency_level: "basic" | "intermediate" | "advanced" | "expert"
       salary_modality: "fixed_salary" | "total_cash" | "total_compensation"
       user_status: "active" | "inactive"
@@ -3676,6 +4885,58 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "hr_manager", "manager", "employee", "super_admin"],
       calculation_mode: ["manual", "automatic"],
+      performance_cycle_status: [
+        "draft",
+        "goals",
+        "monitoring",
+        "insights",
+        "closing",
+        "closed",
+      ],
+      performance_evaluation_angle: ["90", "180", "360"],
+      performance_evaluation_status: [
+        "draft",
+        "pending_review",
+        "reviewed",
+        "approved",
+        "returned",
+      ],
+      performance_evaluator_type: ["self", "manager", "superior", "peer", "hr"],
+      performance_goal_level: [
+        "company",
+        "area",
+        "department",
+        "position",
+        "individual",
+      ],
+      performance_goal_status: [
+        "pending",
+        "in_progress",
+        "achieved",
+        "not_achieved",
+      ],
+      performance_kudos_category: [
+        "teamwork",
+        "innovation",
+        "leadership",
+        "customer_focus",
+        "excellence",
+      ],
+      performance_merit_status: ["pending", "approved", "rejected", "applied"],
+      performance_merit_type: ["merit_increase", "promotion", "none"],
+      performance_pdi_status: [
+        "pending",
+        "in_progress",
+        "completed",
+        "cancelled",
+      ],
+      performance_readiness: [
+        "ready_now",
+        "ready_1_year",
+        "ready_2_years",
+        "development",
+      ],
+      performance_scale_type: ["numeric_1_5", "conceptual", "percentage"],
       proficiency_level: ["basic", "intermediate", "advanced", "expert"],
       salary_modality: ["fixed_salary", "total_cash", "total_compensation"],
       user_status: ["active", "inactive"],

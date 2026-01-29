@@ -12,6 +12,7 @@ import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
 import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrendsCard";
 import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
+import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useFounderStatus } from "@/hooks/useFounderStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
@@ -56,6 +57,9 @@ const Dashboard = () => {
           
           {/* Card de Segurança - Apenas Super Admin */}
           {isSuperAdmin && <SecurityQuickAccessCard />}
+          
+          {/* Card do Módulo de Performance - Destaque */}
+          <PerformanceModuleCard />
           
           {/* Mapa de Localização das Unidades */}
           <CompanyMapCard />
