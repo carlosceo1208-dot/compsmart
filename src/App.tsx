@@ -56,6 +56,22 @@ import SecurityDashboard from "./pages/SecurityDashboard";
 import AboutUs from "./pages/AboutUs";
 import Glossary from "./pages/Glossary";
 import Changelog from "./pages/Changelog";
+
+// Performance Module
+import { PerformanceLayout } from "./components/performance/PerformanceLayout";
+import PerformanceDashboard from "./pages/PerformanceDashboard";
+import PerformanceCycles from "./pages/performance/PerformanceCycles";
+import PerformanceGoals from "./pages/performance/PerformanceGoals";
+import PerformanceEvaluations from "./pages/performance/PerformanceEvaluations";
+import PerformanceTemplates from "./pages/performance/PerformanceTemplates";
+import Performance9Box from "./pages/performance/Performance9Box";
+import PerformanceOneOnOnes from "./pages/performance/PerformanceOneOnOnes";
+import PerformanceKudos from "./pages/performance/PerformanceKudos";
+import PerformancePDI from "./pages/performance/PerformancePDI";
+import PerformanceSuccession from "./pages/performance/PerformanceSuccession";
+import PerformanceGlossary from "./pages/performance/PerformanceGlossary";
+import PerformanceAssistant from "./pages/performance/PerformanceAssistant";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -118,6 +134,23 @@ const App = () => (
               <Route path="/super-admin" element={<SuperAdminDashboard />} />
               <Route path="/security-dashboard" element={<SecurityDashboard />} />
             </Route>
+            
+            {/* Performance Module - Separate Layout */}
+            <Route element={<PerformanceLayout />}>
+              <Route path="/performance" element={<PerformanceDashboard />} />
+              <Route path="/performance/cycles" element={<PerformanceCycles />} />
+              <Route path="/performance/goals" element={<PerformanceGoals />} />
+              <Route path="/performance/evaluations" element={<PerformanceEvaluations />} />
+              <Route path="/performance/templates" element={<PerformanceTemplates />} />
+              <Route path="/performance/9box" element={<Performance9Box />} />
+              <Route path="/performance/one-on-ones" element={<PerformanceOneOnOnes />} />
+              <Route path="/performance/kudos" element={<PerformanceKudos />} />
+              <Route path="/performance/pdi" element={<PerformancePDI />} />
+              <Route path="/performance/succession" element={<PerformanceSuccession />} />
+              <Route path="/performance/glossary" element={<PerformanceGlossary />} />
+              <Route path="/performance/assistant" element={<PerformanceAssistant />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
