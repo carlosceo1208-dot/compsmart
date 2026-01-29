@@ -31,7 +31,7 @@ export const PainPointsSection = () => {
       title: "Salários Defasados",
       description: "Sem critérios claros e falta de benchmark de mercado para ajustes justos",
       stat: "68%",
-      statLabel: "dos funcionários pedem demissão por salários defasados"
+      statLabel: "dos colaboradores pedem demissão por salários defasados"
     },
     {
       icon: FileSpreadsheet,
@@ -52,7 +52,7 @@ export const PainPointsSection = () => {
       title: "Dificuldade em Reter",
       description: "Perda de talentos estratégicos por política de remuneração inadequada",
       stat: "2.5x",
-      statLabel: "custo de substituir um funcionário"
+      statLabel: "custo de substituir um colaborador"
     },
     {
       icon: Users,

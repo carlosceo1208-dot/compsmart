@@ -7,7 +7,7 @@ export const FAQSection = () => {
     // NOVOS - Lançamento e Preços
     {
       question: "Quanto custa o CompSmart e quais são os planos disponíveis?",
-      answer: "Oferecemos 4 planos: Starter (até 50 funcionários) a partir de R$ 199/mês, Medium (até 200 func.) a partir de R$ 499/mês, Pro (até 500 func.) a partir de R$ 899/mês e Enterprise (acima de 500 func.) sob consulta. Aproveite o desconto de 30% no lançamento até 06/02/2026 e economize ainda mais com o plano anual (2 meses grátis).",
+      answer: "Oferecemos 4 planos: Starter (até 50 colaboradores) a partir de R$ 199/mês, Medium (até 200 colab.) a partir de R$ 499/mês, Pro (até 500 colab.) a partir de R$ 899/mês e Enterprise (acima de 500 colab.) sob consulta. Aproveite o desconto de 30% no lançamento até 06/02/2026 e economize ainda mais com o plano anual (2 meses grátis).",
       icon: CreditCard,
       isNew: true
     },
@@ -20,7 +20,7 @@ export const FAQSection = () => {
     // NOVOS - Recursos Avançados
     {
       question: "Como funciona a simulação de dissídio coletivo?",
-      answer: "Acesse Menu > Analytics > Análise Salarial > clique em 'Nova Simulação'. Escolha entre percentual fixo (todos recebem o mesmo %) ou escalonado por faixa (% diferentes por faixa salarial). O sistema calcula automaticamente o impacto: funcionários afetados, custo mensal e anual. Salve cenários para comparação e, quando aprovado, efetive os ajustes com um clique.",
+      answer: "Acesse Menu > Analytics > Análise Salarial > clique em 'Nova Simulação'. Escolha entre percentual fixo (todos recebem o mesmo %) ou escalonado por faixa (% diferentes por faixa salarial). O sistema calcula automaticamente o impacto: colaboradores afetados, custo mensal e anual. Salve cenários para comparação e, quando aprovado, efetive os ajustes com um clique.",
       icon: Calculator,
       isNew: true
     },
@@ -70,7 +70,7 @@ export const FAQSection = () => {
     },
     {
       question: "Posso importar dados de outras plataformas?",
-      answer: "Sim! Oferecemos importação via Excel/CSV para funcionários, cargos, salários e estrutura organizacional. O sistema valida os dados, identifica inconsistências e sugere correções. Também temos templates prontos para facilitar a migração de outras ferramentas de RH.",
+      answer: "Sim! Oferecemos importação via Excel/CSV para colaboradores, cargos, salários e estrutura organizacional. O sistema valida os dados, identifica inconsistências e sugere correções. Também temos templates prontos para facilitar a migração de outras ferramentas de RH.",
       icon: Upload
     },
     {
