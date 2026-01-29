@@ -362,49 +362,16 @@ serve(async (req) => {
         }
       }
 
-      // Buscar nome da empresa para o email de boas-vindas
-      let companyName = 'sua empresa';
-      if (root_company_id) {
-        const { data: company } = await supabase
-          .from('organizational_structure')
-          .select('name')
-          .eq('id', root_company_id)
-          .single();
-        if (company?.name) companyName = company.name;
-      }
-
-      // Gerar link de redefinição de senha (ativação) via Supabase Auth
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const activationUrl = `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/reset-password`;
+      // NÃO ENVIAR EMAIL AUTOMATICAMENTE
+      // O Admin/RH deve disparar manualmente via botão "Enviar Convite"
+      console.log('New employee with email created successfully (no automatic email - awaiting manual invitation)');
       
-      // Gerar token de reset de senha para o novo usuário
-      const { data: resetData, error: resetError } = await supabase.auth.admin.generateLink({
-        type: 'recovery',
-        email: email,
-        options: {
-          redirectTo: activationUrl
-        }
-      });
-
-      if (resetError) {
-        console.warn('Could not generate activation link:', resetError.message);
-      } else {
-        // Enviar email de boas-vindas com link de ativação
-        const emailSent = await sendWelcomeEmail(
-          email,
-          full_name,
-          companyName,
-          resetData.properties?.action_link || activationUrl
-        );
-        console.log('Welcome email sent:', emailSent);
-      }
-
-      console.log('New employee with email created successfully');
       return new Response(JSON.stringify({ 
         success: true, 
         data,
         action: 'created',
-        emailSent: true
+        emailSent: false,
+        message: 'Colaborador criado. Use o botão "Enviar Convite" para enviar o email de ativação.'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
