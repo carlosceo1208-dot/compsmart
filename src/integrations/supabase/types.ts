@@ -2779,6 +2779,7 @@ export type Database = {
           from_employee_id: string
           id: string
           is_public: boolean | null
+          is_read: boolean | null
           message: string
           root_company_id: string
           to_employee_id: string
@@ -2789,6 +2790,7 @@ export type Database = {
           from_employee_id: string
           id?: string
           is_public?: boolean | null
+          is_read?: boolean | null
           message: string
           root_company_id: string
           to_employee_id: string
@@ -2799,6 +2801,7 @@ export type Database = {
           from_employee_id?: string
           id?: string
           is_public?: boolean | null
+          is_read?: boolean | null
           message?: string
           root_company_id?: string
           to_employee_id?: string
