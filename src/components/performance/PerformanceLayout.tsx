@@ -13,9 +13,9 @@ export function PerformanceLayout() {
           <div className="flex items-center justify-between gap-4 mb-4">
             <div className="flex items-center gap-3">
               <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="gap-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900/30">
+              <Button variant="ghost" size="sm" className="gap-2 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30 font-bold">
                   <ArrowLeft className="h-4 w-4" />
-                  Voltar ao Dashboard
+                  Voltar ao Dashboard Gestão Remuneração
                 </Button>
               </Link>
             </div>
