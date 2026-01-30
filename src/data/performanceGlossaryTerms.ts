@@ -725,8 +725,14 @@ O feedback contínuo não substitui a avaliação formal, mas a complementa. A a
   {
     term: "Kudos",
     category: "reconhecimento",
-    summary: "Ferramenta de reconhecimento contínuo que valoriza o trabalho bem feito e fortalece relações. Diferente da avaliação anual, o Kudos é instantâneo, reconhecendo comportamentos no momento em que ocorrem.",
-    fullContent: `Kudos é uma prática de reconhecimento peer-to-peer (entre pares) que complementa o reconhecimento formal do gestor. Cria uma cultura de valorização e gratidão no ambiente de trabalho.
+    summary: "Ferramenta de reconhecimento contínuo que valoriza o trabalho bem feito e fortalece relações. A palavra vem do grego 'κῦδος' (kŷdos), que significa 'glória', 'fama' ou 'renome'. Diferente da avaliação anual, o Kudos é instantâneo, reconhecendo comportamentos no momento em que ocorrem.",
+    fullContent: `**Origem da palavra Kudos:**
+A palavra "Kudos" tem origem no grego antigo **κῦδος (kŷdos)**, que significa "glória", "fama" ou "renome". Na Grécia Antiga, era usada para descrever a honra e o prestígio conquistados por heróis em batalhas ou competições. O termo foi adotado pelo inglês britânico no século XIX, inicialmente em contextos acadêmicos, e posteriormente popularizado nos Estados Unidos.
+
+Curiosidade: Embora "kudos" seja uma palavra singular em grego (não existe "kudo" no original), o uso moderno criou a forma "kudo" como se fosse o singular de "kudos". No ambiente corporativo, "dar um kudo" ou "enviar kudos" tornou-se sinônimo de reconhecer publicamente o bom trabalho de alguém.
+
+**O que é Kudos no contexto organizacional:**
+Kudos é uma prática de reconhecimento peer-to-peer (entre pares) que complementa o reconhecimento formal do gestor. Cria uma cultura de valorização e gratidão no ambiente de trabalho.
 
 **Por que Kudos funciona:**
 - **Combate desengajamento**: supre necessidade básica de reconhecimento
