@@ -2,6 +2,7 @@ import { Outlet, Link } from "react-router-dom";
 import { ArrowLeft, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PerformanceNav } from "./PerformanceNav";
+import { PerformAIWidget } from "./PerformAIWidget";
 
 export function PerformanceLayout() {
   return (
@@ -35,6 +36,9 @@ export function PerformanceLayout() {
       <main className="container mx-auto px-4 py-6">
         <Outlet />
       </main>
+
+      {/* PerformAI Assistant */}
+      <PerformAIWidget />
     </div>
   );
 }
