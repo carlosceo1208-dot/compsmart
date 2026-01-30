@@ -236,14 +236,14 @@ export function GoalDialog({ open, onOpenChange, goal, defaultLevel, parentGoalI
             <div className="space-y-2">
               <Label htmlFor="parent_goal">Meta Pai (Cascateamento)</Label>
               <Select
-                value={formData.parent_goal_id}
-                onValueChange={(value) => setFormData({ ...formData, parent_goal_id: value })}
+                value={formData.parent_goal_id || "none"}
+                onValueChange={(value) => setFormData({ ...formData, parent_goal_id: value === "none" ? "" : value })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Vincular a uma meta superior" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
+                  <SelectItem value="none">Nenhuma</SelectItem>
                   {parentGoals.map((pg) => (
                     <SelectItem key={pg.id} value={pg.id}>
                       [{goalLevelLabels[pg.level as GoalLevel]}] {pg.title}
