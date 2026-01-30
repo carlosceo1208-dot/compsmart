@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Loader2 } from "lucide-react";
+import { EmployeeCombobox } from "@/components/EmployeeCombobox";
 
 interface GoalDialogProps {
   open: boolean;
@@ -43,13 +44,13 @@ export function GoalDialog({ open, onOpenChange, goal, defaultLevel, parentGoalI
   const isEditing = !!goal;
 
   // Fetch employees for individual goals
-  const { data: employees } = useQuery({
+  const { data: employees = [] } = useQuery({
     queryKey: ["employees-for-goals", activeCompanyId],
     queryFn: async () => {
       if (!activeCompanyId) return [];
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name")
+        .select("id, full_name, avatar_url, job_title")
         .eq("root_company_id", activeCompanyId)
         .eq("status", "active")
         .order("full_name");
@@ -254,24 +255,15 @@ export function GoalDialog({ open, onOpenChange, goal, defaultLevel, parentGoalI
             </div>
           )}
 
-          {formData.level === "individual" && employees && (
+          {formData.level === "individual" && employees.length > 0 && (
             <div className="space-y-2">
               <Label htmlFor="employee">Colaborador *</Label>
-              <Select
+              <EmployeeCombobox
+                employees={employees}
                 value={formData.employee_id}
-                onValueChange={(value) => setFormData({ ...formData, employee_id: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o colaborador" />
-                </SelectTrigger>
-                <SelectContent>
-                  {employees.map((emp) => (
-                    <SelectItem key={emp.id} value={emp.id}>
-                      {emp.full_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                onChange={(value) => setFormData({ ...formData, employee_id: value })}
+                placeholder="Digite para buscar colaborador..."
+              />
             </div>
           )}
 

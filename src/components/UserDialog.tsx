@@ -13,7 +13,7 @@ import { Loader2, ChevronsUpDown } from "lucide-react";
 import { calculateSalaryRangePercentage, formatSalaryPercentage, getSalaryStatusBadge } from "@/lib/salaryCalculations";
 import { z } from "zod";
 import { useCompanyContext } from "@/contexts/CompanyContext";
-
+import { EmployeeCombobox } from "@/components/EmployeeCombobox";
 const userSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
   email: z.string().email("Email inválido").optional().or(z.literal('')),
@@ -1174,22 +1174,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="manager_id">Gestor Direto</Label>
-                  <select
-                    id="manager_id"
-                    value={formData.manager_id}
-                    onChange={(e) => setFormData({ ...formData, manager_id: e.target.value })}
+                  <EmployeeCombobox
+                    employees={managers.map(m => ({ id: m.id, full_name: m.full_name }))}
+                    value={formData.manager_id || ""}
+                    onChange={(value) => setFormData({ ...formData, manager_id: value })}
+                    placeholder="Digite para buscar gestor..."
                     disabled={loading}
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="">Selecione um gestor</option>
-                    {managers
-                      .filter(m => m.id !== userId) // Don't allow selecting self as manager
-                      .map((manager) => (
-                        <option key={manager.id} value={manager.id}>
-                          {manager.full_name}
-                        </option>
-                      ))}
-                  </select>
+                    excludeIds={userId ? [userId] : []}
+                  />
                   <p className="text-xs text-muted-foreground">
                     Defina quem é o gestor direto deste colaborador
                   </p>
