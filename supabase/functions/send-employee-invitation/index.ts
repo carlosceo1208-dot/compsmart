@@ -206,7 +206,7 @@ serve(async (req) => {
 
         // Enviar email
         const { error: emailError } = await resend.emails.send({
-          from: 'CompSmart <onboarding@resend.dev>',
+          from: 'CompSmart <noreply@compsmart.ia.br>',
           to: [employee.email],
           subject: `Bem-vindo(a) ao CompSmart - ${companyName}`,
           html: `
