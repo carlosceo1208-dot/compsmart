@@ -1,204 +1,63 @@
 
-# Plano: Sistema de Notificação e Celebração de Kudos
 
-## Problema Identificado
+# Plano: Ajustar Botão de Voltar no Módulo de Desempenho
 
-Atualmente, quando alguém envia um Kudos:
-- O colaborador só descobre quando abre manualmente a página de Kudos ou na avaliação de desempenho
-- Reconhecimento tardio perde o impacto emocional
-- Não há celebração visual que estimule o colaborador
+## Alteração Solicitada
 
-## Solução Proposta
-
-Criar um sistema completo de notificação em tempo real com celebração visual (confetes) quando o colaborador recebe um Kudos.
+Baseado na imagem de referência, modificar o texto e estilo do botão "Voltar ao Dashboard" para:
+- **Texto**: "Voltar ao Dashboard Gestão Remuneração"
+- **Cor**: Verde (igual à página principal do CompSmart)
+- **Peso**: Negrito (font-bold)
 
 ---
 
-## Arquivos a Criar
+## Arquivo a Modificar
 
-### 1. `src/components/kudos/KudosConfetti.tsx` (NOVO)
+**Arquivo:** `src/components/performance/PerformanceLayout.tsx`
 
-Componente de confetes específico para Kudos, com cores temáticas (roxo/índigo do módulo de performance):
-
-- Partículas coloridas caindo da tela
-- Estrelas douradas como no LaunchConfetti
-- Animação de 4-5 segundos
-- Aparece automaticamente ao receber Kudos
-
-### 2. `src/components/kudos/KudosNotificationPopup.tsx` (NOVO)
-
-Modal/Toast especial que aparece quando recebe um Kudos:
-
-```
-+----------------------------------------+
-| 🎉  Você recebeu um Kudos!            |
-+----------------------------------------+
-|                                        |
-|   👤 De: Maria Silva                   |
-|       Analista de RH                   |
-|                                        |
-|   🤝 Trabalho em Equipe                |
-|                                        |
-|   "Parabéns pelo excelente trabalho    |
-|    na entrega do projeto..."           |
-|                                        |
-|   [Ver Todos]      [Fechar]            |
-+----------------------------------------+
-```
-
-Características:
-- Aparece centralizado na tela
-- Animação de entrada suave
-- Botão para ver todos os Kudos recebidos
-- Auto-fecha após 10 segundos ou ao clicar
-
-### 3. `src/hooks/useKudosNotifications.ts` (NOVO)
-
-Hook que:
-- Escuta em tempo real a tabela `performance_kudos` via Supabase Realtime
-- Detecta novos Kudos onde `to_employee_id` = usuário atual
-- Dispara estado para mostrar confetes + popup
-- Armazena Kudos não lidos para o badge no header
+**Linhas 16-19**: Alterar classes CSS e texto do botão
 
 ---
 
-## Arquivos a Modificar
+## Mudanças Específicas
 
-### 4. `src/hooks/useHeaderNotifications.ts`
-
-Adicionar contagem de Kudos não visualizados:
-
-```typescript
-// Adicionar no useQuery
-const { count: unreadKudos } = await supabase
-  .from('performance_kudos')
-  .select('*', { count: 'exact', head: true })
-  .eq('to_employee_id', userId)
-  .eq('is_read', false);
+### Código Atual:
+```tsx
+<Button variant="ghost" size="sm" className="gap-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900/30">
+  <ArrowLeft className="h-4 w-4" />
+  Voltar ao Dashboard
+</Button>
 ```
 
-E adicionar subscription para `performance_kudos` no canal realtime existente.
-
-### 5. `src/components/dashboard/HeaderNotifications.tsx`
-
-Adicionar seção de Kudos pendentes no dropdown:
-
-```
-+----------------------------------------+
-| 🔔 Notificações                        |
-+----------------------------------------+
-| 🎉 Kudos Recebidos                     |
-|    2 novos reconhecimentos             |  [2]
-+----------------------------------------+
-| 📋 Aprovações Pendentes                |
-|    3 orçamentos aguardando             |  [3]
-+----------------------------------------+
-```
-
-Ao clicar, navega para `/performance/kudos?tab=received`.
-
-### 6. `src/components/DashboardLayout.tsx`
-
-Integrar o provider de notificações de Kudos:
-- Importar `KudosConfetti` e `KudosNotificationPopup`
-- Renderizar condicionalmente quando houver novo Kudos
-- Os componentes ficam em camada superior (z-index alto)
-
-### 7. `src/pages/performance/PerformanceKudos.tsx`
-
-Marcar Kudos como "lidos" quando o usuário visualiza a aba "Recebidos":
-- Chamar função para atualizar `is_read = true`
-- Limpar contador do header
-
----
-
-## Alteração no Banco de Dados
-
-### Adicionar coluna `is_read` na tabela `performance_kudos`
-
-```sql
-ALTER TABLE performance_kudos 
-ADD COLUMN is_read BOOLEAN DEFAULT false;
-
--- Atualizar kudos existentes como já lidos
-UPDATE performance_kudos SET is_read = true;
-
--- Habilitar realtime para a tabela
-ALTER PUBLICATION supabase_realtime ADD TABLE public.performance_kudos;
+### Código Novo:
+```tsx
+<Button variant="ghost" size="sm" className="gap-2 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30 font-bold">
+  <ArrowLeft className="h-4 w-4" />
+  Voltar ao Dashboard Gestão Remuneração
+</Button>
 ```
 
 ---
 
-## Fluxo de Funcionamento
+## Detalhes das Alterações de Estilo
 
-```
-1. Colaborador A envia Kudos para B
-           |
-           v
-2. Supabase insere registro com is_read=false
-           |
-           v
-3. Realtime dispara evento para todos listeners
-           |
-           v
-4. Browser do Colaborador B recebe o evento
-           |
-           v
-5. Hook detecta to_employee_id = usuário atual
-           |
-           v
-6. Dispara: Confetes + Popup celebratório
-           |
-           v
-7. Badge no header mostra "1" novo Kudos
-           |
-           v
-8. Ao abrir /performance/kudos (Recebidos)
-           |
-           v
-9. Marca is_read=true, limpa badge
-```
+| Propriedade | Antes | Depois |
+|-------------|-------|--------|
+| Cor do texto | `text-indigo-600` | `text-green-600` |
+| Hover cor texto | `hover:text-indigo-700` | `hover:text-green-700` |
+| Hover fundo | `hover:bg-indigo-100` | `hover:bg-green-100` |
+| Dark mode texto | `dark:text-indigo-400` | `dark:text-green-400` |
+| Dark hover fundo | `dark:hover:bg-indigo-900/30` | `dark:hover:bg-green-900/30` |
+| Peso da fonte | (normal) | `font-bold` |
+| Texto do botão | "Voltar ao Dashboard" | "Voltar ao Dashboard Gestão Remuneração" |
 
 ---
 
-## Componentes Visuais
+## Resultado Visual Esperado
 
-### Confetes (cores temáticas Kudos)
-- Roxo indigo: `hsl(245, 58%, 51%)`
-- Roxo claro: `hsl(245, 58%, 70%)`
-- Dourado: `hsl(45, 93%, 47%)`
-- Rosa: `hsl(330, 80%, 60%)`
-- Branco: `hsl(0, 0%, 100%)`
+O botão ficará:
+- Com texto verde vibrante (`green-600`) em destaque
+- Em **negrito** para maior visibilidade
+- Indicando claramente que retorna ao módulo de **Gestão de Remuneração**
+- Consistente com o tema verde da página principal do CompSmart
 
-### Toast/Popup
-- Borda gradiente roxo/dourado
-- Ícone animado (pulso)
-- Emoji da categoria do Kudos
-- Avatar do remetente
-
----
-
-## Resumo de Alterações
-
-| Arquivo | Tipo | Descrição |
-|---------|------|-----------|
-| `KudosConfetti.tsx` | Novo | Animação de confetes |
-| `KudosNotificationPopup.tsx` | Novo | Popup celebratório |
-| `useKudosNotifications.ts` | Novo | Hook realtime |
-| `useHeaderNotifications.ts` | Modificar | Adicionar contagem Kudos |
-| `HeaderNotifications.tsx` | Modificar | Adicionar item Kudos |
-| `DashboardLayout.tsx` | Modificar | Integrar componentes |
-| `PerformanceKudos.tsx` | Modificar | Marcar como lidos |
-| Migração SQL | Novo | Coluna is_read + realtime |
-
-**Total: 3 arquivos novos + 4 arquivos modificados + 1 migração**
-
----
-
-## Resultado Final
-
-1. Colaborador recebe Kudos -> confetes aparecem instantaneamente
-2. Popup mostra quem enviou e a mensagem
-3. Badge no sino do header indica quantos não lidos
-4. Ao visitar a página de Kudos, marca como lidos
-5. Experiência de reconhecimento imediata e celebratória
