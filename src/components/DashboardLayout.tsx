@@ -33,6 +33,9 @@ import { TrialBanner } from "@/components/dashboard/TrialBanner";
 import { TrialExpiredBlockScreen } from "@/components/dashboard/TrialExpiredBlockScreen";
 import { useFeatureAccess } from "@/hooks/useFeatureAccess";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
+import { KudosConfetti } from "@/components/kudos/KudosConfetti";
+import { KudosNotificationPopup } from "@/components/kudos/KudosNotificationPopup";
+import { useKudosNotifications } from "@/hooks/useKudosNotifications";
 
 interface UserProfile {
   full_name: string;
@@ -110,6 +113,10 @@ export const DashboardLayout = () => {
 
   // Check if user is super admin
   const { data: roleData } = useCurrentUserRole();
+  
+  // Kudos notification system
+  const { showConfetti, showPopup, currentKudos, dismissNotification } = useKudosNotifications();
+  
   // Get current page label for breadcrumbs
   const currentPath = location.pathname;
   const currentPageLabel = routeLabels[currentPath] || currentPath.replace("/", "").replace(/-/g, " ");
@@ -254,6 +261,14 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+      {/* Kudos Celebration Components */}
+      <KudosConfetti isActive={showConfetti} />
+      <KudosNotificationPopup 
+        isOpen={showPopup} 
+        onClose={dismissNotification} 
+        kudos={currentKudos} 
+      />
+      
       {/* Trial Banner - shows during trial period */}
       {status === 'trial' && daysLeftInTrial !== null && trialEndsAt && (
         <TrialBanner daysLeft={daysLeftInTrial} trialEndsAt={trialEndsAt} />

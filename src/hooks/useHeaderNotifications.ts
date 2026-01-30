@@ -1,12 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface NotificationCounts {
   pendingApprovals: number;
   activeAlerts: number;
   pendingAdjustments: number;
+  unreadKudos: number;
   total: number;
 }
 
@@ -15,12 +16,22 @@ export const useHeaderNotifications = () => {
   const queryClient = useQueryClient();
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get current user ID
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUserId(data.user?.id || null);
+    };
+    getUser();
+  }, []);
 
   const query = useQuery({
-    queryKey: ['header-notifications', activeCompanyId],
+    queryKey: ['header-notifications', activeCompanyId, userId],
     queryFn: async (): Promise<NotificationCounts> => {
       if (!activeCompanyId) {
-        return { pendingApprovals: 0, activeAlerts: 0, pendingAdjustments: 0, total: 0 };
+        return { pendingApprovals: 0, activeAlerts: 0, pendingAdjustments: 0, unreadKudos: 0, total: 0 };
       }
 
       // Fetch pending budget approvals
@@ -45,11 +56,23 @@ export const useHeaderNotifications = () => {
         .eq('fiscal_year', currentYear)
         .lte('effective_month', currentMonth);
 
+      // Fetch unread Kudos for current user
+      let unreadKudos = 0;
+      if (userId) {
+        const { count } = await supabase
+          .from('performance_kudos')
+          .select('*', { count: 'exact', head: true })
+          .eq('to_employee_id', userId)
+          .eq('is_read', false);
+        unreadKudos = count || 0;
+      }
+
       const counts = {
         pendingApprovals: pendingApprovals || 0,
         activeAlerts: activeAlerts || 0,
         pendingAdjustments: pendingAdjustments || 0,
-        total: (pendingApprovals || 0) + (activeAlerts || 0) + (pendingAdjustments || 0)
+        unreadKudos,
+        total: (pendingApprovals || 0) + (activeAlerts || 0) + (pendingAdjustments || 0) + unreadKudos
       };
 
       return counts;
@@ -79,6 +102,11 @@ export const useHeaderNotifications = () => {
         { event: '*', schema: 'public', table: 'collective_salary_adjustments' },
         () => queryClient.invalidateQueries({ queryKey: ['header-notifications'] })
       )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'performance_kudos' },
+        () => queryClient.invalidateQueries({ queryKey: ['header-notifications'] })
+      )
       .subscribe();
 
     return () => {
@@ -87,7 +115,7 @@ export const useHeaderNotifications = () => {
   }, [activeCompanyId, queryClient]);
 
   return {
-    ...query.data || { pendingApprovals: 0, activeAlerts: 0, pendingAdjustments: 0, total: 0 },
+    ...query.data || { pendingApprovals: 0, activeAlerts: 0, pendingAdjustments: 0, unreadKudos: 0, total: 0 },
     isLoading: query.isLoading,
   };
 };

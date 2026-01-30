@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,12 +8,16 @@ import { usePerformanceKudos, kudosCategoryLabels, type KudosWithRelations } fro
 import { KudosDialog } from "@/components/performance/KudosDialog";
 import { KudosCard } from "@/components/performance/KudosCard";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 
 export default function PerformanceKudos() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("all");
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'all';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: currentUser } = useQuery({
     queryKey: ["current-user"],
@@ -25,6 +29,31 @@ export default function PerformanceKudos() {
 
   const { kudos, isLoading } = usePerformanceKudos();
 
+  // Mark received kudos as read when viewing "received" tab
+  useEffect(() => {
+    if (activeTab === 'received' && currentUser?.id) {
+      const markAsRead = async () => {
+        const unreadKudos = kudos.filter(
+          k => k.to_employee_id === currentUser.id && !k.is_read
+        );
+        
+        if (unreadKudos.length > 0) {
+          await supabase
+            .from('performance_kudos')
+            .update({ is_read: true })
+            .eq('to_employee_id', currentUser.id)
+            .eq('is_read', false);
+          
+          // Invalidate header notifications to update badge
+          queryClient.invalidateQueries({ queryKey: ['header-notifications'] });
+          queryClient.invalidateQueries({ queryKey: ['performance-kudos'] });
+        }
+      };
+      
+      markAsRead();
+    }
+  }, [activeTab, currentUser?.id, kudos, queryClient]);
+
   const filteredKudos = kudos.filter((kudo) => {
     const matchesTab = 
       activeTab === "all" ||
@@ -35,6 +64,11 @@ export default function PerformanceKudos() {
   });
 
   const categoryOptions = Object.entries(kudosCategoryLabels);
+
+  // Count unread kudos for badge
+  const unreadCount = kudos.filter(
+    k => k.to_employee_id === currentUser?.id && !k.is_read
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -64,9 +98,17 @@ export default function PerformanceKudos() {
               <Globe className="h-4 w-4" />
               Todos
             </TabsTrigger>
-            <TabsTrigger value="received" className="flex items-center gap-1">
+            <TabsTrigger value="received" className="flex items-center gap-1 relative">
               <Inbox className="h-4 w-4" />
               Recebidos
+              {unreadCount > 0 && (
+                <Badge 
+                  variant="destructive" 
+                  className="ml-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {unreadCount}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="sent" className="flex items-center gap-1">
               <Send className="h-4 w-4" />
