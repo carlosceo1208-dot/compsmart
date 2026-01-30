@@ -78,85 +78,87 @@ export function KudosDialog({ open, onOpenChange }: KudosDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md flex flex-col max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             🎉 Enviar Kudos
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Para quem?</Label>
-            <EmployeeCombobox
-              employees={employees}
-              value={formData.to_employee_id}
-              onChange={(value) => setFormData({ ...formData, to_employee_id: value })}
-              placeholder="Digite para buscar colaborador..."
-            />
-          </div>
-
-          {selectedEmployee && (
-            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={selectedEmployee.avatar_url || undefined} />
-                <AvatarFallback>
-                  {selectedEmployee.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{selectedEmployee.full_name}</p>
-                {selectedEmployee.job_title && (
-                  <p className="text-xs text-muted-foreground">{selectedEmployee.job_title}</p>
-                )}
-              </div>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+            <div className="space-y-2">
+              <Label>Para quem?</Label>
+              <EmployeeCombobox
+                employees={employees}
+                value={formData.to_employee_id}
+                onChange={(value) => setFormData({ ...formData, to_employee_id: value })}
+                placeholder="Digite para buscar colaborador..."
+              />
             </div>
-          )}
 
-          <div className="space-y-2">
-            <Label>Categoria</Label>
-            <RadioGroup
-              value={formData.category}
-              onValueChange={(value) => setFormData({ ...formData, category: value as KudosCategory })}
-              className="grid grid-cols-2 gap-2"
-            >
-              {Object.entries(kudosCategoryLabels).map(([value, label]) => (
-                <div key={value} className="flex items-center space-x-2">
-                  <RadioGroupItem value={value} id={value} />
-                  <Label htmlFor={value} className="cursor-pointer text-sm">
-                    {kudosCategoryEmojis[value as KudosCategory]} {label}
-                  </Label>
+            {selectedEmployee && (
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedEmployee.avatar_url || undefined} />
+                  <AvatarFallback>
+                    {selectedEmployee.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{selectedEmployee.full_name}</p>
+                  {selectedEmployee.job_title && (
+                    <p className="text-xs text-muted-foreground">{selectedEmployee.job_title}</p>
+                  )}
                 </div>
-              ))}
-            </RadioGroup>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Categoria</Label>
+              <RadioGroup
+                value={formData.category}
+                onValueChange={(value) => setFormData({ ...formData, category: value as KudosCategory })}
+                className="grid grid-cols-2 gap-2"
+              >
+                {Object.entries(kudosCategoryLabels).map(([value, label]) => (
+                  <div key={value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={value} id={value} />
+                    <Label htmlFor={value} className="cursor-pointer text-sm">
+                      {kudosCategoryEmojis[value as KudosCategory]} {label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="message">Mensagem *</Label>
+              <Textarea
+                id="message"
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                placeholder="Escreva uma mensagem de reconhecimento..."
+                rows={4}
+                required
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="is_public"
+                checked={formData.is_public}
+                onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
+                className="rounded border-gray-300"
+              />
+              <Label htmlFor="is_public" className="text-sm cursor-pointer">
+                Visível para todos (público)
+              </Label>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="message">Mensagem *</Label>
-            <Textarea
-              id="message"
-              value={formData.message}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              placeholder="Escreva uma mensagem de reconhecimento..."
-              rows={4}
-              required
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="is_public"
-              checked={formData.is_public}
-              onChange={(e) => setFormData({ ...formData, is_public: e.target.checked })}
-              className="rounded border-gray-300"
-            />
-            <Label htmlFor="is_public" className="text-sm cursor-pointer">
-              Visível para todos (público)
-            </Label>
-          </div>
-
-          <DialogFooter>
+          <DialogFooter className="mt-4 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancelar
             </Button>
