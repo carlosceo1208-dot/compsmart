@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePerformancePDI, pdiActionTypeLabels, type PerformancePDI, type PDIActionItem, type PDIStatus } from "@/hooks/usePerformancePDI";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { EmployeeCombobox } from "@/components/EmployeeCombobox";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PDIDialogProps {
   open: boolean;
@@ -36,7 +37,7 @@ export function PDIDialog({ open, onOpenChange, pdi, employeeId }: PDIDialogProp
   const isEditing = !!pdi;
 
   // Fetch employees
-  const { data: employees } = useQuery({
+  const { data: employees = [] } = useQuery({
     queryKey: ["employees-for-pdi", activeCompanyId],
     queryFn: async () => {
       if (!activeCompanyId) return [];
@@ -144,30 +145,13 @@ export function PDIDialog({ open, onOpenChange, pdi, employeeId }: PDIDialogProp
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>Colaborador *</Label>
-            <Select
+            <EmployeeCombobox
+              employees={employees}
               value={formData.employee_id}
-              onValueChange={(value) => setFormData({ ...formData, employee_id: value })}
+              onChange={(value) => setFormData({ ...formData, employee_id: value })}
+              placeholder="Digite para buscar colaborador..."
               disabled={!!employeeId}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o colaborador" />
-              </SelectTrigger>
-              <SelectContent>
-                {employees?.map((emp) => (
-                  <SelectItem key={emp.id} value={emp.id}>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={emp.avatar_url || undefined} />
-                        <AvatarFallback className="text-xs">
-                          {emp.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{emp.full_name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </div>
 
           <div className="space-y-2">

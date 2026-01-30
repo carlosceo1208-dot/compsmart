@@ -1,9 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { 
@@ -16,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Loader2, Send } from "lucide-react";
+import { EmployeeCombobox } from "@/components/EmployeeCombobox";
 
 interface KudosDialogProps {
   open: boolean;
@@ -34,7 +34,7 @@ export function KudosDialog({ open, onOpenChange }: KudosDialogProps) {
   });
 
   // Fetch employees
-  const { data: employees, isLoading: loadingEmployees } = useQuery({
+  const { data: employees = [], isLoading: loadingEmployees } = useQuery({
     queryKey: ["employees-for-kudos", activeCompanyId],
     queryFn: async () => {
       if (!activeCompanyId) return [];
@@ -88,29 +88,12 @@ export function KudosDialog({ open, onOpenChange }: KudosDialogProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label>Para quem?</Label>
-            <Select
+            <EmployeeCombobox
+              employees={employees}
               value={formData.to_employee_id}
-              onValueChange={(value) => setFormData({ ...formData, to_employee_id: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione um colega" />
-              </SelectTrigger>
-              <SelectContent>
-                {employees?.map((emp) => (
-                  <SelectItem key={emp.id} value={emp.id}>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={emp.avatar_url || undefined} />
-                        <AvatarFallback className="text-xs">
-                          {emp.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{emp.full_name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={(value) => setFormData({ ...formData, to_employee_id: value })}
+              placeholder="Digite para buscar colaborador..."
+            />
           </div>
 
           {selectedEmployee && (

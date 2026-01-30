@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Loader2 } from "lucide-react";
+import { EmployeeCombobox } from "@/components/EmployeeCombobox";
 
 interface SuccessionDialogProps {
   open: boolean;
@@ -55,7 +56,7 @@ export function SuccessionDialog({ open, onOpenChange, succession }: SuccessionD
   });
 
   // Fetch employees (potential successors)
-  const { data: employees } = useQuery({
+  const { data: employees = [] } = useQuery({
     queryKey: ["employees-for-succession", activeCompanyId],
     queryFn: async () => {
       if (!activeCompanyId) return [];
@@ -156,34 +157,13 @@ export function SuccessionDialog({ open, onOpenChange, succession }: SuccessionD
 
           <div className="space-y-2">
             <Label>Potencial Sucessor *</Label>
-            <Select
+            <EmployeeCombobox
+              employees={employees}
               value={formData.successor_employee_id}
-              onValueChange={(value) => setFormData({ ...formData, successor_employee_id: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione o colaborador" />
-              </SelectTrigger>
-              <SelectContent>
-                {employees?.map((emp) => (
-                  <SelectItem key={emp.id} value={emp.id}>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={emp.avatar_url || undefined} />
-                        <AvatarFallback className="text-xs">
-                          {emp.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span>{emp.full_name}</span>
-                      {emp.grade && (
-                        <span className="text-xs text-muted-foreground">
-                          (Grade {emp.grade})
-                        </span>
-                      )}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={(value) => setFormData({ ...formData, successor_employee_id: value })}
+              placeholder="Digite para buscar colaborador..."
+              showGrade
+            />
           </div>
 
           {selectedEmployee && (
