@@ -39,7 +39,8 @@ export function usePerformanceSuccession(options: UseSuccessionOptions = {}) {
           created_by_user:profiles!performance_succession_created_by_fkey(full_name)
         `)
         .eq("root_company_id", activeCompanyId)
-        .order("created_at", { ascending: false });
+        .order("key_position_id")
+        .order("rank", { ascending: true });
 
       if (options.keyPositionId) {
         query = query.eq("key_position_id", options.keyPositionId);
@@ -174,3 +175,16 @@ export const readinessColors: Record<Readiness, string> = {
 };
 
 export const readinessOrder: Readiness[] = ["ready_now", "ready_1_year", "ready_2_years", "development"];
+
+// Ranking labels and icons
+export const rankLabels: Record<number, string> = {
+  1: "1º - Primeiro na Linha",
+  2: "2º - Segunda Opção",
+  3: "3º - Terceira Opção",
+};
+
+export const rankIcons: Record<number, string> = {
+  1: "🥇",
+  2: "🥈",
+  3: "🥉",
+};

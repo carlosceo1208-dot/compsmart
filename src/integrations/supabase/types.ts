@@ -3192,6 +3192,7 @@ export type Database = {
           id: string
           key_position_id: string
           notes: string | null
+          rank: number | null
           readiness: Database["public"]["Enums"]["performance_readiness"]
           root_company_id: string
           successor_employee_id: string
@@ -3204,6 +3205,7 @@ export type Database = {
           id?: string
           key_position_id: string
           notes?: string | null
+          rank?: number | null
           readiness?: Database["public"]["Enums"]["performance_readiness"]
           root_company_id: string
           successor_employee_id: string
@@ -3216,6 +3218,7 @@ export type Database = {
           id?: string
           key_position_id?: string
           notes?: string | null
+          rank?: number | null
           readiness?: Database["public"]["Enums"]["performance_readiness"]
           root_company_id?: string
           successor_employee_id?: string
