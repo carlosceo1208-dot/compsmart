@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -218,21 +219,31 @@ export default function PerformanceDashboard() {
                 Integrado com PLR/Incentivos e Programa de Mérito.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                  Metas Cascateadas
-                </Badge>
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                  9Box
-                </Badge>
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                  Kudos
-                </Badge>
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                  1:1s
-                </Badge>
-                <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
-                  PerformAI
-                </Badge>
+                <Link to="/performance/goals">
+                  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+                    Metas Cascateadas
+                  </Badge>
+                </Link>
+                <Link to="/performance/9box">
+                  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+                    9Box
+                  </Badge>
+                </Link>
+                <Link to="/performance/kudos">
+                  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+                    Kudos
+                  </Badge>
+                </Link>
+                <Link to="/performance/one-on-ones">
+                  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+                    1:1s
+                  </Badge>
+                </Link>
+                <Link to="/performance/assistant">
+                  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+                    PerformAI
+                  </Badge>
+                </Link>
               </div>
             </div>
           </div>
