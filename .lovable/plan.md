@@ -1,63 +1,129 @@
 
 
-# Plano: Ajustar Botão de Voltar no Módulo de Desempenho
+# Plano: Tornar os Badges do Módulo de Desempenho Clicáveis
 
-## Alteração Solicitada
+## Problema Identificado
 
-Baseado na imagem de referência, modificar o texto e estilo do botão "Voltar ao Dashboard" para:
-- **Texto**: "Voltar ao Dashboard Gestão Remuneração"
-- **Cor**: Verde (igual à página principal do CompSmart)
-- **Peso**: Negrito (font-bold)
+O card "Módulo de Avaliação de Desempenho" na parte inferior do dashboard contém badges (Metas Cascateadas, 9Box, Kudos, 1:1s, PerformAI) que são **apenas visuais** e não navegam para lugar nenhum.
+
+Isso causa confusão porque:
+- Visualmente parecem botões clicáveis
+- O usuário espera interatividade
+- Não há feedback ou ação ao clicar
+
+---
+
+## Solução Proposta
+
+Transformar os badges em **links navegáveis** que levam às respectivas páginas do módulo.
 
 ---
 
 ## Arquivo a Modificar
 
-**Arquivo:** `src/components/performance/PerformanceLayout.tsx`
+**Arquivo:** `src/pages/PerformanceDashboard.tsx`
 
-**Linhas 16-19**: Alterar classes CSS e texto do botão
+**Linhas 220-236**: Substituir badges estáticos por links clicáveis
 
 ---
 
 ## Mudanças Específicas
 
-### Código Atual:
+### Código Atual (linhas 220-236):
 ```tsx
-<Button variant="ghost" size="sm" className="gap-2 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900/30">
-  <ArrowLeft className="h-4 w-4" />
-  Voltar ao Dashboard
-</Button>
+<div className="flex flex-wrap gap-2">
+  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
+    Metas Cascateadas
+  </Badge>
+  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
+    9Box
+  </Badge>
+  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
+    Kudos
+  </Badge>
+  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
+    1:1s
+  </Badge>
+  <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">
+    PerformAI
+  </Badge>
+</div>
 ```
 
 ### Código Novo:
 ```tsx
-<Button variant="ghost" size="sm" className="gap-2 text-green-600 hover:text-green-700 hover:bg-green-100 dark:text-green-400 dark:hover:bg-green-900/30 font-bold">
-  <ArrowLeft className="h-4 w-4" />
-  Voltar ao Dashboard Gestão Remuneração
-</Button>
+<div className="flex flex-wrap gap-2">
+  <Link to="/performance/goals">
+    <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+      Metas Cascateadas
+    </Badge>
+  </Link>
+  <Link to="/performance/9box">
+    <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+      9Box
+    </Badge>
+  </Link>
+  <Link to="/performance/kudos">
+    <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+      Kudos
+    </Badge>
+  </Link>
+  <Link to="/performance/one-on-ones">
+    <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+      1:1s
+    </Badge>
+  </Link>
+  <Link to="/performance/assistant">
+    <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 cursor-pointer transition-colors">
+      PerformAI
+    </Badge>
+  </Link>
+</div>
 ```
 
 ---
 
-## Detalhes das Alterações de Estilo
+## Alterações Necessárias
 
-| Propriedade | Antes | Depois |
-|-------------|-------|--------|
-| Cor do texto | `text-indigo-600` | `text-green-600` |
-| Hover cor texto | `hover:text-indigo-700` | `hover:text-green-700` |
-| Hover fundo | `hover:bg-indigo-100` | `hover:bg-green-100` |
-| Dark mode texto | `dark:text-indigo-400` | `dark:text-green-400` |
-| Dark hover fundo | `dark:hover:bg-indigo-900/30` | `dark:hover:bg-green-900/30` |
-| Peso da fonte | (normal) | `font-bold` |
-| Texto do botão | "Voltar ao Dashboard" | "Voltar ao Dashboard Gestão Remuneração" |
+### 1. Adicionar import do Link (linha 1)
+```tsx
+import { Link } from "react-router-dom";
+```
+
+### 2. Mapeamento de badges para rotas
+
+| Badge | Rota de Destino |
+|-------|-----------------|
+| Metas Cascateadas | `/performance/goals` |
+| 9Box | `/performance/9box` |
+| Kudos | `/performance/kudos` |
+| 1:1s | `/performance/one-on-ones` |
+| PerformAI | `/performance/assistant` |
+
+### 3. Adicionar estilos de hover
+- `hover:bg-indigo-100` - feedback visual ao passar o mouse
+- `cursor-pointer` - indica que é clicável
+- `transition-colors` - animação suave
 
 ---
 
-## Resultado Visual Esperado
+## Resultado Esperado
 
-O botão ficará:
-- Com texto verde vibrante (`green-600`) em destaque
-- Em **negrito** para maior visibilidade
-- Indicando claramente que retorna ao módulo de **Gestão de Remuneração**
-- Consistente com o tema verde da página principal do CompSmart
+Após a alteração:
+- Cada badge será um link funcional
+- Ao clicar em "9Box", navega para `/performance/9box`
+- Ao clicar em "Kudos", navega para `/performance/kudos`
+- Efeito hover indica interatividade
+- UX consistente com expectativa do usuário
+
+---
+
+## Resumo
+
+| Item | Ação |
+|------|------|
+| Arquivo | `src/pages/PerformanceDashboard.tsx` |
+| Tipo | Modificação |
+| Linhas afetadas | 1 (import) + 220-236 (badges) |
+| Impacto | 5 badges tornam-se navegáveis |
 
