@@ -1,209 +1,110 @@
 
-# Plano: Múltiplos Sucessores com Ranking e Plano de Desenvolvimento
+# Plano: Padronizar Domínio de Email nas Edge Functions
 
-## Visão Geral
+## Situação Atual
 
-Expandir o módulo de Plano de Sucessão para permitir:
-- Até **3 sucessores** por posição-chave
-- **Ranking** de prioridade (1º, 2º, 3º)
-- **Plano de desenvolvimento** baseado em gaps de competências
+Após a verificação do domínio `compsmart.ia.br` no Resend, identifiquei **inconsistências** nos domínios de envio de email nas edge functions:
 
----
-
-## Alterações no Banco de Dados
-
-### Nova coluna na tabela `performance_succession`
-
-```sql
-ALTER TABLE performance_succession 
-ADD COLUMN rank INTEGER DEFAULT 1 CHECK (rank >= 1 AND rank <= 3);
-
--- Índice único para evitar duplicação de rank por posição
-CREATE UNIQUE INDEX idx_succession_position_rank 
-ON performance_succession (key_position_id, rank) 
-WHERE rank IS NOT NULL;
-
--- Comentário para documentação
-COMMENT ON COLUMN performance_succession.rank IS 'Ranking do sucessor (1=primeiro, 2=segundo, 3=terceiro)';
-```
+| Arquivo | Domínio Atual | Status |
+|---------|---------------|--------|
+| `send-employee-invitation` | `noreply@compsmart.ia.br` | OK |
+| `send-payment-emails` | `noreply@compsmart.com.br` | Precisa atualizar |
+| `send-trial-reminders` | `noreply@compsmart.com.br` | Precisa atualizar |
+| `send-budget-deadline-reminder` | `onboarding@resend.dev` | Precisa atualizar |
+| `check-agent-alerts` | `alerts@resend.dev` | Precisa atualizar |
+| `process-trial-expiration` | `noreply@compsmart.com.br` | Precisa atualizar |
+| `create-employee-user` | `noreply@compsmart.com.br` | Precisa atualizar |
+| `notify-budget-submission` | - | Verificar |
 
 ---
 
-## Arquivos a Modificar
+## Padronização Proposta
 
-### 1. `src/hooks/usePerformanceSuccession.ts`
+Todos os emails passarão a usar o domínio verificado `compsmart.ia.br`:
 
-**Alterações:**
-- Atualizar interface `SuccessionWithRelations` para incluir `rank`
-- Modificar a query para ordenar por `rank` dentro de cada posição
-- Adicionar validação para limitar 3 sucessores por posição
-- Atualizar a função `getSuccessionsByPosition()` para ordenar por rank
-
-**Código:**
-```typescript
-// Adicionar ao interface
-export interface SuccessionWithRelations extends PerformanceSuccession {
-  rank: number; // Novo campo
-  // ... campos existentes
-}
-
-// Modificar a query para ordenar por rank
-.order("key_position_id")
-.order("rank", { ascending: true })
-```
-
-### 2. `src/components/performance/SuccessionDialog.tsx`
-
-**Alterações:**
-- Adicionar campo para seleção de **Ranking** (1º, 2º, 3º)
-- Adicionar seção para **Gaps de Competências** entre cargo atual e posição-chave
-- Melhorar layout para acomodar novos campos
-- Validar que não existam mais de 3 sucessores para a mesma posição
-
-**Novos campos no formulário:**
-```tsx
-// Campo de Ranking
-<div className="space-y-2">
-  <Label>Ranking de Prioridade *</Label>
-  <Select value={formData.rank} onValueChange={...}>
-    <SelectItem value="1">1º - Primeiro na Linha</SelectItem>
-    <SelectItem value="2">2º - Segunda Opção</SelectItem>
-    <SelectItem value="3">3º - Terceira Opção</SelectItem>
-  </Select>
-</div>
-
-// Seção de Gaps (quando colaborador e posição selecionados)
-<div className="space-y-2">
-  <Label>Gaps Identificados</Label>
-  <Card className="p-3">
-    {gaps.map(gap => (
-      <div className="flex items-center gap-2">
-        <Badge variant="outline">{gap.competency}</Badge>
-        <span>{gap.current} → {gap.required}</span>
-      </div>
-    ))}
-  </Card>
-</div>
-```
-
-### 3. `src/pages/performance/PerformanceSuccession.tsx`
-
-**Alterações:**
-- Agrupar visualização por **posição-chave** (card por posição)
-- Mostrar até 3 sucessores rankeados dentro de cada card
-- Adicionar **medalhas visuais** para 1º, 2º, 3º lugar
-- Melhorar a exibição do plano de desenvolvimento
-
-**Nova estrutura visual:**
-```
-┌─────────────────────────────────────────────────┐
-│  Gerente de Mídia (346 • Grade 007)             │
-├─────────────────────────────────────────────────┤
-│ 🥇 1º José Anzois Pereira                       │
-│    Analista Sênior • Grade 005                  │
-│    Prontidão: Pronto em 2 Anos                  │
-│    Gaps: Liderança, Gestão de Projetos          │
-│    [Editar] [Remover]                           │
-├─────────────────────────────────────────────────┤
-│ 🥈 2º Maria Silva                               │
-│    Analista Pleno • Grade 004                   │
-│    Prontidão: Em Desenvolvimento                │
-│    Gaps: Comunicação Executiva, Excel Avançado  │
-│    [Editar] [Remover]                           │
-├─────────────────────────────────────────────────┤
-│ [+ Adicionar 3º Sucessor]                       │
-└─────────────────────────────────────────────────┘
-```
+| Tipo de Email | Remetente Padronizado |
+|---------------|----------------------|
+| Transacionais gerais | `CompSmart <noreply@compsmart.ia.br>` |
+| Alertas do sistema | `CompSmart Alertas <alerts@compsmart.ia.br>` |
+| Comercial/Marketing | `CompSmart <comercial@compsmart.ia.br>` |
 
 ---
 
-## Lógica de Gaps de Competências
+## Arquivos a Atualizar
 
-### Query para identificar gaps
+### 1. `supabase/functions/send-payment-emails/index.ts`
+- Linha 325: `noreply@compsmart.com.br` → `noreply@compsmart.ia.br`
+- Links no HTML: `compsmart.com.br` → `compsmart.ia.br`
 
-```typescript
-// Buscar competências do cargo-alvo (posição-chave)
-const positionCompetencies = await supabase
-  .from("job_title_competencies")
-  .select(`
-    competency:competencies(id, name, type),
-    required_level
-  `)
-  .eq("job_title_id", keyPositionId);
+### 2. `supabase/functions/send-trial-reminders/index.ts`
+- Linhas 330, 410: `noreply@compsmart.com.br` → `noreply@compsmart.ia.br`
+- Links no HTML: `compsmart.com.br` → `compsmart.ia.br`
 
-// Comparar com cargo atual do colaborador
-// Gap = competência requerida no cargo-alvo que não está no cargo atual
-// ou tem nível inferior
-```
+### 3. `supabase/functions/send-budget-deadline-reminder/index.ts`
+- Linha 242: `onboarding@resend.dev` → `noreply@compsmart.ia.br`
 
-### Sugestão automática de plano de desenvolvimento
+### 4. `supabase/functions/check-agent-alerts/index.ts`
+- Linha 391: `alerts@resend.dev` → `alerts@compsmart.ia.br`
 
-Baseado nos gaps identificados, sugerir ações:
-- **Gap técnico** → Cursos, certificações, treinamentos
-- **Gap comportamental** → Mentoria, coaching, feedback 360º
-- **Gap experiência** → Projetos especiais, job rotation
+### 5. `supabase/functions/process-trial-expiration/index.ts`
+- Atualizar domínio do remetente para `noreply@compsmart.ia.br`
 
----
+### 6. `supabase/functions/create-employee-user/index.ts`
+- Linha 28: `noreply@compsmart.com.br` → `noreply@compsmart.ia.br`
 
-## Validações de Negócio
-
-1. **Máximo 3 sucessores por posição**: Validar antes de inserir
-2. **Rank único por posição**: Não permitir duplicação (1º, 1º)
-3. **Colaborador não pode ser sucessor de si mesmo**
-4. **Colaborador não pode estar rankeado em múltiplas posições-chave** (opcional, discutir)
+### 7. `supabase/functions/notify-budget-submission/index.ts`
+- Verificar e atualizar domínio do remetente
 
 ---
 
-## Resumo de Alterações
+## Links nos Templates HTML
+
+Também atualizarei os links dos templates HTML para apontar para o domínio correto:
+
+| Link Atual | Link Atualizado |
+|------------|-----------------|
+| `compsmart.com.br/dashboard` | `compsmart.ia.br/dashboard` |
+| `compsmart.com.br/pricing` | `compsmart.ia.br/pricing` |
+| `compsmart.com.br/settings/billing` | `compsmart.ia.br/settings/billing` |
+| `compsmart.com.br/privacy` | `compsmart.ia.br/privacy` |
+| `suporte@compsmart.com.br` | `suporte@compsmart.ia.br` |
+| `comercial@compsmart.com.br` | `comercial@compsmart.ia.br` |
+
+---
+
+## Resumo das Alterações
 
 | Componente | Tipo | Descrição |
 |------------|------|-----------|
-| Banco de dados | Migration | Adicionar coluna `rank` + índice único |
-| `usePerformanceSuccession.ts` | Hook | Incluir rank, ordenação, validação |
-| `SuccessionDialog.tsx` | Dialog | Campo rank, seção gaps, plano desenvolvimento |
-| `PerformanceSuccession.tsx` | Page | Visualização agrupada por posição com cards |
+| `send-payment-emails` | Edge Function | Atualizar domínio + links |
+| `send-trial-reminders` | Edge Function | Atualizar domínio + links |
+| `send-budget-deadline-reminder` | Edge Function | Atualizar domínio |
+| `check-agent-alerts` | Edge Function | Atualizar domínio |
+| `process-trial-expiration` | Edge Function | Atualizar domínio + links |
+| `create-employee-user` | Edge Function | Atualizar domínio |
+| `notify-budget-submission` | Edge Function | Verificar e atualizar |
 
 ---
 
 ## Seção Técnica
 
-### Estrutura de dados atualizada
+### Padrão de Substituição
 
 ```typescript
-interface SuccessionWithRelations {
-  id: string;
-  key_position_id: string;
-  successor_employee_id: string;
-  rank: number; // NOVO: 1, 2, ou 3
-  readiness: Readiness;
-  development_plan: string | null;
-  notes: string | null;
-  key_position?: { title: string; grade: string; code: string };
-  successor?: { full_name: string; avatar_url: string | null; job_title: string | null; grade: string | null };
-  gaps?: CompetencyGap[]; // NOVO: gaps identificados
-}
+// ANTES
+from: "CompSmart <noreply@compsmart.com.br>"
+from: "CompSmart <onboarding@resend.dev>"
+from: "CompSmart Alertas <alerts@resend.dev>"
 
-interface CompetencyGap {
-  competency_id: string;
-  competency_name: string;
-  current_level: number | null;
-  required_level: number;
-  gap_type: 'technical' | 'behavioral' | 'leadership';
-}
+// DEPOIS
+from: "CompSmart <noreply@compsmart.ia.br>"
+from: "CompSmart <noreply@compsmart.ia.br>"
+from: "CompSmart Alertas <alerts@compsmart.ia.br>"
 ```
 
-### Labels para ranking
+### Benefícios
 
-```typescript
-export const rankLabels: Record<number, string> = {
-  1: "1º - Primeiro na Linha",
-  2: "2º - Segunda Opção",
-  3: "3º - Terceira Opção",
-};
-
-export const rankIcons: Record<number, string> = {
-  1: "🥇",
-  2: "🥈",
-  3: "🥉",
-};
-```
+1. **Deliverability melhorada**: Usar domínio verificado aumenta taxa de entrega
+2. **Consistência**: Todos os emails vêm do mesmo domínio
+3. **Profissionalismo**: Remove referências ao sandbox do Resend
+4. **SPF/DKIM corretos**: O domínio verificado tem as configurações DNS corretas
