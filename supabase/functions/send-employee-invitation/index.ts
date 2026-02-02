@@ -205,8 +205,9 @@ serve(async (req) => {
         }
 
         // Enviar email
+        // TEMPORÁRIO: usando domínio de teste do Resend até compsmart.ia.br ser verificado
         const { error: emailError } = await resend.emails.send({
-          from: 'CompSmart <noreply@compsmart.ia.br>',
+          from: 'CompSmart <onboarding@resend.dev>',
           to: [employee.email],
           subject: `Bem-vindo(a) ao CompSmart - ${companyName}`,
           html: `
