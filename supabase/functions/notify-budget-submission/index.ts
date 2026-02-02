@@ -79,7 +79,7 @@ const handler = async (req: Request): Promise<Response> => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            from: 'CompSmart <noreply@compsmart.app>',
+            from: 'CompSmart <noreply@compsmart.ia.br>',
             to: [profile.email!],
             subject: `📊 Novo Orçamento Submetido - ${unitName}`,
             html: `

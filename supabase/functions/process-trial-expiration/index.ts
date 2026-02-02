@@ -49,7 +49,7 @@ const getExpirationEmailTemplate = (data: Record<string, any>): { subject: strin
     <div class="footer">
       <p><strong>CompSmart</strong> - Gestão Inteligente em Remuneração</p>
       <p>Este email foi enviado automaticamente. Por favor, não responda.</p>
-      <p>Em conformidade com a LGPD | <a href="https://compsmart.com.br/privacy">Política de Privacidade</a></p>
+      <p>Em conformidade com a LGPD | <a href="https://compsmart.ia.br/privacy">Política de Privacidade</a></p>
     </div>
   `;
 
@@ -94,11 +94,11 @@ const getExpirationEmailTemplate = (data: Record<string, any>): { subject: strin
             </div>
             
             <center>
-              <a href="https://compsmart.com.br/pricing" class="button">Assinar Agora e Manter Meus Dados</a>
+              <a href="https://compsmart.ia.br/pricing" class="button">Assinar Agora e Manter Meus Dados</a>
             </center>
             
             <p style="font-size: 14px; color: #71717a;">
-              Precisa de ajuda? Entre em contato: comercial@compsmart.com.br
+              Precisa de ajuda? Entre em contato: comercial@compsmart.ia.br
             </p>
           </div>
           ${footer}
@@ -207,7 +207,7 @@ serve(async (req) => {
 
       try {
         await resend.emails.send({
-          from: "CompSmart <noreply@compsmart.com.br>",
+          from: "CompSmart <noreply@compsmart.ia.br>",
           to: [recipientEmail],
           subject,
           html,

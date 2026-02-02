@@ -239,7 +239,7 @@ const handler = async (req: Request): Promise<Response> => {
 
         try {
           await resend.emails.send({
-            from: "CompSmart <onboarding@resend.dev>",
+            from: "CompSmart <noreply@compsmart.ia.br>",
             to: [unit.managerEmail],
             subject: `🗓️ Lembrete: Prazo de Orçamento ${settings.fiscal_year} - ${urgencyText}`,
             html: emailHtml,

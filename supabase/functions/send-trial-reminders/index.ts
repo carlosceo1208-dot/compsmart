@@ -50,7 +50,7 @@ const getTrialReminderTemplate = (daysLeft: number, data: Record<string, any>): 
     <div class="footer">
       <p><strong>CompSmart</strong> - Gestão Inteligente em Remuneração</p>
       <p>Este email foi enviado automaticamente. Por favor, não responda.</p>
-      <p>Em conformidade com a LGPD | <a href="https://compsmart.com.br/privacy">Política de Privacidade</a></p>
+      <p>Em conformidade com a LGPD | <a href="https://compsmart.ia.br/privacy">Política de Privacidade</a></p>
     </div>
   `;
 
@@ -94,11 +94,11 @@ const getTrialReminderTemplate = (daysLeft: number, data: Record<string, any>): 
               </div>
               
               <center>
-                <a href="https://compsmart.com.br/pricing" class="button">Assinar Agora com 20% OFF</a>
+                <a href="https://compsmart.ia.br/pricing" class="button">Assinar Agora com 20% OFF</a>
               </center>
               
               <p style="font-size: 14px; color: #71717a;">
-                Dúvidas sobre qual plano escolher? Fale conosco: comercial@compsmart.com.br
+                Dúvidas sobre qual plano escolher? Fale conosco: comercial@compsmart.ia.br
               </p>
             </div>
             ${footer}
@@ -143,11 +143,11 @@ const getTrialReminderTemplate = (daysLeft: number, data: Record<string, any>): 
             ` : ''}
             
             <center>
-              <a href="https://compsmart.com.br/pricing" class="button">Ver Planos e Preços</a>
+              <a href="https://compsmart.ia.br/pricing" class="button">Ver Planos e Preços</a>
             </center>
             
             <p style="font-size: 14px; color: #71717a;">
-              Precisa de mais tempo para avaliar? Entre em contato: comercial@compsmart.com.br
+              Precisa de mais tempo para avaliar? Entre em contato: comercial@compsmart.ia.br
             </p>
           </div>
           ${footer}
@@ -189,7 +189,7 @@ const getGracePeriodReminderTemplate = (daysLeft: number, data: Record<string, a
     <div class="footer">
       <p><strong>CompSmart</strong> - Gestão Inteligente em Remuneração</p>
       <p>Este email foi enviado automaticamente. Por favor, não responda.</p>
-      <p>Em conformidade com a LGPD | <a href="https://compsmart.com.br/privacy">Política de Privacidade</a></p>
+      <p>Em conformidade com a LGPD | <a href="https://compsmart.ia.br/privacy">Política de Privacidade</a></p>
     </div>
   `;
 
@@ -238,11 +238,11 @@ const getGracePeriodReminderTemplate = (daysLeft: number, data: Record<string, a
             </div>
             
             <center>
-              <a href="https://compsmart.com.br/pricing" class="button">Assinar e Manter Meus Dados</a>
+              <a href="https://compsmart.ia.br/pricing" class="button">Assinar e Manter Meus Dados</a>
             </center>
             
             <p style="font-size: 14px; color: #71717a;">
-              Precisa de ajuda? Entre em contato: comercial@compsmart.com.br
+              Precisa de ajuda? Entre em contato: comercial@compsmart.ia.br
             </p>
           </div>
           ${footer}
@@ -327,7 +327,7 @@ serve(async (req) => {
 
       try {
         await resend.emails.send({
-          from: "CompSmart <noreply@compsmart.com.br>",
+          from: "CompSmart <noreply@compsmart.ia.br>",
           to: [recipientEmail],
           subject,
           html,
@@ -407,7 +407,7 @@ serve(async (req) => {
 
       try {
         await resend.emails.send({
-          from: "CompSmart <noreply@compsmart.com.br>",
+          from: "CompSmart <noreply@compsmart.ia.br>",
           to: [recipientEmail],
           subject,
           html,

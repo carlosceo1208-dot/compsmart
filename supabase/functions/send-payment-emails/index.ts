@@ -65,7 +65,7 @@ const getEmailTemplate = (type: EmailType, data: Record<string, any>): { subject
     <div class="footer">
       <p><strong>CompSmart</strong> - Gestão Inteligente em Remuneração</p>
       <p>Este email foi enviado automaticamente. Por favor, não responda.</p>
-      <p>Em conformidade com a LGPD | <a href="https://compsmart.com.br/privacy">Política de Privacidade</a></p>
+      <p>Em conformidade com a LGPD | <a href="https://compsmart.ia.br/privacy">Política de Privacidade</a></p>
     </div>
   `;
 
@@ -99,11 +99,11 @@ const getEmailTemplate = (type: EmailType, data: Record<string, any>): { subject
                 <p>Você já pode acessar todas as funcionalidades do seu plano.</p>
                 
                 <center>
-                  <a href="https://compsmart.com.br/dashboard" class="button">Acessar Dashboard</a>
+                  <a href="https://compsmart.ia.br/dashboard" class="button">Acessar Dashboard</a>
                 </center>
                 
                 <p style="font-size: 14px; color: #71717a;">
-                  Precisa de ajuda? Entre em contato pelo suporte@compsmart.com.br
+                  Precisa de ajuda? Entre em contato pelo suporte@compsmart.ia.br
                 </p>
               </div>
               ${footer}
@@ -145,11 +145,11 @@ const getEmailTemplate = (type: EmailType, data: Record<string, any>): { subject
                 </ol>
                 
                 <center>
-                  <a href="https://compsmart.com.br/dashboard" class="button">Começar Agora</a>
+                  <a href="https://compsmart.ia.br/dashboard" class="button">Começar Agora</a>
                 </center>
                 
                 <p style="font-size: 14px; color: #71717a;">
-                  Dúvidas? Nossa equipe está pronta para ajudar: suporte@compsmart.com.br
+                  Dúvidas? Nossa equipe está pronta para ajudar: suporte@compsmart.ia.br
                 </p>
               </div>
               ${footer}
@@ -191,7 +191,7 @@ const getEmailTemplate = (type: EmailType, data: Record<string, any>): { subject
                 </ul>
                 
                 <center>
-                  <a href="https://compsmart.com.br/settings/billing" class="button" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                  <a href="https://compsmart.ia.br/settings/billing" class="button" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
                     Atualizar Pagamento
                   </a>
                 </center>
@@ -234,7 +234,7 @@ const getEmailTemplate = (type: EmailType, data: Record<string, any>): { subject
                 <p>Se você não deseja renovar, pode cancelar antes da data de renovação nas configurações da sua conta.</p>
                 
                 <center>
-                  <a href="https://compsmart.com.br/settings/billing" class="button">Gerenciar Assinatura</a>
+                  <a href="https://compsmart.ia.br/settings/billing" class="button">Gerenciar Assinatura</a>
                 </center>
                 
                 <p style="font-size: 14px; color: #71717a;">
@@ -322,7 +322,7 @@ serve(async (req) => {
     const { subject, html } = getEmailTemplate(requestData.type, emailData);
 
     const emailResponse = await resend.emails.send({
-      from: "CompSmart <noreply@compsmart.com.br>",
+      from: "CompSmart <noreply@compsmart.ia.br>",
       to: [recipientEmail],
       subject,
       html,

@@ -25,7 +25,7 @@ async function sendWelcomeEmail(
   
   try {
     const { data, error } = await resend.emails.send({
-      from: 'CompSmart <noreply@compsmart.com.br>',
+      from: 'CompSmart <noreply@compsmart.ia.br>',
       to: [email],
       subject: `Bem-vindo(a) ao CompSmart - ${companyName}`,
       html: `
