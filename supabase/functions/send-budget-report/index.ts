@@ -153,7 +153,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Enviar emails para todos os destinatários
     const emailPromises = recipients.map(async (recipient) => {
       return resend.emails.send({
-        from: 'CompSmart <onboarding@resend.dev>',
+        from: 'CompSmart <noreply@compsmart.ia.br>',
         to: [recipient],
         subject: `Relatório de Aprovações de Orçamento - ${fiscalYear} - ${statusLabel}`,
         html: htmlBody,
