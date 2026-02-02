@@ -34,7 +34,7 @@ const getDeletionConfirmationEmail = (data: Record<string, any>): { subject: str
     <div class="footer">
       <p><strong>CompSmart</strong> - Gestão Inteligente em Remuneração</p>
       <p>Este email foi enviado automaticamente. Por favor, não responda.</p>
-      <p>Em conformidade com a LGPD | <a href="https://compsmart.com.br/privacy">Política de Privacidade</a></p>
+      <p>Em conformidade com a LGPD | <a href="https://compsmart.ia.br/privacy">Política de Privacidade</a></p>
     </div>
   `;
 
@@ -68,11 +68,11 @@ const getDeletionConfirmationEmail = (data: Record<string, any>): { subject: str
             <p>Sentiremos sua falta! Se você mudar de ideia, estamos sempre aqui para ajudá-lo com sua gestão de remuneração.</p>
             
             <center>
-              <a href="https://compsmart.com.br" class="button">Conhecer o CompSmart Novamente</a>
+              <a href="https://compsmart.ia.br" class="button">Conhecer o CompSmart Novamente</a>
             </center>
             
             <p style="font-size: 14px; color: #71717a;">
-              Dúvidas? Entre em contato: suporte@compsmart.com.br
+              Dúvidas? Entre em contato: suporte@compsmart.ia.br
             </p>
           </div>
           ${footer}
@@ -350,7 +350,7 @@ serve(async (req) => {
 
           try {
             await resend.emails.send({
-              from: "CompSmart <noreply@compsmart.com.br>",
+              from: "CompSmart <noreply@compsmart.ia.br>",
               to: [adminEmail],
               subject,
               html,
