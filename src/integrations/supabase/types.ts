@@ -1405,6 +1405,57 @@ export type Database = {
           },
         ]
       }
+      engagement_metrics: {
+        Row: {
+          created_at: string | null
+          cycle_id: string | null
+          id: string
+          metadata: Json | null
+          metric_type: string
+          metric_value: number
+          period_end: string
+          period_start: string
+          root_company_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          cycle_id?: string | null
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          metric_value: number
+          period_end: string
+          period_start: string
+          root_company_id: string
+        }
+        Update: {
+          created_at?: string | null
+          cycle_id?: string | null
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          metric_value?: number
+          period_end?: string
+          period_start?: string
+          root_company_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_metrics_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engagement_metrics_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       glossary_terms: {
         Row: {
           category: string
@@ -2280,6 +2331,87 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles_compensation_directory"
             referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      performance_alerts: {
+        Row: {
+          alert_type: string
+          context: Json | null
+          created_at: string | null
+          employee_id: string | null
+          id: string
+          is_resolved: boolean | null
+          message: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          root_company_id: string
+          severity: string
+          title: string
+        }
+        Insert: {
+          alert_type: string
+          context?: Json | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          message?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          root_company_id: string
+          severity: string
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          context?: Json | null
+          created_at?: string | null
+          employee_id?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          message?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          root_company_id?: string
+          severity?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_alerts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_alerts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_alerts_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_alerts_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_alerts_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
           },
         ]
       }
