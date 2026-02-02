@@ -388,7 +388,7 @@ async function sendAlertEmail(
   for (const recipient of recipients) {
     try {
       await resend.emails.send({
-        from: 'CompSmart Alertas <alerts@resend.dev>',
+        from: 'CompSmart Alertas <alerts@compsmart.ia.br>',
         to: [recipient],
         subject: `${severityLabels[severity]}: ${title}`,
         html: htmlBody,
