@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { useLocation } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -52,6 +53,15 @@ export const usePerformAI = () => {
     setIsLoading(true);
 
     try {
+      // Get the user's session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Você precisa estar logado para usar o PerformAI.');
+        setMessages(prev => prev.filter(m => m.timestamp !== userMessage.timestamp));
+        setIsLoading(false);
+        return;
+      }
+
       // Build context with employee info if selected
       let enrichedQuestion = content.trim();
       if (selectedEmployee) {
@@ -64,7 +74,7 @@ export const usePerformAI = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           question: enrichedQuestion,
