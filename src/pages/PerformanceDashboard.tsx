@@ -16,6 +16,7 @@ import {
   Bot,
   Sparkles,
   ArrowRight,
+  BarChart3,
 } from "lucide-react";
 
 import { EngagementCard } from "@/components/performance/EngagementCard";
@@ -147,8 +148,8 @@ export default function PerformanceDashboard() {
         <AlertsCard summary={summary} />
       </div>
 
-      {/* Bottom Row: 9Box + Activity + PerformAI */}
-      <div className="grid md:grid-cols-3 gap-4">
+      {/* Bottom Row: 9Box + Activity + PerformAI + People Analytics */}
+      <div className="grid md:grid-cols-4 gap-4">
         <Mini9BoxCard />
         <RecentActivityCard />
         
@@ -195,6 +196,56 @@ export default function PerformanceDashboard() {
               <Link to="/performance/assistant">
                 <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700">
                   Iniciar Conversa
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* People Analytics Card */}
+        <Card className="border-purple-200/50 dark:border-purple-800/30 bg-gradient-to-br from-purple-50 to-fuchsia-50 dark:from-purple-950/30 dark:to-fuchsia-950/30 overflow-hidden">
+          <CardContent className="p-4 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-700 flex items-center justify-center shadow-lg">
+                <BarChart3 className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-purple-900 dark:text-purple-100 flex items-center gap-2">
+                  People Analytics
+                  <Badge className="bg-purple-600 text-white text-[10px] px-1.5 py-0">
+                    Dados
+                  </Badge>
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Inteligência de RH
+                </p>
+              </div>
+            </div>
+            
+            <p className="text-sm text-muted-foreground flex-1 mb-4">
+              Analise turnover, engajamento, distribuição salarial e tome decisões estratégicas baseadas em dados.
+            </p>
+            
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-1.5">
+                <Badge variant="outline" className="text-[10px] bg-white/50 dark:bg-background/30">
+                  <TrendingUp className="h-2.5 w-2.5 mr-1" />
+                  Turnover
+                </Badge>
+                <Badge variant="outline" className="text-[10px] bg-white/50 dark:bg-background/30">
+                  <Users className="h-2.5 w-2.5 mr-1" />
+                  Headcount
+                </Badge>
+                <Badge variant="outline" className="text-[10px] bg-white/50 dark:bg-background/30">
+                  <BarChart3 className="h-2.5 w-2.5 mr-1" />
+                  Distribuição
+                </Badge>
+              </div>
+              
+              <Link to="/people-analytics">
+                <Button className="w-full bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700">
+                  Acessar Analytics
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
