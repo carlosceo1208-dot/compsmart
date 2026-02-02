@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 import {
   Target,
   Users,
@@ -10,42 +14,18 @@ import {
   Award,
   LayoutGrid,
   Bot,
+  Sparkles,
+  ArrowRight,
 } from "lucide-react";
 
-const quickStats = [
-  {
-    title: "Ciclo Ativo",
-    value: "2025",
-    subtitle: "Avaliação Anual",
-    icon: Calendar,
-    color: "text-indigo-600",
-    bgColor: "bg-indigo-100 dark:bg-indigo-900/30",
-  },
-  {
-    title: "Avaliações",
-    value: "0",
-    subtitle: "Pendentes",
-    icon: ClipboardCheck,
-    color: "text-amber-600",
-    bgColor: "bg-amber-100 dark:bg-amber-900/30",
-  },
-  {
-    title: "Metas",
-    value: "0",
-    subtitle: "Definidas",
-    icon: Target,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-  },
-  {
-    title: "PDIs",
-    value: "0",
-    subtitle: "Em Andamento",
-    icon: TrendingUp,
-    color: "text-blue-600",
-    bgColor: "bg-blue-100 dark:bg-blue-900/30",
-  },
-];
+import { EngagementCard } from "@/components/performance/EngagementCard";
+import { AlertsCard } from "@/components/performance/AlertsCard";
+import { ProfileExecutiveCard } from "@/components/performance/ProfileExecutiveCard";
+import { Mini9BoxCard } from "@/components/performance/Mini9BoxCard";
+import { RecentActivityCard } from "@/components/performance/RecentActivityCard";
+import { PerformanceKPICards } from "@/components/performance/PerformanceKPICards";
+import { usePerformanceAlerts } from "@/hooks/usePerformanceAlerts";
+import { useEngagementMetrics } from "@/hooks/useEngagementMetrics";
 
 const cycleStages = [
   { name: "Metas", status: "current", description: "Definição de metas" },
@@ -54,18 +34,71 @@ const cycleStages = [
   { name: "Fechamento", status: "pending", description: "Devolutiva final" },
 ];
 
-const quickActions = [
-  { label: "Criar Ciclo", icon: Calendar, href: "/performance/cycles" },
-  { label: "Nova Meta", icon: Target, href: "/performance/goals" },
-  { label: "Avaliar", icon: ClipboardCheck, href: "/performance/evaluations" },
-  { label: "9Box", icon: LayoutGrid, href: "/performance/9box" },
-  { label: "Enviar Kudos", icon: Award, href: "/performance/kudos" },
-  { label: "PerformAI", icon: Bot, href: "/performance/assistant" },
-];
-
 export default function PerformanceDashboard() {
+  const { activeCompanyId } = useCompanyContext();
+  const { summary } = usePerformanceAlerts();
+  const { metrics } = useEngagementMetrics();
+
+  // Fetch current user profile
+  const { data: currentUser } = useQuery({
+    queryKey: ['current-user-profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, job_title, avatar_url, unit_id')
+        .eq('id', user.id)
+        .single();
+      
+      return data;
+    },
+  });
+
+  // Fetch active cycle
+  const { data: activeCycle } = useQuery({
+    queryKey: ['active-cycle', activeCompanyId],
+    queryFn: async () => {
+      if (!activeCompanyId) return null;
+      
+      const { data } = await supabase
+        .from('performance_cycles')
+        .select('id, name, fiscal_year, status, is_active')
+        .eq('root_company_id', activeCompanyId)
+        .eq('is_active', true)
+        .single();
+      
+      return data;
+    },
+    enabled: !!activeCompanyId,
+  });
+
   return (
     <div className="space-y-6">
+      {/* Top Row: Profile + KPIs */}
+      <div className="grid lg:grid-cols-3 gap-4">
+        <ProfileExecutiveCard 
+          user={currentUser}
+          stats={{
+            pendingEvaluations: metrics.pendingEvaluations,
+            activeGoals: metrics.activeGoals,
+            activePdis: metrics.activePdis,
+          }}
+        />
+        
+        <div className="lg:col-span-2">
+          <PerformanceKPICards 
+            metrics={metrics}
+            cycleInfo={activeCycle ? {
+              name: activeCycle.name,
+              year: activeCycle.fiscal_year,
+              status: activeCycle.is_active ? 'active' : 'inactive',
+            } : undefined}
+          />
+        </div>
+      </div>
+
       {/* Cycle Progress */}
       <Card className="border-indigo-200/50 dark:border-indigo-800/30">
         <CardHeader className="pb-3">
@@ -80,7 +113,7 @@ export default function PerformanceDashboard() {
               <div key={stage.name} className="flex-1 relative">
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mb-2 ${
+                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mb-2 transition-all ${
                       stage.status === "current"
                         ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
                         : stage.status === "completed"
@@ -104,100 +137,67 @@ export default function PerformanceDashboard() {
         </CardContent>
       </Card>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {quickStats.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.title} className="border-indigo-200/50 dark:border-indigo-800/30">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.title}</p>
-                    <p className="text-2xl font-bold mt-1">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
-                  </div>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <Icon className={`h-5 w-5 ${stat.color}`} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Middle Row: Engagement + Alerts */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <EngagementCard 
+          enps={metrics.enps}
+          breakdown={metrics.enpsBreakdown}
+          adherenceRate={metrics.adherenceRate}
+        />
+        <AlertsCard summary={summary} />
       </div>
 
-      {/* Quick Actions */}
-      <Card className="border-indigo-200/50 dark:border-indigo-800/30">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
-            <Users className="h-5 w-5" />
-            Ações Rápidas
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-              return (
-                <a
-                  key={action.label}
-                  href={action.href}
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors border border-indigo-200/30 dark:border-indigo-800/30"
-                >
-                  <Icon className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-                  <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                    {action.label}
-                  </span>
-                </a>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Info Cards */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <Card className="border-indigo-200/50 dark:border-indigo-800/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
-              <Award className="h-5 w-5" />
-              Últimos Kudos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Award className="h-12 w-12 mb-3 opacity-30" />
-              <p className="text-sm">Nenhum kudos enviado ainda</p>
-              <a
-                href="/performance/kudos"
-                className="text-sm text-indigo-600 hover:underline mt-2"
-              >
-                Enviar primeiro kudos →
-              </a>
+      {/* Bottom Row: 9Box + Activity + PerformAI */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <Mini9BoxCard />
+        <RecentActivityCard />
+        
+        {/* PerformAI Promo Card */}
+        <Card className="border-indigo-200/50 dark:border-indigo-800/30 bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/30 dark:to-indigo-950/30 overflow-hidden">
+          <CardContent className="p-4 flex flex-col h-full">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-violet-600 to-indigo-700 flex items-center justify-center shadow-lg">
+                <Bot className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-violet-900 dark:text-violet-100 flex items-center gap-2">
+                  PerformAI
+                  <Badge className="bg-violet-600 text-white text-[10px] px-1.5 py-0">
+                    IA
+                  </Badge>
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Central de Inteligência
+                </p>
+              </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-indigo-200/50 dark:border-indigo-800/30">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
-              <Bot className="h-5 w-5" />
-              PerformAI
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-              <Bot className="h-12 w-12 mb-3 opacity-30" />
-              <p className="text-sm text-center">
-                Assistente de IA para avaliação de desempenho
-              </p>
-              <a
-                href="/performance/assistant"
-                className="text-sm text-indigo-600 hover:underline mt-2"
-              >
-                Iniciar conversa →
-              </a>
+            
+            <p className="text-sm text-muted-foreground flex-1 mb-4">
+              Analise colaboradores, gere devolutivas personalizadas, sugira PDIs e muito mais com IA.
+            </p>
+            
+            <div className="space-y-2">
+              <div className="flex flex-wrap gap-1.5">
+                <Badge variant="outline" className="text-[10px] bg-white/50 dark:bg-background/30">
+                  <Sparkles className="h-2.5 w-2.5 mr-1" />
+                  Devolutivas
+                </Badge>
+                <Badge variant="outline" className="text-[10px] bg-white/50 dark:bg-background/30">
+                  <Target className="h-2.5 w-2.5 mr-1" />
+                  PDI Automático
+                </Badge>
+                <Badge variant="outline" className="text-[10px] bg-white/50 dark:bg-background/30">
+                  <LayoutGrid className="h-2.5 w-2.5 mr-1" />
+                  Análise 9Box
+                </Badge>
+              </div>
+              
+              <Link to="/performance/assistant">
+                <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700">
+                  Iniciar Conversa
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
