@@ -64,20 +64,15 @@ const SelectContent = React.forwardRef<
 >(({ className, children, position = "popper", ...props }, ref) => {
   const viewportRef = React.useRef<HTMLDivElement>(null);
 
+  // Scroll to top when dropdown opens
   React.useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
 
-    const observer = new MutationObserver(() => {
-      const hasSelected = !!viewport.querySelector('[data-state="checked"]');
-      if (!hasSelected && viewport.parentElement?.getAttribute('data-state') === 'open') {
-        viewport.scrollTop = 0;
-      }
+    requestAnimationFrame(() => {
+      viewport.scrollTop = 0;
     });
-
-    observer.observe(viewport, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, []);
+  });
 
   return (
     <SelectPrimitive.Portal>
