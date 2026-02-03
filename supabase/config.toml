@@ -80,3 +80,6 @@ verify_jwt = false
 
 [functions.send-employee-invitation]
 verify_jwt = true
+
+[functions.send-external-feedback-request]
+verify_jwt = true
