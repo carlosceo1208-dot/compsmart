@@ -71,6 +71,10 @@ import PerformancePDI from "./pages/performance/PerformancePDI";
 import PerformanceSuccession from "./pages/performance/PerformanceSuccession";
 import PerformanceGlossary from "./pages/performance/PerformanceGlossary";
 import PerformanceAssistant from "./pages/performance/PerformanceAssistant";
+import ExternalFeedback360 from "./pages/performance/ExternalFeedback360";
+
+// Public Pages
+import ExternalFeedbackForm from "./pages/public/ExternalFeedbackForm";
 
 const queryClient = new QueryClient();
 
@@ -147,9 +151,13 @@ const App = () => (
               <Route path="/performance/kudos" element={<PerformanceKudos />} />
               <Route path="/performance/pdi" element={<PerformancePDI />} />
               <Route path="/performance/succession" element={<PerformanceSuccession />} />
+              <Route path="/performance/feedback-360" element={<ExternalFeedback360 />} />
               <Route path="/performance/glossary" element={<PerformanceGlossary />} />
               <Route path="/performance/assistant" element={<PerformanceAssistant />} />
             </Route>
+            
+            {/* Public Pages - No Authentication Required */}
+            <Route path="/feedback/:token" element={<ExternalFeedbackForm />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

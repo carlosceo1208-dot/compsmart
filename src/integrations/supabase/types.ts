@@ -1456,6 +1456,150 @@ export type Database = {
           },
         ]
       }
+      external_feedback_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          custom_message: string | null
+          cycle_id: string | null
+          deadline: string
+          employee_id: string
+          external_email: string
+          external_name: string
+          external_type: Database["public"]["Enums"]["external_evaluator_type"]
+          id: string
+          requested_by: string
+          root_company_id: string
+          sent_at: string | null
+          status: Database["public"]["Enums"]["external_feedback_status"]
+          template_questions: Json | null
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          custom_message?: string | null
+          cycle_id?: string | null
+          deadline: string
+          employee_id: string
+          external_email: string
+          external_name: string
+          external_type?: Database["public"]["Enums"]["external_evaluator_type"]
+          id?: string
+          requested_by: string
+          root_company_id: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["external_feedback_status"]
+          template_questions?: Json | null
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          custom_message?: string | null
+          cycle_id?: string | null
+          deadline?: string
+          employee_id?: string
+          external_email?: string
+          external_name?: string
+          external_type?: Database["public"]["Enums"]["external_evaluator_type"]
+          id?: string
+          requested_by?: string
+          root_company_id?: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["external_feedback_status"]
+          template_questions?: Json | null
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_feedback_requests_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      external_feedback_responses: {
+        Row: {
+          additional_comments: string | null
+          answers: Json
+          created_at: string
+          id: string
+          improvement_areas: string | null
+          overall_rating: number | null
+          request_id: string
+          strengths: string | null
+        }
+        Insert: {
+          additional_comments?: string | null
+          answers?: Json
+          created_at?: string
+          id?: string
+          improvement_areas?: string | null
+          overall_rating?: number | null
+          request_id: string
+          strengths?: string | null
+        }
+        Update: {
+          additional_comments?: string | null
+          answers?: Json
+          created_at?: string
+          id?: string
+          improvement_areas?: string | null
+          overall_rating?: number | null
+          request_id?: string
+          strengths?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "external_feedback_responses_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "external_feedback_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       glossary_terms: {
         Row: {
           category: string
@@ -4794,6 +4938,22 @@ export type Database = {
           unique_users: number
         }[]
       }
+      get_feedback_request_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          company_logo_url: string
+          company_name: string
+          custom_message: string
+          deadline: string
+          employee_job_title: string
+          employee_name: string
+          external_name: string
+          external_type: Database["public"]["Enums"]["external_evaluator_type"]
+          id: string
+          status: Database["public"]["Enums"]["external_feedback_status"]
+          template_questions: Json
+        }[]
+      }
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
       get_org_breadcrumb_friendly: {
         Args: { entity_id: string }
@@ -4835,12 +4995,30 @@ export type Database = {
           status: string
         }[]
       }
+      submit_external_feedback: {
+        Args: {
+          p_additional_comments: string
+          p_answers: Json
+          p_improvement_areas: string
+          p_overall_rating: number
+          p_strengths: string
+          p_token: string
+        }
+        Returns: string
+      }
       suggest_next_employee_number: { Args: never; Returns: string }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "hr_manager" | "manager" | "employee" | "super_admin"
       calculation_mode: "manual" | "automatic"
+      external_evaluator_type: "customer" | "supplier" | "partner" | "other"
+      external_feedback_status:
+        | "pending"
+        | "sent"
+        | "completed"
+        | "expired"
+        | "cancelled"
       performance_cycle_status:
         | "draft"
         | "goals"
@@ -5023,6 +5201,14 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "hr_manager", "manager", "employee", "super_admin"],
       calculation_mode: ["manual", "automatic"],
+      external_evaluator_type: ["customer", "supplier", "partner", "other"],
+      external_feedback_status: [
+        "pending",
+        "sent",
+        "completed",
+        "expired",
+        "cancelled",
+      ],
       performance_cycle_status: [
         "draft",
         "goals",

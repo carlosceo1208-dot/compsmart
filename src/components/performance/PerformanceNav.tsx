@@ -25,6 +25,7 @@ const navItems = [
   { path: "/performance/kudos", label: "Kudos", icon: Award },
   { path: "/performance/pdi", label: "PDI", icon: TrendingUp },
   { path: "/performance/succession", label: "Sucessão", icon: UserPlus },
+  { path: "/performance/feedback-360", label: "Feedback 360", icon: Users },
   { path: "/performance/glossary", label: "Glossário", icon: BookOpen },
   { path: "/performance/assistant", label: "PerformAI", icon: Bot },
 ];
