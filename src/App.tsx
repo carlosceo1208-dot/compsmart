@@ -72,6 +72,7 @@ import PerformanceSuccession from "./pages/performance/PerformanceSuccession";
 import PerformanceGlossary from "./pages/performance/PerformanceGlossary";
 import PerformanceAssistant from "./pages/performance/PerformanceAssistant";
 import ExternalFeedback360 from "./pages/performance/ExternalFeedback360";
+import PerformanceEmployees from "./pages/performance/PerformanceEmployees";
 
 // Public Pages
 import ExternalFeedbackForm from "./pages/public/ExternalFeedbackForm";
@@ -142,6 +143,7 @@ const App = () => (
             {/* Performance Module - Separate Layout */}
             <Route element={<PerformanceLayout />}>
               <Route path="/performance" element={<PerformanceDashboard />} />
+              <Route path="/performance/employees" element={<PerformanceEmployees />} />
               <Route path="/performance/cycles" element={<PerformanceCycles />} />
               <Route path="/performance/goals" element={<PerformanceGoals />} />
               <Route path="/performance/evaluations" element={<PerformanceEvaluations />} />

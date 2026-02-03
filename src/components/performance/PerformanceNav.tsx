@@ -16,6 +16,7 @@ import {
 
 const navItems = [
   { path: "/performance", label: "Dashboard", icon: LayoutGrid },
+  { path: "/performance/employees", label: "Colaboradores", icon: Users },
   { path: "/performance/cycles", label: "Ciclos", icon: Calendar },
   { path: "/performance/goals", label: "Metas", icon: Target },
   { path: "/performance/evaluations", label: "Avaliações", icon: ClipboardCheck },
