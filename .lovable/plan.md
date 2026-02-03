@@ -1,291 +1,310 @@
 
-# Plano: Revolução do Dashboard de Avaliação de Desempenho - Inspirado em Mindsight
+# Plano: Implementar Avaliacao 360 com Feedback Externo
 
-## Visao Geral da Inovacao
+## Contexto e Problema Identificado
 
-Analisando o site da Mindsight (https://conteudos.mindsight.com.br/sistemas-integrados-rh) e as capturas de tela fornecidas, identifiquei diferenciais visuais e funcionais impressionantes que podemos adaptar e superar no CompSmart.
+O modulo de Avaliacao de Desempenho atual nao possui funcionalidade de **Avaliacao 360 completa** com coleta de feedback de **pessoas externas a empresa** (clientes e fornecedores). O sistema ja tem o enum `performance_evaluation_angle` com valores "90", "180" e "360", porem nao esta sendo utilizado no fluxo.
 
-### Destaques da Mindsight que Vamos Superar:
-
-1. **IA Synapses** - IA integrada que transforma dados em insights claros
-2. **Dashboard Visual Rico** - Cards com foto do colaborador, metricas de engajamento, alertas visuais
-3. **Graficos Impressionantes** - eNPS, distribuicao de alertas, donuts interativos
-4. **Card de Perfil Executivo** - Foto + cargo + botoes de acao rapida (Metas, Combinados, PDI, etc)
-5. **Alertas de Performance** - Sistema de classificacao visual (Atencao/Neutros/Positivos)
+A Avaliacao 360 tradicional inclui apenas avaliadores internos (gestor, pares, subordinados). Para uma visao realmente holistica, e necessario capturar a perspectiva de stakeholders externos que interagem com o colaborador.
 
 ---
 
-## 1. PerformAI 2.0 - Assistente Inteligente Revolucionario
+## Solucao Proposta
 
-### Transformacao Proposta:
-
-**De:** Widget simples de chat com perguntas pre-definidas
-**Para:** Central de Inteligencia de Desempenho com capacidades avancadas
-
-### Novas Funcionalidades:
-
-| Funcionalidade | Descricao |
-|----------------|-----------|
-| **Analise de Colaborador** | Selecionar colaborador e receber resumo executivo com historico, tendencias e recomendacoes |
-| **Geracao de Devolutiva** | IA gera texto personalizado de feedback baseado nas avaliacoes |
-| **Sugestao Automatica de PDI** | Baseado em gaps identificados, sugere acoes de desenvolvimento |
-| **Comparativo Temporal** | "Como este colaborador evoluiu nos ultimos 3 ciclos?" |
-| **Predicao de Risco** | Alertas proativos: "Maria pode estar em risco de turnover" |
-| **Coach Virtual** | Perguntas guiadas para gestores: "Como dar feedback sobre baixa performance?" |
-
-### Melhorias de UX:
-
-- Streaming de respostas token-by-token
-- Historico de conversas persistente
-- Contexto do colaborador selecionado
-- Sugestoes dinamicas baseadas no contexto
-- Botoes de acao dentro das respostas (ex: "Criar PDI", "Agendar 1:1")
-
----
-
-## 2. Novo Dashboard de Desempenho - Visual Executivo
-
-### Layout Inspirado em Mindsight:
+### Visao Geral do Fluxo
 
 ```text
-+------------------------------------------+
-|  [Perfil do Gestor/HR]    [KPIs Rapidos] |
-|  +-------------------+  +--------------+ |
-|  | Foto + Nome       |  | Ciclo Ativo  | |
-|  | Cargo             |  | Avaliacoes   | |
-|  | [Botoes Acao]     |  | Pendentes    | |
-|  +-------------------+  +--------------+ |
-+------------------------------------------+
-|  [Engajamento]  [Alertas Performance]    |
-|  +-------------+ +---------------------+ |
-|  | eNPS: 65.8  | | 35 Alertas Total    | |
-|  | [Donut]     | | Atencao: 8 (Verm)   | |
-|  |             | | Neutros: 18 (Cinz)  | |
-|  |             | | Positivos: 7 (Verd) | |
-|  +-------------+ +---------------------+ |
-+------------------------------------------+
-|  [9Box Mini]  [Ultimos Kudos]  [1:1s]    |
-+------------------------------------------+
++-------------------+     +------------------+     +-------------------+
+|  Gestor/RH cria   | --> | E-mail enviado   | --> | Pessoa externa    |
+|  solicitacao de   |     | com link unico   |     | responde          |
+|  feedback 360     |     | + explicacao     |     | formulario        |
++-------------------+     +------------------+     +-------------------+
+                                                           |
+                                                           v
+                          +------------------+     +-------------------+
+                          | Gestor visualiza | <-- | Resposta salva    |
+                          | e consolida      |     | no sistema        |
+                          +------------------+     +-------------------+
 ```
-
-### Novos Cards:
-
-1. **Card de Engajamento (eNPS)**
-   - Score grande centralizado
-   - Grafico donut com Detratores/Neutros/Promotores
-   - Percentual de adesao das avaliacoes
-
-2. **Card de Alertas de Performance**
-   - Grafico donut com 3 categorias visuais
-   - Barras horizontais com cores
-   - Click-to-filter por tipo de alerta
-
-3. **Card de Perfil Executivo**
-   - Foto do usuario logado ou colaborador selecionado
-   - Nome + Cargo + Departamento
-   - Botoes de acao rapida: Metas, Combinados, PDI, Check-in
-
-4. **Mini 9Box Interativo**
-   - Versao compacta da matriz 9Box
-   - Indicadores visuais de distribuicao
-   - Click para expandir
-
-5. **Timeline de Atividades**
-   - Ultimas avaliacoes realizadas
-   - Kudos recentes
-   - PDIs criados
 
 ---
 
-## 3. Sistema de Alertas de Performance
+## Fase 1: Estrutura de Banco de Dados
 
-### Nova Tabela no Banco de Dados:
-```
-performance_alerts
-- id, employee_id, alert_type, severity, message, created_at, resolved_at
-```
+### 1.1 Nova Tabela: `external_feedback_requests`
 
-### Tipos de Alerta:
+Armazena as solicitacoes de feedback enviadas para pessoas externas.
 
-| Severidade | Cor | Exemplos |
-|------------|-----|----------|
-| **Atencao** | Vermelho | Score < 2.0, Meta atrasada >30 dias, 3+ meses sem 1:1 |
-| **Neutro** | Cinza | Avaliacao pendente, PDI proximo do prazo |
-| **Positivo** | Verde | Score > 4.0, Meta atingida, Top 10% performance |
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | UUID | Identificador unico |
+| root_company_id | UUID | Empresa |
+| cycle_id | UUID | Ciclo de avaliacao |
+| employee_id | UUID | Colaborador sendo avaliado |
+| requested_by | UUID | Gestor que solicitou |
+| external_name | TEXT | Nome do avaliador externo |
+| external_email | TEXT | E-mail do avaliador externo |
+| external_type | ENUM | "customer" ou "supplier" |
+| token | UUID | Token unico para acesso ao formulario |
+| deadline | TIMESTAMPTZ | Prazo para resposta |
+| status | ENUM | "pending", "sent", "completed", "expired" |
+| template_questions | JSONB | Perguntas especificas (opcional) |
+| created_at | TIMESTAMPTZ | Data de criacao |
+| sent_at | TIMESTAMPTZ | Data de envio do e-mail |
+| completed_at | TIMESTAMPTZ | Data da resposta |
 
-### Logica de Deteccao Automatica:
-- Edge function executada diariamente
-- Analisa scores, metas, prazos
-- Gera alertas automaticos
+### 1.2 Nova Tabela: `external_feedback_responses`
 
----
+Armazena as respostas recebidas dos avaliadores externos.
 
-## 4. Metricas de Engajamento
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | UUID | Identificador unico |
+| request_id | UUID | FK para external_feedback_requests |
+| answers | JSONB | Respostas as perguntas |
+| overall_rating | NUMERIC | Nota geral (1-5) |
+| strengths | TEXT | Pontos fortes identificados |
+| improvement_areas | TEXT | Areas de melhoria |
+| additional_comments | TEXT | Comentarios livres |
+| created_at | TIMESTAMPTZ | Data da resposta |
 
-### Calculo do eNPS:
-```
-eNPS = % Promotores (9-10) - % Detratores (0-6)
-```
-
-### Novos Indicadores:
-
-| Metrica | Descricao |
-|---------|-----------|
-| **eNPS** | Net Promoter Score do colaborador |
-| **Taxa de Adesao** | % de avaliacoes completadas |
-| **Indice de Feedback** | Frequencia de 1:1s e Kudos |
-| **Velocidade de PDI** | % de PDIs concluidos no prazo |
-
----
-
-## 5. Pagina do PerformAI Reformulada
-
-### Nova Estrutura:
-
-```text
-+----------------------------------------+
-| PerformAI - Central de Inteligencia    |
-+----------------------------------------+
-| [Contexto]        | [Chat Expandido]   |
-| +---------------+ | +----------------+ |
-| | Colaborador:  | | | Historico      | |
-| | [Selector]    | | | Conversas      | |
-| |               | | |                | |
-| | Dados Rapidos | | | Streaming      | |
-| | - Ciclo atual | | | Markdown       | |
-| | - Ultima AVD  | | |                | |
-| | - Score atual | | | [Acoes inline] | |
-| +---------------+ | +----------------+ |
-+----------------------------------------+
-| [Acoes Inteligentes]                   |
-| +------------------------------------+ |
-| | Gerar Devolutiva | Sugerir PDI    | |
-| | Analisar 9Box    | Comparar Ciclo | |
-| +------------------------------------+ |
-+----------------------------------------+
-```
-
-### Acoes Inteligentes com Contexto:
-
-1. **"Analisar Joao Silva"**
-   - PerformAI busca dados reais do banco
-   - Gera resumo executivo com historico
-   - Sugere acoes baseadas nos dados
-
-2. **"Gerar Devolutiva"**
-   - Considera scores, pontos fortes, areas de melhoria
-   - Gera texto personalizado pronto para usar
-   - Botao para copiar ou enviar
-
-3. **"Sugerir PDI"**
-   - Analisa gaps de competencias
-   - Lista 3-5 acoes de desenvolvimento
-   - Botao para criar PDI diretamente
-
----
-
-## 6. Graficos Impressionantes com Recharts
-
-### Novos Componentes de Visualizacao:
-
-1. **DonutChart com Centro Interativo**
-   - Numero grande no centro
-   - Legenda lateral
-   - Hover com detalhes
-
-2. **RadialProgress**
-   - Para metricas 0-100%
-   - Animacao de entrada
-   - Cores gradientes
-
-3. **HorizontalBarRace**
-   - Barras empilhadas
-   - Cores por categoria
-   - Labels inline
-
-4. **SparklineCards**
-   - Mini graficos de linha em cards
-   - Tendencia dos ultimos 6 meses
-   - Indicador de direcao
-
----
-
-## Secao Tecnica - Implementacao
-
-### Arquivos a Criar:
-
-| Arquivo | Descricao |
-|---------|-----------|
-| `src/components/performance/PerformanceInsightsDashboard.tsx` | Novo dashboard visual |
-| `src/components/performance/EngagementCard.tsx` | Card eNPS com donut |
-| `src/components/performance/AlertsCard.tsx` | Card alertas performance |
-| `src/components/performance/ProfileExecutiveCard.tsx` | Card perfil executivo |
-| `src/components/performance/Mini9BoxCard.tsx` | 9Box compacto |
-| `src/components/performance/PerformAIAssistant.tsx` | Nova pagina PerformAI |
-| `src/hooks/usePerformanceAlerts.ts` | Hook para alertas |
-| `src/hooks/useEngagementMetrics.ts` | Hook para metricas |
-| `supabase/functions/detect-performance-alerts/index.ts` | Edge function alertas |
-
-### Alteracoes em Arquivos Existentes:
-
-| Arquivo | Alteracao |
-|---------|-----------|
-| `src/pages/PerformanceDashboard.tsx` | Substituir por novo layout |
-| `src/pages/performance/PerformanceAssistant.tsx` | Upgrade completo |
-| `src/components/performance/PerformAIChat.tsx` | Adicionar streaming |
-| `src/hooks/usePerformAI.ts` | Adicionar selecao colaborador |
-| `supabase/functions/performance-assistant/index.ts` | Novos comandos IA |
-
-### Migracoes de Banco:
+### 1.3 Novo Enum: `external_evaluator_type`
 
 ```sql
--- Tabela de alertas de performance
-CREATE TABLE performance_alerts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  company_id UUID REFERENCES companies(id),
-  employee_id UUID REFERENCES employees(id),
-  alert_type TEXT NOT NULL,
-  severity TEXT NOT NULL CHECK (severity IN ('attention', 'neutral', 'positive')),
-  title TEXT NOT NULL,
-  message TEXT,
-  is_resolved BOOLEAN DEFAULT FALSE,
-  resolved_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+CREATE TYPE external_evaluator_type AS ENUM ('customer', 'supplier', 'partner', 'other');
+```
 
--- RLS policies
-ALTER TABLE performance_alerts ENABLE ROW LEVEL SECURITY;
+### 1.4 Atualizacao do Enum `performance_evaluator_type`
+
+Adicionar valor `external` para identificar avaliacoes vindas de externos.
+
+---
+
+## Fase 2: Backend - Edge Function
+
+### 2.1 Edge Function: `send-external-feedback-request`
+
+Responsavel por:
+- Gerar token unico de acesso
+- Compor e-mail explicativo com:
+  - Texto introdutorio sobre a ferramenta (o que e Avaliacao 360)
+  - Nome do colaborador sendo avaliado
+  - Link unico para o formulario
+  - Prazo para resposta
+  - Esclarecimento de anonimato/confidencialidade
+- Enviar via Resend
+- Atualizar status para "sent"
+
+### Modelo do E-mail
+
+```text
+Assunto: Solicitacao de Feedback - [Nome Colaborador] | [Nome Empresa]
+
+Prezado(a) [Nome Externo],
+
+A [Nome Empresa] esta realizando um ciclo de Avaliacao 360, 
+uma ferramenta de gestao de pessoas que busca coletar perspectivas 
+de diferentes stakeholders para desenvolver nossos colaboradores.
+
+Como voce interage com [Nome Colaborador] em sua funcao de [cargo], 
+gostaríamos de contar com sua contribuicao para esse processo.
+
+O que e Avaliacao 360?
+E um metodo onde coletamos feedback de multiplas fontes 
+(gestor, colegas, subordinados e parceiros externos como voce) 
+para obter uma visao completa do desempenho profissional.
+
+Suas respostas serao tratadas com confidencialidade e utilizadas 
+exclusivamente para fins de desenvolvimento profissional.
+
+Prazo para resposta: [DATA]
+
+[BOTAO: Responder Avaliacao]
+
+Tempo estimado: 5-10 minutos
+
+Agradecemos sua colaboracao!
+Equipe de RH - [Nome Empresa]
 ```
 
 ---
 
-## Resultado Esperado
+## Fase 3: Frontend - Componentes
 
-### Antes vs Depois:
+### 3.1 Nova Pagina: `ExternalFeedback360.tsx`
 
-| Aspecto | Antes | Depois |
-|---------|-------|--------|
-| **Dashboard** | Estatico, texto-heavy | Visual, graficos interativos, cards executivos |
-| **PerformAI** | Widget basico | Central de inteligencia com contexto |
-| **Alertas** | Inexistente | Sistema proativo de deteccao |
-| **Metricas** | KPIs simples | eNPS, engagement, tendencias |
-| **UX** | Funcional | Impressionante e user-friendly |
+Pagina para gestores gerenciarem solicitacoes de feedback externo:
+- Lista de solicitacoes enviadas com status
+- Botao para nova solicitacao
+- Visualizacao de respostas recebidas
+- Filtros por ciclo, colaborador, status
 
-### Diferenciais sobre Mindsight:
+### 3.2 Dialog: `ExternalFeedbackRequestDialog.tsx`
 
-1. **IA Generativa Real** - PerformAI gera conteudo, nao apenas analisa
-2. **Integracao Remuneracao** - Alertas conectados com merito e PLR
-3. **Acessibilidade** - Dark mode, responsive, acessivel
-4. **Customizacao** - Alertas configuraveis por empresa
+Formulario para criar nova solicitacao:
+- Selecao do colaborador
+- Dados do avaliador externo (nome, e-mail)
+- Tipo de relacionamento (cliente/fornecedor/parceiro)
+- Prazo para resposta
+- Perguntas customizadas (opcional)
+- Perguntas padrao pre-selecionadas
+
+### 3.3 Pagina Publica: `/feedback/:token`
+
+Formulario acessivel sem login para o avaliador externo:
+- Header com logo da empresa e explicacao breve
+- Card explicativo "O que e Avaliacao 360?"
+- Nome do colaborador sendo avaliado
+- Perguntas estruturadas
+- Campos de texto para pontos fortes/melhorias
+- Nota geral
+- Botao de envio
+- Tela de confirmacao pos-envio
 
 ---
 
-## Fases de Implementacao Sugeridas
+## Fase 4: Integracao com Modulo Existente
 
-| Fase | Entregaveis | Prioridade |
-|------|-------------|------------|
-| **1** | Dashboard visual + Cards de engajamento | Alta |
-| **2** | Sistema de alertas + Deteccao automatica | Alta |
-| **3** | PerformAI 2.0 com streaming e contexto | Media |
-| **4** | Graficos avancados + Animacoes | Media |
-| **5** | Predicao de riscos + Coach virtual | Baixa |
+### 4.1 Atualizacao do PerformanceNav
+
+Adicionar link para "Feedback 360" na navegacao:
+```javascript
+{ path: "/performance/feedback-360", label: "Feedback 360", icon: Users }
+```
+
+### 4.2 Atualizacao da Pagina de Avaliacoes
+
+Exibir badge indicando se avaliacao tem feedbacks externos coletados.
+
+### 4.3 Dashboard de Desempenho
+
+Adicionar card mostrando:
+- Total de solicitacoes enviadas
+- Pendentes de resposta
+- Recebidas no periodo
+
+---
+
+## Fase 5: Hooks e Servicos
+
+### 5.1 `useExternalFeedbackRequests.ts`
+
+Hook para gerenciar solicitacoes:
+- Listar solicitacoes por empresa/ciclo
+- Criar nova solicitacao
+- Reenviar e-mail
+- Cancelar solicitacao
+
+### 5.2 `useExternalFeedbackResponses.ts`
+
+Hook para gerenciar respostas:
+- Listar respostas por solicitacao
+- Visualizar detalhes da resposta
+- Exportar para relatorio
+
+---
+
+## Fase 6: Perguntas Padrao Sugeridas
+
+O sistema oferecera um conjunto de perguntas padrao que podem ser personalizadas:
+
+### Para Clientes:
+1. Como voce avalia a qualidade do atendimento prestado por [Nome]?
+2. O colaborador demonstra conhecimento tecnico adequado?
+3. Como e a comunicacao e clareza nas interacoes?
+4. O colaborador cumpre prazos e compromissos?
+5. Voce recomendaria trabalhar com este profissional?
+
+### Para Fornecedores:
+1. Como voce avalia a clareza nas negociacoes com [Nome]?
+2. O colaborador demonstra profissionalismo e etica?
+3. A comunicacao e objetiva e respeitosa?
+4. Os compromissos acordados sao cumpridos?
+5. Como e o relacionamento profissional de modo geral?
+
+---
+
+## Secao Tecnica
+
+### Estrutura de Arquivos
+
+```text
+src/
+  pages/
+    performance/
+      ExternalFeedback360.tsx          # Pagina de gestao
+    public/
+      ExternalFeedbackForm.tsx         # Formulario publico
+  
+  components/
+    performance/
+      ExternalFeedbackRequestDialog.tsx
+      ExternalFeedbackResponseCard.tsx
+      ExternalFeedbackStatusBadge.tsx
+  
+  hooks/
+    useExternalFeedbackRequests.ts
+    useExternalFeedbackResponses.ts
+
+supabase/
+  functions/
+    send-external-feedback-request/
+      index.ts
+```
+
+### Rotas
+
+```javascript
+// Rota protegida (dentro do PerformanceLayout)
+<Route path="/performance/feedback-360" element={<ExternalFeedback360 />} />
+
+// Rota publica (sem autenticacao)
+<Route path="/feedback/:token" element={<ExternalFeedbackForm />} />
+```
+
+### RLS Policies
+
+```sql
+-- Gestores e RH podem criar/ver solicitacoes da sua empresa
+CREATE POLICY "Managers can manage feedback requests"
+ON external_feedback_requests
+FOR ALL
+USING (root_company_id = get_user_company_id());
+
+-- Respostas publicas via token (sem autenticacao)
+CREATE POLICY "Public can submit responses via token"
+ON external_feedback_responses
+FOR INSERT
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM external_feedback_requests
+    WHERE id = request_id
+    AND status = 'sent'
+    AND deadline > NOW()
+  )
+);
+```
+
+---
+
+## Estimativa de Complexidade
+
+| Componente | Complexidade | Motivo |
+|------------|--------------|--------|
+| Banco de Dados | Media | 2 tabelas + 1 enum + policies |
+| Edge Function | Media | Integracao Resend + template |
+| Pagina Gestao | Media | CRUD + listagem + filtros |
+| Formulario Publico | Alta | Rota publica + validacoes + UX |
+| Integracao | Baixa | Adicionar links e badges |
+
+---
+
+## Proximos Passos Apos Aprovacao
+
+1. Criar migration com tabelas e enums
+2. Implementar Edge Function de envio
+3. Criar pagina de gestao de solicitacoes
+4. Criar formulario publico
+5. Integrar com navegacao existente
+6. Testar fluxo completo
+
