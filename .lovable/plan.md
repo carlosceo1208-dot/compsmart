@@ -1,226 +1,175 @@
 
-# Plano: Implementar Avaliacao 360 com Feedback Externo
+# Plano: Implementar Pagina de Colaboradores no Modulo de Performance com Visibilidade Segmentada
 
-## Contexto e Problema Identificado
+## Problema Identificado
 
-O modulo de Avaliacao de Desempenho atual nao possui funcionalidade de **Avaliacao 360 completa** com coleta de feedback de **pessoas externas a empresa** (clientes e fornecedores). O sistema ja tem o enum `performance_evaluation_angle` com valores "90", "180" e "360", porem nao esta sendo utilizado no fluxo.
+O modulo de Avaliacao de Desempenho nao possui uma pagina centralizada de "Colaboradores" que permita ao gestor visualizar e acessar rapidamente informacoes de desempenho da sua equipe. Alem disso, a visibilidade dos dados precisa seguir regras estritas:
 
-A Avaliacao 360 tradicional inclui apenas avaliadores internos (gestor, pares, subordinados). Para uma visao realmente holistica, e necessario capturar a perspectiva de stakeholders externos que interagem com o colaborador.
+- **Colaborador comum**: Acessa APENAS seus proprios dados
+- **Gestor**: Acessa dados dos seus subordinados diretos (via `manager_id`)
+- **RH/Admin**: Acessa todos os colaboradores da empresa
+- **Isolamento multi-tenant**: Dados de diferentes empresas NUNCA se misturam
 
 ---
 
 ## Solucao Proposta
 
-### Visao Geral do Fluxo
+### Arquitetura de Visibilidade
 
 ```text
-+-------------------+     +------------------+     +-------------------+
-|  Gestor/RH cria   | --> | E-mail enviado   | --> | Pessoa externa    |
-|  solicitacao de   |     | com link unico   |     | responde          |
-|  feedback 360     |     | + explicacao     |     | formulario        |
-+-------------------+     +------------------+     +-------------------+
-                                                           |
-                                                           v
-                          +------------------+     +-------------------+
-                          | Gestor visualiza | <-- | Resposta salva    |
-                          | e consolida      |     | no sistema        |
-                          +------------------+     +-------------------+
++------------------+     +------------------+     +------------------+
+|   COLABORADOR    |     |     GESTOR       |     |    RH/ADMIN      |
+|                  |     |                  |     |                  |
+|  Ve apenas       |     |  Ve subordinados |     |  Ve todos da     |
+|  proprio perfil  |     |  diretos         |     |  empresa         |
++------------------+     +------------------+     +------------------+
+        |                        |                        |
+        v                        v                        v
++--------------------------------------------------------------+
+|                    FILTROS POR HIERARQUIA                    |
+|  Area > Departamento > Setor > Projeto                       |
++--------------------------------------------------------------+
+                                |
+                                v
+                  +------------------------+
+                  | ROOT_COMPANY_ID FILTER |
+                  | (Isolamento Multi-tenant)|
+                  +------------------------+
 ```
 
 ---
 
-## Fase 1: Estrutura de Banco de Dados
+## Fase 1: Novo Hook - usePerformanceEmployees
 
-### 1.1 Nova Tabela: `external_feedback_requests`
+Criar hook centralizado que aplica regras de visibilidade automaticamente:
 
-Armazena as solicitacoes de feedback enviadas para pessoas externas.
+| Role | Regra de Visibilidade |
+|------|----------------------|
+| employee | `.eq("id", auth.uid())` - Apenas proprio perfil |
+| manager | `.eq("manager_id", auth.uid())` - Subordinados diretos |
+| hr_manager | `.eq("root_company_id", activeCompanyId)` - Todos da empresa |
+| admin | `.eq("root_company_id", activeCompanyId)` - Todos da empresa |
 
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Identificador unico |
-| root_company_id | UUID | Empresa |
-| cycle_id | UUID | Ciclo de avaliacao |
-| employee_id | UUID | Colaborador sendo avaliado |
-| requested_by | UUID | Gestor que solicitou |
-| external_name | TEXT | Nome do avaliador externo |
-| external_email | TEXT | E-mail do avaliador externo |
-| external_type | ENUM | "customer" ou "supplier" |
-| token | UUID | Token unico para acesso ao formulario |
-| deadline | TIMESTAMPTZ | Prazo para resposta |
-| status | ENUM | "pending", "sent", "completed", "expired" |
-| template_questions | JSONB | Perguntas especificas (opcional) |
-| created_at | TIMESTAMPTZ | Data de criacao |
-| sent_at | TIMESTAMPTZ | Data de envio do e-mail |
-| completed_at | TIMESTAMPTZ | Data da resposta |
+### Recursos do Hook:
 
-### 1.2 Nova Tabela: `external_feedback_responses`
+- Busca de colaboradores com filtros por unidade organizacional
+- Dados agregados de desempenho (avaliacao atual, metas, PDIs)
+- Paginacao e busca por nome
+- Indicadores visuais (foto, cargo, grade, status de avaliacao)
 
-Armazena as respostas recebidas dos avaliadores externos.
+---
 
-| Coluna | Tipo | Descricao |
-|--------|------|-----------|
-| id | UUID | Identificador unico |
-| request_id | UUID | FK para external_feedback_requests |
-| answers | JSONB | Respostas as perguntas |
-| overall_rating | NUMERIC | Nota geral (1-5) |
-| strengths | TEXT | Pontos fortes identificados |
-| improvement_areas | TEXT | Areas de melhoria |
-| additional_comments | TEXT | Comentarios livres |
-| created_at | TIMESTAMPTZ | Data da resposta |
+## Fase 2: Nova Pagina - PerformanceEmployees.tsx
 
-### 1.3 Novo Enum: `external_evaluator_type`
+### 2.1 Layout da Pagina
+
+Pagina com visao de cards/lista de colaboradores:
+
+- **Header**: Titulo + Botao de filtros + Busca
+- **KPIs**: Total de colaboradores, % com avaliacao concluida, % com PDI ativo
+- **Cards de Colaboradores**: Foto, nome, cargo, grade, indicadores de performance
+- **Filtros**: Area, Departamento, Setor, Status de avaliacao
+
+### 2.2 Card do Colaborador
+
+Cada card exibe:
+- Avatar + Nome + Cargo
+- Grade
+- Status da avaliacao atual (badge colorido)
+- Icones de acesso rapido: Metas, 1:1, PDI, Avaliacao
+- Indicador de feedbacks externos pendentes
+
+### 2.3 Acoes por Card
+
+- Clicar no card abre drawer lateral com detalhes
+- Botoes de acao: Ver Metas, Agendar 1:1, Ver PDI, Iniciar Avaliacao
+
+---
+
+## Fase 3: Drawer de Detalhes do Colaborador
+
+Quando gestor clica em um colaborador, abre drawer lateral com:
+
+### Tabs:
+1. **Resumo**: Dados cadastrais + ultimas avaliacoes + 9Box
+2. **Metas**: Metas individuais do colaborador + progresso
+3. **Avaliacoes**: Historico de avaliacoes + notas
+4. **PDI**: Planos de desenvolvimento ativos
+5. **1:1s**: Historico de reunioes 1:1
+6. **Feedbacks 360**: Externos recebidos
+
+---
+
+## Fase 4: Atualizacao da Navegacao
+
+Adicionar item "Colaboradores" no PerformanceNav:
+
+```javascript
+{ path: "/performance/employees", label: "Colaboradores", icon: Users }
+```
+
+**Posicao**: Logo apos "Dashboard", antes de "Ciclos"
+
+---
+
+## Fase 5: RLS e Seguranca (Banco de Dados)
+
+### 5.1 Nova Funcao: get_visible_employees()
+
+Funcao SQL que retorna IDs de colaboradores visiveis para o usuario atual:
 
 ```sql
-CREATE TYPE external_evaluator_type AS ENUM ('customer', 'supplier', 'partner', 'other');
+CREATE FUNCTION get_visible_employees(p_user_id UUID, p_company_id UUID)
+RETURNS TABLE(employee_id UUID)
+AS $$
+BEGIN
+  -- Se Admin ou HR, retorna todos da empresa
+  IF has_any_role(p_user_id, ARRAY['admin', 'hr_manager']) THEN
+    RETURN QUERY
+    SELECT id FROM profiles WHERE root_company_id = p_company_id;
+  
+  -- Se Manager, retorna subordinados diretos + proprio
+  ELSIF has_role(p_user_id, 'manager') THEN
+    RETURN QUERY
+    SELECT id FROM profiles 
+    WHERE (manager_id = p_user_id OR id = p_user_id)
+    AND root_company_id = p_company_id;
+  
+  -- Senao, apenas proprio perfil
+  ELSE
+    RETURN QUERY
+    SELECT id FROM profiles WHERE id = p_user_id;
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
-### 1.4 Atualizacao do Enum `performance_evaluator_type`
+### 5.2 View: v_performance_employees
 
-Adicionar valor `external` para identificar avaliacoes vindas de externos.
+View segura que expoe apenas dados permitidos:
 
----
-
-## Fase 2: Backend - Edge Function
-
-### 2.1 Edge Function: `send-external-feedback-request`
-
-Responsavel por:
-- Gerar token unico de acesso
-- Compor e-mail explicativo com:
-  - Texto introdutorio sobre a ferramenta (o que e Avaliacao 360)
-  - Nome do colaborador sendo avaliado
-  - Link unico para o formulario
-  - Prazo para resposta
-  - Esclarecimento de anonimato/confidencialidade
-- Enviar via Resend
-- Atualizar status para "sent"
-
-### Modelo do E-mail
-
-```text
-Assunto: Solicitacao de Feedback - [Nome Colaborador] | [Nome Empresa]
-
-Prezado(a) [Nome Externo],
-
-A [Nome Empresa] esta realizando um ciclo de Avaliacao 360, 
-uma ferramenta de gestao de pessoas que busca coletar perspectivas 
-de diferentes stakeholders para desenvolver nossos colaboradores.
-
-Como voce interage com [Nome Colaborador] em sua funcao de [cargo], 
-gostaríamos de contar com sua contribuicao para esse processo.
-
-O que e Avaliacao 360?
-E um metodo onde coletamos feedback de multiplas fontes 
-(gestor, colegas, subordinados e parceiros externos como voce) 
-para obter uma visao completa do desempenho profissional.
-
-Suas respostas serao tratadas com confidencialidade e utilizadas 
-exclusivamente para fins de desenvolvimento profissional.
-
-Prazo para resposta: [DATA]
-
-[BOTAO: Responder Avaliacao]
-
-Tempo estimado: 5-10 minutos
-
-Agradecemos sua colaboracao!
-Equipe de RH - [Nome Empresa]
-```
+- Dados cadastrais basicos (sem PII sensivel para gestores)
+- Ultima nota de avaliacao
+- Contagem de metas/PDIs
+- Status de feedbacks pendentes
 
 ---
 
-## Fase 3: Frontend - Componentes
+## Fase 6: Filtros Hierarquicos
 
-### 3.1 Nova Pagina: `ExternalFeedback360.tsx`
+### Componente: PerformanceEmployeeFilters
 
-Pagina para gestores gerenciarem solicitacoes de feedback externo:
-- Lista de solicitacoes enviadas com status
-- Botao para nova solicitacao
-- Visualizacao de respostas recebidas
-- Filtros por ciclo, colaborador, status
+Filtros em cascata baseados na estrutura organizacional:
 
-### 3.2 Dialog: `ExternalFeedbackRequestDialog.tsx`
+1. **Matriz/Filial** (nivel 1)
+2. **Area** (nivel 2)
+3. **Departamento** (nivel 3)
+4. **Setor** (nivel 4)
+5. **Projeto** (nivel 5 - opcional)
 
-Formulario para criar nova solicitacao:
-- Selecao do colaborador
-- Dados do avaliador externo (nome, e-mail)
-- Tipo de relacionamento (cliente/fornecedor/parceiro)
-- Prazo para resposta
-- Perguntas customizadas (opcional)
-- Perguntas padrao pre-selecionadas
-
-### 3.3 Pagina Publica: `/feedback/:token`
-
-Formulario acessivel sem login para o avaliador externo:
-- Header com logo da empresa e explicacao breve
-- Card explicativo "O que e Avaliacao 360?"
-- Nome do colaborador sendo avaliado
-- Perguntas estruturadas
-- Campos de texto para pontos fortes/melhorias
-- Nota geral
-- Botao de envio
-- Tela de confirmacao pos-envio
-
----
-
-## Fase 4: Integracao com Modulo Existente
-
-### 4.1 Atualizacao do PerformanceNav
-
-Adicionar link para "Feedback 360" na navegacao:
-```javascript
-{ path: "/performance/feedback-360", label: "Feedback 360", icon: Users }
-```
-
-### 4.2 Atualizacao da Pagina de Avaliacoes
-
-Exibir badge indicando se avaliacao tem feedbacks externos coletados.
-
-### 4.3 Dashboard de Desempenho
-
-Adicionar card mostrando:
-- Total de solicitacoes enviadas
-- Pendentes de resposta
-- Recebidas no periodo
-
----
-
-## Fase 5: Hooks e Servicos
-
-### 5.1 `useExternalFeedbackRequests.ts`
-
-Hook para gerenciar solicitacoes:
-- Listar solicitacoes por empresa/ciclo
-- Criar nova solicitacao
-- Reenviar e-mail
-- Cancelar solicitacao
-
-### 5.2 `useExternalFeedbackResponses.ts`
-
-Hook para gerenciar respostas:
-- Listar respostas por solicitacao
-- Visualizar detalhes da resposta
-- Exportar para relatorio
-
----
-
-## Fase 6: Perguntas Padrao Sugeridas
-
-O sistema oferecera um conjunto de perguntas padrao que podem ser personalizadas:
-
-### Para Clientes:
-1. Como voce avalia a qualidade do atendimento prestado por [Nome]?
-2. O colaborador demonstra conhecimento tecnico adequado?
-3. Como e a comunicacao e clareza nas interacoes?
-4. O colaborador cumpre prazos e compromissos?
-5. Voce recomendaria trabalhar com este profissional?
-
-### Para Fornecedores:
-1. Como voce avalia a clareza nas negociacoes com [Nome]?
-2. O colaborador demonstra profissionalismo e etica?
-3. A comunicacao e objetiva e respeitosa?
-4. Os compromissos acordados sao cumpridos?
-5. Como e o relacionamento profissional de modo geral?
+Os filtros respeitam a visibilidade do usuario:
+- Gestor ve apenas unidades dos seus subordinados
+- RH/Admin ve todas as unidades da empresa
 
 ---
 
@@ -232,58 +181,56 @@ O sistema oferecera um conjunto de perguntas padrao que podem ser personalizadas
 src/
   pages/
     performance/
-      ExternalFeedback360.tsx          # Pagina de gestao
-    public/
-      ExternalFeedbackForm.tsx         # Formulario publico
+      PerformanceEmployees.tsx        # Nova pagina principal
   
   components/
     performance/
-      ExternalFeedbackRequestDialog.tsx
-      ExternalFeedbackResponseCard.tsx
-      ExternalFeedbackStatusBadge.tsx
-  
-  hooks/
-    useExternalFeedbackRequests.ts
-    useExternalFeedbackResponses.ts
+      EmployeeCard.tsx                # Card de colaborador
+      EmployeeDrawer.tsx              # Drawer de detalhes
+      EmployeeFilters.tsx             # Filtros hierarquicos
+      EmployeeKPIBar.tsx              # Barra de KPIs
 
-supabase/
-  functions/
-    send-external-feedback-request/
-      index.ts
+  hooks/
+    usePerformanceEmployees.ts        # Hook com visibilidade
+    useSubordinates.ts                # Hook para subordinados diretos
 ```
 
-### Rotas
+### Rota
 
 ```javascript
-// Rota protegida (dentro do PerformanceLayout)
-<Route path="/performance/feedback-360" element={<ExternalFeedback360 />} />
-
-// Rota publica (sem autenticacao)
-<Route path="/feedback/:token" element={<ExternalFeedbackForm />} />
+// Dentro do PerformanceLayout
+<Route path="/performance/employees" element={<PerformanceEmployees />} />
 ```
 
-### RLS Policies
+### Exemplo de Uso do Hook
 
-```sql
--- Gestores e RH podem criar/ver solicitacoes da sua empresa
-CREATE POLICY "Managers can manage feedback requests"
-ON external_feedback_requests
-FOR ALL
-USING (root_company_id = get_user_company_id());
+```typescript
+const { employees, isLoading, filters } = usePerformanceEmployees({
+  unitId: selectedUnitId,
+  evaluationStatus: 'pending',
+  search: searchTerm,
+});
 
--- Respostas publicas via token (sem autenticacao)
-CREATE POLICY "Public can submit responses via token"
-ON external_feedback_responses
-FOR INSERT
-WITH CHECK (
-  EXISTS (
-    SELECT 1 FROM external_feedback_requests
-    WHERE id = request_id
-    AND status = 'sent'
-    AND deadline > NOW()
-  )
-);
+// O hook automaticamente aplica:
+// - Filtro por root_company_id (multi-tenant)
+// - Filtro por visibilidade (colaborador/gestor/RH)
+// - Paginacao
 ```
+
+---
+
+## Regras de Seguranca (Resumo)
+
+| Papel | Ve Colaboradores | Ve Salarios | Ve PII |
+|-------|-----------------|-------------|--------|
+| Colaborador | Apenas proprio | Proprio | Proprio |
+| Gestor | Subordinados | NAO | NAO |
+| RH | Todos da empresa | SIM | SIM |
+| Admin | Todos da empresa | SIM | SIM |
+
+- **PII** = CPF, telefone, email pessoal, data nascimento
+- Gestores veem: Nome, cargo, grade, foto, dados de performance
+- RLS no banco de dados + filtros no frontend (dupla camada)
 
 ---
 
@@ -291,20 +238,20 @@ WITH CHECK (
 
 | Componente | Complexidade | Motivo |
 |------------|--------------|--------|
-| Banco de Dados | Media | 2 tabelas + 1 enum + policies |
-| Edge Function | Media | Integracao Resend + template |
-| Pagina Gestao | Media | CRUD + listagem + filtros |
-| Formulario Publico | Alta | Rota publica + validacoes + UX |
-| Integracao | Baixa | Adicionar links e badges |
+| Hook usePerformanceEmployees | Media | Logica de visibilidade + joins |
+| Funcao SQL get_visible_employees | Media | Roles + hierarquia |
+| Pagina PerformanceEmployees | Media | Lista + filtros + KPIs |
+| EmployeeDrawer | Alta | 6 tabs com dados diferentes |
+| Filtros Hierarquicos | Media | Cascata dinamica |
+| Integracao Nav | Baixa | Adicionar 1 item |
 
 ---
 
 ## Proximos Passos Apos Aprovacao
 
-1. Criar migration com tabelas e enums
-2. Implementar Edge Function de envio
-3. Criar pagina de gestao de solicitacoes
-4. Criar formulario publico
-5. Integrar com navegacao existente
-6. Testar fluxo completo
-
+1. Criar funcao SQL `get_visible_employees`
+2. Criar hook `usePerformanceEmployees` com visibilidade
+3. Criar componentes de UI (Card, Drawer, Filters)
+4. Criar pagina `PerformanceEmployees.tsx`
+5. Adicionar rota e navegacao
+6. Testar visibilidade com diferentes roles
