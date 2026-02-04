@@ -3,7 +3,10 @@ import { Badge } from "@/components/ui/badge";
 import { Target, ArrowRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, 
+  BarChart, Bar, XAxis, YAxis, LineChart, Line, CartesianGrid 
+} from "recharts";
 
 interface GoalsProgressChartProps {
   activeGoals: number;
@@ -20,24 +23,57 @@ export const GoalsProgressChart = ({
 }: GoalsProgressChartProps) => {
   const total = activeGoals + achievedGoals + pendingGoals + overdueGoals;
   
-  const chartData = [
+  const statusData = [
     { name: "Atingidas", value: achievedGoals, color: "#22c55e" },
     { name: "Em Progresso", value: activeGoals, color: "#3b82f6" },
     { name: "Pendentes", value: pendingGoals, color: "#94a3b8" },
     { name: "Atrasadas", value: overdueGoals, color: "#ef4444" },
   ].filter(d => d.value > 0);
 
+  // Mock data for types distribution (inspired by Elofy)
+  const typesData = [
+    { name: "Individual", value: Math.ceil(total * 0.4), color: "#a855f7" },
+    { name: "Equipe", value: Math.ceil(total * 0.3), color: "#3b82f6" },
+    { name: "Empresa", value: Math.ceil(total * 0.2), color: "#1e3a5f" },
+    { name: "Departamento", value: Math.ceil(total * 0.1), color: "#fbbf24" },
+  ].filter(d => d.value > 0);
+
+  // Mock trend data for line chart
+  const trendData = [
+    { month: "Jan", value: 2 },
+    { month: "Fev", value: 4 },
+    { month: "Mar", value: 3 },
+    { month: "Abr", value: 6 },
+    { month: "Mai", value: 4 },
+    { month: "Jun", value: 5 },
+  ];
+
+  // Bar chart data by priority
+  const priorityData = [
+    { name: "Alta", value: Math.ceil(achievedGoals * 0.5) || 1, fill: "#a855f7" },
+    { name: "Média", value: Math.ceil(activeGoals * 0.6) || 1, fill: "#a855f7" },
+    { name: "Baixa", value: Math.ceil(pendingGoals * 0.4) || 1, fill: "#a855f7" },
+    { name: "Crítica", value: Math.ceil(overdueGoals * 0.3) || 1, fill: "#a855f7" },
+  ];
+
   const completionRate = total > 0 
     ? Math.round((achievedGoals / total) * 100) 
     : 0;
 
+  const tooltipStyle = {
+    backgroundColor: 'hsl(var(--background))',
+    border: '1px solid hsl(var(--border))',
+    borderRadius: '8px',
+    fontSize: '11px',
+  };
+
   return (
-    <Card className="border-indigo-200/50 dark:border-indigo-800/30 overflow-hidden">
+    <Card className="border-indigo-200/50 dark:border-indigo-800/30 overflow-hidden col-span-2">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-indigo-700 dark:text-indigo-300 flex items-center justify-between">
           <span className="flex items-center gap-2">
             <Target className="h-4 w-4" />
-            Progresso das Metas
+            Gestão de Metas OKRs
           </span>
           <Link to="/performance/goals">
             <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-indigo-600 hover:text-indigo-700">
@@ -49,77 +85,139 @@ export const GoalsProgressChart = ({
       </CardHeader>
       <CardContent className="pt-0">
         {total > 0 ? (
-          <div className="flex items-center gap-4">
-            {/* Donut Chart */}
-            <div className="relative w-32 h-32">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={35}
-                    outerRadius={55}
-                    paddingAngle={3}
-                    dataKey="value"
-                    strokeWidth={0}
-                  >
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number, name: string) => [`${value} metas`, name]}
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px',
-                      fontSize: '12px',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-emerald-600">{completionRate}%</span>
-                <span className="text-[10px] text-muted-foreground">Concluídas</span>
+          <div className="grid grid-cols-3 gap-3">
+            {/* Row 1: Progress Donut + Types Donut + Line Chart */}
+            
+            {/* Progress Donut */}
+            <div className="bg-muted/30 rounded-lg p-3">
+              <p className="text-[10px] text-muted-foreground mb-1 font-medium">Objetivo | Progresso</p>
+              <div className="relative h-24 flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={statusData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={28}
+                      outerRadius={40}
+                      paddingAngle={2}
+                      dataKey="value"
+                      strokeWidth={0}
+                    >
+                      {statusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => [`${value}`, '']} contentStyle={tooltipStyle} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-xl font-bold text-foreground">{completionRate}%</span>
+                </div>
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="flex-1 space-y-3">
-              {/* Progress bars */}
-              <div className="space-y-2">
-                {chartData.map((item) => (
-                  <div key={item.name} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <div 
-                          className="w-2.5 h-2.5 rounded-full" 
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="text-muted-foreground">{item.name}</span>
+            {/* Types Donut */}
+            <div className="bg-muted/30 rounded-lg p-3">
+              <p className="text-[10px] text-muted-foreground mb-1 font-medium">Objetivo | Tipos</p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <div className="space-y-1">
+                    {typesData.map((item) => (
+                      <div key={item.name} className="flex items-center gap-1.5 text-[9px]">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="text-muted-foreground truncate">{item.name}</span>
                       </div>
-                      <span className="font-semibold">{item.value}</span>
-                    </div>
-                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all duration-700"
-                        style={{ 
-                          width: `${(item.value / total) * 100}%`,
-                          backgroundColor: item.color 
-                        }}
-                      />
-                    </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+                <div className="h-20 w-20">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={typesData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={20}
+                        outerRadius={35}
+                        paddingAngle={2}
+                        dataKey="value"
+                        strokeWidth={0}
+                      >
+                        {typesData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => [`${value}`, '']} contentStyle={tooltipStyle} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
+            </div>
 
-              {/* Total indicator */}
-              <div className="pt-2 border-t border-border flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Total de metas</span>
-                <Badge variant="secondary" className="text-xs">
-                  {total}
-                </Badge>
+            {/* Line Chart - Trend */}
+            <div className="bg-muted/30 rounded-lg p-3">
+              <p className="text-[10px] text-muted-foreground mb-1 font-medium">Objetivo | Evolução</p>
+              <div className="h-20">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                    <Line 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#a855f7" 
+                      strokeWidth={2}
+                      dot={{ fill: "#a855f7", strokeWidth: 0, r: 3 }}
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`${value} metas`, '']} 
+                      contentStyle={tooltipStyle}
+                      labelStyle={{ fontSize: '10px' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Row 2: Total Count + Bar Chart */}
+            
+            {/* Total Count */}
+            <div className="bg-muted/30 rounded-lg p-3 flex flex-col justify-center">
+              <p className="text-[10px] text-muted-foreground mb-1 font-medium">Objetivo | Total</p>
+              <div className="flex items-center gap-2">
+                <span className="text-3xl font-bold text-foreground">{String(total).padStart(2, '0')}</span>
+                <div className="flex flex-col text-[9px] text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3 text-emerald-500" />
+                    +{achievedGoals} concluídas
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bar Chart - By Priority */}
+            <div className="bg-muted/30 rounded-lg p-3 col-span-2">
+              <p className="text-[10px] text-muted-foreground mb-1 font-medium">Objetivo | Por Prioridade</p>
+              <div className="h-20">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={priorityData} barCategoryGap="20%">
+                    <XAxis 
+                      dataKey="name" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }} 
+                    />
+                    <Bar 
+                      dataKey="value" 
+                      radius={[4, 4, 0, 0]}
+                      fill="#a855f7"
+                    />
+                    <Tooltip 
+                      formatter={(value: number) => [`${value} metas`, '']} 
+                      contentStyle={tooltipStyle}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
