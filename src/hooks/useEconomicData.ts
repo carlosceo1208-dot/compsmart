@@ -135,33 +135,62 @@ const formatReferenceMonth = (period: string): string => {
 };
 
 const fetchINPCData = async (months: number = 12): Promise<INPCData> => {
-  // IBGE SIDRA API - Tabela 1736 (INPC)
-  const response = await fetch(
-    `https://servicodados.ibge.gov.br/api/v3/agregados/1736/periodos/-${months}/variaveis/44?localidades=N1[all]`
-  );
+  const cacheKey = `inpc-cache-${months}`;
+  const cacheTimeKey = `inpc-cache-time-${months}`;
   
-  if (!response.ok) throw new Error('Failed to fetch INPC data');
-  
-  const data = await response.json();
-  const series = data[0]?.resultados[0]?.series[0];
-  
-  if (!series) throw new Error('Invalid INPC data structure');
-  
-  const periods = Object.keys(series.serie);
-  const latestPeriod = periods[periods.length - 1];
-  const values = Object.values(series.serie).map(v => parseFloat(v as string));
-  
-  // Calcular acumulado
-  const accumulated = values.reduce((acc, val) => {
-    return ((1 + acc / 100) * (1 + val / 100) - 1) * 100;
-  }, 0);
-  
-  return {
-    monthly: values[values.length - 1],
-    accumulated: accumulated,
-    period: `${months} meses`,
-    referenceMonth: formatReferenceMonth(latestPeriod),
-  };
+  try {
+    // IBGE SIDRA API - Tabela 1736 (INPC)
+    const response = await fetch(
+      `https://servicodados.ibge.gov.br/api/v3/agregados/1736/periodos/-${months}/variaveis/44?localidades=N1[all]`,
+      { signal: AbortSignal.timeout(10000) } // 10s timeout
+    );
+    
+    if (!response.ok) throw new Error('Failed to fetch INPC data');
+    
+    const data = await response.json();
+    const series = data[0]?.resultados[0]?.series[0];
+    
+    if (!series) throw new Error('Invalid INPC data structure');
+    
+    const periods = Object.keys(series.serie);
+    const latestPeriod = periods[periods.length - 1];
+    const values = Object.values(series.serie).map(v => parseFloat(v as string));
+    
+    // Calcular acumulado
+    const accumulated = values.reduce((acc, val) => {
+      return ((1 + acc / 100) * (1 + val / 100) - 1) * 100;
+    }, 0);
+    
+    const result: INPCData = {
+      monthly: values[values.length - 1],
+      accumulated: accumulated,
+      period: `${months} meses`,
+      referenceMonth: formatReferenceMonth(latestPeriod),
+    };
+    
+    // Salvar no cache
+    localStorage.setItem(cacheKey, JSON.stringify(result));
+    localStorage.setItem(cacheTimeKey, Date.now().toString());
+    
+    return result;
+  } catch (error) {
+    console.warn('IBGE API falhou, verificando cache...', error);
+    
+    // Tentar usar cache (máximo 24 horas de idade)
+    const cached = localStorage.getItem(cacheKey);
+    const cacheTime = localStorage.getItem(cacheTimeKey);
+    
+    if (cached && cacheTime) {
+      const age = Date.now() - parseInt(cacheTime);
+      if (age < 24 * 60 * 60 * 1000) { // 24 horas
+        console.info('Usando cache do INPC');
+        return JSON.parse(cached);
+      }
+    }
+    
+    // Se não houver cache válido, lançar erro
+    throw new Error('INPC data unavailable');
+  }
 };
 
 export const useEconomicData = (inpcMonths: number = 12) => {
@@ -180,11 +209,13 @@ export const useEconomicData = (inpcMonths: number = 12) => {
   const inpcQuery = useQuery({
     queryKey: ['inpc-data', inpcMonths],
     queryFn: () => fetchINPCData(inpcMonths),
-    staleTime: 24 * 60 * 60 * 1000, // 24 horas
+    staleTime: 6 * 60 * 60 * 1000, // 6 horas - INPC não muda frequentemente
+    gcTime: 24 * 60 * 60 * 1000, // manter em cache por 24h
     refetchInterval: (query) => {
-      return query.state.error ? false : 24 * 60 * 60 * 1000;
+      return query.state.error ? false : 6 * 60 * 60 * 1000;
     },
-    retry: 2,
+    retry: 3, // 3 tentativas
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // backoff exponencial
     refetchOnWindowFocus: false,
   });
 
