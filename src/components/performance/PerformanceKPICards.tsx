@@ -111,17 +111,20 @@ export const PerformanceKPICards = ({ metrics, cycleInfo }: PerformanceKPICardsP
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {kpis.map((kpi) => {
         const Icon = kpi.icon;
+        const isCycleCard = kpi.title === "Ciclo Ativo";
         return (
           <Link key={kpi.title} to={kpi.link}>
-            <Card className={`${kpi.bgColor} border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group`}>
-              <CardContent className="p-3">
-                <div className="flex items-start justify-between">
-                  <div className="min-w-0 flex-1">
+            <Card className={`${kpi.bgColor} border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group h-full`}>
+              <CardContent className="p-3 h-full">
+                <div className="flex items-start justify-between gap-2 h-full">
+                  <div className="min-w-0 flex-1 overflow-hidden">
                     <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
                       {kpi.title}
                       {getTrendIcon(kpi.trend)}
                     </p>
-                    <p className={`text-xl font-bold mt-0.5 ${kpi.textColor}`}>{kpi.value}</p>
+                    <p className={`${isCycleCard ? 'text-sm leading-tight' : 'text-xl'} font-bold mt-0.5 ${kpi.textColor} ${isCycleCard ? 'line-clamp-2' : ''}`}>
+                      {kpi.value}
+                    </p>
                     <p className="text-[10px] text-muted-foreground truncate">{kpi.subtitle}</p>
                   </div>
                   <div className={`p-2 rounded-xl bg-gradient-to-br ${kpi.color} flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform`}>
