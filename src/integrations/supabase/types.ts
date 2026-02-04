@@ -5263,6 +5263,15 @@ export type Database = {
         Returns: string
       }
       suggest_next_employee_number: { Args: never; Returns: string }
+      validate_coupon_code: {
+        Args: { p_billing_cycle?: string; p_code: string; p_plan_id?: string }
+        Returns: {
+          discount_type: string
+          discount_value: number
+          error_message: string
+          is_valid: boolean
+        }[]
+      }
       validate_cpf_format: { Args: { cpf_value: string }; Returns: boolean }
     }
     Enums: {
