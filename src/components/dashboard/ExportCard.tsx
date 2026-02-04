@@ -18,7 +18,6 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type ExcelJS from 'exceljs';
 
 type ReportType = 
   | 'executive-consolidated' 
@@ -1197,7 +1196,7 @@ export const ExportCard = () => {
   const generateExcelReport = async (reportType: ReportType) => {
     const ExcelJS = (await import('exceljs')).default;
     
-    let workbook: ExcelJS.Workbook;
+    let workbook: any;
     
     switch (reportType) {
       case 'executive-consolidated':

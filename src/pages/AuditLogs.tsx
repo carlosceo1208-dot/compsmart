@@ -10,7 +10,6 @@ import { useAuditKPIs } from '@/hooks/useAuditKPIs';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { subDays, format } from 'date-fns';
-import ExcelJS from 'exceljs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
@@ -43,6 +42,7 @@ const AuditLogs = () => {
     }
 
     try {
+      const ExcelJS = (await import('exceljs')).default;
       const workbook = new ExcelJS.Workbook();
       
       // Resumo sheet
