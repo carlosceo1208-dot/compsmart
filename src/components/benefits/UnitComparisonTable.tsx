@@ -13,7 +13,6 @@ import {
 import { ArrowUpDown, TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { UnitBenefitsHistory } from '@/hooks/useBenefitsHistoryByUnit';
 import { formatCurrency, formatNumber, formatPercentage } from '@/lib/formatters';
-import ExcelJS from 'exceljs';
 
 interface UnitComparisonTableProps {
   unitsData: UnitBenefitsHistory[];
@@ -79,6 +78,7 @@ export const UnitComparisonTable = ({ unitsData }: UnitComparisonTableProps) => 
 
   const handleExport = async () => {
     try {
+      const ExcelJS = (await import('exceljs')).default;
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Comparação de Benefícios');
       

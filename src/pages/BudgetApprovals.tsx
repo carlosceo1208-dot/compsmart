@@ -27,7 +27,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import ExcelJS from 'exceljs';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -184,6 +183,7 @@ const BudgetApprovals = () => {
   // Funções de exportação
   const exportToExcel = async () => {
     try {
+      const ExcelJS = (await import('exceljs')).default;
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Aprovações');
       
