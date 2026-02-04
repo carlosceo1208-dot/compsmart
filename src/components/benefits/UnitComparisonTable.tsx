@@ -13,7 +13,7 @@ import {
 import { ArrowUpDown, TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { UnitBenefitsHistory } from '@/hooks/useBenefitsHistoryByUnit';
 import { formatCurrency, formatNumber, formatPercentage } from '@/lib/formatters';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface UnitComparisonTableProps {
   unitsData: UnitBenefitsHistory[];
@@ -77,28 +77,55 @@ export const UnitComparisonTable = ({ unitsData }: UnitComparisonTableProps) => 
     return sortOrder === 'asc' ? comparison : -comparison;
   });
 
-  const handleExport = () => {
-    const exportData = sortedData.map((unit) => {
-      const lastMonth = unit.history[unit.history.length - 1];
-      return {
-        'Unidade': unit.unitName,
-        'Tipo': getTypeLabel(unit.unitType),
-        'Código': unit.unitCode || '-',
-        'Funcionários': lastMonth?.employeesCount || 0,
-        'Custo Total Médio': unit.summary.avgMonthlyCost,
-        'Custo Empresa': lastMonth?.companyCost || 0,
-        'Custo Funcionário': lastMonth?.employeeCost || 0,
-        '% Funcionário': lastMonth?.employeeCostPercentage || 0,
-        'Variação %': unit.summary.trendPercentage,
-        'Custo/Funcionário': lastMonth?.avgCostPerEmployee || 0,
-        'Ranking': unit.summary.rank,
-      };
-    });
+  const handleExport = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Comparação de Benefícios');
+      
+      // Add header row
+      worksheet.addRow([
+        'Unidade', 'Tipo', 'Código', 'Funcionários', 'Custo Total Médio',
+        'Custo Empresa', 'Custo Funcionário', '% Funcionário', 'Variação %',
+        'Custo/Funcionário', 'Ranking'
+      ]);
+      worksheet.getRow(1).font = { bold: true };
+      
+      // Add data rows
+      sortedData.forEach((unit) => {
+        const lastMonth = unit.history[unit.history.length - 1];
+        worksheet.addRow([
+          unit.unitName,
+          getTypeLabel(unit.unitType),
+          unit.unitCode || '-',
+          lastMonth?.employeesCount || 0,
+          unit.summary.avgMonthlyCost,
+          lastMonth?.companyCost || 0,
+          lastMonth?.employeeCost || 0,
+          lastMonth?.employeeCostPercentage || 0,
+          unit.summary.trendPercentage,
+          lastMonth?.avgCostPerEmployee || 0,
+          unit.summary.rank,
+        ]);
+      });
+      
+      // Set column widths
+      worksheet.columns = [
+        { width: 30 }, { width: 12 }, { width: 12 }, { width: 15 },
+        { width: 18 }, { width: 15 }, { width: 18 }, { width: 15 },
+        { width: 12 }, { width: 18 }, { width: 10 }
+      ];
 
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Comparação de Benefícios');
-    XLSX.writeFile(wb, 'comparacao_beneficios_unidades.xlsx');
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'comparacao_beneficios_unidades.xlsx';
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+    }
   };
 
   return (
