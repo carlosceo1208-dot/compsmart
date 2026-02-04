@@ -10,7 +10,7 @@ import { useAuditKPIs } from '@/hooks/useAuditKPIs';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { subDays, format } from 'date-fns';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
@@ -36,45 +36,68 @@ const AuditLogs = () => {
     setPage(1);
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (!logsData?.logs || !kpis) {
       toast.error('Nenhum dado para exportar');
       return;
     }
 
-    const kpiData = [
-      ['Métrica', 'Valor'],
-      ['Total de Consultas', kpis.total_queries],
-      ['Total de Tokens', kpis.total_tokens],
-      ['Tempo Médio (ms)', kpis.avg_response_time],
-      ['Usuários Únicos', kpis.unique_users],
-      ['Consultas Jurídicas', kpis.legal_queries],
-      ['Consultas R&B', kpis.incentive_queries]
-    ];
+    try {
+      const workbook = new ExcelJS.Workbook();
+      
+      // Resumo sheet
+      const summarySheet = workbook.addWorksheet('Resumo');
+      summarySheet.addRow(['Métrica', 'Valor']);
+      summarySheet.addRow(['Total de Consultas', kpis.total_queries]);
+      summarySheet.addRow(['Total de Tokens', kpis.total_tokens]);
+      summarySheet.addRow(['Tempo Médio (ms)', kpis.avg_response_time]);
+      summarySheet.addRow(['Usuários Únicos', kpis.unique_users]);
+      summarySheet.addRow(['Consultas Jurídicas', kpis.legal_queries]);
+      summarySheet.addRow(['Consultas R&B', kpis.incentive_queries]);
+      
+      // Style header
+      summarySheet.getRow(1).font = { bold: true };
+      summarySheet.columns = [{ width: 25 }, { width: 20 }];
 
-    const logsDataFormatted = logsData.logs.map(log => ({
-      'Data/Hora': format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss'),
-      'Usuário': log.user_name,
-      'Email': log.user_email,
-      'Empresa': log.company_name,
-      'Agente': log.agent_type === 'legal' ? 'Jurídico' : 'R&B',
-      'Modo': log.operation_mode || 'N/A',
-      'Pergunta': log.question.substring(0, 100),
-      'Tokens': log.tokens_used,
-      'Tempo (ms)': log.response_time_ms
-    }));
+      // Detalhes sheet
+      const detailsSheet = workbook.addWorksheet('Detalhes');
+      detailsSheet.addRow(['Data/Hora', 'Usuário', 'Email', 'Empresa', 'Agente', 'Modo', 'Pergunta', 'Tokens', 'Tempo (ms)']);
+      detailsSheet.getRow(1).font = { bold: true };
+      
+      logsData.logs.forEach(log => {
+        detailsSheet.addRow([
+          format(new Date(log.created_at), 'dd/MM/yyyy HH:mm:ss'),
+          log.user_name,
+          log.user_email,
+          log.company_name,
+          log.agent_type === 'legal' ? 'Jurídico' : 'R&B',
+          log.operation_mode || 'N/A',
+          log.question.substring(0, 100),
+          log.tokens_used,
+          log.response_time_ms
+        ]);
+      });
+      
+      detailsSheet.columns = [
+        { width: 20 }, { width: 25 }, { width: 30 }, { width: 25 },
+        { width: 12 }, { width: 15 }, { width: 50 }, { width: 10 }, { width: 12 }
+      ];
 
-    const wb = XLSX.utils.book_new();
-    const ws1 = XLSX.utils.aoa_to_sheet(kpiData);
-    const ws2 = XLSX.utils.json_to_sheet(logsDataFormatted);
-
-    XLSX.utils.book_append_sheet(wb, ws1, 'Resumo');
-    XLSX.utils.book_append_sheet(wb, ws2, 'Detalhes');
-
-    const fileName = `Auditoria_AgenteSmart_${format(new Date(), 'yyyyMMdd')}.xlsx`;
-    XLSX.writeFile(wb, fileName);
-    
-    toast.success('Relatório Excel exportado com sucesso');
+      const fileName = `Auditoria_AgenteSmart_${format(new Date(), 'yyyyMMdd')}.xlsx`;
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success('Relatório Excel exportado com sucesso');
+    } catch (error) {
+      console.error('Error exporting Excel:', error);
+      toast.error('Erro ao exportar Excel');
+    }
   };
 
   const exportToPDF = () => {

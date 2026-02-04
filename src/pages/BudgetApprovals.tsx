@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
@@ -182,27 +182,42 @@ const BudgetApprovals = () => {
   }) || [];
 
   // Funções de exportação
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     try {
-      const exportData = filteredSubmissions.map(sub => ({
-        'Unidade': sub.unit?.description || 'N/A',
-        'Status': getStatusLabel(sub.status),
-        'Submetido Por': sub.submitted_by_profile?.full_name || 'N/A',
-        'Data Submissão': formatDate(sub.submitted_at),
-        'Revisado Por': sub.reviewed_by_profile?.full_name || '-',
-        'Total Anual': formatCurrency(sub.totalAnnual || 0),
-      }));
-
-      const ws = XLSX.utils.json_to_sheet(exportData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Aprovações');
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Aprovações');
       
-      ws['!cols'] = [
-        { wch: 30 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 25 }, { wch: 18 },
+      // Add header row
+      worksheet.addRow(['Unidade', 'Status', 'Submetido Por', 'Data Submissão', 'Revisado Por', 'Total Anual']);
+      worksheet.getRow(1).font = { bold: true };
+      
+      // Add data rows
+      filteredSubmissions.forEach(sub => {
+        worksheet.addRow([
+          sub.unit?.description || 'N/A',
+          getStatusLabel(sub.status),
+          sub.submitted_by_profile?.full_name || 'N/A',
+          formatDate(sub.submitted_at),
+          sub.reviewed_by_profile?.full_name || '-',
+          formatCurrency(sub.totalAnnual || 0),
+        ]);
+      });
+      
+      // Set column widths
+      worksheet.columns = [
+        { width: 30 }, { width: 15 }, { width: 25 }, { width: 15 }, { width: 25 }, { width: 18 }
       ];
       
       const fileName = `aprovacoes_orcamento_${fiscalYear}_${statusFilter}_${new Date().toISOString().split('T')[0]}.xlsx`;
-      XLSX.writeFile(wb, fileName);
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+      
       toast.success('Exportação concluída com sucesso!');
     } catch (error) {
       toast.error('Erro ao exportar dados');

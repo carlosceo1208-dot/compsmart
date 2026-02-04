@@ -18,6 +18,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import type ExcelJS from 'exceljs';
 
 type ReportType = 
   | 'executive-consolidated' 
@@ -655,242 +656,210 @@ export const ExportCard = () => {
     });
   };
 
-  // Excel Generation Functions
-  const generateExecutiveConsolidatedExcel = async (XLSX: any) => {
-    const wb = XLSX.utils.book_new();
+  // Excel Generation Functions using ExcelJS
+  const generateExecutiveConsolidatedExcel = async () => {
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
     
     // Sheet 1: KPIs Principais
-    const kpisData = [
-      ['Indicador', 'Valor'],
-      ['Funcionários Ativos', totalEmployees || 0],
-      ['Massa Salarial Total', salaryData?.total || 0],
-      ['Média Salarial', salaryData?.avg || 0],
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(kpisData);
-    XLSX.utils.book_append_sheet(wb, ws1, 'KPIs Principais');
+    const ws1 = workbook.addWorksheet('KPIs Principais');
+    ws1.addRow(['Indicador', 'Valor']);
+    ws1.addRow(['Funcionários Ativos', totalEmployees || 0]);
+    ws1.addRow(['Massa Salarial Total', salaryData?.total || 0]);
+    ws1.addRow(['Média Salarial', salaryData?.avg || 0]);
+    ws1.getRow(1).font = { bold: true };
     
     // Sheet 2: Budget
-    const budgetData = [
-      ['Categoria', 'Orçado', 'Real', 'Variação', '% Variação'],
-      [
-        'Salários',
-        budgetKPI?.budgetedSalary || 0,
-        budgetKPI?.realSalary || 0,
-        budgetKPI?.salaryVariance || 0,
-        budgetKPI?.budgetedSalary
-          ? ((budgetKPI.salaryVariance / budgetKPI.budgetedSalary) * 100).toFixed(2)
-          : '0',
-      ],
-      [
-        'Headcount',
-        budgetKPI?.budgetedHeadcount || 0,
-        budgetKPI?.realHeadcount || 0,
-        budgetKPI?.headcountVariance || 0,
-        budgetKPI?.budgetedHeadcount
-          ? ((budgetKPI.headcountVariance / budgetKPI.budgetedHeadcount) * 100).toFixed(2)
-          : '0',
-      ],
-    ];
-    const ws2 = XLSX.utils.aoa_to_sheet(budgetData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Budget');
+    const ws2 = workbook.addWorksheet('Budget');
+    ws2.addRow(['Categoria', 'Orçado', 'Real', 'Variação', '% Variação']);
+    ws2.addRow([
+      'Salários',
+      budgetKPI?.budgetedSalary || 0,
+      budgetKPI?.realSalary || 0,
+      budgetKPI?.salaryVariance || 0,
+      budgetKPI?.budgetedSalary
+        ? ((budgetKPI.salaryVariance / budgetKPI.budgetedSalary) * 100).toFixed(2)
+        : '0',
+    ]);
+    ws2.addRow([
+      'Headcount',
+      budgetKPI?.budgetedHeadcount || 0,
+      budgetKPI?.realHeadcount || 0,
+      budgetKPI?.headcountVariance || 0,
+      budgetKPI?.budgetedHeadcount
+        ? ((budgetKPI.headcountVariance / budgetKPI.budgetedHeadcount) * 100).toFixed(2)
+        : '0',
+    ]);
+    ws2.getRow(1).font = { bold: true };
     
     // Sheet 3: Benefícios e Incentivos
-    const benefitsData = [
-      ['Item', 'Valor'],
-      ['Total de Benefícios Ativos', benefitsKPI?.totalBenefits || 0],
-      ['Custo Mensal de Benefícios', benefitsKPI?.totalCost || 0],
-      ['Incentivos Curto Prazo (ICP)', incentivesKPI?.shortTerm || 0],
-      ['Incentivos Longo Prazo (ILP)', incentivesKPI?.longTerm || 0],
-      ['Total Incentivos', incentivesKPI?.total || 0],
-    ];
-    const ws3 = XLSX.utils.aoa_to_sheet(benefitsData);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Benefícios e Incentivos');
+    const ws3 = workbook.addWorksheet('Benefícios e Incentivos');
+    ws3.addRow(['Item', 'Valor']);
+    ws3.addRow(['Total de Benefícios Ativos', benefitsKPI?.totalBenefits || 0]);
+    ws3.addRow(['Custo Mensal de Benefícios', benefitsKPI?.totalCost || 0]);
+    ws3.addRow(['Incentivos Curto Prazo (ICP)', incentivesKPI?.shortTerm || 0]);
+    ws3.addRow(['Incentivos Longo Prazo (ILP)', incentivesKPI?.longTerm || 0]);
+    ws3.addRow(['Total Incentivos', incentivesKPI?.total || 0]);
+    ws3.getRow(1).font = { bold: true };
     
     // Sheet 4: Indicadores Econômicos
-    const economicDataSheet = [
-      ['Indicador', 'Valor'],
-      ['INPC Mês Atual (%)', economicData?.inpc?.monthly || 0],
-      ['INPC Acumulado (%)', economicData?.inpc?.accumulated || 0],
-      ['USD Cotação (R$)', economicData?.usd?.value || 0],
-    ];
-    const ws4 = XLSX.utils.aoa_to_sheet(economicDataSheet);
-    XLSX.utils.book_append_sheet(wb, ws4, 'Indicadores Econômicos');
+    const ws4 = workbook.addWorksheet('Indicadores Econômicos');
+    ws4.addRow(['Indicador', 'Valor']);
+    ws4.addRow(['INPC Mês Atual (%)', economicData?.inpc?.monthly || 0]);
+    ws4.addRow(['INPC Acumulado (%)', economicData?.inpc?.accumulated || 0]);
+    ws4.addRow(['USD Cotação (R$)', economicData?.usd?.value || 0]);
+    ws4.getRow(1).font = { bold: true };
     
-    return wb;
+    return workbook;
   };
 
-  const generatePayrollMassExcel = async (XLSX: any) => {
-    const wb = XLSX.utils.book_new();
+  const generatePayrollMassExcel = async () => {
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
     
     // Sheet 1: Resumo
-    const summaryData = [
-      ['Métrica', 'Valor'],
-      ['Massa Salarial Total', salaryData?.total || 0],
-      ['Total de Funcionários', totalEmployees || 0],
-      ['Média Salarial', salaryData?.avg || 0],
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, ws1, 'Resumo');
+    const ws1 = workbook.addWorksheet('Resumo');
+    ws1.addRow(['Métrica', 'Valor']);
+    ws1.addRow(['Massa Salarial Total', salaryData?.total || 0]);
+    ws1.addRow(['Total de Funcionários', totalEmployees || 0]);
+    ws1.addRow(['Média Salarial', salaryData?.avg || 0]);
+    ws1.getRow(1).font = { bold: true };
     
     // Sheet 2: Distribuição por Grade
-    const gradeData = [
-      ['Grade', 'Quantidade', 'Média', 'Mínimo', 'Máximo'],
-      ...(gradeDistribution || []).map(g => [
-        g.grade,
-        g.count,
-        g.avg,
-        g.min,
-        g.max,
-      ]),
-    ];
-    const ws2 = XLSX.utils.aoa_to_sheet(gradeData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Por Grade');
+    const ws2 = workbook.addWorksheet('Por Grade');
+    ws2.addRow(['Grade', 'Quantidade', 'Média', 'Mínimo', 'Máximo']);
+    ws2.getRow(1).font = { bold: true };
+    (gradeDistribution || []).forEach(g => {
+      ws2.addRow([g.grade, g.count, g.avg, g.min, g.max]);
+    });
     
     // Sheet 3: Distribuição por Unidade
-    const unitData = [
-      ['Unidade', 'Quantidade', 'Total', 'Média'],
-      ...(unitDistribution || []).map(u => [
-        u.name,
-        u.count,
-        u.total,
-        u.avg,
-      ]),
-    ];
-    const ws3 = XLSX.utils.aoa_to_sheet(unitData);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Por Unidade');
+    const ws3 = workbook.addWorksheet('Por Unidade');
+    ws3.addRow(['Unidade', 'Quantidade', 'Total', 'Média']);
+    ws3.getRow(1).font = { bold: true };
+    (unitDistribution || []).forEach(u => {
+      ws3.addRow([u.name, u.count, u.total, u.avg]);
+    });
     
-    return wb;
+    return workbook;
   };
 
-  const generatePeopleAnalyticsExcel = async (XLSX: any) => {
-    const wb = XLSX.utils.book_new();
+  const generatePeopleAnalyticsExcel = async () => {
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
     
     // Sheet 1: Métricas Gerais
-    const metricsData = [
-      ['Métrica', 'Valor'],
-      ['Total de Funcionários', totalEmployees || 0],
-      ['Média Salarial', salaryData?.avg || 0],
-      ['Massa Salarial', salaryData?.total || 0],
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(metricsData);
-    XLSX.utils.book_append_sheet(wb, ws1, 'Métricas');
+    const ws1 = workbook.addWorksheet('Métricas');
+    ws1.addRow(['Métrica', 'Valor']);
+    ws1.addRow(['Total de Funcionários', totalEmployees || 0]);
+    ws1.addRow(['Média Salarial', salaryData?.avg || 0]);
+    ws1.addRow(['Massa Salarial', salaryData?.total || 0]);
+    ws1.getRow(1).font = { bold: true };
     
     // Sheet 2: Top 10 Salários
-    const topData = [
-      ['#', 'Nome', 'Cargo', 'Grade', 'Salário'],
-      ...(detailedEmployees || []).slice(0, 10).map((emp, idx) => [
-        idx + 1,
-        emp.full_name,
-        emp.job_title || 'N/A',
-        emp.grade || 'N/A',
-        emp.salary || 0,
-      ]),
-    ];
-    const ws2 = XLSX.utils.aoa_to_sheet(topData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Top 10 Salários');
+    const ws2 = workbook.addWorksheet('Top 10 Salários');
+    ws2.addRow(['#', 'Nome', 'Cargo', 'Grade', 'Salário']);
+    ws2.getRow(1).font = { bold: true };
+    (detailedEmployees || []).slice(0, 10).forEach((emp, idx) => {
+      ws2.addRow([idx + 1, emp.full_name, emp.job_title || 'N/A', emp.grade || 'N/A', emp.salary || 0]);
+    });
     
     // Sheet 3: Distribuição por Grade
-    const gradeData = [
-      ['Grade', 'Quantidade', 'Média Salarial'],
-      ...(gradeDistribution || []).map(g => [g.grade, g.count, g.avg]),
-    ];
-    const ws3 = XLSX.utils.aoa_to_sheet(gradeData);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Por Grade');
+    const ws3 = workbook.addWorksheet('Por Grade');
+    ws3.addRow(['Grade', 'Quantidade', 'Média Salarial']);
+    ws3.getRow(1).font = { bold: true };
+    (gradeDistribution || []).forEach(g => {
+      ws3.addRow([g.grade, g.count, g.avg]);
+    });
     
     // Sheet 4: Distribuição por Unidade
-    const unitData = [
-      ['Unidade', 'Quantidade', 'Total', 'Média'],
-      ...(unitDistribution || []).map(u => [u.name, u.count, u.total, u.avg]),
-    ];
-    const ws4 = XLSX.utils.aoa_to_sheet(unitData);
-    XLSX.utils.book_append_sheet(wb, ws4, 'Por Unidade');
+    const ws4 = workbook.addWorksheet('Por Unidade');
+    ws4.addRow(['Unidade', 'Quantidade', 'Total', 'Média']);
+    ws4.getRow(1).font = { bold: true };
+    (unitDistribution || []).forEach(u => {
+      ws4.addRow([u.name, u.count, u.total, u.avg]);
+    });
     
-    return wb;
+    return workbook;
   };
 
-  const generateBenefitsIncentivesExcel = async (XLSX: any) => {
-    const wb = XLSX.utils.book_new();
+  const generateBenefitsIncentivesExcel = async () => {
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
     
     // Sheet 1: Resumo
-    const summaryData = [
-      ['Item', 'Valor'],
-      ['Total de Benefícios Ativos', benefitsKPI?.totalBenefits || 0],
-      ['Custo Mensal Total', benefitsKPI?.totalCost || 0],
-      ['Funcionários Ativos', totalEmployees || 0],
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, ws1, 'Resumo');
+    const ws1 = workbook.addWorksheet('Resumo');
+    ws1.addRow(['Item', 'Valor']);
+    ws1.addRow(['Total de Benefícios Ativos', benefitsKPI?.totalBenefits || 0]);
+    ws1.addRow(['Custo Mensal Total', benefitsKPI?.totalCost || 0]);
+    ws1.addRow(['Funcionários Ativos', totalEmployees || 0]);
+    ws1.getRow(1).font = { bold: true };
     
     // Sheet 2: Lista de Benefícios
-    const benefitsData = [
-      ['Nome', 'Tipo', 'Valor/Funcionário'],
-      ...(benefitsList || []).map(b => [
-        b.name,
-        b.benefit_type,
-        b.value_per_employee || 0,
-      ]),
-    ];
-    const ws2 = XLSX.utils.aoa_to_sheet(benefitsData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Benefícios');
+    const ws2 = workbook.addWorksheet('Benefícios');
+    ws2.addRow(['Nome', 'Tipo', 'Valor/Funcionário']);
+    ws2.getRow(1).font = { bold: true };
+    (benefitsList || []).forEach(b => {
+      ws2.addRow([b.name, b.benefit_type, b.value_per_employee || 0]);
+    });
     
     // Sheet 3: Programas de Incentivos
-    const incentivesData = [
-      ['Programa', 'Provisão'],
-      ['Incentivos Curto Prazo (ICP)', incentivesKPI?.shortTerm || 0],
-      ['Incentivos Longo Prazo (ILP)', incentivesKPI?.longTerm || 0],
-      ['Total de Incentivos', incentivesKPI?.total || 0],
-    ];
-    const ws3 = XLSX.utils.aoa_to_sheet(incentivesData);
-    XLSX.utils.book_append_sheet(wb, ws3, 'Incentivos');
+    const ws3 = workbook.addWorksheet('Incentivos');
+    ws3.addRow(['Programa', 'Provisão']);
+    ws3.addRow(['Incentivos Curto Prazo (ICP)', incentivesKPI?.shortTerm || 0]);
+    ws3.addRow(['Incentivos Longo Prazo (ILP)', incentivesKPI?.longTerm || 0]);
+    ws3.addRow(['Total de Incentivos', incentivesKPI?.total || 0]);
+    ws3.getRow(1).font = { bold: true };
     
     // Sheet 4: Detalhes dos Programas
     if (incentivePrograms && incentivePrograms.length > 0) {
-      const programsData = [
-        ['Nome', 'Tipo', '% Alvo', 'Frequência'],
-        ...incentivePrograms.map(p => [
+      const ws4 = workbook.addWorksheet('Programas');
+      ws4.addRow(['Nome', 'Tipo', '% Alvo', 'Frequência']);
+      ws4.getRow(1).font = { bold: true };
+      incentivePrograms.forEach(p => {
+        ws4.addRow([
           p.name,
           p.program_type === 'short_term' ? 'ICP' : 'ILP',
           p.target_percentage || 0,
           p.payment_frequency || 'N/A',
-        ]),
-      ];
-      const ws4 = XLSX.utils.aoa_to_sheet(programsData);
-      XLSX.utils.book_append_sheet(wb, ws4, 'Programas');
+        ]);
+      });
     }
     
-    return wb;
+    return workbook;
   };
 
-  const generateBudgetOverviewExcel = async (XLSX: any) => {
-    const wb = XLSX.utils.book_new();
+  const generateBudgetOverviewExcel = async () => {
+    const ExcelJS = (await import('exceljs')).default;
+    const workbook = new ExcelJS.Workbook();
     
     // Sheet 1: Comparação Orçado vs Real
-    const comparisonData = [
-      ['Categoria', 'Orçado', 'Real', 'Variação', '% Variação'],
-      [
-        'Salários',
-        budgetKPI?.budgetedSalary || 0,
-        budgetKPI?.realSalary || 0,
-        budgetKPI?.salaryVariance || 0,
-        budgetKPI?.budgetedSalary
-          ? ((budgetKPI.salaryVariance / budgetKPI.budgetedSalary) * 100).toFixed(2)
-          : '0',
-      ],
-      [
-        'Headcount',
-        budgetKPI?.budgetedHeadcount || 0,
-        budgetKPI?.realHeadcount || 0,
-        budgetKPI?.headcountVariance || 0,
-        budgetKPI?.budgetedHeadcount
-          ? ((budgetKPI.headcountVariance / budgetKPI.budgetedHeadcount) * 100).toFixed(2)
-          : '0',
-      ],
-    ];
-    const ws1 = XLSX.utils.aoa_to_sheet(comparisonData);
-    XLSX.utils.book_append_sheet(wb, ws1, 'Orçado vs Real');
+    const ws1 = workbook.addWorksheet('Orçado vs Real');
+    ws1.addRow(['Categoria', 'Orçado', 'Real', 'Variação', '% Variação']);
+    ws1.addRow([
+      'Salários',
+      budgetKPI?.budgetedSalary || 0,
+      budgetKPI?.realSalary || 0,
+      budgetKPI?.salaryVariance || 0,
+      budgetKPI?.budgetedSalary
+        ? ((budgetKPI.salaryVariance / budgetKPI.budgetedSalary) * 100).toFixed(2)
+        : '0',
+    ]);
+    ws1.addRow([
+      'Headcount',
+      budgetKPI?.budgetedHeadcount || 0,
+      budgetKPI?.realHeadcount || 0,
+      budgetKPI?.headcountVariance || 0,
+      budgetKPI?.budgetedHeadcount
+        ? ((budgetKPI.headcountVariance / budgetKPI.budgetedHeadcount) * 100).toFixed(2)
+        : '0',
+    ]);
+    ws1.getRow(1).font = { bold: true };
     
     // Sheet 2: Análise de Variação
-    const varianceData: any[] = [['Item', 'Status', 'Desvio (%)']];
+    const ws2 = workbook.addWorksheet('Análise de Variação');
+    ws2.addRow(['Item', 'Status', 'Desvio (%)']);
+    ws2.getRow(1).font = { bold: true };
     
     if (budgetKPI) {
       const salaryVariancePercent = budgetKPI.budgetedSalary
@@ -901,24 +870,19 @@ export const ExportCard = () => {
         ? (budgetKPI.headcountVariance / budgetKPI.budgetedHeadcount) * 100
         : 0;
       
-      varianceData.push(
-        [
-          'Salários',
-          salaryVariancePercent > 0 ? 'Acima' : salaryVariancePercent < 0 ? 'Abaixo' : 'No orçado',
-          Math.abs(salaryVariancePercent).toFixed(2),
-        ],
-        [
-          'Headcount',
-          headcountVariancePercent > 0 ? 'Acima' : headcountVariancePercent < 0 ? 'Abaixo' : 'No orçado',
-          Math.abs(headcountVariancePercent).toFixed(2),
-        ]
-      );
+      ws2.addRow([
+        'Salários',
+        salaryVariancePercent > 0 ? 'Acima' : salaryVariancePercent < 0 ? 'Abaixo' : 'No orçado',
+        Math.abs(salaryVariancePercent).toFixed(2),
+      ]);
+      ws2.addRow([
+        'Headcount',
+        headcountVariancePercent > 0 ? 'Acima' : headcountVariancePercent < 0 ? 'Abaixo' : 'No orçado',
+        Math.abs(headcountVariancePercent).toFixed(2),
+      ]);
     }
     
-    const ws2 = XLSX.utils.aoa_to_sheet(varianceData);
-    XLSX.utils.book_append_sheet(wb, ws2, 'Análise de Variação');
-    
-    return wb;
+    return workbook;
   };
 
   // Novo relatório PDF: Orçamento Aprovado Detalhado (Melhorado)
@@ -1231,32 +1195,34 @@ export const ExportCard = () => {
   };
 
   const generateExcelReport = async (reportType: ReportType) => {
-    const XLSX = await import('xlsx');
+    const ExcelJS = (await import('exceljs')).default;
     
-    let workbook: any;
+    let workbook: ExcelJS.Workbook;
     
     switch (reportType) {
       case 'executive-consolidated':
-        workbook = await generateExecutiveConsolidatedExcel(XLSX);
+        workbook = await generateExecutiveConsolidatedExcel();
         break;
       case 'payroll-mass':
-        workbook = await generatePayrollMassExcel(XLSX);
+        workbook = await generatePayrollMassExcel();
         break;
       case 'people-analytics':
-        workbook = await generatePeopleAnalyticsExcel(XLSX);
+        workbook = await generatePeopleAnalyticsExcel();
         break;
       case 'benefits-incentives':
-        workbook = await generateBenefitsIncentivesExcel(XLSX);
+        workbook = await generateBenefitsIncentivesExcel();
         break;
       case 'budget-overview':
-        workbook = await generateBudgetOverviewExcel(XLSX);
+        workbook = await generateBudgetOverviewExcel();
         break;
       case 'budget-approved-detail':
         // Para Excel, criar planilha simples com todas as projeções
-        workbook = XLSX.utils.book_new();
-        const projectionsData = [
-          ['Funcionário/Nome', 'Unidade', 'Tipo', 'Mês', 'Grade', 'Salário Projetado', 'Justificativa'],
-          ...(budgetProjections?.raw?.map((p: any) => [
+        workbook = new ExcelJS.Workbook();
+        const ws = workbook.addWorksheet('Projeções Orçamento');
+        ws.addRow(['Funcionário/Nome', 'Unidade', 'Tipo', 'Mês', 'Grade', 'Salário Projetado', 'Justificativa']);
+        ws.getRow(1).font = { bold: true };
+        (budgetProjections?.raw || []).forEach((p: any) => {
+          ws.addRow([
             p.is_planned_hire ? p.planned_employee_name : p.employee?.full_name,
             p.projected_unit?.description || 'N/A',
             p.is_planned_hire ? 'Contratação' : (p.change_type || 'Manutenção'),
@@ -1264,15 +1230,22 @@ export const ExportCard = () => {
             p.projected_grade || p.employee?.grade || 'N/A',
             p.projected_fixed_salary || 0,
             p.justification || 'Sem justificativa'
-          ]) || [])
-        ];
-        const ws = XLSX.utils.aoa_to_sheet(projectionsData);
-        XLSX.utils.book_append_sheet(workbook, ws, 'Projeções Orçamento');
+          ]);
+        });
         break;
+      default:
+        workbook = new ExcelJS.Workbook();
     }
     
     const fileName = `compsmart_${reportType}_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
-    XLSX.writeFile(workbook, fileName);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const generatePDFReport = async (reportType: ReportType) => {
