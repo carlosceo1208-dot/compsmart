@@ -1,178 +1,86 @@
 
-
-# Plano: Correção da Tela Branca e Melhoria de Tratamento de Erros
+# Plano: Implementar Fallback Robusto para INPC
 
 ## Problema Identificado
-A aplicação está mostrando uma tela completamente branca ao navegar para `/auth`. Isso geralmente ocorre quando há um erro JavaScript não capturado que "crasheia" toda a aplicação React.
+A API do IBGE está bloqueando requisições diretas do navegador por CORS ("Failed to fetch"). Como o INPC é um índice mensal que muda raramente, precisamos de uma solução resiliente.
 
 ## Análise Técnica
-Baseado na análise do código e da sessão de replay:
-- O usuário navegou de `/performance` → `/` → `/auth`
-- A tela ficou branca após navegar para `/auth`
-- Não há console logs de erro disponíveis (podem ter sido limpos pelo crash)
-- A página Auth.tsx não possui erros de sintaxe visíveis
-
-## Causa Provável
-Erros assíncronos em handlers de eventos (como verificação de sessão ou Turnstile) ocorrem após a renderização e estão fora do tratamento do React Error Boundary. Se uma Promise for rejeitada sem ser capturada, isso pode crashear a aplicação.
+- **Erro atual**: `TypeError: Failed to fetch` - indica bloqueio de CORS
+- **Causa**: A API do IBGE não permite requisições cross-origin de navegadores
+- **Tabela existente**: `economic_parameters` já armazena dados econômicos (salário mínimo)
+- **Solução**: Usar a mesma estrutura para INPC + fallback estático
 
 ## Solução Proposta
 
-### 1. Adicionar Error Boundary Global
-Criar um componente de Error Boundary para capturar erros de renderização e mostrar uma mensagem amigável ao invés de uma tela branca.
-
-**Arquivo:** `src/components/ErrorBoundary.tsx`
-
+### Estratégia de 3 Camadas
 ```text
-┌─────────────────────────────────────────┐
-│         CompSmart Error Boundary        │
-├─────────────────────────────────────────┤
-│  Captura erros de componentes filhos    │
-│  Mostra UI de fallback amigável         │
-│  Opção de "Tentar Novamente"            │
-│  Log do erro para debugging             │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│            CAMADA 1: Edge Function (Proxy)          │
+│  - Busca dados do IBGE via backend (sem CORS)       │
+│  - Salva no banco para cache                        │
+└──────────────────────┬──────────────────────────────┘
+                       │ falhou?
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│            CAMADA 2: Banco de Dados                 │
+│  - Busca último INPC salvo em economic_parameters   │
+│  - Cache de até 30 dias                             │
+└──────────────────────┬──────────────────────────────┘
+                       │ não existe?
+                       ▼
+┌─────────────────────────────────────────────────────┐
+│         CAMADA 3: Fallback Estático                 │
+│  - Valores conhecidos de Janeiro/2025               │
+│  - Sempre disponível como último recurso            │
+└─────────────────────────────────────────────────────┘
 ```
-
-### 2. Adicionar Handler Global de Rejection
-Adicionar listener para `unhandledrejection` no App.tsx para capturar Promises rejeitadas que escapam dos `try/catch`.
-
-### 3. Melhorar Try/Catch na Página Auth
-Garantir que todos os blocos assíncronos na página Auth.tsx tenham tratamento de erro adequado.
-
-### 4. Verificar Componentes Problemáticos
-Adicionar proteção extra no `TurnstileWidget` para evitar crashes.
 
 ## Mudanças Técnicas
 
-### Arquivo 1: `src/components/ErrorBoundary.tsx` (NOVO)
-```tsx
-import { Component, ErrorInfo, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCcw } from "lucide-react";
+### 1. Edge Function: `fetch-inpc` (NOVO)
+Criar uma Edge Function que funciona como proxy para a API do IBGE:
+- Busca dados da API do IBGE (sem restrição de CORS no backend)
+- Salva o resultado na tabela `economic_parameters`
+- Retorna os dados para o frontend
 
-interface Props {
-  children: ReactNode;
-}
+```text
+Arquivo: supabase/functions/fetch-inpc/index.ts
 
-interface State {
-  hasError: boolean;
-  error?: Error;
-}
-
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("ErrorBoundary caught:", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="text-center p-8 max-w-md">
-            <AlertTriangle className="h-16 w-16 text-destructive mx-auto mb-4" />
-            <h1 className="text-2xl font-bold mb-2">Algo deu errado</h1>
-            <p className="text-muted-foreground mb-6">
-              Ocorreu um erro inesperado. Por favor, tente novamente.
-            </p>
-            <Button
-              onClick={() => {
-                this.setState({ hasError: false });
-                window.location.href = "/";
-              }}
-              className="gap-2"
-            >
-              <RefreshCcw className="h-4 w-4" />
-              Voltar ao Início
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    return this.props.children;
-  }
-}
+Funcionalidades:
+- GET request para API do IBGE
+- Parsear resposta e calcular acumulado
+- Salvar/atualizar em economic_parameters
+- Retornar JSON para o frontend
 ```
 
-### Arquivo 2: `src/App.tsx` (MODIFICAR)
-- Importar e envolver o app com ErrorBoundary
-- Adicionar useEffect para handler de unhandledrejection
+### 2. Modificar `useEconomicData.ts`
+Atualizar o hook para usar a nova estratégia:
 
-```tsx
-// Adicionar no início do componente App:
-useEffect(() => {
-  const handleRejection = (event: PromiseRejectionEvent) => {
-    console.error("Unhandled rejection:", event.reason);
-    event.preventDefault();
-  };
-
-  window.addEventListener("unhandledrejection", handleRejection);
-  return () => window.removeEventListener("unhandledrejection", handleRejection);
-}, []);
-
-// Envolver BrowserRouter com ErrorBoundary:
-<ErrorBoundary>
-  <BrowserRouter>
-    ...
-  </BrowserRouter>
-</ErrorBoundary>
+```text
+Fluxo novo:
+1. Tentar chamar Edge Function fetch-inpc
+2. Se falhar → buscar do banco economic_parameters
+3. Se não houver no banco → usar fallback estático
+4. Nunca mostrar "Indisponível"
 ```
 
-### Arquivo 3: `src/pages/Auth.tsx` (MODIFICAR)
-- Adicionar try/catch no checkSession do useEffect
-- Adicionar try/catch no OAuth handler
+**Fallback Estático (valores de Janeiro/2025)**:
+- Mensal: 0.48%
+- Acumulado 12m: 4.77%
+- Referência: Janeiro/2025
 
-```tsx
-// No useEffect do checkSession:
-useEffect(() => {
-  const checkSession = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.error("Session check failed:", error);
-    }
-  };
-  checkSession();
-  // ...
-}, [navigate]);
+### 3. Adicionar Registro INPC no Banco (opcional)
+Inserir valores mais recentes conhecidos na tabela `economic_parameters` para servir como backup imediato.
 
-// No onClick do Google OAuth:
-onClick={async () => {
-  setLoading(true);
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({...});
-    if (error) {
-      toast.error("Erro ao conectar com Google");
-    }
-  } catch (error) {
-    console.error("OAuth error:", error);
-    toast.error("Erro ao conectar com Google");
-  } finally {
-    setLoading(false);
-  }
-}}
-```
+## Arquivos a Criar/Modificar
+
+| Arquivo | Ação | Descrição |
+|---------|------|-----------|
+| `supabase/functions/fetch-inpc/index.ts` | Criar | Proxy para API do IBGE |
+| `src/hooks/useEconomicData.ts` | Modificar | Adicionar fallback robusto de 3 camadas |
 
 ## Resultado Esperado
-- Erros de renderização serão capturados pelo ErrorBoundary
-- Erros assíncronos serão tratados graciosamente
-- Usuário verá uma mensagem amigável em vez de tela branca
-- Opção de recuperação ("Voltar ao Início")
-
-## Arquivos a Modificar
-1. `src/components/ErrorBoundary.tsx` - Criar novo arquivo
-2. `src/App.tsx` - Adicionar ErrorBoundary e handler global
-3. `src/pages/Auth.tsx` - Melhorar tratamento de erros assíncronos
-
+- INPC **nunca** mostrará "Indisponível"
+- Dados serão atualizados automaticamente quando possível
+- Fallback mostra valores recentes conhecidos com indicação visual
+- Performance melhorada (sem esperar timeout de API bloqueada)
