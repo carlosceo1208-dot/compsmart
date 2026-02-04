@@ -37,82 +37,46 @@ serve(async (req) => {
       });
     }
 
-    // Buscar cupom
-    const { data: coupon, error: couponError } = await supabaseClient
-      .from('discount_coupons')
-      .select('*')
-      .eq('code', coupon_code.toUpperCase())
-      .eq('is_active', true)
-      .single();
-
-    if (couponError || !coupon) {
-      return new Response(JSON.stringify({ 
-        valid: false, 
-        error: 'Cupom não encontrado ou inválido' 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Validar período
-    const now = new Date();
-    if (coupon.valid_from && new Date(coupon.valid_from) > now) {
-      return new Response(JSON.stringify({ 
-        valid: false, 
-        error: 'Cupom ainda não está ativo' 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    if (coupon.valid_until && new Date(coupon.valid_until) < now) {
-      return new Response(JSON.stringify({ 
-        valid: false, 
-        error: 'Cupom expirado' 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Validar limite de uso
-    if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
-      return new Response(JSON.stringify({ 
-        valid: false, 
-        error: 'Cupom esgotado' 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Validar planos aplicáveis
-    if (coupon.applicable_plans && coupon.applicable_plans.length > 0) {
-      if (!coupon.applicable_plans.includes(plan_id)) {
-        return new Response(JSON.stringify({ 
-          valid: false, 
-          error: 'Cupom não aplicável a este plano' 
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+    // Use secure RPC function instead of direct table query
+    const { data: validation, error: validationError } = await supabaseClient.rpc(
+      'validate_coupon_code',
+      {
+        p_code: coupon_code.toUpperCase(),
+        p_plan_id: plan_id || null,
+        p_billing_cycle: billing_cycle || null
       }
-    }
+    );
 
-    // Validar ciclo de cobrança mínimo
-    if (coupon.min_billing_cycle === 'annual' && billing_cycle === 'monthly') {
+    if (validationError) {
+      console.error('Coupon validation error:', validationError);
       return new Response(JSON.stringify({ 
         valid: false, 
-        error: 'Cupom válido apenas para planos anuais' 
+        error: 'Erro ao validar cupom' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // RPC returns array, get first result
+    const result = Array.isArray(validation) ? validation[0] : validation;
+
+    if (!result?.is_valid) {
+      return new Response(JSON.stringify({ 
+        valid: false, 
+        error: result?.error_message || 'Cupom inválido' 
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Calcular desconto
+    // Calculate discount if amount provided
     let discount_value = 0;
     if (amount) {
-      if (coupon.discount_type === 'percentage') {
-        discount_value = amount * (coupon.discount_value / 100);
+      if (result.discount_type === 'percentage') {
+        discount_value = amount * (result.discount_value / 100);
       } else {
-        discount_value = Math.min(coupon.discount_value, amount);
+        discount_value = Math.min(result.discount_value, amount);
       }
     }
 
@@ -121,12 +85,12 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       valid: true,
       coupon: {
-        code: coupon.code,
-        discount_type: coupon.discount_type,
-        discount_value: coupon.discount_value,
-        description: coupon.discount_type === 'percentage' 
-          ? `${coupon.discount_value}% de desconto`
-          : `R$ ${coupon.discount_value.toFixed(2)} de desconto`
+        code: coupon_code.toUpperCase(),
+        discount_type: result.discount_type,
+        discount_value: result.discount_value,
+        description: result.discount_type === 'percentage' 
+          ? `${result.discount_value}% de desconto`
+          : `R$ ${result.discount_value.toFixed(2)} de desconto`
       },
       calculated_discount: discount_value,
       final_amount: final_amount

@@ -121,28 +121,25 @@ serve(async (req) => {
 
     let discount_cents = 0;
 
-    // Validar cupom se fornecido
+    // Validar cupom usando RPC seguro (sem acesso direto à tabela)
     if (coupon_code) {
-      const { data: coupon } = await supabaseClient
-        .from('discount_coupons')
-        .select('*')
-        .eq('code', coupon_code.toUpperCase())
-        .eq('is_active', true)
-        .single();
+      const { data: validation, error: validationError } = await supabaseClient.rpc(
+        'validate_coupon_code',
+        {
+          p_code: coupon_code.toUpperCase(),
+          p_plan_id: plan_id,
+          p_billing_cycle: billing_cycle
+        }
+      );
 
-      if (coupon) {
-        const now = new Date();
-        const validFrom = coupon.valid_from ? new Date(coupon.valid_from) : null;
-        const validUntil = coupon.valid_until ? new Date(coupon.valid_until) : null;
-
-        const isValidPeriod = (!validFrom || now >= validFrom) && (!validUntil || now <= validUntil);
-        const isValidUses = !coupon.max_uses || coupon.used_count < coupon.max_uses;
-
-        if (isValidPeriod && isValidUses) {
-          if (coupon.discount_type === 'percentage') {
-            discount_cents = Math.round(amount_cents * (coupon.discount_value / 100));
+      if (!validationError) {
+        const result = Array.isArray(validation) ? validation[0] : validation;
+        
+        if (result?.is_valid) {
+          if (result.discount_type === 'percentage') {
+            discount_cents = Math.round(amount_cents * (result.discount_value / 100));
           } else {
-            discount_cents = Math.round(coupon.discount_value * 100);
+            discount_cents = Math.round(result.discount_value * 100);
           }
         }
       }
