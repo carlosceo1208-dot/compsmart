@@ -1,86 +1,100 @@
 
-# Plano: Implementar Fallback Robusto para INPC
+# Plano: Melhorias na Política de Privacidade
 
-## Problema Identificado
-A API do IBGE está bloqueando requisições diretas do navegador por CORS ("Failed to fetch"). Como o INPC é um índice mensal que muda raramente, precisamos de uma solução resiliente.
+## Resumo das Alterações
+Com base na análise comparativa com a política da Sólides, proponho 5 melhorias para a CompSmart.
 
-## Análise Técnica
-- **Erro atual**: `TypeError: Failed to fetch` - indica bloqueio de CORS
-- **Causa**: A API do IBGE não permite requisições cross-origin de navegadores
-- **Tabela existente**: `economic_parameters` já armazena dados econômicos (salário mínimo)
-- **Solução**: Usar a mesma estrutura para INPC + fallback estático
+---
 
-## Solução Proposta
+## Alteração 1: Remover Telefone de Contato
 
-### Estratégia de 3 Camadas
-```text
-┌─────────────────────────────────────────────────────┐
-│            CAMADA 1: Edge Function (Proxy)          │
-│  - Busca dados do IBGE via backend (sem CORS)       │
-│  - Salva no banco para cache                        │
-└──────────────────────┬──────────────────────────────┘
-                       │ falhou?
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│            CAMADA 2: Banco de Dados                 │
-│  - Busca último INPC salvo em economic_parameters   │
-│  - Cache de até 30 dias                             │
-└──────────────────────┬──────────────────────────────┘
-                       │ não existe?
-                       ▼
-┌─────────────────────────────────────────────────────┐
-│         CAMADA 3: Fallback Estático                 │
-│  - Valores conhecidos de Janeiro/2025               │
-│  - Sempre disponível como último recurso            │
-└─────────────────────────────────────────────────────┘
+**Justificativa:** Padrão de mercado (Sólides faz igual). Evita spam e ligações indesejadas.
+
+**Locais:**
+- Seção 10 (DPO) - remover linha do telefone
+- Seção 12 (Contato) - remover linha do telefone
+
+---
+
+## Alteração 2: Adicionar Glossário de Termos
+
+**Justificativa:** Ajuda usuários leigos a entender conceitos técnicos.
+
+**Posição:** Nova seção após a Introdução (antes da Seção 2)
+
+**Conteúdo:**
+```
+1.1 Definições
+
+"Dados Pessoais": informações relacionadas à pessoa natural identificada 
+ou identificável (nome, e-mail, CPF, etc.)
+
+"Cookies": pequenos arquivos salvos no navegador para lembrar preferências
+
+"Controlador": empresa cliente que decide sobre o tratamento dos dados 
+de seus colaboradores
+
+"Operador": a CompSmart, que processa dados conforme instruções do cliente
+
+"LGPD": Lei Geral de Proteção de Dados (Lei nº 13.709/2018)
 ```
 
-## Mudanças Técnicas
+---
 
-### 1. Edge Function: `fetch-inpc` (NOVO)
-Criar uma Edge Function que funciona como proxy para a API do IBGE:
-- Busca dados da API do IBGE (sem restrição de CORS no backend)
-- Salva o resultado na tabela `economic_parameters`
-- Retorna os dados para o frontend
+## Alteração 3: Adicionar Seção "Crianças e Adolescentes"
 
-```text
-Arquivo: supabase/functions/fetch-inpc/index.ts
+**Justificativa:** Compliance essencial. Sólides possui essa seção.
 
-Funcionalidades:
-- GET request para API do IBGE
-- Parsear resposta e calcular acumulado
-- Salvar/atualizar em economic_parameters
-- Retornar JSON para o frontend
+**Posição:** Nova seção 5 (renumerar subsequentes)
+
+**Conteúdo:**
+```
+5. Tratamento de Dados de Crianças e Adolescentes
+
+A CompSmart não coleta nem processa intencionalmente dados pessoais 
+de crianças e adolescentes menores de 18 anos. Nossa plataforma é 
+destinada exclusivamente a ambientes corporativos e profissionais.
+
+Caso identifiquemos que dados de menores foram inseridos 
+inadvertidamente, estes serão prontamente eliminados.
 ```
 
-### 2. Modificar `useEconomicData.ts`
-Atualizar o hook para usar a nova estratégia:
+---
 
-```text
-Fluxo novo:
-1. Tentar chamar Edge Function fetch-inpc
-2. Se falhar → buscar do banco economic_parameters
-3. Se não houver no banco → usar fallback estático
-4. Nunca mostrar "Indisponível"
-```
+## Alteração 4: Especificar Provedor de Infraestrutura
 
-**Fallback Estático (valores de Janeiro/2025)**:
-- Mensal: 0.48%
-- Acumulado 12m: 4.77%
-- Referência: Janeiro/2025
+**Justificativa:** Transparência técnica (Sólides menciona AWS).
 
-### 3. Adicionar Registro INPC no Banco (opcional)
-Inserir valores mais recentes conhecidos na tabela `economic_parameters` para servir como backup imediato.
+**Local:** Seção 6.2 (Localização)
 
-## Arquivos a Criar/Modificar
+**De:**
+> Os dados são armazenados em servidores localizados no Brasil ou em data centers certificados...
 
-| Arquivo | Ação | Descrição |
-|---------|------|-----------|
-| `supabase/functions/fetch-inpc/index.ts` | Criar | Proxy para API do IBGE |
-| `src/hooks/useEconomicData.ts` | Modificar | Adicionar fallback robusto de 3 camadas |
+**Para:**
+> Os dados são armazenados em infraestrutura de nuvem segura (Lovable Cloud/AWS), com data centers que garantem conformidade com a LGPD e certificações de segurança internacionais.
+
+---
+
+## Alteração 5: Atualizar Data
+
+**Local:** Subtítulo inicial
+
+**De:** "Última atualização: 26 de novembro de 2025"  
+**Para:** "Última atualização: 04 de fevereiro de 2026"
+
+---
+
+## Arquivos a Modificar
+
+| Arquivo | Alterações |
+|---------|------------|
+| `src/pages/PrivacyPolicy.tsx` | Todas as 5 alterações acima |
+
+---
 
 ## Resultado Esperado
-- INPC **nunca** mostrará "Indisponível"
-- Dados serão atualizados automaticamente quando possível
-- Fallback mostra valores recentes conhecidos com indicação visual
-- Performance melhorada (sem esperar timeout de API bloqueada)
+
+- Política mais completa e profissional
+- Alinhamento com práticas de mercado (benchmark Sólides)
+- Melhor compliance LGPD
+- Contato simplificado (apenas e-mail)
