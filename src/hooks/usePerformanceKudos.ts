@@ -85,11 +85,11 @@ export function usePerformanceKudos(options: UseKudosOptions = {}) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["performance-kudos"] });
-      toast.success("Kudos enviado com sucesso! 🎉");
+      toast.success("Reconhecimento enviado com sucesso! 🎉");
     },
     onError: (error) => {
       console.error("Error sending kudos:", error);
-      toast.error("Erro ao enviar kudos");
+      toast.error("Erro ao enviar reconhecimento");
     },
   });
 
@@ -104,11 +104,11 @@ export function usePerformanceKudos(options: UseKudosOptions = {}) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["performance-kudos"] });
-      toast.success("Kudos removido");
+      toast.success("Reconhecimento removido");
     },
     onError: (error) => {
       console.error("Error deleting kudos:", error);
-      toast.error("Erro ao remover kudos");
+      toast.error("Erro ao remover reconhecimento");
     },
   });
 

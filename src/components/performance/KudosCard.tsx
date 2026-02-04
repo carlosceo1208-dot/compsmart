@@ -28,7 +28,7 @@ export function KudosCard({ kudos, currentUserId }: KudosCardProps) {
   const canDelete = currentUserId === kudos.from_employee_id;
 
   const handleDelete = async () => {
-    if (confirm("Tem certeza que deseja remover este kudos?")) {
+    if (confirm("Tem certeza que deseja remover este reconhecimento?")) {
       await deleteKudos.mutateAsync(kudos.id);
     }
   };

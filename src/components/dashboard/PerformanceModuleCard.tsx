@@ -42,7 +42,7 @@ export function PerformanceModuleCard() {
           </div>
           <div className="flex flex-col items-center p-2 rounded-lg bg-white/50 dark:bg-background/50">
             <Award className="h-4 w-4 text-indigo-600 mb-1" />
-            <span className="text-xs text-muted-foreground">Kudos</span>
+            <span className="text-xs text-muted-foreground">Reconhec.</span>
           </div>
         </div>
 

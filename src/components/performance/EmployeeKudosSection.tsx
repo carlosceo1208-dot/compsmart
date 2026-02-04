@@ -92,7 +92,7 @@ export function EmployeeKudosSection({
             >
               <CardTitle className="text-base flex items-center gap-2">
                 <Award className="h-5 w-5 text-indigo-600" />
-                Reconhecimentos (Kudos)
+                Reconhecimentos
                 {totalKudos > 0 && (
                   <Badge variant="secondary" className="ml-2 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300">
                     {totalKudos}
