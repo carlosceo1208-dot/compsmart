@@ -75,7 +75,7 @@ export default function PerformanceKudos() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">
-            Kudos
+            Reconhecimento
           </h1>
           <p className="text-sm text-muted-foreground">
             Reconheça e celebre as conquistas dos colegas
@@ -86,7 +86,7 @@ export default function PerformanceKudos() {
           onClick={() => setDialogOpen(true)}
         >
           <Plus className="h-4 w-4" />
-          Enviar Kudos
+          Enviar Reconhecimento
         </Button>
       </div>
 
@@ -143,7 +143,7 @@ export default function PerformanceKudos() {
             <Card className="border-indigo-200/50 dark:border-indigo-800/30">
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-600 mb-4" />
-                <p className="text-sm text-muted-foreground">Carregando kudos...</p>
+                <p className="text-sm text-muted-foreground">Carregando reconhecimentos...</p>
               </CardContent>
             </Card>
           ) : filteredKudos.length === 0 ? (
@@ -151,13 +151,13 @@ export default function PerformanceKudos() {
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <Award className="h-16 w-16 text-indigo-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">
-                  {filterCategory ? "Nenhum kudos nesta categoria" : "Nenhum kudos ainda"}
+                  {filterCategory ? "Nenhum reconhecimento nesta categoria" : "Nenhum reconhecimento ainda"}
                 </h3>
                 <p className="text-sm text-muted-foreground text-center mb-4">
                   {activeTab === "received" 
-                    ? "Você ainda não recebeu kudos"
+                    ? "Você ainda não recebeu reconhecimentos"
                     : activeTab === "sent"
-                    ? "Você ainda não enviou kudos"
+                    ? "Você ainda não enviou reconhecimentos"
                     : "Seja o primeiro a reconhecer um colega!"
                   }
                 </p>
@@ -166,7 +166,7 @@ export default function PerformanceKudos() {
                   onClick={() => setDialogOpen(true)}
                 >
                   <Plus className="h-4 w-4" />
-                  Enviar Kudos
+                  Enviar Reconhecimento
                 </Button>
               </CardContent>
             </Card>

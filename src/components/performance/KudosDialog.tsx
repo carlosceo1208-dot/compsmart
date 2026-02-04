@@ -81,7 +81,7 @@ export function KudosDialog({ open, onOpenChange }: KudosDialogProps) {
       <DialogContent className="max-w-md flex flex-col max-h-[85vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            🎉 Enviar Kudos
+            🎉 Enviar Reconhecimento
           </DialogTitle>
         </DialogHeader>
 
@@ -172,7 +172,7 @@ export function KudosDialog({ open, onOpenChange }: KudosDialogProps) {
               ) : (
                 <Send className="mr-2 h-4 w-4" />
               )}
-              Enviar Kudos
+              Enviar Reconhecimento
             </Button>
           </DialogFooter>
         </form>

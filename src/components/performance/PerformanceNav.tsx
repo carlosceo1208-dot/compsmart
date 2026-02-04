@@ -23,7 +23,7 @@ const navItems = [
   { path: "/performance/templates", label: "Modelos", icon: FileText },
   { path: "/performance/9box", label: "9Box", icon: LayoutGrid },
   { path: "/performance/one-on-ones", label: "1:1s", icon: Users },
-  { path: "/performance/kudos", label: "Kudos", icon: Award },
+  { path: "/performance/kudos", label: "Reconhecimento", icon: Award },
   { path: "/performance/pdi", label: "PDI", icon: TrendingUp },
   { path: "/performance/succession", label: "Sucessão", icon: UserPlus },
   { path: "/performance/feedback-360", label: "Feedback 360", icon: Users },
