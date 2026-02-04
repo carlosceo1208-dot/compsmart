@@ -205,7 +205,7 @@ const PrivacyPolicy = () => {
 
               <p className="text-muted-foreground leading-relaxed mt-4">
                 Para exercer seus direitos, entre em contato com nosso Encarregado de Dados (DPO) através 
-                do e-mail: <strong>dpo@compsmart.com.br</strong>
+                do e-mail: <strong>contato@compsmart.ia.br</strong>
               </p>
             </section>
 
@@ -246,8 +246,8 @@ const PrivacyPolicy = () => {
                   <strong>Contato do DPO:</strong>
                 </p>
                 <ul className="space-y-1 text-sm text-muted-foreground mt-2">
-                  <li>📧 E-mail: dpo@compsmart.com.br</li>
-                  <li>📞 Telefone: +55 (11) 9999-9999</li>
+                  <li>📧 E-mail: contato@compsmart.ia.br</li>
+                  <li>📞 Telefone: +55 11 98326 6580</li>
                   <li>📍 Endereço: São Paulo, Brasil</li>
                 </ul>
               </div>
@@ -275,9 +275,9 @@ const PrivacyPolicy = () => {
               <div className="bg-muted/50 rounded-lg p-4">
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li><strong>CompSmart - Gestão de Remuneração Estratégica</strong></li>
-                  <li>📧 Geral: contato@compsmart.com.br</li>
-                  <li>🔒 Privacidade: dpo@compsmart.com.br</li>
-                  <li>📞 Telefone: +55 (11) 9999-9999</li>
+                  <li>📧 Geral: contato@compsmart.ia.br</li>
+                  <li>🔒 Privacidade: contato@compsmart.ia.br</li>
+                  <li>📞 Telefone: +55 11 98326 6580</li>
                   <li>📍 Endereço: São Paulo, Brasil</li>
                 </ul>
               </div>
