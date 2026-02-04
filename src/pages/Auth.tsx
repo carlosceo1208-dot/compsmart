@@ -53,20 +53,35 @@ const Auth = () => {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate("/dashboard");
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
       }
     };
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
+    let subscription: { unsubscribe: () => void } | null = null;
+    
+    try {
+      const authListener = supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          navigate("/dashboard");
+        }
+      });
+      subscription = authListener.data.subscription;
+    } catch (error) {
+      console.error("Auth state listener failed:", error);
+    }
 
-    return () => subscription.unsubscribe();
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -227,13 +242,20 @@ const Auth = () => {
               className="w-full mb-4 bg-background hover:bg-muted border-border"
               onClick={async () => {
                 setLoading(true);
-                const { error } = await supabase.auth.signInWithOAuth({
-                  provider: 'google',
-                  options: {
-                    redirectTo: `${window.location.origin}/dashboard`
+                try {
+                  const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                      redirectTo: `${window.location.origin}/dashboard`
+                    }
+                  });
+                  if (error) {
+                    console.error("Google OAuth error:", error);
+                    toast.error("Erro ao conectar com Google");
+                    setLoading(false);
                   }
-                });
-                if (error) {
+                } catch (error) {
+                  console.error("Google OAuth exception:", error);
                   toast.error("Erro ao conectar com Google");
                   setLoading(false);
                 }
