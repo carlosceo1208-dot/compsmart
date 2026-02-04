@@ -26,7 +26,7 @@ const PrivacyPolicy = () => {
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold">Política de Privacidade</h1>
             <p className="text-muted-foreground">
-              Última atualização: 26 de novembro de 2025
+              Última atualização: 04 de fevereiro de 2026
             </p>
           </div>
 
@@ -44,6 +44,34 @@ const PrivacyPolicy = () => {
                 e protegemos os dados pessoais dos usuários da Plataforma, bem como os direitos dos titulares 
                 de dados.
               </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">1.1 Definições</h2>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Para melhor compreensão desta Política, apresentamos os seguintes termos e definições:
+              </p>
+              <ul className="space-y-3 text-muted-foreground">
+                <li>
+                  <strong>"Dados Pessoais":</strong> informações relacionadas à pessoa natural identificada 
+                  ou identificável (nome, e-mail, CPF, etc.)
+                </li>
+                <li>
+                  <strong>"Cookies":</strong> pequenos arquivos salvos no navegador para lembrar preferências 
+                  e melhorar a experiência de uso.
+                </li>
+                <li>
+                  <strong>"Controlador":</strong> empresa cliente que decide sobre o tratamento dos dados 
+                  de seus colaboradores.
+                </li>
+                <li>
+                  <strong>"Operador":</strong> a CompSmart, que processa dados conforme instruções do cliente.
+                </li>
+                <li>
+                  <strong>"LGPD":</strong> Lei Geral de Proteção de Dados (Lei nº 13.709/2018), legislação 
+                  brasileira que regula o tratamento de dados pessoais.
+                </li>
+              </ul>
             </section>
 
             <section>
@@ -145,7 +173,20 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">5. Compartilhamento de Dados</h2>
+              <h2 className="text-2xl font-semibold mb-4">5. Tratamento de Dados de Crianças e Adolescentes</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                A CompSmart não coleta nem processa intencionalmente dados pessoais de crianças e adolescentes 
+                menores de 18 anos. Nossa plataforma é destinada exclusivamente a ambientes corporativos e 
+                profissionais.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mt-2">
+                Caso identifiquemos que dados de menores foram inseridos inadvertidamente, estes serão 
+                prontamente eliminados de nossos sistemas.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">6. Compartilhamento de Dados</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 A CompSmart não vende, aluga ou comercializa dados pessoais. Compartilhamos dados apenas 
                 nas seguintes situações:
@@ -168,9 +209,9 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">6. Armazenamento e Segurança</h2>
+              <h2 className="text-2xl font-semibold mb-4">7. Armazenamento e Segurança</h2>
               <p className="text-muted-foreground leading-relaxed">
-                <strong>6.1 Medidas de Segurança:</strong> Implementamos medidas técnicas e organizacionais 
+                <strong>7.1 Medidas de Segurança:</strong> Implementamos medidas técnicas e organizacionais 
                 de segurança, incluindo:
               </p>
               <ul className="space-y-1 text-muted-foreground mt-2">
@@ -182,13 +223,14 @@ const PrivacyPolicy = () => {
               </ul>
 
               <p className="text-muted-foreground leading-relaxed mt-4">
-                <strong>6.2 Localização:</strong> Os dados são armazenados em servidores localizados no Brasil 
-                ou em data centers certificados que garantem conformidade com a LGPD.
+                <strong>7.2 Localização:</strong> Os dados são armazenados em infraestrutura de nuvem segura 
+                (Lovable Cloud/AWS), com data centers que garantem conformidade com a LGPD e certificações 
+                de segurança internacionais.
               </p>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">7. Direitos do Titular (LGPD)</h2>
+              <h2 className="text-2xl font-semibold mb-4">8. Direitos do Titular (LGPD)</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 Em conformidade com os Arts. 17 a 22 da LGPD, você tem os seguintes direitos:
               </p>
@@ -210,7 +252,7 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">8. Retenção de Dados</h2>
+              <h2 className="text-2xl font-semibold mb-4">9. Retenção de Dados</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Retemos dados pessoais apenas pelo tempo necessário para cumprir as finalidades para as quais 
                 foram coletados, incluindo:
@@ -226,7 +268,7 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">9. Transferência Internacional</h2>
+              <h2 className="text-2xl font-semibold mb-4">10. Transferência Internacional</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Caso seja necessário transferir dados pessoais para países estrangeiros, garantiremos que o 
                 país de destino oferece grau de proteção adequado ou adotaremos salvaguardas contratuais 
@@ -235,7 +277,7 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">10. Encarregado de Dados (DPO)</h2>
+              <h2 className="text-2xl font-semibold mb-4">11. Encarregado de Dados (DPO)</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Nomeamos um Encarregado de Proteção de Dados (Data Protection Officer - DPO) para atuar como 
                 canal de comunicação entre a CompSmart, os titulares de dados e a Autoridade Nacional de 
@@ -247,14 +289,13 @@ const PrivacyPolicy = () => {
                 </p>
                 <ul className="space-y-1 text-sm text-muted-foreground mt-2">
                   <li>📧 E-mail: contato@compsmart.ia.br</li>
-                  <li>📞 Telefone: +55 11 98326 6580</li>
                   <li>📍 Endereço: São Paulo, Brasil</li>
                 </ul>
               </div>
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">11. Alterações na Política</h2>
+              <h2 className="text-2xl font-semibold mb-4">12. Alterações na Política</h2>
               <p className="text-muted-foreground leading-relaxed">
                 Reservamo-nos o direito de atualizar esta Política de Privacidade periodicamente para refletir 
                 mudanças em nossas práticas ou na legislação. Alterações substanciais serão comunicadas aos 
@@ -267,7 +308,7 @@ const PrivacyPolicy = () => {
             </section>
 
             <section>
-              <h2 className="text-2xl font-semibold mb-4">12. Contato</h2>
+              <h2 className="text-2xl font-semibold mb-4">13. Contato</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 Para dúvidas, solicitações ou reclamações relacionadas a esta Política de Privacidade ou ao 
                 tratamento de seus dados pessoais, entre em contato:
@@ -277,7 +318,6 @@ const PrivacyPolicy = () => {
                   <li><strong>CompSmart - Gestão de Remuneração Estratégica</strong></li>
                   <li>📧 Geral: contato@compsmart.ia.br</li>
                   <li>🔒 Privacidade: contato@compsmart.ia.br</li>
-                  <li>📞 Telefone: +55 11 98326 6580</li>
                   <li>📍 Endereço: São Paulo, Brasil</li>
                 </ul>
               </div>
