@@ -32,13 +32,13 @@ export const PerformanceKPICards = ({ metrics, cycleInfo }: PerformanceKPICardsP
   const kpis = [
     {
       title: "Ciclo Ativo",
-      value: cycleInfo?.name || "2025",
-      subtitle: cycleInfo?.status === 'active' ? "Em andamento" : "Não iniciado",
+      value: cycleInfo?.year?.toString() || new Date().getFullYear().toString(),
+      subtitle: cycleInfo?.name || "Ciclo atual",
       icon: Calendar,
       color: "from-indigo-500 to-indigo-600",
       textColor: "text-indigo-600 dark:text-indigo-400",
       bgColor: "bg-gradient-to-br from-indigo-50 to-indigo-100/50 dark:from-indigo-950/40 dark:to-indigo-900/20",
-      trend: null,
+      trend: cycleInfo?.status === 'active' ? "positive" : null,
       link: "/performance/cycles",
     },
     {
@@ -111,7 +111,6 @@ export const PerformanceKPICards = ({ metrics, cycleInfo }: PerformanceKPICardsP
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {kpis.map((kpi) => {
         const Icon = kpi.icon;
-        const isCycleCard = kpi.title === "Ciclo Ativo";
         return (
           <Link key={kpi.title} to={kpi.link}>
             <Card className={`${kpi.bgColor} border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer group h-full`}>
@@ -122,7 +121,7 @@ export const PerformanceKPICards = ({ metrics, cycleInfo }: PerformanceKPICardsP
                       {kpi.title}
                       {getTrendIcon(kpi.trend)}
                     </p>
-                    <p className={`${isCycleCard ? 'text-sm leading-tight' : 'text-xl'} font-bold mt-0.5 ${kpi.textColor} ${isCycleCard ? 'line-clamp-2' : ''}`}>
+                    <p className={`text-xl font-bold mt-0.5 ${kpi.textColor}`}>
                       {kpi.value}
                     </p>
                     <p className="text-[10px] text-muted-foreground truncate">{kpi.subtitle}</p>
