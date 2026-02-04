@@ -4867,57 +4867,21 @@ export type Database = {
       profiles_compensation_directory: {
         Row: {
           avatar_url: string | null
-          benefits_value: number | null
+          email: string | null
           full_name: string | null
           grade: string | null
+          hire_date: string | null
+          is_active: boolean | null
           job_title: string | null
           job_title_id: string | null
-          long_term_incentive: number | null
           root_company_id: string | null
           salary: number | null
-          salary_range_percentage: number | null
-          short_term_incentive: number | null
-          status: Database["public"]["Enums"]["user_status"] | null
+          total_benefits_value: number | null
+          total_incentives_value: number | null
           unit_id: string | null
-          updated_at: string | null
+          unit_name: string | null
           user_id: string | null
           variable_salary: number | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          benefits_value?: number | null
-          full_name?: never
-          grade?: string | null
-          job_title?: string | null
-          job_title_id?: string | null
-          long_term_incentive?: number | null
-          root_company_id?: string | null
-          salary?: number | null
-          salary_range_percentage?: number | null
-          short_term_incentive?: number | null
-          status?: Database["public"]["Enums"]["user_status"] | null
-          unit_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          variable_salary?: number | null
-        }
-        Update: {
-          avatar_url?: string | null
-          benefits_value?: number | null
-          full_name?: never
-          grade?: string | null
-          job_title?: string | null
-          job_title_id?: string | null
-          long_term_incentive?: number | null
-          root_company_id?: string | null
-          salary?: number | null
-          salary_range_percentage?: number | null
-          short_term_incentive?: number | null
-          status?: Database["public"]["Enums"]["user_status"] | null
-          unit_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-          variable_salary?: number | null
         }
         Relationships: [
           {
