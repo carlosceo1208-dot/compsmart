@@ -36,13 +36,15 @@ const fetchMinimumWage = async (): Promise<MinimumWageData> => {
       return FALLBACK_MINIMUM_WAGE;
     }
     
-    const effectiveDate = new Date(data.effective_date);
+    // Parse date without timezone conversion (effective_date comes as YYYY-MM-DD)
+    const [year, month, day] = data.effective_date.split('-').map(Number);
+    const formattedDate = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
     const metadata = data.metadata as { year?: number } | null;
     
     return {
       value: Number(data.value),
-      effectiveDate: effectiveDate.toLocaleDateString('pt-BR'),
-      year: metadata?.year || effectiveDate.getFullYear(),
+      effectiveDate: formattedDate,
+      year: metadata?.year || year,
     };
   } catch (error) {
     console.error('Falha ao buscar salário mínimo:', error);
