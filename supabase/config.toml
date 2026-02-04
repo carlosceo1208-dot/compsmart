@@ -83,3 +83,6 @@ verify_jwt = true
 
 [functions.send-external-feedback-request]
 verify_jwt = true
+
+[functions.fetch-inpc]
+verify_jwt = false
