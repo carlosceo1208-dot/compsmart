@@ -23,7 +23,7 @@ const quickActions = [
   { label: "1:1s", icon: Calendar, href: "/performance/one-on-ones", color: "text-blue-600" },
   { label: "PDIs", icon: FileText, href: "/performance/pdi", color: "text-amber-600" },
   { label: "Avaliar", icon: CheckSquare, href: "/performance/evaluations", color: "text-purple-600" },
-  { label: "Kudos", icon: Award, href: "/performance/kudos", color: "text-pink-600" },
+  { label: "Reconhecimento", icon: Award, href: "/performance/kudos", color: "text-pink-600" },
 ];
 
 export const ProfileExecutiveCard = ({ user, stats }: ProfileExecutiveCardProps) => {
