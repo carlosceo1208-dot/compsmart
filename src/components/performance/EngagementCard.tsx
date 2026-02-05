@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Minus, Users, Sparkles } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { TrendingUp, TrendingDown, Minus, Users, Sparkles, HelpCircle } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ENPSInfoDialog } from "./ENPSInfoDialog";
 
 interface EngagementCardProps {
   enps: number | null;
@@ -15,6 +18,8 @@ interface EngagementCardProps {
 }
 
 export const EngagementCard = ({ enps, breakdown, adherenceRate }: EngagementCardProps) => {
+  const [showInfoDialog, setShowInfoDialog] = useState(false);
+  
   const chartData = [
     { name: "Promotores", value: breakdown.promoters, color: "#22c55e" },
     { name: "Neutros", value: breakdown.neutrals, color: "#94a3b8" },
@@ -38,6 +43,15 @@ export const EngagementCard = ({ enps, breakdown, adherenceRate }: EngagementCar
           <span className="flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             Engajamento (eNPS)
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-5 w-5 hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+              onClick={() => setShowInfoDialog(true)}
+              title="O que é eNPS?"
+            >
+              <HelpCircle className="h-3.5 w-3.5 text-indigo-500" />
+            </Button>
           </span>
           <Badge className={`${status.bgColor} ${status.color} border-0`}>
             <StatusIcon className="h-3 w-3 mr-1" />
@@ -161,6 +175,8 @@ export const EngagementCard = ({ enps, breakdown, adherenceRate }: EngagementCar
             </div>
           </div>
         </div>
+
+        <ENPSInfoDialog open={showInfoDialog} onOpenChange={setShowInfoDialog} />
       </CardContent>
     </Card>
   );
