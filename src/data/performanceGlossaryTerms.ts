@@ -18,6 +18,99 @@ export const performanceGlossaryCategories = [
 ] as const;
 
 export const performanceGlossaryTerms: PerformanceGlossaryTerm[] = [
+  // ===== MÉTRICAS DE ENGAJAMENTO =====
+  {
+    term: "eNPS (Employee Net Promoter Score)",
+    category: "ferramentas",
+    summary: "Métrica vital para medir a lealdade e satisfação dos colaboradores, adaptada da metodologia clássica de satisfação de clientes (NPS). Baseia-se em uma única pergunta: 'Em uma escala de 0 a 10, o quanto você recomendaria esta empresa como um bom lugar para se trabalhar?'",
+    fullContent: `O **eNPS (Employee Net Promoter Score)** é uma das métricas mais estratégicas para medir o engajamento e a lealdade dos colaboradores. Adaptada do NPS tradicional usado para clientes, ela oferece uma visão rápida e poderosa do clima organizacional.
+
+## 🎯 O que é o eNPS?
+
+O eNPS baseia-se em uma única pergunta fundamental:
+
+> **"Em uma escala de 0 a 10, o quanto você recomendaria esta empresa como um bom lugar para se trabalhar?"**
+
+## 📊 Classificação dos Colaboradores
+
+Com base na nota atribuída, dividimos o time em três categorias:
+
+### Promotores (Notas 9 e 10)
+Colaboradores altamente engajados, que "vestem a camisa" e impulsionam a cultura da empresa. São embaixadores naturais da marca empregadora.
+
+### Neutros/Passivos (Notas 7 e 8)
+Estão satisfeitos, mas não entusiasmados. São vulneráveis a ofertas de mercado e raramente promovem a marca espontaneamente.
+
+### Detratores (Notas 0 a 6)
+Colaboradores insatisfeitos que podem impactar negativamente o clima organizacional e a produtividade. Merecem atenção especial.
+
+## 🧮 Como Calcular o Score?
+
+O cálculo é simples e direto:
+
+\`\`\`
+eNPS = % Promotores - % Detratores
+\`\`\`
+
+**Importante:** Os neutros entram no cálculo do total de respondentes, mas não somam nem subtraem do score final.
+
+**Exemplo prático:**
+- 100 colaboradores responderam
+- 50 são Promotores (50%)
+- 30 são Neutros (30%)
+- 20 são Detratores (20%)
+- **eNPS = 50% - 20% = +30**
+
+## 🌡️ Régua de Benchmarking
+
+| Faixa | Classificação | Interpretação |
+|-------|---------------|---------------|
+| -100 a 0 | Zona Crítica | Necessita intervenção imediata |
+| 1 a 40 | Zona de Aperfeiçoamento | Espaço para melhorias |
+| 41 a 70 | Zona de Qualidade | Bom engajamento |
+| 71 a 100 | Zona de Excelência | Referência no mercado |
+
+## 💡 Por que o eNPS é Estratégico no CompSmart?
+
+No CompSmart, o eNPS não é apenas um número isolado. Ele se conecta com outros pilares:
+
+### Cruzamento com Performance
+Analisamos se os seus "Top Talents" (Estrelas na 9Box) também são Promotores. Se um talento de alta performance for um Detrator, há um risco altíssimo de turnover.
+
+### Feedback Qualitativo
+Geralmente, após a nota, permitimos um comentário aberto. Isso gera insights valiosos para o RH sobre o que precisa mudar na cultura ou liderança.
+
+### Ciclo de Melhoria
+O eNPS serve como termômetro para medir se as ações de PDI e as mudanças na gestão estão surtindo efeito no clima.`,
+    examples: [
+      "Empresa com eNPS de +65: Boa parte dos colaboradores são promotores, indicando alta satisfação e potencial de indicações.",
+      "Área de TI com eNPS -15 vs. Comercial com +45: Sinaliza necessidade de investigar causas específicas na TI.",
+      "eNPS subiu de +20 para +40 após implementação de PDIs: Comprova eficácia das ações de desenvolvimento.",
+      "Top performer avaliado como Detrator: Alerta crítico de risco de turnover de talento-chave."
+    ],
+    tips: [
+      "🔄 Frequência: Realize a pesquisa de eNPS trimestralmente para captar variações rápidas de clima.",
+      "🔒 Anonimato: Garanta que as respostas sejam anônimas para obter a máxima sinceridade.",
+      "🎯 Ação: O pior erro é medir e não agir. Compartilhe os resultados (mesmo os ruins) e mostre o plano de ação.",
+      "📊 Segmentação: Analise o eNPS por área, unidade, tempo de casa e nível hierárquico para insights mais profundos.",
+      "🔗 Cruze com 9Box: Identifique se seus talentos de alto desempenho são promotores ou detratores."
+    ],
+    myths: [
+      {
+        myth: "eNPS alto significa que está tudo perfeito na empresa",
+        reality: "O eNPS é um indicador, não uma garantia. Mesmo com score alto, é importante investigar áreas ou perfis específicos que podem estar insatisfeitos."
+      },
+      {
+        myth: "Basta medir o eNPS uma vez por ano",
+        reality: "O clima organizacional é dinâmico. Medições trimestrais captam tendências e permitem ações corretivas rápidas."
+      },
+      {
+        myth: "Neutros são 'ok' e não precisam de atenção",
+        reality: "Neutros representam risco de turnover. Pequenas melhorias podem convertê-los em promotores."
+      }
+    ]
+  },
+
   // ===== TIPOS DE AVALIAÇÃO =====
   {
     term: "Avaliação 90°",
