@@ -1,100 +1,64 @@
 
-# Plano: Melhorias na Política de Privacidade
+# Plano: Atualizar INPC para Janeiro/2026
 
-## Resumo das Alterações
-Com base na análise comparativa com a política da Sólides, proponho 5 melhorias para a CompSmart.
+## Situação Atual
+- A API do IBGE retorna **Dezembro/2025** (0.21% mensal, 3.90% acumulado)
+- O usuário confirma que o **Janeiro/2026** já foi divulgado oficialmente
 
----
+## Dados Necessários
+Para prosseguir, preciso confirmar os valores oficiais de Janeiro/2026:
+- INPC mensal de Janeiro/2026: **?**
+- INPC acumulado 12 meses: **?**
 
-## Alteração 1: Remover Telefone de Contato
+## Alterações Propostas
 
-**Justificativa:** Padrão de mercado (Sólides faz igual). Evita spam e ligações indesejadas.
+### 1. Atualizar Fallback na Edge Function
+**Arquivo:** `supabase/functions/fetch-inpc/index.ts`
 
-**Locais:**
-- Seção 10 (DPO) - remover linha do telefone
-- Seção 12 (Contato) - remover linha do telefone
-
----
-
-## Alteração 2: Adicionar Glossário de Termos
-
-**Justificativa:** Ajuda usuários leigos a entender conceitos técnicos.
-
-**Posição:** Nova seção após a Introdução (antes da Seção 2)
-
-**Conteúdo:**
-```
-1.1 Definições
-
-"Dados Pessoais": informações relacionadas à pessoa natural identificada 
-ou identificável (nome, e-mail, CPF, etc.)
-
-"Cookies": pequenos arquivos salvos no navegador para lembrar preferências
-
-"Controlador": empresa cliente que decide sobre o tratamento dos dados 
-de seus colaboradores
-
-"Operador": a CompSmart, que processa dados conforme instruções do cliente
-
-"LGPD": Lei Geral de Proteção de Dados (Lei nº 13.709/2018)
+Atualizar o `FALLBACK_INPC` (linhas 16-22):
+```typescript
+const FALLBACK_INPC: INPCResponse = {
+  monthly: X.XX,  // Valor de Janeiro/2026
+  accumulated: X.XX,  // Acumulado 12 meses
+  period: '12 meses',
+  referenceMonth: 'Janeiro/2026',
+  source: 'fallback',
+};
 ```
 
----
+### 2. Atualizar Fallback no Hook
+**Arquivo:** `src/hooks/useEconomicData.ts`
 
-## Alteração 3: Adicionar Seção "Crianças e Adolescentes"
-
-**Justificativa:** Compliance essencial. Sólides possui essa seção.
-
-**Posição:** Nova seção 5 (renumerar subsequentes)
-
-**Conteúdo:**
+Atualizar o `FALLBACK_INPC` (linhas 14-19):
+```typescript
+const FALLBACK_INPC: INPCData = {
+  monthly: X.XX,  // Valor de Janeiro/2026
+  accumulated: X.XX,  // Acumulado 12 meses
+  period: '12 meses',
+  referenceMonth: 'Janeiro/2026',
+};
 ```
-5. Tratamento de Dados de Crianças e Adolescentes
 
-A CompSmart não coleta nem processa intencionalmente dados pessoais 
-de crianças e adolescentes menores de 18 anos. Nossa plataforma é 
-destinada exclusivamente a ambientes corporativos e profissionais.
-
-Caso identifiquemos que dados de menores foram inseridos 
-inadvertidamente, estes serão prontamente eliminados.
+### 3. Inserir Registro no Banco de Dados
+Criar migração SQL para inserir os dados atualizados:
+```sql
+INSERT INTO public.economic_parameters 
+  (parameter_key, value, effective_date, metadata)
+VALUES 
+  ('inpc_monthly', X.XX, '2026-02-05', 
+   '{"accumulated": X.XX, "period": "12 meses", "referenceMonth": "Janeiro/2026", "months": 12}'
+  )
+ON CONFLICT (parameter_key, effective_date) 
+DO UPDATE SET 
+  value = EXCLUDED.value,
+  metadata = EXCLUDED.metadata;
 ```
 
 ---
 
-## Alteração 4: Especificar Provedor de Infraestrutura
+## Pergunta
+Por favor, informe os valores oficiais do INPC de Janeiro/2026:
+1. **INPC mensal** (variação do mês)
+2. **INPC acumulado** (últimos 12 meses)
 
-**Justificativa:** Transparência técnica (Sólides menciona AWS).
-
-**Local:** Seção 6.2 (Localização)
-
-**De:**
-> Os dados são armazenados em servidores localizados no Brasil ou em data centers certificados...
-
-**Para:**
-> Os dados são armazenados em infraestrutura de nuvem segura (Lovable Cloud/AWS), com data centers que garantem conformidade com a LGPD e certificações de segurança internacionais.
-
----
-
-## Alteração 5: Atualizar Data
-
-**Local:** Subtítulo inicial
-
-**De:** "Última atualização: 26 de novembro de 2025"  
-**Para:** "Última atualização: 04 de fevereiro de 2026"
-
----
-
-## Arquivos a Modificar
-
-| Arquivo | Alterações |
-|---------|------------|
-| `src/pages/PrivacyPolicy.tsx` | Todas as 5 alterações acima |
-
----
-
-## Resultado Esperado
-
-- Política mais completa e profissional
-- Alinhamento com práticas de mercado (benchmark Sólides)
-- Melhor compliance LGPD
-- Contato simplificado (apenas e-mail)
+Com esses dados, implementarei as 3 alterações automaticamente.
