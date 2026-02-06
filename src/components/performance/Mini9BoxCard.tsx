@@ -138,8 +138,9 @@ const MiniBox = ({ boxKey, count }: { boxKey: string; count: number }) => {
   );
 };
 
+// Escala 0-5: Low (0-1.67), Medium (1.67-3.33), High (3.33-5.0)
 function getLevel(score: number): "low" | "medium" | "high" {
-  if (score < 2.0) return "low";
-  if (score < 3.5) return "medium";
+  if (score < 1.67) return "low";
+  if (score < 3.33) return "medium";
   return "high";
 }
