@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClipboardCheck, Plus, Search, Loader2, MoreVertical, Pencil, Eye } from "lucide-react";
 import { usePerformanceEvaluations, evaluationStatusLabels, evaluationStatusColors } from "@/hooks/usePerformanceEvaluations";
 import { usePerformanceCycles } from "@/hooks/usePerformanceCycles";
@@ -123,78 +124,80 @@ export default function PerformanceEvaluations() {
         </Card>
       ) : (
         <Card className="border-indigo-200/50 dark:border-indigo-800/30">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Colaborador</TableHead>
-                <TableHead>Ciclo</TableHead>
-                <TableHead>Avaliador</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Nota Final</TableHead>
-                <TableHead>Potencial</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredEvaluations.map((evaluation) => (
-                <TableRow key={evaluation.id}>
-                  <TableCell className="font-medium">
-                    {evaluation.employee?.full_name || "Colaborador"}
-                  </TableCell>
-                  <TableCell>
-                    {evaluation.cycle?.name || "-"}
-                  </TableCell>
-                  <TableCell>
-                    {evaluation.evaluator?.full_name || "-"}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="capitalize">
-                      {evaluation.evaluator_type === "self" ? "Auto" : 
-                       evaluation.evaluator_type === "manager" ? "Gestor" :
-                       evaluation.evaluator_type === "peer" ? "Par" :
-                       evaluation.evaluator_type === "hr" ? "RH" : 
-                       evaluation.evaluator_type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={evaluationStatusColors[evaluation.status]}>
-                      {evaluationStatusLabels[evaluation.status]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {evaluation.final_score !== null ? (
-                      <span className="font-medium">{evaluation.final_score.toFixed(1)}</span>
-                    ) : "-"}
-                  </TableCell>
-                  <TableCell>
-                    {evaluation.potential_score !== null ? (
-                      <span className="font-medium">{evaluation.potential_score.toFixed(1)}</span>
-                    ) : "-"}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Visualizar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem disabled={evaluation.status === "approved"}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          <ScrollArea className="h-[calc(100vh-320px)] min-h-[300px]">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Colaborador</TableHead>
+                  <TableHead>Ciclo</TableHead>
+                  <TableHead>Avaliador</TableHead>
+                  <TableHead>Tipo</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Nota Final</TableHead>
+                  <TableHead>Potencial</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredEvaluations.map((evaluation) => (
+                  <TableRow key={evaluation.id}>
+                    <TableCell className="font-medium">
+                      {evaluation.employee?.full_name || "Colaborador"}
+                    </TableCell>
+                    <TableCell>
+                      {evaluation.cycle?.name || "-"}
+                    </TableCell>
+                    <TableCell>
+                      {evaluation.evaluator?.full_name || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {evaluation.evaluator_type === "self" ? "Auto" : 
+                         evaluation.evaluator_type === "manager" ? "Gestor" :
+                         evaluation.evaluator_type === "peer" ? "Par" :
+                         evaluation.evaluator_type === "hr" ? "RH" : 
+                         evaluation.evaluator_type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={evaluationStatusColors[evaluation.status]}>
+                        {evaluationStatusLabels[evaluation.status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {evaluation.final_score !== null ? (
+                        <span className="font-medium">{evaluation.final_score.toFixed(1)}</span>
+                      ) : "-"}
+                    </TableCell>
+                    <TableCell>
+                      {evaluation.potential_score !== null ? (
+                        <span className="font-medium">{evaluation.potential_score.toFixed(1)}</span>
+                      ) : "-"}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Visualizar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem disabled={evaluation.status === "approved"}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </Card>
       )}
     </div>
