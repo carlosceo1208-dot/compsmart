@@ -21,6 +21,7 @@ import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { EmployeeCombobox } from "@/components/EmployeeCombobox";
 import { toast } from "sonner";
+import { SuccessorPerformanceCard } from "./SuccessorPerformanceCard";
 
 interface SuccessionDialogProps {
   open: boolean;
@@ -312,21 +313,26 @@ export function SuccessionDialog({
           </div>
 
           {selectedEmployee && (
-            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={selectedEmployee.avatar_url || undefined} />
-                <AvatarFallback>
-                  {selectedEmployee.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{selectedEmployee.full_name}</p>
-                {selectedEmployee.job_title && (
-                  <p className="text-xs text-muted-foreground">
-                    {selectedEmployee.job_title} • Grade {selectedEmployee.grade}
-                  </p>
-                )}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={selectedEmployee.avatar_url || undefined} />
+                  <AvatarFallback>
+                    {selectedEmployee.full_name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium">{selectedEmployee.full_name}</p>
+                  {selectedEmployee.job_title && (
+                    <p className="text-xs text-muted-foreground">
+                      {selectedEmployee.job_title} • Grade {selectedEmployee.grade}
+                    </p>
+                  )}
+                </div>
               </div>
+              
+              {/* Performance History Card */}
+              <SuccessorPerformanceCard employeeId={selectedEmployee.id} />
             </div>
           )}
 
