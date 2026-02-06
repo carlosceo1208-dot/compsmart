@@ -168,14 +168,24 @@ export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDe
 
       const response = await supabase.functions.invoke("generate-job-description", {
         body: {
-          jobTitleId: position.id,
-          title: position.title,
+          jobTitle: position.title,
           grade: position.grade,
-          generateSummaryOnly: true,
+          mode: "summary",
         },
       });
 
       if (response.error) throw new Error(response.error.message);
+
+      // Update the job_title with generated summary
+      const generatedData = response.data;
+      if (generatedData?.summary) {
+        const { error: updateError } = await supabase
+          .from("job_titles")
+          .update({ summary: generatedData.summary })
+          .eq("id", position.id);
+        
+        if (updateError) throw updateError;
+      }
 
       // Refetch position data
       queryClient.invalidateQueries({ queryKey: ["key-position-details", positionId] });
