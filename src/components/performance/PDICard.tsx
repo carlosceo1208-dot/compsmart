@@ -7,25 +7,24 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Pencil, Trash2, TrendingUp, BookOpen, Users, Briefcase, FileText } from "lucide-react";
+import { MoreVertical, Pencil, Trash2, TrendingUp, BookOpen, Users, Briefcase, FileText, FileDown } from "lucide-react";
 import { 
   usePerformancePDI, 
   pdiStatusLabels, 
   pdiStatusColors,
   pdiActionTypeLabels,
-  type PerformancePDI,
-  type PDIActionItem
+  type PDIWithRelations
 } from "@/hooks/usePerformancePDI";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { exportPDIToPDF } from "@/lib/pdfExport";
+import { toast } from "sonner";
 
 interface PDICardProps {
-  pdi: PerformancePDI & {
-    employee?: { full_name: string; avatar_url: string | null; job_title: string | null } | null;
-    competency?: { name: string; type: string } | null;
-  };
+  pdi: PDIWithRelations;
   onEdit: () => void;
 }
 
@@ -151,7 +150,17 @@ export function PDICard({ pdi, onEdit }: PDICardProps) {
                 <Pencil className="mr-2 h-4 w-4" />
                 Editar
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+              <DropdownMenuItem 
+                onClick={() => {
+                  exportPDIToPDF(pdi, actionItems);
+                  toast.success("PDF exportado com sucesso!");
+                }}
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                Exportar PDF
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleDelete} className="text-destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Excluir
               </DropdownMenuItem>

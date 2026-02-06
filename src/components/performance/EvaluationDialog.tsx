@@ -16,9 +16,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePerformanceEvaluations, evaluationStatusLabels, evaluationStatusColors, EvaluationDirectoryRow } from "@/hooks/usePerformanceEvaluations";
-import { Loader2, User, Calendar, Target, Star, TrendingUp, MessageSquare, CheckCircle } from "lucide-react";
+import { Loader2, User, Calendar, Target, Star, TrendingUp, MessageSquare, CheckCircle, FileDown } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { exportEvaluationToPDF } from "@/lib/pdfExport";
+import { toast } from "sonner";
 
 interface EvaluationDialogProps {
   evaluation: EvaluationDirectoryRow | null;
@@ -259,7 +261,18 @@ export function EvaluationDialog({ evaluation, open, onOpenChange, mode }: Evalu
           </div>
         </ScrollArea>
 
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            onClick={() => {
+              exportEvaluationToPDF(evaluation);
+              toast.success("PDF exportado com sucesso!");
+            }}
+            className="gap-2"
+          >
+            <FileDown className="h-4 w-4" />
+            Exportar PDF
+          </Button>
           {mode === "edit" && evaluation.status === "draft" && (
             <>
               <Button variant="outline" onClick={() => onOpenChange(false)}>
