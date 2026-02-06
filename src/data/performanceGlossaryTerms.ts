@@ -816,32 +816,39 @@ O feedback contínuo não substitui a avaliação formal, mas a complementa. A a
 
   // ===== RECONHECIMENTO =====
   {
-    term: "Kudos",
+    term: "Reconhecimento (Kudo)",
     category: "reconhecimento",
-    summary: "Ferramenta de reconhecimento contínuo que valoriza o trabalho bem feito e fortalece relações. A palavra vem do grego 'κῦδος' (kŷdos), que significa 'glória', 'fama' ou 'renome'. Diferente da avaliação anual, o Kudos é instantâneo, reconhecendo comportamentos no momento em que ocorrem.",
-    fullContent: `**Origem da palavra Kudos:**
-A palavra "Kudos" tem origem no grego antigo **κῦδος (kŷdos)**, que significa "glória", "fama" ou "renome". Na Grécia Antiga, era usada para descrever a honra e o prestígio conquistados por heróis em batalhas ou competições. O termo foi adotado pelo inglês britânico no século XIX, inicialmente em contextos acadêmicos, e posteriormente popularizado nos Estados Unidos.
+    summary: "Ferramenta de reconhecimento contínuo que valoriza o trabalho bem feito e fortalece relações. A palavra 'Kudo' vem do grego 'κῦδος' (kŷdos), que significa 'glória', 'fama' ou 'renome'. Diferente da avaliação anual, o Reconhecimento é instantâneo, valorizando comportamentos no momento em que ocorrem e integrando-se automaticamente às avaliações de desempenho.",
+    fullContent: `**Origem da palavra Kudo:**
+A palavra "Kudo" (ou "Kudos") tem origem no grego antigo **κῦδος (kŷdos)**, que significa "glória", "fama" ou "renome". Na Grécia Antiga, era usada para descrever a honra e o prestígio conquistados por heróis em batalhas ou competições. O termo foi adotado pelo inglês britânico no século XIX, inicialmente em contextos acadêmicos, e posteriormente popularizado nos Estados Unidos.
 
-Curiosidade: Embora "kudos" seja uma palavra singular em grego (não existe "kudo" no original), o uso moderno criou a forma "kudo" como se fosse o singular de "kudos". No ambiente corporativo, "dar um kudo" ou "enviar kudos" tornou-se sinônimo de reconhecer publicamente o bom trabalho de alguém.
+Curiosidade: Embora "kudos" seja uma palavra singular em grego (não existe "kudo" no original), o uso moderno criou a forma "kudo" como se fosse o singular. No ambiente corporativo, "dar um reconhecimento" ou "enviar um kudo" tornou-se sinônimo de reconhecer publicamente o bom trabalho de alguém.
 
-**O que é Kudos no contexto organizacional:**
-Kudos é uma prática de reconhecimento peer-to-peer (entre pares) que complementa o reconhecimento formal do gestor. Cria uma cultura de valorização e gratidão no ambiente de trabalho.
+**O que é Reconhecimento no contexto organizacional:**
+Reconhecimento é uma prática peer-to-peer (entre pares) que complementa o reconhecimento formal do gestor. Cria uma cultura de valorização e gratidão no ambiente de trabalho. No CompSmart, os reconhecimentos são **integrados automaticamente às avaliações de desempenho** como evidências qualitativas.
 
-**Por que Kudos funciona:**
+**Fluxo do Reconhecimento no CompSmart:**
+1. **Envio imediato**: Colaborador envia reconhecimento a um colega
+2. **Notificação por email**: O destinatário recebe email imediatamente
+3. **Integração na avaliação**: Os reconhecimentos aparecem como evidências qualitativas na avaliação de desempenho
+4. **Suporte ao gestor**: Ajuda gestores a fundamentar feedbacks com exemplos reais
+
+**Por que Reconhecimento funciona:**
 - **Combate desengajamento**: supre necessidade básica de reconhecimento
 - **É imediato**: valoriza no momento do comportamento
 - **É horizontal**: não depende apenas do gestor
 - **Reforça valores**: evidencia comportamentos alinhados à cultura
 - **Cria conexões**: fortalece relações entre equipes
+- **Embasa avaliações**: fornece evidências para o ciclo formal
 
-**Tipos de Kudos:**
+**Tipos de Reconhecimento:**
 - **Agradecimento**: por ajuda ou colaboração
-- **Reconhecimento**: por entrega ou resultado
+- **Valorização**: por entrega ou resultado
 - **Celebração**: por conquista ou marco
 - **Inspiração**: por atitude ou comportamento exemplar
 
 **Como implementar:**
-1. Ferramenta simples para enviar kudos
+1. Ferramenta simples para enviar reconhecimentos
 2. Categorias alinhadas aos valores da empresa
 3. Visibilidade pública (mural, canal, reunião)
 4. Estímulo da liderança (dar o exemplo)
@@ -855,7 +862,8 @@ Kudos é uma prática de reconhecimento peer-to-peer (entre pares) que complemen
       "Seja específico: diga exatamente o que a pessoa fez",
       "Conecte ao impacto: explique por que fez diferença",
       "Seja oportuno: não deixe passar muito tempo",
-      "Faça público quando possível: amplifica o reconhecimento"
+      "Faça público quando possível: amplifica o reconhecimento",
+      "No CompSmart, os reconhecimentos aparecem automaticamente na avaliação do colaborador"
     ]
   },
   {

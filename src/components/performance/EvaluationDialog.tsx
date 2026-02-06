@@ -16,11 +16,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePerformanceEvaluations, evaluationStatusLabels, evaluationStatusColors, EvaluationDirectoryRow } from "@/hooks/usePerformanceEvaluations";
-import { Loader2, User, Calendar, Target, Star, TrendingUp, MessageSquare, CheckCircle, FileDown } from "lucide-react";
+import { Loader2, User, Calendar, Target, Star, TrendingUp, MessageSquare, CheckCircle, FileDown, Award } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { exportEvaluationToPDF } from "@/lib/pdfExport";
 import { toast } from "sonner";
+import { EmployeeKudosSection } from "./EmployeeKudosSection";
 
 interface EvaluationDialogProps {
   evaluation: EvaluationDirectoryRow | null;
@@ -245,6 +246,26 @@ export function EvaluationDialog({ evaluation, open, onOpenChange, mode }: Evalu
               </div>
             </div>
 
+            <Separator />
+
+            {/* Reconhecimentos recebidos durante o ciclo */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                <Award className="h-4 w-4" />
+                Reconhecimentos Recebidos (Evidências Qualitativas)
+              </Label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Reconhecimentos enviados por colegas durante o período de avaliação
+              </p>
+              <EmployeeKudosSection
+                employeeId={evaluation.employee_id}
+                employeeName={evaluation.employee_full_name ?? undefined}
+                showAsCard={false}
+                maxHeight="200px"
+                className="border rounded-lg p-3 bg-muted/20"
+              />
+            </div>
+
             {/* Metadados */}
             <div className="flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
@@ -253,7 +274,7 @@ export function EvaluationDialog({ evaluation, open, onOpenChange, mode }: Evalu
               </span>
               {evaluation.approved_at && (
                 <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-green-600" />
+                  <CheckCircle className="h-3 w-3 text-primary" />
                   Aprovado em {format(new Date(evaluation.approved_at), "dd/MM/yyyy", { locale: ptBR })}
                 </span>
               )}
@@ -288,7 +309,7 @@ export function EvaluationDialog({ evaluation, open, onOpenChange, mode }: Evalu
               <Button 
                 onClick={handleSubmit}
                 disabled={submitForReview.isPending}
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-primary hover:bg-primary/90"
               >
                 {submitForReview.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Enviar para Revisão
@@ -310,7 +331,7 @@ export function EvaluationDialog({ evaluation, open, onOpenChange, mode }: Evalu
               <Button 
                 onClick={handleApprove}
                 disabled={approveEvaluation.isPending}
-                className="bg-green-600 hover:bg-green-700"
+                variant="default"
               >
                 {approveEvaluation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Aprovar
@@ -332,7 +353,7 @@ export function EvaluationDialog({ evaluation, open, onOpenChange, mode }: Evalu
               <Button 
                 onClick={handleApprove}
                 disabled={approveEvaluation.isPending}
-                className="bg-green-600 hover:bg-green-700"
+                variant="default"
               >
                 {approveEvaluation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Aprovar
