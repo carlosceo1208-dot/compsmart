@@ -2689,6 +2689,13 @@ export type Database = {
             referencedRelation: "performance_evaluations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "performance_competency_scores_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_evaluations_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       performance_cycles: {
@@ -3380,6 +3387,13 @@ export type Database = {
             referencedRelation: "performance_evaluations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "performance_merit_recommendations_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_evaluations_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       performance_merit_rules: {
@@ -3641,6 +3655,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_pdi_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_evaluations_directory"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "performance_pdi_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -3856,6 +3877,13 @@ export type Database = {
             columns: ["evaluation_id"]
             isOneToOne: false
             referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_variable_link_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
           },
           {
@@ -5014,6 +5042,156 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_performance_evaluations_directory: {
+        Row: {
+          ai_feedback: string | null
+          approved_at: string | null
+          approved_by: string | null
+          competency_score: number | null
+          created_at: string | null
+          cycle_fiscal_year: number | null
+          cycle_id: string | null
+          cycle_name: string | null
+          employee_avatar_url: string | null
+          employee_comments: string | null
+          employee_full_name: string | null
+          employee_grade: string | null
+          employee_id: string | null
+          employee_job_title: string | null
+          evaluator_avatar_url: string | null
+          evaluator_full_name: string | null
+          evaluator_id: string | null
+          evaluator_type:
+            | Database["public"]["Enums"]["performance_evaluator_type"]
+            | null
+          final_score: number | null
+          goals_score: number | null
+          id: string | null
+          improvement_areas: string | null
+          is_probationary: boolean | null
+          manager_comments: string | null
+          potential_score: number | null
+          probationary_decision: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          root_company_id: string | null
+          status:
+            | Database["public"]["Enums"]["performance_evaluation_status"]
+            | null
+          strengths: string | null
+          template_id: string | null
+          template_name: string | null
+          template_type: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "performance_templates"
             referencedColumns: ["id"]
           },
         ]

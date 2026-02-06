@@ -10,11 +10,45 @@ export type PerformanceEvaluationUpdate = TablesUpdate<"performance_evaluations"
 export type EvaluationStatus = Enums<"performance_evaluation_status">;
 export type EvaluatorType = Enums<"performance_evaluator_type">;
 
-interface EvaluationWithRelations extends PerformanceEvaluation {
-  employee?: { full_name: string; avatar_url: string | null; job_title: string | null; grade: string | null } | null;
-  evaluator?: { full_name: string; avatar_url: string | null } | null;
-  cycle?: { name: string; fiscal_year: number } | null;
-  template?: { name: string; template_type: string } | null;
+// Interface para o retorno da view segura (sem PII)
+export interface EvaluationDirectoryRow {
+  id: string;
+  root_company_id: string;
+  employee_id: string;
+  evaluator_id: string | null;
+  cycle_id: string | null;
+  template_id: string | null;
+  evaluator_type: EvaluatorType;
+  status: EvaluationStatus;
+  goals_score: number | null;
+  competency_score: number | null;
+  final_score: number | null;
+  potential_score: number | null;
+  strengths: string | null;
+  improvement_areas: string | null;
+  manager_comments: string | null;
+  employee_comments: string | null;
+  ai_feedback: string | null;
+  is_probationary: boolean | null;
+  probationary_decision: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  created_at: string;
+  updated_at: string;
+  // Campos do diretório (sem PII)
+  employee_full_name: string | null;
+  employee_avatar_url: string | null;
+  employee_job_title: string | null;
+  employee_grade: string | null;
+  evaluator_full_name: string | null;
+  evaluator_avatar_url: string | null;
+  // Cycle/Template info
+  cycle_name: string | null;
+  cycle_fiscal_year: number | null;
+  template_name: string | null;
+  template_type: string | null;
 }
 
 interface UseEvaluationsOptions {
@@ -28,20 +62,15 @@ export function usePerformanceEvaluations(options: UseEvaluationsOptions = {}) {
   const { activeCompanyId } = useCompanyContext();
   const queryClient = useQueryClient();
 
+  // Query usando a view segura com nomes do diretório
   const evaluationsQuery = useQuery({
     queryKey: ["performance-evaluations", activeCompanyId, options],
     queryFn: async () => {
       if (!activeCompanyId) return [];
 
       let query = supabase
-        .from("performance_evaluations")
-        .select(`
-          *,
-          employee:profiles!performance_evaluations_employee_id_fkey(full_name, avatar_url, job_title, grade),
-          evaluator:profiles!performance_evaluations_evaluator_id_fkey(full_name, avatar_url),
-          cycle:performance_cycles!performance_evaluations_cycle_id_fkey(name, fiscal_year),
-          template:performance_templates!performance_evaluations_template_id_fkey(name, template_type)
-        `)
+        .from("v_performance_evaluations_directory")
+        .select("*")
         .eq("root_company_id", activeCompanyId)
         .order("created_at", { ascending: false });
 
@@ -64,7 +93,7 @@ export function usePerformanceEvaluations(options: UseEvaluationsOptions = {}) {
       const { data, error } = await query;
 
       if (error) throw error;
-      return data as EvaluationWithRelations[];
+      return data as EvaluationDirectoryRow[];
     },
     enabled: !!activeCompanyId,
   });
@@ -192,10 +221,10 @@ export function usePerformanceEvaluations(options: UseEvaluationsOptions = {}) {
     return approved.map(e => ({
       id: e.id,
       employeeId: e.employee_id,
-      employeeName: e.employee?.full_name ?? "Sem nome",
-      avatarUrl: e.employee?.avatar_url,
-      jobTitle: e.employee?.job_title,
-      grade: e.employee?.grade,
+      employeeName: e.employee_full_name ?? "Sem nome",
+      avatarUrl: e.employee_avatar_url,
+      jobTitle: e.employee_job_title,
+      grade: e.employee_grade,
       performanceScore: e.final_score ?? 0,
       potentialScore: e.potential_score ?? 0,
     }));
