@@ -128,12 +128,12 @@ export function OneOnOneDialog({ open, onOpenChange, oneOnOne }: OneOnOneDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{isEditing ? "Editar Reunião 1:1" : "Agendar Reunião 1:1"}</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto space-y-4 pr-1">
           <div className="space-y-2">
             <Label>Colaborador *</Label>
             <EmployeeCombobox
