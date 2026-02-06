@@ -59,14 +59,15 @@ export default function Performance9Box() {
     );
 
     // Classify each employee into a box
+    // Escala 0-5: Low (0-1.67), Medium (1.67-3.33), High (3.33-5.0)
     rawData.forEach(emp => {
       const perfScore = emp.performanceScore;
       const potScore = emp.potentialScore;
 
-      // Performance: Low (0-3.33), Medium (3.33-6.66), High (6.66-10)
-      // Potential: Low (0-3.33), Medium (3.33-6.66), High (6.66-10)
-      const perfLevel = perfScore < 3.33 ? 0 : perfScore < 6.66 ? 1 : 2;
-      const potLevel = potScore < 3.33 ? 2 : potScore < 6.66 ? 1 : 0;
+      // Performance (coluna): Low=0, Medium=1, High=2
+      const perfLevel = perfScore < 1.67 ? 0 : perfScore < 3.33 ? 1 : 2;
+      // Potential (linha): High=0 (topo), Medium=1, Low=2 (base)
+      const potLevel = potScore < 1.67 ? 2 : potScore < 3.33 ? 1 : 0;
 
       matrix[potLevel][perfLevel].count++;
       matrix[potLevel][perfLevel].employees.push({
