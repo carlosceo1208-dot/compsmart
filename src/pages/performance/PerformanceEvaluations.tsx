@@ -7,9 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ClipboardCheck, Plus, Search, Loader2, MoreVertical, Pencil, Eye } from "lucide-react";
-import { usePerformanceEvaluations, evaluationStatusLabels, evaluationStatusColors } from "@/hooks/usePerformanceEvaluations";
+import { usePerformanceEvaluations, evaluationStatusLabels, evaluationStatusColors, EvaluationDirectoryRow } from "@/hooks/usePerformanceEvaluations";
 import { usePerformanceCycles } from "@/hooks/usePerformanceCycles";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { EvaluationDialog } from "@/components/performance/EvaluationDialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -17,11 +18,26 @@ export default function PerformanceEvaluations() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [filterCycleId, setFilterCycleId] = useState<string | null>(null);
+  const [selectedEvaluation, setSelectedEvaluation] = useState<EvaluationDirectoryRow | null>(null);
+  const [dialogMode, setDialogMode] = useState<"view" | "edit">("view");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const { cycles } = usePerformanceCycles();
   const { evaluations, isLoading } = usePerformanceEvaluations({ 
     cycleId: filterCycleId || undefined 
   });
+  
+  const handleView = (evaluation: EvaluationDirectoryRow) => {
+    setSelectedEvaluation(evaluation);
+    setDialogMode("view");
+    setDialogOpen(true);
+  };
+
+  const handleEdit = (evaluation: EvaluationDirectoryRow) => {
+    setSelectedEvaluation(evaluation);
+    setDialogMode("edit");
+    setDialogOpen(true);
+  };
 
   const filteredEvaluations = evaluations.filter((evaluation) => {
     const normalizedSearch = searchTerm.toLowerCase().trim();
@@ -205,11 +221,14 @@ export default function PerformanceEvaluations() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleView(evaluation)}>
                             <Eye className="mr-2 h-4 w-4" />
                             Visualizar
                           </DropdownMenuItem>
-                          <DropdownMenuItem disabled={evaluation.status === "approved"}>
+                          <DropdownMenuItem 
+                            onClick={() => handleEdit(evaluation)}
+                            disabled={evaluation.status === "approved"}
+                          >
                             <Pencil className="mr-2 h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
@@ -223,6 +242,13 @@ export default function PerformanceEvaluations() {
           </ScrollArea>
         </Card>
       )}
+
+      <EvaluationDialog
+        evaluation={selectedEvaluation}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={dialogMode}
+      />
     </div>
   );
 }
