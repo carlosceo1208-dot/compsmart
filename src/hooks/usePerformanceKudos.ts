@@ -70,6 +70,21 @@ export function usePerformanceKudos(options: UseKudosOptions = {}) {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user?.id) throw new Error("Usuário não autenticado");
 
+      // Get sender profile
+      const { data: senderProfile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userData.user.id)
+        .single();
+
+      // Get receiver profile with email
+      const { data: receiverProfile } = await supabase
+        .from("profiles")
+        .select("full_name, email")
+        .eq("id", kudos.to_employee_id)
+        .single();
+
+      // Insert kudos
       const { data, error } = await supabase
         .from("performance_kudos")
         .insert({
@@ -81,6 +96,25 @@ export function usePerformanceKudos(options: UseKudosOptions = {}) {
         .single();
 
       if (error) throw error;
+
+      // Send email notification (fire and forget - don't block the main operation)
+      if (receiverProfile?.email) {
+        supabase.functions.invoke("send-kudos-notification", {
+          body: {
+            kudosId: data.id,
+            toEmployeeId: kudos.to_employee_id,
+            fromEmployeeName: senderProfile?.full_name || "Um colega",
+            toEmployeeEmail: receiverProfile.email,
+            toEmployeeName: receiverProfile.full_name || "Colaborador",
+            category: kudos.category,
+            message: kudos.message,
+            isPublic: kudos.is_public ?? true,
+          },
+        }).catch((emailError) => {
+          console.warn("Failed to send kudos email notification:", emailError);
+        });
+      }
+
       return data;
     },
     onSuccess: () => {
