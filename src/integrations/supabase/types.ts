@@ -3672,6 +3672,9 @@ export type Database = {
       }
       performance_succession: {
         Row: {
+          approval_comments: string | null
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
           created_by: string | null
           development_plan: string | null
@@ -3681,10 +3684,15 @@ export type Database = {
           rank: number | null
           readiness: Database["public"]["Enums"]["performance_readiness"]
           root_company_id: string
+          selected_as_successor: boolean | null
+          status: string | null
           successor_employee_id: string
           updated_at: string
         }
         Insert: {
+          approval_comments?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by?: string | null
           development_plan?: string | null
@@ -3694,10 +3702,15 @@ export type Database = {
           rank?: number | null
           readiness?: Database["public"]["Enums"]["performance_readiness"]
           root_company_id: string
+          selected_as_successor?: boolean | null
+          status?: string | null
           successor_employee_id: string
           updated_at?: string
         }
         Update: {
+          approval_comments?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
           created_by?: string | null
           development_plan?: string | null
@@ -3707,10 +3720,33 @@ export type Database = {
           rank?: number | null
           readiness?: Database["public"]["Enums"]["performance_readiness"]
           root_company_id?: string
+          selected_as_successor?: boolean | null
+          status?: string | null
           successor_employee_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "performance_succession_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "performance_succession_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "performance_succession_created_by_fkey"
             columns: ["created_by"]
@@ -4481,6 +4517,129 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      succession_decisions: {
+        Row: {
+          ai_recommendation: string | null
+          comments: string | null
+          created_at: string
+          decision_at: string
+          decision_by: string
+          decision_type: string
+          id: string
+          key_position_id: string
+          linked_evaluation_id: string | null
+          root_company_id: string
+          succession_id: string
+          successor_employee_id: string
+        }
+        Insert: {
+          ai_recommendation?: string | null
+          comments?: string | null
+          created_at?: string
+          decision_at?: string
+          decision_by: string
+          decision_type: string
+          id?: string
+          key_position_id: string
+          linked_evaluation_id?: string | null
+          root_company_id: string
+          succession_id: string
+          successor_employee_id: string
+        }
+        Update: {
+          ai_recommendation?: string | null
+          comments?: string | null
+          created_at?: string
+          decision_at?: string
+          decision_by?: string
+          decision_type?: string
+          id?: string
+          key_position_id?: string
+          linked_evaluation_id?: string | null
+          root_company_id?: string
+          succession_id?: string
+          successor_employee_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "succession_decisions_decision_by_fkey"
+            columns: ["decision_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_decision_by_fkey"
+            columns: ["decision_by"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_decision_by_fkey"
+            columns: ["decision_by"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_key_position_id_fkey"
+            columns: ["key_position_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_linked_evaluation_id_fkey"
+            columns: ["linked_evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_linked_evaluation_id_fkey"
+            columns: ["linked_evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_evaluations_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_succession_id_fkey"
+            columns: ["succession_id"]
+            isOneToOne: false
+            referencedRelation: "performance_succession"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       super_admin_active_company: {
         Row: {

@@ -14,6 +14,7 @@ import {
 } from "@/hooks/usePerformanceSuccession";
 import { SuccessionDialog } from "@/components/performance/SuccessionDialog";
 import { KeyPositionDetailPanel } from "@/components/performance/KeyPositionDetailPanel";
+import { SuccessionApprovalCard } from "@/components/performance/SuccessionApprovalCard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function PerformanceSuccession() {
@@ -298,6 +299,17 @@ export default function PerformanceSuccession() {
                         <Plus className="h-4 w-4 mr-2" />
                         Adicionar {existingRanks.length + 1}º Sucessor
                       </Button>
+                    )}
+
+                    {/* Approval Card - embedded in position card */}
+                    {successors.length > 0 && (
+                      <div className="mt-3 pt-3 border-t" onClick={(e) => e.stopPropagation()}>
+                        <SuccessionApprovalCard
+                          positionId={positionId}
+                          positionTitle={position?.title || "Cargo"}
+                          successors={successors}
+                        />
+                      </div>
                     )}
                   </CardContent>
                 </Card>
