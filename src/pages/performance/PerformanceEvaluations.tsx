@@ -24,8 +24,17 @@ export default function PerformanceEvaluations() {
   });
 
   const filteredEvaluations = evaluations.filter((evaluation) => {
-    const matchesSearch = 
-      (evaluation.employee?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+    const normalizedSearch = searchTerm.toLowerCase().trim();
+    const employeeName = evaluation.employee?.full_name?.toLowerCase() ?? "";
+    const cycleName = evaluation.cycle?.name?.toLowerCase() ?? "";
+    const employeeId = evaluation.employee_id?.toLowerCase() ?? "";
+    
+    // Se não há termo de busca, não filtra por busca
+    const matchesSearch = !normalizedSearch || 
+      employeeName.includes(normalizedSearch) ||
+      cycleName.includes(normalizedSearch) ||
+      employeeId.includes(normalizedSearch);
+    
     const matchesStatus = !filterStatus || evaluation.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -142,13 +151,26 @@ export default function PerformanceEvaluations() {
                 {filteredEvaluations.map((evaluation) => (
                   <TableRow key={evaluation.id}>
                     <TableCell className="font-medium">
-                      {evaluation.employee?.full_name || "Colaborador"}
+                      {evaluation.employee?.full_name || (
+                        <span className="text-muted-foreground italic">
+                          Colaborador não carregado
+                          <span className="block text-xs font-normal opacity-60 truncate max-w-[120px]" title={evaluation.employee_id}>
+                            ID: {evaluation.employee_id?.slice(0, 8)}...
+                          </span>
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       {evaluation.cycle?.name || "-"}
                     </TableCell>
                     <TableCell>
-                      {evaluation.evaluator?.full_name || "-"}
+                      {evaluation.evaluator?.full_name || (
+                        evaluation.evaluator_id ? (
+                          <span className="text-muted-foreground italic text-xs">
+                            ID: {evaluation.evaluator_id.slice(0, 8)}...
+                          </span>
+                        ) : "-"
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize">
