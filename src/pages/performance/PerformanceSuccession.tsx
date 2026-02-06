@@ -13,6 +13,7 @@ import {
   type SuccessionWithRelations 
 } from "@/hooks/usePerformanceSuccession";
 import { SuccessionDialog } from "@/components/performance/SuccessionDialog";
+import { KeyPositionDetailPanel } from "@/components/performance/KeyPositionDetailPanel";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function PerformanceSuccession() {
@@ -22,6 +23,7 @@ export default function PerformanceSuccession() {
   const [preselectedRank, setPreselectedRank] = useState<number | undefined>();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterReadiness, setFilterReadiness] = useState<string | null>(null);
+  const [selectedPositionId, setSelectedPositionId] = useState<string | null>(null);
 
   const { successions, isLoading, deleteSuccession } = usePerformanceSuccession();
 
@@ -181,107 +183,131 @@ export default function PerformanceSuccession() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from(groupedSuccessions.entries()).map(([positionId, { position, successors }]) => {
-            const existingRanks = successors.map(s => s.rank || 1);
-            const canAddMore = existingRanks.length < 3;
+        <div className="flex gap-6">
+          {/* Left: Position Cards */}
+          <div className="flex-1 grid gap-4 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 content-start">
+            {Array.from(groupedSuccessions.entries()).map(([positionId, { position, successors }]) => {
+              const existingRanks = successors.map(s => s.rank || 1);
+              const canAddMore = existingRanks.length < 3;
+              const isSelected = selectedPositionId === positionId;
 
-            return (
-              <Card key={positionId} className="border-indigo-200/50 dark:border-indigo-800/30">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-base font-semibold">
-                        {position?.title || "Cargo não definido"}
-                      </CardTitle>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {position?.code} • Grade {position?.grade}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      <Users className="h-3 w-3 mr-1" />
-                      {successors.length}/3
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {successors.map((succession) => (
-                    <div 
-                      key={succession.id}
-                      className="p-3 bg-muted/30 rounded-lg border border-border/50"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl" title={`${succession.rank}º lugar`}>
-                            {rankIcons[succession.rank || 1]}
-                          </span>
-                          <Avatar className="h-9 w-9">
-                            <AvatarImage src={succession.successor?.avatar_url || undefined} />
-                            <AvatarFallback className="text-xs">
-                              {succession.successor?.full_name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0">
-                            <p className="font-medium text-sm truncate">
-                              {succession.successor?.full_name || "Sucessor não definido"}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {succession.successor?.job_title} 
-                              {succession.successor?.grade && ` • G${succession.successor.grade}`}
-                            </p>
-                          </div>
-                        </div>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(succession)}>
-                              <Pencil className="mr-2 h-4 w-4" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => handleDelete(succession.id)} 
-                              className="text-red-600"
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Excluir
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      
-                      <div className="mt-2 flex items-center gap-2">
-                        <Badge className={`text-xs ${readinessColors[succession.readiness]}`}>
-                          {readinessLabels[succession.readiness]}
-                        </Badge>
-                      </div>
-
-                      {succession.development_plan && (
-                        <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
-                          📋 {succession.development_plan}
+              return (
+                <Card 
+                  key={positionId} 
+                  className={`border-indigo-200/50 dark:border-indigo-800/30 cursor-pointer transition-all hover:shadow-md ${
+                    isSelected ? "ring-2 ring-indigo-500 bg-indigo-50/30 dark:bg-indigo-950/20" : ""
+                  }`}
+                  onClick={() => setSelectedPositionId(positionId)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-base font-semibold">
+                          {position?.title || "Cargo não definido"}
+                        </CardTitle>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {position?.code} • Grade {position?.grade}
                         </p>
-                      )}
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        <Users className="h-3 w-3 mr-1" />
+                        {successors.length}/3
+                      </Badge>
                     </div>
-                  ))}
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {successors.map((succession) => (
+                      <div 
+                        key={succession.id}
+                        className="p-3 bg-muted/30 rounded-lg border border-border/50"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl" title={`${succession.rank}º lugar`}>
+                              {rankIcons[succession.rank || 1]}
+                            </span>
+                            <Avatar className="h-9 w-9">
+                              <AvatarImage src={succession.successor?.avatar_url || undefined} />
+                              <AvatarFallback className="text-xs">
+                                {succession.successor?.full_name?.split(" ").map(n => n[0]).join("").slice(0, 2) || "?"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0">
+                              <p className="font-medium text-sm truncate">
+                                {succession.successor?.full_name || "Sucessor não definido"}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {succession.successor?.job_title} 
+                                {succession.successor?.grade && ` • G${succession.successor.grade}`}
+                              </p>
+                            </div>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(succession)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(succession.id)} 
+                                className="text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        
+                        <div className="mt-2 flex items-center gap-2">
+                          <Badge className={`text-xs ${readinessColors[succession.readiness]}`}>
+                            {readinessLabels[succession.readiness]}
+                          </Badge>
+                        </div>
 
-                  {canAddMore && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-dashed"
-                      onClick={() => handleAddToPosition(positionId, existingRanks)}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Adicionar {existingRanks.length + 1}º Sucessor
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
+                        {succession.development_plan && (
+                          <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
+                            📋 {succession.development_plan}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+
+                    {canAddMore && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full border-dashed"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToPosition(positionId, existingRanks);
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar {existingRanks.length + 1}º Sucessor
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Right: Detail Panel */}
+          {selectedPositionId && groupedSuccessions.has(selectedPositionId) && (
+            <div className="hidden lg:block w-[400px] shrink-0">
+              <KeyPositionDetailPanel
+                positionId={selectedPositionId}
+                successors={groupedSuccessions.get(selectedPositionId)!.successors}
+              />
+            </div>
+          )}
         </div>
       )}
 
