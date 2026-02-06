@@ -61,6 +61,12 @@ export default function PerformanceSuccession() {
     return grouped;
   }, [successions, searchTerm, filterReadiness]);
 
+  // Auto-select first position when data loads
+  const firstPositionId = Array.from(groupedSuccessions.keys())[0] || null;
+  const activePositionId = selectedPositionId && groupedSuccessions.has(selectedPositionId) 
+    ? selectedPositionId 
+    : firstPositionId;
+
   const handleEdit = (succession: SuccessionWithRelations) => {
     setEditingSuccession(succession);
     setPreselectedPositionId(undefined);
@@ -183,13 +189,13 @@ export default function PerformanceSuccession() {
           </CardContent>
         </Card>
       ) : (
-        <div className="flex gap-6">
+        <div className="flex gap-6 flex-col lg:flex-row">
           {/* Left: Position Cards */}
-          <div className="flex-1 grid gap-4 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-2 content-start">
+          <div className="flex-1 grid gap-4 md:grid-cols-1 lg:grid-cols-1 content-start">
             {Array.from(groupedSuccessions.entries()).map(([positionId, { position, successors }]) => {
               const existingRanks = successors.map(s => s.rank || 1);
               const canAddMore = existingRanks.length < 3;
-              const isSelected = selectedPositionId === positionId;
+              const isSelected = activePositionId === positionId;
 
               return (
                 <Card 
@@ -299,12 +305,12 @@ export default function PerformanceSuccession() {
             })}
           </div>
 
-          {/* Right: Detail Panel */}
-          {selectedPositionId && groupedSuccessions.has(selectedPositionId) && (
-            <div className="hidden lg:block w-[400px] shrink-0">
+          {/* Right: Detail Panel - always visible when there's data */}
+          {activePositionId && groupedSuccessions.has(activePositionId) && (
+            <div className="w-full lg:w-[420px] shrink-0">
               <KeyPositionDetailPanel
-                positionId={selectedPositionId}
-                successors={groupedSuccessions.get(selectedPositionId)!.successors}
+                positionId={activePositionId}
+                successors={groupedSuccessions.get(activePositionId)!.successors}
               />
             </div>
           )}
