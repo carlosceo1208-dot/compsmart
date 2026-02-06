@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { 
   Briefcase, 
   Hash, 
@@ -11,7 +12,8 @@ import {
   Sparkles, 
   Loader2, 
   Trophy,
-  AlertCircle 
+  AlertCircle,
+  Wand2
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -36,8 +38,10 @@ interface PositionDetails {
 }
 
 export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDetailPanelProps) {
+  const queryClient = useQueryClient();
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
 
   // Fetch position details
   const { data: position, isLoading: positionLoading } = useQuery({
@@ -153,6 +157,37 @@ export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDe
     generateAnalysis();
   }, [position, successors, successorEvaluations]);
 
+  // Generate summary via AI
+  const handleGenerateSummary = async () => {
+    if (!position) return;
+    
+    setIsGeneratingSummary(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Não autenticado");
+
+      const response = await supabase.functions.invoke("generate-job-description", {
+        body: {
+          jobTitleId: position.id,
+          title: position.title,
+          grade: position.grade,
+          generateSummaryOnly: true,
+        },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+
+      // Refetch position data
+      queryClient.invalidateQueries({ queryKey: ["key-position-details", positionId] });
+      toast.success("Sumário gerado com sucesso!");
+    } catch (error) {
+      console.error("Error generating summary:", error);
+      toast.error("Erro ao gerar sumário");
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
+
   if (positionLoading) {
     return (
       <Card className="border-indigo-200/50 dark:border-indigo-800/30">
@@ -211,44 +246,52 @@ export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDe
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 pt-4">
+      <CardContent className="space-y-3 pt-3">
         {/* Position Summary */}
-        {position.summary && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <FileText className="h-4 w-4" />
-              <span>Sumário do Cargo</span>
-            </div>
-            <p className="text-sm text-foreground leading-relaxed">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <FileText className="h-4 w-4" />
+            <span>Sumário do Cargo</span>
+          </div>
+          {position.summary ? (
+            <p className="text-sm text-foreground leading-relaxed line-clamp-4">
               {position.summary}
             </p>
-          </div>
-        )}
-
-        {/* Main Responsibilities - show first 2-3 lines */}
-        {position.main_responsibilities && (
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-muted-foreground">
-              Principais Responsabilidades
+          ) : (
+            <div className="p-3 bg-muted/30 rounded-lg border border-dashed border-muted-foreground/30">
+              <p className="text-sm text-muted-foreground mb-2">
+                Nenhum sumário cadastrado para este cargo.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleGenerateSummary}
+                disabled={isGeneratingSummary}
+                className="gap-2"
+              >
+                {isGeneratingSummary ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Wand2 className="h-4 w-4" />
+                )}
+                Gerar Sumário com IA
+              </Button>
             </div>
-            <p className="text-sm text-foreground/80 leading-relaxed line-clamp-3">
-              {position.main_responsibilities}
-            </p>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Skills */}
+        {/* Skills - compact */}
         {(position.hard_skills || position.soft_skills) && (
-          <div className="space-y-2">
-            <div className="text-sm font-medium text-muted-foreground">
-              Competências Requeridas
+          <div className="space-y-1.5">
+            <div className="text-xs font-medium text-muted-foreground">
+              Competências
             </div>
             <div className="flex flex-wrap gap-1">
-              {position.hard_skills?.split(",").slice(0, 4).map((skill, i) => (
+              {position.hard_skills?.split(",").slice(0, 3).map((skill, i) => (
                 <Badge 
                   key={`hard-${i}`} 
                   variant="outline" 
-                  className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800"
+                  className="text-xs py-0 bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800"
                 >
                   {skill.trim()}
                 </Badge>
@@ -257,7 +300,7 @@ export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDe
                 <Badge 
                   key={`soft-${i}`} 
                   variant="outline" 
-                  className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800"
+                  className="text-xs py-0 bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800"
                 >
                   {skill.trim()}
                 </Badge>
@@ -266,7 +309,7 @@ export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDe
           </div>
         )}
 
-        <Separator />
+        <Separator className="my-2" />
 
         {/* AI Analysis */}
         <div className="space-y-3">
