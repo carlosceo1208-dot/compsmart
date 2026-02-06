@@ -13,6 +13,7 @@ export interface SuccessionWithRelations extends PerformanceSuccession {
   key_position?: { title: string; grade: string; code: string } | null;
   successor?: { full_name: string; avatar_url: string | null; job_title: string | null; grade: string | null } | null;
   created_by_user?: { full_name: string } | null;
+  approved_by_user?: { full_name: string } | null;
 }
 
 interface UseSuccessionOptions {
@@ -36,7 +37,8 @@ export function usePerformanceSuccession(options: UseSuccessionOptions = {}) {
           *,
           key_position:job_titles!performance_succession_key_position_id_fkey(title, grade, code),
           successor:profiles!performance_succession_successor_employee_id_fkey(full_name, avatar_url, job_title, grade),
-          created_by_user:profiles!performance_succession_created_by_fkey(full_name)
+          created_by_user:profiles!performance_succession_created_by_fkey(full_name),
+          approved_by_user:profiles!performance_succession_approved_by_fkey(full_name)
         `)
         .eq("root_company_id", activeCompanyId)
         .order("key_position_id")
