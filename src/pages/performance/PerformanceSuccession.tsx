@@ -190,8 +190,8 @@ export default function PerformanceSuccession() {
         </Card>
       ) : (
         <div className="flex gap-4 flex-col lg:flex-row">
-          {/* Left: Position Cards - compact width */}
-          <div className="lg:w-[55%] grid gap-3 content-start">
+          {/* Left: Position Cards - 40% width */}
+          <div className="lg:w-[40%] grid gap-3 content-start">
             {Array.from(groupedSuccessions.entries()).map(([positionId, { position, successors }]) => {
               const existingRanks = successors.map(s => s.rank || 1);
               const canAddMore = existingRanks.length < 3;
@@ -305,9 +305,9 @@ export default function PerformanceSuccession() {
             })}
           </div>
 
-          {/* Right: Detail Panel - balanced width */}
+          {/* Right: Detail Panel - 60% width */}
           {activePositionId && groupedSuccessions.has(activePositionId) && (
-            <div className="lg:w-[45%] shrink-0">
+            <div className="lg:w-[60%] shrink-0">
               <KeyPositionDetailPanel
                 positionId={activePositionId}
                 successors={groupedSuccessions.get(activePositionId)!.successors}
