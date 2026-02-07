@@ -177,11 +177,87 @@ serve(async (req) => {
               continue;
             }
           } else if (authData?.user) {
-            // Atualizar o profile para vincular ao auth user se necessário
-            await supabase
+            // CRITICAL FIX: O trigger handle_new_user cria um novo perfil automaticamente.
+            // Precisamos copiar os dados do perfil original (employee) para o novo perfil criado.
+            console.log(`Auth user created: ${authData.user.id}, original profile: ${employee.id}`);
+
+            // Buscar todos os dados do perfil original
+            const { data: originalProfile } = await supabase
               .from('profiles')
-              .update({ has_system_access: true })
-              .eq('id', employee.id);
+              .select('*')
+              .eq('id', employee.id)
+              .single();
+
+            if (originalProfile) {
+              // Atualizar o novo perfil (criado pelo trigger) com os dados do original
+              const { error: updateNewProfileError } = await supabase
+                .from('profiles')
+                .update({
+                  full_name: originalProfile.full_name,
+                  employee_number: originalProfile.employee_number,
+                  phone: originalProfile.phone,
+                  cpf: originalProfile.cpf,
+                  birth_date: originalProfile.birth_date,
+                  job_title: originalProfile.job_title,
+                  job_title_id: originalProfile.job_title_id,
+                  grade: originalProfile.grade,
+                  salary: originalProfile.salary,
+                  variable_salary: originalProfile.variable_salary,
+                  salary_range_percentage: originalProfile.salary_range_percentage,
+                  performance_rating: originalProfile.performance_rating,
+                  unit_id: originalProfile.unit_id,
+                  manager_id: originalProfile.manager_id,
+                  root_company_id: originalProfile.root_company_id,
+                  has_system_access: true,
+                  benefits_value: originalProfile.benefits_value,
+                  short_term_incentive: originalProfile.short_term_incentive,
+                  long_term_incentive: originalProfile.long_term_incentive,
+                  avatar_url: originalProfile.avatar_url,
+                  address: originalProfile.address,
+                  gender: originalProfile.gender,
+                  marital_status: originalProfile.marital_status,
+                  hire_date: originalProfile.hire_date,
+                  termination_date: originalProfile.termination_date,
+                  status: originalProfile.status,
+                  points: originalProfile.points,
+                  hay_reference: originalProfile.hay_reference,
+                })
+                .eq('id', authData.user.id);
+
+              if (updateNewProfileError) {
+                console.error('Error updating new profile with original data:', updateNewProfileError);
+              } else {
+                console.log(`Profile data copied from ${employee.id} to ${authData.user.id}`);
+              }
+
+              // Copiar roles do perfil original para o novo usuário
+              const { data: originalRoles } = await supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', employee.id);
+
+              if (originalRoles && originalRoles.length > 0) {
+                // Primeiro deletar roles que foram criadas automaticamente
+                await supabase
+                  .from('user_roles')
+                  .delete()
+                  .eq('user_id', authData.user.id);
+
+                // Inserir os roles originais
+                for (const roleData of originalRoles) {
+                  await supabase.from('user_roles').insert({
+                    user_id: authData.user.id,
+                    role: roleData.role
+                  });
+                }
+                console.log(`Roles copied from ${employee.id} to ${authData.user.id}`);
+              }
+
+              // Deletar o perfil original (órfão) e seus roles
+              await supabase.from('user_roles').delete().eq('user_id', employee.id);
+              await supabase.from('profiles').delete().eq('id', employee.id);
+              console.log(`Original profile ${employee.id} deleted`);
+            }
 
             // Gerar link de ativação
             const { data: resetData, error: resetError } = await supabase.auth.admin.generateLink({
