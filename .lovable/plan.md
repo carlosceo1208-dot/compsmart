@@ -1,90 +1,153 @@
 
-## Objetivo
-Fazer com que a tela **Avaliações** mostre o **nome dos colaboradores** (e do avaliador) corretamente, sem abrir acesso indevido a dados sensíveis. Hoje o nome aparece como “Colaborador não carregado” porque o front tenta buscar `profiles` diretamente via relacionamento, mas a tabela `profiles` está corretamente restrita (PII) e o relacionamento volta `null`.
 
-## O que está acontecendo (causa raiz)
-- A lista de avaliações está vindo do backend (os 8 registros existem).
-- O embed/relacionamento no `usePerformanceEvaluations()` usa:
-  - `employee:profiles!...(full_name, ...)`
-  - `evaluator:profiles!...(full_name, ...)`
-- Porém, por política de segurança, usuários que não são Admin/RH **não conseguem ler a tabela `profiles`** (para evitar exposição de PII). Resultado: o PostgREST retorna `employee: null` e `evaluator: null`.
-- Já existe a estrutura correta para isso no banco:
-  - `profiles_directory` (tabela “diretório”, sem PII, com RLS por empresa)
-  - `profiles_compensation_directory` (view para cenários de remuneração/gestores)
+## Diagnóstico do Problema
 
-Conclusão: a UI está correta em exibir fallback, mas precisamos mudar a fonte dos nomes para o **diretório seguro**, e não para `profiles`.
+### Situação Atual
+Quando um colaborador recebe um convite por email e clica no link para definir sua senha, ele é redirecionado incorretamente para a tela de **Onboarding de Empresa** (cadastro de CNPJ, Razão Social, etc.) ao invés de ir diretamente para o Dashboard.
 
-## Estratégia de correção (segura)
-Criar uma **view segura** para “Avaliações + Nomes”, que:
-- Lê avaliações de `performance_evaluations`
-- Faz JOIN com `profiles_directory` para obter `full_name`, `avatar_url`, `job_title`, `grade` (sem email/telefone/CPF)
-- Faz JOIN com `performance_cycles` e `performance_templates` (como já faz hoje)
-- Usa `WITH (security_invoker=on)` para respeitar isolamento por RLS das tabelas subjacentes
+### Causa Raiz Identificada
+O problema ocorre devido a uma dessincronização entre o perfil do colaborador e o usuário Auth:
 
-Depois, no front:
-- Para listagem/consulta: buscar dados na view (com nomes já resolvidos)
-- Para criar/editar/aprovar/excluir: continuar usando `performance_evaluations` (tabela original), sem mudanças no fluxo de escrita
+1. **Perfil Original**: O colaborador foi cadastrado na tabela `profiles` com todos os dados (cargo, salário, `root_company_id`, etc.)
+2. **Envio do Convite**: A edge function `send-employee-invitation` cria um novo usuário no Auth
+3. **Trigger automático**: O trigger `handle_new_user` cria um **novo perfil** vinculado ao usuário Auth
+4. **Perfil Duplicado**: Agora existem dois perfis: o original (com dados) e o novo (vazio, sem `root_company_id`)
+5. **Login do colaborador**: O `DashboardLayout` busca o perfil pelo `auth.uid()` e encontra o perfil **vazio**
+6. **Redirecionamento incorreto**: Como `root_company_id = null`, o sistema direciona para `/onboarding`
 
-## Mudanças no backend (Lovable Cloud / banco de dados)
-1) Criar view `v_performance_evaluations_directory` (nome sugerido)
-- Campos sugeridos (exemplos):
-  - Todos os campos de `performance_evaluations` (ou os necessários)
-  - `employee_full_name`, `employee_avatar_url`, `employee_job_title`, `employee_grade`
-  - `evaluator_full_name`, `evaluator_avatar_url`
-  - `cycle_name`, `cycle_fiscal_year`
-  - `template_name`, `template_type`
+### Evidência no Banco de Dados
+Encontrado caso concreto do problema:
+- **Perfil original** (ID: `05a4166c...`): `root_company_id` preenchido, `has_system_access = false`
+- **Auth user** (ID: `6901dce8...`): `raw_user_meta_data` **sem** `root_company_id`  
+- **Novo perfil** (ID: `6901dce8...`): `root_company_id = NULL`
 
-2) Garantir que a view não inclua PII (email, phone, cpf, birth_date etc.)
-- Somente os campos “de diretório” já presentes em `profiles_directory`
+---
 
-3) Verificar se a RLS atual permite:
-- Ler `profiles_directory` para membros da mesma empresa (`root_company_id = get_user_company_id()`)
-- Ler `performance_evaluations` conforme regras já existentes
+## Solução Proposta
 
-## Mudanças no frontend (código)
-### A) Hook de listagem: `src/hooks/usePerformanceEvaluations.ts`
-1) Alterar **apenas a query de listagem** (useQuery) para:
-- `from("v_performance_evaluations_directory")`
-- Selecionar campos já “flattened” (employee_full_name etc.)
+### Abordagem 1: Correção na Edge Function (Recomendada)
+Modificar a `send-employee-invitation` para **vincular o usuário Auth ao perfil existente** ao invés de criar um novo:
 
-2) Manter mutations (create/update/submit/approve/delete) apontando para a tabela original `performance_evaluations`
+**Alterações:**
+1. Após criar o usuário Auth, transferir os dados do perfil original para o novo perfil (igual à `activate-employee`)
+2. Garantir que o `root_company_id` seja passado corretamente no `user_metadata`
+3. Copiar os roles do perfil original
+4. Deletar o perfil original para evitar duplicatas
 
-3) Atualizar os tipos locais:
-- Criar um type/interface local para o retorno da view (ex.: `PerformanceEvaluationDirectoryRow`)
-- Ajustar `get9BoxData()` para usar `employee_full_name` (quando existir) e manter fallback
+### Abordagem 2: Validação no Frontend (Complementar)
+Adicionar lógica no `DashboardLayout` para tratar colaboradores que perderam vínculo:
 
-### B) Página: `src/pages/performance/PerformanceEvaluations.tsx`
-1) Substituir o uso de `evaluation.employee?.full_name` por:
-- `evaluation.employee_full_name` (vindo da view)
-2) Substituir avaliador por:
-- `evaluation.evaluator_full_name`
-3) Manter o fallback com ID (como está), mas ele deve passar a ser raro (apenas se o diretório não tiver o registro, o que indicaria problema de sincronização)
+**Alterações:**
+1. Ao detectar `root_company_id = null`, verificar se existe um perfil original com o mesmo email
+2. Se encontrar, vincular automaticamente ou direcionar para uma tela de "reconexão"
+3. Nunca direcionar colaboradores com role `employee` para o onboarding de empresa
 
-### C) (Opcional, mas recomendado) Log/Indicador de integridade
-Adicionar uma mensagem discreta quando `employee_full_name` vier vazio, indicando:
-- “Dados do diretório não sincronizados” (ajuda a diagnosticar se o trigger de sync falhar)
+### Abordagem 3: Correção no Trigger (Prevenção)
+Modificar o trigger `handle_new_user` para verificar se já existe um perfil com o mesmo email:
 
-## Validação (passo a passo)
-1) Recarregar `/performance/evaluations`
-2) Confirmar que as 8 avaliações aparecem com:
-- Nome do colaborador preenchido
-- Nome do avaliador preenchido (no seu teste é autoavaliação, então deve ser o mesmo nome)
-3) Testar busca:
-- Buscar por nome (deve filtrar)
-- Buscar por ID (ainda pode funcionar se mantivermos a lógica atual)
-4) Confirmar que scroll funciona agora com lista maior (se necessário, podemos gerar mais 20-50 avaliações de teste depois)
+**Alterações:**
+1. Antes de criar novo perfil, verificar se existe perfil com mesmo email
+2. Se existir, atualizar o perfil existente com o novo `id` do Auth
 
-## Riscos e como evitamos
-- Risco: “Liberar acesso ao `profiles`” seria perigoso (PII).
-  - Mitigação: não mexer em `profiles` e usar apenas `profiles_directory`.
-- Risco: view não aparecer no client types imediatamente.
-  - Mitigação: no front, tipar o retorno localmente (TS interface) sem depender do autogen para a view.
+---
 
-## Entregáveis
-- 1 migration criando `v_performance_evaluations_directory` (security_invoker=on) com JOIN no `profiles_directory`
-- Atualização do hook `usePerformanceEvaluations` para ler da view na listagem
-- Ajustes da página `PerformanceEvaluations` para exibir campos da view
+## Plano de Implementação
 
-## Observação sobre a imagem enviada
-A tela já está listando linhas (o filtro foi corrigido), mas os nomes não aparecem porque o relacionamento com `profiles` está bloqueado por segurança. A correção acima resolve exatamente isso, sem abrir dados sensíveis.
+### Fase 1: Correção da Edge Function `send-employee-invitation`
+Modificar para que, ao criar um usuário Auth para um colaborador:
+- Copie todos os dados do perfil original para o novo perfil criado
+- Preserve `root_company_id`, cargo, salário e outros dados
+- Copie os roles (`user_roles`) 
+- Delete o perfil órfão original
+
+### Fase 2: Correção da Edge Function `activate-employee` 
+Revisar a lógica para garantir que não haja conflitos similares no fluxo de ativação manual.
+
+### Fase 3: Validação no DashboardLayout
+Adicionar verificação para:
+- Se usuário tem role `employee` mas não tem `root_company_id`, buscar perfil pelo email
+- Exibir mensagem apropriada caso haja problema de vinculação
+- Nunca redirecionar colaboradores para onboarding de empresa
+
+### Fase 4: Script de Correção de Dados
+Criar script SQL para corrigir os perfis existentes que estão órfãos:
+- Identificar perfis duplicados por email
+- Mesclar dados do perfil original para o perfil com Auth
+- Limpar perfis órfãos
+
+---
+
+## Seção Técnica
+
+### Arquivos a Modificar
+
+1. **`supabase/functions/send-employee-invitation/index.ts`**
+   - Adicionar lógica para copiar dados do perfil original após criar usuário Auth
+   - Implementar merge de dados similar ao que existe em `activate-employee`
+
+2. **`src/components/DashboardLayout.tsx`**
+   - Modificar a função `fetchProfile` (linhas 126-159)
+   - Adicionar verificação: se `root_company_id` for null, verificar se existe perfil com mesmo email que tenha empresa
+   - Adicionar tratamento para colaboradores órfãos
+
+3. **`src/pages/Onboarding.tsx`**
+   - Adicionar verificação de role do usuário
+   - Se for `employee`, não permitir acesso ao onboarding de empresa
+
+### Migração de Banco de Dados
+```sql
+-- Script para corrigir perfis órfãos existentes
+WITH duplicates AS (
+  SELECT 
+    p1.id as orphan_id,
+    p2.id as original_id,
+    p2.root_company_id,
+    p2.job_title,
+    p2.grade,
+    p2.salary,
+    p2.unit_id
+  FROM profiles p1
+  JOIN profiles p2 ON p1.email = p2.email AND p1.id != p2.id
+  WHERE p1.root_company_id IS NULL 
+    AND p2.root_company_id IS NOT NULL
+)
+UPDATE profiles p
+SET 
+  root_company_id = d.root_company_id,
+  job_title = COALESCE(p.job_title, d.job_title),
+  grade = COALESCE(p.grade, d.grade),
+  salary = COALESCE(p.salary, d.salary),
+  unit_id = COALESCE(p.unit_id, d.unit_id)
+FROM duplicates d
+WHERE p.id = d.orphan_id;
+```
+
+### Fluxo Corrigido
+
+```text
+[Colaborador Cadastrado] --> [RH Envia Convite] --> [Edge Function]
+                                                          |
+                                                          v
+                                           [Cria Auth User com metadata]
+                                                          |
+                                                          v
+                                           [Trigger cria novo profile]
+                                                          |
+                                                          v
+                                           [Edge Function copia dados]
+                                           [do perfil original + roles]
+                                                          |
+                                                          v
+                                           [Deleta perfil original]
+                                                          |
+                                                          v
+                                    [Colaborador recebe email e define senha]
+                                                          |
+                                                          v
+                                    [Login: DashboardLayout encontra perfil]
+                                    [com root_company_id correto]
+                                                          |
+                                                          v
+                                           [Dashboard do Colaborador]
+```
 
