@@ -146,8 +146,57 @@ export const DashboardLayout = () => {
 
       setProfile(data);
 
-      // Check if needs onboarding
+      // Check if needs onboarding - BUT only for non-employee users
+      // Employees should NEVER be redirected to company onboarding
       if (!data.root_company_id) {
+        // First check if user has employee role - they shouldn't do company onboarding
+        const { data: roles } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id);
+        
+        const userRoles = roles?.map(r => r.role) || [];
+        const isEmployee = userRoles.includes('employee');
+        
+        // If employee without company, try to find matching profile by email
+        if (isEmployee) {
+          console.log('Employee without root_company_id - checking for original profile...');
+          
+          // Try to find original profile with same email that has root_company_id
+          const { data: matchingProfile } = await supabase
+            .from('profiles')
+            .select('root_company_id, full_name, job_title, grade, salary')
+            .eq('email', data.email)
+            .not('root_company_id', 'is', null)
+            .neq('id', session.user.id)
+            .maybeSingle();
+          
+          if (matchingProfile?.root_company_id) {
+            console.log('Found original profile, syncing data...');
+            // Copy data from original profile
+            await supabase
+              .from('profiles')
+              .update({
+                root_company_id: matchingProfile.root_company_id,
+                full_name: matchingProfile.full_name || data.full_name,
+                job_title: matchingProfile.job_title,
+                grade: matchingProfile.grade,
+                salary: matchingProfile.salary,
+              })
+              .eq('id', session.user.id);
+            
+            // Reload the page to get updated data
+            window.location.reload();
+            return;
+          }
+          
+          // If no matching profile found, show error and don't redirect to onboarding
+          console.error('Employee without company - contact admin');
+          setLoading(false);
+          return;
+        }
+        
+        // Only non-employees (admins creating companies) should go to onboarding
         navigate("/onboarding");
         return;
       }

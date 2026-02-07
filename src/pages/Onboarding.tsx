@@ -51,6 +51,22 @@ const Onboarding = () => {
         return;
       }
 
+      // Check if user is an employee - employees should NEVER access company onboarding
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id);
+      
+      const userRoles = roles?.map(r => r.role) || [];
+      const isEmployee = userRoles.includes('employee');
+      
+      // Block employees from accessing company onboarding
+      if (isEmployee) {
+        console.log('Employee attempted to access company onboarding - redirecting to dashboard');
+        navigate("/dashboard");
+        return;
+      }
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("root_company_id")
