@@ -78,7 +78,7 @@ const Roles = () => {
     setCurrentUserRoles(roles?.map((r: any) => r.role) || []);
   };
 
-  const isAdmin = () => currentUserRoles.includes("admin") || currentUserRoles.includes("super_admin");
+  const isAdminOrSuperAdmin = () => currentUserRoles.includes("admin") || currentUserRoles.includes("super_admin");
 
   const fetchData = async () => {
     try {
@@ -107,7 +107,7 @@ const Roles = () => {
   };
 
   const togglePermission = (role: string, permissionId: string) => {
-    if (!isAdmin()) return;
+    if (!isAdminOrSuperAdmin()) return;
 
     setHasChanges(true);
     const exists = hasPermission(role, permissionId);
@@ -124,18 +124,18 @@ const Roles = () => {
   };
 
   const handleSave = async () => {
-    if (!isAdmin()) {
+    if (!isAdminOrSuperAdmin()) {
       toast.error("Você não tem permissão para salvar alterações");
       return;
     }
 
     setSaving(true);
     try {
-      // Delete all existing role_permissions
+      // Delete all existing role_permissions using gt to match all UUIDs
       const { error: deleteError } = await supabase
         .from("role_permissions")
         .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
+        .gt("id", "00000000-0000-0000-0000-000000000000");
 
       if (deleteError) throw deleteError;
 
@@ -158,7 +158,7 @@ const Roles = () => {
     }
   };
 
-  if (!isAdmin()) {
+  if (!isAdminOrSuperAdmin()) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Card className="max-w-md">
@@ -250,7 +250,7 @@ const Roles = () => {
                         id={`${role}-${permission.id}`}
                         checked={hasPermission(role, permission.id)}
                         onCheckedChange={() => togglePermission(role, permission.id)}
-                        disabled={!isAdmin()}
+                        disabled={!isAdminOrSuperAdmin()}
                       />
                       <div className="flex-1 min-w-0">
                         <Label
