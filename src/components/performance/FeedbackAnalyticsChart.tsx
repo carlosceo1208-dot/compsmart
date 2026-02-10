@@ -19,7 +19,7 @@ export const FeedbackAnalyticsChart = ({
   feedbacksReceived = 0
 }: FeedbackAnalyticsChartProps) => {
   const chartData = [
-    { name: "Kudos", value: kudosThisMonth, color: "#ec4899", icon: Award },
+    { name: "Reconhecimento", value: kudosThisMonth, color: "#ec4899", icon: Award },
     { name: "1:1s", value: oneOnOnesThisMonth, color: "#8b5cf6", icon: Calendar },
     { name: "Feedbacks Enviados", value: feedbacksSent, color: "#3b82f6", icon: MessageSquare },
     { name: "Feedbacks Recebidos", value: feedbacksReceived, color: "#22c55e", icon: ThumbsUp },

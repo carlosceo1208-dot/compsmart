@@ -80,7 +80,7 @@ export const HeaderNotifications = () => {
                   <Award className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Kudos Recebidos</p>
+                  <p className="text-sm font-medium">Reconhecimentos Recebidos</p>
                   <p className="text-xs text-muted-foreground">
                     {unreadKudos} {unreadKudos === 1 ? 'novo reconhecimento' : 'novos reconhecimentos'}
                   </p>
