@@ -1505,6 +1505,61 @@ export type Database = {
           },
         ]
       }
+      evaluation_potential_dimensions: {
+        Row: {
+          comment: string | null
+          created_at: string
+          dimension: string
+          evaluation_id: string
+          id: string
+          root_company_id: string
+          score: number
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          dimension: string
+          evaluation_id: string
+          id?: string
+          root_company_id: string
+          score?: number
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          dimension?: string
+          evaluation_id?: string
+          id?: string
+          root_company_id?: string
+          score?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evaluation_potential_dimensions_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "performance_evaluations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_potential_dimensions_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_evaluations_directory"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_potential_dimensions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       external_feedback_requests: {
         Row: {
           completed_at: string | null
@@ -2830,11 +2885,17 @@ export type Database = {
           final_score: number | null
           goals_score: number | null
           id: string
+          impact_level: Database["public"]["Enums"]["impact_level"] | null
           improvement_areas: string | null
           is_probationary: boolean | null
           manager_comments: string | null
           potential_score: number | null
           probationary_decision: string | null
+          retention_risk_factors: Json | null
+          retention_risk_level:
+            | Database["public"]["Enums"]["retention_risk_level"]
+            | null
+          retention_risk_notes: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           root_company_id: string
@@ -2857,11 +2918,17 @@ export type Database = {
           final_score?: number | null
           goals_score?: number | null
           id?: string
+          impact_level?: Database["public"]["Enums"]["impact_level"] | null
           improvement_areas?: string | null
           is_probationary?: boolean | null
           manager_comments?: string | null
           potential_score?: number | null
           probationary_decision?: string | null
+          retention_risk_factors?: Json | null
+          retention_risk_level?:
+            | Database["public"]["Enums"]["retention_risk_level"]
+            | null
+          retention_risk_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           root_company_id: string
@@ -2884,11 +2951,17 @@ export type Database = {
           final_score?: number | null
           goals_score?: number | null
           id?: string
+          impact_level?: Database["public"]["Enums"]["impact_level"] | null
           improvement_areas?: string | null
           is_probationary?: boolean | null
           manager_comments?: string | null
           potential_score?: number | null
           probationary_decision?: string | null
+          retention_risk_factors?: Json | null
+          retention_risk_level?:
+            | Database["public"]["Enums"]["retention_risk_level"]
+            | null
+          retention_risk_notes?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           root_company_id?: string
@@ -5621,6 +5694,7 @@ export type Database = {
         | "completed"
         | "expired"
         | "cancelled"
+      impact_level: "low" | "medium" | "high"
       performance_cycle_status:
         | "draft"
         | "goals"
@@ -5672,6 +5746,7 @@ export type Database = {
         | "development"
       performance_scale_type: "numeric_1_5" | "conceptual" | "percentage"
       proficiency_level: "basic" | "intermediate" | "advanced" | "expert"
+      retention_risk_level: "low" | "medium" | "high"
       salary_modality: "fixed_salary" | "total_cash" | "total_compensation"
       user_status: "active" | "inactive"
     }
@@ -5811,6 +5886,7 @@ export const Constants = {
         "expired",
         "cancelled",
       ],
+      impact_level: ["low", "medium", "high"],
       performance_cycle_status: [
         "draft",
         "goals",
@@ -5864,6 +5940,7 @@ export const Constants = {
       ],
       performance_scale_type: ["numeric_1_5", "conceptual", "percentage"],
       proficiency_level: ["basic", "intermediate", "advanced", "expert"],
+      retention_risk_level: ["low", "medium", "high"],
       salary_modality: ["fixed_salary", "total_cash", "total_compensation"],
       user_status: ["active", "inactive"],
     },
