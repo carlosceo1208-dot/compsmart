@@ -21,7 +21,7 @@ const quickActions = [
   { id: '2', questionText: 'O que é a Matriz 9Box?', priority: 2 },
   { id: '3', questionText: 'Como cascatear metas?', priority: 3 },
   { id: '4', questionText: 'Para que serve o PDI?', priority: 4 },
-  { id: '5', questionText: 'Como enviar Kudos?', priority: 5 },
+  { id: '5', questionText: 'Como enviar Reconhecimento?', priority: 5 },
   { id: '6', questionText: 'Qual a diferença entre avaliação e feedback?', priority: 6 },
 ];
 
