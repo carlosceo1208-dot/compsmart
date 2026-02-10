@@ -327,7 +327,7 @@ export default function PerformanceDashboard() {
                 </Link>
                 <Link to="/performance/kudos">
                   <Badge variant="outline" className="bg-pink-50 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 border-pink-200 dark:border-pink-700 hover:bg-pink-100 dark:hover:bg-pink-900/50 cursor-pointer transition-colors">
-                    Kudos
+                    Reconhecimento
                   </Badge>
                 </Link>
                 <Link to="/performance/one-on-ones">
