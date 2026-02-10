@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { UserPlus, Plus, Search, Loader2, MoreVertical, Pencil, Trash2, Users } from "lucide-react";
+import { UserPlus, Plus, Search, Loader2, MoreVertical, Pencil, Trash2, Users, List, GitBranch } from "lucide-react";
 import { 
   usePerformanceSuccession, 
   readinessLabels, 
@@ -16,6 +16,7 @@ import { SuccessionDialog } from "@/components/performance/SuccessionDialog";
 import { KeyPositionDetailPanel } from "@/components/performance/KeyPositionDetailPanel";
 import { SuccessionApprovalCard } from "@/components/performance/SuccessionApprovalCard";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { SuccessionOrgTree } from "@/components/performance/SuccessionOrgTree";
 
 export default function PerformanceSuccession() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function PerformanceSuccession() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterReadiness, setFilterReadiness] = useState<string | null>(null);
   const [selectedPositionId, setSelectedPositionId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"list" | "tree">("list");
 
   const { successions, isLoading, deleteSuccession } = usePerformanceSuccession();
 
@@ -116,13 +118,35 @@ export default function PerformanceSuccession() {
             Identifique e prepare sucessores para posições-chave
           </p>
         </div>
-        <Button 
-          className="gap-2 bg-indigo-600 hover:bg-indigo-700"
-          onClick={handleNewMapping}
-        >
-          <Plus className="h-4 w-4" />
-          Mapear Sucessão
-        </Button>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded-lg border border-border overflow-hidden">
+            <Button
+              variant={viewMode === "list" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-none h-8 px-3"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="h-4 w-4 mr-1" />
+              Lista
+            </Button>
+            <Button
+              variant={viewMode === "tree" ? "default" : "ghost"}
+              size="sm"
+              className="rounded-none h-8 px-3"
+              onClick={() => setViewMode("tree")}
+            >
+              <GitBranch className="h-4 w-4 mr-1" />
+              Árvore
+            </Button>
+          </div>
+          <Button 
+            className="gap-2 bg-indigo-600 hover:bg-indigo-700"
+            onClick={handleNewMapping}
+          >
+            <Plus className="h-4 w-4" />
+            Mapear Sucessão
+          </Button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -189,6 +213,8 @@ export default function PerformanceSuccession() {
             )}
           </CardContent>
         </Card>
+      ) : viewMode === "tree" ? (
+        <SuccessionOrgTree groupedSuccessions={groupedSuccessions} />
       ) : (
         <div className="flex gap-4 flex-col lg:flex-row">
           {/* Left: Position Cards - 40% width */}
