@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 import type { SuccessionWithRelations } from "@/hooks/usePerformanceSuccession";
 
 interface KeyPositionDetailPanelProps {
@@ -341,15 +342,8 @@ export function KeyPositionDetailPanel({ positionId, successors }: KeyPositionDe
             </div>
           ) : aiAnalysis ? (
             <div className="p-4 bg-gradient-to-br from-violet-50/50 to-purple-50/30 dark:from-violet-950/20 dark:to-purple-950/10 rounded-lg border border-violet-200/50 dark:border-violet-800/30">
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                <div 
-                  className="text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ 
-                    __html: aiAnalysis
-                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                      .replace(/\n/g, '<br />') 
-                  }}
-                />
+              <div className="prose prose-sm dark:prose-invert max-w-none text-sm text-foreground/90 leading-relaxed">
+                <ReactMarkdown>{aiAnalysis}</ReactMarkdown>
               </div>
             </div>
           ) : (
