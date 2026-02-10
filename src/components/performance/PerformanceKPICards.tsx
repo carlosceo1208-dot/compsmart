@@ -77,7 +77,7 @@ export const PerformanceKPICards = ({ metrics, cycleInfo }: PerformanceKPICardsP
       link: "/performance/pdi",
     },
     {
-      title: "Kudos",
+      title: "Reconhecimento",
       value: metrics.kudosThisMonth.toString(),
       subtitle: "Este mês",
       icon: Award,

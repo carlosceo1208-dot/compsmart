@@ -54,7 +54,7 @@ export const RecentActivityCard = () => {
         results.push({
           id: k.id,
           type: "kudos",
-          title: `Kudos enviado`,
+          title: `Reconhecimento enviado`,
           description: `${k.sender?.full_name} → ${k.receiver?.full_name}`,
           timestamp: k.created_at,
           user: { name: k.sender?.full_name, avatar: k.sender?.avatar_url },
