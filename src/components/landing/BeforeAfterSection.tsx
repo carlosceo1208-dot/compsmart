@@ -1,23 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { XCircle, CheckCircle2, Clock, FileSpreadsheet, Brain, AlertTriangle, Users, BarChart3, Zap, Shield, TrendingUp, Award } from "lucide-react";
+import { XCircle, CheckCircle2, DollarSign, FileSpreadsheet, Brain, AlertTriangle, BarChart3, Zap, Shield, TrendingUp, Award, Scale } from "lucide-react";
 
 const problems = [
-  { icon: Clock, text: "14 dias para fechar revisão salarial" },
-  { icon: FileSpreadsheet, text: "5+ planilhas desconectadas" },
-  { icon: Brain, text: 'Decisões baseadas em "feeling"' },
-  { icon: AlertTriangle, text: "Erros de fórmula e retrabalho constante" },
-  { icon: BarChart3, text: "CFO sem previsibilidade de custo" },
-  { icon: Users, text: "Talentos saindo por injustiça percebida" },
+  { icon: DollarSign, text: "Tabelas salariais desatualizadas e sem critério técnico" },
+  { icon: Scale, text: "Sem visibilidade de equidade interna e externa" },
+  { icon: FileSpreadsheet, text: "5+ planilhas desconectadas para gerir salários" },
+  { icon: BarChart3, text: "CFO sem previsibilidade de custo de pessoal" },
+  { icon: Brain, text: 'Decisões de aumento baseadas em "feeling"' },
+  { icon: AlertTriangle, text: "Talentos saindo por falta de meritocracia" },
 ];
 
 const benefits = [
-  { icon: Zap, text: "2 horas para simular 5 cenários diferentes" },
-  { icon: Shield, text: "Tudo integrado em uma única plataforma" },
-  { icon: BarChart3, text: "Decisões baseadas em dados auditáveis" },
-  { icon: Brain, text: "Automação inteligente com IA" },
-  { icon: TrendingUp, text: "CFO com controle financeiro em tempo real" },
-  { icon: Award, text: "Meritocracia transparente e justa" },
+  { icon: Zap, text: "Tabelas salariais automáticas com curvas e faixas" },
+  { icon: Scale, text: "Equidade interna auditável por área, gênero e nível" },
+  { icon: BarChart3, text: "Simulação de dissídio, aumentos e cenários em minutos" },
+  { icon: Shield, text: "CFO com controle de budget e headcount em tempo real" },
+  { icon: TrendingUp, text: "Avaliação de desempenho alimenta decisões de mérito" },
+  { icon: Award, text: "Meritocracia transparente com PDI, metas e 9Box integrados" },
 ];
 
 export const BeforeAfterSection = () => {
@@ -28,7 +28,7 @@ export const BeforeAfterSection = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-3">
-            Sua gestão de pessoas <strong>HOJE</strong> vs. <strong className="text-secondary">COM CompSmart</strong>
+            Sua gestão de remuneração <strong>HOJE</strong> vs. <strong className="text-secondary">COM CompSmart</strong>
           </h2>
           <p className="text-muted-foreground text-lg">Veja a transformação lado a lado</p>
         </div>
@@ -79,7 +79,7 @@ export const BeforeAfterSection = () => {
                 ))}
               </ul>
               <p className="text-sm italic text-secondary-dark pt-2">
-                RH se torna estratégico. Decisões ganham velocidade e precisão.
+                RH se torna estratégico. Remuneração justa porque baseada em dados reais de desempenho.
               </p>
             </div>
           </div>
