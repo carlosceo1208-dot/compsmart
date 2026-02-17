@@ -3,6 +3,25 @@ import { Sparkles, Users, BarChart3, TrendingUp, DollarSign } from "lucide-react
 import { ImpactCalculator } from "./ImpactCalculator";
 import { useState, useEffect, useRef } from "react";
 
+const COMPANY_CYCLE = [1, 2, 3, 2, 1, 3, 2];
+const LiveCompanyCounter = () => {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIdx((prev) => (prev + 1) % COMPANY_CYCLE.length);
+    }, 240_000 + Math.random() * 60_000); // ~4-5 min
+    return () => clearInterval(interval);
+  }, []);
+  const count = COMPANY_CYCLE[idx];
+  return (
+    <div className="flex justify-end">
+      <Badge className="bg-destructive/10 text-destructive border-destructive/20 px-4 py-2 animate-pulse-slow transition-all">
+        🔥 <strong>{count} empresa{count > 1 ? "s" : ""}</strong> avaliando agora
+      </Badge>
+    </div>
+  );
+};
+
 const AnimatedCounter = ({ target, suffix = "" }: { target: number; suffix?: string }) => {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -125,11 +144,7 @@ export const HeroSection = () => {
             </div>
 
             {/* Floating badge */}
-            <div className="flex justify-end">
-              <Badge className="bg-destructive/10 text-destructive border-destructive/20 px-4 py-2 animate-pulse-slow">
-                🔥 <strong>2 empresas</strong> avaliando agora
-              </Badge>
-            </div>
+            <LiveCompanyCounter />
           </div>
         </div>
       </div>
