@@ -30,7 +30,7 @@ const features = [
   },
   {
     name: "Agentes de IA Especializados",
-    compsmart: { status: "yes", text: "3 agentes incluídos" },
+    compsmart: { status: "yes", text: "4 agentes incluídos" },
     tradA: { status: "no", text: "Não tem" },
     tradB: { status: "warn", text: "Add-on pago" },
   },

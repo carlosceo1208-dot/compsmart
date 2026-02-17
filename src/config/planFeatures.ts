@@ -21,7 +21,7 @@ export const planFeatures: Record<string, PlanFeature[]> = {
   "Medium": [
     { text: "Até 200 colaboradores" },
     { text: "Tudo do Starter incluído" },
-    { text: "2 IAs: Jurídico + Salary Smart", tooltip: "Dois agentes especializados", isNew: true },
+    { text: "3 IAs: Jurídico + Salary Smart + PerformAI", tooltip: "Três agentes especializados incluindo PerformAI para avaliação de desempenho", isNew: true },
     { text: "Organograma Interativo", tooltip: "Visualização hierárquica", isNew: true },
     { text: "Planejamento Orçamentário", tooltip: "Gestão de budget e headcount", isNew: true },
     { text: "Acesso do Gestor", tooltip: "Visualiza apenas sua própria área", isNew: true },
@@ -35,7 +35,7 @@ export const planFeatures: Record<string, PlanFeature[]> = {
   "Pro": [
     { text: "Até 500 colaboradores" },
     { text: "Tudo do Medium incluído" },
-    { text: "3 IAs: Jurídico + Salary + Rem&Benef", tooltip: "Todos os agentes IA", isNew: true },
+    { text: "4 IAs: Jurídico + Salary + Rem&Benef + PerformAI", tooltip: "Todos os 4 agentes IA incluindo PerformAI para desempenho", isNew: true },
     { text: "Pesquisa Salarial Total Cash", tooltip: "Salário Fixo + Variável (Bônus, PLR, Comissões)", isNew: true },
     { text: "Pesquisa Salarial Total Compensation", tooltip: "Total Cash + Benefícios + ILP", isNew: true },
     { text: "Portal do Colaborador", tooltip: "Acesso aos próprios dados (opcional)" },
