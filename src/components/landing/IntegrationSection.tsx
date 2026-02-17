@@ -40,7 +40,7 @@ export const IntegrationSection = () => {
         <div className="flex justify-center mb-8">
           <Badge className="bg-gradient-to-r from-primary to-secondary text-primary-foreground px-5 py-2 text-sm shadow-lg">
             <Sparkles className="h-4 w-4 mr-2" />
-            Desempenho + Remuneração incluídos — Sem custo adicional
+            Remuneração + Desempenho incluídos — Sem custo adicional
           </Badge>
         </div>
 
