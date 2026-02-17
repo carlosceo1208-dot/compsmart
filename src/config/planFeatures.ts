@@ -14,6 +14,7 @@ export const planFeatures: Record<string, PlanFeature[]> = {
     { text: "Calculadora de Encargos", isNew: true },
     { text: "Tabela Salarial" },
     { text: "Dashboards essenciais" },
+    { text: "Avaliação de Desempenho integrada", tooltip: "Avaliação 90°, 180°, PDI, Matriz 9Box", isNew: true },
     { text: "2 usuários administradores" },
     { text: "Suporte por email" }
   ],
@@ -26,6 +27,7 @@ export const planFeatures: Record<string, PlanFeature[]> = {
     { text: "Acesso do Gestor", tooltip: "Visualiza apenas sua própria área", isNew: true },
     { text: "Simulação de Políticas Salariais", isNew: true },
     { text: "Gestão de PLR e Incentivos" },
+    { text: "Avaliação completa (90°, 180°, 360°, 6 modelos, PDI, 9Box, Sucessão)", tooltip: "Padrão, Liderança, Vendas, Técnico, Operacional, Administrativo", isNew: true },
     { text: "Relatórios avançados" },
     { text: "5 usuários" },
     { text: "Suporte prioritário" }
@@ -38,6 +40,7 @@ export const planFeatures: Record<string, PlanFeature[]> = {
     { text: "Pesquisa Salarial Total Compensation", tooltip: "Total Cash + Benefícios + ILP", isNew: true },
     { text: "Portal do Colaborador", tooltip: "Acesso aos próprios dados (opcional)" },
     { text: "Análise de equidade interna", tooltip: "Comparações por área, nível, faixa e gênero" },
+    { text: "Avaliação avançada + Reconhecimento + 5 dimensões de agilidade", tooltip: "Aprendizado, Mental, Pessoas, Mudanças, Resultados", isNew: true },
     { text: "Modelagem preditiva", tooltip: "Forecast de 12-36 meses" },
     { text: "Dashboard de riscos trabalhistas" },
     { text: "Usuários ilimitados" },

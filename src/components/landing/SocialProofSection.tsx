@@ -4,36 +4,36 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Clock, TrendingUp, DollarSign, Building2, Users, BarChart3 } from "lucide-react";
 
 const notifications = [
-  { company: "TechCorp", employees: 850, action: "simulou revisão salarial", time: "há 2min" },
-  { company: "Indústria XYZ", employees: 600, action: "economizou 120h/mês", time: "há 5min" },
-  { company: "Varejo ABC", employees: 1200, action: "integrou avaliação + remuneração", time: "há 8min" },
-  { company: "Consultoria DEF", employees: 380, action: "aprovou 47 decisões salariais", time: "há 12min" },
-  { company: "Grupo GHI", employees: 2500, action: "identificou R$ 230k em distorções", time: "há 15min" },
+  { company: "TechCorp", employees: 850, action: "simulou dissídio coletivo escalonado", time: "há 2min" },
+  { company: "Indústria XYZ", employees: 600, action: "economizou R$ 47k corrigindo distorções salariais", time: "há 5min" },
+  { company: "Varejo ABC", employees: 1200, action: "completou revisão salarial com 9Box integrado", time: "há 8min" },
+  { company: "Consultoria DEF", employees: 380, action: "aprovou 47 ajustes de mérito baseados em avaliação 360", time: "há 12min" },
+  { company: "Grupo GHI", employees: 2500, action: "identificou R$ 230k em distorções com análise de equidade", time: "há 15min" },
 ];
 
 const microCases = [
   {
-    icon: Clock,
-    headline: "De 2 semanas para 1 dia",
-    quote: "Antes: cruzar avaliação e salários levava 2 semanas com 3 pessoas. Hoje: faço sozinha em 1 dia.",
-    name: "Paula M.",
-    role: "Diretora de RH • Tecnologia, 1.200 colab.",
-    metric: "⏱️ 93% de redução de tempo",
-    color: "text-primary",
-  },
-  {
     icon: DollarSign,
     headline: "R$ 47 mil economizados no 1° ano",
-    quote: "Identificamos distorções salariais que estavam custando caro e gerando turnover invisível.",
+    quote: "Identificamos distorções salariais que estavam custando caro e gerando turnover invisível. O CompSmart mostrou tudo em um dashboard.",
     name: "Ricardo A.",
     role: "CFO • Indústria, 600 colab.",
     metric: "💰 R$ 47k economizados",
     color: "text-secondary",
   },
   {
+    icon: Clock,
+    headline: "De 2 semanas para 1 dia",
+    quote: "Antes: cruzar tabela salarial e avaliações levava 2 semanas com 3 pessoas. Hoje: faço sozinha em 1 dia com simulação de cenários.",
+    name: "Paula M.",
+    role: "Diretora de RH • Tecnologia, 1.200 colab.",
+    metric: "⏱️ 93% de redução de tempo",
+    color: "text-primary",
+  },
+  {
     icon: TrendingUp,
     headline: "Retenção subiu 23% em 6 meses",
-    quote: "Talentos agora confiam no processo de meritocracia. Transparência virou vantagem competitiva.",
+    quote: "Com remuneração baseada em dados reais de desempenho, talentos agora confiam no processo de meritocracia.",
     name: "Fernanda C.",
     role: "CEO • Serviços, 380 colab.",
     metric: "📈 +23% retenção",
@@ -55,7 +55,7 @@ export const SocialProofSection = () => {
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4 max-w-5xl">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
-          Empresas eliminando planilhas <strong className="text-primary">agora</strong>
+          Empresas transformando sua <strong className="text-primary">gestão de remuneração</strong> agora
         </h2>
 
         {/* Live notifications */}

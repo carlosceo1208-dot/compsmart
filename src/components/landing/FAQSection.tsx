@@ -6,14 +6,20 @@ export const FAQSection = () => {
   const faqs = [
     // INTEGRAÇÃO DESEMPENHO + REMUNERAÇÃO
     {
-      question: "Como funciona a integração entre Desempenho e Remuneração?",
-      answer: "A CompSmart foi construída como um sistema único. Quando você avalia um colaborador (90°, 180°, 360°, metas), a nota automaticamente alimenta o módulo de remuneração, que sugere faixa salarial ideal, identifica distorções e permite simular ajustes. Não é integração via API — é um fluxo nativo.",
+      question: "Como funciona a integração entre Remuneração e Desempenho?",
+      answer: "O CompSmart foi construído como plataforma de Gestão Estratégica de Remuneração. A Avaliação de Desempenho — com 6 modelos (Padrão, Liderança, Vendas, Técnico, Operacional, Administrativo), 5 dimensões de agilidade, 9Box, PDI e Plano de Sucessão — alimenta nativamente as decisões de remuneração. Quando você avalia um colaborador, o sistema automaticamente sugere faixa salarial ideal, identifica distorções e permite simular ajustes.",
       icon: TrendingUp,
       isNew: true
     },
     {
       question: "Posso usar apenas Remuneração OU apenas Desempenho?",
-      answer: "Sim, você pode usar um módulo por vez. Mas o verdadeiro valor está na integração — e você não paga nada a mais por ter os dois. É tudo incluído.",
+      answer: "O foco principal do CompSmart é a Gestão Estratégica de Remuneração: tabelas salariais, faixas, simulações, equidade, budget e incentivos (ICP e ILP). A Avaliação de Desempenho complementa fornecendo dados de performance, metas, PDI, Reconhecimento e Sucessão que fundamentam decisões justas de mérito. Você pode começar apenas pela Remuneração e ativar Desempenho quando quiser — sem custo adicional.",
+      icon: Settings,
+      isNew: true
+    },
+    {
+      question: "Quais modelos de avaliação de desempenho estão disponíveis?",
+      answer: "6 modelos prontos e personalizáveis: Padrão, Liderança, Vendas, Técnico, Operacional e Administrativo. Cada um com indicadores e pesos configuráveis. As avaliações usam 5 dimensões de agilidade (Aprendizado, Mental, Pessoas, Mudanças, Resultados) e alimentam automaticamente a Matriz 9Box e as recomendações de remuneração.",
       icon: Settings,
       isNew: true
     },

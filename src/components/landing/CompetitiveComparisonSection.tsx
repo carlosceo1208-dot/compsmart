@@ -5,28 +5,46 @@ import { useNavigate } from "react-router-dom";
 
 const features = [
   {
-    name: "Desempenho + Remuneração Integrados",
+    name: "Tabelas e Faixas Salariais Automáticas",
+    compsmart: { status: "yes", text: "Curvas e amplitudes" },
+    tradA: { status: "warn", text: "Básico" },
+    tradB: { status: "no", text: "Não tem" },
+  },
+  {
+    name: "Simulação de Dissídio e Cenários",
+    compsmart: { status: "yes", text: "Fixo + Escalonado" },
+    tradA: { status: "no", text: "Não tem" },
+    tradB: { status: "no", text: "Não tem" },
+  },
+  {
+    name: "ICP + ILP (PLR, Stock Options, RSU)",
     compsmart: { status: "yes", text: "Incluído" },
+    tradA: { status: "warn", text: "Só PLR" },
+    tradB: { status: "no", text: "Não tem" },
+  },
+  {
+    name: "Desempenho + Remuneração Integrados",
+    compsmart: { status: "yes", text: "Nativo" },
     tradA: { status: "no", text: "Módulos separados" },
     tradB: { status: "warn", text: "Via API externa" },
+  },
+  {
+    name: "Agentes de IA Especializados",
+    compsmart: { status: "yes", text: "3 agentes incluídos" },
+    tradA: { status: "no", text: "Não tem" },
+    tradB: { status: "warn", text: "Add-on pago" },
+  },
+  {
+    name: "Equidade Interna Auditável",
+    compsmart: { status: "yes", text: "Por área, gênero, nível" },
+    tradA: { status: "warn", text: "Limitada" },
+    tradB: { status: "no", text: "Não tem" },
   },
   {
     name: "Trial sem cartão",
     compsmart: { status: "yes", text: "14 dias" },
     tradA: { status: "no", text: "Precisa falar com consultor" },
     tradB: { status: "no", text: "7 dias c/ cartão" },
-  },
-  {
-    name: "Agentes de IA",
-    compsmart: { status: "yes", text: "3 agentes incluídos" },
-    tradA: { status: "no", text: "Não tem" },
-    tradB: { status: "warn", text: "Add-on pago" },
-  },
-  {
-    name: "Simulação de Cenários",
-    compsmart: { status: "yes", text: "Ilimitada" },
-    tradA: { status: "warn", text: "Limitada" },
-    tradB: { status: "no", text: "Não tem" },
   },
   {
     name: "Setup",

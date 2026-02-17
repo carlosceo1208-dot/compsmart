@@ -42,7 +42,7 @@ export const HeroSection = () => {
         <div className="flex justify-center mb-6">
           <Badge className="bg-secondary/10 text-secondary border-secondary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
             <Sparkles className="h-3 w-3 mr-2" />
-            Gestão Integrada de Desempenho + Remuneração
+            Gestão Estratégica de Remuneração com Avaliação de Desempenho Integrada
           </Badge>
         </div>
 
@@ -71,15 +71,15 @@ export const HeroSection = () => {
 
               {/* KPI Cards */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-primary/5 rounded-lg p-3 text-center">
-                  <Users className="h-4 w-4 text-primary mx-auto mb-1" />
-                  <p className="text-lg font-bold text-primary"><AnimatedCounter target={487} /></p>
-                  <p className="text-[10px] text-muted-foreground">Colaboradores</p>
-                </div>
                 <div className="bg-secondary/5 rounded-lg p-3 text-center">
                   <BarChart3 className="h-4 w-4 text-secondary mx-auto mb-1" />
                   <p className="text-lg font-bold text-secondary"><AnimatedCounter target={94} suffix="%" /></p>
                   <p className="text-[10px] text-muted-foreground">Dentro da Faixa</p>
+                </div>
+                <div className="bg-primary/5 rounded-lg p-3 text-center">
+                  <DollarSign className="h-4 w-4 text-primary mx-auto mb-1" />
+                  <p className="text-sm font-bold text-primary">R$ <AnimatedCounter target={12} />,4M</p>
+                  <p className="text-[10px] text-muted-foreground">Folha Anual</p>
                 </div>
                 <div className="bg-warning/5 rounded-lg p-3 text-center">
                   <TrendingUp className="h-4 w-4 text-warning mx-auto mb-1" />
