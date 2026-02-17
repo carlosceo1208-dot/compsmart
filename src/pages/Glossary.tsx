@@ -146,6 +146,97 @@ const glossaryTerms: GlossaryTerm[] = [
     term: "Cliff",
     definition: "Período de carência inicial em programas de ILP durante o qual o colaborador não adquire direito ao benefício.",
     category: "Incentivos"
+  },
+  // Avaliação de Desempenho
+  {
+    term: "Avaliação 90°",
+    definition: "Avaliação feita exclusivamente pelo gestor direto do colaborador. Modelo mais simples e rápido, ideal para empresas que estão iniciando o processo de avaliação.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Avaliação 180°",
+    definition: "Avaliação com duas perspectivas: autoavaliação do colaborador + avaliação do gestor direto. Permite comparar a percepção do colaborador com a visão do líder.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Avaliação 360°",
+    definition: "Avaliação multidirecional que inclui autoavaliação, gestor, pares, subordinados e, opcionalmente, clientes e fornecedores externos. Visão completa do colaborador.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Matriz 9Box",
+    definition: "Ferramenta que classifica colaboradores em 9 quadrantes combinando dois eixos: Desempenho (entregas) e Potencial (capacidade futura). Escala de 0 a 5.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "PDI (Plano de Desenvolvimento Individual)",
+    definition: "Plano estruturado de ações de desenvolvimento para o colaborador, gerado a partir dos gaps identificados na avaliação de desempenho.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Dimensões de Agilidade",
+    definition: "Cinco dimensões usadas para avaliar o potencial do colaborador: Aprendizado, Mental, Pessoas, Mudanças e Resultados.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "OKR (Objectives and Key Results)",
+    definition: "Metodologia de definição de metas com objetivos qualitativos e resultados-chave mensuráveis. No CompSmart, as metas cascateiam da empresa para departamento e colaborador.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Plano de Sucessão",
+    definition: "Identificação e preparação de até 3 potenciais sucessores para posições-chave da organização, baseado em desempenho, potencial e prontidão.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Reconhecimento (Kudos)",
+    definition: "Prática de valorizar comportamentos e conquistas dos colaboradores de forma pública e registrada, integrada ao ciclo de desempenho.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "1:1 (One-on-One)",
+    definition: "Reunião periódica entre gestor e colaborador para acompanhamento de metas, feedback contínuo e alinhamento de expectativas.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Feedback Contínuo",
+    definition: "Prática de fornecer retorno constante ao colaborador sobre sua performance, sem esperar o ciclo formal de avaliação.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Compa-Ratio de Mérito",
+    definition: "Relação entre o salário do colaborador e o ponto médio da faixa, ajustada pela nota de desempenho para fundamentar decisões de aumento por mérito.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "eNPS (Employee Net Promoter Score)",
+    definition: "Indicador de engajamento que mede a probabilidade de um colaborador recomendar a empresa como bom lugar para trabalhar. Classifica em Promotores, Neutros e Detratores.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "PerformAI",
+    definition: "Agente de inteligência artificial do CompSmart especializado em avaliação de desempenho. Auxilia na elaboração de feedbacks, geração de PDIs automáticos, análise de 9Box e devolutivas personalizadas com base nos dados reais do colaborador.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Risco de Retenção",
+    definition: "Indicador que classifica o risco de perda de um colaborador (Baixo, Médio, Alto) com base em fatores como remuneração, carreira, clima e mercado.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Ciclo de Avaliação",
+    definition: "Processo estruturado em 4 etapas: Metas (alinhamento), Acompanhamento (1:1s e feedback), Insights (9Box e analytics) e Fechamento (PDI e recomendações de mérito).",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Competências",
+    definition: "Conhecimentos, habilidades e atitudes avaliadas no ciclo de desempenho. No CompSmart, são 100% customizáveis por cargo, área ou nível hierárquico.",
+    category: "Avaliação de Desempenho"
+  },
+  {
+    term: "Metas Individuais, Departamentais e Corporativas",
+    definition: "Três níveis de metas cascateadas com pesos configuráveis: da empresa para o departamento e do departamento para o colaborador, garantindo alinhamento estratégico.",
+    category: "Avaliação de Desempenho"
   }
 ];
 
@@ -185,9 +276,9 @@ const Glossary = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-12 max-w-5xl">
-        <h1 className="text-4xl font-bold mb-4 text-foreground">Glossário de C&S</h1>
+        <h1 className="text-4xl font-bold mb-4 text-foreground">Glossário de C&S e Desempenho</h1>
         <p className="text-muted-foreground mb-8">
-          Termos e conceitos essenciais de Compensação e Salários para gestão estratégica de remuneração.
+          Termos e conceitos essenciais de Compensação, Salários e Avaliação de Desempenho para gestão estratégica de remuneração e pessoas.
         </p>
 
         {/* Search and Filter */}
