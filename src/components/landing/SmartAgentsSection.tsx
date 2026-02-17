@@ -5,6 +5,7 @@ import { Bot, Briefcase, FileText, Sparkles, Clock, TrendingUp, Shield, Zap, Bra
 import avatarWoman2 from "@/assets/avatar-woman-2.png";
 import avatarMan1 from "@/assets/avatar-man-1.png";
 import avatarWoman1 from "@/assets/avatar-woman-1.png";
+import avatarWoman3 from "@/assets/avatar-woman-3.png";
 import { useScrollReveal, getStaggeredStyle } from "@/hooks/useScrollReveal";
 
 export const SmartAgentsSection = () => {
@@ -52,7 +53,7 @@ export const SmartAgentsSection = () => {
       title: "PerformAI",
       description: "Agente especializado em avaliação de desempenho: elabora feedbacks, gera PDIs automáticos, analisa 9Box e cria devolutivas personalizadas",
       badge: "Desempenho",
-      avatar: avatarMan1,
+      avatar: avatarWoman3,
       metrics: [
         { icon: Target, value: "360°", label: "avaliação completa" },
         { icon: Zap, value: "PDI", label: "gerado por IA" }
