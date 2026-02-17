@@ -1,160 +1,163 @@
 
 
-# Plano: Landing Page CompSmart 2.0 -- Secoes Prioritarias
+# Plano: Rebalancear Landing Page -- Enfase em Gestao Estrategica de Remuneracao
 
-## Resumo Estrategico
+## Diagnostico Atual
 
-Implementacao focada nas secoes de maior impacto na conversao, mantendo o que ja funciona bem e adicionando os novos elementos interativos que diferenciam a CompSmart 2.0. Fotos de pessoas serao substituidas por ilustracoes vetoriais/icones profissionais. Video institucional sera removido do Hero. Concorrentes usarao nomes genericos.
+A landing page atual trata Desempenho e Remuneracao com peso quase igual, mas o **mote principal do CompSmart e a Gestao Estrategica de Remuneracao** -- o problema mais tecnico e critico para organizacoes que ainda usam planilhas. A Avaliacao de Desempenho e um complemento poderoso que alimenta decisoes de remuneracao, nao o contrario.
 
----
-
-## Fase 1 -- Secoes Prioritarias (esta implementacao)
-
-### 1. Novo Hero Section com Calculadora Interativa
-- **Substituir** o HeroSection atual (remover video, particulas, orbs)
-- Split screen: 45% calculadora / 55% preview animado do dashboard
-- **Calculadora "Calcule Seu Impacto"**: 3 inputs com sliders (colaboradores 50-5000, horas/mes 10-200, custo/hora R$50-500)
-- Resultado em tempo real: custo anual perdido, dias de trabalho desperdicados, economia de 85%
-- 2 CTAs: "Eliminar Esse Custo Agora" (vai para /auth) + "Ver Como Funciona" (scroll para demo)
-- Trust badge: "14 dias gratis - Sem cartao - Cancele quando quiser"
-- Lado direito: icone ilustrativo de dashboard com animacoes CSS (contadores, barras preenchendo, cards em fade-in)
-- Badge flutuante: "87 empresas testando agora" com pulso
-- Eyebrow: "GESTAO INTEGRADA DE DESEMPENHO + REMUNERACAO"
-- Mobile: stack vertical, sliders touch-friendly, botoes full-width
-
-### 2. Secao "Antes vs Depois" (novo componente)
-- **Novo arquivo**: `BeforeAfterSection.tsx`
-- Split visual com 2 colunas: "Sem CompSmart" (tom negativo, header cinza escuro) vs "Com CompSmart" (tom positivo, header verde)
-- Listas com icones (circulos vermelhos vs checks verdes)
-- Ilustracoes com icones Lucide (nao fotos)
-- CTA centralizado abaixo
-
-### 3. Demo Interativa -- Wizard 4 Passos (novo componente)
-- **Novo arquivo**: `InteractiveDemoSection.tsx`
-- Progress bar com 4 circulos (ativo/completo/futuro)
-- **Passo 1**: Avaliar "Ana Silva" -- 4 competencias com estrelas clicaveis, calculo automatico da nota
-- **Passo 2**: Recomendacao salarial -- gauge visual semicirculo, faixa R$5.500-7.500, salario atual vs recomendado, alerta de distorcao
-- **Passo 3**: Simular impacto -- slider de novo salario, 3 cards de impacto (aumento, mensal, anual) atualizando em tempo real, grafico barras antes/depois
-- **Passo 4**: Aprovar decisao -- resumo com checks verdes, botao "Aprovar" que dispara confete CSS e mensagem de sucesso
-- CTA final: "Faca isso de verdade na sua empresa"
-- Nao requer cadastro -- tudo roda no frontend com dados ficticios
-
-### 4. Secao Integracao Desempenho + Remuneracao (novo componente)
-- **Novo arquivo**: `IntegrationSection.tsx`
-- Diagrama visual com 2 blocos (Desempenho azul + Remuneracao verde) conectados por setas animadas
-- Sub-icones em grid 2x3 para cada bloco
-- Badge flutuante: "Desempenho + Remuneracao incluidos -- Sem custo adicional"
-- Texto explicativo e CTA
-
-### 5. Atualizacao da PricingSection
-- Adicionar badge "Desempenho + Remuneracao incluidos" em cada card de plano
-- Feature adicional: "Modulo completo de Avaliacao (90, 180, 360, PDI, 9Box)"
-- Nota de lancamento: "Promocao ate 22/02/2026 -- assine agora e garanta para sempre"
-- Manter countdown existente (ja aponta para 22/02/2026)
-- Badge "MAIS ESCOLHIDO" no plano Medium (ja existe como "Mais Popular")
-
-### 6. Atualizacao do CTA Final
-- Atualizar textos: "Pronto para eliminar planilhas e tomar decisoes justas baseadas em dados?"
-- Countdown atualizado para 22/02/2026 (atualmente aponta para 07/01/2026)
-- Trust badges atualizados
-- Remover referencia a "Lancamento Oficial Janeiro 2026"
-
-### 7. Atualizacao da FAQ
-- Adicionar novas perguntas sobre integracao Desempenho + Remuneracao
-- Atualizar pergunta sobre precos (data de lancamento 22/02)
-- Adicionar pergunta sobre promocao de lancamento
-
-### 8. Social Proof Dinamico (novo componente)
-- **Novo arquivo**: `SocialProofSection.tsx`
-- Notificacoes animadas (fade-in/fade-out sequencial, 4s cada)
-- 3 micro-cases com icones ilustrativos (nao fotos), metricas destacadas
-- Dados ficticios mas realistas
-
-### 9. Comparacao Competitiva (novo componente)
-- **Novo arquivo**: `CompetitiveComparisonSection.tsx`
-- Tabela responsiva: CompSmart vs "Solucao Tradicional" vs "Ferramenta Isolada"
-- Checks verdes, X vermelhos, alertas amarelos
-- Scroll horizontal em mobile
-
-### 10. Atualizacao do Index.tsx
-- Reordenar secoes na nova sequencia:
-  1. Hero (calculadora)
-  2. Before/After
-  3. Demo Interativa
-  4. Integracao Desempenho+Remuneracao
-  5. Como Funciona (manter HowItWorksSection existente, atualizar para 5 passos)
-  6. Agentes IA (manter SmartAgentsSection existente)
-  7. Social Proof
-  8. Comparacao Competitiva
-  9. Seguranca (manter SecuritySection existente)
-  10. Precos
-  11. FAQ
-  12. CTA Final
-- Remover secoes redundantes: TrustBar, LogoSlider, AIShowcaseSection, WhatsNewSection, PainPointsSection, SolutionSection, TargetAudienceSection, DifferentialsSection, TestimonialsSection
-- Manter: LaunchPromoBanner, FloatingTrialBanner
-
-### 11. Sticky CTA Bar (novo componente)
-- **Novo arquivo**: `StickyCTABar.tsx`
-- Aparece apos 30s ou 50% scroll
-- Fixo no bottom (mobile) ou top (desktop)
-- Dismissivel, reaparece apos 2min
-- Texto: "Promocao termina em [X dias] - Trial 14 dias gratis"
+O rebalanceamento precisa acontecer em **8 componentes** para garantir que Remuneracao apareca como protagonista e Desempenho como integrador estrategico.
 
 ---
 
-## Secoes Existentes Mantidas (sem alteracao)
-- `SecuritySection.tsx` -- ja cobre LGPD e seguranca
-- `SmartAgentsSection.tsx` -- ja tem os 3 agentes
-- `Header.tsx` -- navegacao existente
-- `Footer.tsx` -- manter + adicionar links para calculadora, demo, FAQ
+## Alteracoes Planejadas
 
-## Secoes Removidas da Pagina (arquivos mantidos mas nao importados)
-- TrustBar, LogoSlider, AIShowcaseSection, WhatsNewSection
-- PainPointsSection, SolutionSection, TargetAudienceSection
-- DifferentialsSection, TestimonialsSection
+### 1. HeroSection.tsx -- Remuneracao como protagonista
+
+**Eyebrow:** Mudar de "Gestao Integrada de Desempenho + Remuneracao" para:
+"GESTAO ESTRATEGICA DE REMUNERACAO COM AVALIACAO DE DESEMPENHO INTEGRADA"
+
+**Headline:** Manter "Quanto tempo sua empresa perde com planilhas de RH?" (ja foca em Remuneracao/planilhas)
+
+**Dashboard Preview:** Reordenar KPIs para dar mais destaque a Remuneracao:
+- KPI 1: "94% Dentro da Faixa" (Remuneracao - manter destaque)
+- KPI 2: "R$ 12,4M Folha Anual" (novo - custo total gerenciado)
+- KPI 3: "23 Avaliacoes Pendentes" (Desempenho - manter mas em terceiro)
+
+Adicionar uma linha extra no dashboard preview: "Simulacao de Dissidio" ou "Curva Salarial" para reforcar que o core e remuneracao.
+
+### 2. BeforeAfterSection.tsx -- Problemas e solucoes focados em Remuneracao
+
+**Problemas (SEM COMPSMART):** Reordenar para liderar com dor de Remuneracao:
+1. "Tabelas salariais desatualizadas e sem criterio tecnico"
+2. "Sem visibilidade de equidade interna e externa"
+3. "5+ planilhas desconectadas para gerir salarios"
+4. "CFO sem previsibilidade de custo de pessoal"
+5. "Decisoes de aumento baseadas em 'feeling'"
+6. "Talentos saindo por falta de meritocracia"
+
+**Beneficios (COM COMPSMART):** Liderar com solucoes de Remuneracao:
+1. "Tabelas salariais automaticas com curvas e faixas"
+2. "Equidade interna auditavel por area, genero e nivel"
+3. "Simulacao de dissidio, aumentos e cenarios em minutos"
+4. "CFO com controle de budget e headcount em tempo real"
+5. "Avaliacao de desempenho alimenta decisoes de merito"
+6. "Meritocracia transparente com PDI, metas e 9Box integrados"
+
+### 3. InteractiveDemoSection.tsx -- Fluxo Remuneracao-primeiro
+
+Inverter a logica do wizard para comecar pela **dor de Remuneracao** e mostrar como o Desempenho complementa:
+
+**Passo 1: "Identificar Distorcao Salarial"** (NOVO - Remuneracao)
+- Mostrar colaboradora "Ana Silva" com salario atual R$ 5.200
+- Faixa salarial do cargo: R$ 5.500 - R$ 7.500 (Ponto Medio R$ 6.500)
+- Compa-Ratio: 80% (abaixo da faixa)
+- Alerta: "Distorcao identificada: Ana esta R$ 300 abaixo do minimo da faixa"
+- Texto: "O CompSmart identifica automaticamente colaboradores fora da faixa"
+
+**Passo 2: "Consultar Desempenho para Decisao"** (Desempenho como APOIO)
+- Mostrar as 5 dimensoes de agilidade de Ana (Aprendizado, Mental, Pessoas, Mudancas, Resultados)
+- Nota: 4.5/5
+- Badge 9Box: "Alto Potencial / Alto Desempenho"
+- Texto: "A avaliacao de desempenho confirma: Ana merece o ajuste. Decisao baseada em dados, nao em achismo."
+
+**Passo 3: "Simular Impacto Financeiro"** (Remuneracao)
+- Slider de ajuste salarial (manter como esta)
+- 3 cards de impacto (aumento, mensal, anual)
+- Grafico antes/depois
+
+**Passo 4: "Aprovar e Documentar"** (manter)
+- Adicionar: "Classificacao 9Box: Alto Potencial / Alto Desempenho"
+- Adicionar: "Base: Faixa salarial + avaliacao de merito"
+
+**Subtitulo da secao:** Mudar de "Simule uma avaliacao de desempenho conectada a remuneracao" para:
+"Veja como identificar distorcoes salariais e tomar decisoes justas com dados de desempenho integrados"
+
+### 4. IntegrationSection.tsx -- Remuneracao como bloco principal (ESQUERDA)
+
+Inverter a ordem dos blocos para que **Remuneracao apareca primeiro** (esquerda):
+
+**BLOCO 1 (esquerda) - REMUNERACAO ESTRATEGICA** (protagonista):
+- Tabelas e Faixas Salariais
+- ICP: PLR, Bonus, Comissoes
+- ILP: Stock Options, RSU, Phantom Shares
+- Simulacao de Cenarios e Dissidio
+- Budget e Headcount
+- Equidade Interna e Compliance
+
+**BLOCO 2 (direita) - AVALIACAO DE DESEMPENHO** (complementar):
+- Metas Cascateadas (OKRs)
+- Avaliacao 90, 180, 360
+- PDI (Plano de Desenvolvimento)
+- 9Box + Plano de Sucessao
+- Reconhecimento
+- 1:1 Continuo
+
+**Seta central:** Manter "INTEGRACAO EM TEMPO REAL" mas adicionar subtexto:
+"Desempenho alimenta decisoes de remuneracao"
+
+**Titulo da secao:** Mudar para:
+"Remuneracao Estrategica com Avaliacao de Desempenho **integrada nativamente**"
+
+**Texto explicativo:** Mudar para:
+"A gestao de remuneracao e o core do CompSmart. Cada avaliacao de desempenho -- metas, competencias, 9Box, PDI -- alimenta automaticamente as decisoes salariais, de bonus e de promocao. Remuneração justa porque baseada em dados reais de performance."
+
+### 5. FAQSection.tsx -- Atualizar com enfase em Remuneracao
+
+**Pergunta "Como funciona a integracao?":** Reescrever para:
+"O CompSmart foi construido como plataforma de Gestao Estrategica de Remuneracao. A Avaliacao de Desempenho -- com 6 modelos (Padrao, Lideranca, Vendas, Tecnico, Operacional, Administrativo), 5 dimensoes de agilidade, 9Box, PDI e Plano de Sucessao -- alimenta nativamente as decisoes de remuneracao. Quando voce avalia um colaborador, o sistema automaticamente sugere faixa salarial ideal, identifica distorcoes e permite simular ajustes."
+
+**Pergunta "Posso usar apenas um modulo?":** Reescrever para:
+"O foco principal do CompSmart e a Gestao Estrategica de Remuneracao: tabelas salariais, faixas, simulacoes, equidade, budget e incentivos. A Avaliacao de Desempenho complementa fornecendo dados de performance, metas, PDI, Reconhecimento e Sucessao que fundamentam decisoes justas de merito. Voce pode comecar apenas pela Remuneracao e ativar Desempenho quando quiser -- sem custo adicional."
+
+**Nova pergunta sobre modelos de avaliacao:**
+"Quais modelos de avaliacao de desempenho estao disponiveis?"
+Resposta: "6 modelos prontos e personalizaveis: Padrao, Lideranca, Vendas, Tecnico, Operacional e Administrativo. Cada um com indicadores e pesos configuraveis. As avaliacoes usam 5 dimensoes de agilidade (Aprendizado, Mental, Pessoas, Mudancas, Resultados) e alimentam automaticamente a Matriz 9Box e as recomendacoes de remuneracao."
+
+### 6. SocialProofSection.tsx -- Notificacoes com foco em Remuneracao
+
+Atualizar notificacoes para enfatizar acoes de Remuneracao:
+1. "TechCorp (850 colab.) simulou dissidio coletivo escalonado -- ha 2min"
+2. "Industria XYZ economizou R$ 47k corrigindo distorcoes salariais -- ha 5min"
+3. "Varejo ABC completou revisao salarial com 9Box integrado -- ha 8min"
+4. "Consultoria DEF aprovou 47 ajustes de merito baseados em avaliacao 360 -- ha 12min"
+5. "Grupo GHI identificou R$ 230k em distorcoes com analise de equidade -- ha 15min"
+
+### 7. planFeatures.ts -- Feature de Desempenho como complemento
+
+Adicionar em cada plano a feature de Avaliacao como item complementar (nao como destaque principal):
+- Starter: "Avaliacao de Desempenho integrada (90, 180, PDI, 9Box)"
+- Medium: "Avaliacao completa (90, 180, 360, 6 modelos, PDI, 9Box, Sucessao)"
+- Pro: "Avaliacao avancada + Reconhecimento + 5 dimensoes de agilidade"
+- Enterprise: manter como esta
+
+### 8. CompetitiveComparisonSection.tsx -- Verificar e ajustar
+
+Garantir que a tabela comparativa tenha mais linhas de Remuneracao do que de Desempenho:
+- Manter "Desempenho + Remuneracao Integrados" como diferencial
+- Adicionar linha: "Simulacao de Dissidio e Cenarios" (CompSmart: sim, outros: nao)
+- Adicionar linha: "ICP + ILP (PLR, Stock Options, RSU)" (CompSmart: sim, outros: nao)
 
 ---
 
-## Detalhes Tecnicos
+## Arquivos Modificados
 
-### Novos Arquivos
-| Arquivo | Finalidade |
-|---------|-----------|
-| `src/components/landing/ImpactCalculator.tsx` | Calculadora interativa do Hero |
-| `src/components/landing/BeforeAfterSection.tsx` | Secao Antes vs Depois |
-| `src/components/landing/InteractiveDemoSection.tsx` | Demo wizard 4 passos |
-| `src/components/landing/IntegrationSection.tsx` | Diagrama integracao |
-| `src/components/landing/SocialProofSection.tsx` | Notificacoes + micro-cases |
-| `src/components/landing/CompetitiveComparisonSection.tsx` | Tabela comparativa |
-| `src/components/landing/StickyCTABar.tsx` | Barra fixa de CTA |
-
-### Arquivos Modificados
 | Arquivo | Alteracao |
-|---------|----------|
-| `src/components/landing/HeroSection.tsx` | Reescrita completa com calculadora |
-| `src/components/landing/PricingSection.tsx` | Badges de desempenho, nota de lancamento |
-| `src/components/landing/CTASection.tsx` | Textos e countdown atualizados |
-| `src/components/landing/FAQSection.tsx` | Novas perguntas |
-| `src/components/landing/Footer.tsx` | Links adicionais |
-| `src/pages/Index.tsx` | Nova ordem de secoes |
+|---------|-----------|
+| `src/components/landing/HeroSection.tsx` | Eyebrow, KPIs do dashboard preview |
+| `src/components/landing/BeforeAfterSection.tsx` | Problemas e beneficios reordenados |
+| `src/components/landing/InteractiveDemoSection.tsx` | Wizard restruturado: Remuneracao primeiro |
+| `src/components/landing/IntegrationSection.tsx` | Blocos invertidos, termos reais, ICP/ILP |
+| `src/components/landing/FAQSection.tsx` | Respostas reescritas, nova pergunta |
+| `src/components/landing/SocialProofSection.tsx` | Notificacoes com foco em Remuneracao |
+| `src/config/planFeatures.ts` | Avaliacao como complemento em cada plano |
+| `src/components/landing/CompetitiveComparisonSection.tsx` | Linhas extras de Remuneracao |
 
-### Dependencias
-- Nenhuma nova dependencia necessaria
-- Usa: React, Tailwind CSS, Lucide icons, Radix UI (Slider), Recharts (grafico barras da demo)
-- Confete do Passo 4: animacao CSS pura (sem biblioteca adicional)
+## Principio Geral
 
-### Performance
-- Lazy loading via IntersectionObserver para secoes abaixo do fold
-- Calculadora e demo sao componentes leves (dados ficticios, sem API)
-- Animacoes CSS com will-change e GPU acceleration
-- Sem imagens pesadas (tudo icones/SVG)
-
----
-
-## Fase 2 (futura, nao incluida agora)
-- Chatbot IA no canto inferior direito
-- Barra de busca na FAQ com autocomplete
-- HowItWorksSection atualizado para 5 passos com timeline vertical
-- Atualizacao da SmartAgentsSection com fundo escuro e particulas
-- SEO meta tags
+Toda a landing page deve transmitir:
+- **CompSmart = Gestao Estrategica de Remuneracao** (core, diferencial, valor principal)
+- **Avaliacao de Desempenho = Complemento integrado** que fornece dados para decisoes justas de remuneracao
+- PDI, metas, 9Box, Reconhecimento e Sucessao sao ferramentas que **fundamentam** decisoes salariais
+- A mensagem e: "Remunere com justia porque voce tem dados reais de desempenho"
 
