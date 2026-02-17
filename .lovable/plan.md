@@ -1,121 +1,160 @@
 
-# Melhorias no Modulo de Avaliacao de Desempenho -- Inspirado pela Mereo
 
-## Resumo
+# Plano: Landing Page CompSmart 2.0 -- Secoes Prioritarias
 
-Analisei as telas da Mereo e comparei com o CompSmart atual. Identifiquei 5 melhorias principais que agregam valor estrategico ao modulo de Desempenho, sem replicar a Mereo, mas incorporando os conceitos mais fortes.
+## Resumo Estrategico
+
+Implementacao focada nas secoes de maior impacto na conversao, mantendo o que ja funciona bem e adicionando os novos elementos interativos que diferenciam a CompSmart 2.0. Fotos de pessoas serao substituidas por ilustracoes vetoriais/icones profissionais. Video institucional sera removido do Hero. Concorrentes usarao nomes genericos.
 
 ---
 
-## Melhorias Propostas
+## Fase 1 -- Secoes Prioritarias (esta implementacao)
 
-### 1. Avaliacao de Potencial Estruturada (Competencias)
+### 1. Novo Hero Section com Calculadora Interativa
+- **Substituir** o HeroSection atual (remover video, particulas, orbs)
+- Split screen: 45% calculadora / 55% preview animado do dashboard
+- **Calculadora "Calcule Seu Impacto"**: 3 inputs com sliders (colaboradores 50-5000, horas/mes 10-200, custo/hora R$50-500)
+- Resultado em tempo real: custo anual perdido, dias de trabalho desperdicados, economia de 85%
+- 2 CTAs: "Eliminar Esse Custo Agora" (vai para /auth) + "Ver Como Funciona" (scroll para demo)
+- Trust badge: "14 dias gratis - Sem cartao - Cancele quando quiser"
+- Lado direito: icone ilustrativo de dashboard com animacoes CSS (contadores, barras preenchendo, cards em fade-in)
+- Badge flutuante: "87 empresas testando agora" com pulso
+- Eyebrow: "GESTAO INTEGRADA DE DESEMPENHO + REMUNERACAO"
+- Mobile: stack vertical, sliders touch-friendly, botoes full-width
 
-**O que a Mereo faz:** Avalia potencial por dimensoes especificas (Agilidade de autoconhecimento, Mental, com Pessoas, com Mudancas, com Resultados) com nota e comentario por item.
+### 2. Secao "Antes vs Depois" (novo componente)
+- **Novo arquivo**: `BeforeAfterSection.tsx`
+- Split visual com 2 colunas: "Sem CompSmart" (tom negativo, header cinza escuro) vs "Com CompSmart" (tom positivo, header verde)
+- Listas com icones (circulos vermelhos vs checks verdes)
+- Ilustracoes com icones Lucide (nao fotos)
+- CTA centralizado abaixo
 
-**O que o CompSmart faz hoje:** Score de potencial e um unico slider (0-5).
+### 3. Demo Interativa -- Wizard 4 Passos (novo componente)
+- **Novo arquivo**: `InteractiveDemoSection.tsx`
+- Progress bar com 4 circulos (ativo/completo/futuro)
+- **Passo 1**: Avaliar "Ana Silva" -- 4 competencias com estrelas clicaveis, calculo automatico da nota
+- **Passo 2**: Recomendacao salarial -- gauge visual semicirculo, faixa R$5.500-7.500, salario atual vs recomendado, alerta de distorcao
+- **Passo 3**: Simular impacto -- slider de novo salario, 3 cards de impacto (aumento, mensal, anual) atualizando em tempo real, grafico barras antes/depois
+- **Passo 4**: Aprovar decisao -- resumo com checks verdes, botao "Aprovar" que dispara confete CSS e mensagem de sucesso
+- CTA final: "Faca isso de verdade na sua empresa"
+- Nao requer cadastro -- tudo roda no frontend com dados ficticios
 
-**Melhoria:** Adicionar uma secao de "Avaliacao de Potencial por Dimensao" dentro do EvaluationDialog, com 5 dimensoes de agilidade e campo de comentario por dimensao. O score final de potencial sera calculado automaticamente como media das dimensoes.
+### 4. Secao Integracao Desempenho + Remuneracao (novo componente)
+- **Novo arquivo**: `IntegrationSection.tsx`
+- Diagrama visual com 2 blocos (Desempenho azul + Remuneracao verde) conectados por setas animadas
+- Sub-icones em grid 2x3 para cada bloco
+- Badge flutuante: "Desempenho + Remuneracao incluidos -- Sem custo adicional"
+- Texto explicativo e CTA
 
-**Impacto:** Avaliacao mais fundamentada e comparavel entre colaboradores.
+### 5. Atualizacao da PricingSection
+- Adicionar badge "Desempenho + Remuneracao incluidos" em cada card de plano
+- Feature adicional: "Modulo completo de Avaliacao (90, 180, 360, PDI, 9Box)"
+- Nota de lancamento: "Promocao ate 22/02/2026 -- assine agora e garanta para sempre"
+- Manter countdown existente (ja aponta para 22/02/2026)
+- Badge "MAIS ESCOLHIDO" no plano Medium (ja existe como "Mais Popular")
 
-### 2. Indicador de Risco de Perda (Retention Risk)
+### 6. Atualizacao do CTA Final
+- Atualizar textos: "Pronto para eliminar planilhas e tomar decisoes justas baseadas em dados?"
+- Countdown atualizado para 22/02/2026 (atualmente aponta para 07/01/2026)
+- Trust badges atualizados
+- Remover referencia a "Lancamento Oficial Janeiro 2026"
 
-**O que a Mereo faz:** Card "Risco de Perda" com fatores como Remuneracao, Adaptacao a localidade, Carreira, Outros (Sim/Nao).
+### 7. Atualizacao da FAQ
+- Adicionar novas perguntas sobre integracao Desempenho + Remuneracao
+- Atualizar pergunta sobre precos (data de lancamento 22/02)
+- Adicionar pergunta sobre promocao de lancamento
 
-**O que o CompSmart faz hoje:** Nao possui avaliacao de risco de retencao.
+### 8. Social Proof Dinamico (novo componente)
+- **Novo arquivo**: `SocialProofSection.tsx`
+- Notificacoes animadas (fade-in/fade-out sequencial, 4s cada)
+- 3 micro-cases com icones ilustrativos (nao fotos), metricas destacadas
+- Dados ficticios mas realistas
 
-**Melhoria:** Adicionar secao "Risco de Perda" no EvaluationDialog com:
-- Score geral de risco (Baixo/Medio/Alto)
-- Fatores de risco com toggle: Remuneracao, Localizacao, Carreira, Clima, Mercado
-- Campo de observacao
+### 9. Comparacao Competitiva (novo componente)
+- **Novo arquivo**: `CompetitiveComparisonSection.tsx`
+- Tabela responsiva: CompSmart vs "Solucao Tradicional" vs "Ferramenta Isolada"
+- Checks verdes, X vermelhos, alertas amarelos
+- Scroll horizontal em mobile
 
-**Impacto:** Permite ao gestor e RH antecipar turnover e agir preventivamente.
+### 10. Atualizacao do Index.tsx
+- Reordenar secoes na nova sequencia:
+  1. Hero (calculadora)
+  2. Before/After
+  3. Demo Interativa
+  4. Integracao Desempenho+Remuneracao
+  5. Como Funciona (manter HowItWorksSection existente, atualizar para 5 passos)
+  6. Agentes IA (manter SmartAgentsSection existente)
+  7. Social Proof
+  8. Comparacao Competitiva
+  9. Seguranca (manter SecuritySection existente)
+  10. Precos
+  11. FAQ
+  12. CTA Final
+- Remover secoes redundantes: TrustBar, LogoSlider, AIShowcaseSection, WhatsNewSection, PainPointsSection, SolutionSection, TargetAudienceSection, DifferentialsSection, TestimonialsSection
+- Manter: LaunchPromoBanner, FloatingTrialBanner
 
-### 3. Resumo Executivo da Avaliacao (Evaluation Summary Card)
+### 11. Sticky CTA Bar (novo componente)
+- **Novo arquivo**: `StickyCTABar.tsx`
+- Aparece apos 30s ou 50% scroll
+- Fixo no bottom (mobile) ou top (desktop)
+- Dismissivel, reaparece apos 2min
+- Texto: "Promocao termina em [X dias] - Trial 14 dias gratis"
 
-**O que a Mereo faz:** Card "Resumo da Avaliacao" com foto do colaborador, cargo, scores grandes de Potencial e Desempenho, nivel de risco e impacto, e preview da posicao no 9Box.
+---
 
-**O que o CompSmart faz hoje:** O EvaluationDialog mostra os dados, mas sem um resumo visual executivo compacto.
+## Secoes Existentes Mantidas (sem alteracao)
+- `SecuritySection.tsx` -- ja cobre LGPD e seguranca
+- `SmartAgentsSection.tsx` -- ja tem os 3 agentes
+- `Header.tsx` -- navegacao existente
+- `Footer.tsx` -- manter + adicionar links para calculadora, demo, FAQ
 
-**Melhoria:** Redesenhar o cabecalho do EvaluationDialog para incluir:
-- Foto e dados do colaborador (ja existe)
-- Scores de Desempenho e Potencial em destaque grande com classificacao textual (ex: "Alta Performance", "Medio Potencial")
-- Mini 9Box inline mostrando a posicao do colaborador
-- Badges de Nivel de Risco e Nivel de Impacto
-
-**Impacto:** Visao executiva imediata ao abrir uma avaliacao.
-
-### 4. Arvore de Sucessao Hierarquica (Succession Org Tree)
-
-**O que a Mereo faz:** Visualizacao em formato de organograma com cards de posicao (CEO -> Diretor Comercial -> Diretor Operacoes), cada um mostrando o titular + carrossel de avatares de sucessores com prontidao.
-
-**O que o CompSmart faz hoje:** Layout mestre-detalhe (split 40/60) com cards por posicao e painel lateral com detalhes e IA.
-
-**Melhoria:** Adicionar uma opcao de visualizacao alternativa "Arvore" na pagina de Sucessao com:
-- Toggle entre "Lista" (atual) e "Arvore" (nova)
-- Cards hierarquicos verticais mostrando: titular, avatar, cargo, sucessores (com avatares navegaveis)
-- Badge de prontidao e tempo estimado ao lado de cada sucessor
-- Conectores visuais entre niveis hierarquicos
-
-**Impacto:** Visao estrategica do pipeline de lideranca em formato intuitivo.
-
-### 5. Indicacao de Sucessores na Avaliacao
-
-**O que a Mereo faz:** Dentro da tela de avaliacao, ha uma secao "Indicacao de Sucessores" onde o avaliador pode indicar cargo + colaborador + prontidao.
-
-**O que o CompSmart faz hoje:** Sucessao e avaliacao sao modulos separados, conectados apenas via comentarios do gestor.
-
-**Melhoria:** Adicionar secao "Indicacao de Sucessores" no EvaluationDialog para que o gestor possa, durante a avaliacao:
-- Ver posicoes-chave vinculadas ao avaliado
-- Indicar se o avaliado pode ser sucessor de alguma posicao
-- Definir prontidao estimada
-- Salvar automaticamente no modulo de Sucessao
-
-**Impacto:** Integra os dois processos no momento mais natural -- a avaliacao.
+## Secoes Removidas da Pagina (arquivos mantidos mas nao importados)
+- TrustBar, LogoSlider, AIShowcaseSection, WhatsNewSection
+- PainPointsSection, SolutionSection, TargetAudienceSection
+- DifferentialsSection, TestimonialsSection
 
 ---
 
 ## Detalhes Tecnicos
 
-### Banco de dados
+### Novos Arquivos
+| Arquivo | Finalidade |
+|---------|-----------|
+| `src/components/landing/ImpactCalculator.tsx` | Calculadora interativa do Hero |
+| `src/components/landing/BeforeAfterSection.tsx` | Secao Antes vs Depois |
+| `src/components/landing/InteractiveDemoSection.tsx` | Demo wizard 4 passos |
+| `src/components/landing/IntegrationSection.tsx` | Diagrama integracao |
+| `src/components/landing/SocialProofSection.tsx` | Notificacoes + micro-cases |
+| `src/components/landing/CompetitiveComparisonSection.tsx` | Tabela comparativa |
+| `src/components/landing/StickyCTABar.tsx` | Barra fixa de CTA |
 
-**Nova tabela: `evaluation_potential_dimensions`**
-- `id` (uuid PK)
-- `evaluation_id` (FK -> performance_evaluations)
-- `dimension` (text: learning_agility, mental_agility, people_agility, change_agility, results_agility)
-- `score` (numeric 0-5)
-- `comment` (text)
-- `root_company_id` (FK para isolamento multi-tenant)
-- RLS: mesmas politicas da tabela performance_evaluations
+### Arquivos Modificados
+| Arquivo | Alteracao |
+|---------|----------|
+| `src/components/landing/HeroSection.tsx` | Reescrita completa com calculadora |
+| `src/components/landing/PricingSection.tsx` | Badges de desempenho, nota de lancamento |
+| `src/components/landing/CTASection.tsx` | Textos e countdown atualizados |
+| `src/components/landing/FAQSection.tsx` | Novas perguntas |
+| `src/components/landing/Footer.tsx` | Links adicionais |
+| `src/pages/Index.tsx` | Nova ordem de secoes |
 
-**Novas colunas em `performance_evaluations`:**
-- `retention_risk_level` (enum: low, medium, high)
-- `retention_risk_factors` (jsonb: array de fatores marcados)
-- `retention_risk_notes` (text)
-- `impact_level` (enum: low, medium, high)
+### Dependencias
+- Nenhuma nova dependencia necessaria
+- Usa: React, Tailwind CSS, Lucide icons, Radix UI (Slider), Recharts (grafico barras da demo)
+- Confete do Passo 4: animacao CSS pura (sem biblioteca adicional)
 
-### Componentes a criar/modificar
+### Performance
+- Lazy loading via IntersectionObserver para secoes abaixo do fold
+- Calculadora e demo sao componentes leves (dados ficticios, sem API)
+- Animacoes CSS com will-change e GPU acceleration
+- Sem imagens pesadas (tudo icones/SVG)
 
-1. **`PotentialDimensionsSection.tsx`** -- Secao de dimensoes de potencial com 5 sliders + comentarios
-2. **`RetentionRiskSection.tsx`** -- Card de risco de perda com toggles e score
-3. **`EvaluationSummaryHeader.tsx`** -- Cabecalho executivo com mini 9Box inline
-4. **`SuccessionOrgTree.tsx`** -- Arvore hierarquica para pagina de Sucessao
-5. **`EvaluationSuccessionSection.tsx`** -- Secao de indicacao de sucessores dentro da avaliacao
-6. **Modificar `EvaluationDialog.tsx`** -- Integrar as novas secoes
-7. **Modificar `PerformanceSuccession.tsx`** -- Adicionar toggle Lista/Arvore
+---
 
-### Sequencia de implementacao
+## Fase 2 (futura, nao incluida agora)
+- Chatbot IA no canto inferior direito
+- Barra de busca na FAQ com autocomplete
+- HowItWorksSection atualizado para 5 passos com timeline vertical
+- Atualizacao da SmartAgentsSection com fundo escuro e particulas
+- SEO meta tags
 
-1. Migracao de banco (tabela + colunas + RLS)
-2. PotentialDimensionsSection + RetentionRiskSection
-3. EvaluationSummaryHeader com mini 9Box
-4. Integrar tudo no EvaluationDialog
-5. SuccessionOrgTree
-6. EvaluationSuccessionSection
-
-### Riscos e consideracoes
-
-- As dimensoes de potencial sao opcionais -- o slider geral continua disponivel para empresas que preferem avaliacoes simplificadas
-- A arvore de sucessao depende dos dados de organizational_structure para montar a hierarquia; sera necessario cruzar posicoes-chave com a estrutura organizacional
-- O risco de perda e um campo subjetivo do gestor, nao calculado automaticamente
