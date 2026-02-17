@@ -127,7 +127,7 @@ export const HeroSection = () => {
             {/* Floating badge */}
             <div className="flex justify-end">
               <Badge className="bg-destructive/10 text-destructive border-destructive/20 px-4 py-2 animate-pulse-slow">
-                🔥 <strong>87 empresas</strong> testando agora
+                🔥 <strong>2 empresas</strong> avaliando agora
               </Badge>
             </div>
           </div>
