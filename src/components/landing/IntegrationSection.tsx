@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BarChart3, Gift, Scale, Wand2, CreditCard, TrendingUp, Target, RotateCcw, GraduationCap, LayoutGrid, MessageSquare, Award, ArrowLeftRight, Sparkles } from "lucide-react";
+import { BarChart3, Gift, Scale, Wand2, CreditCard, TrendingUp, Target, RotateCcw, GraduationCap, LayoutGrid, MessageSquare, Award, ArrowLeftRight, Sparkles, Bot, Settings } from "lucide-react";
 
 const compensationItems = [
   { icon: BarChart3, label: "Tabelas e Faixas Salariais" },
@@ -12,12 +12,13 @@ const compensationItems = [
 ];
 
 const performanceItems = [
-  { icon: Target, label: "Metas Cascateadas (OKRs)" },
+  { icon: Settings, label: "100% Customizável (Competências, Metas, 9Box)" },
+  { icon: Target, label: "Metas: Individuais, Depto. e Empresa" },
   { icon: RotateCcw, label: "Avaliação 90°, 180°, 360°" },
   { icon: GraduationCap, label: "PDI (Plano de Desenvolvimento)" },
   { icon: LayoutGrid, label: "9Box + Plano de Sucessão" },
-  { icon: Award, label: "Reconhecimento" },
-  { icon: MessageSquare, label: "1:1 Contínuo" },
+  { icon: Bot, label: "PerformAI (Agente IA de Desempenho)" },
+  { icon: Award, label: "Reconhecimento + 1:1 Contínuo" },
 ];
 
 export const IntegrationSection = () => {

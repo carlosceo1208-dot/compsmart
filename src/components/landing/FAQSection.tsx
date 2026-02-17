@@ -19,7 +19,7 @@ export const FAQSection = () => {
     },
     {
       question: "Quais modelos de avaliação de desempenho estão disponíveis?",
-      answer: "6 modelos prontos e personalizáveis: Padrão, Liderança, Vendas, Técnico, Operacional e Administrativo. Cada um com indicadores e pesos configuráveis. As avaliações usam 5 dimensões de agilidade (Aprendizado, Mental, Pessoas, Mudanças, Resultados) e alimentam automaticamente a Matriz 9Box e as recomendações de remuneração.",
+      answer: "A avaliação de desempenho do CompSmart é 100% customizável às necessidades da sua empresa. São 6 modelos prontos e personalizáveis (Padrão, Liderança, Vendas, Técnico, Operacional e Administrativo), com avaliações 90°, 180° e 360°, competências configuráveis por cargo/área, e metas em 3 níveis cascateados (individuais, departamentais e corporativas) com pesos ajustáveis. O PerformAI, agente de IA especializado, auxilia na elaboração de feedbacks, geração automática de PDIs, análise de 9Box e devolutivas personalizadas com base nos dados reais de cada colaborador.",
       icon: Settings,
       isNew: true
     },
@@ -75,7 +75,7 @@ export const FAQSection = () => {
     },
     {
       question: "Como funcionam os Agentes Inteligentes de IA?",
-      answer: "Nossos agentes são especialistas virtuais treinados em remuneração brasileira. O Jurídico Smart gera contratos e analisa compliance, o Salary Smart faz benchmarking e calcula compa-ratio, e o R&B Smart ajuda a estruturar incentivos. Todos trabalham 24/7, respondem em segundos e aprendem com o contexto da sua empresa.",
+      answer: "São 4 agentes especializados: o Jurídico Smart gera contratos e analisa compliance trabalhista; o Salary Smart faz benchmarking e calcula compa-ratio; o R&B Smart ajuda a estruturar incentivos e benefícios; e o PerformAI auxilia na elaboração de feedbacks, geração automática de PDIs, análise de 9Box e devolutivas personalizadas. Todos trabalham 24/7, respondem em segundos e aprendem com o contexto da sua empresa.",
       icon: Bot
     },
     {
