@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Bot, Briefcase, FileText, Sparkles, Clock, TrendingUp, Shield, Zap } from "lucide-react";
+import { Bot, Briefcase, FileText, Sparkles, Clock, TrendingUp, Shield, Zap, Brain, Target } from "lucide-react";
 import avatarWoman2 from "@/assets/avatar-woman-2.png";
 import avatarMan1 from "@/assets/avatar-man-1.png";
 import avatarWoman1 from "@/assets/avatar-woman-1.png";
@@ -46,6 +46,18 @@ export const SmartAgentsSection = () => {
         { icon: Shield, value: "ROI", label: "calculado" }
       ],
       capabilities: ["Incentivos", "Benefícios", "Retenção"]
+    },
+    {
+      icon: Brain,
+      title: "PerformAI",
+      description: "Agente especializado em avaliação de desempenho: elabora feedbacks, gera PDIs automáticos, analisa 9Box e cria devolutivas personalizadas",
+      badge: "Desempenho",
+      avatar: avatarMan1,
+      metrics: [
+        { icon: Target, value: "360°", label: "avaliação completa" },
+        { icon: Zap, value: "PDI", label: "gerado por IA" }
+      ],
+      capabilities: ["Feedbacks", "PDI", "9Box", "Devolutivas"]
     }
   ];
 
@@ -81,7 +93,7 @@ export const SmartAgentsSection = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {agents.map((agent, index) => (
               <Card 
                 key={index} 
