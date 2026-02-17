@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { VideoSection } from "@/components/landing/VideoSection";
 import { BeforeAfterSection } from "@/components/landing/BeforeAfterSection";
 import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
 import { IntegrationSection } from "@/components/landing/IntegrationSection";
@@ -47,6 +48,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={isLoggedIn} />
       <HeroSection />
+      <VideoSection />
       <BeforeAfterSection />
       <InteractiveDemoSection />
       <IntegrationSection />
