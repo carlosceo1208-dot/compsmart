@@ -3,25 +3,21 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { TrustBar } from "@/components/landing/TrustBar";
-import { LogoSlider } from "@/components/landing/LogoSlider";
-import { AIShowcaseSection } from "@/components/landing/AIShowcaseSection";
-import { WhatsNewSection } from "@/components/landing/WhatsNewSection";
-import { PainPointsSection } from "@/components/landing/PainPointsSection";
-import { SolutionSection } from "@/components/landing/SolutionSection";
-import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
-import { SecuritySection } from "@/components/landing/SecuritySection";
-import { TargetAudienceSection } from "@/components/landing/TargetAudienceSection";
+import { BeforeAfterSection } from "@/components/landing/BeforeAfterSection";
+import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
+import { IntegrationSection } from "@/components/landing/IntegrationSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
-import { DifferentialsSection } from "@/components/landing/DifferentialsSection";
+import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
+import { SocialProofSection } from "@/components/landing/SocialProofSection";
+import { CompetitiveComparisonSection } from "@/components/landing/CompetitiveComparisonSection";
+import { SecuritySection } from "@/components/landing/SecuritySection";
 import { PricingSection } from "@/components/landing/PricingSection";
-import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { FloatingTrialBanner } from "@/components/landing/FloatingTrialBanner";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
-import { LaunchConfetti } from "@/components/launch/LaunchConfetti";
+import { StickyCTABar } from "@/components/landing/StickyCTABar";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,7 +31,6 @@ const Index = () => {
     checkSession();
   }, []);
 
-  // Handle hash-based scrolling (e.g., /#pricing from checkout)
   useEffect(() => {
     const hash = location.hash;
     if (hash) {
@@ -50,27 +45,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <LaunchConfetti />
       <Header isLoggedIn={isLoggedIn} />
       <HeroSection />
-      <TrustBar />
-      <LogoSlider />
-      <AIShowcaseSection />
-      <WhatsNewSection />
-      <PainPointsSection />
-      <SolutionSection />
-      <SmartAgentsSection />
-      <SecuritySection />
-      <TargetAudienceSection />
+      <BeforeAfterSection />
+      <InteractiveDemoSection />
+      <IntegrationSection />
       <HowItWorksSection />
-      <DifferentialsSection />
+      <SmartAgentsSection />
+      <SocialProofSection />
+      <CompetitiveComparisonSection />
+      <SecuritySection />
       <PricingSection />
-      <TestimonialsSection />
       <FAQSection />
       <CTASection />
       <Footer />
       <FloatingTrialBanner />
       <LaunchPromoBanner />
+      <StickyCTABar />
     </div>
   );
 };

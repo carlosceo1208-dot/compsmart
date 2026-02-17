@@ -4,10 +4,29 @@ import { HelpCircle, Bot, Shield, Database, Upload, Zap, Calculator, CreditCard,
 
 export const FAQSection = () => {
   const faqs = [
-    // NOVOS - Lançamento e Preços
+    // INTEGRAÇÃO DESEMPENHO + REMUNERAÇÃO
+    {
+      question: "Como funciona a integração entre Desempenho e Remuneração?",
+      answer: "A CompSmart foi construída como um sistema único. Quando você avalia um colaborador (90°, 180°, 360°, metas), a nota automaticamente alimenta o módulo de remuneração, que sugere faixa salarial ideal, identifica distorções e permite simular ajustes. Não é integração via API — é um fluxo nativo.",
+      icon: TrendingUp,
+      isNew: true
+    },
+    {
+      question: "Posso usar apenas Remuneração OU apenas Desempenho?",
+      answer: "Sim, você pode usar um módulo por vez. Mas o verdadeiro valor está na integração — e você não paga nada a mais por ter os dois. É tudo incluído.",
+      icon: Settings,
+      isNew: true
+    },
+    {
+      question: "A promoção de lançamento termina quando?",
+      answer: "22 de fevereiro de 2026. Depois disso, novos clientes pagarão adicional pelo módulo de Desempenho. Quem assinar antes, garante incluído para sempre no mesmo preço.",
+      icon: Clock,
+      isNew: true
+    },
+    // PREÇOS E TRIAL
     {
       question: "Quanto custa o CompSmart e quais são os planos disponíveis?",
-      answer: "Oferecemos 4 planos: Starter (até 50 colaboradores) a partir de R$ 199/mês, Medium (até 200 colab.) a partir de R$ 499/mês, Pro (até 500 colab.) a partir de R$ 899/mês e Enterprise (acima de 500 colab.) sob consulta. Aproveite o desconto de 30% no lançamento até 06/02/2026 e economize ainda mais com o plano anual (2 meses grátis).",
+      answer: "Oferecemos 4 planos: Starter (até 50 colaboradores) a partir de R$ 199/mês, Medium (até 200 colab.) a partir de R$ 499/mês, Pro (até 500 colab.) a partir de R$ 899/mês e Enterprise (acima de 500 colab.) sob consulta. Aproveite o desconto de 30% no lançamento até 22/02/2026 e economize ainda mais com o plano anual.",
       icon: CreditCard,
       isNew: true
     },

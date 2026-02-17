@@ -8,10 +8,9 @@ export const CTASection = () => {
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
 
-  // Countdown to January 2026
+  // Countdown to Feb 22 2026
   useEffect(() => {
-    const targetDate = new Date('2026-01-07T00:00:00').getTime();
-    
+    const targetDate = new Date('2026-02-22T23:59:59-03:00').getTime();
     const updateCountdown = () => {
       const now = new Date().getTime();
       const difference = targetDate - now;
@@ -48,11 +47,11 @@ export const CTASection = () => {
           </div>
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-            Pronto para transformar sua gestão de remuneração?
+            Pronto para eliminar planilhas e tomar decisões justas baseadas em dados?
           </h2>
           
           <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-            Junte-se às empresas pioneiras que estão revolucionando a forma de gerenciar salários, benefícios e incentivos com inteligência artificial.
+            Comece seu teste grátis agora. 14 dias para transformar sua gestão de pessoas com desempenho e remuneração integrados.
           </p>
 
           {/* Countdown */}
@@ -78,8 +77,8 @@ export const CTASection = () => {
               <div className="text-xs text-white/70 uppercase tracking-wider">Min</div>
             </div>
             <div className="ml-4 text-left">
-              <div className="text-sm text-white/80">para o</div>
-              <div className="text-sm font-bold text-white">Lançamento Oficial</div>
+              <div className="text-sm text-white/80">para encerrar a</div>
+              <div className="text-sm font-bold text-white">Promoção de Lançamento</div>
             </div>
           </div>
 
@@ -117,10 +116,10 @@ export const CTASection = () => {
 
           <div className="pt-4 space-y-2">
             <p className="text-sm text-white/80">
-              ✓ Teste grátis por 14 dias • ✓ Sem cartão de crédito • ✓ Suporte completo em português
+              ✅ 14 dias grátis • ✅ Sem cartão de crédito • ✅ Cancele quando quiser
             </p>
             <p className="text-xs text-white/70">
-              Lançamento oficial: Janeiro 2026 • Seja uma empresa pioneira e ganhe benefícios exclusivos
+              Desempenho + Remuneração incluídos em todos os planos • Promoção até 22/02/2026
             </p>
           </div>
         </div>

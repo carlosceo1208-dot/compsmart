@@ -333,11 +333,14 @@ export const PricingSection = () => {
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                 Planos{" "}
                 <span className="bg-gradient-primary bg-clip-text text-transparent">
-                  transparentes
+                  transparentes. Sem surpresas.
                 </span>
               </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-                Escolha o plano ideal para o tamanho e necessidades da sua empresa. Sem custos ocultos.
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-2">
+                <strong>Desempenho + Remuneração incluídos em todos os planos</strong> — sem custo adicional
+              </p>
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto mb-8">
+                Escolha o plano ideal para o tamanho e necessidades da sua empresa.
               </p>
 
               {/* Billing Cycle Toggle */}
@@ -460,11 +463,11 @@ export const PricingSection = () => {
                       </div>
                     )}
 
-                    {/* Badge Lançamento 2026 */}
-                    {isLaunchPeriod && !isEnterprise && (
+                     {/* Badge Lançamento 2026 */}
+                    {!isEnterprise && (
                       <div className="absolute -top-3 right-12 z-20">
-                        <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-2 py-0.5 text-[10px] shadow-lg animate-pulse">
-                          🚀 Lançamento
+                        <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-2 py-0.5 text-[10px] shadow-lg">
+                          🎁 Desempenho Incluído
                         </Badge>
                       </div>
                     )}
@@ -508,7 +511,7 @@ export const PricingSection = () => {
                         {/* Texto de validade do lançamento */}
                         {isLaunchPeriod && !isEnterprise && (
                           <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 font-medium">
-                            Desconto válido até 06/02/2026
+                            Desconto válido até 22/02/2026
                           </p>
                         )}
                       </div>
@@ -566,6 +569,13 @@ export const PricingSection = () => {
             </div>
 
             <div className="mt-12 text-center space-y-4">
+              {/* Launch promo note */}
+              <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl p-4 max-w-2xl mx-auto">
+                <p className="text-sm font-medium">
+                  🎉 <strong>Promoção de Lançamento:</strong> Módulo de Desempenho incluído até 22/02/2026 — depois disso, novos clientes pagam adicional. <strong>Assine agora e garanta para sempre.</strong>
+                </p>
+              </div>
+
               {/* Feature highlights */}
               <div className="flex flex-wrap justify-center gap-4 text-sm">
                 <div className="flex items-center gap-2 bg-primary/5 px-4 py-2 rounded-full">
@@ -574,27 +584,10 @@ export const PricingSection = () => {
                 </div>
                 <div className="flex items-center gap-2 bg-green-500/5 px-4 py-2 rounded-full">
                   <Shield className="h-4 w-4 text-green-600" />
-                  <span><strong>LGPD Compliant</strong></span>
+                  <span><strong>Avaliação 90°, 180°, 360°, PDI, 9Box</strong> incluída</span>
                 </div>
               </div>
 
-              {/* Diferenciais e Integrações */}
-              <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-                <span className="flex items-center gap-2">
-                  🏢 <strong>Ideal para PMEs e Grandes Empresas</strong>
-                </span>
-                <span className="flex items-center gap-2">
-                  🧩 <strong>Integração com Google Workspace</strong>
-                </span>
-                <span className="flex items-center gap-2">
-                  🔁 <strong>Evolução Contínua</strong>
-                </span>
-                <span className="flex items-center gap-2">
-                  🤝 <strong>Suporte Consultivo</strong>
-                </span>
-              </div>
-
-              {/* Garantias */}
               <p className="text-sm text-muted-foreground">
                 💳 Sem compromisso • 🔄 Cancele quando quiser • 🎯 Upgrade ou downgrade a qualquer momento
               </p>

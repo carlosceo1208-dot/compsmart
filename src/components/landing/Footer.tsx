@@ -42,8 +42,8 @@ export const Footer = () => {
             <h3 className="font-semibold mb-4">Produto</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#solution" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Funcionalidades
+                <a href="#interactive-demo" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Demo Interativa
                 </a>
               </li>
               <li>
@@ -52,8 +52,8 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="/auth" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Demonstração
+                <a href="#faq" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  FAQ Completa
                 </a>
               </li>
               <li>
