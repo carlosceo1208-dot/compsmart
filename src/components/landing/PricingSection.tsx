@@ -391,13 +391,6 @@ export const PricingSection = () => {
                       </div>
                     )}
 
-                    {/* Badge Desempenho Incluído - todos os planos */}
-                    <div className="absolute -top-3 right-12 z-20">
-                      <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-2 py-0.5 text-[10px] shadow-lg">
-                        🎁 Desempenho Incluído
-                      </Badge>
-                    </div>
-
                     <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
                       <CardTitle className="text-xl">{plan.name}</CardTitle>
                       <CardDescription className="text-xs min-h-[40px]">
@@ -431,6 +424,13 @@ export const PricingSection = () => {
                             </span>
                           </div>
                         )}
+
+                        {/* Badge Desempenho Incluído - dentro do card */}
+                        <div className="mt-3">
+                          <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-3 py-1 text-xs shadow-md">
+                            🎁 Desempenho Incluído
+                          </Badge>
+                        </div>
                       </div>
                     </CardHeader>
 
