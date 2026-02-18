@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Check, Timer } from 'lucide-react';
+import { useState } from 'react';
+import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,37 +8,12 @@ import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { PlanBadge } from '@/components/PlanBadge';
 import { DiscountCalculator } from '@/components/landing/DiscountCalculator';
 
-// Configuração do período de lançamento - UTC-3 Brasil
-const LAUNCH_END_DATE = new Date('2026-02-22T23:59:59-03:00');
-const LAUNCH_DISCOUNT = 0.30; // 30% de desconto
-const ANNUAL_DISCOUNT = 0.10; // 10% adicional para anual
+const ANNUAL_DISCOUNT = 0.10;
+
 const Pricing = () => {
   const { plan } = useFeatureAccess();
   const navigate = useNavigate();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-  const [isLaunchPeriod, setIsLaunchPeriod] = useState(() => new Date() <= LAUNCH_END_DATE);
-  const [timeRemaining, setTimeRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
-  useEffect(() => {
-    const calculateTimeRemaining = () => {
-      const now = new Date();
-      const diff = LAUNCH_END_DATE.getTime() - now.getTime();
-      if (diff <= 0) {
-        setIsLaunchPeriod(false);
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-      }
-      return {
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000)
-      };
-    };
-    
-    setTimeRemaining(calculateTimeRemaining());
-    const interval = setInterval(() => setTimeRemaining(calculateTimeRemaining()), 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   const plans = [
     {
@@ -50,6 +25,7 @@ const Pricing = () => {
         'Até 50 funcionários',
         '3 tabelas salariais',
         'People Analytics básico',
+        'Avaliação de Desempenho integrada + PerformAI',
         'Exportação em PDF',
         'Suporte por email',
       ],
@@ -65,6 +41,7 @@ const Pricing = () => {
         '10 tabelas salariais',
         'Pesquisa Salarial básica',
         'People Analytics completo',
+        'Avaliação completa (90°, 180°, 360°, PDI, 9Box) + PerformAI',
         'Exportação PDF + Excel',
         'Suporte por email e chat',
       ],
@@ -81,7 +58,8 @@ const Pricing = () => {
         'Tabelas salariais ilimitadas',
         'Pesquisa Salarial avançada',
         'People Analytics avançado',
-        '🎯 Agentes Smart (Jurídico, Salary, R&B)',
+        '🎯 Agentes Smart (Jurídico, Salary, R&B, PerformAI)',
+        'Avaliação avançada + Reconhecimento + Sucessão',
         'Exportação completa + API',
         'Suporte prioritário',
       ],
@@ -91,39 +69,17 @@ const Pricing = () => {
 
   const getDisplayPrice = (basePrice: number) => {
     let price: number;
-    if (isLaunchPeriod) {
-      if (billingCycle === 'annual') {
-        price = Math.round(basePrice * (1 - LAUNCH_DISCOUNT) * (1 - ANNUAL_DISCOUNT) * 12);
-      } else {
-        price = Math.round(basePrice * (1 - LAUNCH_DISCOUNT));
-      }
+    if (billingCycle === 'annual') {
+      price = Math.round(basePrice * (1 - ANNUAL_DISCOUNT) * 12);
     } else {
-      if (billingCycle === 'annual') {
-        price = Math.round(basePrice * (1 - ANNUAL_DISCOUNT) * 12);
-      } else {
-        price = basePrice;
-      }
+      price = basePrice;
     }
     return `R$ ${price.toLocaleString('pt-BR')}`;
   };
 
-  const getFullPrice = (basePrice: number) => {
-    return billingCycle === 'annual' ? basePrice * 12 : basePrice;
-  };
-
   const getMonthlyEquivalent = (basePrice: number) => {
     if (billingCycle !== 'annual') return null;
-    if (isLaunchPeriod) {
-      return Math.round(basePrice * (1 - LAUNCH_DISCOUNT) * (1 - ANNUAL_DISCOUNT));
-    }
     return Math.round(basePrice * (1 - ANNUAL_DISCOUNT));
-  };
-
-  const getDiscountBadge = () => {
-    if (!isLaunchPeriod) {
-      return billingCycle === 'annual' ? '-10%' : null;
-    }
-    return billingCycle === 'annual' ? '-30% +10%' : '-30%';
   };
 
   return (
@@ -134,7 +90,7 @@ const Pricing = () => {
             Escolha o plano ideal para sua empresa
           </h1>
           <p className="text-xl text-muted-foreground">
-            Transparência e flexibilidade para crescer junto com você
+            Remuneração + Desempenho integrados em todos os planos
           </p>
         </div>
 
@@ -160,50 +116,16 @@ const Pricing = () => {
               }`}
             >
               Anual
-              {isLaunchPeriod && (
-                <Badge variant="secondary" className="ml-2 text-xs">
-                  +10% off
-                </Badge>
-              )}
+              <Badge variant="secondary" className="ml-2 text-xs">
+                -10%
+              </Badge>
             </button>
           </div>
         </div>
 
-        {/* Contador Regressivo - Período de Lançamento */}
-        {isLaunchPeriod && (
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-primary/10 border border-primary/20 rounded-xl">
-              <Timer className="w-5 h-5 text-primary animate-pulse" />
-              <span className="text-sm font-medium text-foreground">Oferta de lançamento expira em:</span>
-              <div className="flex items-center gap-2">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-bold text-primary">{timeRemaining.days}</span>
-                  <span className="text-xs text-muted-foreground">dias</span>
-                </div>
-                <span className="text-primary font-bold">:</span>
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-bold text-primary">{String(timeRemaining.hours).padStart(2, '0')}</span>
-                  <span className="text-xs text-muted-foreground">hrs</span>
-                </div>
-                <span className="text-primary font-bold">:</span>
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-bold text-primary">{String(timeRemaining.minutes).padStart(2, '0')}</span>
-                  <span className="text-xs text-muted-foreground">min</span>
-                </div>
-                <span className="text-primary font-bold">:</span>
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-bold text-primary">{String(timeRemaining.seconds).padStart(2, '0')}</span>
-                  <span className="text-xs text-muted-foreground">seg</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Calculadora de Desconto Interativa */}
         <div className="max-w-2xl mx-auto mb-8">
           <DiscountCalculator 
-            isLaunchPeriod={isLaunchPeriod}
             plans={plans.map(p => ({
               id: p.id,
               name: p.name,
@@ -227,15 +149,13 @@ const Pricing = () => {
                   <PlanBadge plan="medium" />
                 </div>
               )}
-              
-              {/* Badge de Lançamento */}
-              {isLaunchPeriod && (
-                <div className="absolute -top-2 -right-2">
-                  <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
-                    🚀 Lançamento
-                  </Badge>
-                </div>
-              )}
+
+              {/* Badge Desempenho Incluído */}
+              <div className="absolute -top-2 -right-2">
+                <Badge className="bg-gradient-to-r from-primary to-secondary text-white border-0 text-xs">
+                  🎁 Desempenho Incluído
+                </Badge>
+              </div>
 
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
@@ -247,18 +167,6 @@ const Pricing = () => {
                 
                 {/* Preços */}
                 <div className="mb-2 space-y-1">
-                  {isLaunchPeriod && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-lg text-muted-foreground line-through">
-                        R$ {getFullPrice(planItem.basePrice).toLocaleString('pt-BR')}
-                      </span>
-                      {getDiscountBadge() && (
-                        <Badge variant="destructive" className="text-xs">
-                          {getDiscountBadge()}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
                   <div>
                     <span className="text-4xl font-bold">{getDisplayPrice(planItem.basePrice)}</span>
                     <span className="text-muted-foreground">
@@ -268,11 +176,6 @@ const Pricing = () => {
                   {billingCycle === 'annual' && (
                     <p className="text-sm text-muted-foreground">
                       Equivalente a R$ {getMonthlyEquivalent(planItem.basePrice)?.toLocaleString('pt-BR')}/mês
-                    </p>
-                  )}
-                  {isLaunchPeriod && (
-                    <p className="text-xs text-primary font-medium">
-                      Desconto válido até 22/02/2026
                     </p>
                   )}
                 </div>

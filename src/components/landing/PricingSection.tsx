@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Loader2, Rocket, TrendingUp, Building2, Crown, LucideIcon, Zap, Brain, Shield, Timer } from "lucide-react";
+import { Check, Sparkles, Loader2, Rocket, TrendingUp, Building2, Crown, LucideIcon, Zap, Brain, Shield, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { planFeatures, PlanFeature } from "@/config/planFeatures";
 import { DiscountCalculator } from "./DiscountCalculator";
+
 interface ColorClasses {
   gradient: string;
   border: string;
@@ -126,10 +127,15 @@ interface PlanData {
   employeeLimit: string;
 }
 
-// Configuração do período de lançamento - UTC-3 Brasil
-const LAUNCH_END_DATE = new Date('2026-02-22T23:59:59-03:00');
-const LAUNCH_DISCOUNT = 0.30; // 30% de desconto
-const ANNUAL_DISCOUNT = 0.10; // 10% adicional para anual
+const ANNUAL_DISCOUNT = 0.10; // 10% para plano anual
+
+// Limites de colaboradores por plano para cálculo de preço/colab
+const COLAB_LIMITS: Record<string, number> = {
+  "Starter": 50,
+  "Medium": 200,
+  "Pro": 500,
+};
+
 export const PricingSection = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -137,8 +143,6 @@ export const PricingSection = () => {
   const [plans, setPlans] = useState<PlanData[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isLaunchPeriod, setIsLaunchPeriod] = useState(() => new Date() <= LAUNCH_END_DATE);
-  const [timeRemaining, setTimeRemaining] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   // Intersection Observer for stagger animation
   useEffect(() => {
@@ -166,30 +170,6 @@ export const PricingSection = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, [isVisible]);
-
-  // Contador regressivo - atualiza a cada segundo
-  useEffect(() => {
-    const calculateTimeRemaining = () => {
-      const now = new Date();
-      const diff = LAUNCH_END_DATE.getTime() - now.getTime();
-      
-      if (diff <= 0) {
-        setIsLaunchPeriod(false);
-        return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-      }
-      
-      return {
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000)
-      };
-    };
-    
-    setTimeRemaining(calculateTimeRemaining());
-    const interval = setInterval(() => setTimeRemaining(calculateTimeRemaining()), 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -219,7 +199,6 @@ export const PricingSection = () => {
               employeeLimit: ""
             };
 
-            // Usar features do config centralizado
             const features = planFeatures[dbPlan.name] || [];
 
             return {
@@ -238,7 +217,6 @@ export const PricingSection = () => {
             };
           });
 
-          // Sort: Enterprise always at the end
           const sortedPlans = mappedPlans.sort((a, b) => {
             if (a.name === 'Enterprise') return 1;
             if (b.name === 'Enterprise') return -1;
@@ -262,43 +240,25 @@ export const PricingSection = () => {
     if (isEnterprise) return "Sob consulta";
 
     let price: number;
-    const baseMonthly = plan.monthlyPrice;
-
-    if (isLaunchPeriod) {
-      if (billingCycle === 'annual') {
-        // Lançamento Anual: 30% + 10% = preço × 0.70 × 0.90 × 12
-        price = Math.round(baseMonthly * (1 - LAUNCH_DISCOUNT) * (1 - ANNUAL_DISCOUNT) * 12);
-      } else {
-        // Lançamento Mensal: 30% de desconto
-        price = Math.round(baseMonthly * (1 - LAUNCH_DISCOUNT));
-      }
+    if (billingCycle === 'annual') {
+      price = plan.annualPrice;
     } else {
-      if (billingCycle === 'annual') {
-        // Pós-lançamento Anual: usa annual_price do banco (já com 10% desc)
-        price = plan.annualPrice;
-      } else {
-        // Pós-lançamento Mensal: preço cheio
-        price = baseMonthly;
-      }
+      price = plan.monthlyPrice;
     }
 
     return `R$ ${Math.round(price).toLocaleString('pt-BR')}`;
   };
 
-  // Preço cheio (para exibir riscado durante lançamento)
-  const getFullPrice = (plan: PlanData) => {
-    if (plan.name === "Enterprise" || plan.monthlyPrice === 0) return null;
-    return billingCycle === 'annual' ? plan.monthlyPrice * 12 : plan.monthlyPrice;
-  };
-
-  // Equivalente mensal no plano anual
   const getMonthlyEquivalent = (plan: PlanData) => {
     if (plan.name === "Enterprise" || plan.monthlyPrice === 0 || billingCycle !== 'annual') return null;
-    const base = plan.monthlyPrice;
-    if (isLaunchPeriod) {
-      return Math.round(base * (1 - LAUNCH_DISCOUNT) * (1 - ANNUAL_DISCOUNT) * 100) / 100;
-    }
-    return Math.round(base * (1 - ANNUAL_DISCOUNT) * 100) / 100;
+    return Math.round(plan.monthlyPrice * (1 - ANNUAL_DISCOUNT) * 100) / 100;
+  };
+
+  const getPerColabPrice = (plan: PlanData) => {
+    const limit = COLAB_LIMITS[plan.name];
+    if (!limit || plan.monthlyPrice === 0) return null;
+    const price = plan.monthlyPrice / limit;
+    return price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   const getSavingsPercent = (plan: PlanData) => {
@@ -328,7 +288,7 @@ export const PricingSection = () => {
             <div className="text-center mb-12">
               <Badge className="bg-gradient-primary text-white px-4 py-1.5 mb-6 text-sm">
                 <Zap className="h-4 w-4 mr-2" />
-                Preços Atualizados 2026
+                2 ferramentas completas por menos de US$ 1/colaborador
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                 Planos{" "}
@@ -374,42 +334,9 @@ export const PricingSection = () => {
                 
               </div>
 
-              {/* Contador Regressivo - Oferta de Lançamento */}
-              {isLaunchPeriod && (
-                <div className="mt-8 p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-xl max-w-xl mx-auto">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <Timer className="h-5 w-5 text-orange-500 animate-pulse" />
-                      <span className="font-semibold text-orange-600 dark:text-orange-400">
-                        Oferta de Lançamento termina em:
-                      </span>
-                    </div>
-                    <div className="flex gap-2 sm:gap-3">
-                      <div className="flex flex-col items-center bg-background/80 backdrop-blur px-3 sm:px-4 py-2 rounded-lg shadow border border-orange-200 dark:border-orange-800">
-                        <span className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{String(timeRemaining.days).padStart(2, '0')}</span>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">dias</span>
-                      </div>
-                      <div className="flex flex-col items-center bg-background/80 backdrop-blur px-3 sm:px-4 py-2 rounded-lg shadow border border-orange-200 dark:border-orange-800">
-                        <span className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{String(timeRemaining.hours).padStart(2, '0')}</span>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">horas</span>
-                      </div>
-                      <div className="flex flex-col items-center bg-background/80 backdrop-blur px-3 sm:px-4 py-2 rounded-lg shadow border border-orange-200 dark:border-orange-800">
-                        <span className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{String(timeRemaining.minutes).padStart(2, '0')}</span>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">min</span>
-                      </div>
-                      <div className="flex flex-col items-center bg-background/80 backdrop-blur px-3 sm:px-4 py-2 rounded-lg shadow border border-orange-200 dark:border-orange-800">
-                        <span className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">{String(timeRemaining.seconds).padStart(2, '0')}</span>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">seg</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Calculadora de Desconto Interativa */}
               <div className="max-w-2xl mx-auto">
                 <DiscountCalculator 
-                  isLaunchPeriod={isLaunchPeriod}
                   plans={plans
                     .filter(p => p.name !== 'Enterprise' && p.monthlyPrice > 0)
                     .map(p => ({
@@ -429,6 +356,7 @@ export const PricingSection = () => {
                 const IconComponent = plan.icon;
                 const isEnterprise = plan.name === "Enterprise" || plan.monthlyPrice === 0;
                 const savingsPercent = getSavingsPercent(plan);
+                const perColabPrice = getPerColabPrice(plan);
 
                 return (
                   <Card 
@@ -463,14 +391,12 @@ export const PricingSection = () => {
                       </div>
                     )}
 
-                     {/* Badge Lançamento 2026 */}
-                    {!isEnterprise && (
-                      <div className="absolute -top-3 right-12 z-20">
-                        <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-2 py-0.5 text-[10px] shadow-lg">
-                          🎁 Desempenho Incluído
-                        </Badge>
-                      </div>
-                    )}
+                    {/* Badge Desempenho Incluído - todos os planos */}
+                    <div className="absolute -top-3 right-12 z-20">
+                      <Badge className="bg-gradient-to-r from-primary to-secondary text-white px-2 py-0.5 text-[10px] shadow-lg">
+                        🎁 Desempenho Incluído
+                      </Badge>
+                    </div>
 
                     <CardHeader className={plan.highlighted ? 'pt-8' : ''}>
                       <CardTitle className="text-xl">{plan.name}</CardTitle>
@@ -478,19 +404,7 @@ export const PricingSection = () => {
                         {plan.description}
                       </CardDescription>
                       <div className="pt-3">
-                        {/* Preço cheio riscado durante lançamento */}
-                        {isLaunchPeriod && !isEnterprise && (
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm text-muted-foreground line-through">
-                              R$ {getFullPrice(plan)?.toLocaleString('pt-BR')}
-                            </span>
-                            <Badge className="bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300 text-xs">
-                              -{Math.round(LAUNCH_DISCOUNT * 100)}%{billingCycle === 'annual' ? ' +10%' : ''}
-                            </Badge>
-                          </div>
-                        )}
-
-                        {/* Preço com desconto em destaque */}
+                        {/* Preço */}
                         <span className={`text-3xl font-bold transition-colors duration-200 ${plan.colorClasses.priceColor}`}>
                           {getDisplayPrice(plan)}
                         </span>
@@ -508,11 +422,14 @@ export const PricingSection = () => {
                           </p>
                         )}
 
-                        {/* Texto de validade do lançamento */}
-                        {isLaunchPeriod && !isEnterprise && (
-                          <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 font-medium">
-                            Desconto válido até 22/02/2026
-                          </p>
+                        {/* Preço por colaborador */}
+                        {perColabPrice && (
+                          <div className="mt-2 flex items-center gap-1">
+                            <Users className="h-3 w-3 text-primary" />
+                            <span className="text-xs font-semibold text-primary">
+                              apenas R$ {perColabPrice}/colaborador
+                            </span>
+                          </div>
                         )}
                       </div>
                     </CardHeader>
@@ -569,10 +486,10 @@ export const PricingSection = () => {
             </div>
 
             <div className="mt-12 text-center space-y-4">
-              {/* Launch promo note */}
+              {/* Nota sobre AVD integrada */}
               <div className="bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl p-4 max-w-2xl mx-auto">
                 <p className="text-sm font-medium">
-                  🎉 <strong>Promoção de Lançamento:</strong> Módulo de Desempenho incluído até 22/02/2026 — depois disso, novos clientes pagam adicional. <strong>Assine agora e garanta para sempre.</strong>
+                  🎉 <strong>Avaliação de Desempenho integrada em todos os planos</strong> — Remuneração + Desempenho em uma só plataforma, sem custo adicional.
                 </p>
               </div>
 

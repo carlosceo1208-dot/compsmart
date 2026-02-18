@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
-import { Calculator, Percent, Calendar, CreditCard, Banknote, Sparkles, ArrowRight } from 'lucide-react';
+import { Calculator, Sparkles, ArrowRight, Calendar, Banknote, CreditCard } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { useNavigate } from 'react-router-dom';
 
 interface Plan {
@@ -14,18 +14,15 @@ interface Plan {
 }
 
 interface DiscountCalculatorProps {
-  isLaunchPeriod: boolean;
   plans: Plan[];
 }
 
-const LAUNCH_DISCOUNT = 0.30;
 const ANNUAL_DISCOUNT = 0.10;
 const PIX_DISCOUNT = 0.05;
 
-export const DiscountCalculator = ({ isLaunchPeriod, plans }: DiscountCalculatorProps) => {
+export const DiscountCalculator = ({ plans }: DiscountCalculatorProps) => {
   const navigate = useNavigate();
   const [selectedPlan, setSelectedPlan] = useState<string>(plans[1]?.id || plans[0]?.id || '');
-  const [launchDiscount, setLaunchDiscount] = useState(isLaunchPeriod);
   const [annualDiscount, setAnnualDiscount] = useState(true);
   const [pixDiscount, setPixDiscount] = useState(false);
 
@@ -43,13 +40,6 @@ export const DiscountCalculator = ({ isLaunchPeriod, plans }: DiscountCalculator
     const originalPrice = totalPrice;
 
     const discounts: { name: string; percent: number; value: number }[] = [];
-
-    // Aplicar descontos multiplicativamente
-    if (launchDiscount && isLaunchPeriod) {
-      const discountValue = totalPrice * LAUNCH_DISCOUNT;
-      discounts.push({ name: 'Desconto de Lançamento (30%)', percent: 30, value: discountValue });
-      totalPrice *= (1 - LAUNCH_DISCOUNT);
-    }
 
     if (annualDiscount) {
       const discountValue = totalPrice * ANNUAL_DISCOUNT;
@@ -76,11 +66,11 @@ export const DiscountCalculator = ({ isLaunchPeriod, plans }: DiscountCalculator
       monthlyEquivalent: Math.round(monthlyEquivalent),
       period: annualDiscount ? 'ano' : 'mês'
     };
-  }, [selectedPlanData, launchDiscount, annualDiscount, pixDiscount, isLaunchPeriod]);
+  }, [selectedPlanData, annualDiscount, pixDiscount]);
 
   if (!calculation || plans.length === 0) return null;
 
-  const hasMaxDiscount = launchDiscount && isLaunchPeriod && annualDiscount && pixDiscount;
+  const hasMaxDiscount = annualDiscount && pixDiscount;
 
   return (
     <TooltipProvider>
@@ -134,49 +124,6 @@ export const DiscountCalculator = ({ isLaunchPeriod, plans }: DiscountCalculator
             </label>
             
             <div className="space-y-2">
-              {/* Desconto de Lançamento */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div 
-                    className={`
-                      flex items-center justify-between p-3 rounded-lg border transition-all
-                      ${!isLaunchPeriod 
-                        ? 'bg-muted/50 border-muted cursor-not-allowed opacity-60' 
-                        : launchDiscount 
-                          ? 'bg-orange-500/10 border-orange-500/30' 
-                          : 'border-border hover:border-primary/30'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Checkbox 
-                        id="launch"
-                        checked={launchDiscount && isLaunchPeriod}
-                        onCheckedChange={(checked) => setLaunchDiscount(!!checked)}
-                        disabled={!isLaunchPeriod}
-                      />
-                      <div className="flex items-center gap-2">
-                        <Percent className="h-4 w-4 text-orange-500" />
-                        <label htmlFor="launch" className="text-sm font-medium cursor-pointer">
-                          30% Desconto de Lançamento
-                          {isLaunchPeriod && (
-                            <span className="text-xs text-muted-foreground ml-1">(até 22/02/2026)</span>
-                          )}
-                        </label>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-orange-600 border-orange-300">
-                      -30%
-                    </Badge>
-                  </div>
-                </TooltipTrigger>
-                {!isLaunchPeriod && (
-                  <TooltipContent>
-                    <p>Promoção de lançamento encerrada</p>
-                  </TooltipContent>
-                )}
-              </Tooltip>
-
               {/* Desconto Anual */}
               <div 
                 className={`
@@ -242,7 +189,6 @@ export const DiscountCalculator = ({ isLaunchPeriod, plans }: DiscountCalculator
               Resultado da Simulação
             </div>
 
-            {/* Breakdown de descontos */}
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Preço original:</span>
@@ -271,7 +217,6 @@ export const DiscountCalculator = ({ isLaunchPeriod, plans }: DiscountCalculator
               )}
             </div>
 
-            {/* Economia total */}
             {calculation.totalSavings > 0 && (
               <div className="flex items-center justify-center gap-2 p-2 rounded-lg bg-green-500/10 border border-green-500/20">
                 <Sparkles className="h-4 w-4 text-green-600" />

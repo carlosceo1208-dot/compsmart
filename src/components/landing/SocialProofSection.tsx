@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, TrendingUp, DollarSign, Building2, Users, BarChart3 } from "lucide-react";
+import { Building2, Users, BarChart3 } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import avatarMan1 from "@/assets/avatar-man-1.png";
+import avatarWoman1 from "@/assets/avatar-woman-1.png";
+import avatarWoman2 from "@/assets/avatar-woman-2.png";
 
 const notifications = [
   { company: "TechCorp", employees: 850, action: "simulou dissídio coletivo escalonado", time: "há 2min" },
@@ -13,7 +17,8 @@ const notifications = [
 
 const microCases = [
   {
-    icon: DollarSign,
+    avatar: avatarMan1,
+    initials: "RA",
     headline: "R$ 47 mil economizados no 1° ano",
     quote: "Identificamos distorções salariais que estavam custando caro e gerando turnover invisível. O CompSmart mostrou tudo em um dashboard.",
     name: "Ricardo A.",
@@ -22,7 +27,8 @@ const microCases = [
     color: "text-secondary",
   },
   {
-    icon: Clock,
+    avatar: avatarWoman1,
+    initials: "PM",
     headline: "De 2 semanas para 1 dia",
     quote: "Antes: cruzar tabela salarial e avaliações levava 2 semanas com 3 pessoas. Hoje: faço sozinha em 1 dia com simulação de cenários.",
     name: "Paula M.",
@@ -31,7 +37,8 @@ const microCases = [
     color: "text-primary",
   },
   {
-    icon: TrendingUp,
+    avatar: avatarWoman2,
+    initials: "FC",
     headline: "Retenção subiu 23% em 6 meses",
     quote: "Com remuneração baseada em dados reais de desempenho, talentos agora confiam no processo de meritocracia.",
     name: "Fernanda C.",
@@ -82,10 +89,11 @@ export const SocialProofSection = () => {
           {microCases.map((c, i) => (
             <Card key={i} className="hover:shadow-lg transition-shadow">
               <CardContent className="p-6 space-y-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <c.icon className={`h-5 w-5 ${c.color}`} />
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-12 w-12 border-2 border-primary/20">
+                    <AvatarImage src={c.avatar} alt={c.name} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">{c.initials}</AvatarFallback>
+                  </Avatar>
                   <h3 className="font-bold text-sm">{c.headline}</h3>
                 </div>
                 <p className="text-sm text-muted-foreground italic">"{c.quote}"</p>

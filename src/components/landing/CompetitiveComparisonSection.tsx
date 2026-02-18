@@ -53,10 +53,10 @@ const features = [
     tradB: { status: "no", text: "3-4 semanas" },
   },
   {
-    name: "Preço",
-    compsmart: { status: "yes", text: "Transparente" },
+    name: "Preço por colaborador",
+    compsmart: { status: "yes", text: "A partir de R$ 3,80/colab" },
     tradA: { status: "no", text: '"Sob consulta"' },
-    tradB: { status: "no", text: '"Sob consulta"' },
+    tradB: { status: "no", text: "R$ 9+/colab (só AVD)" },
   },
 ];
 

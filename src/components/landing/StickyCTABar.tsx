@@ -1,25 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Timer } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const LAUNCH_END = new Date("2026-02-22T23:59:59-03:00").getTime();
 
 export const StickyCTABar = () => {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
-  const [daysLeft, setDaysLeft] = useState(0);
-
-  useEffect(() => {
-    const calc = () => {
-      const diff = LAUNCH_END - Date.now();
-      setDaysLeft(Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24))));
-    };
-    calc();
-    const i = setInterval(calc, 60000);
-    return () => clearInterval(i);
-  }, []);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -53,15 +40,15 @@ export const StickyCTABar = () => {
     return () => clearTimeout(timer);
   }, [dismissed]);
 
-  if (!visible || dismissed || daysLeft <= 0) return null;
+  if (!visible || dismissed) return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:bottom-auto md:top-0 bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm">
-          <Timer className="h-4 w-4" />
+          <Sparkles className="h-4 w-4" />
           <span>
-            ⏰ Promoção termina em <strong>{daysLeft} dias</strong> • Trial 14 dias grátis
+            🚀 2 ferramentas completas por menos de US$ 1/colab — <strong>Trial 14 dias grátis</strong>
           </span>
         </div>
         <div className="flex items-center gap-2">
