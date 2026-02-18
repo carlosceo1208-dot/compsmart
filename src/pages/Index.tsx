@@ -16,7 +16,6 @@ import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
-import { FloatingTrialBanner } from "@/components/landing/FloatingTrialBanner";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
 import { StickyCTABar } from "@/components/landing/StickyCTABar";
 
@@ -61,7 +60,6 @@ const Index = () => {
       <FAQSection />
       <CTASection />
       <Footer />
-      <FloatingTrialBanner />
       <LaunchPromoBanner />
       <StickyCTABar />
     </div>

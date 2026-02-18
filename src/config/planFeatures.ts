@@ -49,6 +49,7 @@ export const planFeatures: Record<string, PlanFeature[]> = {
   "Enterprise": [
     { text: "+500 colaboradores" },
     { text: "Tudo do Pro incluído" },
+    { text: "Avaliação de Desempenho completa + PerformAI", tooltip: "Avaliação 90°, 180°, 360°, PDI, 9Box, Sucessão. PerformAI com análise preditiva e devolutivas personalizadas.", isNew: true },
     { text: "Pesquisa Salarial Total Cash", tooltip: "Salário Fixo + Variável (Bônus, PLR, Comissões)", isNew: true },
     { text: "Pesquisa Salarial Total Compensation", tooltip: "Total Cash + Benefícios + ILP", isNew: true },
     { text: "Consultoria dedicada" },

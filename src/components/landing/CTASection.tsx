@@ -2,32 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Mail, Rocket, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
 
 export const CTASection = () => {
   const navigate = useNavigate();
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
-
-  // Countdown to Feb 22 2026
-  useEffect(() => {
-    const targetDate = new Date('2026-02-22T23:59:59-03:00').getTime();
-    const updateCountdown = () => {
-      const now = new Date().getTime();
-      const difference = targetDate - now;
-      
-      if (difference > 0) {
-        setCountdown({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-        });
-      }
-    };
-    
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 60000); // Update every minute
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section className="py-20 bg-gradient-to-br from-primary via-primary-hover to-secondary relative overflow-hidden">
@@ -40,9 +17,9 @@ export const CTASection = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Badge */}
           <div className="flex justify-center">
-            <Badge className="bg-white/20 text-white border-white/30 px-4 py-2 text-sm backdrop-blur-sm animate-pulse">
+            <Badge className="bg-white/20 text-white border-white/30 px-4 py-2 text-sm backdrop-blur-sm">
               <Rocket className="h-4 w-4 mr-2" />
-              Vagas limitadas para Empresas Pioneiras
+              Remuneração + Desempenho integrados — tudo por menos de R$ 6/colaborador
             </Badge>
           </div>
 
@@ -53,34 +30,6 @@ export const CTASection = () => {
           <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
             Comece seu teste grátis agora. 14 dias para transformar sua gestão de pessoas com desempenho e remuneração integrados.
           </p>
-
-          {/* Countdown */}
-          <div className="flex items-center justify-center gap-6 py-4">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white">
-                {countdown.days}
-              </div>
-              <div className="text-xs text-white/70 uppercase tracking-wider">Dias</div>
-            </div>
-            <span className="text-2xl text-white/50">:</span>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white">
-                {countdown.hours.toString().padStart(2, '0')}
-              </div>
-              <div className="text-xs text-white/70 uppercase tracking-wider">Horas</div>
-            </div>
-            <span className="text-2xl text-white/50">:</span>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white">
-                {countdown.minutes.toString().padStart(2, '0')}
-              </div>
-              <div className="text-xs text-white/70 uppercase tracking-wider">Min</div>
-            </div>
-            <div className="ml-4 text-left">
-              <div className="text-sm text-white/80">para encerrar a</div>
-              <div className="text-sm font-bold text-white">Promoção de Lançamento</div>
-            </div>
-          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Button 
@@ -119,7 +68,7 @@ export const CTASection = () => {
               ✅ 14 dias grátis • ✅ Sem cartão de crédito • ✅ Cancele quando quiser
             </p>
             <p className="text-xs text-white/70">
-              Desempenho + Remuneração incluídos em todos os planos • Promoção até 22/02/2026
+              Desempenho + Remuneração incluídos em todos os planos • Desconto para plano anual e pagamento via PIX
             </p>
           </div>
         </div>
