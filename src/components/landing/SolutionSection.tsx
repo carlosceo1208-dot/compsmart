@@ -52,19 +52,43 @@ export const SolutionSection = () => {
       ]
     },
     {
+      id: "performance",
+      label: "Avaliação de Desempenho",
+      icon: Target,
+      color: "text-orange-600",
+      bg: "bg-orange-500/10",
+      solutions: [
+        {
+          icon: Users,
+          title: "Avaliação 360°",
+          description: "Ciclos de avaliação 90°, 180° e 360° com feedback estruturado e devolutivas com IA"
+        },
+        {
+          icon: Award,
+          title: "Matriz 9Box & PDI",
+          description: "Classificação automática de performance × potencial com planos de desenvolvimento individual"
+        },
+        {
+          icon: TrendingUp,
+          title: "Plano de Sucessão",
+          description: "Mapeamento de sucessores por posição-chave com análise de prontidão e gaps"
+        }
+      ]
+    },
+    {
       id: "planning",
       label: "Planejamento Inteligente",
-      icon: TrendingUp,
+      icon: PieChart,
       color: "text-blue-600",
       bg: "bg-blue-500/10",
       solutions: [
         {
-          icon: Users,
+          icon: Calculator,
           title: "Orçamento de Headcount",
           description: "Planejamento completo de contratações, promoções e movimentações com impacto orçamentário"
         },
         {
-          icon: PieChart,
+          icon: BarChart3,
           title: "Projeções Fiscais Anuais",
           description: "Previsão de custo de folha para 12-36 meses com projeções automáticas de crescimento"
         },
@@ -88,14 +112,14 @@ export const SolutionSection = () => {
           description: "Upload de acordos coletivos, políticas e contratos para extração automática de informações"
         },
         {
-          icon: Award,
-          title: "Otimização de Incentivos",
-          description: "Recomendações inteligentes para programas de ICP, ILP, stock options e previdência"
-        },
-        {
           icon: Bot,
           title: "Agentes Smart",
           description: "Assistentes especializados: Jurídico, Salary Analysis e R&B para consultas estratégicas"
+        },
+        {
+          icon: Brain,
+          title: "Otimização de Incentivos",
+          description: "Recomendações inteligentes para programas de ICP, ILP, stock options e previdência"
         }
       ]
     }
@@ -124,7 +148,7 @@ export const SolutionSection = () => {
 
           {/* Tabs for 3 Pillars */}
           <Tabs defaultValue="strategic" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-4 mb-8 h-auto p-1 bg-muted/50">
               {pillars.map((pillar) => (
                 <TabsTrigger 
                   key={pillar.id} 

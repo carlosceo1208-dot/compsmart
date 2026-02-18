@@ -35,6 +35,11 @@ export const DifferentialsSection = () => {
       icon: Award,
       title: "Metodologias de Mercado",
       description: "Avaliação de cargos por fatores e pontos baseada nas melhores práticas e metodologias reconhecidas pelo mercado"
+    },
+    {
+      icon: TrendingUp,
+      title: "Desempenho + Remuneração Integrados",
+      description: "Única plataforma que conecta avaliação de desempenho a decisões salariais — mérito, bônus e promoções baseados em dados reais"
     }
   ];
 

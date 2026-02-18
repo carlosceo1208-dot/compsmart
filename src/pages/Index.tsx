@@ -4,11 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { VideoSection } from "@/components/landing/VideoSection";
+import { LogoSlider } from "@/components/landing/LogoSlider";
 import { BeforeAfterSection } from "@/components/landing/BeforeAfterSection";
+import { SolutionSection } from "@/components/landing/SolutionSection";
 import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
 import { IntegrationSection } from "@/components/landing/IntegrationSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { TargetAudienceSection } from "@/components/landing/TargetAudienceSection";
 import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
+import { DifferentialsSection } from "@/components/landing/DifferentialsSection";
 import { SocialProofSection } from "@/components/landing/SocialProofSection";
 import { CompetitiveComparisonSection } from "@/components/landing/CompetitiveComparisonSection";
 import { SecuritySection } from "@/components/landing/SecuritySection";
@@ -48,11 +52,15 @@ const Index = () => {
       <Header isLoggedIn={isLoggedIn} />
       <HeroSection />
       <VideoSection />
+      <LogoSlider />
       <BeforeAfterSection />
+      <SolutionSection />
       <InteractiveDemoSection />
       <IntegrationSection />
       <HowItWorksSection />
+      <TargetAudienceSection />
       <SmartAgentsSection />
+      <DifferentialsSection />
       <SocialProofSection />
       <CompetitiveComparisonSection />
       <SecuritySection />
