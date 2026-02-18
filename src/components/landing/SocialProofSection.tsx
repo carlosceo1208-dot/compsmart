@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Building2, Users, BarChart3 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import avatarMan1 from "@/assets/avatar-man-1.png";
-import avatarWoman1 from "@/assets/avatar-woman-1.png";
-import avatarWoman2 from "@/assets/avatar-woman-2.png";
+import testimonialRicardo from "@/assets/testimonial-ricardo.png";
+import testimonialPaula from "@/assets/testimonial-paula.png";
+import testimonialFernanda from "@/assets/testimonial-fernanda.png";
 
 const notifications = [
   { company: "TechCorp", employees: 850, action: "simulou dissídio coletivo escalonado", time: "há 2min" },
@@ -17,7 +17,7 @@ const notifications = [
 
 const microCases = [
   {
-    avatar: avatarMan1,
+    avatar: testimonialRicardo,
     initials: "RA",
     headline: "R$ 47 mil economizados no 1° ano",
     quote: "Identificamos distorções salariais que estavam custando caro e gerando turnover invisível. O CompSmart mostrou tudo em um dashboard.",
@@ -27,7 +27,7 @@ const microCases = [
     color: "text-secondary",
   },
   {
-    avatar: avatarWoman1,
+    avatar: testimonialPaula,
     initials: "PM",
     headline: "De 2 semanas para 1 dia",
     quote: "Antes: cruzar tabela salarial e avaliações levava 2 semanas com 3 pessoas. Hoje: faço sozinha em 1 dia com simulação de cenários.",
@@ -37,7 +37,7 @@ const microCases = [
     color: "text-primary",
   },
   {
-    avatar: avatarWoman2,
+    avatar: testimonialFernanda,
     initials: "FC",
     headline: "Retenção subiu 23% em 6 meses",
     quote: "Com remuneração baseada em dados reais de desempenho, talentos agora confiam no processo de meritocracia.",
