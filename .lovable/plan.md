@@ -1,84 +1,95 @@
 
-# Plano: Glossario + PerformAI + Customizacao na Landing Page
 
-## Resumo
+## Atualizacao da Landing Page -- Versao Pos-Lancamento (22/02/2026)
 
-Adicionar 18 termos de Avaliacao de Desempenho ao glossario, incluir o PerformAI como agente de IA na landing page, e destacar que a avaliacao e totalmente customizavel (competencias, metas individuais/depto/empresa, 90/180/360, 9Box).
+### Contexto
 
----
-
-## 1. Glossary.tsx -- Adicionar 18 termos de Avaliacao de Desempenho
-
-**Titulo atualizado:** "Glossario de C&S e Desempenho"
-**Subtitulo atualizado:** incluir "e Avaliacao de Desempenho"
-
-Nova categoria **"Avaliacao de Desempenho"** com os termos:
-
-| Termo | Definicao resumida |
-|-------|-------------------|
-| Avaliacao 90 | Feita pelo gestor direto |
-| Avaliacao 180 | Autoavaliacao + gestor |
-| Avaliacao 360 | Multidirecional (gestor, pares, subordinados, externos) |
-| Matriz 9Box | Desempenho x Potencial em 9 quadrantes |
-| PDI | Plano de acoes de desenvolvimento |
-| Dimensoes de Agilidade | 5 dimensoes: Aprendizado, Mental, Pessoas, Mudancas, Resultados |
-| OKR | Metas cascateadas empresa > depto > colaborador |
-| Plano de Sucessao | Ate 3 sucessores para posicoes-chave |
-| Reconhecimento (Kudos) | Valorizacao publica de conquistas |
-| 1:1 (One-on-One) | Reuniao periodica gestor-colaborador |
-| Feedback Continuo | Retorno constante sem esperar ciclo formal |
-| Compa-Ratio de Merito | Salario vs ponto medio ajustado por desempenho |
-| eNPS | Indicador de engajamento (Promotores/Neutros/Detratores) |
-| PerformAI | Agente IA para feedbacks, PDIs, 9Box e devolutivas |
-| Risco de Retencao | Classificacao Baixo/Medio/Alto de perda do colaborador |
-| Ciclo de Avaliacao | 4 etapas: Metas, Acompanhamento, Insights, Fechamento |
-| Competencias | Conhecimentos, habilidades e atitudes customizaveis por cargo/area |
-| Metas Individuais, Departamentais e Corporativas | 3 niveis cascateados com pesos configuraveis |
+Esta landing page sera publicada a partir de 22/02/2026, quando a promocao de 30% ja tera terminado. A Avaliacao de Desempenho passa a ser uma ferramenta permanente incluida em todos os planos (inclusive Enterprise). Nao deve haver nenhuma referencia a promocao de 30%, countdown, ou urgencia de lancamento. Os descontos que permanecem sao: **10% para plano anual** e **5% para pagamento via PIX**.
 
 ---
 
-## 2. IntegrationSection.tsx -- PerformAI + Customizacao
+### Mudancas Planejadas
 
-Atualizar o bloco de Avaliacao de Desempenho (direita) para 7 itens:
+**1. PricingSection.tsx -- Remover toda logica de promocao de 30%**
+- Remover constantes `LAUNCH_END_DATE`, `LAUNCH_DISCOUNT`, `isLaunchPeriod`, `timeRemaining`
+- Remover countdown regressivo (linhas 377-407)
+- Remover preco riscado e badge de desconto (linhas 482-491)
+- Remover texto "Desconto valido ate 22/02/2026" (linhas 512-516)
+- Simplificar `getDisplayPrice`: apenas preco cheio (mensal) ou com 10% anual
+- Simplificar `getMonthlyEquivalent`: apenas desconto anual de 10%
+- Remover `getFullPrice` (nao ha mais preco riscado)
+- Atualizar nota no rodape (linha 573-577): trocar mensagem de "Promocao de Lancamento" por "Avaliacao de Desempenho integrada em todos os planos -- sem custo adicional"
+- Habilitar badge "Desempenho Incluido" para Enterprise (remover condicao `!isEnterprise` na linha 467)
+- Adicionar exibicao do preco por colaborador abaixo de cada preco:
+  - Starter: "apenas R$ 5,98/colaborador"
+  - Medium: "apenas R$ 4,50/colaborador"
+  - Pro: "apenas R$ 3,80/colaborador"
+- Adicionar badge de destaque: "2 ferramentas completas por menos de US$ 1/colaborador"
 
-- "100% Customizavel (Competencias, Metas, 9Box)" (icone Settings)
-- "Metas: Individuais, Depto. e Empresa" (icone Target)
-- "Avaliacao 90, 180, 360" (manter)
-- "PDI (Plano de Desenvolvimento)" (manter)
-- "9Box + Plano de Sucessao" (manter)
-- **"PerformAI (Agente IA de Desempenho)"** (icone Bot) -- NOVO
-- "Reconhecimento + 1:1 Continuo" (consolidado)
+**2. DiscountCalculator.tsx -- Remover opcao de desconto de lancamento**
+- Remover checkbox "30% Desconto de Lancamento" (linhas 137-178)
+- Remover a prop `isLaunchPeriod` e constante `LAUNCH_DISCOUNT`
+- Manter apenas descontos Anual (10%) e PIX (5%)
 
-Adicionar imports: Bot, Settings de lucide-react.
+**3. planFeatures.ts -- Adicionar AVD ao Enterprise**
+- Adicionar no array Enterprise: `{ text: "Avaliacao de Desempenho completa + PerformAI", tooltip: "Avaliacao 90, 180, 360, PDI, 9Box, Sucessao. PerformAI com analise preditiva e devolutivas.", isNew: true }`
+
+**4. SocialProofSection.tsx -- Trocar icones por avatares humanos**
+- Importar as imagens existentes: `avatar-man-1.png`, `avatar-woman-1.png`, `avatar-woman-2.png`
+- Substituir o icone circular generico por `Avatar` com `AvatarImage` usando as fotos
+  - Ricardo A. (CFO) -> avatar-man-1.png
+  - Paula M. (Diretora RH) -> avatar-woman-1.png
+  - Fernanda C. (CEO) -> avatar-woman-2.png
+
+**5. CTASection.tsx -- Remover countdown e referencia a promocao**
+- Remover countdown regressivo (linhas 57-83)
+- Remover texto "Promocao ate 22/02/2026" (linha 122)
+- Adicionar frase de impacto sobre valor: "Remuneracao + Desempenho integrados -- tudo por menos de R$ 6/colaborador"
+- Manter CTA de trial 14 dias e botao de contato
+
+**6. StickyCTABar.tsx -- Atualizar mensagem**
+- Remover referencia a promocao e countdown de dias
+- Trocar mensagem para: "2 ferramentas completas por menos de US$ 1/colab -- Trial 14 dias gratis"
+- Remover logica de `LAUNCH_END` e `daysLeft`
+
+**7. LaunchPromoBanner.tsx -- Transformar em banner de valor**
+- Remover countdown e referencia a "30% OFF"
+- Trocar para mensagem de lancamento da AVD: "Novidade! Avaliacao de Desempenho integrada -- Remuneracao + Desempenho em uma so plataforma"
+- Manter CTA de "Comecar Agora"
+
+**8. CompetitiveComparisonSection.tsx -- Atualizar linha de preco**
+- Alterar a linha "Preco" para incluir valor por colaborador:
+  - CompSmart: "A partir de R$ 3,80/colab"
+  - Solucao Tradicional: "Sob consulta"
+  - Ferramenta Isolada: "R$ 9+/colab (so AVD)"
+
+**9. Index.tsx -- Remover FloatingTrialBanner (redundante)**
+- Remover import e uso de `FloatingTrialBanner` para reduzir poluicao visual (ja existem StickyCTABar e LaunchPromoBanner)
 
 ---
 
-## 3. FAQSection.tsx -- Atualizar 2 perguntas
-
-**Pergunta "Quais modelos de avaliacao...":** Reescrever para mencionar:
-- Totalmente customizavel as necessidades da empresa
-- Competencias e metas configuraveis
-- Metas em 3 niveis (individuais, departamentais, corporativas)
-- PerformAI como agente que auxilia feedbacks, PDIs e devolutivas
-
-**Pergunta "Como funcionam os Agentes Inteligentes de IA?":** Adicionar PerformAI como 4o agente:
-- Juridico Smart, Salary Smart, R&B Smart e **PerformAI** (avaliacao de desempenho, feedbacks, PDIs automaticos, analise 9Box)
-
----
-
-## 4. planFeatures.ts -- PerformAI nos planos
-
-- **Starter:** "Avaliacao de Desempenho integrada + PerformAI" com tooltip mencionando customizacao
-- **Medium:** "Avaliacao completa (...) + PerformAI" com tooltip sobre competencias e metas customizaveis
-- **Pro:** "Avaliacao avancada + Reconhecimento + 5 dimensoes + PerformAI" com tooltip sobre analise preditiva
-
----
-
-## Arquivos Modificados
+### Secao Tecnica -- Resumo de Arquivos
 
 | Arquivo | Alteracao |
-|---------|-----------|
-| src/pages/Glossary.tsx | +18 termos, titulo e subtitulo atualizados |
-| src/components/landing/IntegrationSection.tsx | PerformAI + customizacao no bloco de desempenho |
-| src/components/landing/FAQSection.tsx | PerformAI em 2 respostas, customizacao destacada |
-| src/config/planFeatures.ts | PerformAI nos tooltips de 3 planos |
+|---|---|
+| `src/components/landing/PricingSection.tsx` | Remover toda logica de promo 30%, adicionar preco/colaborador, badge Enterprise |
+| `src/components/landing/DiscountCalculator.tsx` | Remover checkbox de lancamento, manter Anual + PIX |
+| `src/config/planFeatures.ts` | Adicionar AVD no Enterprise |
+| `src/components/landing/SocialProofSection.tsx` | Avatares humanos nos depoimentos |
+| `src/components/landing/CTASection.tsx` | Remover countdown e promo, adicionar argumento de valor |
+| `src/components/landing/StickyCTABar.tsx` | Mensagem de valor por colaborador |
+| `src/components/landing/LaunchPromoBanner.tsx` | Transformar em banner de novidade AVD |
+| `src/components/landing/CompetitiveComparisonSection.tsx` | Preco por colaborador na comparacao |
+| `src/pages/Index.tsx` | Remover FloatingTrialBanner |
+
+### Dados de Referencia para Preco por Colaborador
+
+```text
+Plano     | Limite | Mensal   | /colab  | Anual 10% | /colab anual | Anual+PIX 15% | /colab
+Starter   | 50     | R$ 299   | R$ 5,98 | R$ 269    | R$ 5,38      | R$ 256        | R$ 5,11
+Medium    | 200    | R$ 899   | R$ 4,50 | R$ 809    | R$ 4,05      | R$ 769        | R$ 3,84
+Pro       | 500    | R$ 1.900 | R$ 3,80 | R$ 1.710  | R$ 3,42      | R$ 1.625      | R$ 3,25
+```
+
+Cotacao dolar ~R$ 5,80: todos os planos ficam abaixo de US$ 1/colaborador.
+
