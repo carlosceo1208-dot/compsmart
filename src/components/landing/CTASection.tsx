@@ -34,7 +34,7 @@ export const CTASection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Button 
               size="lg"
-              className="bg-white text-primary hover:bg-white/90 hover:scale-105 text-lg px-8 shadow-xl w-full sm:w-auto font-semibold transition-all duration-300 group"
+              className="bg-amber-400 text-gray-900 hover:bg-amber-300 hover:scale-105 text-lg px-10 py-4 shadow-2xl w-full sm:w-auto font-bold transition-all duration-300 group border-2 border-amber-300"
               onClick={() => navigate("/auth")}
             >
               Criar Conta Grátis
@@ -43,7 +43,7 @@ export const CTASection = () => {
             <Button 
               size="lg"
               variant="outline"
-              className="text-lg px-8 w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white/10 hover:scale-105 transition-all duration-300"
+              className="text-lg px-8 py-4 w-full sm:w-auto bg-white/15 border-2 border-white/60 text-white hover:bg-white/25 hover:scale-105 transition-all duration-300 font-semibold backdrop-blur-sm"
               onClick={() => window.location.href = "mailto:contato@compsmart.ia.br"}
             >
               <Mail className="mr-2 h-5 w-5" />
