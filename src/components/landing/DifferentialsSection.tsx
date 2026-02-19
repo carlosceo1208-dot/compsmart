@@ -14,7 +14,7 @@ export const DifferentialsSection = () => {
     {
       icon: DollarSign,
       title: "Menor Custo do Mercado",
-      description: "Plataforma completa por menos de US$ 1 por colaborador/mês. Enquanto concorrentes cobram R$ 9+/colab só para avaliação, o CompSmart entrega remuneração + desempenho + IA por menos de R$ 6/colab"
+      description: "Plataforma completa por em média menos de US$ 1 (R$ 6,00) por colaborador/mês. Enquanto concorrentes cobram muito mais por colaborador e somente por uma ferramenta, por exemplo: Avaliação de Desempenho, a CompSmart entrega Gestão de Remuneração Completa + Avaliação de Desempenho Completa e com personalização pelo cliente + IA em todos os módulos Trabalhando Com Você"
     },
     {
       icon: Sparkles,
