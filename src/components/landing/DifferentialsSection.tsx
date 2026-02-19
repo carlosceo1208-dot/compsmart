@@ -1,4 +1,4 @@
-import { Award, Globe2, HeartHandshake, Lock, Sparkles, TrendingUp } from "lucide-react";
+import { Award, Bot, DollarSign, Globe2, HeartHandshake, Lock, Sparkles, TrendingUp, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useScrollReveal, getStaggeredStyle } from "@/hooks/useScrollReveal";
 
@@ -7,39 +7,49 @@ export const DifferentialsSection = () => {
 
   const differentials = [
     {
+      icon: Zap,
+      title: "Remuneração + Desempenho Integrados",
+      description: "Única plataforma que conecta avaliação 360°, 9Box e PDI diretamente a decisões de mérito, bônus e promoções — eliminando achismos e garantindo meritocracia real baseada em dados"
+    },
+    {
+      icon: DollarSign,
+      title: "Menor Custo do Mercado",
+      description: "Plataforma completa por menos de US$ 1 por colaborador/mês. Enquanto concorrentes cobram R$ 9+/colab só para avaliação, o CompSmart entrega remuneração + desempenho + IA por menos de R$ 6/colab"
+    },
+    {
       icon: Sparkles,
-      title: "IA Integrada",
-      description: "Agentes Inteligentes especializados em compliance, análise salarial e gestão de benefícios"
+      title: "4 Agentes de IA Especializados",
+      description: "Jurídico Smart (compliance e acordos coletivos), Salary Smart (análise salarial), R&B Smart (benefícios e incentivos) e PerformAI (feedbacks e PDIs) — trabalhando COM você em tempo real"
     },
     {
       icon: Globe2,
-      title: "Presença Brasil + LATAM",
-      description: "Solução desenvolvida para empresas brasileiras com expansão para toda América Latina"
-    },
-    {
-      icon: HeartHandshake,
-      title: "Consultoria Embutida",
-      description: "Suporte humanizado e orientação estratégica inclusos na plataforma"
-    },
-    {
-      icon: TrendingUp,
-      title: "Dados de Mercado",
-      description: "Benchmarking atualizado com pesquisas salariais reais"
-    },
-    {
-      icon: Lock,
-      title: "Segurança Enterprise",
-      description: "LGPD compliant com criptografia e proteção de dados de nível corporativo"
+      title: "Brasil + LATAM Nativo",
+      description: "Desenvolvido para a realidade brasileira: CLT, CBO, INPC, encargos, vale-transporte com desconto legal de 6%, e pronto para expansão na América Latina com suporte a múltiplas moedas"
     },
     {
       icon: Award,
       title: "Feedback Externo 360°",
-      description: "Avaliadores de fora da empresa — clientes, fornecedores e parceiros — participam dos ciclos de feedback, ampliando a visão sobre o colaborador"
+      description: "Avaliadores de fora da empresa — clientes, fornecedores e parceiros — participam dos ciclos de feedback via formulário seguro com link único, ampliando a visão sobre o colaborador"
+    },
+    {
+      icon: HeartHandshake,
+      title: "Consultoria Embutida",
+      description: "Metodologias Hay e Mercer integradas, job matching inteligente, curvas salariais automáticas e recomendações de IA — como ter um consultor de remuneração 24/7 dentro da plataforma"
     },
     {
       icon: TrendingUp,
-      title: "Desempenho + Remuneração Integrados",
-      description: "Única plataforma que conecta avaliação de desempenho a decisões salariais — mérito, bônus e promoções baseados em dados reais"
+      title: "Alertas Proativos com IA",
+      description: "O sistema identifica riscos de retenção, defasagens salariais, avaliações pendentes e distorções de equidade antes que virem problemas — antecipando decisões para o RH e gestores"
+    },
+    {
+      icon: Bot,
+      title: "ICP + ILP Completo",
+      description: "Gestão integrada de incentivos de curto prazo (bônus, PLR, comissões) e longo prazo (Stock Options, RSU, Phantom Shares, Previdência) com vesting, cliff e simulações por grade"
+    },
+    {
+      icon: Lock,
+      title: "Segurança & LGPD Enterprise",
+      description: "Criptografia de ponta, controle de acesso por perfil, auditoria de equidade salarial (gênero, área, nível) e conformidade total com a LGPD — seus dados protegidos com padrão corporativo"
     }
   ];
 
@@ -61,8 +71,8 @@ export const DifferentialsSection = () => {
                 diferentes?
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Combinamos tecnologia de ponta com expertise em remuneração para entregar uma solução única no mercado
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              A única plataforma que integra Remuneração Estratégica, Avaliação de Desempenho e Inteligência Artificial — por menos de 1 dólar por colaborador
             </p>
           </div>
 
