@@ -1,68 +1,40 @@
 
 
-## Recuperar Seções Essenciais e Adicionar Avaliação de Desempenho
+## Integrar Texto Descritivo da Landing Page Publicada ao Hero
 
-### Problema Identificado
+### Analise
 
-Quatro seções importantes da landing page publicada atualmente existem como componentes prontos, mas foram **removidas ou nunca incluídas** no `Index.tsx`:
+A captura de tela mostra o Hero da landing page publicada com:
+- Titulo: "Ainda improvisa na gestao de remuneracao?"
+- Paragrafo descritivo rico mencionando Cargos, Salarios, Beneficios, Programas de Incentivos
+- Cards de dor: Salarios Defasados, Processos Manuais, Riscos Trabalhistas
 
-1. **LogoSlider** -- "Empresas de todos os tamanhos confiam na CompSmart" (carrossel animado de setores)
-2. **SolutionSection** -- "O que o CompSmart entrega" (3 pilares com tabs)
-3. **TargetAudienceSection** -- "CompSmart para Todos os Portes" (PE, ME, GE)
-4. **DifferentialsSection** -- "Por que somos diferentes?" (6 diferenciais)
+A nova versao ja cobre todo este conteudo de forma ate mais completa:
+- O Hero usa uma Calculadora de Impacto interativa (mais envolvente que texto estatico)
+- A BeforeAfterSection lista os mesmos problemas + solucoes lado a lado
+- A SolutionSection detalha os 4 pilares incluindo AVD
 
-### Mudancas Planejadas
+### O que falta (e faz sentido adicionar)
 
-**1. Index.tsx -- Adicionar as 4 secoes de volta**
+O paragrafo descritivo da pagina publicada tem uma frase de impacto que reforca a abrangencia da plataforma e que nao esta presente na nova versao. Proposta: adicionar este texto como complemento no Hero.
 
-Inserir na ordem correta para manter o fluxo narrativo:
+### Mudanca Planejada
 
-```text
-Header
-HeroSection
-VideoSection
-LogoSlider              <-- ADICIONAR (logo apos video, prova social rapida)
-BeforeAfterSection
-SolutionSection         <-- ADICIONAR (o que entregamos, com AVD)
-InteractiveDemoSection
-IntegrationSection
-HowItWorksSection
-TargetAudienceSection   <-- ADICIONAR (portes de empresa)
-SmartAgentsSection
-DifferentialsSection    <-- ADICIONAR (por que somos diferentes)
-SocialProofSection
-CompetitiveComparisonSection
-SecuritySection
-PricingSection
-FAQSection
-CTASection
-Footer
-LaunchPromoBanner
-StickyCTABar
-```
+**HeroSection.tsx -- Enriquecer o subtitulo**
 
-**2. SolutionSection.tsx -- Adicionar 4o pilar "Avaliacao de Desempenho"**
+Alterar o paragrafo descritivo atual:
+- De: "Descubra o custo real do caos e veja como a CompSmart transforma isso em decisoes estrategicas -- em minutos."
+- Para: "Empresas lideres exigem mais que planilhas. Com a CompSmart, voce e a inteligencia artificial orquestram toda a gestao de Cargos, Salarios, Beneficios, Incentivos e Desempenho. **Transforme sua remuneracao em vantagem estrategica decisiva.**"
 
-Transformar de 3 pilares para 4, adicionando uma nova tab:
-
-- Tab: "Avaliacao de Desempenho" (icone: Target, cor: orange)
-- Cards dentro da tab:
-  - **Avaliacao 360** -- "Ciclos de avaliacao 90, 180 e 360 graus com feedback estruturado e devolutivas com IA"
-  - **Matriz 9Box e PDI** -- "Classificacao automatica de performance x potencial com planos de desenvolvimento individual"
-  - **Plano de Sucessao** -- "Mapeamento de sucessores por posicao-chave com analise de prontidao e gaps"
-- Ajustar o grid da TabsList de `grid-cols-3` para `grid-cols-4`
-
-**3. DifferentialsSection.tsx -- Adicionar diferencial de AVD integrada**
-
-Adicionar um 7o diferencial (ou substituir um existente):
-- Titulo: "Desempenho + Remuneracao Integrados"
-- Descricao: "Unica plataforma que conecta avaliacao de desempenho a decisoes salariais -- merito, bonus e promocoes baseados em dados reais"
+Isto preserva a essencia da pagina publicada sem duplicar conteudo ja coberto pelas secoes BeforeAfter e SolutionSection.
 
 ### Secao Tecnica
 
 | Arquivo | Alteracao |
 |---|---|
-| `src/pages/Index.tsx` | Importar e adicionar LogoSlider, SolutionSection, TargetAudienceSection, DifferentialsSection |
-| `src/components/landing/SolutionSection.tsx` | Adicionar 4o pilar "Avaliacao de Desempenho" com 3 cards (360, 9Box/PDI, Sucessao), ajustar grid para 4 colunas |
-| `src/components/landing/DifferentialsSection.tsx` | Adicionar diferencial "Desempenho + Remuneracao Integrados" |
+| `src/components/landing/HeroSection.tsx` | Atualizar paragrafo descritivo (linha 77-78) com texto da landing publicada, incluindo mencao a Desempenho |
+
+### Conclusao
+
+Os cards de dor (Salarios Defasados, Processos Manuais, Riscos Trabalhistas) ja estao totalmente cobertos pela BeforeAfterSection. Nao ha necessidade de duplica-los. Apenas o texto descritivo do Hero merece ser incorporado para manter a identidade da marca.
 
