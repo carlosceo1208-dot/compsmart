@@ -74,7 +74,7 @@ export const HeroSection = () => {
               <span className="text-primary">planilhas de RH</span>?
             </h1>
             <p className="text-base md:text-lg text-muted-foreground">
-              Descubra o custo real do caos e veja como a CompSmart transforma isso em decisões estratégicas — em minutos.
+              Empresas líderes exigem mais que planilhas. Com a CompSmart, você e a inteligência artificial orquestram toda a gestão de <strong className="text-foreground">Cargos, Salários, Benefícios, Incentivos e Desempenho</strong>. Transforme sua remuneração em <strong className="text-primary">vantagem estratégica decisiva</strong>.
             </p>
             <ImpactCalculator />
           </div>
