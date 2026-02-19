@@ -33,8 +33,8 @@ export const DifferentialsSection = () => {
     },
     {
       icon: Award,
-      title: "Metodologias de Mercado",
-      description: "Avaliação de cargos por fatores e pontos baseada nas melhores práticas e metodologias reconhecidas pelo mercado"
+      title: "Feedback Externo 360°",
+      description: "Avaliadores de fora da empresa — clientes, fornecedores e parceiros — participam dos ciclos de feedback, ampliando a visão sobre o colaborador"
     },
     {
       icon: TrendingUp,

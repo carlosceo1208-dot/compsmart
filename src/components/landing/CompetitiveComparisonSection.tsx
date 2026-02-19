@@ -58,6 +58,18 @@ const features = [
     tradA: { status: "no", text: '"Sob consulta"' },
     tradB: { status: "no", text: "R$ 9+/colab (só AVD)" },
   },
+  {
+    name: "Reconhecimento & 1:1s",
+    compsmart: { status: "yes", text: "Integrado" },
+    tradA: { status: "no", text: "Não tem" },
+    tradB: { status: "warn", text: "Módulo separado R$ 5+/colab" },
+  },
+  {
+    name: "Alertas Proativos de Performance",
+    compsmart: { status: "yes", text: "Automático com IA" },
+    tradA: { status: "no", text: "Não tem" },
+    tradB: { status: "no", text: "Não tem" },
+  },
 ];
 
 const StatusIcon = ({ status }: { status: string }) => {

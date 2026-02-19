@@ -1,4 +1,4 @@
-import { BarChart3, Database, FileText, TrendingUp, Users, Calculator, Brain, Award, Target, Briefcase, PieChart, Bot } from "lucide-react";
+import { BarChart3, Database, FileText, TrendingUp, Users, Calculator, Brain, Award, Target, Briefcase, PieChart, Bot, Heart, MessageSquare, UserCheck, Shield, Bell } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -72,6 +72,21 @@ export const SolutionSection = () => {
           icon: TrendingUp,
           title: "Plano de Sucessão",
           description: "Mapeamento de sucessores por posição-chave com análise de prontidão e gaps"
+        },
+        {
+          icon: Heart,
+          title: "Reconhecimento & Kudos",
+          description: "Celebre conquistas entre pares com notificações em tempo real — integrado às avaliações formais como evidência qualitativa"
+        },
+        {
+          icon: MessageSquare,
+          title: "Reuniões 1:1",
+          description: "One-on-ones estruturados com registro de pautas, acompanhamento de ações e histórico completo"
+        },
+        {
+          icon: UserCheck,
+          title: "Feedback Externo 360°",
+          description: "Clientes, fornecedores e parceiros participam dos ciclos de avaliação via formulário seguro com link único"
         }
       ]
     },
@@ -96,6 +111,11 @@ export const SolutionSection = () => {
           icon: Target,
           title: "Gestão de Custos de Pessoas",
           description: "Controle total sobre encargos, benefícios e custos variáveis por área e centro de custo"
+        },
+        {
+          icon: Shield,
+          title: "Gestão de Benefícios",
+          description: "Configure benefícios por grade, calcule custos mensais/anuais e gerencie elegibilidade automaticamente"
         }
       ]
     },
@@ -120,6 +140,11 @@ export const SolutionSection = () => {
           icon: Brain,
           title: "Otimização de Incentivos",
           description: "Recomendações inteligentes para programas de ICP, ILP, stock options e previdência"
+        },
+        {
+          icon: Bell,
+          title: "Alertas Proativos",
+          description: "Sistema inteligente que identifica riscos de retenção, avaliações pendentes e distorções salariais antes que virem problemas"
         }
       ]
     }
@@ -174,7 +199,7 @@ export const SolutionSection = () => {
                 </div>
 
                 {/* Solutions Grid */}
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className={`grid gap-6 ${pillar.solutions.length > 3 ? 'md:grid-cols-3' : 'md:grid-cols-3'}`}>
                   {pillar.solutions.map((solution, index) => (
                     <Card 
                       key={index}
