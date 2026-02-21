@@ -3086,6 +3086,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           related_terms: string[] | null
+          root_company_id: string | null
           synonyms: string[] | null
           term: string
           updated_at: string
@@ -3097,6 +3098,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           related_terms?: string[] | null
+          root_company_id?: string | null
           synonyms?: string[] | null
           term: string
           updated_at?: string
@@ -3108,11 +3110,20 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           related_terms?: string[] | null
+          root_company_id?: string | null
           synonyms?: string[] | null
           term?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "performance_glossary_terms_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       performance_goals: {
         Row: {
