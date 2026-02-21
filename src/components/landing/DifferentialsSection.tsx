@@ -33,8 +33,8 @@ export const DifferentialsSection = () => {
     },
     {
       icon: HeartHandshake,
-      title: "Consultoria Embutida",
-      description: "Metodologias Hay e Mercer integradas, job matching inteligente, curvas salariais automáticas e recomendações de IA — como ter um consultor de remuneração 24/7 dentro da plataforma"
+      title: "Consultoria Integrada",
+      description: "Metodologias de ponta mais utilizadas no mercado integradas para job matching inteligente, curvas salariais automáticas, descrição e avaliação de cargos, recomendações de IA e muito mais — Como ter um consultor de remuneração 24/7 dentro da plataforma trabalhando com você"
     },
     {
       icon: TrendingUp,
