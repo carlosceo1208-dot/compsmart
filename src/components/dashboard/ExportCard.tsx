@@ -43,7 +43,8 @@ export const ExportCard = () => {
       const { count, error } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
       if (error) throw error;
       return count || 0;
     },
