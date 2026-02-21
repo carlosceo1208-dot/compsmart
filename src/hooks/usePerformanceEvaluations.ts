@@ -184,10 +184,24 @@ export function usePerformanceEvaluations(options: UseEvaluationsOptions = {}) {
         .single();
 
       if (error) throw error;
+
+      // Gravar final_score no performance_rating do perfil do colaborador
+      if (data.employee_id && data.final_score != null) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ performance_rating: data.final_score })
+          .eq("id", data.employee_id);
+
+        if (profileError) {
+          console.error("Error syncing performance_rating to profile:", profileError);
+        }
+      }
+
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["performance-evaluations"] });
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
       toast.success("Avaliação aprovada com sucesso");
     },
     onError: (error) => {

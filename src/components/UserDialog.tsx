@@ -403,7 +403,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         setSelectedUnitBreadcrumb(breadcrumbData || '');
       }
     } catch (error: any) {
-      toast.error("Erro ao carregar dados do funcionário");
+      toast.error("Erro ao carregar dados do colaborador");
       console.error(error);
     }
   };
@@ -493,7 +493,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
     // Evita submit enquanto o perfil ainda não carregou (modo edição)
     if (userId && originalEmail === null) {
-      toast.info("Aguarde o carregamento do funcionário antes de salvar.");
+      toast.info("Aguarde o carregamento do colaborador antes de salvar.");
       return;
     }
 
@@ -593,8 +593,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
 
         if (updateError) throw updateError;
 
-        // Só atualiza roles se o funcionário tiver conta no auth.users (email cadastrado)
-        // Funcionários sem email não existem em auth.users
+        // Só atualiza roles se o colaborador tiver conta no auth.users (email cadastrado)
+        // Colaboradores sem email não existem em auth.users
         const { data: profileData } = await supabase
           .from('profiles')
           .select('email')
@@ -611,9 +611,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         }
 
         if (!formData.unit_id) {
-          toast.info("Funcionário atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
+          toast.info("Colaborador atualizado sem vínculo organizacional. Você pode vincular a um Setor/Projeto depois em Editar Colaborador ou na Estrutura Organizacional.");
         } else if (!emailChanged) {
-          toast.success("Funcionário atualizado com sucesso!");
+          toast.success("Colaborador atualizado com sucesso!");
         }
       } else {
         // Create new user via Edge Function (não afeta sessão do admin)
@@ -628,7 +628,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           .single();
 
         if (!adminProfile?.root_company_id) {
-          throw new Error('Você precisa estar vinculado a uma empresa para cadastrar funcionários');
+          throw new Error('Você precisa estar vinculado a uma empresa para cadastrar colaboradores');
         }
 
         // Usar Edge Function para criar usuário (não troca sessão do admin)
@@ -657,14 +657,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         });
 
         if (fnError) throw fnError;
-        if (!result.success) throw new Error(result.error || "Falha ao criar funcionário");
+        if (!result.success) throw new Error(result.error || "Falha ao criar colaborador");
 
         if (result.action === 'created_without_auth') {
-          toast.success("Funcionário criado! Poderá ativar conta posteriormente em /activate");
+          toast.success("Colaborador criado! Poderá ativar conta posteriormente em /activate");
         } else if (!formData.unit_id) {
-          toast.info("Funcionário criado sem vínculo organizacional. Você pode vincular a uma Área/Departamento/Setor/Projeto depois em Editar Funcionário ou na Estrutura Organizacional.");
+          toast.info("Colaborador criado sem vínculo organizacional. Você pode vincular a uma Área/Departamento/Setor/Projeto depois em Editar Colaborador ou na Estrutura Organizacional.");
         } else {
-          toast.success("Funcionário criado com sucesso!");
+          toast.success("Colaborador criado com sucesso!");
         }
       }
 
@@ -678,12 +678,12 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       } else if (error.code === '23503') {
         // Distinguir entre diferentes tipos de violação de FK
         if (error.message?.includes('user_roles')) {
-          toast.warning("Funcionário salvo, mas sem roles (não possui conta de acesso ao sistema).");
+          toast.warning("Colaborador salvo, mas sem roles (não possui conta de acesso ao sistema).");
         } else {
           toast.error("Unidade organizacional não encontrada. Ela pode ter sido excluída.");
         }
       } else {
-        toast.error(error.message || "Erro ao salvar funcionário");
+        toast.error(error.message || "Erro ao salvar colaborador");
       }
       console.error(error);
     } finally {
@@ -695,9 +695,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{userId ? "Editar Funcionário" : "Novo Funcionário"}</DialogTitle>
+          <DialogTitle>{userId ? "Editar Colaborador" : "Novo Colaborador"}</DialogTitle>
           <DialogDescription>
-            {userId ? "Atualize as informações do funcionário e suas permissões" : "Preencha os dados para criar um novo funcionário"}
+            {userId ? "Atualize as informações do colaborador e suas permissões" : "Preencha os dados para criar um novo colaborador"}
           </DialogDescription>
         </DialogHeader>
         
@@ -717,14 +717,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                       type="button"
                       disabled={loading}
                     >
-                      {formData.full_name || "Buscar funcionário ou digitar novo nome"}
+                      {formData.full_name || "Buscar colaborador ou digitar novo nome"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="p-0 z-[1000] w-full">
                     <Command>
                       <CommandInput 
-                        placeholder="Digite o nome do funcionário..." 
+                        placeholder="Digite o nome do colaborador..." 
                         value={formData.full_name}
                         onValueChange={(value) => {
                           setFormData({ ...formData, full_name: value });
@@ -734,14 +734,14 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                       <CommandList className="max-h-[300px]">
                         <CommandEmpty>
                           <div className="p-2 text-sm text-muted-foreground">
-                            {formData.full_name ? `Nenhum funcionário encontrado. Use "${formData.full_name}" para novo cadastro` : "Digite para buscar"}
+                            {formData.full_name ? `Nenhum colaborador encontrado. Use "${formData.full_name}" para novo cadastro` : "Digite para buscar"}
                           </div>
                         </CommandEmpty>
                         
                         {employees.filter(emp => 
                           emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase())
                         ).length > 0 && (
-                          <CommandGroup heading="Funcionários Cadastrados">
+                          <CommandGroup heading="Colaboradores Cadastrados">
                             {employees
                               .filter(emp => emp.full_name.toLowerCase().includes(formData.full_name.toLowerCase()))
                               .slice(0, 10)
@@ -790,7 +790,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                 <p className="text-xs text-muted-foreground">
                   {selectedEmployee 
                     ? `✅ Dados importados de: ${selectedEmployee.full_name}` 
-                    : "Digite para buscar funcionário existente ou criar novo"}
+                    : "Digite para buscar colaborador existente ou criar novo"}
                 </p>
               </div>
               <div className="col-span-2 space-y-2">
@@ -801,17 +801,17 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   disabled={loading}
-                  placeholder="funcionario@empresa.com"
+                  placeholder="colaborador@empresa.com"
                 />
                 {userId ? (
                   <p className="text-xs text-muted-foreground">
-                    ⚠️ Alterar o email irá atualizar também o login do funcionário
+                    ⚠️ Alterar o email irá atualizar também o login do colaborador
                   </p>
                 ) : (
                   <p className="text-xs text-muted-foreground">
                     {formData.email 
-                      ? "✅ Funcionário terá acesso ao sistema" 
-                      : "⚠️ Sem email = sem acesso ao sistema. Funcionário poderá ativar conta posteriormente em /activate"}
+                      ? "✅ Colaborador terá acesso ao sistema" 
+                      : "⚠️ Sem email = sem acesso ao sistema. Colaborador poderá ativar conta posteriormente em /activate"}
                   </p>
                 )}
               </div>
@@ -907,7 +907,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   className={formData.termination_date ? "border-destructive" : ""}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Ao informar a data de desligamento, o status do funcionário será alterado automaticamente para "Inativo"
+                  Ao informar a data de desligamento, o status do colaborador será alterado automaticamente para "Inativo"
                 </p>
               </div>
             </div>
