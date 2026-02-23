@@ -45,11 +45,13 @@ export const StickyCTABar = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:bottom-auto md:top-0 bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm">
-          <Sparkles className="h-4 w-4" />
-          <span>
-            🚀 2 ferramentas completas por menos de US$ 1/colab — <strong>Trial 14 dias grátis</strong>
-          </span>
+        <div className="flex items-center gap-2 text-sm min-w-0 flex-1 overflow-hidden">
+          <Sparkles className="h-4 w-4 shrink-0" />
+          <div className="overflow-hidden whitespace-nowrap">
+            <span className="inline-block animate-[marquee_15s_linear_infinite]">
+              🚀 2 Ferramentas Estratégicas Completas totalmente customizável por apenas menos do que R$ 6,00 em média p/ colaborador &nbsp;&nbsp;&nbsp;⭐&nbsp;&nbsp;&nbsp; 🚀 2 Ferramentas Estratégicas Completas totalmente customizável por apenas menos do que R$ 6,00 em média p/ colaborador &nbsp;&nbsp;&nbsp;⭐&nbsp;&nbsp;&nbsp;
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Button
