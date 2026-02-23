@@ -48,8 +48,8 @@ export const StickyCTABar = () => {
         <div className="flex items-center gap-2 text-sm min-w-0 flex-1 overflow-hidden">
           <Sparkles className="h-4 w-4 shrink-0" />
           <div className="overflow-hidden whitespace-nowrap">
-            <span className="inline-block animate-[marquee_15s_linear_infinite]">
-              🚀 2 Ferramentas Estratégicas Completas totalmente customizável por apenas menos do que R$ 6,00 em média p/ colaborador &nbsp;&nbsp;&nbsp;⭐&nbsp;&nbsp;&nbsp; 🚀 2 Ferramentas Estratégicas Completas totalmente customizável por apenas menos do que R$ 6,00 em média p/ colaborador &nbsp;&nbsp;&nbsp;⭐&nbsp;&nbsp;&nbsp;
+            <span className="inline-block animate-[marquee_18s_linear_infinite]">
+              🚀 2 Ferramentas Estratégicas Completas totalmente customizável por apenas menos do que R$ 6,00 em média p/ colaborador — <strong className="text-secondary bg-secondary/20 px-2 py-0.5 rounded">Trial 14 dias grátis</strong> &nbsp;&nbsp;&nbsp;⭐&nbsp;&nbsp;&nbsp; 🚀 2 Ferramentas Estratégicas Completas totalmente customizável por apenas menos do que R$ 6,00 em média p/ colaborador — <strong className="text-secondary bg-secondary/20 px-2 py-0.5 rounded">Trial 14 dias grátis</strong> &nbsp;&nbsp;&nbsp;⭐&nbsp;&nbsp;&nbsp;
             </span>
           </div>
         </div>
