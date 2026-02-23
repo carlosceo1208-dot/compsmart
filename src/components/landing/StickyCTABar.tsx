@@ -43,7 +43,7 @@ export const StickyCTABar = () => {
   if (!visible || dismissed) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:bottom-auto md:top-0 bg-primary text-primary-foreground shadow-lg">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm min-w-0 flex-1 overflow-hidden">
           <Sparkles className="h-4 w-4 shrink-0" />
