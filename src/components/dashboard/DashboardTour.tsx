@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Joyride, { CallBackProps, STATUS, Step } from 'react-joyride';
 
-const TOUR_STORAGE_KEY = 'compsmart_tour_completed';
+const TOUR_STORAGE_KEY = 'compsmart_tour_completed_v2';
 
 // Função exportada para reiniciar o tour
 export const resetDashboardTour = () => {
