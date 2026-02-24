@@ -1,36 +1,23 @@
 
-## Atualizar o Tour do Dashboard
 
-O tour atual tem 6 passos e foca apenas em remuneração, sem mencionar o modulo de Avaliacao de Desempenho, o agente PerformAI, nem a visao completa da plataforma.
+## Corrigir Tour do Dashboard para Reexibir Apos Atualizacao
 
-### Novos passos do tour (7 passos)
+### Problema
+O tour salva `compsmart_tour_completed = true` no localStorage. Como o usuario ja completou a versao antiga, o tour atualizado (com Avaliacao de Desempenho e PerformAI) nunca aparece.
 
-1. **Bem-vindo ao CompSmart!** (target: `.dashboard-welcome`)
-   - "Plataforma integrada de Remuneracao Estrategica e Avaliacao de Desempenho. Tudo conectado para decisoes mais justas e inteligentes."
-
-2. **Avaliacao de Desempenho** (target: card do PerformanceModuleCard na coluna esquerda)
-   - "Modulo completo: Metas, Avaliacoes 90/180/360, Matriz 9Box, Reconhecimento e Kudos. Integrado com a remuneracao para decisoes baseadas em dados."
-   - Adicionar classe CSS `.performance-module-card` ao PerformanceModuleCard para servir de target
-
-3. **Agentes Smart** (target: `.smart-agents-section`)
-   - "4 Assistentes de IA: Juridico Smart, Salary Smart, R&B Smart e PerformAI. Seu time de consultores 24/7."
-   - Atualizar de 3 para 4 agentes, incluindo PerformAI
-
-4. **Analytics e Relatorios** (target: `.analytics-section`)
-   - "KPIs de remuneracao, People Analytics, Analise Salarial e tendencias em tempo real."
-
-5. **Gestao e Configuracao** (target: `.management-section`)
-   - "Funcionarios, cargos, tabelas salariais, beneficios, incentivos ICP/ILP e estrutura organizacional."
-
-6. **Modulos Premium** (target: `.locked-module`)
-   - "Modulos com cadeado requerem upgrade. Clique para conhecer os beneficios!"
-
-7. **Pronto para comecar!** (target: `.dashboard-welcome`)
-   - "Explore Remuneracao + Desempenho integrados. Sua gestao de pessoas nunca mais sera a mesma!"
+### Solucao
+Versionar a chave do localStorage para que cada atualizacao de conteudo force a reexibicao do tour.
 
 ### Alteracoes tecnicas
 
-| Arquivo | Alteracao |
-|---------|-----------|
-| `src/components/dashboard/DashboardTour.tsx` | Reescrever os 6 steps para 7, com textos atualizados incluindo Avaliacao de Desempenho e PerformAI |
-| `src/components/dashboard/PerformanceModuleCard.tsx` | Adicionar classe CSS `performance-module-card` ao Card raiz para o tour poder apontar |
+**Arquivo:** `src/components/dashboard/DashboardTour.tsx`
+
+1. Mudar a constante `TOUR_STORAGE_KEY` de `'compsmart_tour_completed'` para `'compsmart_tour_completed_v2'`
+2. Atualizar a funcao `resetDashboardTour` para limpar a nova chave
+3. Nenhuma outra alteracao necessaria -- o restante da logica ja funciona corretamente
+
+Isso garante que:
+- Usuarios que completaram a v1 verao o tour v2 automaticamente
+- Futuras atualizacoes de conteudo podem incrementar para v3, v4, etc.
+- A funcao `resetDashboardTour` continua funcionando para reset manual
+
