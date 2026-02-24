@@ -6,7 +6,7 @@ import { TrendingUp, ArrowRight, Target, ClipboardCheck, LayoutGrid, Award } fro
 
 export function PerformanceModuleCard() {
   return (
-    <Card className="overflow-hidden border-2 border-indigo-200/50 dark:border-indigo-800/30 bg-gradient-to-br from-indigo-50 via-white to-indigo-50 dark:from-indigo-950/30 dark:via-background dark:to-indigo-950/30 shadow-lg hover:shadow-xl transition-shadow">
+    <Card className="performance-module-card overflow-hidden border-2 border-indigo-200/50 dark:border-indigo-800/30 bg-gradient-to-br from-indigo-50 via-white to-indigo-50 dark:from-indigo-950/30 dark:via-background dark:to-indigo-950/30 shadow-lg hover:shadow-xl transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
