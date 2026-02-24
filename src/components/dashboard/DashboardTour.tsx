@@ -15,7 +15,7 @@ const tourSteps: Step[] = [
       <div className="text-left">
         <h3 className="font-semibold text-base mb-1 text-gray-800">Bem-vindo ao CompSmart!</h3>
         <p className="text-sm text-gray-600">
-          Dashboard executivo para gestão inteligente de remuneração.
+          Plataforma integrada de Remuneração Estratégica e Avaliação de Desempenho. Tudo conectado para decisões mais justas e inteligentes.
         </p>
       </div>
     ),
@@ -23,12 +23,24 @@ const tourSteps: Step[] = [
     disableBeacon: true,
   },
   {
+    target: '.performance-module-card',
+    content: (
+      <div className="text-left">
+        <h3 className="font-semibold text-base mb-1 text-gray-800">Avaliação de Desempenho</h3>
+        <p className="text-sm text-gray-600">
+          Módulo completo: Metas, Avaliações 90°/180°/360°, Matriz 9Box, Reconhecimento e Kudos. Integrado com a remuneração para decisões baseadas em dados.
+        </p>
+      </div>
+    ),
+    placement: 'right',
+  },
+  {
     target: '.smart-agents-section',
     content: (
       <div className="text-left">
         <h3 className="font-semibold text-base mb-1 text-gray-800">Agentes Smart</h3>
         <p className="text-sm text-gray-600">
-          Assistentes de IA: Jurídico Smart, Salary Smart e R&B Smart.
+          4 Assistentes de IA: Jurídico Smart, Salary Smart, R&B Smart e PerformAI. Seu time de consultores 24/7.
         </p>
         <p className="text-xs text-amber-600 mt-1">⭐ Plano Pro</p>
       </div>
@@ -41,7 +53,7 @@ const tourSteps: Step[] = [
       <div className="text-left">
         <h3 className="font-semibold text-base mb-1 text-gray-800">Analytics & Relatórios</h3>
         <p className="text-sm text-gray-600">
-          KPIs, tendências e relatórios em tempo real.
+          KPIs de remuneração, People Analytics, Análise Salarial e tendências em tempo real.
         </p>
       </div>
     ),
@@ -53,7 +65,7 @@ const tourSteps: Step[] = [
       <div className="text-left">
         <h3 className="font-semibold text-base mb-1 text-gray-800">Gestão e Configuração</h3>
         <p className="text-sm text-gray-600">
-          Funcionários, cargos, tabelas e benefícios.
+          Funcionários, cargos, tabelas salariais, benefícios, incentivos ICP/ILP e estrutura organizacional.
         </p>
       </div>
     ),
@@ -65,7 +77,7 @@ const tourSteps: Step[] = [
       <div className="text-left">
         <h3 className="font-semibold text-base mb-1 text-gray-800">Módulos Premium</h3>
         <p className="text-sm text-gray-600">
-          Cadeado = upgrade necessário. Clique para ver benefícios!
+          Módulos com cadeado requerem upgrade. Clique para conhecer os benefícios!
         </p>
       </div>
     ),
@@ -75,9 +87,9 @@ const tourSteps: Step[] = [
     target: '.dashboard-welcome',
     content: (
       <div className="text-left">
-        <h3 className="font-semibold text-base mb-1 text-gray-800">Pronto!</h3>
+        <h3 className="font-semibold text-base mb-1 text-gray-800">Pronto para começar!</h3>
         <p className="text-sm text-gray-600">
-          Explore os módulos do seu plano. Bom trabalho!
+          Explore Remuneração + Desempenho integrados. Sua gestão de pessoas nunca mais será a mesma!
         </p>
       </div>
     ),
