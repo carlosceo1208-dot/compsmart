@@ -138,6 +138,19 @@ export default function ExternalFeedbackForm() {
       return;
     }
 
+    // Validate text field lengths
+    const MAX_TEXT_LENGTH = 2000;
+    if ((strengths && strengths.length > MAX_TEXT_LENGTH) ||
+        (improvementAreas && improvementAreas.length > MAX_TEXT_LENGTH) ||
+        (additionalComments && additionalComments.length > MAX_TEXT_LENGTH)) {
+      toast({
+        title: "Texto muito longo",
+        description: `Cada campo de texto deve ter no máximo ${MAX_TEXT_LENGTH} caracteres.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -147,13 +160,19 @@ export default function ExternalFeedbackForm() {
         rating: answers[q.id] || null,
       }));
 
+      // Sanitize text inputs: trim whitespace
+      const sanitize = (text: string | null): string | null => {
+        if (!text) return null;
+        return text.trim().slice(0, MAX_TEXT_LENGTH);
+      };
+
       const { error: submitError } = await supabase.rpc("submit_external_feedback", {
         p_token: token,
         p_answers: answersArray,
         p_overall_rating: overallRating,
-        p_strengths: strengths || null,
-        p_improvement_areas: improvementAreas || null,
-        p_additional_comments: additionalComments || null,
+        p_strengths: sanitize(strengths),
+        p_improvement_areas: sanitize(improvementAreas),
+        p_additional_comments: sanitize(additionalComments),
       });
 
       if (submitError) throw submitError;
@@ -408,6 +427,7 @@ export default function ExternalFeedbackForm() {
                 placeholder="O que você considera como principais qualidades deste profissional?"
                 value={strengths}
                 onChange={(e) => setStrengths(e.target.value)}
+                maxLength={2000}
                 rows={3}
               />
             </div>
@@ -419,6 +439,7 @@ export default function ExternalFeedbackForm() {
                 placeholder="Em quais aspectos este profissional poderia melhorar?"
                 value={improvementAreas}
                 onChange={(e) => setImprovementAreas(e.target.value)}
+                maxLength={2000}
                 rows={3}
               />
             </div>
@@ -430,6 +451,7 @@ export default function ExternalFeedbackForm() {
                 placeholder="Algo mais que gostaria de compartilhar?"
                 value={additionalComments}
                 onChange={(e) => setAdditionalComments(e.target.value)}
+                maxLength={2000}
                 rows={3}
               />
             </div>
