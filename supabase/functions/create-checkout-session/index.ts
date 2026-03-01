@@ -37,6 +37,39 @@ serve(async (req) => {
       });
     }
 
+    // Server-side validation: allowed payment methods
+    const allowedMethods = ['pix', 'credit_card', 'debit_card', 'boleto'];
+    if (!allowedMethods.includes(payment_method)) {
+      return new Response(JSON.stringify({ error: 'Método de pagamento inválido' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Server-side validation: card token required for card payments
+    if ((payment_method === 'credit_card' || payment_method === 'debit_card') && !card_token) {
+      return new Response(JSON.stringify({ error: 'Token do cartão é obrigatório para pagamento com cartão' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Server-side validation: card_token format (Pagar.me tokens are alphanumeric strings)
+    if (card_token && (typeof card_token !== 'string' || card_token.length < 10 || card_token.length > 255 || !/^[a-zA-Z0-9_-]+$/.test(card_token))) {
+      return new Response(JSON.stringify({ error: 'Token do cartão inválido' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Server-side validation: billing_cycle
+    if (!['monthly', 'annual'].includes(billing_cycle)) {
+      return new Response(JSON.stringify({ error: 'Ciclo de cobrança inválido' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Buscar plano
     const { data: plan, error: planError } = await supabaseClient
       .from('subscription_plans')
