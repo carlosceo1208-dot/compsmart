@@ -54,9 +54,9 @@ serve(async (req) => {
       });
     }
 
-    // Server-side validation: card_token format (Pagar.me tokens are alphanumeric strings)
-    if (card_token && (typeof card_token !== 'string' || card_token.length < 10 || card_token.length > 255 || !/^[a-zA-Z0-9_-]+$/.test(card_token))) {
-      return new Response(JSON.stringify({ error: 'Token do cartão inválido' }), {
+    // Server-side validation: card_token format (Pagar.me tokens are alphanumeric, typically 20-100 chars)
+    if (card_token && (typeof card_token !== 'string' || card_token.length < 20 || card_token.length > 100 || !/^[a-zA-Z0-9_-]+$/.test(card_token))) {
+      return new Response(JSON.stringify({ error: 'Formato de token inválido' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -287,8 +287,7 @@ serve(async (req) => {
     if (!pagarmeResponse.ok) {
       console.error('Pagar.me error:', pagarmeOrder);
       return new Response(JSON.stringify({ 
-        error: 'Erro ao processar pagamento',
-        details: pagarmeOrder.message || pagarmeOrder.errors 
+        error: 'Erro ao processar pagamento. Tente novamente ou use outro método.'
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
