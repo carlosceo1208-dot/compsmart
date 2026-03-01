@@ -288,7 +288,7 @@ export const PricingSection = () => {
             <div className="text-center mb-12">
               <Badge className="bg-gradient-primary text-white px-4 py-1.5 mb-6 text-sm">
                 <Zap className="h-4 w-4 mr-2" />
-                2 ferramentas completas por menos de US$ 1/colaborador
+                2 ferramentas completas por menos de R$ 6,00 em média por colaborador
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
                 Planos{" "}
