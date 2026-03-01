@@ -62,8 +62,19 @@ serve(async (req) => {
 
     const { employee_ids, force_send = false }: InvitationRequest = await req.json();
 
-    if (!employee_ids || employee_ids.length === 0) {
+    if (!employee_ids || !Array.isArray(employee_ids) || employee_ids.length === 0) {
       throw new Error('Nenhum colaborador selecionado');
+    }
+
+    // Limit batch size to prevent abuse
+    if (employee_ids.length > 100) {
+      throw new Error('Limite máximo de 100 colaboradores por envio');
+    }
+
+    // Validate all IDs are valid UUIDs
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!employee_ids.every(id => typeof id === 'string' && uuidRegex.test(id))) {
+      throw new Error('IDs de colaboradores em formato inválido');
     }
 
     console.log(`Sending invitations to ${employee_ids.length} employees...`);
