@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,46 @@ serve(async (req) => {
   }
 
   try {
+    // --- Authentication: require valid JWT ---
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Invalid or expired token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // --- Rate limiting: 10 requests/user/hour via database ---
+    const serviceClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data: allowed } = await serviceClient.rpc("check_rate_limit", {
+      p_user_id: user.id,
+      p_function_name: "compensation-trends",
+      p_max_requests: 10,
+      p_window_minutes: 60,
+    });
+
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // --- AI call ---
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -66,8 +107,7 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      console.error("AI gateway error:", response.status);
       return new Response(JSON.stringify({ error: "AI gateway error" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -81,26 +121,17 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
       throw new Error("No content in AI response");
     }
 
-    console.log("AI response length:", content.length);
-
     // Parse the JSON response
     let trends;
     try {
-      // Remove markdown code blocks if present
       let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      
-      // Try to find valid JSON object
       const jsonStart = cleanContent.indexOf('{');
       const jsonEnd = cleanContent.lastIndexOf('}');
-      
       if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
         cleanContent = cleanContent.substring(jsonStart, jsonEnd + 1);
       }
-      
       trends = JSON.parse(cleanContent);
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", content.substring(0, 500));
-      
+    } catch (_parseError) {
       // Return fallback trends if parsing fails
       trends = {
         trends: [
@@ -163,8 +194,8 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
     });
 
   } catch (error) {
-    console.error("compensation-trends error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    console.error("compensation-trends error:", error instanceof Error ? error.message : "Unknown error");
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
