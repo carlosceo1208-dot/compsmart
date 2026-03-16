@@ -23,7 +23,7 @@ export function CBOSearchInput({ value, onChange, placeholder = "Digite código 
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedTitle, setSelectedTitle] = useState<string>("");
   const containerRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync external value changes
   useEffect(() => {
