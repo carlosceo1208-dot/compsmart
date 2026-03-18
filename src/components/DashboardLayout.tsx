@@ -384,6 +384,28 @@ export const DashboardLayout = () => {
                   
                   <Separator className="my-3" />
                   
+                  {/* AI Agents */}
+                  <p className="text-xs font-medium text-muted-foreground px-2 py-2 flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3 text-violet-500" /> Agentes IA
+                  </p>
+                  {aiAgents.map((agent) => (
+                    <Button
+                      key={agent.path}
+                      variant={currentPath === agent.path ? "default" : "ghost"}
+                      className={`justify-start ${
+                        currentPath === agent.path 
+                          ? "bg-violet-500 text-white hover:bg-violet-600" 
+                          : "hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-900/50 dark:hover:text-violet-400"
+                      }`}
+                      onClick={() => handleNavigate(agent.path)}
+                    >
+                      <agent.icon className="mr-2 h-4 w-4" />
+                      {agent.label}
+                    </Button>
+                  ))}
+                  
+                  <Separator className="my-3" />
+                  
                   {/* User Menu */}
                   <p className="text-xs font-medium text-muted-foreground px-2 py-2">Conta</p>
                   {userItems.map((item) => (
