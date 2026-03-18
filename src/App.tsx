@@ -58,6 +58,7 @@ import SecurityDashboard from "./pages/SecurityDashboard";
 import AboutUs from "./pages/AboutUs";
 import Glossary from "./pages/Glossary";
 import Changelog from "./pages/Changelog";
+import TotalRewards from "./pages/TotalRewards";
 
 // Performance Module
 import { PerformanceLayout } from "./components/performance/PerformanceLayout";
