@@ -384,6 +384,14 @@ const TotalRewards = () => {
                     >
                       {((annualSalary / totalCompensation) * 100).toFixed(0)}% Fixo
                     </div>
+                    {annualVariable > 0 && (
+                      <div
+                        className="h-full bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ width: `${(annualVariable / totalCompensation) * 100}%` }}
+                      >
+                        {((annualVariable / totalCompensation) * 100).toFixed(0)}% Var.
+                      </div>
+                    )}
                     {totalBenefitsAnnual > 0 && (
                       <div
                         className="h-full bg-secondary flex items-center justify-center text-[10px] font-bold text-secondary-foreground"
@@ -397,7 +405,7 @@ const TotalRewards = () => {
                         className="h-full bg-amber-500 flex items-center justify-center text-[10px] font-bold text-white"
                         style={{ width: `${(totalIncentivesAnnual / totalCompensation) * 100}%` }}
                       >
-                        {((totalIncentivesAnnual / totalCompensation) * 100).toFixed(0)}% Var.
+                        {((totalIncentivesAnnual / totalCompensation) * 100).toFixed(0)}% Inc.
                       </div>
                     )}
                   </>
@@ -405,8 +413,9 @@ const TotalRewards = () => {
               </div>
               <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-primary inline-block" /> Salário Fixo</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> Variável</span>
                 <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-secondary inline-block" /> Benefícios</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> Variável</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> Incentivos</span>
               </div>
             </CardContent>
           </Card>
