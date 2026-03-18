@@ -42,7 +42,7 @@ const features = [
   },
   {
     name: "Trial sem cartão",
-    compsmart: { status: "yes", text: "14 dias" },
+    compsmart: { status: "yes", text: "30 dias" },
     tradA: { status: "no", text: "Precisa falar com consultor" },
     tradB: { status: "no", text: "7 dias c/ cartão" },
   },
