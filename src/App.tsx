@@ -155,6 +155,7 @@ const App = () => {
               <Route path="/settings/my-plan" element={<MyPlan />} />
               <Route path="/super-admin" element={<SuperAdminDashboard />} />
               <Route path="/security-dashboard" element={<SecurityDashboard />} />
+              <Route path="/total-rewards" element={<TotalRewards />} />
             </Route>
             
             {/* Performance Module - Separate Layout */}
