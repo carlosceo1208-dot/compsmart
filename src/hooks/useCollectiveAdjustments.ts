@@ -292,6 +292,7 @@ export const useCollectiveAdjustments = (fiscalYear?: number) => {
         .from('profiles')
         .select('id, salary, grade, unit_id')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null);
 
       if (adjustment.filter_unit_id) {
