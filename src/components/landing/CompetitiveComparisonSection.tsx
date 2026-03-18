@@ -42,7 +42,7 @@ const features = [
   },
   {
     name: "Trial sem cartão",
-    compsmart: { status: "yes", text: "14 dias" },
+    compsmart: { status: "yes", text: "30 dias" },
     tradA: { status: "no", text: "Precisa falar com consultor" },
     tradB: { status: "no", text: "7 dias c/ cartão" },
   },
@@ -128,7 +128,7 @@ export const CompetitiveComparisonSection = () => {
 
         <div className="text-center mt-8">
           <Button className="cta-action" onClick={() => navigate("/auth")}>
-            Experimentar a Diferença (14 dias grátis)
+            Experimentar a Diferença (30 dias grátis)
           </Button>
         </div>
       </div>

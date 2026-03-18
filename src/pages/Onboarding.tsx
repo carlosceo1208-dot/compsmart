@@ -91,7 +91,7 @@ const Onboarding = () => {
 
       // Criar empresa principal
       const trialEndsAt = new Date();
-      trialEndsAt.setDate(trialEndsAt.getDate() + 14); // 14 dias de trial
+      trialEndsAt.setDate(trialEndsAt.getDate() + 30); // 30 dias de trial
 
       const { data: company, error: companyError } = await supabase
         .from("organizational_structure")

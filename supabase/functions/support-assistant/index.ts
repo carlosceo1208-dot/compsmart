@@ -406,7 +406,7 @@ Este guia ajuda novos clientes a configurar o CompSmart corretamente desde o pri
 2. Clique em "Começar Grátis" ou "Criar Conta"
 3. Preencha: Nome, Email, Telefone, Empresa
 4. Escolha o plano: Starter, Medium, Pro ou Enterprise
-5. Você tem **14 dias de teste grátis** com acesso completo a todas funcionalidades
+5. Você tem **30 dias de teste grátis** com acesso completo a todas funcionalidades
 
 ### PASSO 1: DADOS DA EMPRESA (Onboarding)
 Após criar conta, o sistema guia você pelo onboarding automático:

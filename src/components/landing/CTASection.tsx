@@ -28,7 +28,7 @@ export const CTASection = () => {
           </h2>
           
           <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-            Comece seu teste grátis agora. 14 dias para transformar sua gestão de pessoas com desempenho e remuneração integrados.
+            Comece seu teste grátis agora. 30 dias para transformar sua gestão de pessoas com desempenho e remuneração integrados.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
@@ -59,13 +59,13 @@ export const CTASection = () => {
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Calendar className="h-5 w-5" />
-              <span><strong className="text-white">14 dias</strong> de teste grátis</span>
+              <span><strong className="text-white">30 dias</strong> de teste grátis</span>
             </div>
           </div>
 
           <div className="pt-4 space-y-2">
             <p className="text-sm text-white/80">
-              ✅ 14 dias grátis • ✅ Sem cartão de crédito • ✅ Cancele quando quiser
+              ✅ 30 dias grátis • ✅ Sem cartão de crédito • ✅ Cancele quando quiser
             </p>
             <p className="text-xs text-white/70">
               Desempenho + Remuneração incluídos em todos os planos • Desconto para plano anual e pagamento via PIX

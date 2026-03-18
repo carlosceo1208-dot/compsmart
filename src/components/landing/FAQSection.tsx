@@ -38,7 +38,7 @@ export const FAQSection = () => {
     },
     {
       question: "O que está incluso no período de teste grátis?",
-      answer: "O teste grátis de 14 dias dá acesso completo ao plano escolhido, sem restrições de funcionalidades. Você pode cadastrar sua estrutura organizacional, colaboradores, tabela salarial e testar todos os Agentes Smart de IA. Não é necessário cartão de crédito para começar e o suporte está disponível durante todo o período.",
+      answer: "O teste grátis de 30 dias dá acesso completo ao plano escolhido, sem restrições de funcionalidades. Você pode cadastrar sua estrutura organizacional, colaboradores, tabela salarial e testar todos os Agentes Smart de IA. Não é necessário cartão de crédito para começar e o suporte está disponível durante todo o período.",
       icon: Clock,
       isNew: true
     },

@@ -249,7 +249,7 @@ export const InteractiveDemoSection = () => {
                 className="w-full bg-card text-primary hover:bg-card/90 font-bold group"
                 onClick={() => navigate("/auth")}
               >
-                Começar Teste Grátis Agora (14 dias)
+                Começar Teste Grátis Agora (30 dias)
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </CardContent>

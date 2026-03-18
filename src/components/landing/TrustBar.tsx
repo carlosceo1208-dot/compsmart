@@ -8,7 +8,7 @@ const trustItems = [
   },
   {
     icon: Clock,
-    value: "14 dias",
+    value: "30 dias",
     label: "Teste grátis",
   },
   {

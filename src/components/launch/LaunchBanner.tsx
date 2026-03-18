@@ -44,7 +44,7 @@ export const LaunchBanner = () => {
             className="bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-600 hover:to-emerald-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            Começar Agora - Grátis por 14 dias
+            Começar Agora - Grátis por 30 dias
           </Button>
         </div>
       </div>
