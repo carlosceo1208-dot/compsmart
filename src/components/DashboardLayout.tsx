@@ -79,6 +79,7 @@ const routeLabels: Record<string, string> = {
   "/settings/my-plan": "Configurações",
   "/super-admin": "Painel Super Admin",
   "/security-dashboard": "Monitoramento de Segurança",
+  "/total-rewards": "Total Rewards Statement",
 };
 
 // Parent route mapping for hierarchical navigation
