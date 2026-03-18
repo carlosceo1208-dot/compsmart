@@ -75,7 +75,9 @@ const TotalRewards = () => {
 
   const employee = employees?.find((e) => e.id === selectedEmployee);
   const baseSalary = employee?.salary || 0;
+  const variableSalary = employee?.variable_salary || 0;
   const annualSalary = baseSalary * 13; // 13th salary
+  const annualVariable = variableSalary * 12;
 
   // Calculate total benefits (monthly)
   const totalBenefitsMonthly = employeeBenefits?.reduce((sum, eb) => {
@@ -88,7 +90,7 @@ const TotalRewards = () => {
     return sum + (ei.target_value || 0);
   }, 0) || 0;
 
-  const totalCompensation = annualSalary + totalBenefitsAnnual + totalIncentivesAnnual;
+  const totalCompensation = annualSalary + annualVariable + totalBenefitsAnnual + totalIncentivesAnnual;
 
   // Pie chart data
   const pieData = [
