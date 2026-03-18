@@ -28,7 +28,7 @@ export const CTASection = () => {
           </h2>
           
           <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-            Comece seu teste grátis agora. 14 dias para transformar sua gestão de pessoas com desempenho e remuneração integrados.
+            Comece seu teste grátis agora. 30 dias para transformar sua gestão de pessoas com desempenho e remuneração integrados.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
