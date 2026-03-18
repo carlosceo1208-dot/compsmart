@@ -46,6 +46,7 @@ export function OneOnOneDialog({ open, onOpenChange, oneOnOne }: OneOnOneDialogP
         .select("id, full_name, avatar_url, job_title")
         .eq("root_company_id", activeCompanyId)
         .eq("status", "active")
+        .not("employee_number", "is", null)
         .eq("manager_id", userData.user?.id)
         .order("full_name");
       
@@ -58,6 +59,7 @@ export function OneOnOneDialog({ open, onOpenChange, oneOnOne }: OneOnOneDialogP
           .select("id, full_name, avatar_url, job_title")
           .eq("root_company_id", activeCompanyId)
           .eq("status", "active")
+          .not("employee_number", "is", null)
           .neq("id", userData.user?.id)
           .order("full_name");
         if (allError) throw allError;

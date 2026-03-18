@@ -69,7 +69,8 @@ export const useEmployeeFilters = () => {
         `,
           { count: 'exact' }
         )
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
       
       // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
       if (activeCompanyId) {

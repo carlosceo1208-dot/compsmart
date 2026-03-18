@@ -115,7 +115,9 @@ export default function MyPlan() {
       const { count: empCount } = await supabase
         .from('profiles')
         .select('id', { count: 'exact', head: true })
-        .eq('root_company_id', activeCompanyId);
+        .eq('root_company_id', activeCompanyId)
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
 
       setEmployeeCount(empCount || 0);
 

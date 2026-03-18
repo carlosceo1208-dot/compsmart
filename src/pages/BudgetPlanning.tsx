@@ -67,6 +67,7 @@ const BudgetPlanning = () => {
         .from('profiles')
         .select('id, full_name, job_title, salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .order('full_name');
 
       if (selectedUnitId) {

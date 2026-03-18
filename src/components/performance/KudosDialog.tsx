@@ -46,6 +46,7 @@ export function KudosDialog({ open, onOpenChange }: KudosDialogProps) {
         .select("id, full_name, avatar_url, job_title")
         .eq("root_company_id", activeCompanyId)
         .eq("status", "active")
+        .not("employee_number", "is", null)
         .neq("id", userData.user?.id) // Exclude current user
         .order("full_name");
       if (error) throw error;

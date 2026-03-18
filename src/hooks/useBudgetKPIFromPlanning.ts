@@ -47,6 +47,7 @@ export const useBudgetKPIFromPlanning = (params: UseBudgetKPIFromPlanningParams 
         .from('profiles')
         .select('salary, variable_salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null);
 
       if (params.unitId) {
@@ -60,7 +61,8 @@ export const useBudgetKPIFromPlanning = (params: UseBudgetKPIFromPlanningParams 
       let employeesQuery = supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
 
       if (params.unitId) {
         employeesQuery = employeesQuery.eq('unit_id', params.unitId);

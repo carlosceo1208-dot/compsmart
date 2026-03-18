@@ -18,7 +18,8 @@ export const useBudgetSummary = (unitId: string | null, fiscalYear: number) => {
       let employeesQuery = supabase
         .from('profiles')
         .select('id, salary, variable_salary, benefits_value')
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
       
       if (unitId) {
         employeesQuery = employeesQuery.eq('unit_id', unitId);

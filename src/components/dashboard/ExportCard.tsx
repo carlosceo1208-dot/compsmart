@@ -58,6 +58,7 @@ export const ExportCard = () => {
         .from('profiles')
         .select('salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null);
       if (error) throw error;
       
@@ -90,6 +91,7 @@ export const ExportCard = () => {
           status
         `)
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null)
         .order('salary', { ascending: false });
       
@@ -106,6 +108,7 @@ export const ExportCard = () => {
         .from('profiles')
         .select('grade, salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null)
         .not('grade', 'is', null);
       
@@ -141,6 +144,7 @@ export const ExportCard = () => {
         .from('profiles')
         .select('salary, unit_id')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null)
         .not('unit_id', 'is', null);
       

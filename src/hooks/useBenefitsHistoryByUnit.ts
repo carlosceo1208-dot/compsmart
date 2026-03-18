@@ -66,6 +66,7 @@ export const useBenefitsHistoryByUnit = ({
         .from('profiles')
         .select('id, unit_id, full_name')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .in('unit_id', units.map(u => u.id));
 
       if (employeesError) throw employeesError;

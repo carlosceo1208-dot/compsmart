@@ -46,7 +46,8 @@ export const useBenefitsHistory = (monthsBack: number = 12) => {
       const { data: activeEmployees, error: employeesError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
       
       if (employeesError) throw employeesError;
 
