@@ -22,7 +22,7 @@ const TotalRewards = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, job_title, grade, salary, status")
+        .select("id, full_name, job_title, grade, salary, variable_salary, status")
         .eq("status", "active")
         .order("full_name");
       if (error) throw error;
@@ -75,7 +75,9 @@ const TotalRewards = () => {
 
   const employee = employees?.find((e) => e.id === selectedEmployee);
   const baseSalary = employee?.salary || 0;
+  const variableSalary = employee?.variable_salary || 0;
   const annualSalary = baseSalary * 13; // 13th salary
+  const annualVariable = variableSalary * 12;
 
   // Calculate total benefits (monthly)
   const totalBenefitsMonthly = employeeBenefits?.reduce((sum, eb) => {
@@ -88,11 +90,12 @@ const TotalRewards = () => {
     return sum + (ei.target_value || 0);
   }, 0) || 0;
 
-  const totalCompensation = annualSalary + totalBenefitsAnnual + totalIncentivesAnnual;
+  const totalCompensation = annualSalary + annualVariable + totalBenefitsAnnual + totalIncentivesAnnual;
 
   // Pie chart data
   const pieData = [
     { name: "Salário Base (13°)", value: annualSalary },
+    ...(annualVariable > 0 ? [{ name: "Variável", value: annualVariable }] : []),
     ...(totalBenefitsAnnual > 0 ? [{ name: "Benefícios", value: totalBenefitsAnnual }] : []),
     ...(totalIncentivesAnnual > 0 ? [{ name: "Incentivos", value: totalIncentivesAnnual }] : []),
   ].filter((d) => d.value > 0);
@@ -174,7 +177,7 @@ const TotalRewards = () => {
           </Card>
 
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
@@ -186,6 +189,22 @@ const TotalRewards = () => {
                     <p className="text-lg font-bold">{formatCurrency(annualSalary)}</p>
                     <p className="text-xs text-muted-foreground">
                       {formatCurrency(baseSalary)}/mês × 13
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-500/10">
+                    <TrendingUp className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Variável Anual</p>
+                    <p className="text-lg font-bold">{formatCurrency(annualVariable)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(variableSalary)}/mês × 12
                     </p>
                   </div>
                 </div>
@@ -365,6 +384,14 @@ const TotalRewards = () => {
                     >
                       {((annualSalary / totalCompensation) * 100).toFixed(0)}% Fixo
                     </div>
+                    {annualVariable > 0 && (
+                      <div
+                        className="h-full bg-emerald-500 flex items-center justify-center text-[10px] font-bold text-white"
+                        style={{ width: `${(annualVariable / totalCompensation) * 100}%` }}
+                      >
+                        {((annualVariable / totalCompensation) * 100).toFixed(0)}% Var.
+                      </div>
+                    )}
                     {totalBenefitsAnnual > 0 && (
                       <div
                         className="h-full bg-secondary flex items-center justify-center text-[10px] font-bold text-secondary-foreground"
@@ -378,7 +405,7 @@ const TotalRewards = () => {
                         className="h-full bg-amber-500 flex items-center justify-center text-[10px] font-bold text-white"
                         style={{ width: `${(totalIncentivesAnnual / totalCompensation) * 100}%` }}
                       >
-                        {((totalIncentivesAnnual / totalCompensation) * 100).toFixed(0)}% Var.
+                        {((totalIncentivesAnnual / totalCompensation) * 100).toFixed(0)}% Inc.
                       </div>
                     )}
                   </>
@@ -386,8 +413,9 @@ const TotalRewards = () => {
               </div>
               <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-primary inline-block" /> Salário Fixo</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-500 inline-block" /> Variável</span>
                 <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-secondary inline-block" /> Benefícios</span>
-                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> Variável</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-amber-500 inline-block" /> Incentivos</span>
               </div>
             </CardContent>
           </Card>
