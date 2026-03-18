@@ -25,6 +25,7 @@ import {
   Gift,
   LucideIcon,
   AlertTriangle,
+  FileText,
 } from 'lucide-react';
 
 interface ModuleDefinition {
@@ -170,6 +171,15 @@ export const ModuleGrid = () => {
       description: 'Consultas sobre Remuneração e Benefícios com IA',
       icon: Bot,
       path: '/incentive-assistant',
+      status: 'active',
+      category: 'consultation',
+      requiredPlan: 'pro',
+    },
+    {
+      title: 'Total Rewards',
+      description: 'Demonstrativo de remuneração total por colaborador',
+      icon: FileText,
+      path: '/total-rewards',
       status: 'active',
       category: 'consultation',
       requiredPlan: 'pro',

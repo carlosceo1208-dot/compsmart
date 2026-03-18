@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
-  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield
+  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield,
+  Bot, Sparkles, Scale, BadgeDollarSign, Gift
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
@@ -78,6 +79,7 @@ const routeLabels: Record<string, string> = {
   "/settings/my-plan": "Configurações",
   "/super-admin": "Painel Super Admin",
   "/security-dashboard": "Monitoramento de Segurança",
+  "/total-rewards": "Total Rewards Statement",
 };
 
 // Parent route mapping for hierarchical navigation
@@ -292,6 +294,14 @@ export const DashboardLayout = () => {
     );
   }
 
+  // AI Agents menu items
+  const aiAgents = [
+    { icon: Scale, label: "Jurídico Smart", path: "/legal-assistant", description: "Consultoria jurídica trabalhista" },
+    { icon: BadgeDollarSign, label: "Salary Smart", path: "/salary-assistant", description: "Análise e estratégia salarial" },
+    { icon: Gift, label: "R&B Smart", path: "/incentive-assistant", description: "Remuneração e benefícios" },
+    { icon: Bot, label: "PerformAI", path: "/performance/assistant", description: "Assistente de desempenho" },
+  ];
+
   // Navigation items for mobile menu
   const navItems = [
     { icon: Home, label: "Dashboard", path: "/dashboard" },
@@ -375,6 +385,28 @@ export const DashboardLayout = () => {
                   
                   <Separator className="my-3" />
                   
+                  {/* AI Agents */}
+                  <p className="text-xs font-medium text-muted-foreground px-2 py-2 flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3 text-violet-500" /> Agentes IA
+                  </p>
+                  {aiAgents.map((agent) => (
+                    <Button
+                      key={agent.path}
+                      variant={currentPath === agent.path ? "default" : "ghost"}
+                      className={`justify-start ${
+                        currentPath === agent.path 
+                          ? "bg-violet-500 text-white hover:bg-violet-600" 
+                          : "hover:bg-violet-50 hover:text-violet-700 dark:hover:bg-violet-900/50 dark:hover:text-violet-400"
+                      }`}
+                      onClick={() => handleNavigate(agent.path)}
+                    >
+                      <agent.icon className="mr-2 h-4 w-4" />
+                      {agent.label}
+                    </Button>
+                  ))}
+                  
+                  <Separator className="my-3" />
+                  
                   {/* User Menu */}
                   <p className="text-xs font-medium text-muted-foreground px-2 py-2">Conta</p>
                   {userItems.map((item) => (
@@ -444,6 +476,41 @@ export const DashboardLayout = () => {
                 <span className="hidden lg:inline">{item.label}</span>
               </Button>
             ))}
+            {/* AI Agents Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="px-2 lg:px-3 transition-all duration-300 border bg-gradient-to-r from-violet-50 to-purple-50 text-violet-700 border-violet-200 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 dark:from-violet-950/50 dark:to-purple-950/50 dark:text-violet-400 dark:border-violet-800 dark:hover:from-violet-900/70 dark:hover:to-purple-900/70"
+                  title="Agentes de IA"
+                >
+                  <Sparkles className="w-3.5 h-3.5 lg:mr-1" />
+                  <span className="hidden lg:inline">IA</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64">
+                <DropdownMenuLabel className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-500" />
+                  <span>Agentes Smart</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {aiAgents.map((agent) => (
+                  <DropdownMenuItem
+                    key={agent.path}
+                    onClick={() => navigate(agent.path)}
+                    className="flex items-start gap-3 py-2.5 cursor-pointer hover:bg-violet-50 dark:hover:bg-violet-900/30"
+                  >
+                    <agent.icon className="h-4 w-4 mt-0.5 text-violet-600 dark:text-violet-400 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm">{agent.label}</span>
+                      <span className="text-xs text-muted-foreground">{agent.description}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="ghost"
               size="sm"

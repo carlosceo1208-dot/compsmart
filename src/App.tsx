@@ -58,6 +58,7 @@ import SecurityDashboard from "./pages/SecurityDashboard";
 import AboutUs from "./pages/AboutUs";
 import Glossary from "./pages/Glossary";
 import Changelog from "./pages/Changelog";
+import TotalRewards from "./pages/TotalRewards";
 
 // Performance Module
 import { PerformanceLayout } from "./components/performance/PerformanceLayout";
@@ -154,6 +155,7 @@ const App = () => {
               <Route path="/settings/my-plan" element={<MyPlan />} />
               <Route path="/super-admin" element={<SuperAdminDashboard />} />
               <Route path="/security-dashboard" element={<SecurityDashboard />} />
+              <Route path="/total-rewards" element={<TotalRewards />} />
             </Route>
             
             {/* Performance Module - Separate Layout */}
