@@ -22,7 +22,7 @@ const TotalRewards = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, job_title, grade, salary, status")
+        .select("id, full_name, job_title, grade, salary, variable_salary, status")
         .eq("status", "active")
         .order("full_name");
       if (error) throw error;
