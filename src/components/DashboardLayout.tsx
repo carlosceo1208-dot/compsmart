@@ -453,6 +453,41 @@ export const DashboardLayout = () => {
                 <span className="hidden lg:inline">{item.label}</span>
               </Button>
             ))}
+            {/* AI Agents Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="px-2 lg:px-3 transition-all duration-300 border bg-gradient-to-r from-violet-50 to-purple-50 text-violet-700 border-violet-200 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 dark:from-violet-950/50 dark:to-purple-950/50 dark:text-violet-400 dark:border-violet-800 dark:hover:from-violet-900/70 dark:hover:to-purple-900/70"
+                  title="Agentes de IA"
+                >
+                  <Sparkles className="w-3.5 h-3.5 lg:mr-1" />
+                  <span className="hidden lg:inline">IA</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-64">
+                <DropdownMenuLabel className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-violet-500" />
+                  <span>Agentes Smart</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {aiAgents.map((agent) => (
+                  <DropdownMenuItem
+                    key={agent.path}
+                    onClick={() => navigate(agent.path)}
+                    className="flex items-start gap-3 py-2.5 cursor-pointer hover:bg-violet-50 dark:hover:bg-violet-900/30"
+                  >
+                    <agent.icon className="h-4 w-4 mt-0.5 text-violet-600 dark:text-violet-400 flex-shrink-0" />
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm">{agent.label}</span>
+                      <span className="text-xs text-muted-foreground">{agent.description}</span>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="ghost"
               size="sm"
