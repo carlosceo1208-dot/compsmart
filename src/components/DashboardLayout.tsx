@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
-  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield
+  DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield,
+  Bot, Sparkles, Scale, BadgeDollarSign, Gift
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
