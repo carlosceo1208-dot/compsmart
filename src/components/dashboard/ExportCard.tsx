@@ -91,6 +91,7 @@ export const ExportCard = () => {
           status
         `)
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null)
         .order('salary', { ascending: false });
       
