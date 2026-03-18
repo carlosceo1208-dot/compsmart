@@ -121,19 +121,19 @@ export const CompetitiveComparisonSection = () => {
                 </th>
                 <th className="py-3 px-4 font-medium text-muted-foreground">
                   <div className="flex flex-col items-center">
-                    <span>Sólides</span>
+                    <span>Concorrente X</span>
                     <span className="text-[10px] font-normal">RH Geral</span>
                   </div>
                 </th>
                 <th className="py-3 px-4 font-medium text-muted-foreground">
                   <div className="flex flex-col items-center">
-                    <span>ImpulseUp</span>
+                    <span>Concorrente Y</span>
                     <span className="text-[10px] font-normal">Só Desempenho</span>
                   </div>
                 </th>
                 <th className="py-3 px-4 font-medium text-muted-foreground">
                   <div className="flex flex-col items-center">
-                    <span>Gupy</span>
+                    <span>Concorrente Z</span>
                     <span className="text-[10px] font-normal">R&S + Admissão</span>
                   </div>
                 </th>
