@@ -47,6 +47,7 @@ export const useBudgetKPIFromPlanning = (params: UseBudgetKPIFromPlanningParams 
         .from('profiles')
         .select('salary, variable_salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null);
 
       if (params.unitId) {
