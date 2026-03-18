@@ -151,20 +151,20 @@ export const CompetitiveComparisonSection = () => {
                   </td>
                   <td className="py-3 px-4 text-center text-muted-foreground">
                     <div className="flex items-center gap-1.5 justify-center">
-                      <StatusIcon status={f.solides.status} />
-                      <span className="text-xs">{f.solides.text}</span>
+                      <StatusIcon status={f.concX.status} />
+                      <span className="text-xs">{f.concX.text}</span>
                     </div>
                   </td>
                   <td className="py-3 px-4 text-center text-muted-foreground">
                     <div className="flex items-center gap-1.5 justify-center">
-                      <StatusIcon status={f.impulseup.status} />
-                      <span className="text-xs">{f.impulseup.text}</span>
+                      <StatusIcon status={f.concY.status} />
+                      <span className="text-xs">{f.concY.text}</span>
                     </div>
                   </td>
                   <td className="py-3 px-4 text-center text-muted-foreground">
                     <div className="flex items-center gap-1.5 justify-center">
-                      <StatusIcon status={f.gupy.status} />
-                      <span className="text-xs">{f.gupy.text}</span>
+                      <StatusIcon status={f.concZ.status} />
+                      <span className="text-xs">{f.concZ.text}</span>
                     </div>
                   </td>
                 </tr>
