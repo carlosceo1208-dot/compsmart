@@ -177,7 +177,7 @@ const TotalRewards = () => {
           </Card>
 
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
@@ -189,6 +189,22 @@ const TotalRewards = () => {
                     <p className="text-lg font-bold">{formatCurrency(annualSalary)}</p>
                     <p className="text-xs text-muted-foreground">
                       {formatCurrency(baseSalary)}/mês × 13
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-emerald-500/10">
+                    <TrendingUp className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Variável Anual</p>
+                    <p className="text-lg font-bold">{formatCurrency(annualVariable)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(variableSalary)}/mês × 12
                     </p>
                   </div>
                 </div>
