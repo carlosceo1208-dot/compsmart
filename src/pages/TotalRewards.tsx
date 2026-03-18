@@ -95,6 +95,7 @@ const TotalRewards = () => {
   // Pie chart data
   const pieData = [
     { name: "Salário Base (13°)", value: annualSalary },
+    ...(annualVariable > 0 ? [{ name: "Variável", value: annualVariable }] : []),
     ...(totalBenefitsAnnual > 0 ? [{ name: "Benefícios", value: totalBenefitsAnnual }] : []),
     ...(totalIncentivesAnnual > 0 ? [{ name: "Incentivos", value: totalIncentivesAnnual }] : []),
   ].filter((d) => d.value > 0);
