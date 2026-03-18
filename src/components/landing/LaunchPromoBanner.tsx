@@ -78,7 +78,7 @@ export const LaunchPromoBanner = () => {
 
         {/* Fine print */}
         <p className="text-white/50 text-[10px] text-center mt-2">
-          14 dias grátis • Sem cartão de crédito
+          30 dias grátis • Sem cartão de crédito
         </p>
       </div>
     </div>

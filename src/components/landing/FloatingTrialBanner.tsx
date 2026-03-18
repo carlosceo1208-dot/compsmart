@@ -97,7 +97,7 @@ export const FloatingTrialBanner = () => {
 
         {/* Description */}
         <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-          Experimente o CompSmart por <span className="font-semibold text-primary">14 dias GRÁTIS</span> — sem compromisso e sem cartão!
+          Experimente o CompSmart por <span className="font-semibold text-primary">30 dias GRÁTIS</span> — sem compromisso e sem cartão!
         </p>
 
         {/* Buttons */}

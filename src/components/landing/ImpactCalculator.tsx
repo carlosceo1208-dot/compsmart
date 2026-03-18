@@ -106,7 +106,7 @@ export const ImpactCalculator = () => {
         </div>
 
         <p className="text-xs text-center text-muted-foreground">
-          ✅ 14 dias grátis • Sem cartão • Cancele quando quiser
+          ✅ 30 dias grátis • Sem cartão • Cancele quando quiser
         </p>
       </CardContent>
     </Card>

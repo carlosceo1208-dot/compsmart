@@ -225,7 +225,7 @@ export const PlanSelectionStep = ({
 
         {/* Trial Info */}
         <div className="bg-accent/50 border border-accent rounded-lg p-4 text-sm">
-          <p className="font-semibold mb-1">🎉 14 dias grátis para teste</p>
+          <p className="font-semibold mb-1">🎉 30 dias grátis para teste</p>
           <p className="text-muted-foreground">
             Experimente todos os recursos do plano escolhido sem compromisso. 
             Cancele a qualquer momento durante o período de teste.

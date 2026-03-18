@@ -65,7 +65,7 @@ export const CTASection = () => {
 
           <div className="pt-4 space-y-2">
             <p className="text-sm text-white/80">
-              ✅ 14 dias grátis • ✅ Sem cartão de crédito • ✅ Cancele quando quiser
+              ✅ 30 dias grátis • ✅ Sem cartão de crédito • ✅ Cancele quando quiser
             </p>
             <p className="text-xs text-white/70">
               Desempenho + Remuneração incluídos em todos os planos • Desconto para plano anual e pagamento via PIX

@@ -128,7 +128,7 @@ export const CompetitiveComparisonSection = () => {
 
         <div className="text-center mt-8">
           <Button className="cta-action" onClick={() => navigate("/auth")}>
-            Experimentar a Diferença (14 dias grátis)
+            Experimentar a Diferença (30 dias grátis)
           </Button>
         </div>
       </div>
