@@ -59,7 +59,7 @@ export const CTASection = () => {
             </div>
             <div className="flex items-center gap-2 text-white/80">
               <Calendar className="h-5 w-5" />
-              <span><strong className="text-white">14 dias</strong> de teste grátis</span>
+              <span><strong className="text-white">30 dias</strong> de teste grátis</span>
             </div>
           </div>
 
