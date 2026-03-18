@@ -144,6 +144,7 @@ export const ExportCard = () => {
         .from('profiles')
         .select('salary, unit_id')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null)
         .not('unit_id', 'is', null);
       

@@ -80,6 +80,7 @@ export function SuccessionDialog({
         .select("id, full_name, avatar_url, job_title, grade, job_title_id")
         .eq("root_company_id", activeCompanyId)
         .eq("status", "active")
+        .not("employee_number", "is", null)
         .order("full_name");
       if (error) throw error;
       return data;

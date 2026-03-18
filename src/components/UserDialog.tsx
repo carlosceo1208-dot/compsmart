@@ -294,7 +294,8 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       let query = supabase
         .from("profiles")
         .select("id, full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
-        .eq("status", "active");
+        .eq("status", "active")
+        .not("employee_number", "is", null);
       
       // Filtrar por empresa ativa (CORREÇÃO DE ISOLAMENTO)
       if (activeCompanyId) {

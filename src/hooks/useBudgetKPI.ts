@@ -57,7 +57,8 @@ export const useBudgetKPI = (params: UseBudgetKPIParams = {}) => {
       let employeesQuery = supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .not('employee_number', 'is', null);
 
       if (params.unitId) {
         employeesQuery = employeesQuery.eq('unit_id', params.unitId);

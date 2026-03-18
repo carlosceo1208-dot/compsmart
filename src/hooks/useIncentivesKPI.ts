@@ -18,6 +18,7 @@ export const useIncentivesKPI = () => {
         .from('profiles')
         .select('salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null);
       
       if (salariesError) throw salariesError;

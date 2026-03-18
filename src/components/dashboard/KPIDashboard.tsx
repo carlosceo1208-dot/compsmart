@@ -42,6 +42,7 @@ export const KPIDashboard = ({ currency, showWithCharges = false }: KPIDashboard
         .from('profiles')
         .select('salary')
         .eq('status', 'active')
+        .not('employee_number', 'is', null)
         .not('salary', 'is', null);
       
       if (error) throw error;

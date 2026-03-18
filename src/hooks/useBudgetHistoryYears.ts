@@ -84,6 +84,7 @@ export const useBudgetHistoryYears = (unitId?: string | null) => {
             .select('id, salary, variable_salary, benefits_value')
             .eq('root_company_id', activeCompanyId)
             .eq('status', 'active')
+            .not('employee_number', 'is', null)
             .not('salary', 'is', null);
 
           if (unitId) {

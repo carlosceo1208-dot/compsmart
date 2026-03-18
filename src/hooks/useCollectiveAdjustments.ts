@@ -411,6 +411,7 @@ export const calculateSimulationPreview = async (
     .from('profiles')
     .select('id, full_name, salary, grade, unit_id')
     .eq('status', 'active')
+    .not('employee_number', 'is', null)
     .not('salary', 'is', null);
 
   if (adjustment.filter_unit_id) {
