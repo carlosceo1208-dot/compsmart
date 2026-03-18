@@ -293,6 +293,14 @@ export const DashboardLayout = () => {
     );
   }
 
+  // AI Agents menu items
+  const aiAgents = [
+    { icon: Scale, label: "Jurídico Smart", path: "/legal-assistant", description: "Consultoria jurídica trabalhista" },
+    { icon: BadgeDollarSign, label: "Salary Smart", path: "/salary-assistant", description: "Análise e estratégia salarial" },
+    { icon: Gift, label: "R&B Smart", path: "/incentive-assistant", description: "Remuneração e benefícios" },
+    { icon: Bot, label: "PerformAI", path: "/performance/assistant", description: "Assistente de desempenho" },
+  ];
+
   // Navigation items for mobile menu
   const navItems = [
     { icon: Home, label: "Dashboard", path: "/dashboard" },
