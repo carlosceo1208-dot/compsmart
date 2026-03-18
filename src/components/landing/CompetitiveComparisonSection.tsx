@@ -7,79 +7,79 @@ const features = [
   {
     name: "Remuneração + Desempenho Integrados",
     compsmart: { status: "yes", text: "Nativo e unificado" },
-    solides: { status: "no", text: "Não tem remuneração" },
-    impulseup: { status: "no", text: "Só desempenho" },
-    gupy: { status: "no", text: "Só R&S e admissão" },
+    concX: { status: "no", text: "Não tem remuneração" },
+    concY: { status: "no", text: "Só desempenho" },
+    concZ: { status: "no", text: "Só R&S e admissão" },
   },
   {
     name: "Tabelas e Faixas Salariais Automáticas",
     compsmart: { status: "yes", text: "Curvas e amplitudes" },
-    solides: { status: "no", text: "Não tem" },
-    impulseup: { status: "no", text: "Não tem" },
-    gupy: { status: "no", text: "Não tem" },
+    concX: { status: "no", text: "Não tem" },
+    concY: { status: "no", text: "Não tem" },
+    concZ: { status: "no", text: "Não tem" },
   },
   {
     name: "Agentes de IA Especializados",
     compsmart: { status: "yes", text: "4 agentes incluídos" },
-    solides: { status: "warn", text: "IA básica" },
-    impulseup: { status: "warn", text: "IA em header" },
-    gupy: { status: "warn", text: "Gaia (R&S)" },
+    concX: { status: "warn", text: "IA básica" },
+    concY: { status: "warn", text: "IA limitada" },
+    concZ: { status: "warn", text: "IA apenas R&S" },
   },
   {
     name: "ICP + ILP (PLR, Stock Options, RSU)",
     compsmart: { status: "yes", text: "Incluído" },
-    solides: { status: "no", text: "Não tem" },
-    impulseup: { status: "no", text: "Não tem" },
-    gupy: { status: "no", text: "Não tem" },
+    concX: { status: "no", text: "Não tem" },
+    concY: { status: "no", text: "Não tem" },
+    concZ: { status: "no", text: "Não tem" },
   },
   {
     name: "Trial sem cartão",
     compsmart: { status: "yes", text: "30 dias" },
-    solides: { status: "no", text: "Sem trial" },
-    impulseup: { status: "warn", text: "14 dias" },
-    gupy: { status: "no", text: "Sem trial" },
+    concX: { status: "no", text: "Sem trial" },
+    concY: { status: "warn", text: "14 dias" },
+    concZ: { status: "no", text: "Sem trial" },
   },
   {
     name: "Simulação de Dissídio e Cenários",
     compsmart: { status: "yes", text: "Fixo + Escalonado" },
-    solides: { status: "no", text: "Não tem" },
-    impulseup: { status: "no", text: "Não tem" },
-    gupy: { status: "no", text: "Não tem" },
+    concX: { status: "no", text: "Não tem" },
+    concY: { status: "no", text: "Não tem" },
+    concZ: { status: "no", text: "Não tem" },
   },
   {
     name: "Gestão de Benefícios por Grade",
     compsmart: { status: "yes", text: "Regras automáticas" },
-    solides: { status: "warn", text: "Básico" },
-    impulseup: { status: "no", text: "Não tem" },
-    gupy: { status: "no", text: "Não tem" },
+    concX: { status: "warn", text: "Básico" },
+    concY: { status: "no", text: "Não tem" },
+    concZ: { status: "no", text: "Não tem" },
   },
   {
     name: "Reconhecimento & Kudos + 1:1s",
     compsmart: { status: "yes", text: "Integrado" },
-    solides: { status: "no", text: "Não tem" },
-    impulseup: { status: "warn", text: "Módulo extra" },
-    gupy: { status: "no", text: "Não tem" },
+    concX: { status: "no", text: "Não tem" },
+    concY: { status: "warn", text: "Módulo extra" },
+    concZ: { status: "no", text: "Não tem" },
   },
   {
     name: "Equidade Interna Auditável",
     compsmart: { status: "yes", text: "Por área, gênero, nível" },
-    solides: { status: "no", text: "Não tem" },
-    impulseup: { status: "no", text: "Não tem" },
-    gupy: { status: "no", text: "Não tem" },
+    concX: { status: "no", text: "Não tem" },
+    concY: { status: "no", text: "Não tem" },
+    concZ: { status: "no", text: "Não tem" },
   },
   {
     name: "Setup autoguiado",
     compsmart: { status: "yes", text: "15 minutos" },
-    solides: { status: "no", text: "Precisa consultor" },
-    impulseup: { status: "warn", text: "Onboarding guiado" },
-    gupy: { status: "no", text: "Implantação longa" },
+    concX: { status: "no", text: "Precisa consultor" },
+    concY: { status: "warn", text: "Onboarding guiado" },
+    concZ: { status: "no", text: "Implantação longa" },
   },
   {
     name: "Preço por colaborador",
     compsmart: { status: "yes", text: "A partir de R$ 3,80" },
-    solides: { status: "no", text: '"Sob consulta"' },
-    impulseup: { status: "warn", text: "~R$ 9+/colab" },
-    gupy: { status: "no", text: '"Sob consulta"' },
+    concX: { status: "no", text: '"Sob consulta"' },
+    concY: { status: "warn", text: "~R$ 9+/colab" },
+    concZ: { status: "no", text: '"Sob consulta"' },
   },
 ];
 
@@ -121,19 +121,19 @@ export const CompetitiveComparisonSection = () => {
                 </th>
                 <th className="py-3 px-4 font-medium text-muted-foreground">
                   <div className="flex flex-col items-center">
-                    <span>Sólides</span>
+                    <span>Concorrente X</span>
                     <span className="text-[10px] font-normal">RH Geral</span>
                   </div>
                 </th>
                 <th className="py-3 px-4 font-medium text-muted-foreground">
                   <div className="flex flex-col items-center">
-                    <span>ImpulseUp</span>
+                    <span>Concorrente Y</span>
                     <span className="text-[10px] font-normal">Só Desempenho</span>
                   </div>
                 </th>
                 <th className="py-3 px-4 font-medium text-muted-foreground">
                   <div className="flex flex-col items-center">
-                    <span>Gupy</span>
+                    <span>Concorrente Z</span>
                     <span className="text-[10px] font-normal">R&S + Admissão</span>
                   </div>
                 </th>
@@ -151,20 +151,20 @@ export const CompetitiveComparisonSection = () => {
                   </td>
                   <td className="py-3 px-4 text-center text-muted-foreground">
                     <div className="flex items-center gap-1.5 justify-center">
-                      <StatusIcon status={f.solides.status} />
-                      <span className="text-xs">{f.solides.text}</span>
+                      <StatusIcon status={f.concX.status} />
+                      <span className="text-xs">{f.concX.text}</span>
                     </div>
                   </td>
                   <td className="py-3 px-4 text-center text-muted-foreground">
                     <div className="flex items-center gap-1.5 justify-center">
-                      <StatusIcon status={f.impulseup.status} />
-                      <span className="text-xs">{f.impulseup.text}</span>
+                      <StatusIcon status={f.concY.status} />
+                      <span className="text-xs">{f.concY.text}</span>
                     </div>
                   </td>
                   <td className="py-3 px-4 text-center text-muted-foreground">
                     <div className="flex items-center gap-1.5 justify-center">
-                      <StatusIcon status={f.gupy.status} />
-                      <span className="text-xs">{f.gupy.text}</span>
+                      <StatusIcon status={f.concZ.status} />
+                      <span className="text-xs">{f.concZ.text}</span>
                     </div>
                   </td>
                 </tr>
