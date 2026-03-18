@@ -25,6 +25,7 @@ import {
   Gift,
   LucideIcon,
   AlertTriangle,
+  FileText,
 } from 'lucide-react';
 
 interface ModuleDefinition {
