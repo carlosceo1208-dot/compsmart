@@ -176,6 +176,15 @@ export const ModuleGrid = () => {
       requiredPlan: 'pro',
     },
     {
+      title: 'Total Rewards',
+      description: 'Demonstrativo de remuneração total por colaborador',
+      icon: FileText,
+      path: '/total-rewards',
+      status: 'active',
+      category: 'consultation',
+      requiredPlan: 'pro',
+    },
+    {
       title: 'Análise Salarial',
       description: 'Relatório de posicionamento salarial',
       icon: FileBarChart,
