@@ -147,6 +147,11 @@ export const HeroSection = () => {
             <LiveCompanyCounter />
           </div>
         </div>
+
+        {/* Mobile counter */}
+        <div className="lg:hidden flex justify-center mt-6">
+          <LiveCompanyCounter />
+        </div>
       </div>
     </section>
   );
