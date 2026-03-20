@@ -15,7 +15,7 @@ const LiveCompanyCounter = () => {
   const count = COMPANY_CYCLE[idx];
   return (
     <div className="flex justify-end">
-      <Badge className="bg-destructive/10 text-destructive border-destructive/20 px-4 py-2 animate-pulse-slow transition-all">
+      <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-2 animate-pulse-slow transition-all">
         🔥 <strong>{count} empresa{count > 1 ? "s" : ""}</strong> avaliando agora
       </Badge>
     </div>
