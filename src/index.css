@@ -8,29 +8,34 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    /* Surfaces - refined neutrals with subtle blue tint */
+    --background: 210 20% 99%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
+    --surface-elevated: 210 30% 98%;
+    --surface-sunken: 210 20% 96%;
     
-    /* Primary - Azul CompSmart (dominante no logo) */
-    --primary: 202 65% 38%;
-    --primary-hover: 202 65% 30%;
-    --primary-light: 202 65% 95%;
-    --primary-dark: 202 65% 25%;
+    /* Primary - Azul CompSmart refinado (mais profundidade) */
+    --primary: 202 75% 36%;
+    --primary-hover: 202 80% 28%;
+    --primary-light: 202 70% 96%;
+    --primary-dark: 202 80% 22%;
+    --primary-glow: 202 90% 55%;
     --primary-foreground: 0 0% 100%;
     
-    /* Secondary - Verde CompSmart (destaque SMART) */
-    --secondary: 150 55% 48%;
-    --secondary-hover: 150 55% 40%;
-    --secondary-light: 150 55% 95%;
-    --secondary-dark: 150 55% 35%;
+    /* Secondary - Verde CompSmart vibrante */
+    --secondary: 152 60% 45%;
+    --secondary-hover: 152 65% 38%;
+    --secondary-light: 152 55% 95%;
+    --secondary-dark: 152 70% 32%;
+    --secondary-glow: 152 75% 55%;
     --secondary-foreground: 0 0% 100%;
     
-    --muted: 220 13% 96%;
-    --muted-foreground: 220 13% 45%;
+    --muted: 215 16% 95%;
+    --muted-foreground: 220 10% 42%;
     
     /* Success - Verde (mantém consistência funcional) */
     --success: 150 55% 48%;
@@ -61,23 +66,31 @@ All colors MUST be HSL.
     --chart-4: 197 83% 52%;
     --chart-5: 280 65% 60%;
     
-    /* Gradientes dinâmicos - Azul + Verde CompSmart */
-    --gradient-primary: linear-gradient(135deg, hsl(202 65% 38%) 0%, hsl(202 65% 28%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(202 65% 38%) 0%, hsl(150 55% 48%) 50%, hsl(202 65% 25%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(202 65% 99%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(150 55% 48%) 0%, hsl(150 55% 40%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(32 95% 58%) 0%, hsl(32 95% 48%) 100%);
-    --gradient-footer: linear-gradient(135deg, hsl(202 65% 35%) 0%, hsl(202 65% 42%) 50%, hsl(150 55% 45%) 100%);
+    /* Gradientes refinados - mais profundidade e luminosidade */
+    --gradient-primary: linear-gradient(135deg, hsl(202 80% 42%) 0%, hsl(202 85% 28%) 100%);
+    --gradient-primary-soft: linear-gradient(135deg, hsl(202 70% 96%) 0%, hsl(152 60% 96%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(202 80% 42%) 0%, hsl(190 70% 50%) 35%, hsl(152 65% 50%) 100%);
+    --gradient-mesh: radial-gradient(at 27% 37%, hsl(202 80% 50% / 0.15) 0px, transparent 50%), radial-gradient(at 97% 21%, hsl(152 60% 50% / 0.12) 0px, transparent 50%), radial-gradient(at 52% 99%, hsl(202 80% 60% / 0.10) 0px, transparent 50%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(210 30% 99%) 100%);
+    --gradient-card-hover: linear-gradient(145deg, hsl(202 70% 99%) 0%, hsl(210 30% 98%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(152 65% 50%) 0%, hsl(152 70% 38%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(32 95% 58%) 0%, hsl(28 95% 48%) 100%);
+    --gradient-footer: linear-gradient(135deg, hsl(202 80% 32%) 0%, hsl(202 70% 42%) 50%, hsl(152 60% 45%) 100%);
+    --gradient-shimmer: linear-gradient(90deg, transparent, hsl(202 75% 36% / 0.08), transparent);
     
-    /* Sombras pronunciadas - Azul primário */
-    --shadow-sm: 0 2px 8px hsl(202 65% 38% / 0.08);
-    --shadow-md: 0 8px 24px -4px hsl(202 65% 38% / 0.12);
-    --shadow-lg: 0 16px 32px -8px hsl(202 65% 38% / 0.18);
-    --shadow-xl: 0 24px 48px -12px hsl(202 65% 38% / 0.25);
-    --shadow-primary: 0 12px 32px -8px hsl(202 65% 38% / 0.35);
-    --shadow-success: 0 12px 32px -8px hsl(150 55% 48% / 0.3);
-    --shadow-warning: 0 12px 32px -8px hsl(32 95% 58% / 0.3);
-    --shadow-accent: 0 12px 32px -8px hsl(200 95% 45% / 0.3);
+    /* Sombras refinadas com tint colorido */
+    --shadow-xs: 0 1px 2px hsl(220 30% 20% / 0.05);
+    --shadow-sm: 0 2px 8px hsl(202 50% 30% / 0.06), 0 1px 2px hsl(220 30% 20% / 0.04);
+    --shadow-md: 0 8px 24px -4px hsl(202 60% 30% / 0.10), 0 2px 6px hsl(220 30% 20% / 0.05);
+    --shadow-lg: 0 20px 40px -12px hsl(202 70% 30% / 0.18), 0 4px 12px hsl(220 30% 20% / 0.06);
+    --shadow-xl: 0 32px 64px -16px hsl(202 75% 30% / 0.28), 0 8px 16px hsl(220 30% 20% / 0.08);
+    --shadow-primary: 0 16px 40px -10px hsl(202 80% 40% / 0.40);
+    --shadow-success: 0 16px 40px -10px hsl(152 65% 45% / 0.35);
+    --shadow-warning: 0 16px 40px -10px hsl(32 95% 58% / 0.35);
+    --shadow-accent: 0 16px 40px -10px hsl(200 95% 45% / 0.35);
+    --shadow-glow-primary: 0 0 40px hsl(202 90% 55% / 0.35);
+    --shadow-glow-success: 0 0 40px hsl(152 75% 55% / 0.30);
+    --shadow-inner-soft: inset 0 1px 2px hsl(220 30% 20% / 0.06);
     
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5% 26%;
@@ -90,29 +103,34 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222 47% 11%;
+    /* Surfaces - deeper, more contrast */
+    --background: 222 47% 7%;
     --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
+    --card: 222 40% 11%;
     --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
+    --popover: 222 40% 11%;
     --popover-foreground: 210 40% 98%;
+    --surface-elevated: 222 35% 14%;
+    --surface-sunken: 222 50% 5%;
     
-    /* Primary - Azul CompSmart (dark mode) */
-    --primary: 202 65% 45%;
-    --primary-hover: 202 65% 55%;
-    --primary-light: 202 65% 20%;
-    --primary-dark: 202 65% 60%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Azul mais luminoso no dark */
+    --primary: 202 85% 58%;
+    --primary-hover: 202 90% 68%;
+    --primary-light: 202 60% 18%;
+    --primary-dark: 202 75% 75%;
+    --primary-glow: 202 100% 65%;
+    --primary-foreground: 222 47% 7%;
     
-    /* Secondary - Verde CompSmart (dark mode) */
-    --secondary: 150 55% 55%;
-    --secondary-hover: 150 55% 65%;
-    --secondary-light: 150 55% 25%;
-    --secondary-dark: 150 55% 70%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary - Verde luminoso */
+    --secondary: 152 70% 55%;
+    --secondary-hover: 152 75% 65%;
+    --secondary-light: 152 50% 18%;
+    --secondary-dark: 152 65% 72%;
+    --secondary-glow: 152 85% 60%;
+    --secondary-foreground: 222 47% 7%;
     
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 217 30% 16%;
+    --muted-foreground: 215 18% 70%;
     
     /* Success - Verde */
     --success: 150 55% 55%;
@@ -142,23 +160,31 @@ All colors MUST be HSL.
     --chart-4: 197 83% 62%;
     --chart-5: 280 65% 70%;
     
-    /* Gradientes dinâmicos - Azul + Verde (dark mode) */
-    --gradient-primary: linear-gradient(135deg, hsl(202 65% 45%) 0%, hsl(202 65% 35%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(202 65% 45%) 0%, hsl(150 55% 55%) 50%, hsl(202 65% 30%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(222 47% 11%) 0%, hsl(202 65% 15%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(150 55% 55%) 0%, hsl(150 55% 45%) 100%);
-    --gradient-warning: linear-gradient(135deg, hsl(32 95% 65%) 0%, hsl(32 95% 55%) 100%);
-    --gradient-footer: linear-gradient(135deg, hsl(202 65% 40%) 0%, hsl(202 65% 50%) 50%, hsl(150 55% 50%) 100%);
+    /* Gradientes dark refinados */
+    --gradient-primary: linear-gradient(135deg, hsl(202 85% 50%) 0%, hsl(202 90% 30%) 100%);
+    --gradient-primary-soft: linear-gradient(135deg, hsl(202 60% 18%) 0%, hsl(152 50% 18%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(202 85% 55%) 0%, hsl(190 75% 55%) 35%, hsl(152 70% 55%) 100%);
+    --gradient-mesh: radial-gradient(at 27% 37%, hsl(202 85% 55% / 0.18) 0px, transparent 50%), radial-gradient(at 97% 21%, hsl(152 70% 55% / 0.15) 0px, transparent 50%), radial-gradient(at 52% 99%, hsl(202 85% 60% / 0.12) 0px, transparent 50%);
+    --gradient-card: linear-gradient(145deg, hsl(222 40% 11%) 0%, hsl(222 35% 14%) 100%);
+    --gradient-card-hover: linear-gradient(145deg, hsl(222 40% 13%) 0%, hsl(202 50% 16%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(152 70% 55%) 0%, hsl(152 75% 42%) 100%);
+    --gradient-warning: linear-gradient(135deg, hsl(32 95% 65%) 0%, hsl(28 95% 55%) 100%);
+    --gradient-footer: linear-gradient(135deg, hsl(202 80% 35%) 0%, hsl(202 70% 45%) 50%, hsl(152 60% 50%) 100%);
+    --gradient-shimmer: linear-gradient(90deg, transparent, hsl(202 85% 58% / 0.12), transparent);
     
-    /* Sombras pronunciadas (dark mode) */
-    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.4);
-    --shadow-md: 0 8px 24px -4px hsl(0 0% 0% / 0.5);
-    --shadow-lg: 0 16px 32px -8px hsl(0 0% 0% / 0.6);
-    --shadow-xl: 0 24px 48px -12px hsl(0 0% 0% / 0.7);
-    --shadow-primary: 0 12px 32px -8px hsl(202 65% 45% / 0.5);
-    --shadow-success: 0 12px 32px -8px hsl(150 55% 55% / 0.4);
-    --shadow-warning: 0 12px 32px -8px hsl(32 95% 65% / 0.4);
-    --shadow-accent: 0 12px 32px -8px hsl(200 95% 55% / 0.4);
+    /* Sombras dark refinadas */
+    --shadow-xs: 0 1px 2px hsl(0 0% 0% / 0.3);
+    --shadow-sm: 0 2px 8px hsl(0 0% 0% / 0.35);
+    --shadow-md: 0 8px 24px -4px hsl(0 0% 0% / 0.45);
+    --shadow-lg: 0 20px 40px -12px hsl(0 0% 0% / 0.55);
+    --shadow-xl: 0 32px 64px -16px hsl(0 0% 0% / 0.65);
+    --shadow-primary: 0 16px 40px -10px hsl(202 85% 55% / 0.50);
+    --shadow-success: 0 16px 40px -10px hsl(152 70% 55% / 0.45);
+    --shadow-warning: 0 16px 40px -10px hsl(32 95% 65% / 0.45);
+    --shadow-accent: 0 16px 40px -10px hsl(200 95% 55% / 0.45);
+    --shadow-glow-primary: 0 0 50px hsl(202 100% 65% / 0.45);
+    --shadow-glow-success: 0 0 50px hsl(152 85% 60% / 0.40);
+    --shadow-inner-soft: inset 0 1px 2px hsl(0 0% 0% / 0.25);
     
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 210 40% 98%;
