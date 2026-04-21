@@ -67,6 +67,7 @@ const Glossary = lazy(() => import("./pages/Glossary"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const TotalRewards = lazy(() => import("./pages/TotalRewards"));
 const Equity = lazy(() => import("./pages/Equity"));
+const MarketBenchmark = lazy(() => import("./pages/MarketBenchmark"));
 
 // Lazy — Performance Module
 const PerformanceLayout = lazy(() =>
@@ -182,6 +183,7 @@ const App = () => {
                         <Route path="/security-dashboard" element={<SecurityDashboard />} />
                         <Route path="/total-rewards" element={<TotalRewards />} />
                         <Route path="/equity" element={<Equity />} />
+                        <Route path="/market-benchmark" element={<MarketBenchmark />} />
                       </Route>
 
                       {/* Performance Module */}
