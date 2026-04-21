@@ -247,6 +247,76 @@ All colors MUST be HSL.
       linear-gradient(90deg, hsl(var(--primary) / 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
   }
+
+  /* Mesh gradient background — rich ambient color */
+  .bg-mesh {
+    background-image: var(--gradient-mesh);
+  }
+
+  /* Premium card with refined depth */
+  .card-elevated {
+    @apply bg-card border border-border/60 rounded-xl;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s ease;
+  }
+  .card-elevated:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: hsl(var(--primary) / 0.25);
+  }
+
+  /* Interactive card with primary tint hover */
+  .card-interactive {
+    @apply bg-card border border-border/50 rounded-xl cursor-pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-interactive:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-primary);
+    border-color: hsl(var(--primary) / 0.4);
+    background: var(--gradient-card-hover);
+  }
+
+  /* Gradient text — premium feel */
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .text-gradient-hero {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Shimmer skeleton effect */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+    background: hsl(var(--muted));
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-shimmer);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s ease-in-out infinite;
+  }
+
+  /* Glow ring on focus */
+  .focus-glow:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.25), var(--shadow-md);
+  }
+
   
   /* Orbs decorativos flutuantes */
   .hero-orb {
