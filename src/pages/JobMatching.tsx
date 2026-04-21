@@ -11,14 +11,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
 import {
+  Sparkles,
+  Loader2,
+  AlertTriangle,
+  ClipboardCheck,
+  History,
+} from "lucide-react";
+import {
+  JobMatchingResult,
   useJobMatchingResults,
   useRunJobMatching,
 } from "@/hooks/useJobMatching";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { Navigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { JobMatchingReviewDialog } from "@/components/match/JobMatchingReviewDialog";
+import { JobMatchingHistoryDialog } from "@/components/match/JobMatchingHistoryDialog";
+import { useCompany } from "@/contexts/CompanyContext";
 
 interface JobTitleRow {
   id: string;
