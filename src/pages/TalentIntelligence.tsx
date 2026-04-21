@@ -72,6 +72,9 @@ export default function TalentIntelligence() {
         <KpiCard icon={CheckCircle2} label="Recomendações Pendentes" value={kpis?.pending ?? 0} variant="warning" />
       </div>
 
+      {/* Mérito inteligente com guardrails */}
+      <SmartMeritCalculator />
+
       {/* Tabela */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3">

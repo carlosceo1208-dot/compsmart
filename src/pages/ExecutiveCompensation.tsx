@@ -67,6 +67,9 @@ export default function ExecutiveCompensation() {
         </Dialog>
       </div>
 
+      {/* Comparação multi-instrumento com cenários bear/base/bull */}
+      <LtipScenarioComparison />
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Simulações Salvas</CardTitle>
