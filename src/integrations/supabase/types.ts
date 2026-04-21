@@ -6836,6 +6836,7 @@ export type Database = {
         Row: {
           ai_reasoning: string | null
           applied_at: string | null
+          approver_notes: string | null
           box_position: number | null
           created_at: string
           current_salary: number | null
@@ -6856,11 +6857,14 @@ export type Database = {
           reviewed_by: string | null
           root_company_id: string
           status: string
+          submitted_at: string | null
+          submitted_by: string | null
           updated_at: string
         }
         Insert: {
           ai_reasoning?: string | null
           applied_at?: string | null
+          approver_notes?: string | null
           box_position?: number | null
           created_at?: string
           current_salary?: number | null
@@ -6881,11 +6885,14 @@ export type Database = {
           reviewed_by?: string | null
           root_company_id: string
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           updated_at?: string
         }
         Update: {
           ai_reasoning?: string | null
           applied_at?: string | null
+          approver_notes?: string | null
           box_position?: number | null
           created_at?: string
           current_salary?: number | null
@@ -6906,6 +6913,8 @@ export type Database = {
           reviewed_by?: string | null
           root_company_id?: string
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -6957,6 +6966,57 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_talent_intelligence_dashboard"
             referencedColumns: ["employee_id"]
+          },
+        ]
+      }
+      talent_recommendation_history: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          new_status: string | null
+          notes: string | null
+          previous_status: string | null
+          recommendation_id: string
+          snapshot: Json | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          previous_status?: string | null
+          recommendation_id: string
+          snapshot?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          previous_status?: string | null
+          recommendation_id?: string
+          snapshot?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_recommendation_history_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "talent_intelligence_recommendations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_recommendation_history_recommendation_id_fkey"
+            columns: ["recommendation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["recommendation_id"]
           },
         ]
       }
@@ -8366,6 +8426,28 @@ export type Database = {
           range_info: string
           salary: number
           status: string
+        }[]
+      }
+      simulate_9box_budget: {
+        Args: {
+          p_ceiling_pct?: number
+          p_fiscal_year?: number
+          p_root_company_id: string
+        }
+        Returns: {
+          avg_box_position: number
+          ceiling_amount_annual: number
+          ceiling_pct: number
+          current_payroll_annual: number
+          excess_annual: number
+          headcount: number
+          high_performers: number
+          low_performers: number
+          payroll_increase_pct: number
+          proposed_merit_impact_annual: number
+          status: string
+          unit_id: string
+          unit_name: string
         }[]
       }
       simulate_budget_scenarios: {
