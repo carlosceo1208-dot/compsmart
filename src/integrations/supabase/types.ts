@@ -3334,6 +3334,62 @@ export type Database = {
         }
         Relationships: []
       }
+      merit_budget_ledger: {
+        Row: {
+          amount_annual: number
+          balance_after: number | null
+          budget_id: string
+          created_at: string
+          created_by: string | null
+          employee_id: string | null
+          fiscal_year: number
+          id: string
+          movement_type: string
+          notes: string | null
+          source_id: string | null
+          source_type: string
+          unit_id: string
+        }
+        Insert: {
+          amount_annual: number
+          balance_after?: number | null
+          budget_id: string
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string | null
+          fiscal_year: number
+          id?: string
+          movement_type: string
+          notes?: string | null
+          source_id?: string | null
+          source_type: string
+          unit_id: string
+        }
+        Update: {
+          amount_annual?: number
+          balance_after?: number | null
+          budget_id?: string
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string | null
+          fiscal_year?: number
+          id?: string
+          movement_type?: string
+          notes?: string | null
+          source_id?: string | null
+          source_type?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merit_budget_ledger_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "unit_merit_budgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizational_structure: {
         Row: {
           address: string | null
@@ -7020,6 +7076,77 @@ export type Database = {
           },
         ]
       }
+      unit_merit_budgets: {
+        Row: {
+          approved_amount_annual: number
+          approved_at: string | null
+          approved_by: string | null
+          ceiling_pct: number
+          created_at: string
+          fiscal_year: number
+          id: string
+          notes: string | null
+          root_company_id: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          approved_amount_annual: number
+          approved_at?: string | null
+          approved_by?: string | null
+          ceiling_pct?: number
+          created_at?: string
+          fiscal_year: number
+          id?: string
+          notes?: string | null
+          root_company_id: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          approved_amount_annual?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          ceiling_pct?: number
+          created_at?: string
+          fiscal_year?: number
+          id?: string
+          notes?: string | null
+          root_company_id?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_merit_budgets_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_merit_budgets_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_merit_budgets_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_merit_budgets_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_feedback: {
         Row: {
           created_at: string | null
@@ -8015,6 +8142,18 @@ export type Database = {
       }
     }
     Functions: {
+      apply_merit_to_budget: {
+        Args: {
+          p_amount_annual: number
+          p_employee_id?: string
+          p_fiscal_year: number
+          p_notes?: string
+          p_source_id: string
+          p_source_type: string
+          p_unit_id: string
+        }
+        Returns: string
+      }
       calculate_9box_position: {
         Args: { p_performance: number; p_potential: number }
         Returns: number
@@ -8063,6 +8202,14 @@ export type Database = {
           employee_discount: number
           total_cost: number
         }[]
+      }
+      check_budget_capacity: {
+        Args: {
+          p_amount_annual: number
+          p_fiscal_year: number
+          p_unit_id: string
+        }
+        Returns: Json
       }
       check_budget_ceiling: {
         Args: {
@@ -8386,6 +8533,21 @@ export type Database = {
           salary_range_percentage: number
         }[]
       }
+      get_unit_budget_status: {
+        Args: { p_fiscal_year?: number; p_root_company_id: string }
+        Returns: {
+          approved_amount_annual: number
+          available_amount: number
+          burn_pct: number
+          consumed_amount: number
+          fiscal_year: number
+          ledger_count: number
+          reserved_amount: number
+          status: string
+          unit_id: string
+          unit_name: string
+        }[]
+      }
       get_user_company_id: { Args: never; Returns: string }
       get_visible_employees: {
         Args: { p_company_id: string; p_user_id: string }
@@ -8427,6 +8589,10 @@ export type Database = {
           salary: number
           status: string
         }[]
+      }
+      revert_merit_from_budget: {
+        Args: { p_reason?: string; p_source_id: string; p_source_type: string }
+        Returns: string
       }
       simulate_9box_budget: {
         Args: {
