@@ -41,10 +41,13 @@ interface JobTitleRow {
 export default function JobMatching() {
   const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
   const allowed = roleData?.isAdmin || roleData?.isHR;
+  const { activeCompanyId } = useCompanyContext();
 
   const [jobs, setJobs] = useState<JobTitleRow[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [runningId, setRunningId] = useState<string | null>(null);
+  const [reviewMatch, setReviewMatch] = useState<JobMatchingResult | null>(null);
+  const [historyJob, setHistoryJob] = useState<{ id: string; name: string } | null>(null);
 
   const { data: matches, isLoading: matchesLoading } = useJobMatchingResults();
   const runMatch = useRunJobMatching();
