@@ -3185,6 +3185,155 @@ export type Database = {
           },
         ]
       }
+      merit_approval_history: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          new_status: string | null
+          notes: string | null
+          previous_status: string | null
+          request_id: string
+          snapshot: Json | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          previous_status?: string | null
+          request_id: string
+          snapshot?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          new_status?: string | null
+          notes?: string | null
+          previous_status?: string | null
+          request_id?: string
+          snapshot?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merit_approval_history_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "merit_approval_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merit_approval_requests: {
+        Row: {
+          annual_impact: number
+          applied_at: string | null
+          applied_by: string | null
+          approval_notes: string | null
+          approver_id: string | null
+          box_position: number | null
+          budget_after_request: number | null
+          budget_available_pct: number | null
+          budget_remaining_annual: number | null
+          compa_ratio: number | null
+          created_at: string
+          current_salary: number
+          employee_id: string
+          fiscal_year: number
+          gate_warnings: Json | null
+          id: string
+          is_blocked: boolean
+          justification: string
+          monthly_impact: number
+          months_since_last_raise: number | null
+          new_salary: number
+          override_reason: string | null
+          performance_score: number | null
+          range_position_pct: number | null
+          requested_by: string
+          requested_merit_pct: number
+          reviewed_at: string | null
+          root_company_id: string
+          status: string
+          suggested_merit_pct: number
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          annual_impact: number
+          applied_at?: string | null
+          applied_by?: string | null
+          approval_notes?: string | null
+          approver_id?: string | null
+          box_position?: number | null
+          budget_after_request?: number | null
+          budget_available_pct?: number | null
+          budget_remaining_annual?: number | null
+          compa_ratio?: number | null
+          created_at?: string
+          current_salary: number
+          employee_id: string
+          fiscal_year?: number
+          gate_warnings?: Json | null
+          id?: string
+          is_blocked?: boolean
+          justification: string
+          monthly_impact: number
+          months_since_last_raise?: number | null
+          new_salary: number
+          override_reason?: string | null
+          performance_score?: number | null
+          range_position_pct?: number | null
+          requested_by: string
+          requested_merit_pct: number
+          reviewed_at?: string | null
+          root_company_id: string
+          status?: string
+          suggested_merit_pct: number
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          annual_impact?: number
+          applied_at?: string | null
+          applied_by?: string | null
+          approval_notes?: string | null
+          approver_id?: string | null
+          box_position?: number | null
+          budget_after_request?: number | null
+          budget_available_pct?: number | null
+          budget_remaining_annual?: number | null
+          compa_ratio?: number | null
+          created_at?: string
+          current_salary?: number
+          employee_id?: string
+          fiscal_year?: number
+          gate_warnings?: Json | null
+          id?: string
+          is_blocked?: boolean
+          justification?: string
+          monthly_impact?: number
+          months_since_last_raise?: number | null
+          new_salary?: number
+          override_reason?: string | null
+          performance_score?: number | null
+          range_position_pct?: number | null
+          requested_by?: string
+          requested_merit_pct?: number
+          reviewed_at?: string | null
+          root_company_id?: string
+          status?: string
+          suggested_merit_pct?: number
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizational_structure: {
         Row: {
           address: string | null
@@ -7958,6 +8107,19 @@ export type Database = {
           top_user_name: string
           total_count: number
         }[]
+      }
+      evaluate_merit_governance: {
+        Args: {
+          p_annual_impact: number
+          p_budget_available_pct: number
+          p_budget_remaining_annual: number
+          p_compa_ratio: number
+          p_employee_id: string
+          p_months_since_last_raise: number
+          p_requested_pct: number
+          p_suggested_pct: number
+        }
+        Returns: Json
       }
       get_agent_audit_logs: {
         Args: {
