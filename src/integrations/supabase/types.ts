@@ -1616,6 +1616,198 @@ export type Database = {
           },
         ]
       }
+      cycle_decision_snapshots: {
+        Row: {
+          chosen_scenario_id: string | null
+          created_at: string
+          cycle_name: string
+          executive_notes: string | null
+          fiscal_year: number
+          id: string
+          locked_at: string
+          locked_by: string | null
+          root_company_id: string
+          snapshot_data: Json
+        }
+        Insert: {
+          chosen_scenario_id?: string | null
+          created_at?: string
+          cycle_name: string
+          executive_notes?: string | null
+          fiscal_year: number
+          id?: string
+          locked_at?: string
+          locked_by?: string | null
+          root_company_id: string
+          snapshot_data: Json
+        }
+        Update: {
+          chosen_scenario_id?: string | null
+          created_at?: string
+          cycle_name?: string
+          executive_notes?: string | null
+          fiscal_year?: number
+          id?: string
+          locked_at?: string
+          locked_by?: string | null
+          root_company_id?: string
+          snapshot_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cycle_decision_snapshots_chosen_scenario_id_fkey"
+            columns: ["chosen_scenario_id"]
+            isOneToOne: false
+            referencedRelation: "decision_scenarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_decision_snapshots_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_decision_snapshots_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_scenario_items: {
+        Row: {
+          annual_impact: number | null
+          box_position: number | null
+          created_at: string
+          current_salary: number | null
+          employee_id: string
+          id: string
+          monthly_impact: number | null
+          scenario_id: string
+          scenario_merit_pct: number | null
+          suggested_merit_pct: number | null
+          unit_id: string | null
+        }
+        Insert: {
+          annual_impact?: number | null
+          box_position?: number | null
+          created_at?: string
+          current_salary?: number | null
+          employee_id: string
+          id?: string
+          monthly_impact?: number | null
+          scenario_id: string
+          scenario_merit_pct?: number | null
+          suggested_merit_pct?: number | null
+          unit_id?: string | null
+        }
+        Update: {
+          annual_impact?: number | null
+          box_position?: number | null
+          created_at?: string
+          current_salary?: number | null
+          employee_id?: string
+          id?: string
+          monthly_impact?: number | null
+          scenario_id?: string
+          scenario_merit_pct?: number | null
+          suggested_merit_pct?: number | null
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_scenario_items_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "decision_scenarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_scenarios: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          filter_box_max: number | null
+          filter_box_min: number | null
+          filter_unit_ids: string[] | null
+          fiscal_year: number
+          high_performers_retained: number | null
+          id: string
+          is_active: boolean | null
+          low_performers_included: number | null
+          multiplier: number
+          payroll_increase_pct: number | null
+          root_company_id: string
+          scenario_name: string
+          strategy: string
+          total_annual_impact: number | null
+          total_headcount: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          filter_box_max?: number | null
+          filter_box_min?: number | null
+          filter_unit_ids?: string[] | null
+          fiscal_year: number
+          high_performers_retained?: number | null
+          id?: string
+          is_active?: boolean | null
+          low_performers_included?: number | null
+          multiplier?: number
+          payroll_increase_pct?: number | null
+          root_company_id: string
+          scenario_name: string
+          strategy?: string
+          total_annual_impact?: number | null
+          total_headcount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          filter_box_max?: number | null
+          filter_box_min?: number | null
+          filter_unit_ids?: string[] | null
+          fiscal_year?: number
+          high_performers_retained?: number | null
+          id?: string
+          is_active?: boolean | null
+          low_performers_included?: number | null
+          multiplier?: number
+          payroll_increase_pct?: number | null
+          root_company_id?: string
+          scenario_name?: string
+          strategy?: string
+          total_annual_impact?: number | null
+          total_headcount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_scenarios_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_scenarios_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       discount_coupons: {
         Row: {
           applicable_plans: string[] | null
@@ -8303,6 +8495,19 @@ export type Database = {
         }
         Returns: string
       }
+      build_scenario_from_9box: {
+        Args: {
+          p_filter_box_max?: number
+          p_filter_box_min?: number
+          p_filter_unit_ids?: string[]
+          p_fiscal_year: number
+          p_multiplier?: number
+          p_root_company_id: string
+          p_scenario_name: string
+          p_strategy?: string
+        }
+        Returns: string
+      }
       calculate_9box_position: {
         Args: { p_performance: number; p_potential: number }
         Returns: number
@@ -8395,6 +8600,21 @@ export type Database = {
         Returns: boolean
       }
       cleanup_rate_limit_logs: { Args: never; Returns: undefined }
+      compare_scenarios: {
+        Args: { p_scenario_ids: string[] }
+        Returns: {
+          avg_merit_pct: number
+          high_performers_retained: number
+          low_performers_included: number
+          multiplier: number
+          payroll_increase_pct: number
+          scenario_id: string
+          scenario_name: string
+          strategy: string
+          total_annual_impact: number
+          total_headcount: number
+        }[]
+      }
       count_agent_audit_logs: {
         Args: {
           p_agent_type?: string
@@ -8800,6 +9020,16 @@ export type Database = {
           total_merit_impact_annual: number
           total_merit_impact_monthly: number
         }[]
+      }
+      snapshot_cycle_decision: {
+        Args: {
+          p_cycle_name: string
+          p_fiscal_year: number
+          p_notes?: string
+          p_root_company_id: string
+          p_scenario_id: string
+        }
+        Returns: string
       }
       submit_external_feedback: {
         Args: {
