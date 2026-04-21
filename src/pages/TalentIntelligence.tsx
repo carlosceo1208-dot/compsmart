@@ -14,6 +14,7 @@ import {
   TalentIntelRow,
 } from '@/hooks/useTalentIntelligence';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { SmartMeritCalculator } from '@/components/talent/SmartMeritCalculator';
 
 const formatBRL = (v: number | null | undefined) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v ?? 0));
@@ -70,6 +71,9 @@ export default function TalentIntelligence() {
         <KpiCard icon={DollarSign} label="Impacto Anual Estimado" value={formatBRL(kpis?.totalImpact)} />
         <KpiCard icon={CheckCircle2} label="Recomendações Pendentes" value={kpis?.pending ?? 0} variant="warning" />
       </div>
+
+      {/* Mérito inteligente com guardrails */}
+      <SmartMeritCalculator />
 
       {/* Tabela */}
       <Card>

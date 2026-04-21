@@ -1883,8 +1883,46 @@ export type Database = {
           },
         ]
       }
+      executive_dashboard_indicators: {
+        Row: {
+          created_at: string
+          fetched_at: string
+          id: string
+          indicator_key: string
+          indicator_value: number
+          metadata: Json | null
+          reference_date: string
+          source: string | null
+        }
+        Insert: {
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          indicator_key: string
+          indicator_value: number
+          metadata?: Json | null
+          reference_date: string
+          source?: string | null
+        }
+        Update: {
+          created_at?: string
+          fetched_at?: string
+          id?: string
+          indicator_key?: string
+          indicator_value?: number
+          metadata?: Json | null
+          reference_date?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
       executive_ltip_simulations: {
         Row: {
+          bear_growth_rate: number | null
+          bear_value_at_vest: number | null
+          bull_growth_rate: number | null
+          bull_value_at_vest: number | null
+          clawback_clause: string | null
           cliff_months: number
           created_at: string
           created_by: string
@@ -1893,9 +1931,12 @@ export type Database = {
           employee_contribution_pct: number | null
           employee_id: string | null
           exercise_price: number | null
+          forfeiture_rules: Json | null
           grant_value: number
           id: string
           instrument_type: string
+          leaver_treatment: Json | null
+          liquidity_event_assumption: string | null
           matching_percentage: number | null
           notes: string | null
           num_shares: number | null
@@ -1910,6 +1951,11 @@ export type Database = {
           vesting_years: number
         }
         Insert: {
+          bear_growth_rate?: number | null
+          bear_value_at_vest?: number | null
+          bull_growth_rate?: number | null
+          bull_value_at_vest?: number | null
+          clawback_clause?: string | null
           cliff_months?: number
           created_at?: string
           created_by: string
@@ -1918,9 +1964,12 @@ export type Database = {
           employee_contribution_pct?: number | null
           employee_id?: string | null
           exercise_price?: number | null
+          forfeiture_rules?: Json | null
           grant_value: number
           id?: string
           instrument_type: string
+          leaver_treatment?: Json | null
+          liquidity_event_assumption?: string | null
           matching_percentage?: number | null
           notes?: string | null
           num_shares?: number | null
@@ -1935,6 +1984,11 @@ export type Database = {
           vesting_years?: number
         }
         Update: {
+          bear_growth_rate?: number | null
+          bear_value_at_vest?: number | null
+          bull_growth_rate?: number | null
+          bull_value_at_vest?: number | null
+          clawback_clause?: string | null
           cliff_months?: number
           created_at?: string
           created_by?: string
@@ -1943,9 +1997,12 @@ export type Database = {
           employee_contribution_pct?: number | null
           employee_id?: string | null
           exercise_price?: number | null
+          forfeiture_rules?: Json | null
           grant_value?: number
           id?: string
           instrument_type?: string
+          leaver_treatment?: Json | null
+          liquidity_event_assumption?: string | null
           matching_percentage?: number | null
           notes?: string | null
           num_shares?: number | null
@@ -3062,6 +3119,72 @@ export type Database = {
           },
         ]
       }
+      ltip_scenario_comparisons: {
+        Row: {
+          cliff_months: number
+          comparison_name: string
+          created_at: string
+          created_by: string
+          employee_id: string | null
+          grant_value: number
+          growth_rate: number
+          id: string
+          instruments_compared: Json
+          recommendation: string | null
+          results: Json
+          root_company_id: string
+          updated_at: string
+          vesting_years: number
+        }
+        Insert: {
+          cliff_months?: number
+          comparison_name: string
+          created_at?: string
+          created_by: string
+          employee_id?: string | null
+          grant_value: number
+          growth_rate?: number
+          id?: string
+          instruments_compared: Json
+          recommendation?: string | null
+          results: Json
+          root_company_id: string
+          updated_at?: string
+          vesting_years?: number
+        }
+        Update: {
+          cliff_months?: number
+          comparison_name?: string
+          created_at?: string
+          created_by?: string
+          employee_id?: string | null
+          grant_value?: number
+          growth_rate?: number
+          id?: string
+          instruments_compared?: Json
+          recommendation?: string | null
+          results?: Json
+          root_company_id?: string
+          updated_at?: string
+          vesting_years?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ltip_scenario_comparisons_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ltip_scenario_comparisons_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizational_structure: {
         Row: {
           address: string | null
@@ -3262,6 +3385,78 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pay_equity_regression_results: {
+        Row: {
+          analysis_date: string
+          controls_used: Json
+          created_at: string
+          created_by: string | null
+          explained_gap_pct: number
+          group_a_label: string
+          group_b_label: string
+          id: string
+          notes: string | null
+          protected_attribute: string
+          raw_gap_pct: number
+          root_company_id: string
+          sample_size: number
+          severity: string
+          statistical_significance: number | null
+          unexplained_gap_pct: number
+        }
+        Insert: {
+          analysis_date?: string
+          controls_used?: Json
+          created_at?: string
+          created_by?: string | null
+          explained_gap_pct: number
+          group_a_label: string
+          group_b_label: string
+          id?: string
+          notes?: string | null
+          protected_attribute: string
+          raw_gap_pct: number
+          root_company_id: string
+          sample_size: number
+          severity: string
+          statistical_significance?: number | null
+          unexplained_gap_pct: number
+        }
+        Update: {
+          analysis_date?: string
+          controls_used?: Json
+          created_at?: string
+          created_by?: string | null
+          explained_gap_pct?: number
+          group_a_label?: string
+          group_b_label?: string
+          id?: string
+          notes?: string | null
+          protected_attribute?: string
+          raw_gap_pct?: number
+          root_company_id?: string
+          sample_size?: number
+          severity?: string
+          statistical_significance?: number | null
+          unexplained_gap_pct?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pay_equity_regression_results_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pay_equity_regression_results_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_methods: {
         Row: {
@@ -7642,6 +7837,15 @@ export type Database = {
           q1_value: number
           q3_value: number
         }[]
+      }
+      calculate_smart_merit: {
+        Args: {
+          p_box_position: number
+          p_budget_available_pct?: number
+          p_compa_ratio?: number
+          p_months_since_last_raise?: number
+        }
+        Returns: Json
       }
       calculate_transportation_benefit: {
         Args: { p_employee_id: string; p_monthly_cost: number }

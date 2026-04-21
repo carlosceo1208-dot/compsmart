@@ -19,6 +19,7 @@ import {
   SimulationInput,
 } from '@/hooks/useExecutiveCompensation';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { LtipScenarioComparison } from '@/components/executive/LtipScenarioComparison';
 
 const formatBRL = (v: number | null | undefined) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v ?? 0));
@@ -65,6 +66,9 @@ export default function ExecutiveCompensation() {
           <SimulationForm onClose={() => setOpen(false)} onSubmit={(input) => createMut.mutate(input, { onSuccess: () => setOpen(false) })} />
         </Dialog>
       </div>
+
+      {/* Comparação multi-instrumento com cenários bear/base/bull */}
+      <LtipScenarioComparison />
 
       <Card>
         <CardHeader>
