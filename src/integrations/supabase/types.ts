@@ -1883,6 +1883,127 @@ export type Database = {
           },
         ]
       }
+      executive_ltip_simulations: {
+        Row: {
+          cliff_months: number
+          created_at: string
+          created_by: string
+          current_share_price: number | null
+          dilution_percentage: number | null
+          employee_contribution_pct: number | null
+          employee_id: string | null
+          exercise_price: number | null
+          grant_value: number
+          id: string
+          instrument_type: string
+          matching_percentage: number | null
+          notes: string | null
+          num_shares: number | null
+          projected_growth_rate: number | null
+          root_company_id: string
+          scenario_name: string
+          tax_impact_estimated: number | null
+          tax_treatment: string | null
+          total_value_at_vest: number | null
+          updated_at: string
+          vesting_type: string | null
+          vesting_years: number
+        }
+        Insert: {
+          cliff_months?: number
+          created_at?: string
+          created_by: string
+          current_share_price?: number | null
+          dilution_percentage?: number | null
+          employee_contribution_pct?: number | null
+          employee_id?: string | null
+          exercise_price?: number | null
+          grant_value: number
+          id?: string
+          instrument_type: string
+          matching_percentage?: number | null
+          notes?: string | null
+          num_shares?: number | null
+          projected_growth_rate?: number | null
+          root_company_id: string
+          scenario_name: string
+          tax_impact_estimated?: number | null
+          tax_treatment?: string | null
+          total_value_at_vest?: number | null
+          updated_at?: string
+          vesting_type?: string | null
+          vesting_years?: number
+        }
+        Update: {
+          cliff_months?: number
+          created_at?: string
+          created_by?: string
+          current_share_price?: number | null
+          dilution_percentage?: number | null
+          employee_contribution_pct?: number | null
+          employee_id?: string | null
+          exercise_price?: number | null
+          grant_value?: number
+          id?: string
+          instrument_type?: string
+          matching_percentage?: number | null
+          notes?: string | null
+          num_shares?: number | null
+          projected_growth_rate?: number | null
+          root_company_id?: string
+          scenario_name?: string
+          tax_impact_estimated?: number | null
+          tax_treatment?: string | null
+          total_value_at_vest?: number | null
+          updated_at?: string
+          vesting_type?: string | null
+          vesting_years?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executive_ltip_simulations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "executive_ltip_simulations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "executive_ltip_simulations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_budget_merit_projection"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "executive_ltip_simulations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_compensation_intelligence"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "executive_ltip_simulations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "executive_ltip_simulations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+        ]
+      }
       external_feedback_requests: {
         Row: {
           completed_at: string | null
@@ -3078,6 +3199,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pay_equity_alerts: {
+        Row: {
+          affected_count: number | null
+          alert_type: string
+          created_at: string
+          gap_percentage: number | null
+          grade: string | null
+          group_a_avg_salary: number | null
+          group_a_label: string
+          group_b_avg_salary: number | null
+          group_b_label: string
+          id: string
+          job_title: string | null
+          resolution_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          root_company_id: string
+          severity: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          affected_count?: number | null
+          alert_type: string
+          created_at?: string
+          gap_percentage?: number | null
+          grade?: string | null
+          group_a_avg_salary?: number | null
+          group_a_label: string
+          group_b_avg_salary?: number | null
+          group_b_label: string
+          id?: string
+          job_title?: string | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id: string
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          affected_count?: number | null
+          alert_type?: string
+          created_at?: string
+          gap_percentage?: number | null
+          grade?: string | null
+          group_a_avg_salary?: number | null
+          group_a_label?: string
+          group_b_avg_salary?: number | null
+          group_b_label?: string
+          id?: string
+          job_title?: string | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id?: string
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       payment_methods: {
         Row: {
@@ -5219,6 +5403,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_range: string | null
           avatar_url: string | null
           benefits_value: number | null
           birth_date: string | null
@@ -5239,6 +5424,7 @@ export type Database = {
           performance_rating: number | null
           phone: string | null
           preferred_language: string | null
+          race_ethnicity: string | null
           root_company_id: string | null
           salary: number | null
           salary_range_percentage: number | null
@@ -5250,6 +5436,7 @@ export type Database = {
           variable_salary: number | null
         }
         Insert: {
+          age_range?: string | null
           avatar_url?: string | null
           benefits_value?: number | null
           birth_date?: string | null
@@ -5270,6 +5457,7 @@ export type Database = {
           performance_rating?: number | null
           phone?: string | null
           preferred_language?: string | null
+          race_ethnicity?: string | null
           root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
@@ -5281,6 +5469,7 @@ export type Database = {
           variable_salary?: number | null
         }
         Update: {
+          age_range?: string | null
           avatar_url?: string | null
           benefits_value?: number | null
           birth_date?: string | null
@@ -5301,6 +5490,7 @@ export type Database = {
           performance_rating?: number | null
           phone?: string | null
           preferred_language?: string | null
+          race_ethnicity?: string | null
           root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
@@ -6950,6 +7140,62 @@ export type Database = {
             referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pay_equity_by_gender: {
+        Row: {
+          avg_salary: number | null
+          employee_count: number | null
+          gender: string | null
+          grade: string | null
+          job_title: string | null
+          max_salary: number | null
+          median_salary: number | null
+          min_salary: number | null
+          root_company_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_pay_equity_by_race: {
+        Row: {
+          avg_salary: number | null
+          employee_count: number | null
+          grade: string | null
+          job_title: string | null
+          median_salary: number | null
+          race_ethnicity: string | null
+          root_company_id: string | null
+        }
+        Relationships: [
           {
             foreignKeyName: "profiles_root_company_id_fkey"
             columns: ["root_company_id"]
