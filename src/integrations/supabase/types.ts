@@ -2404,7 +2404,7 @@ export type Database = {
           },
         ]
       }
-      job_matching_results: {
+      job_matching_history: {
         Row: {
           created_at: string
           created_by: string | null
@@ -2416,10 +2416,13 @@ export type Database = {
           match_score: number
           matched_cbo_code: string | null
           matched_market_role: string
+          parameters: Json | null
           reasoning: string | null
           recommendations: string | null
+          review_notes: string | null
           root_company_id: string
-          updated_at: string
+          source: string
+          version: number
         }
         Insert: {
           created_at?: string
@@ -2432,10 +2435,13 @@ export type Database = {
           match_score: number
           matched_cbo_code?: string | null
           matched_market_role: string
+          parameters?: Json | null
           reasoning?: string | null
           recommendations?: string | null
+          review_notes?: string | null
           root_company_id: string
-          updated_at?: string
+          source?: string
+          version: number
         }
         Update: {
           created_at?: string
@@ -2448,10 +2454,110 @@ export type Database = {
           match_score?: number
           matched_cbo_code?: string | null
           matched_market_role?: string
+          parameters?: Json | null
           reasoning?: string | null
           recommendations?: string | null
+          review_notes?: string | null
+          root_company_id?: string
+          source?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_matching_history_job_title_id_fkey"
+            columns: ["job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_matching_history_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_matching_history_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_matching_results: {
+        Row: {
+          ai_original_reasoning: string | null
+          ai_original_score: number | null
+          created_at: string
+          created_by: string | null
+          final_reasoning: string | null
+          gap_pct: number | null
+          id: string
+          internal_median: number | null
+          job_title_id: string
+          market_median: number | null
+          match_score: number
+          matched_cbo_code: string | null
+          matched_market_role: string
+          reasoning: string | null
+          recommendations: string | null
+          review_notes: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          root_company_id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          ai_original_reasoning?: string | null
+          ai_original_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          final_reasoning?: string | null
+          gap_pct?: number | null
+          id?: string
+          internal_median?: number | null
+          job_title_id: string
+          market_median?: number | null
+          match_score: number
+          matched_cbo_code?: string | null
+          matched_market_role: string
+          reasoning?: string | null
+          recommendations?: string | null
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          ai_original_reasoning?: string | null
+          ai_original_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          final_reasoning?: string | null
+          gap_pct?: number | null
+          id?: string
+          internal_median?: number | null
+          job_title_id?: string
+          market_median?: number | null
+          match_score?: number
+          matched_cbo_code?: string | null
+          matched_market_role?: string
+          reasoning?: string | null
+          recommendations?: string | null
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           root_company_id?: string
           updated_at?: string
+          version?: number
         }
         Relationships: [
           {
