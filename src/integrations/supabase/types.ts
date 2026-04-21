@@ -269,6 +269,155 @@ export type Database = {
           },
         ]
       }
+      approval_assignments: {
+        Row: {
+          approval_type: string
+          approver_id: string
+          assigned_at: string
+          completed_at: string | null
+          created_at: string
+          deadline_at: string
+          escalated_at: string | null
+          escalated_to: string | null
+          id: string
+          root_company_id: string
+          source_id: string
+          status: string
+        }
+        Insert: {
+          approval_type: string
+          approver_id: string
+          assigned_at?: string
+          completed_at?: string | null
+          created_at?: string
+          deadline_at: string
+          escalated_at?: string | null
+          escalated_to?: string | null
+          id?: string
+          root_company_id: string
+          source_id: string
+          status?: string
+        }
+        Update: {
+          approval_type?: string
+          approver_id?: string
+          assigned_at?: string
+          completed_at?: string | null
+          created_at?: string
+          deadline_at?: string
+          escalated_at?: string | null
+          escalated_to?: string | null
+          id?: string
+          root_company_id?: string
+          source_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      approval_notifications: {
+        Row: {
+          assignment_id: string | null
+          channel: string
+          created_at: string
+          error_message: string | null
+          id: string
+          notification_type: string
+          payload: Json
+          read_at: string | null
+          recipient_id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          assignment_id?: string | null
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_notifications_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "approval_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_sla_config: {
+        Row: {
+          approval_type: string
+          created_at: string
+          escalate_after_days: number
+          escalate_to_superior: boolean
+          id: string
+          notify_email: boolean
+          reminder_days_before: number[]
+          root_company_id: string
+          sla_business_days: number
+          updated_at: string
+        }
+        Insert: {
+          approval_type: string
+          created_at?: string
+          escalate_after_days?: number
+          escalate_to_superior?: boolean
+          id?: string
+          notify_email?: boolean
+          reminder_days_before?: number[]
+          root_company_id: string
+          sla_business_days?: number
+          updated_at?: string
+        }
+        Update: {
+          approval_type?: string
+          created_at?: string
+          escalate_after_days?: number
+          escalate_to_superior?: boolean
+          id?: string
+          notify_email?: boolean
+          reminder_days_before?: number[]
+          root_company_id?: string
+          sla_business_days?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_sla_config_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_sla_config_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -8315,6 +8464,12 @@ export type Database = {
           total_count: number
         }[]
       }
+      escalate_overdue_approvals: {
+        Args: never
+        Returns: {
+          escalated_count: number
+        }[]
+      }
       evaluate_merit_governance: {
         Args: {
           p_annual_impact: number
@@ -8484,6 +8639,23 @@ export type Database = {
           recommendation: string
           suggested_merit_percentage: number
           suggested_new_salary: number
+        }[]
+      }
+      get_my_approval_inbox: {
+        Args: never
+        Returns: {
+          annual_impact: number
+          approval_type: string
+          assigned_at: string
+          assignment_id: string
+          deadline_at: string
+          employee_name: string
+          escalated: boolean
+          hours_remaining: number
+          is_overdue: boolean
+          requested_pct: number
+          source_id: string
+          status: string
         }[]
       }
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
