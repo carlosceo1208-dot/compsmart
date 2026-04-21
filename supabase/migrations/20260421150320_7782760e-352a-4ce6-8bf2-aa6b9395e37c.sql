@@ -1,0 +1,1 @@
+ALTER VIEW public.v_budget_merit_projection SET (security_invoker = true);
