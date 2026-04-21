@@ -67,6 +67,7 @@ const featureMap: Record<string, PlanType[]> = {
   employee_portal: ['pro', 'enterprise'], // Portal do Funcionário (opcional)
   employee_self_edit: ['pro', 'enterprise'], // Edição pelo funcionário (telefone, email, endereço)
   salary_modality_advanced: ['pro', 'enterprise'], // Total Cash e Total Compensation
+  merit_governance: ['pro', 'enterprise'], // Budget Burn-Down, Approval Inbox, Decision Scenarios
   
   // === ENTERPRISE ONLY ===
   api_access: ['enterprise'],
@@ -100,6 +101,9 @@ const pathToFeatureMap: Record<string, string> = {
   '/incentive-programs': 'incentive_programs',
   '/salary-analysis-report': 'salary_analysis_report',
   '/organogram': 'organogram',
+  '/budget-burndown': 'merit_governance',
+  '/approval-inbox': 'merit_governance',
+  '/decision-scenarios': 'merit_governance',
 };
 
 // Get required plan for a feature

@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { useUnitBudgetStatus, useUpsertUnitBudget } from '@/hooks/useBudgetBurndown';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Wallet, AlertTriangle, TrendingDown, Plus } from 'lucide-react';
+import { PlanGate } from '@/components/PlanGate';
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n ?? 0);
 
@@ -43,6 +44,7 @@ export default function BudgetBurndown() {
   const globalBurn = totalApproved > 0 ? (totalConsumed / totalApproved) * 100 : 0;
 
   return (
+    <PlanGate feature="merit_governance" title="Budget Burn-Down">
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -126,5 +128,6 @@ export default function BudgetBurndown() {
         </CardContent>
       </Card>
     </div>
+    </PlanGate>
   );
 }
