@@ -74,6 +74,9 @@ const PayEquity = lazy(() => import("./pages/PayEquity"));
 const ExecutiveCompensation = lazy(() => import("./pages/ExecutiveCompensation"));
 const ExecutiveDashboard = lazy(() => import("./pages/ExecutiveDashboard"));
 const MeritGovernance = lazy(() => import("./pages/MeritGovernance"));
+const BudgetBurndown = lazy(() => import("./pages/BudgetBurndown"));
+const ApprovalInbox = lazy(() => import("./pages/ApprovalInbox"));
+const DecisionScenarios = lazy(() => import("./pages/DecisionScenarios"));
 
 // Lazy — Performance Module
 const PerformanceLayout = lazy(() =>
@@ -196,6 +199,9 @@ const App = () => {
                         <Route path="/executive-compensation" element={<ExecutiveCompensation />} />
                         <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
                         <Route path="/merit-governance" element={<MeritGovernance />} />
+                        <Route path="/budget-burndown" element={<BudgetBurndown />} />
+                        <Route path="/approval-inbox" element={<ApprovalInbox />} />
+                        <Route path="/decision-scenarios" element={<DecisionScenarios />} />
                       </Route>
 
                       {/* Performance Module */}

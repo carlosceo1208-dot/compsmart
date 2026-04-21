@@ -269,6 +269,155 @@ export type Database = {
           },
         ]
       }
+      approval_assignments: {
+        Row: {
+          approval_type: string
+          approver_id: string
+          assigned_at: string
+          completed_at: string | null
+          created_at: string
+          deadline_at: string
+          escalated_at: string | null
+          escalated_to: string | null
+          id: string
+          root_company_id: string
+          source_id: string
+          status: string
+        }
+        Insert: {
+          approval_type: string
+          approver_id: string
+          assigned_at?: string
+          completed_at?: string | null
+          created_at?: string
+          deadline_at: string
+          escalated_at?: string | null
+          escalated_to?: string | null
+          id?: string
+          root_company_id: string
+          source_id: string
+          status?: string
+        }
+        Update: {
+          approval_type?: string
+          approver_id?: string
+          assigned_at?: string
+          completed_at?: string | null
+          created_at?: string
+          deadline_at?: string
+          escalated_at?: string | null
+          escalated_to?: string | null
+          id?: string
+          root_company_id?: string
+          source_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      approval_notifications: {
+        Row: {
+          assignment_id: string | null
+          channel: string
+          created_at: string
+          error_message: string | null
+          id: string
+          notification_type: string
+          payload: Json
+          read_at: string | null
+          recipient_id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          assignment_id?: string | null
+          channel?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          payload?: Json
+          read_at?: string | null
+          recipient_id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_notifications_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "approval_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_sla_config: {
+        Row: {
+          approval_type: string
+          created_at: string
+          escalate_after_days: number
+          escalate_to_superior: boolean
+          id: string
+          notify_email: boolean
+          reminder_days_before: number[]
+          root_company_id: string
+          sla_business_days: number
+          updated_at: string
+        }
+        Insert: {
+          approval_type: string
+          created_at?: string
+          escalate_after_days?: number
+          escalate_to_superior?: boolean
+          id?: string
+          notify_email?: boolean
+          reminder_days_before?: number[]
+          root_company_id: string
+          sla_business_days?: number
+          updated_at?: string
+        }
+        Update: {
+          approval_type?: string
+          created_at?: string
+          escalate_after_days?: number
+          escalate_to_superior?: boolean
+          id?: string
+          notify_email?: boolean
+          reminder_days_before?: number[]
+          root_company_id?: string
+          sla_business_days?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_sla_config_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "approval_sla_config_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -1460,6 +1609,198 @@ export type Database = {
           },
           {
             foreignKeyName: "conversation_sessions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cycle_decision_snapshots: {
+        Row: {
+          chosen_scenario_id: string | null
+          created_at: string
+          cycle_name: string
+          executive_notes: string | null
+          fiscal_year: number
+          id: string
+          locked_at: string
+          locked_by: string | null
+          root_company_id: string
+          snapshot_data: Json
+        }
+        Insert: {
+          chosen_scenario_id?: string | null
+          created_at?: string
+          cycle_name: string
+          executive_notes?: string | null
+          fiscal_year: number
+          id?: string
+          locked_at?: string
+          locked_by?: string | null
+          root_company_id: string
+          snapshot_data: Json
+        }
+        Update: {
+          chosen_scenario_id?: string | null
+          created_at?: string
+          cycle_name?: string
+          executive_notes?: string | null
+          fiscal_year?: number
+          id?: string
+          locked_at?: string
+          locked_by?: string | null
+          root_company_id?: string
+          snapshot_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cycle_decision_snapshots_chosen_scenario_id_fkey"
+            columns: ["chosen_scenario_id"]
+            isOneToOne: false
+            referencedRelation: "decision_scenarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_decision_snapshots_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cycle_decision_snapshots_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_scenario_items: {
+        Row: {
+          annual_impact: number | null
+          box_position: number | null
+          created_at: string
+          current_salary: number | null
+          employee_id: string
+          id: string
+          monthly_impact: number | null
+          scenario_id: string
+          scenario_merit_pct: number | null
+          suggested_merit_pct: number | null
+          unit_id: string | null
+        }
+        Insert: {
+          annual_impact?: number | null
+          box_position?: number | null
+          created_at?: string
+          current_salary?: number | null
+          employee_id: string
+          id?: string
+          monthly_impact?: number | null
+          scenario_id: string
+          scenario_merit_pct?: number | null
+          suggested_merit_pct?: number | null
+          unit_id?: string | null
+        }
+        Update: {
+          annual_impact?: number | null
+          box_position?: number | null
+          created_at?: string
+          current_salary?: number | null
+          employee_id?: string
+          id?: string
+          monthly_impact?: number | null
+          scenario_id?: string
+          scenario_merit_pct?: number | null
+          suggested_merit_pct?: number | null
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_scenario_items_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "decision_scenarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      decision_scenarios: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          filter_box_max: number | null
+          filter_box_min: number | null
+          filter_unit_ids: string[] | null
+          fiscal_year: number
+          high_performers_retained: number | null
+          id: string
+          is_active: boolean | null
+          low_performers_included: number | null
+          multiplier: number
+          payroll_increase_pct: number | null
+          root_company_id: string
+          scenario_name: string
+          strategy: string
+          total_annual_impact: number | null
+          total_headcount: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          filter_box_max?: number | null
+          filter_box_min?: number | null
+          filter_unit_ids?: string[] | null
+          fiscal_year: number
+          high_performers_retained?: number | null
+          id?: string
+          is_active?: boolean | null
+          low_performers_included?: number | null
+          multiplier?: number
+          payroll_increase_pct?: number | null
+          root_company_id: string
+          scenario_name: string
+          strategy?: string
+          total_annual_impact?: number | null
+          total_headcount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          filter_box_max?: number | null
+          filter_box_min?: number | null
+          filter_unit_ids?: string[] | null
+          fiscal_year?: number
+          high_performers_retained?: number | null
+          id?: string
+          is_active?: boolean | null
+          low_performers_included?: number | null
+          multiplier?: number
+          payroll_increase_pct?: number | null
+          root_company_id?: string
+          scenario_name?: string
+          strategy?: string
+          total_annual_impact?: number | null
+          total_headcount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decision_scenarios_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "decision_scenarios_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure_public"
@@ -3333,6 +3674,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      merit_budget_ledger: {
+        Row: {
+          amount_annual: number
+          balance_after: number | null
+          budget_id: string
+          created_at: string
+          created_by: string | null
+          employee_id: string | null
+          fiscal_year: number
+          id: string
+          movement_type: string
+          notes: string | null
+          source_id: string | null
+          source_type: string
+          unit_id: string
+        }
+        Insert: {
+          amount_annual: number
+          balance_after?: number | null
+          budget_id: string
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string | null
+          fiscal_year: number
+          id?: string
+          movement_type: string
+          notes?: string | null
+          source_id?: string | null
+          source_type: string
+          unit_id: string
+        }
+        Update: {
+          amount_annual?: number
+          balance_after?: number | null
+          budget_id?: string
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string | null
+          fiscal_year?: number
+          id?: string
+          movement_type?: string
+          notes?: string | null
+          source_id?: string | null
+          source_type?: string
+          unit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merit_budget_ledger_budget_id_fkey"
+            columns: ["budget_id"]
+            isOneToOne: false
+            referencedRelation: "unit_merit_budgets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organizational_structure: {
         Row: {
@@ -7020,6 +7417,77 @@ export type Database = {
           },
         ]
       }
+      unit_merit_budgets: {
+        Row: {
+          approved_amount_annual: number
+          approved_at: string | null
+          approved_by: string | null
+          ceiling_pct: number
+          created_at: string
+          fiscal_year: number
+          id: string
+          notes: string | null
+          root_company_id: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          approved_amount_annual: number
+          approved_at?: string | null
+          approved_by?: string | null
+          ceiling_pct?: number
+          created_at?: string
+          fiscal_year: number
+          id?: string
+          notes?: string | null
+          root_company_id: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          approved_amount_annual?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          ceiling_pct?: number
+          created_at?: string
+          fiscal_year?: number
+          id?: string
+          notes?: string | null
+          root_company_id?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unit_merit_budgets_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_merit_budgets_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_merit_budgets_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unit_merit_budgets_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_feedback: {
         Row: {
           created_at: string | null
@@ -8015,6 +8483,31 @@ export type Database = {
       }
     }
     Functions: {
+      apply_merit_to_budget: {
+        Args: {
+          p_amount_annual: number
+          p_employee_id?: string
+          p_fiscal_year: number
+          p_notes?: string
+          p_source_id: string
+          p_source_type: string
+          p_unit_id: string
+        }
+        Returns: string
+      }
+      build_scenario_from_9box: {
+        Args: {
+          p_filter_box_max?: number
+          p_filter_box_min?: number
+          p_filter_unit_ids?: string[]
+          p_fiscal_year: number
+          p_multiplier?: number
+          p_root_company_id: string
+          p_scenario_name: string
+          p_strategy?: string
+        }
+        Returns: string
+      }
       calculate_9box_position: {
         Args: { p_performance: number; p_potential: number }
         Returns: number
@@ -8064,6 +8557,14 @@ export type Database = {
           total_cost: number
         }[]
       }
+      check_budget_capacity: {
+        Args: {
+          p_amount_annual: number
+          p_fiscal_year: number
+          p_unit_id: string
+        }
+        Returns: Json
+      }
       check_budget_ceiling: {
         Args: {
           p_ceiling_pct?: number
@@ -8099,6 +8600,21 @@ export type Database = {
         Returns: boolean
       }
       cleanup_rate_limit_logs: { Args: never; Returns: undefined }
+      compare_scenarios: {
+        Args: { p_scenario_ids: string[] }
+        Returns: {
+          avg_merit_pct: number
+          high_performers_retained: number
+          low_performers_included: number
+          multiplier: number
+          payroll_increase_pct: number
+          scenario_id: string
+          scenario_name: string
+          strategy: string
+          total_annual_impact: number
+          total_headcount: number
+        }[]
+      }
       count_agent_audit_logs: {
         Args: {
           p_agent_type?: string
@@ -8166,6 +8682,12 @@ export type Database = {
           top_user_count: number
           top_user_name: string
           total_count: number
+        }[]
+      }
+      escalate_overdue_approvals: {
+        Args: never
+        Returns: {
+          escalated_count: number
         }[]
       }
       evaluate_merit_governance: {
@@ -8339,6 +8861,23 @@ export type Database = {
           suggested_new_salary: number
         }[]
       }
+      get_my_approval_inbox: {
+        Args: never
+        Returns: {
+          annual_impact: number
+          approval_type: string
+          assigned_at: string
+          assignment_id: string
+          deadline_at: string
+          employee_name: string
+          escalated: boolean
+          hours_remaining: number
+          is_overdue: boolean
+          requested_pct: number
+          source_id: string
+          status: string
+        }[]
+      }
       get_org_breadcrumb: { Args: { entity_id: string }; Returns: string }
       get_org_breadcrumb_friendly: {
         Args: { entity_id: string }
@@ -8386,6 +8925,21 @@ export type Database = {
           salary_range_percentage: number
         }[]
       }
+      get_unit_budget_status: {
+        Args: { p_fiscal_year?: number; p_root_company_id: string }
+        Returns: {
+          approved_amount_annual: number
+          available_amount: number
+          burn_pct: number
+          consumed_amount: number
+          fiscal_year: number
+          ledger_count: number
+          reserved_amount: number
+          status: string
+          unit_id: string
+          unit_name: string
+        }[]
+      }
       get_user_company_id: { Args: never; Returns: string }
       get_visible_employees: {
         Args: { p_company_id: string; p_user_id: string }
@@ -8428,6 +8982,10 @@ export type Database = {
           status: string
         }[]
       }
+      revert_merit_from_budget: {
+        Args: { p_reason?: string; p_source_id: string; p_source_type: string }
+        Returns: string
+      }
       simulate_9box_budget: {
         Args: {
           p_ceiling_pct?: number
@@ -8462,6 +9020,16 @@ export type Database = {
           total_merit_impact_annual: number
           total_merit_impact_monthly: number
         }[]
+      }
+      snapshot_cycle_decision: {
+        Args: {
+          p_cycle_name: string
+          p_fiscal_year: number
+          p_notes?: string
+          p_root_company_id: string
+          p_scenario_id: string
+        }
+        Returns: string
       }
       submit_external_feedback: {
         Args: {
