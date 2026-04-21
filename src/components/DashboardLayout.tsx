@@ -14,7 +14,7 @@ import {
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
   DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield,
-  Bot, Sparkles, Scale, BadgeDollarSign, Gift
+  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
@@ -80,6 +80,9 @@ const routeLabels: Record<string, string> = {
   "/super-admin": "Painel Super Admin",
   "/security-dashboard": "Monitoramento de Segurança",
   "/total-rewards": "Total Rewards Statement",
+  "/budget-burndown": "Budget Burn-Down",
+  "/approval-inbox": "Inbox de Aprovações",
+  "/decision-scenarios": "Cenários de Decisão",
 };
 
 // Parent route mapping for hierarchical navigation
@@ -309,6 +312,9 @@ export const DashboardLayout = () => {
     { icon: DollarSign, label: "Tabela Salarial", path: "/salary-ranges" },
     { icon: Network, label: "Organograma", path: "/organograma" },
     { icon: Briefcase, label: "Plano de Cargos", path: "/job-titles" },
+    { icon: Wallet, label: "Budget Burn-Down", path: "/budget-burndown" },
+    { icon: Inbox, label: "Aprovações", path: "/approval-inbox" },
+    { icon: GitCompare, label: "Cenários de Decisão", path: "/decision-scenarios" },
   ];
 
   const userItems = [
