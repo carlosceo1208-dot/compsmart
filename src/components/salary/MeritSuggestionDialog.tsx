@@ -4,9 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Sparkles, TrendingUp, AlertTriangle, ArrowRight } from 'lucide-react';
+import { Sparkles, TrendingUp, AlertTriangle, ArrowRight, Download } from 'lucide-react';
 import { useMeritSuggestion } from '@/hooks/useMeritIntelligence';
 import { formatCurrency } from '@/lib/formatters';
+import { exportToCSV } from '@/lib/csvExport';
 
 interface MeritSuggestionDialogProps {
   open: boolean;
@@ -146,6 +147,33 @@ export function MeritSuggestionDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Fechar
           </Button>
+          {suggestion && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                exportToCSV(
+                  `merit_suggestion_${employeeName ?? employeeId}_${new Date().toISOString().slice(0, 10)}.csv`,
+                  [
+                    { header: 'Funcionário', accessor: () => employeeName ?? employeeId ?? '' },
+                    { header: 'Performance', accessor: () => suggestion.performance_score?.toFixed(2) ?? '' },
+                    { header: '% na Faixa', accessor: () => suggestion.range_position_percentage?.toFixed(1) ?? '' },
+                    { header: 'Salário Atual', accessor: () => suggestion.current_salary.toFixed(2) },
+                    { header: '% Mérito Sugerido', accessor: () => suggestion.suggested_merit_percentage.toFixed(2) },
+                    { header: 'Novo Salário', accessor: () => suggestion.suggested_new_salary.toFixed(2) },
+                    { header: 'Impacto Mensal', accessor: () => suggestion.monthly_impact.toFixed(2) },
+                    { header: 'Impacto Anual', accessor: () => suggestion.annual_impact.toFixed(2) },
+                    { header: 'Recomendação', accessor: () => suggestion.recommendation },
+                    { header: 'Incoerência', accessor: () => (suggestion.is_mismatch ? suggestion.mismatch_reason ?? 'Sim' : 'Não') },
+                  ],
+                  [suggestion],
+                  ';'
+                );
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              CSV
+            </Button>
+          )}
           {onApply && suggestion && suggestion.suggested_merit_percentage > 0 && (
             <Button
               onClick={() => {
