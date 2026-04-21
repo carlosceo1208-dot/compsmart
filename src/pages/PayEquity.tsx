@@ -199,6 +199,9 @@ export default function PayEquity() {
           )}
         </CardContent>
       </Card>
+
+      {/* Análise multivariada (gap explicado vs não-explicado) */}
+      <PayEquityRegressionCard />
     </div>
   );
 }
