@@ -312,6 +312,19 @@ export default function JobMatching() {
           </CardContent>
         </Card>
       )}
+
+      <JobMatchingReviewDialog
+        open={!!reviewMatch}
+        onOpenChange={(o) => !o && setReviewMatch(null)}
+        match={reviewMatch}
+        rootCompanyId={activeCompanyId ?? ""}
+      />
+      <JobMatchingHistoryDialog
+        open={!!historyJob}
+        onOpenChange={(o) => !o && setHistoryJob(null)}
+        jobTitleId={historyJob?.id ?? null}
+        jobTitleName={historyJob?.name}
+      />
     </div>
   );
 }
