@@ -3,16 +3,16 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, AlertTriangle, Target } from "lucide-react";
 import { useMarketBenchmarkSummary, useMarketAlerts } from "@/hooks/useMarketBenchmark";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export function MarketBenchmarkCard() {
-  const { role } = useUserRole();
+  const { data: roleData } = useCurrentUserRole();
   const { data: summary, isLoading } = useMarketBenchmarkSummary();
   const { data: alerts } = useMarketAlerts(15);
 
-  const canView = role === "admin" || role === "hr_manager";
+  const canView = roleData?.isAdmin || roleData?.isHR;
   if (!canView) return null;
 
   const criticalAlerts = alerts?.filter((a) => a.severity === "critical").slice(0, 3) ?? [];
