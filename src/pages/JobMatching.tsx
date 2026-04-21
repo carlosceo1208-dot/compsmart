@@ -11,14 +11,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Sparkles, Loader2, AlertTriangle } from "lucide-react";
 import {
+  Sparkles,
+  Loader2,
+  AlertTriangle,
+  ClipboardCheck,
+  History,
+} from "lucide-react";
+import {
+  JobMatchingResult,
   useJobMatchingResults,
   useRunJobMatching,
 } from "@/hooks/useJobMatching";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { Navigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { JobMatchingReviewDialog } from "@/components/match/JobMatchingReviewDialog";
+import { JobMatchingHistoryDialog } from "@/components/match/JobMatchingHistoryDialog";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 interface JobTitleRow {
   id: string;
@@ -31,10 +41,13 @@ interface JobTitleRow {
 export default function JobMatching() {
   const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
   const allowed = roleData?.isAdmin || roleData?.isHR;
+  const { activeCompanyId } = useCompanyContext();
 
   const [jobs, setJobs] = useState<JobTitleRow[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
   const [runningId, setRunningId] = useState<string | null>(null);
+  const [reviewMatch, setReviewMatch] = useState<JobMatchingResult | null>(null);
+  const [historyJob, setHistoryJob] = useState<{ id: string; name: string } | null>(null);
 
   const { data: matches, isLoading: matchesLoading } = useJobMatchingResults();
   const runMatch = useRunJobMatching();
@@ -104,8 +117,10 @@ export default function JobMatching() {
                     <TableHead>Grade</TableHead>
                     <TableHead>Match de Mercado</TableHead>
                     <TableHead className="text-center">Score</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                    <TableHead className="text-center">v</TableHead>
                     <TableHead className="text-right">Gap %</TableHead>
-                    <TableHead className="text-right">Ação</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -157,6 +172,34 @@ export default function JobMatching() {
                             "—"
                           )}
                         </TableCell>
+                        <TableCell className="text-center">
+                          {m ? (
+                            <Badge
+                              variant={
+                                m.review_status === "approved"
+                                  ? "default"
+                                  : m.review_status === "corrected"
+                                  ? "secondary"
+                                  : m.review_status === "rejected"
+                                  ? "destructive"
+                                  : "outline"
+                              }
+                            >
+                              {m.review_status === "approved"
+                                ? "Aprovado"
+                                : m.review_status === "corrected"
+                                ? "Corrigido"
+                                : m.review_status === "rejected"
+                                ? "Rejeitado"
+                                : "Pendente"}
+                            </Badge>
+                          ) : (
+                            "—"
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center text-xs text-muted-foreground">
+                          {m ? `v${m.version}` : "—"}
+                        </TableCell>
                         <TableCell className="text-right">
                           {m?.gap_pct != null ? (
                             <span
@@ -177,24 +220,48 @@ export default function JobMatching() {
                           )}
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            size="sm"
-                            variant={m ? "outline" : "default"}
-                            disabled={runningId === j.id}
-                            onClick={() => handleRun(j.id)}
-                          >
-                            {runningId === j.id ? (
+                          <div className="flex justify-end gap-1">
+                            {m && (
                               <>
-                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                                Analisando
-                              </>
-                            ) : (
-                              <>
-                                <Sparkles className="h-3 w-3 mr-1" />
-                                {m ? "Re-analisar" : "Analisar"}
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  title="Revisar"
+                                  onClick={() => setReviewMatch(m)}
+                                >
+                                  <ClipboardCheck className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  title="Histórico"
+                                  onClick={() =>
+                                    setHistoryJob({ id: j.id, name: j.title })
+                                  }
+                                >
+                                  <History className="h-4 w-4" />
+                                </Button>
                               </>
                             )}
-                          </Button>
+                            <Button
+                              size="sm"
+                              variant={m ? "outline" : "default"}
+                              disabled={runningId === j.id}
+                              onClick={() => handleRun(j.id)}
+                            >
+                              {runningId === j.id ? (
+                                <>
+                                  <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                  IA
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="h-3 w-3 mr-1" />
+                                  {m ? "Re-IA" : "Analisar"}
+                                </>
+                              )}
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
@@ -202,7 +269,7 @@ export default function JobMatching() {
                   {jobs.length === 0 && (
                     <TableRow>
                       <TableCell
-                        colSpan={6}
+                        colSpan={8}
                         className="text-center text-muted-foreground py-6"
                       >
                         Nenhum cargo cadastrado.
@@ -245,6 +312,19 @@ export default function JobMatching() {
           </CardContent>
         </Card>
       )}
+
+      <JobMatchingReviewDialog
+        open={!!reviewMatch}
+        onOpenChange={(o) => !o && setReviewMatch(null)}
+        match={reviewMatch}
+        rootCompanyId={activeCompanyId ?? ""}
+      />
+      <JobMatchingHistoryDialog
+        open={!!historyJob}
+        onOpenChange={(o) => !o && setHistoryJob(null)}
+        jobTitleId={historyJob?.id ?? null}
+        jobTitleName={historyJob?.name}
+      />
     </div>
   );
 }
