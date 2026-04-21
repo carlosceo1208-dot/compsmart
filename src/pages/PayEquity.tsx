@@ -12,6 +12,7 @@ import {
 } from '@/hooks/usePayEquity';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { formatDateBRFromISODate } from '@/lib/date';
+import { PayEquityRegressionCard } from '@/components/equity/PayEquityRegressionCard';
 
 const formatBRL = (v: number | null | undefined) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v ?? 0));

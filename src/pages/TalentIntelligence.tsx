@@ -14,6 +14,7 @@ import {
   TalentIntelRow,
 } from '@/hooks/useTalentIntelligence';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { SmartMeritCalculator } from '@/components/talent/SmartMeritCalculator';
 
 const formatBRL = (v: number | null | undefined) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v ?? 0));
