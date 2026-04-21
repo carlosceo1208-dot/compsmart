@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 import { EquityDashboardCard } from '@/components/equity/EquityDashboardCard';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -8,13 +8,12 @@ export default function Equity() {
   const { data: role, isLoading } = useCurrentUserRole();
   const isAuthorized = role?.isAdmin || role?.isHR || role?.isSuperAdmin;
 
+  useEffect(() => {
+    document.title = 'Equidade Salarial | CompSmart';
+  }, []);
+
   return (
     <>
-      <Helmet>
-        <title>Equidade Salarial | CompSmart</title>
-        <meta name="description" content="Análise de equidade, pay gap e índice de Gini salarial." />
-      </Helmet>
-
       <div className="container mx-auto p-6 space-y-6">
         <header>
           <h1 className="text-3xl font-bold tracking-tight">Equidade Salarial</h1>
