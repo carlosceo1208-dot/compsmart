@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useApprovalInbox, useEscalateOverdue } from '@/hooks/useApprovalInbox';
 import { Inbox, AlertTriangle, Clock, ArrowUpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { PlanGate } from '@/components/PlanGate';
 
 const fmt = (n: number | null) =>
   n === null ? '—' : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
@@ -16,6 +17,7 @@ export default function ApprovalInbox() {
   const overdue = items?.filter((i) => i.is_overdue) ?? [];
 
   return (
+    <PlanGate feature="merit_governance" title="Inbox de Aprovações">
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -57,6 +59,7 @@ export default function ApprovalInbox() {
         </CardContent>
       </Card>
     </div>
+    </PlanGate>
   );
 }
 

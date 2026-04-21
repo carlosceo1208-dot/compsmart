@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useDecisionScenarios, useBuildScenario, useCompareScenarios, useSnapshotCycle } from '@/hooks/useDecisionScenarios';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { GitCompare, Plus, Lock, TrendingUp } from 'lucide-react';
+import { PlanGate } from '@/components/PlanGate';
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n ?? 0);
 
@@ -38,6 +39,7 @@ export default function DecisionScenarios() {
   const preset = strategyPresets[form.strategy];
 
   return (
+    <PlanGate feature="merit_governance" title="Cenários de Decisão">
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -149,5 +151,6 @@ export default function DecisionScenarios() {
         </Card>
       )}
     </div>
+    </PlanGate>
   );
 }
