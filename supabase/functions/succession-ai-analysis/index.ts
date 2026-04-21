@@ -1,9 +1,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 interface Successor {
@@ -25,6 +26,49 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY não configurada');
+    }
+
+    // ============ AUTENTICAÇÃO OBRIGATÓRIA (multi-tenant) ============
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Autorização necessária' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Usuário não autenticado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ============ RATE LIMITING ============
+    const { data: allowed } = await supabase.rpc('check_rate_limit', {
+      p_user_id: user.id,
+      p_function_name: 'succession-ai-analysis',
+      p_max_requests: 30,
+      p_window_minutes: 60
+    });
+
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Limite de requisições excedido. Aguarde alguns minutos.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { 
       positionTitle, 
       positionGrade, 
@@ -33,17 +77,23 @@ serve(async (req) => {
       successors 
     } = await req.json();
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY não configurada');
+    // Validação básica de input
+    if (!positionTitle || typeof positionTitle !== 'string' || positionTitle.length > 500) {
+      return new Response(
+        JSON.stringify({ error: 'positionTitle inválido' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    if (!successors || successors.length === 0) {
+    if (!successors || !Array.isArray(successors) || successors.length === 0) {
       return new Response(
         JSON.stringify({ analysis: null }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Limitar quantidade de sucessores para evitar abuso
+    const limitedSuccessors = successors.slice(0, 20);
 
     const readinessLabels: Record<string, string> = {
       ready_now: "Pronto Agora",
@@ -53,7 +103,7 @@ serve(async (req) => {
     };
 
     // Format successors for prompt
-    const successorsInfo = successors.map((s: Successor) => {
+    const successorsInfo = limitedSuccessors.map((s: Successor) => {
       const score9Box = s.latestScore !== null && s.latestPotential !== null
         ? `Score: ${s.latestScore.toFixed(1)}/5, Potencial: ${s.latestPotential.toFixed(1)}/5`
         : "Sem avaliações aprovadas";
@@ -98,7 +148,7 @@ ${successorsInfo}
 
 Analise os candidatos e recomende o melhor para a sucessão, justificando sua escolha com base nos dados de performance, potencial e prontidão.`;
 
-    console.log('Calling AI for succession analysis...');
+    console.log(`[succession-ai-analysis] User ${user.id} analyzing ${limitedSuccessors.length} successors`);
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -123,13 +173,13 @@ Analise os candidatos e recomende o melhor para a sucessão, justificando sua es
       
       if (response.status === 429) {
         return new Response(
-          JSON.stringify({ error: 'Limite de requisições atingido. Tente novamente.' }),
+          JSON.stringify({ error: 'Limite de requisições da IA atingido. Tente novamente em instantes.' }),
           { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: 'Créditos Lovable AI esgotados.' }),
+          JSON.stringify({ error: 'Créditos de IA esgotados. Entre em contato com o administrador.' }),
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -142,8 +192,6 @@ Analise os candidatos e recomende o melhor para a sucessão, justificando sua es
     if (!analysis) {
       throw new Error('Resposta vazia da IA');
     }
-
-    console.log('AI succession analysis generated successfully');
 
     return new Response(
       JSON.stringify({ analysis }),

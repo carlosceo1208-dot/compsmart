@@ -1,8 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
 serve(async (req) => {
@@ -11,12 +12,56 @@ serve(async (req) => {
   }
 
   try {
+    // ============ AUTENTICAÇÃO OBRIGATÓRIA ============
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const authHeader = req.headers.get('Authorization');
+
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Autorização necessária' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Usuário não autenticado' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ============ RATE LIMITING (20/hora - geração é mais cara) ============
+    const { data: allowed } = await supabase.rpc('check_rate_limit', {
+      p_user_id: user.id,
+      p_function_name: 'generate-job-description',
+      p_max_requests: 20,
+      p_window_minutes: 60
+    });
+
+    if (!allowed) {
+      return new Response(
+        JSON.stringify({ error: 'Limite de gerações excedido. Aguarde alguns minutos.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { jobTitle, grade, cbo, jobFamily, mode = 'full', summary, mainResponsibilities } = await req.json();
     
-    // CBO agora é opcional - IA vai sugerir se não fornecido
-    if (!jobTitle || !grade) {
+    // Validação de inputs
+    if (!jobTitle || typeof jobTitle !== 'string' || jobTitle.length > 200) {
       return new Response(
-        JSON.stringify({ error: 'jobTitle e grade são obrigatórios' }),
+        JSON.stringify({ error: 'jobTitle inválido (máx 200 caracteres)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (!grade) {
+      return new Response(
+        JSON.stringify({ error: 'grade é obrigatório' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

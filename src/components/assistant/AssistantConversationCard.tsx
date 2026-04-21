@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, User, Bot, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
 
 interface Conversation {
@@ -84,6 +85,7 @@ export const AssistantConversationCard = ({
                     <p className="text-sm font-medium mb-1">Assistente</p>
                     <div className="prose prose-sm dark:prose-invert max-w-none">
                       <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
                         components={{
                           p: ({ children }) => <p className="text-sm mb-2 last:mb-0">{children}</p>,
                           ul: ({ children }) => <ul className="text-sm list-disc pl-4 mb-2">{children}</ul>,
@@ -98,6 +100,18 @@ export const AssistantConversationCard = ({
                           ),
                           pre: ({ children }) => (
                             <pre className="bg-muted p-2 rounded text-xs overflow-x-auto mb-2">{children}</pre>
+                          ),
+                          table: ({ children }) => (
+                            <div className="overflow-x-auto mb-2">
+                              <table className="text-xs w-full border-collapse">{children}</table>
+                            </div>
+                          ),
+                          thead: ({ children }) => <thead className="bg-muted/50">{children}</thead>,
+                          th: ({ children }) => (
+                            <th className="border border-border px-2 py-1 text-left font-semibold">{children}</th>
+                          ),
+                          td: ({ children }) => (
+                            <td className="border border-border px-2 py-1">{children}</td>
                           ),
                         }}
                       >
