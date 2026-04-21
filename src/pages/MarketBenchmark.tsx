@@ -9,7 +9,7 @@ import {
   useMarketAlerts,
   useMarketBenchmarkSummary,
 } from "@/hooks/useMarketBenchmark";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { Navigate } from "react-router-dom";
 
 const POSITION_LABELS: Record<string, { label: string; variant: "default" | "destructive" | "secondary" | "outline" }> = {
@@ -27,13 +27,13 @@ const SEVERITY_VARIANT: Record<string, "destructive" | "default" | "secondary" |
 };
 
 export default function MarketBenchmark() {
-  const { role, loading: roleLoading } = useUserRole();
+  const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
   const { data: summary, isLoading: loadingSummary } = useMarketBenchmarkSummary();
   const { data: comp, isLoading: loadingComp } = useMarketCompetitiveness();
   const { data: alerts, isLoading: loadingAlerts } = useMarketAlerts(15);
 
   if (roleLoading) return <div className="p-8"><Skeleton className="h-32 w-full" /></div>;
-  if (role !== "admin" && role !== "hr_manager") {
+  if (!roleData?.isAdmin && !roleData?.isHR) {
     return <Navigate to="/dashboard" replace />;
   }
 
