@@ -66,8 +66,8 @@ export function MeritCoherenceCard() {
                 <div className="text-lg font-bold text-destructive">{kpi.high_perf_low_salary}</div>
                 <div className="text-[10px] text-muted-foreground uppercase">Alta perf<br/>+ baixo $</div>
               </div>
-              <div className="p-2 rounded-md bg-amber-500/10">
-                <div className="text-lg font-bold text-amber-700 dark:text-amber-300">
+              <div className="p-2 rounded-md bg-warning/10">
+                <div className="text-lg font-bold text-warning">
                   {kpi.low_perf_high_salary}
                 </div>
                 <div className="text-[10px] text-muted-foreground uppercase">Baixa perf<br/>+ alto $</div>
