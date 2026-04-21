@@ -129,9 +129,29 @@ const SalaryAssistant = () => {
         },
       });
 
-      if (error) throw error;
+      // Tratamento de erros HTTP do edge function (429/402/401)
+      if (error) {
+        const ctx = (error as any).context;
+        const status = ctx?.status;
+        let userMessage = error.message || 'Erro ao processar análise';
 
-      if (data.error) {
+        if (status === 429) {
+          userMessage = 'Muitas requisições. Aguarde alguns minutos e tente novamente.';
+        } else if (status === 402) {
+          userMessage = 'Créditos de IA insuficientes. Entre em contato com o administrador.';
+        } else if (status === 401) {
+          userMessage = 'Sessão expirada. Por favor, faça login novamente.';
+        }
+
+        toast({
+          title: 'Erro',
+          description: userMessage,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      if (data?.error) {
         toast({
           title: 'Erro',
           description: data.error,
@@ -152,7 +172,7 @@ const SalaryAssistant = () => {
 
       toast({
         title: 'Análise concluída',
-        description: `Consulta processada com sucesso (${data.tokens_used} tokens)`,
+        description: `Consulta processada com sucesso${data.tokens_used ? ` (${data.tokens_used} tokens)` : ''}`,
       });
 
       setQuestion('');
@@ -161,7 +181,7 @@ const SalaryAssistant = () => {
     } catch (error: any) {
       toast({
         title: 'Erro ao processar análise',
-        description: error.message,
+        description: error.message || 'Erro inesperado',
         variant: 'destructive',
       });
     } finally {

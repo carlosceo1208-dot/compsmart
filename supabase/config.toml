@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.generate-job-description]
 verify_jwt = true
 
+[functions.succession-ai-analysis]
+verify_jwt = true
+
 [functions.legal-assistant]
 verify_jwt = true
 
