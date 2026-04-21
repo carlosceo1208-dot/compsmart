@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useDecisionScenarios, useBuildScenario, useCompareScenarios, useSnapshotCycle } from '@/hooks/useDecisionScenarios';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 import { GitCompare, Plus, Lock, TrendingUp } from 'lucide-react';
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n ?? 0);
@@ -21,9 +21,9 @@ const strategyPresets: Record<string, { label: string; multiplier: number; descr
 };
 
 export default function DecisionScenarios() {
-  const { selectedCompany } = useCompany();
+  const { activeCompany } = useCompanyContext();
   const fiscalYear = new Date().getFullYear();
-  const { data: scenarios } = useDecisionScenarios(selectedCompany?.id ?? null, fiscalYear);
+  const { data: scenarios } = useDecisionScenarios(activeCompany?.id ?? null, fiscalYear);
   const build = useBuildScenario();
   const snapshot = useSnapshotCycle();
   const [selected, setSelected] = useState<string[]>([]);
@@ -68,7 +68,7 @@ export default function DecisionScenarios() {
             </div>
             <DialogFooter>
               <Button onClick={() => build.mutate({
-                root_company_id: selectedCompany!.id,
+                root_company_id: activeCompany!.id,
                 fiscal_year: fiscalYear,
                 scenario_name: form.scenario_name,
                 strategy: form.strategy,
@@ -101,7 +101,7 @@ export default function DecisionScenarios() {
               <Button
                 size="sm" variant="outline" className="w-full mt-2"
                 onClick={() => snapshot.mutate({
-                  root_company_id: selectedCompany!.id,
+                  root_company_id: activeCompany!.id,
                   fiscal_year: fiscalYear,
                   cycle_name: `Ciclo ${fiscalYear}`,
                   scenario_id: s.id,

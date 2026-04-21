@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { useUnitBudgetStatus, useUpsertUnitBudget } from '@/hooks/useBudgetBurndown';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Wallet, AlertTriangle, TrendingDown, Plus } from 'lucide-react';
 
 const fmt = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n ?? 0);
@@ -30,9 +30,9 @@ const statusLabel: Record<string, string> = {
 };
 
 export default function BudgetBurndown() {
-  const { selectedCompany } = useCompany();
+  const { activeCompany } = useCompanyContext();
   const fiscalYear = new Date().getFullYear();
-  const { data: budgets, isLoading } = useUnitBudgetStatus(selectedCompany?.id ?? null, fiscalYear);
+  const { data: budgets, isLoading } = useUnitBudgetStatus(activeCompany?.id ?? null, fiscalYear);
   const upsert = useUpsertUnitBudget();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ unit_id: '', approved_amount_annual: 0, ceiling_pct: 5 });
@@ -71,7 +71,7 @@ export default function BudgetBurndown() {
             </div>
             <DialogFooter>
               <Button onClick={() => upsert.mutate({
-                root_company_id: selectedCompany!.id,
+                root_company_id: activeCompany!.id,
                 unit_id: form.unit_id,
                 fiscal_year: fiscalYear,
                 approved_amount_annual: form.approved_amount_annual,
@@ -84,8 +84,8 @@ export default function BudgetBurndown() {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card><CardHeader className="pb-2"><CardDescription>Aprovado total</CardDescription><CardTitle>{fmt(totalApproved)}</CardTitle></CardHeader></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>Consumido</CardDescription><CardTitle className="text-orange-600">{fmt(totalConsumed)}</CardTitle></CardHeader></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>Disponível</CardDescription><CardTitle className="text-emerald-600">{fmt(totalAvailable)}</CardTitle></CardHeader></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Consumido</CardDescription><CardTitle className="text-warning">{fmt(totalConsumed)}</CardTitle></CardHeader></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Disponível</CardDescription><CardTitle className="text-success">{fmt(totalAvailable)}</CardTitle></CardHeader></Card>
         <Card>
           <CardHeader className="pb-2"><CardDescription>Burn global</CardDescription><CardTitle>{globalBurn.toFixed(1)}%</CardTitle></CardHeader>
           <CardContent><Progress value={Math.min(globalBurn, 100)} /></CardContent>
@@ -117,7 +117,7 @@ export default function BudgetBurndown() {
                 <div className="grid grid-cols-4 gap-2 text-xs">
                   <div><span className="text-muted-foreground">Aprovado:</span><br /><strong>{fmt(Number(b.approved_amount_annual))}</strong></div>
                   <div><span className="text-muted-foreground">Consumido:</span><br /><strong>{fmt(Number(b.consumed_amount))}</strong></div>
-                  <div><span className="text-muted-foreground">Disponível:</span><br /><strong className="text-emerald-600">{fmt(Number(b.available_amount))}</strong></div>
+                  <div><span className="text-muted-foreground">Disponível:</span><br /><strong className="text-success">{fmt(Number(b.available_amount))}</strong></div>
                   <div><span className="text-muted-foreground">Burn:</span><br /><strong>{Number(b.burn_pct).toFixed(1)}%</strong></div>
                 </div>
               </div>
