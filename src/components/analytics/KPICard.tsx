@@ -1,6 +1,8 @@
 import { LucideIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { formatCurrency, formatNumber, formatPercentage, formatCompactCurrency, formatCurrencyCustom } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
@@ -13,10 +15,59 @@ interface KPICardProps {
   className?: string;
   variant?: 'default' | 'success' | 'info' | 'premium' | 'warning';
   currency?: 'BRL' | 'USD';
+  index?: number;
 }
 
-export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading, className, variant = 'default', currency = 'BRL' }: KPICardProps) => {
-  const formatValue = (val: number | null | undefined) => {
+const variantStyles: Record<string, { bg: string; ring: string; iconBg: string; iconColor: string; glow: string }> = {
+  default: {
+    bg: 'bg-gradient-to-br from-card to-primary/5',
+    ring: 'border-primary/20 hover:border-primary/40',
+    iconBg: 'bg-primary/15',
+    iconColor: 'text-primary',
+    glow: 'hover:shadow-primary',
+  },
+  success: {
+    bg: 'bg-gradient-to-br from-card to-secondary/8',
+    ring: 'border-secondary/25 hover:border-secondary/50',
+    iconBg: 'bg-secondary/15',
+    iconColor: 'text-secondary',
+    glow: 'hover:shadow-success',
+  },
+  info: {
+    bg: 'bg-gradient-to-br from-card to-accent/8',
+    ring: 'border-accent/25 hover:border-accent/50',
+    iconBg: 'bg-accent/15',
+    iconColor: 'text-accent',
+    glow: 'hover:shadow-accent',
+  },
+  premium: {
+    bg: 'bg-gradient-to-br from-card via-primary/5 to-secondary/8',
+    ring: 'border-primary/30 hover:border-primary/60',
+    iconBg: 'bg-gradient-to-br from-primary/20 to-secondary/20',
+    iconColor: 'text-primary',
+    glow: 'hover:shadow-glow-primary',
+  },
+  warning: {
+    bg: 'bg-gradient-to-br from-card to-warning/8',
+    ring: 'border-warning/25 hover:border-warning/50',
+    iconBg: 'bg-warning/15',
+    iconColor: 'text-warning',
+    glow: 'hover:shadow-warning',
+  },
+};
+
+export const KPICard = ({
+  title,
+  value,
+  icon: Icon,
+  format = 'number',
+  isLoading,
+  className,
+  variant = 'default',
+  currency = 'BRL',
+  index = 0,
+}: KPICardProps) => {
+  const formatter = (val: number) => {
     switch (format) {
       case 'currency':
         return formatCurrencyCustom(val, currency);
@@ -30,33 +81,44 @@ export const KPICard = ({ title, value, icon: Icon, format = 'number', isLoading
     }
   };
 
-  const variantStyles = {
-    default: "bg-gradient-to-br from-background to-primary/5 border-2 border-primary/20 hover:border-primary/40 hover:shadow-primary",
-    success: "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/50 dark:to-emerald-950/50 border-2 border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700 hover:shadow-green-200/50 dark:hover:shadow-green-900/50",
-    info: "bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/50 dark:to-cyan-950/50 border-2 border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-blue-200/50 dark:hover:shadow-blue-900/50",
-    premium: "bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/50 dark:to-violet-950/50 border-2 border-purple-200/50 dark:border-purple-800/50 hover:border-purple-300 dark:hover:border-purple-700 hover:shadow-purple-200/50 dark:hover:shadow-purple-900/50",
-    warning: "bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-950/50 dark:to-orange-950/50 border-2 border-yellow-200/50 dark:border-yellow-800/50 hover:border-yellow-300 dark:hover:border-yellow-700 hover:shadow-yellow-200/50 dark:hover:shadow-yellow-900/50"
-  };
+  const styles = variantStyles[variant];
+  const numericValue = typeof value === 'number' ? value : 0;
 
   return (
-    <Card className={cn("hover:-translate-y-1 transition-all duration-300", variantStyles[variant], className)}>
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm text-muted-foreground mb-2 font-medium">{title}</p>
-            {isLoading ? (
-              <Skeleton className="h-8 w-32" />
-            ) : (
-              <p className="text-2xl font-bold text-foreground">
-                {formatValue(value)}
-              </p>
-            )}
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: index * 0.05, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -3, transition: { duration: 0.2 } }}
+    >
+      <Card
+        className={cn(
+          'border transition-all duration-300 overflow-hidden relative',
+          styles.bg,
+          styles.ring,
+          styles.glow,
+          className
+        )}
+      >
+        <div className="absolute inset-0 bg-gradient-mesh opacity-30 pointer-events-none" />
+        <CardContent className="p-4 relative">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-muted-foreground mb-2 font-medium truncate">{title}</p>
+              {isLoading || value === null || value === undefined ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <p className="text-2xl font-bold text-foreground tabular-nums">
+                  <AnimatedCounter value={numericValue} formatter={formatter} />
+                </p>
+              )}
+            </div>
+            <div className={cn('p-2.5 rounded-xl shadow-sm flex items-center justify-center transition-transform duration-300 hover:scale-110', styles.iconBg)}>
+              <Icon className={cn('h-5 w-5', styles.iconColor)} />
+            </div>
           </div>
-          <div className="p-2 bg-primary/15 rounded-xl shadow-md flex items-center justify-center">
-            <Icon className="h-5 w-5 text-primary" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
