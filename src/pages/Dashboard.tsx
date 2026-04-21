@@ -11,6 +11,7 @@ import { SalaryTableSetupAlert } from "@/components/dashboard/SalaryTableSetupAl
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
 import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrendsCard";
+import { MeritCoherenceCard } from "@/components/dashboard/MeritCoherenceCard";
 import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
 import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
@@ -81,6 +82,8 @@ const Dashboard = () => {
           />
           
           <CompensationTrendsCard />
+          
+          <MeritCoherenceCard />
           
           <AlphabeticalNav />
           
