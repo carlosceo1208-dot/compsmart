@@ -66,6 +66,7 @@ const AboutUs = lazy(() => import("./pages/AboutUs"));
 const Glossary = lazy(() => import("./pages/Glossary"));
 const Changelog = lazy(() => import("./pages/Changelog"));
 const TotalRewards = lazy(() => import("./pages/TotalRewards"));
+const Equity = lazy(() => import("./pages/Equity"));
 
 // Lazy — Performance Module
 const PerformanceLayout = lazy(() =>
@@ -180,6 +181,7 @@ const App = () => {
                         <Route path="/super-admin" element={<SuperAdminDashboard />} />
                         <Route path="/security-dashboard" element={<SecurityDashboard />} />
                         <Route path="/total-rewards" element={<TotalRewards />} />
+                        <Route path="/equity" element={<Equity />} />
                       </Route>
 
                       {/* Performance Module */}
