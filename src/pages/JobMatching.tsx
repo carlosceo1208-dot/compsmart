@@ -29,8 +29,8 @@ interface JobTitleRow {
 }
 
 export default function JobMatching() {
-  const { role, loading: roleLoading } = useCurrentUserRole();
-  const allowed = role === "admin" || role === "hr_manager";
+  const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
+  const allowed = roleData?.isAdmin || roleData?.isHR;
 
   const [jobs, setJobs] = useState<JobTitleRow[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);

@@ -9,8 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const JobMatchingCard = () => {
   const { data: matches, isLoading } = useJobMatchingResults();
-  const { role } = useCurrentUserRole();
-  const allowed = role === "admin" || role === "hr_manager";
+  const { data: roleData } = useCurrentUserRole();
+  const allowed = roleData?.isAdmin || roleData?.isHR;
   if (!allowed) return null;
 
   const top = (matches ?? []).slice(0, 3);
