@@ -28,7 +28,7 @@ import { Navigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { JobMatchingReviewDialog } from "@/components/match/JobMatchingReviewDialog";
 import { JobMatchingHistoryDialog } from "@/components/match/JobMatchingHistoryDialog";
-import { useCompany } from "@/contexts/CompanyContext";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 interface JobTitleRow {
   id: string;
