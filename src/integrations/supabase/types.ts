@@ -6903,6 +6903,51 @@ export type Database = {
           template_questions: Json
         }[]
       }
+      get_market_alerts: {
+        Args: { threshold_pct?: number }
+        Returns: {
+          employee_id: string
+          employee_name: string
+          gap_amount: number
+          gap_pct: number
+          grade: string
+          internal_salary: number
+          job_title: string
+          market_median: number
+          recommendation: string
+          severity: string
+        }[]
+      }
+      get_market_benchmark_summary: {
+        Args: never
+        Returns: {
+          above_market: number
+          avg_competitiveness_pct: number
+          below_market: number
+          competitive: number
+          critical_alerts: number
+          total_gap_amount: number
+          total_matched: number
+        }[]
+      }
+      get_market_competitiveness: {
+        Args: never
+        Returns: {
+          competitiveness_pct: number
+          employee_id: string
+          employee_name: string
+          grade: string
+          internal_salary: number
+          job_title: string
+          market_median: number
+          market_position: string
+          market_q1: number
+          market_q3: number
+          survey_name: string
+          unit_id: string
+          unit_name: string
+        }[]
+      }
       get_merit_suggestion: {
         Args: { p_employee_id: string }
         Returns: {
