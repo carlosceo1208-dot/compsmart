@@ -73,6 +73,7 @@ const TalentIntelligence = lazy(() => import("./pages/TalentIntelligence"));
 const PayEquity = lazy(() => import("./pages/PayEquity"));
 const ExecutiveCompensation = lazy(() => import("./pages/ExecutiveCompensation"));
 const ExecutiveDashboard = lazy(() => import("./pages/ExecutiveDashboard"));
+const MeritGovernance = lazy(() => import("./pages/MeritGovernance"));
 
 // Lazy — Performance Module
 const PerformanceLayout = lazy(() =>
@@ -194,6 +195,7 @@ const App = () => {
                         <Route path="/pay-equity" element={<PayEquity />} />
                         <Route path="/executive-compensation" element={<ExecutiveCompensation />} />
                         <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
+                        <Route path="/merit-governance" element={<MeritGovernance />} />
                       </Route>
 
                       {/* Performance Module */}
