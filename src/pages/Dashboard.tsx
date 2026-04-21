@@ -15,6 +15,7 @@ import { MeritCoherenceCard } from "@/components/dashboard/MeritCoherenceCard";
 import { TalentIntelligenceCard } from "@/components/dashboard/TalentIntelligenceCard";
 import { PayEquityCard } from "@/components/dashboard/PayEquityCard";
 import { ExecutiveCompCard } from "@/components/dashboard/ExecutiveCompCard";
+import { EconomicIndicatorsCard } from "@/components/dashboard/EconomicIndicatorsCard";
 import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
 import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
@@ -93,6 +94,8 @@ const Dashboard = () => {
           <PayEquityCard />
           
           <ExecutiveCompCard />
+          
+          <EconomicIndicatorsCard />
           
           <AlphabeticalNav />
           
