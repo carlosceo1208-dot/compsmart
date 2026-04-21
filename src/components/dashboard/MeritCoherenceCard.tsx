@@ -2,9 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TrendingUp, AlertTriangle, ShieldCheck, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { TrendingUp, AlertTriangle, ShieldCheck, Users, Download, Lock } from 'lucide-react';
 import { useCompensationMismatchKPI, useTopMismatches } from '@/hooks/useMeritIntelligence';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Link } from 'react-router-dom';
+import { exportToCSV } from '@/lib/csvExport';
+import { toast } from 'sonner';
 
 const severityStyle: Record<string, string> = {
   'crítico': 'bg-destructive/15 text-destructive border-destructive/30',
@@ -13,13 +17,76 @@ const severityStyle: Record<string, string> = {
 };
 
 export function MeritCoherenceCard() {
-  const { data: kpi, isLoading: kpiLoading, error: kpiError } = useCompensationMismatchKPI();
-  const { data: top, isLoading: topLoading } = useTopMismatches(5);
+  const { data: userRole, isLoading: roleLoading } = useCurrentUserRole();
 
-  // Esconde silenciosamente para usuários sem permissão
+  // Apenas Admin / HR / Super Admin podem ver inteligência de mérito × salário.
+  // Managers individuais NÃO têm acesso à visão agregada (LGPD + governança).
+  const canViewIntelligence =
+    !!userRole && (userRole.isAdmin || userRole.isHR || userRole.isSuperAdmin);
+
+  const { data: kpi, isLoading: kpiLoading, error: kpiError } = useCompensationMismatchKPI();
+  const { data: top, isLoading: topLoading } = useTopMismatches(20);
+
+  // Aguarda role carregar para evitar flash
+  if (roleLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <Skeleton className="h-32 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Sem permissão → card discreto explicando restrição (sem vazar dados)
+  if (!canViewIntelligence) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="p-6 flex items-center gap-3 text-muted-foreground">
+          <Lock className="h-4 w-4 shrink-0" />
+          <p className="text-xs">
+            Inteligência de Mérito × Salário disponível apenas para RH e Administradores.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Erro de RLS / backend → esconde silenciosamente
   if (kpiError) return null;
 
   const isHealthy = (kpi?.mismatch_percentage ?? 0) < 5;
+
+  const handleExport = () => {
+    if (!top || top.length === 0) {
+      toast.info('Nenhum dado para exportar');
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    exportToCSV(
+      `compsmart_top_mismatches_${today}.csv`,
+      [
+        { header: 'Funcionário', accessor: (r) => r.full_name },
+        { header: 'Cargo', accessor: (r) => r.job_title ?? '' },
+        {
+          header: 'Performance',
+          accessor: (r) =>
+            r.performance_score != null ? r.performance_score.toFixed(2) : '',
+        },
+        {
+          header: '% na Faixa Salarial',
+          accessor: (r) =>
+            r.salary_range_percentage != null
+              ? r.salary_range_percentage.toFixed(1)
+              : '',
+        },
+        { header: 'Severidade', accessor: (r) => r.mismatch_severity },
+      ],
+      top,
+      ';'
+    );
+    toast.success(`${top.length} registros exportados`);
+  };
 
   return (
     <Card className="relative overflow-hidden">
@@ -36,15 +103,28 @@ export function MeritCoherenceCard() {
               </p>
             </div>
           </div>
-          {!kpiLoading && kpi && (
-            <Badge
-              variant={isHealthy ? 'secondary' : 'destructive'}
-              className="shrink-0"
+          <div className="flex items-center gap-1.5 shrink-0">
+            {!kpiLoading && kpi && (
+              <Badge variant={isHealthy ? 'secondary' : 'destructive'}>
+                {isHealthy ? (
+                  <ShieldCheck className="h-3 w-3 mr-1" />
+                ) : (
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                )}
+                {kpi.mismatch_percentage.toFixed(1)}%
+              </Badge>
+            )}
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7"
+              onClick={handleExport}
+              disabled={topLoading || !top || top.length === 0}
+              title="Exportar CSV"
             >
-              {isHealthy ? <ShieldCheck className="h-3 w-3 mr-1" /> : <AlertTriangle className="h-3 w-3 mr-1" />}
-              {kpi.mismatch_percentage.toFixed(1)}%
-            </Badge>
-          )}
+              <Download className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
