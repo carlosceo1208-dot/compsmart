@@ -69,6 +69,9 @@ const TotalRewards = lazy(() => import("./pages/TotalRewards"));
 const Equity = lazy(() => import("./pages/Equity"));
 const MarketBenchmark = lazy(() => import("./pages/MarketBenchmark"));
 const JobMatching = lazy(() => import("./pages/JobMatching"));
+const TalentIntelligence = lazy(() => import("./pages/TalentIntelligence"));
+const PayEquity = lazy(() => import("./pages/PayEquity"));
+const ExecutiveCompensation = lazy(() => import("./pages/ExecutiveCompensation"));
 
 // Lazy — Performance Module
 const PerformanceLayout = lazy(() =>
@@ -186,6 +189,9 @@ const App = () => {
                         <Route path="/equity" element={<Equity />} />
                         <Route path="/market-benchmark" element={<MarketBenchmark />} />
                         <Route path="/job-matching" element={<JobMatching />} />
+                        <Route path="/talent-intelligence" element={<TalentIntelligence />} />
+                        <Route path="/pay-equity" element={<PayEquity />} />
+                        <Route path="/executive-compensation" element={<ExecutiveCompensation />} />
                       </Route>
 
                       {/* Performance Module */}
