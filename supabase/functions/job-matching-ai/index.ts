@@ -237,7 +237,30 @@ Retorne o melhor match com score (0-100), justificativa, e recomendações de a�
           )
         : null;
 
-    // Upsert via delete-then-insert (one match per job_title)
+    // Determine next version (look at history for this job)
+    const { data: lastVersionRow } = await supabase
+      .from("job_matching_history")
+      .select("version")
+      .eq("job_title_id", jobTitleId)
+      .eq("root_company_id", companyId)
+      .order("version", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    const nextVersion = (lastVersionRow?.version ?? 0) + 1;
+
+    const score = Math.max(0, Math.min(100, Number(args.match_score)));
+    const parameters = {
+      model: "google/gemini-3-flash-preview",
+      market_catalog_size: marketRows?.length ?? 0,
+      employees_in_role: salaries.length,
+      job_snapshot: {
+        title: job.title,
+        grade: job.grade,
+        family: job.job_family,
+      },
+    };
+
+    // Replace current "latest" record
     await supabase
       .from("job_matching_results")
       .delete()
@@ -251,16 +274,39 @@ Retorne o melhor match com score (0-100), justificativa, e recomendações de a�
         job_title_id: jobTitleId,
         matched_market_role: args.matched_market_role,
         matched_cbo_code: args.matched_cbo_code ?? null,
-        match_score: Math.max(0, Math.min(100, Number(args.match_score))),
+        match_score: score,
         reasoning: args.reasoning,
         recommendations: args.recommendations,
+        final_reasoning: args.reasoning,
+        ai_original_score: score,
+        ai_original_reasoning: args.reasoning,
         market_median: marketMedian,
         internal_median: internalMedian,
         gap_pct: gapPct,
+        version: nextVersion,
+        review_status: "pending",
         created_by: userId,
       })
       .select()
       .single();
+
+    // Append history snapshot
+    await supabase.from("job_matching_history").insert({
+      root_company_id: companyId,
+      job_title_id: jobTitleId,
+      version: nextVersion,
+      source: "ai",
+      matched_market_role: args.matched_market_role,
+      matched_cbo_code: args.matched_cbo_code ?? null,
+      match_score: score,
+      reasoning: args.reasoning,
+      recommendations: args.recommendations,
+      market_median: marketMedian,
+      internal_median: internalMedian,
+      gap_pct: gapPct,
+      parameters,
+      created_by: userId,
+    });
 
     if (insErr) {
       console.error("Insert error:", insErr);
