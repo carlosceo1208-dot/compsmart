@@ -122,6 +122,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "alert_configurations_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       alert_history: {
@@ -211,6 +218,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "alert_history_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       audit_logs: {
@@ -292,6 +306,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "auth_attempt_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -455,6 +476,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "benefits_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       budget: {
@@ -504,6 +532,13 @@ export type Database = {
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -596,6 +631,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_deadline_settings_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -697,6 +739,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "budget_employee_projections_projected_unit_id_fkey"
+            columns: ["projected_unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       budget_submissions: {
@@ -766,6 +815,13 @@ export type Database = {
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_submissions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -879,6 +935,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "checkout_sessions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "checkout_sessions_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
@@ -987,10 +1050,81 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "collective_salary_adjustments_filter_unit_id_fkey"
+            columns: ["filter_unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "collective_salary_adjustments_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_salary_adjustments_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_billing: {
+        Row: {
+          billing_cycle: string | null
+          billing_email: string | null
+          cnpj: string | null
+          company_id: string
+          created_at: string
+          custom_annual_price: number | null
+          custom_monthly_price: number | null
+          payment_method: string | null
+          subscription_started_at: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle?: string | null
+          billing_email?: string | null
+          cnpj?: string | null
+          company_id: string
+          created_at?: string
+          custom_annual_price?: number | null
+          custom_monthly_price?: number | null
+          payment_method?: string | null
+          subscription_started_at?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle?: string | null
+          billing_email?: string | null
+          cnpj?: string | null
+          company_id?: string
+          created_at?: string
+          custom_annual_price?: number | null
+          custom_monthly_price?: number | null
+          payment_method?: string | null
+          subscription_started_at?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_billing_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_billing_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1038,6 +1172,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: true
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_identity_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: true
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1118,6 +1259,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
           {
@@ -1203,6 +1351,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_sessions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1503,6 +1658,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "engagement_metrics_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       evaluation_potential_dimensions: {
@@ -1556,6 +1718,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_potential_dimensions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1673,6 +1842,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -1896,6 +2072,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "incentive_programs_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       invoice_items: {
@@ -2032,6 +2215,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "invoices_subscription_id_fkey"
             columns: ["subscription_id"]
             isOneToOne: false
@@ -2077,6 +2267,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_families_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2235,6 +2432,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "job_titles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "job_titles_salary_range_id_fkey"
             columns: ["salary_range_id"]
             isOneToOne: false
@@ -2298,6 +2502,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "knowledge_base_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2464,10 +2675,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "organizational_structure_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "organizational_structure_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
           {
@@ -2525,6 +2750,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_methods_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2694,6 +2926,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_alerts_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -2866,6 +3105,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_cycles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3070,6 +3316,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_template_id_fkey"
             columns: ["template_id"]
             isOneToOne: false
@@ -3121,6 +3374,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_glossary_terms_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3264,10 +3524,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_goals_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "performance_goals_unit_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3333,6 +3607,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_kudos_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
           {
@@ -3532,6 +3813,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "performance_merit_rules_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       performance_one_on_ones: {
@@ -3625,6 +3913,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_one_on_ones_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -3752,6 +4047,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "performance_pdi_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       performance_succession: {
@@ -3867,6 +4169,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_succession_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "performance_succession_successor_employee_id_fkey"
             columns: ["successor_employee_id"]
             isOneToOne: false
@@ -3959,6 +4268,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_templates_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -4167,10 +4483,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "profiles_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -4433,6 +4763,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "salary_tables_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       security_alerts: {
@@ -4487,6 +4824,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "security_alerts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -4696,6 +5040,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "succession_decisions_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "succession_decisions_succession_id_fkey"
             columns: ["succession_id"]
             isOneToOne: false
@@ -4750,6 +5101,13 @@ export type Database = {
             columns: ["active_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "super_admin_active_company_active_company_id_fkey"
+            columns: ["active_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -4927,6 +5285,13 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "survey_tables_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       system_labels: {
@@ -4966,6 +5331,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_labels_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -5022,6 +5394,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_feedback_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -5133,6 +5512,115 @@ export type Database = {
             referencedRelation: "organizational_structure"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "invoices_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizational_structure_public: {
+        Row: {
+          code: string | null
+          created_at: string | null
+          default_language: string | null
+          description: string | null
+          fantasy_name: string | null
+          id: string | null
+          industry_sector: string | null
+          is_founder: boolean | null
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string | null
+          parent_id: string | null
+          root_company_id: string | null
+          social_charges_percentage: number | null
+          subscription_plan_id: string | null
+          subscription_status: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string | null
+          default_language?: string | null
+          description?: string | null
+          fantasy_name?: string | null
+          id?: string | null
+          industry_sector?: string | null
+          is_founder?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          parent_id?: string | null
+          root_company_id?: string | null
+          social_charges_percentage?: number | null
+          subscription_plan_id?: string | null
+          subscription_status?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string | null
+          default_language?: string | null
+          description?: string | null
+          fantasy_name?: string | null
+          id?: string | null
+          industry_sector?: string | null
+          is_founder?: boolean | null
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string | null
+          parent_id?: string | null
+          root_company_id?: string | null
+          social_charges_percentage?: number | null
+          subscription_plan_id?: string | null
+          subscription_status?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organizational_structure_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizational_structure_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles_compensation_directory: {
@@ -5170,10 +5658,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "profiles_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -5281,10 +5783,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "profiles_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
         ]
@@ -5428,6 +5944,13 @@ export type Database = {
             columns: ["root_company_id"]
             isOneToOne: false
             referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
           },
           {
