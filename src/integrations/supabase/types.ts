@@ -130,6 +130,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "alert_configurations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "alert_configurations_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -238,6 +245,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_history_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "alert_history_root_company_id_fkey"
@@ -669,6 +683,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "budget_deadline_settings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "budget_deadline_settings_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -780,6 +801,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "budget_employee_projections_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "budget_employee_projections_projected_job_title_id_fkey"
@@ -1111,6 +1139,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collective_salary_adjustments_effectuated_by_fkey"
+            columns: ["effectuated_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "collective_salary_adjustments_filter_unit_id_fkey"
@@ -1623,6 +1658,13 @@ export type Database = {
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "employee_benefits_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
         ]
       }
       employee_incentive_assignments: {
@@ -1697,6 +1739,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_incentive_assignments_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "employee_incentive_assignments_program_id_fkey"
@@ -1810,6 +1859,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evaluation_potential_dimensions_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["evaluation_id"]
           },
           {
             foreignKeyName: "evaluation_potential_dimensions_root_company_id_fkey"
@@ -1929,6 +1985,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "external_feedback_requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "external_feedback_requests_requested_by_fkey"
             columns: ["requested_by"]
             isOneToOne: false
@@ -1962,6 +2025,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "external_feedback_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "external_feedback_requests_root_company_id_fkey"
@@ -3152,6 +3222,13 @@ export type Database = {
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "performai_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
         ]
       }
       performance_alerts: {
@@ -3234,6 +3311,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_alerts_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_alerts_resolved_by_fkey"
             columns: ["resolved_by"]
             isOneToOne: false
@@ -3267,6 +3351,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_alerts_resolved_by_fkey"
+            columns: ["resolved_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_alerts_root_company_id_fkey"
@@ -3336,6 +3427,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_competency_scores_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["evaluation_id"]
           },
         ]
       }
@@ -3453,6 +3551,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_cycles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_cycles_linked_incentive_program_id_fkey"
@@ -3614,6 +3719,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_cycle_id_fkey"
             columns: ["cycle_id"]
             isOneToOne: false
@@ -3656,6 +3768,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_evaluator_id_fkey"
             columns: ["evaluator_id"]
             isOneToOne: false
@@ -3691,6 +3810,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
@@ -3724,6 +3850,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_evaluations_root_company_id_fkey"
@@ -3906,6 +4039,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_goals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_goals_cycle_id_fkey"
             columns: ["cycle_id"]
             isOneToOne: false
@@ -3946,6 +4086,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_goals_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_goals_job_title_id_fkey"
@@ -4062,6 +4209,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_kudos_from_employee_id_fkey"
+            columns: ["from_employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_kudos_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -4109,6 +4263,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_kudos_to_employee_id_fkey"
+            columns: ["to_employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
         ]
       }
@@ -4205,6 +4366,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_merit_recommendations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_merit_recommendations_budget_projection_id_fkey"
             columns: ["budget_projection_id"]
             isOneToOne: false
@@ -4247,6 +4415,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_merit_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_merit_recommendations_evaluation_id_fkey"
             columns: ["evaluation_id"]
             isOneToOne: false
@@ -4259,6 +4434,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_merit_recommendations_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["evaluation_id"]
           },
         ]
       }
@@ -4403,6 +4585,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_one_on_ones_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_one_on_ones_manager_id_fkey"
             columns: ["manager_id"]
             isOneToOne: false
@@ -4436,6 +4625,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_one_on_ones_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_one_on_ones_root_company_id_fkey"
@@ -4549,6 +4745,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_pdi_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_pdi_employee_id_fkey"
             columns: ["employee_id"]
             isOneToOne: false
@@ -4584,6 +4787,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_pdi_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_pdi_evaluation_id_fkey"
             columns: ["evaluation_id"]
             isOneToOne: false
@@ -4596,6 +4806,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_pdi_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["evaluation_id"]
           },
           {
             foreignKeyName: "performance_pdi_root_company_id_fkey"
@@ -4705,6 +4922,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_succession_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_succession_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -4738,6 +4962,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_succession_key_position_id_fkey"
@@ -4794,6 +5025,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_succession_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
         ]
       }
@@ -4877,6 +5115,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_templates_root_company_id_fkey"
             columns: ["root_company_id"]
             isOneToOne: false
@@ -4934,6 +5179,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_variable_link_evaluation_id_fkey"
+            columns: ["evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["evaluation_id"]
           },
           {
             foreignKeyName: "performance_variable_link_incentive_program_id_fkey"
@@ -5101,6 +5353,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "profiles_position_id_fkey"
@@ -5300,6 +5559,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "salary_assistant_conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
         ]
       }
@@ -5667,6 +5933,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "succession_decisions_decision_by_fkey"
+            columns: ["decision_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "succession_decisions_key_position_id_fkey"
             columns: ["key_position_id"]
             isOneToOne: false
@@ -5686,6 +5959,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_evaluations_directory"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_linked_evaluation_id_fkey"
+            columns: ["linked_evaluation_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["evaluation_id"]
           },
           {
             foreignKeyName: "succession_decisions_root_company_id_fkey"
@@ -5742,6 +6022,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "succession_decisions_successor_employee_id_fkey"
+            columns: ["successor_employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
         ]
       }
@@ -6008,6 +6295,134 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "organizational_structure_public"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      talent_intelligence_recommendations: {
+        Row: {
+          ai_reasoning: string | null
+          applied_at: string | null
+          box_position: number | null
+          created_at: string
+          current_salary: number | null
+          cycle_id: string | null
+          employee_id: string
+          financial_impact_annual: number | null
+          financial_impact_monthly: number | null
+          id: string
+          manual_override_pct: number | null
+          override_justification: string | null
+          performance_score: number | null
+          potential_score: number | null
+          recommended_grade: string | null
+          recommended_merit_pct: number | null
+          recommended_new_salary: number | null
+          recommended_promotion: boolean | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          root_company_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          applied_at?: string | null
+          box_position?: number | null
+          created_at?: string
+          current_salary?: number | null
+          cycle_id?: string | null
+          employee_id: string
+          financial_impact_annual?: number | null
+          financial_impact_monthly?: number | null
+          id?: string
+          manual_override_pct?: number | null
+          override_justification?: string | null
+          performance_score?: number | null
+          potential_score?: number | null
+          recommended_grade?: string | null
+          recommended_merit_pct?: number | null
+          recommended_new_salary?: number | null
+          recommended_promotion?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          applied_at?: string | null
+          box_position?: number | null
+          created_at?: string
+          current_salary?: number | null
+          cycle_id?: string | null
+          employee_id?: string
+          financial_impact_annual?: number | null
+          financial_impact_monthly?: number | null
+          id?: string
+          manual_override_pct?: number | null
+          override_justification?: string | null
+          performance_score?: number | null
+          potential_score?: number | null
+          recommended_grade?: string | null
+          recommended_merit_pct?: number | null
+          recommended_new_salary?: number | null
+          recommended_promotion?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          root_company_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "talent_intelligence_recommendations_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_intelligence_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_intelligence_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_compensation_directory"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "talent_intelligence_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_budget_merit_projection"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "talent_intelligence_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_employee_compensation_intelligence"
+            referencedColumns: ["employee_id"]
+          },
+          {
+            foreignKeyName: "talent_intelligence_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_performance_employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "talent_intelligence_recommendations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
         ]
       }
@@ -6515,6 +6930,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "profiles_position_id_fkey"
             columns: ["unit_id"]
             isOneToOne: false
@@ -6603,6 +7025,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "profiles_position_id_fkey"
@@ -6713,6 +7142,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_cycle_id_fkey"
             columns: ["cycle_id"]
             isOneToOne: false
@@ -6755,6 +7191,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_evaluator_id_fkey"
             columns: ["evaluator_id"]
             isOneToOne: false
@@ -6790,6 +7233,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "performance_evaluations_evaluator_id_fkey"
+            columns: ["evaluator_id"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
+          },
+          {
             foreignKeyName: "performance_evaluations_reviewed_by_fkey"
             columns: ["reviewed_by"]
             isOneToOne: false
@@ -6823,6 +7273,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_performance_employees"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "performance_evaluations_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "v_talent_intelligence_dashboard"
+            referencedColumns: ["employee_id"]
           },
           {
             foreignKeyName: "performance_evaluations_root_company_id_fkey"
@@ -6847,10 +7304,77 @@ export type Database = {
           },
         ]
       }
+      v_talent_intelligence_dashboard: {
+        Row: {
+          box_position: number | null
+          current_salary: number | null
+          cycle_id: string | null
+          employee_id: string | null
+          evaluation_id: string | null
+          financial_impact_annual: number | null
+          full_name: string | null
+          grade: string | null
+          job_title: string | null
+          performance_score: number | null
+          potential_score: number | null
+          recommendation_id: string | null
+          recommendation_status: string | null
+          recommended_merit_pct: number | null
+          recommended_new_salary: number | null
+          root_company_id: string | null
+          suggested_merit_pct: number | null
+          unit_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_evaluations_cycle_id_fkey"
+            columns: ["cycle_id"]
+            isOneToOne: false
+            referencedRelation: "performance_cycles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_position_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      calculate_9box_position: {
+        Args: { p_performance: number; p_potential: number }
+        Returns: number
+      }
       calculate_employee_benefits: {
         Args: { p_employee_id: string }
+        Returns: number
+      }
+      calculate_merit_by_9box: {
+        Args: { p_box_position: number }
         Returns: number
       }
       calculate_salary_range: {
