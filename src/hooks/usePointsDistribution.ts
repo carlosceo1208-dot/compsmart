@@ -121,7 +121,7 @@ export const usePointsDistribution = () => {
   const pointsByDepartment = useQuery({
     queryKey: ["points-by-department"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("profiles")
         .select(`
           unit_id,
