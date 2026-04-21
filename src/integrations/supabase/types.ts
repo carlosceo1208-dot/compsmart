@@ -6875,6 +6875,18 @@ export type Database = {
           total_mismatches: number
         }[]
       }
+      get_equity_alerts: {
+        Args: { p_threshold_pct?: number }
+        Returns: {
+          employee_count: number
+          gap_percentage: number
+          grade: string
+          job_title: string
+          max_salary: number
+          min_salary: number
+          severity: string
+        }[]
+      }
       get_feedback_request_by_token: {
         Args: { p_token: string }
         Returns: {
@@ -6911,6 +6923,37 @@ export type Database = {
       get_org_breadcrumb_friendly: {
         Args: { entity_id: string }
         Returns: string
+      }
+      get_pay_gap_by_gender: {
+        Args: never
+        Returns: {
+          avg_salary: number
+          employee_count: number
+          gap_vs_male_percentage: number
+          gender: string
+          median_salary: number
+        }[]
+      }
+      get_pay_gap_by_grade: {
+        Args: never
+        Returns: {
+          avg_salary: number
+          coefficient_variation: number
+          employee_count: number
+          grade: string
+          max_salary: number
+          min_salary: number
+          std_deviation: number
+        }[]
+      }
+      get_salary_gini_index: {
+        Args: never
+        Returns: {
+          gini_index: number
+          interpretation: string
+          total_employees: number
+          total_payroll: number
+        }[]
       }
       get_top_compensation_mismatches: {
         Args: { p_limit?: number }
