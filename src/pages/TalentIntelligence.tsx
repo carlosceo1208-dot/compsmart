@@ -15,6 +15,8 @@ import {
 } from '@/hooks/useTalentIntelligence';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { SmartMeritCalculator } from '@/components/talent/SmartMeritCalculator';
+import { NineBoxBudgetSimulator } from '@/components/talent/NineBoxBudgetSimulator';
+import { TalentApprovalDialog } from '@/components/talent/TalentApprovalDialog';
 
 const formatBRL = (v: number | null | undefined) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(v ?? 0));
@@ -28,6 +30,7 @@ export default function TalentIntelligence() {
   const generate = useGenerateTalentRecommendation();
   const updateStatus = useUpdateRecommendationStatus();
   const [search, setSearch] = useState('');
+  const [approvalTarget, setApprovalTarget] = useState<{ id: string; status: string; name: string } | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -75,6 +78,9 @@ export default function TalentIntelligence() {
       {/* Mérito inteligente com guardrails */}
       <SmartMeritCalculator />
 
+      {/* Simulador 9Box × Orçamento */}
+      <NineBoxBudgetSimulator />
+
       {/* Tabela */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3">
@@ -113,6 +119,9 @@ export default function TalentIntelligence() {
                       onApprove={(id) => updateStatus.mutate({ id, status: 'approved' })}
                       onReject={(id) => updateStatus.mutate({ id, status: 'rejected' })}
                       onApply={(id) => updateStatus.mutate({ id, status: 'applied' })}
+                      onWorkflow={(id, status) =>
+                        setApprovalTarget({ id, status, name: r.full_name ?? 'Funcionário' })
+                      }
                     />
                   ))}
                   {filtered.length === 0 && (
@@ -128,6 +137,16 @@ export default function TalentIntelligence() {
           )}
         </CardContent>
       </Card>
+
+      {approvalTarget && (
+        <TalentApprovalDialog
+          open={!!approvalTarget}
+          onOpenChange={(o) => !o && setApprovalTarget(null)}
+          recommendationId={approvalTarget.id}
+          currentStatus={approvalTarget.status}
+          employeeName={approvalTarget.name}
+        />
+      )}
     </div>
   );
 }
@@ -170,12 +189,14 @@ function RowItem({
   onApprove,
   onReject,
   onApply,
+  onWorkflow,
 }: {
   row: TalentIntelRow;
   onGenerate: () => void;
   onApprove: (id: string) => void;
   onReject: (id: string) => void;
   onApply: (id: string) => void;
+  onWorkflow: (id: string, status: string) => void;
 }) {
   const box = row.box_position ?? 0;
   const meta = BOX_LABELS[box];
@@ -216,19 +237,13 @@ function RowItem({
             <Sparkles className="h-3 w-3 mr-1" /> Gerar
           </Button>
         )}
-        {row.recommendation_id && status === 'pending' && (
-          <>
-            <Button size="sm" variant="outline" onClick={() => onApprove(row.recommendation_id!)}>
-              <CheckCircle2 className="h-3 w-3" />
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => onReject(row.recommendation_id!)}>
-              <XCircle className="h-3 w-3" />
-            </Button>
-          </>
-        )}
-        {row.recommendation_id && status === 'approved' && (
-          <Button size="sm" onClick={() => onApply(row.recommendation_id!)}>
-            Aplicar
+        {row.recommendation_id && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onWorkflow(row.recommendation_id!, status ?? 'draft')}
+          >
+            Workflow
           </Button>
         )}
       </TableCell>

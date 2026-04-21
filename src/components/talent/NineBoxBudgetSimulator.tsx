@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Calculator, AlertTriangle, TrendingUp, Users } from 'lucide-react';
 import { use9BoxBudgetSimulation, type BudgetSimRow } from '@/hooks/useTalentApproval';
-import { useCompany } from '@/contexts/CompanyContext';
+import { useCompanyContext } from '@/contexts/CompanyContext';
 
 const formatBRL = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v);
@@ -28,12 +28,12 @@ const statusStyle: Record<BudgetSimRow['status'], string> = {
 };
 
 export function NineBoxBudgetSimulator() {
-  const { selectedCompany } = useCompany();
+  const { activeCompanyId } = useCompanyContext();
   const [ceiling, setCeiling] = useState(5);
   const [fiscalYear, setFiscalYear] = useState(new Date().getFullYear());
 
   const { data, isLoading } = use9BoxBudgetSimulation(
-    selectedCompany?.id ?? null,
+    activeCompanyId,
     fiscalYear,
     ceiling
   );
