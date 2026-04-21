@@ -2404,6 +2404,79 @@ export type Database = {
           },
         ]
       }
+      job_matching_results: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          gap_pct: number | null
+          id: string
+          internal_median: number | null
+          job_title_id: string
+          market_median: number | null
+          match_score: number
+          matched_cbo_code: string | null
+          matched_market_role: string
+          reasoning: string | null
+          recommendations: string | null
+          root_company_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          gap_pct?: number | null
+          id?: string
+          internal_median?: number | null
+          job_title_id: string
+          market_median?: number | null
+          match_score: number
+          matched_cbo_code?: string | null
+          matched_market_role: string
+          reasoning?: string | null
+          recommendations?: string | null
+          root_company_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          gap_pct?: number | null
+          id?: string
+          internal_median?: number | null
+          job_title_id?: string
+          market_median?: number | null
+          match_score?: number
+          matched_cbo_code?: string | null
+          matched_market_role?: string
+          reasoning?: string | null
+          recommendations?: string | null
+          root_company_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_matching_results_job_title_id_fkey"
+            columns: ["job_title_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_matching_results_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_matching_results_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_title_competencies: {
         Row: {
           competency_id: string
