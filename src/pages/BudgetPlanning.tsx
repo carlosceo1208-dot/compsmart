@@ -11,6 +11,7 @@ import { BudgetPlanningFilterPanel } from '@/components/budget/BudgetPlanningFil
 import { BudgetSummaryTable } from '@/components/budget/BudgetSummaryTable';
 import { BudgetUnitBreakdownCard } from '@/components/budget/BudgetUnitBreakdownCard';
 import { BudgetEvolutionChart } from '@/components/budget/BudgetEvolutionChart';
+import { SmartBudgetScenariosCard } from '@/components/budget/SmartBudgetScenariosCard';
 import { EmployeeBudgetList } from '@/components/budget/EmployeeBudgetList';
 import { EmployeeBudgetDialog } from '@/components/budget/EmployeeBudgetDialog';
 import { PlannedHireDialog } from '@/components/budget/PlannedHireDialog';
@@ -278,7 +279,9 @@ const BudgetPlanning = () => {
 
         <div className="space-y-6">
           <BudgetUnitBreakdownCard fiscalYear={fiscalYear} />
-          
+
+          <SmartBudgetScenariosCard unitId={selectedUnitId} fiscalYear={fiscalYear} />
+
           <BudgetEvolutionChart
             monthlyTotals={summary?.monthlyTotals || []}
             isLoading={summaryLoading}
