@@ -265,7 +265,7 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div class="footer">
                   <p>Este é um email automático enviado pelo sistema CompSmart.</p>
-                  <p>${companyName}</p>
+                  <p>${esc(companyName)}</p>
                 </div>
               </div>
             </div>
