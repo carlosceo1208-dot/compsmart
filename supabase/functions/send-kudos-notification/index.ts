@@ -105,7 +105,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "CompSmart <noreply@compsmart.com.br>",
       to: [toEmployeeEmail],
-      subject: `${categoryEmoji} Você recebeu um reconhecimento de ${fromEmployeeName}!`,
+      subject: `${categoryEmoji} Você recebeu um reconhecimento de ${fromEmployeeName}!`.replace(/[\r\n]+/g, ' '),
       html: `
         <!DOCTYPE html>
         <html>
