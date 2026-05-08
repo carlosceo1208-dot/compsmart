@@ -295,38 +295,32 @@ export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBu
             if (error) throw error;
             results.updated++;
           } else {
-            // Criar novo
-            const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-              email: row.email,
-              password: "TempPass123!",
-              email_confirm: true,
-              user_metadata: { full_name: row.full_name },
+            // Criar novo pelo backend seguro
+            const { data: result, error: fnError } = await supabase.functions.invoke("create-employee-user", {
+              body: {
+                email: row.email,
+                full_name: row.full_name,
+                employee_number: row.employee_number,
+                phone: row.phone || null,
+                cpf: row.cpf || null,
+                birth_date: row.birth_date || null,
+                hire_date: row.hire_date || null,
+                job_title: row.job_title || null,
+                job_title_id: row.job_title_id || null,
+                grade: row.grade || null,
+                salary: row.salary || null,
+                variable_salary: row.variable_salary || null,
+                salary_range_percentage: row.salary_range_percentage || null,
+                performance_rating: row.performance_rating || null,
+                unit_id: row.unit_id || null,
+                manager_id: row.manager_id || null,
+                has_system_access: true,
+                roles: ["employee"],
+              },
             });
 
-            if (authError) throw authError;
-
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .update({
-            full_name: row.full_name,
-            employee_number: row.employee_number || null,
-            phone: row.phone || null,
-            cpf: row.cpf || null,
-            birth_date: row.birth_date || null,
-            hire_date: row.hire_date || null,
-            job_title: row.job_title || null,
-            grade: row.grade || null,
-            job_title_id: row.job_title_id || null,
-            salary: row.salary || null,
-            variable_salary: row.variable_salary || null,
-            salary_range_percentage: row.salary_range_percentage || null,
-            performance_rating: row.performance_rating || null,
-            unit_id: row.unit_id || null,
-            manager_id: row.manager_id || null,
-          })
-          .eq("id", authData.user.id);
-
-            if (profileError) throw profileError;
+            if (fnError) throw fnError;
+            if (!result?.success) throw new Error(result?.error || "Falha ao criar colaborador");
             results.created++;
           }
         } catch (error: any) {

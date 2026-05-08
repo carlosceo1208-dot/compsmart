@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.76.1";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -36,6 +37,10 @@ interface SendFeedbackRequest {
   requestId: string;
 }
 
+const RequestSchema = z.object({
+  requestId: z.string().uuid("requestId inválido"),
+});
+
 const formatDate = (date: string): string => {
   return new Date(date).toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -70,26 +75,66 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
-    // Verify user token
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    
-    if (userError || !userData.user) {
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: claimsData, error: claimsError } = await authClient.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims?.sub) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const { requestId }: SendFeedbackRequest = await req.json();
+    const callerId = claimsData.claims.sub as string;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    if (!requestId) {
+    const parsedBody = RequestSchema.safeParse(await req.json());
+    if (!parsedBody.success) {
       return new Response(
-        JSON.stringify({ error: "requestId is required" }),
+        JSON.stringify({ error: parsedBody.error.flatten().fieldErrors }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { requestId }: SendFeedbackRequest = parsedBody.data;
+
+    const [{ data: callerProfile, error: callerProfileError }, { data: callerRoles, error: callerRolesError }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("root_company_id")
+        .eq("id", callerId)
+        .single(),
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", callerId),
+    ]);
+
+    if (callerProfileError || !callerProfile?.root_company_id) {
+      return new Response(
+        JSON.stringify({ error: "Empresa do usuário não encontrada" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (callerRolesError) {
+      return new Response(
+        JSON.stringify({ error: "Falha ao validar permissões" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const allowedRoles = new Set(["admin", "hr_manager", "manager", "super_admin"]);
+    const canSendFeedback = (callerRoles ?? []).some(({ role }) => allowedRoles.has(role));
+    if (!canSendFeedback) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -112,6 +157,13 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
+    if (feedbackRequest.root_company_id !== callerProfile.root_company_id) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Check if already sent or completed
     if (feedbackRequest.status === "completed") {
       return new Response(
@@ -127,7 +179,6 @@ const handler = async (req: Request): Promise<Response> => {
     const deadlineFormatted = formatDate(feedbackRequest.deadline);
 
     // Build the feedback form URL
-    const baseUrl = Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "");
     const feedbackFormUrl = `https://compsmart.lovable.app/feedback/${feedbackRequest.token}`;
 
     const emailHtml = `
