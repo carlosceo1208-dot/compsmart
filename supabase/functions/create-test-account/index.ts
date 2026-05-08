@@ -183,42 +183,42 @@ serve(async (req) => {
       }
     });
 
-      if (authError) {
-        console.error(`[ERROR] Failed to create auth user: ${authError.message}`);
-        throw authError;
-      }
+    if (authError) {
+      console.error(`[ERROR] Failed to create auth user: ${authError.message}`);
+      throw authError;
+    }
 
-      const userId = authData.user.id;
+    const userId = authData.user.id;
 
-      // Update profile with company link
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          has_system_access: true,
-          root_company_id: COMPSMART_COMPANY_ID,
-          full_name: fullName
-        })
-        .eq('id', userId);
+    // Update profile with company link
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .update({
+        has_system_access: true,
+        root_company_id: COMPSMART_COMPANY_ID,
+        full_name: fullName
+      })
+      .eq('id', userId);
 
-      if (profileError) {
-        console.error(`[ERROR] Failed to update profile: ${profileError.message}`);
-      }
+    if (profileError) {
+      console.error(`[ERROR] Failed to update profile: ${profileError.message}`);
+    }
 
-      // Set admin role
-      await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId);
+    // Set admin role
+    await supabase
+      .from('user_roles')
+      .delete()
+      .eq('user_id', userId);
 
-      const { error: roleError } = await supabase
-        .from('user_roles')
-        .insert({ user_id: userId, role: 'admin' });
+    const { error: roleError } = await supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role: 'admin' });
 
-      if (roleError) {
-        console.error(`[ERROR] Failed to set admin role: ${roleError.message}`);
-      }
+    if (roleError) {
+      console.error(`[ERROR] Failed to set admin role: ${roleError.message}`);
+    }
 
-      console.log(`[AUDIT] Test account created: ${email} (${userId}) by IP: ${clientIP}`);
+    console.log(`[AUDIT] Test account created: ${email} (${userId}) by IP: ${clientIP} by caller: ${callerId}`);
 
     return json({ 
       success: true, 
