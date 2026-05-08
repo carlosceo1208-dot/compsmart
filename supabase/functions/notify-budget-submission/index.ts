@@ -134,11 +134,11 @@ const handler = async (req: Request): Promise<Response> => {
                     <div class="info-box">
                       <div class="info-item">
                         <span class="info-label">🏢 Unidade:</span>
-                        <span class="info-value">${unitName}</span>
+                        <span class="info-value">${safeUnit}</span>
                       </div>
                       <div class="info-item">
                         <span class="info-label">👤 Submetido por:</span>
-                        <span class="info-value">${submittedBy}</span>
+                        <span class="info-value">${safeSubmittedBy}</span>
                       </div>
                       <div class="info-item">
                         <span class="info-label">📅 Ano Fiscal:</span>
