@@ -2,6 +2,9 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 
+
+const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -240,7 +243,7 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="margin: 10px 0 0 0; opacity: 0.9;">Prazo de Submissão - Ano Fiscal ${settings.fiscal_year}</p>
               </div>
               <div class="content">
-                <p>Olá${unit.managerName ? `, <strong>${unit.managerName}</strong>` : ''},</p>
+                <p>Olá${unit.managerName ? `, <strong>${esc(unit.managerName)}</strong>` : ''},</p>
                 
                 <p>Este é um lembrete sobre o prazo de submissão do orçamento para o ano fiscal de <strong>${settings.fiscal_year}</strong>.</p>
                 
@@ -251,7 +254,7 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div class="unit-box">
                   <strong>🏢 Sua Unidade:</strong><br>
-                  ${unit.code} - ${unit.description}
+                  ${esc(unit.code)} - ${esc(unit.description)}
                 </div>
                 
                 <p>Por favor, acesse o sistema CompSmart para submeter o orçamento da sua unidade antes do prazo.</p>
@@ -262,7 +265,7 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div class="footer">
                   <p>Este é um email automático enviado pelo sistema CompSmart.</p>
-                  <p>${companyName}</p>
+                  <p>${esc(companyName)}</p>
                 </div>
               </div>
             </div>

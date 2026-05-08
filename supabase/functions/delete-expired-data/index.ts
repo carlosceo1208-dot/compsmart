@@ -2,6 +2,9 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
+const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -51,8 +54,8 @@ const getDeletionConfirmationEmail = (data: Record<string, any>): { subject: str
             <p>Confirmação de exclusão de conta</p>
           </div>
           <div class="content">
-            <h2>Olá, ${data.userName}!</h2>
-            <p>Conforme informado, os dados da empresa <strong>${data.companyName}</strong> foram permanentemente excluídos do CompSmart.</p>
+            <h2>Olá, ${esc(data.userName)}!</h2>
+            <p>Conforme informado, os dados da empresa <strong>${esc(data.companyName)}</strong> foram permanentemente excluídos do CompSmart.</p>
             
             <div class="info-box">
               <h3>📋 O que foi excluído:</h3>

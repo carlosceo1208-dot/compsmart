@@ -2,6 +2,9 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
+const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -82,7 +85,7 @@ const getTrialReminderTemplate = (daysLeft: number, data: Record<string, any>): 
               <p>Não perca acesso às funcionalidades premium</p>
             </div>
             <div class="content">
-              <h2>Olá, ${data.userName}!</h2>
+              <h2>Olá, ${esc(data.userName)}!</h2>
               <p><strong>Seu período de teste do CompSmart termina hoje.</strong> Após meia-noite, você perderá acesso às funcionalidades premium.</p>
               
               ${featuresLost}
@@ -122,7 +125,7 @@ const getTrialReminderTemplate = (daysLeft: number, data: Record<string, any>): 
             <p>Aproveite ao máximo antes que termine</p>
           </div>
           <div class="content">
-            <h2>Olá, ${data.userName}!</h2>
+            <h2>Olá, ${esc(data.userName)}!</h2>
             <p>Queremos lembrar que seu período de teste do CompSmart está chegando ao fim.</p>
             
             <div class="countdown">
@@ -208,7 +211,7 @@ const getGracePeriodReminderTemplate = (daysLeft: number, data: Record<string, a
             <p>Ação necessária para manter seus dados</p>
           </div>
           <div class="content">
-            <h2>Olá, ${data.userName}!</h2>
+            <h2>Olá, ${esc(data.userName)}!</h2>
             <p>Seu período de teste do CompSmart expirou e sua conta está <strong>bloqueada</strong>.</p>
             
             <div class="alert-box">
