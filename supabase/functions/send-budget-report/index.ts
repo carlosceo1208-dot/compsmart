@@ -155,8 +155,8 @@ const handler = async (req: Request): Promise<Response> => {
             <h2>Filtros Aplicados</h2>
             <div class="summary">
               <div class="summary-item"><strong>Ano Fiscal:</strong> ${fiscalYear}</div>
-              <div class="summary-item"><strong>Status:</strong> ${statusLabel}</div>
-              <div class="summary-item"><strong>Unidade:</strong> ${unitName}</div>
+              <div class="summary-item"><strong>Status:</strong> ${esc(statusLabel)}</div>
+              <div class="summary-item"><strong>Unidade:</strong> ${esc(unitName)}</div>
             </div>
 
             <h2>Resumo Consolidado</h2>
