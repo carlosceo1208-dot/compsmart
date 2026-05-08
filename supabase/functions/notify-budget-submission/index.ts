@@ -82,28 +82,6 @@ const handler = async (req: Request): Promise<Response> => {
     const approverIds = new Set((adminHRUsers ?? []).map((r) => r.user_id));
     const profiles = (companyProfiles ?? []).filter((p) => approverIds.has(p.id));
 
-    const userIds = [...new Set(adminHRUsers?.map(r => r.user_id) || [])];
-
-    if (userIds.length === 0) {
-      console.warn('⚠️ Nenhum admin/HR encontrado para notificar');
-      return new Response(
-        JSON.stringify({ message: 'Nenhum aprovador encontrado' }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Buscar emails dos aprovadores
-    const { data: profiles, error: profilesError } = await supabase
-      .from('profiles')
-      .select('email, full_name')
-      .in('id', userIds)
-      .not('email', 'is', null);
-
-    if (profilesError) {
-      console.error('❌ Erro ao buscar perfis:', profilesError);
-      throw profilesError;
-    }
-
     console.log(`📨 Enviando notificações para ${profiles?.length || 0} aprovadores`);
 
     // Enviar email para cada aprovador
