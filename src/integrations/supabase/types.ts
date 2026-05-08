@@ -8853,6 +8853,38 @@ export type Database = {
           template_questions: Json
         }[]
       }
+      get_manager_direct_reports: {
+        Args: never
+        Returns: {
+          age_range: string
+          avatar_url: string
+          benefits_value: number
+          created_at: string
+          email: string
+          employee_number: string
+          full_name: string
+          grade: string
+          has_system_access: boolean
+          hire_date: string
+          id: string
+          job_title: string
+          job_title_id: string
+          long_term_incentive: number
+          manager_id: string
+          performance_rating: number
+          phone: string
+          preferred_language: string
+          root_company_id: string
+          salary: number
+          salary_range_percentage: number
+          short_term_incentive: number
+          status: string
+          termination_date: string
+          unit_id: string
+          updated_at: string
+          variable_salary: number
+        }[]
+      }
       get_market_alerts: {
         Args: { threshold_pct?: number }
         Returns: {
