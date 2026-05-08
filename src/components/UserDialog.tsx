@@ -60,7 +60,6 @@ interface UserData {
   full_name: string;
   email: string;
   employee_number: string;
-  password?: string;
   phone?: string;
   cpf?: string;
   birth_date?: string;
@@ -377,7 +376,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         employee_number: profile.employee_number || "",
         hire_date: profile.hire_date || "",
         termination_date: profile.termination_date || "",
-        password: "",
         salary: profile.salary 
           ? profile.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : "",
@@ -413,7 +411,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       full_name: "",
       email: "",
       employee_number: "",
-      password: "",
       phone: "",
       cpf: "",
       birth_date: "",
