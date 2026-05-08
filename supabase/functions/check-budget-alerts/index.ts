@@ -63,19 +63,21 @@ Deno.serve(async (req) => {
     for (const config of alertConfigs as AlertConfig[]) {
       console.log(`[check-budget-alerts] Checking company ${config.root_company_id}...`);
 
-      // Buscar projeções do ano atual
+      // Buscar projeções do ano atual (escopo por tenant)
       const { data: currentProjections } = await supabase
         .from('budget_employee_projections')
         .select('projected_fixed_salary, projected_variable_salary, projected_benefits, projected_unit_id')
         .eq('fiscal_year', currentYear)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .eq('root_company_id', config.root_company_id);
 
-      // Buscar projeções do ano projetado (verificar se tem submissão aprovada)
+      // Buscar projeções do ano projetado (verificar se tem submissão aprovada) — escopo por tenant
       const { data: projectedSubmissions } = await supabase
         .from('budget_submissions')
         .select('id, unit_id, status')
         .eq('fiscal_year', projectedYear)
-        .eq('status', 'approved');
+        .eq('status', 'approved')
+        .eq('root_company_id', config.root_company_id);
 
       if (!projectedSubmissions || projectedSubmissions.length === 0) {
         console.log(`[check-budget-alerts] No approved budget for ${projectedYear}`);
@@ -86,7 +88,8 @@ Deno.serve(async (req) => {
         .from('budget_employee_projections')
         .select('projected_fixed_salary, projected_variable_salary, projected_benefits, projected_unit_id')
         .eq('fiscal_year', projectedYear)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .eq('root_company_id', config.root_company_id);
 
       // Calcular totais anuais
       const calculateAnnualTotal = (projections: any[] | null) => {
