@@ -228,6 +228,21 @@ serve(async (req) => {
       });
     }
 
+    // SECURITY: Account takeover guard.
+    // If the profile already has a registered email, the activation email MUST match it.
+    // Prevents an attacker who knows employee_number/CPF from claiming the account
+    // with an arbitrary email of their choice.
+    if (profile.email && profile.email.toLowerCase().trim() !== email) {
+      console.warn('Activation email mismatch - blocking takeover attempt');
+      return new Response(JSON.stringify({
+        success: false,
+        error: GENERIC_ERROR
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     // Check if email is already in use WITHIN THE SAME COMPANY (multi-tenant isolation)
     const { data: existingUserByEmail } = await supabase
       .from('profiles')
