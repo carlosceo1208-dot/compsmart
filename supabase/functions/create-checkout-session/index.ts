@@ -269,7 +269,7 @@ serve(async (req) => {
       });
     }
 
-    console.log('Creating Pagar.me order:', JSON.stringify(orderPayload, null, 2));
+    console.log('Creating Pagar.me order for', customerType, 'amount_cents:', final_amount_cents);
 
     const pagarmeResponse = await fetch(`${PAGARME_API_URL}/orders`, {
       method: 'POST',
@@ -282,7 +282,7 @@ serve(async (req) => {
 
     const pagarmeOrder = await pagarmeResponse.json();
 
-    console.log('Pagar.me response:', JSON.stringify(pagarmeOrder, null, 2));
+    console.log('Pagar.me response status:', pagarmeOrder?.status, 'id:', pagarmeOrder?.id, 'charge:', pagarmeOrder?.charges?.[0]?.id);
 
     if (!pagarmeResponse.ok) {
       console.error('Pagar.me error:', pagarmeOrder);

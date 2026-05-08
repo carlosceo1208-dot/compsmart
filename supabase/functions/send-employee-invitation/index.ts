@@ -102,6 +102,7 @@ serve(async (req) => {
       .single();
 
     const companyName = company?.name || 'sua empresa';
+    const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
     // Resultados do envio
     const results = {
@@ -315,11 +316,11 @@ serve(async (req) => {
                 
                 <div style="background: white; padding: 32px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
                   <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 16px;">
-                    Olá <strong>${employee.full_name}</strong>,
+                    Olá <strong>${esc(employee.full_name)}</strong>,
                   </p>
                   
                   <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 16px;">
-                    Você foi cadastrado(a) como colaborador(a) na empresa <strong>${companyName}</strong> no sistema CompSmart.
+                    Você foi cadastrado(a) como colaborador(a) na empresa <strong>${esc(companyName)}</strong> no sistema CompSmart.
                   </p>
                   
                   <p style="color: #374151; font-size: 16px; line-height: 1.6; margin-bottom: 24px;">
