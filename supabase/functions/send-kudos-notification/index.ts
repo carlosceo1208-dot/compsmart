@@ -135,7 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="padding: 40px 30px;">
                       <p style="margin: 0 0 20px 0; color: #333; font-size: 16px;">
-                        Olá, <strong>${toEmployeeName}</strong>!
+                        Olá, <strong>${safeTo}</strong>!
                       </p>
                       
                       <p style="margin: 0 0 30px 0; color: #666; font-size: 16px; line-height: 1.6;">
