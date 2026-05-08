@@ -70,16 +70,25 @@ serve(async (req) => {
 
     const startTime = Date.now();
 
-    // Fetch employee context if provided
+    // Fetch caller's company for tenant isolation
+    const { data: callerProfile } = await supabase
+      .from('profiles')
+      .select('root_company_id')
+      .eq('id', user.id)
+      .single();
+    const callerCompanyId = callerProfile?.root_company_id;
+
+    // Fetch employee context if provided (tenant-scoped)
     let employeeContext = '';
-    if (employeeId) {
+    if (employeeId && callerCompanyId) {
       const { data: employee } = await supabase
         .from('profiles')
         .select(`
-          full_name, job_title, grade, salary,
+          full_name, job_title, grade, salary, root_company_id,
           unit:organizational_structure!profiles_unit_id_fkey(description)
         `)
         .eq('id', employeeId)
+        .eq('root_company_id', callerCompanyId)
         .single();
       
       if (employee) {
@@ -90,20 +99,20 @@ serve(async (req) => {
 - **Grade:** ${employee.grade || 'N/A'}
 - **Departamento:** ${employee.unit?.description || 'N/A'}
 `;
-      }
 
-      // Fetch latest evaluation
-      const { data: evaluation } = await supabase
-        .from('performance_evaluations')
-        .select('final_score, potential_score, goals_score, competencies_score, strengths, improvement_areas')
-        .eq('employee_id', employeeId)
-        .eq('status', 'approved')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+        // Fetch latest evaluation (tenant-scoped via employee match above)
+        const { data: evaluation } = await supabase
+          .from('performance_evaluations')
+          .select('final_score, potential_score, goals_score, competencies_score, strengths, improvement_areas')
+          .eq('employee_id', employeeId)
+          .eq('root_company_id', callerCompanyId)
+          .eq('status', 'approved')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
-      if (evaluation) {
-        employeeContext += `
+        if (evaluation) {
+          employeeContext += `
 ### ÚLTIMA AVALIAÇÃO
 - **Score Final:** ${evaluation.final_score || 'N/A'}/5.0
 - **Score de Potencial:** ${evaluation.potential_score || 'N/A'}/5.0
@@ -112,34 +121,35 @@ serve(async (req) => {
 - **Pontos Fortes:** ${evaluation.strengths || 'Não informado'}
 - **Áreas de Melhoria:** ${evaluation.improvement_areas || 'Não informado'}
 `;
-      }
+        }
 
-      // Fetch active goals
-      const { data: goals } = await supabase
-        .from('performance_goals')
-        .select('title, status, progress')
-        .eq('employee_id', employeeId)
-        .in('status', ['pending', 'in_progress']);
+        const { data: goals } = await supabase
+          .from('performance_goals')
+          .select('title, status, progress')
+          .eq('employee_id', employeeId)
+          .eq('root_company_id', callerCompanyId)
+          .in('status', ['pending', 'in_progress']);
 
-      if (goals && goals.length > 0) {
-        employeeContext += `
+        if (goals && goals.length > 0) {
+          employeeContext += `
 ### METAS ATIVAS (${goals.length})
 ${goals.map(g => `- ${g.title} (${g.status}, ${g.progress || 0}%)`).join('\n')}
 `;
-      }
+        }
 
-      // Fetch active PDIs
-      const { data: pdis } = await supabase
-        .from('performance_pdi')
-        .select('title, status')
-        .eq('employee_id', employeeId)
-        .in('status', ['pending', 'in_progress']);
+        const { data: pdis } = await supabase
+          .from('performance_pdi')
+          .select('title, status')
+          .eq('employee_id', employeeId)
+          .eq('root_company_id', callerCompanyId)
+          .in('status', ['pending', 'in_progress']);
 
-      if (pdis && pdis.length > 0) {
-        employeeContext += `
+        if (pdis && pdis.length > 0) {
+          employeeContext += `
 ### PDIs ATIVOS (${pdis.length})
 ${pdis.map(p => `- ${p.title} (${p.status})`).join('\n')}
 `;
+        }
       }
     }
 
