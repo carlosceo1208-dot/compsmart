@@ -8776,18 +8776,14 @@ export type Database = {
         }[]
       }
       get_company_billing_info: {
-        Args: { p_company_id: string }
+        Args: { _company_id: string }
         Returns: {
-          billing_cycle: string
           billing_email: string
           cnpj: string
           custom_annual_price: number
           custom_monthly_price: number
           id: string
           payment_method: string
-          subscription_started_at: string
-          subscription_status: string
-          trial_ends_at: string
         }[]
       }
       get_compensation_mismatch_kpi: {
