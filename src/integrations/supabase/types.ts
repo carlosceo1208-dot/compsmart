@@ -8495,6 +8495,16 @@ export type Database = {
         }
         Returns: string
       }
+      audit_rls_tenant_isolation: {
+        Args: never
+        Returns: {
+          affected_rows: number
+          details: string
+          operation: string
+          status: string
+          table_name: string
+        }[]
+      }
       build_scenario_from_9box: {
         Args: {
           p_filter_box_max?: number
