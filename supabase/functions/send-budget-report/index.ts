@@ -205,7 +205,7 @@ const handler = async (req: Request): Promise<Response> => {
       return resend.emails.send({
         from: 'CompSmart <noreply@compsmart.ia.br>',
         to: [recipient],
-        subject: `Relatório de Aprovações de Orçamento - ${fiscalYear} - ${statusLabel}`,
+        subject: `Relatório de Aprovações de Orçamento - ${fiscalYear} - ${statusLabel}`.replace(/[\r\n]+/g, ' '),
         html: htmlBody,
       });
     });
