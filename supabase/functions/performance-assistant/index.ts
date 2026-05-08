@@ -70,16 +70,25 @@ serve(async (req) => {
 
     const startTime = Date.now();
 
-    // Fetch employee context if provided
+    // Fetch caller's company for tenant isolation
+    const { data: callerProfile } = await supabase
+      .from('profiles')
+      .select('root_company_id')
+      .eq('id', user.id)
+      .single();
+    const callerCompanyId = callerProfile?.root_company_id;
+
+    // Fetch employee context if provided (tenant-scoped)
     let employeeContext = '';
-    if (employeeId) {
+    if (employeeId && callerCompanyId) {
       const { data: employee } = await supabase
         .from('profiles')
         .select(`
-          full_name, job_title, grade, salary,
+          full_name, job_title, grade, salary, root_company_id,
           unit:organizational_structure!profiles_unit_id_fkey(description)
         `)
         .eq('id', employeeId)
+        .eq('root_company_id', callerCompanyId)
         .single();
       
       if (employee) {
