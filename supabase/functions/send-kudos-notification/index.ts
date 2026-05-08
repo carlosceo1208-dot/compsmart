@@ -94,6 +94,14 @@ const handler = async (req: Request): Promise<Response> => {
     const categoryLabel = categoryLabels[category] || category;
     const categoryEmoji = categoryEmojis[category] || "🎉";
 
+    // SECURITY: escape all client-supplied strings before embedding in HTML
+    const esc = (s: string) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const safeFrom = esc(fromEmployeeName);
+    const safeTo = esc(toEmployeeName);
+    const safeMessage = esc(message);
+    const safeCategoryLabel = esc(categoryLabel);
     const emailResponse = await resend.emails.send({
       from: "CompSmart <noreply@compsmart.com.br>",
       to: [toEmployeeEmail],
