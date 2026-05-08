@@ -94,10 +94,18 @@ const handler = async (req: Request): Promise<Response> => {
     const categoryLabel = categoryLabels[category] || category;
     const categoryEmoji = categoryEmojis[category] || "🎉";
 
+    // SECURITY: escape all client-supplied strings before embedding in HTML
+    const esc = (s: string) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const safeFrom = esc(fromEmployeeName);
+    const safeTo = esc(toEmployeeName);
+    const safeMessage = esc(message);
+    const safeCategoryLabel = esc(categoryLabel);
     const emailResponse = await resend.emails.send({
       from: "CompSmart <noreply@compsmart.com.br>",
       to: [toEmployeeEmail],
-      subject: `${categoryEmoji} Você recebeu um reconhecimento de ${fromEmployeeName}!`,
+      subject: `${categoryEmoji} Você recebeu um reconhecimento de ${fromEmployeeName}!`.replace(/[\r\n]+/g, ' '),
       html: `
         <!DOCTYPE html>
         <html>
@@ -127,17 +135,17 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="padding: 40px 30px;">
                       <p style="margin: 0 0 20px 0; color: #333; font-size: 16px;">
-                        Olá, <strong>${toEmployeeName}</strong>!
+                        Olá, <strong>${safeTo}</strong>!
                       </p>
                       
                       <p style="margin: 0 0 30px 0; color: #666; font-size: 16px; line-height: 1.6;">
-                        <strong>${fromEmployeeName}</strong> enviou um reconhecimento para você na categoria <strong>${categoryLabel}</strong>:
+                        <strong>${safeFrom}</strong> enviou um reconhecimento para você na categoria <strong>${safeCategoryLabel}</strong>:
                       </p>
                       
                       <!-- Message Box -->
                       <div style="background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%); border-left: 4px solid #4f46e5; padding: 20px; border-radius: 8px; margin: 0 0 30px 0;">
                         <p style="margin: 0; color: #333; font-size: 16px; line-height: 1.6; font-style: italic;">
-                          "${message}"
+                          "${safeMessage}"
                         </p>
                       </div>
                       

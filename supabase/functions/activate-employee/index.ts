@@ -263,8 +263,8 @@ serve(async (req) => {
     }
 
     // Check if auth user already exists for this profile
-    const { data: authUserList } = await supabase.auth.admin.listUsers();
-    const existingAuthUser = authUserList?.users?.find(u => u.id === profile.id);
+    const { data: authUserData } = await supabase.auth.admin.getUserById(profile.id);
+    const existingAuthUser = authUserData?.user ?? null;
 
     if (existingAuthUser) {
       // Update existing auth user

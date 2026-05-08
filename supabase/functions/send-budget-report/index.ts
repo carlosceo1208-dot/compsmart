@@ -111,13 +111,18 @@ const handler = async (req: Request): Promise<Response> => {
     const statusLabel = statusLabels[statusFilter] || statusFilter;
 
     // Criar tabela HTML das submissões
+    // SECURITY: escape all client-supplied strings before HTML interpolation
+    const esc = (s: string) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
     const submissionsTableRows = reportData.submissions.map(sub => `
       <tr>
-        <td style="padding: 8px; border: 1px solid #ddd;">${sub.unitName}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${sub.status}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${sub.submittedBy}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${sub.submittedAt}</td>
-        <td style="padding: 8px; border: 1px solid #ddd;">${sub.reviewedBy}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${esc(sub.unitName)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${esc(sub.status)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${esc(sub.submittedBy)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${esc(sub.submittedAt)}</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${esc(sub.reviewedBy)}</td>
         <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sub.totalAnnual)}</td>
       </tr>
     `).join('');
@@ -150,8 +155,8 @@ const handler = async (req: Request): Promise<Response> => {
             <h2>Filtros Aplicados</h2>
             <div class="summary">
               <div class="summary-item"><strong>Ano Fiscal:</strong> ${fiscalYear}</div>
-              <div class="summary-item"><strong>Status:</strong> ${statusLabel}</div>
-              <div class="summary-item"><strong>Unidade:</strong> ${unitName}</div>
+              <div class="summary-item"><strong>Status:</strong> ${esc(statusLabel)}</div>
+              <div class="summary-item"><strong>Unidade:</strong> ${esc(unitName)}</div>
             </div>
 
             <h2>Resumo Consolidado</h2>
@@ -200,7 +205,7 @@ const handler = async (req: Request): Promise<Response> => {
       return resend.emails.send({
         from: 'CompSmart <noreply@compsmart.ia.br>',
         to: [recipient],
-        subject: `Relatório de Aprovações de Orçamento - ${fiscalYear} - ${statusLabel}`,
+        subject: `Relatório de Aprovações de Orçamento - ${fiscalYear} - ${statusLabel}`.replace(/[\r\n]+/g, ' '),
         html: htmlBody,
       });
     });

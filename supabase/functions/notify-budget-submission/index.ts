@@ -54,6 +54,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { submissionId, unitName, submittedBy, totalAmount, fiscalYear }: NotificationRequest = await req.json();
 
+    // SECURITY: escape client-supplied strings before HTML interpolation
+    const esc = (s: string) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const safeUnit = esc(unitName);
+    const safeSubmittedBy = esc(submittedBy);
+
     console.log('📧 Notificação orçamento:', { submissionId, unitName, fiscalYear, callerCompanyId });
 
     // SECURITY: Only fetch admin/HR users from the SAME company as the caller
@@ -96,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
           body: JSON.stringify({
             from: 'CompSmart <noreply@compsmart.ia.br>',
             to: [profile.email!],
-            subject: `📊 Novo Orçamento Submetido - ${unitName}`,
+            subject: `📊 Novo Orçamento Submetido - ${unitName}`.replace(/[\r\n]+/g, ' '),
             html: `
               <!DOCTYPE html>
               <html>
@@ -127,11 +134,11 @@ const handler = async (req: Request): Promise<Response> => {
                     <div class="info-box">
                       <div class="info-item">
                         <span class="info-label">🏢 Unidade:</span>
-                        <span class="info-value">${unitName}</span>
+                        <span class="info-value">${safeUnit}</span>
                       </div>
                       <div class="info-item">
                         <span class="info-label">👤 Submetido por:</span>
-                        <span class="info-value">${submittedBy}</span>
+                        <span class="info-value">${safeSubmittedBy}</span>
                       </div>
                       <div class="info-item">
                         <span class="info-label">📅 Ano Fiscal:</span>
