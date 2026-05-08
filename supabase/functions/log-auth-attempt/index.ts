@@ -78,7 +78,8 @@ serve(async (req) => {
 
     const { error } = await supabase.from("auth_attempt_logs").insert({
       email: cleanEmail,
-      user_id: payload.user_id || null,
+      // SECURITY: never trust caller-supplied user_id on this unauthenticated endpoint
+      user_id: null,
       attempt_type: payload.attempt_type,
       success: payload.success,
       failure_reason: failureReason,
