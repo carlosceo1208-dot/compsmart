@@ -63,19 +63,34 @@ Deno.serve(async (req) => {
     for (const config of alertConfigs as AlertConfig[]) {
       console.log(`[check-budget-alerts] Checking company ${config.root_company_id}...`);
 
-      // Buscar projeções do ano atual
+      // SECURITY: derive tenant unit scope. budget_* tables don't carry root_company_id,
+      // so we must restrict by unit_id belonging to this company's organizational tree.
+      const { data: tenantUnits } = await supabase
+        .from('organizational_structure')
+        .select('id')
+        .eq('root_company_id', config.root_company_id);
+
+      const tenantUnitIds = (tenantUnits ?? []).map((u: { id: string }) => u.id);
+      if (tenantUnitIds.length === 0) {
+        console.log(`[check-budget-alerts] No units for company ${config.root_company_id}`);
+        continue;
+      }
+
+      // Buscar projeções do ano atual (escopo por tenant via unit_id)
       const { data: currentProjections } = await supabase
         .from('budget_employee_projections')
         .select('projected_fixed_salary, projected_variable_salary, projected_benefits, projected_unit_id')
         .eq('fiscal_year', currentYear)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .in('projected_unit_id', tenantUnitIds);
 
-      // Buscar projeções do ano projetado (verificar se tem submissão aprovada)
+      // Submissões aprovadas do ano projetado (escopo por tenant)
       const { data: projectedSubmissions } = await supabase
         .from('budget_submissions')
         .select('id, unit_id, status')
         .eq('fiscal_year', projectedYear)
-        .eq('status', 'approved');
+        .eq('status', 'approved')
+        .in('unit_id', tenantUnitIds);
 
       if (!projectedSubmissions || projectedSubmissions.length === 0) {
         console.log(`[check-budget-alerts] No approved budget for ${projectedYear}`);
@@ -86,7 +101,8 @@ Deno.serve(async (req) => {
         .from('budget_employee_projections')
         .select('projected_fixed_salary, projected_variable_salary, projected_benefits, projected_unit_id')
         .eq('fiscal_year', projectedYear)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .in('projected_unit_id', tenantUnitIds);
 
       // Calcular totais anuais
       const calculateAnnualTotal = (projections: any[] | null) => {
