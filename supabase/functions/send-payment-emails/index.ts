@@ -259,13 +259,49 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseService = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+
+    // ============= SECURITY: JWT auth + ownership check =============
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const userClient = createClient(supabaseUrl, supabaseAnon, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const callerId = claims.claims.sub as string;
+
     const requestData: EmailRequest = await req.json();
     console.log('Email request received:', requestData.type);
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabase = createClient(supabaseUrl, supabaseService);
+
+    // SECURITY: Caller can only request emails for themselves OR be admin in the target company
+    const { data: callerRoles } = await supabase
+      .from('user_roles').select('role').eq('user_id', callerId);
+    const isAdmin = (callerRoles ?? []).some((r) => ['admin', 'super_admin'].includes(r.role));
+
+    if (requestData.userId && requestData.userId !== callerId && !isAdmin) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    if (requestData.companyId && !isAdmin) {
+      const { data: callerProfile } = await supabase
+        .from('profiles').select('root_company_id').eq('id', callerId).single();
+      if (callerProfile?.root_company_id !== requestData.companyId) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
 
     // Fetch user and company data
     let userData: Record<string, any> = {};

@@ -31,7 +31,6 @@ interface SendReportRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,11 +38,57 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY')!;
+
+    // ============= SECURITY: JWT auth =============
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const userClient = createClient(supabaseUrl, supabaseAnon, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const callerId = claims.claims.sub as string;
+
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // SECURITY: Caller must be admin or hr_manager
+    const { data: rolesRows } = await supabase
+      .from('user_roles').select('role').eq('user_id', callerId);
+    const userRoles = (rolesRows ?? []).map((r) => r.role);
+    if (!userRoles.includes('admin') && !userRoles.includes('hr_manager')) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
 
     const { recipients, fiscalYear, statusFilter, unitFilter, reportData }: SendReportRequest = await req.json();
 
-    console.log('Sending budget report to:', recipients);
+    // SECURITY: Validate recipients belong to caller's company
+    const { data: callerProfile } = await supabase
+      .from('profiles').select('root_company_id').eq('id', callerId).single();
+    if (!callerProfile?.root_company_id) {
+      return new Response(JSON.stringify({ error: 'No company on caller' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const { data: validRecipientProfiles } = await supabase
+      .from('profiles').select('email')
+      .in('email', recipients ?? [])
+      .eq('root_company_id', callerProfile.root_company_id);
+    const allowedEmails = new Set((validRecipientProfiles ?? []).map((p) => p.email));
+    const safeRecipients = (recipients ?? []).filter((e) => allowedEmails.has(e));
+    if (safeRecipients.length === 0) {
+      return new Response(JSON.stringify({ error: 'No valid recipients in your company' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    console.log('Sending budget report to:', safeRecipients);
 
     // Buscar nome da unidade se filtrado
     let unitName = 'Todas as Unidades';
@@ -151,7 +196,7 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Enviar emails para todos os destinatários
-    const emailPromises = recipients.map(async (recipient) => {
+    const emailPromises = safeRecipients.map(async (recipient) => {
       return resend.emails.send({
         from: 'CompSmart <noreply@compsmart.ia.br>',
         to: [recipient],
