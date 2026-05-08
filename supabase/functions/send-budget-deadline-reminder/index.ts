@@ -254,7 +254,7 @@ const handler = async (req: Request): Promise<Response> => {
                 
                 <div class="unit-box">
                   <strong>🏢 Sua Unidade:</strong><br>
-                  ${unit.code} - ${unit.description}
+                  ${esc(unit.code)} - ${esc(unit.description)}
                 </div>
                 
                 <p>Por favor, acesse o sistema CompSmart para submeter o orçamento da sua unidade antes do prazo.</p>
