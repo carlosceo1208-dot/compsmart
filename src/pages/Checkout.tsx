@@ -151,14 +151,13 @@ const planId = searchParams.get('plan');
         }
 
         if (profile?.root_company_id) {
-          const { data: company } = await supabase
-            .from('organizational_structure')
-            .select('cnpj')
-            .eq('id', profile.root_company_id)
-            .single();
+          // SECURITY: cnpj is admin/HR-only; fetched via secured RPC
+          const { data: billing } = await supabase
+            .rpc('get_company_billing_info', { _company_id: profile.root_company_id })
+            .maybeSingle();
 
-          if (company?.cnpj) {
-            setSavedCnpj(company.cnpj);
+          if (billing?.cnpj) {
+            setSavedCnpj(billing.cnpj);
             setDocumentType('cnpj');
           } else if (profile?.cpf) {
             setDocumentType('cpf');

@@ -172,14 +172,21 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const employeeName = feedbackRequest.employee?.full_name || "Colaborador";
-    const employeeTitle = feedbackRequest.employee?.job_title || "";
-    const companyName = feedbackRequest.company?.description || "Empresa";
-    const externalTypeLabel = getExternalTypeLabel(feedbackRequest.external_type);
-    const deadlineFormatted = formatDate(feedbackRequest.deadline);
+    // SECURITY: HTML-escape every value interpolated into the email body to prevent injection
+    const esc = (s: unknown): string => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-    // Build the feedback form URL
-    const feedbackFormUrl = `https://compsmart.lovable.app/feedback/${feedbackRequest.token}`;
+    const employeeName = esc(feedbackRequest.employee?.full_name || "Colaborador");
+    const employeeTitle = esc(feedbackRequest.employee?.job_title || "");
+    const companyName = esc(feedbackRequest.company?.description || "Empresa");
+    const externalName = esc(feedbackRequest.external_name);
+    const externalTypeLabel = esc(getExternalTypeLabel(feedbackRequest.external_type));
+    const deadlineFormatted = esc(formatDate(feedbackRequest.deadline));
+    const customMessageEscaped = feedbackRequest.custom_message ? esc(feedbackRequest.custom_message) : '';
+
+    // Build the feedback form URL (token is a server-generated UUID, safe)
+    const feedbackFormUrl = `https://compsmart.lovable.app/feedback/${encodeURIComponent(feedbackRequest.token)}`;
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -211,7 +218,7 @@ const handler = async (req: Request): Promise<Response> => {
           <tr>
             <td style="padding: 40px;">
               <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
-                Prezado(a) <strong>${feedbackRequest.external_name}</strong>,
+                Prezado(a) <strong>${externalName}</strong>,
               </p>
               
               <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
@@ -242,11 +249,11 @@ const handler = async (req: Request): Promise<Response> => {
                 exclusivamente para fins de desenvolvimento profissional.
               </p>
               
-              ${feedbackRequest.custom_message ? `
+              ${customMessageEscaped ? `
               <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px 20px; margin: 24px 0; border-radius: 0 8px 8px 0;">
                 <p style="color: #92400e; margin: 0; font-size: 14px; line-height: 1.5;">
                   <strong>Mensagem do solicitante:</strong><br/>
-                  ${feedbackRequest.custom_message}
+                  ${customMessageEscaped}
                 </p>
               </div>
               ` : ''}
