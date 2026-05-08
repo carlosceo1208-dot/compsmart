@@ -103,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
           body: JSON.stringify({
             from: 'CompSmart <noreply@compsmart.ia.br>',
             to: [profile.email!],
-            subject: `📊 Novo Orçamento Submetido - ${unitName}`,
+            subject: `📊 Novo Orçamento Submetido - ${unitName}`.replace(/[\r\n]+/g, ' '),
             html: `
               <!DOCTYPE html>
               <html>
