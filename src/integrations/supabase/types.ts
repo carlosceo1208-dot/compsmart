@@ -1547,6 +1547,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          root_company_id: string | null
           type: string
           updated_at: string
         }
@@ -1555,6 +1556,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          root_company_id?: string | null
           type: string
           updated_at?: string
         }
@@ -1563,10 +1565,26 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          root_company_id?: string | null
           type?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "competencies_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competencies_root_company_id_fkey"
+            columns: ["root_company_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversation_sessions: {
         Row: {
