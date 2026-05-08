@@ -18,7 +18,6 @@ const userSchema = z.object({
   full_name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
   email: z.string().email("Email inválido").optional().or(z.literal('')),
   employee_number: z.string().min(1, "Número de Registro (Matrícula) é obrigatório"),
-  password: z.string().min(8, "Senha deve ter no mínimo 8 caracteres").optional().or(z.literal('')),
   phone: z.string().optional(),
   cpf: z.string()
     .optional()
@@ -61,7 +60,6 @@ interface UserData {
   full_name: string;
   email: string;
   employee_number: string;
-  password?: string;
   phone?: string;
   cpf?: string;
   birth_date?: string;
@@ -125,7 +123,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     full_name: "",
     email: "",
     employee_number: "",
-    password: "",
     phone: "",
     cpf: "",
     birth_date: "",
@@ -379,7 +376,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         employee_number: profile.employee_number || "",
         hire_date: profile.hire_date || "",
         termination_date: profile.termination_date || "",
-        password: "",
         salary: profile.salary 
           ? profile.salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : "",
@@ -415,7 +411,6 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       full_name: "",
       email: "",
       employee_number: "",
-      password: "",
       phone: "",
       cpf: "",
       birth_date: "",
@@ -819,17 +814,9 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
               </div>
               {!userId && formData.email && (
                 <div className="col-span-2 space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    disabled={loading}
-                    placeholder="Senha temporária: TempPass123!"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Deixe em branco para usar senha temporária (TempPass123!)
+                  <Label>Acesso inicial</Label>
+                  <p className="text-sm text-muted-foreground">
+                    O sistema cria um acesso seguro automaticamente e o convite deve ser enviado depois pelo fluxo de ativação.
                   </p>
                 </div>
               )}
