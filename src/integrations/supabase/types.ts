@@ -9068,6 +9068,14 @@ export type Database = {
         Returns: string
       }
       suggest_next_employee_number: { Args: never; Returns: string }
+      test_audit_rollback_on_insert_failure: {
+        Args: never
+        Returns: {
+          details: string
+          scenario: string
+          status: string
+        }[]
+      }
       validate_coupon_code: {
         Args: { p_billing_cycle?: string; p_code: string; p_plan_id?: string }
         Returns: {
