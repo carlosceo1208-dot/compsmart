@@ -130,12 +130,21 @@ const Organization = () => {
     try {
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name, fantasy_name, cnpj")
+        .select("id, name, fantasy_name")
         .eq("type", "company")
         .order("name", { ascending: true });
 
       if (error) throw error;
-      setCompanies(data || []);
+
+      // SECURITY: cnpj is restricted; fetch via admin/HR RPC and merge
+      const ids = (data || []).map((c: any) => c.id);
+      let billingMap = new Map<string, string | null>();
+      if (ids.length > 0) {
+        const { data: billing } = await supabase
+          .rpc('get_companies_billing_info', { _company_ids: ids });
+        (billing || []).forEach((b: any) => billingMap.set(b.id, b.cnpj));
+      }
+      setCompanies((data || []).map((c: any) => ({ ...c, cnpj: billingMap.get(c.id) ?? null })));
     } catch (error: any) {
       toast.error("Erro ao carregar empresas");
       console.error("Error fetching companies:", error);
