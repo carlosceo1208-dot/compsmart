@@ -72,7 +72,7 @@ export default function Organogram() {
       // Filtrar funcionários por empresa ativa
       let employeesQuery = supabase
         .from('profiles_directory')
-        .select('user_id, full_name, job_title, grade, avatar_url, unit_id, status')
+        .select('user_id, full_name, job_title, avatar_url, unit_id, status')
         .eq('status', 'active');
       
       if (activeCompanyId) {
