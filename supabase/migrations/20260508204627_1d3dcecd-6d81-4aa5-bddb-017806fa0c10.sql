@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can view feedback responses from their company" ON public.external_feedback_responses;
