@@ -9,6 +9,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
 interface AlertConfig {
   id: string;
   root_company_id: string;
@@ -366,15 +368,15 @@ async function sendAlertEmail(
       </head>
       <body>
         <div class="header">
-          <h1>${severityLabels[severity]}</h1>
-          <p>${companyName}</p>
+          <h1>${esc(severityLabels[severity])}</h1>
+          <p>${esc(companyName)}</p>
         </div>
         
         <div class="content">
-          <h2>${title}</h2>
+          <h2>${esc(title)}</h2>
           
           <div class="alert-box">
-            <p style="white-space: pre-line;">${description}</p>
+            <p style="white-space: pre-line;">${esc(description)}</p>
           </div>
 
           <p>
