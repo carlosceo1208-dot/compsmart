@@ -8762,6 +8762,17 @@ export type Database = {
           unique_users: number
         }[]
       }
+      get_companies_billing_info: {
+        Args: { _company_ids: string[] }
+        Returns: {
+          billing_email: string
+          cnpj: string
+          custom_annual_price: number
+          custom_monthly_price: number
+          id: string
+          payment_method: string
+        }[]
+      }
       get_company_billing_details: {
         Args: { p_company_id: string }
         Returns: {
