@@ -24,26 +24,63 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
-    const { submissionId, unitName, submittedBy, totalAmount, fiscalYear }: NotificationRequest = await req.json();
-    
-    console.log('📧 Processando notificação de submissão de orçamento:', {
-      submissionId,
-      unitName,
-      fiscalYear
+    // ============= SECURITY: JWT auth =============
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const userClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
+      global: { headers: { Authorization: authHeader } },
     });
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const callerId = claims.claims.sub as string;
 
-    // Buscar todos os usuários com role admin ou hr_manager
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Resolve caller's company to scope notifications
+    const { data: callerProfile } = await supabase
+      .from('profiles').select('root_company_id').eq('id', callerId).single();
+    const callerCompanyId = callerProfile?.root_company_id;
+    if (!callerCompanyId) {
+      return new Response(JSON.stringify({ error: 'No company on caller' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const { submissionId, unitName, submittedBy, totalAmount, fiscalYear }: NotificationRequest = await req.json();
+
+    console.log('📧 Notificação orçamento:', { submissionId, unitName, fiscalYear, callerCompanyId });
+
+    // SECURITY: Only fetch admin/HR users from the SAME company as the caller
+    const { data: companyProfiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, email, full_name')
+      .eq('root_company_id', callerCompanyId)
+      .not('email', 'is', null);
+
+    if (profilesError) throw profilesError;
+
+    const companyUserIds = (companyProfiles ?? []).map((p) => p.id);
+    if (companyUserIds.length === 0) {
+      return new Response(JSON.stringify({ message: 'Nenhum aprovador encontrado' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const { data: adminHRUsers, error: rolesError } = await supabase
       .from('user_roles')
       .select('user_id')
+      .in('user_id', companyUserIds)
       .in('role', ['admin', 'hr_manager']);
 
-    if (rolesError) {
-      console.error('❌ Erro ao buscar roles:', rolesError);
-      throw rolesError;
-    }
+    if (rolesError) throw rolesError;
+
+    const approverIds = new Set((adminHRUsers ?? []).map((r) => r.user_id));
+    const profiles = (companyProfiles ?? []).filter((p) => approverIds.has(p.id));
 
     const userIds = [...new Set(adminHRUsers?.map(r => r.user_id) || [])];
 
