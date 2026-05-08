@@ -132,9 +132,9 @@ serve(async (req) => {
       }
 
       try {
-        // Verificar se já existe um usuário auth para este email
-        const { data: authUsers } = await supabase.auth.admin.listUsers();
-        const existingAuthUser = authUsers?.users?.find(u => u.email === employee.email);
+        // SECURITY: Avoid unbounded listUsers(); rely on createUser's "already registered"
+        // error path below to detect existing auth users (handled in catch logic).
+        const existingAuthUser: { id: string } | null = null;
 
         let activationUrl: string;
 
