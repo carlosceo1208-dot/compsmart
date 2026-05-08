@@ -2,6 +2,9 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+
+const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
@@ -66,8 +69,8 @@ const getExpirationEmailTemplate = (data: Record<string, any>): { subject: strin
             <p>Seu período de teste expirou</p>
           </div>
           <div class="content">
-            <h2>Olá, ${data.userName}!</h2>
-            <p>O período de teste gratuito do CompSmart para a empresa <strong>${data.companyName}</strong> expirou.</p>
+            <h2>Olá, ${esc(data.userName)}!</h2>
+            <p>O período de teste gratuito do CompSmart para a empresa <strong>${esc(data.companyName)}</strong> expirou.</p>
             
             <div class="alert-box">
               <div class="icon">⏰</div>
