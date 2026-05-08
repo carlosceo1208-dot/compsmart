@@ -108,49 +108,55 @@ serve(async (req) => {
     // Log without sensitive data
     console.log('Activation attempt received');
 
-    // SECURITY: Verify Turnstile CAPTCHA token if provided
-    if (turnstileSecretKey && turnstileToken) {
-      try {
-        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            secret: turnstileSecretKey,
-            response: turnstileToken,
-            remoteip: clientIP
-          })
-        });
-        
-        const turnstileResult = await turnstileResponse.json();
-        
-        if (!turnstileResult.success) {
-          console.warn('Turnstile verification failed');
-          return new Response(JSON.stringify({ 
-            success: false,
-            error: 'Verificação de segurança falhou. Por favor, tente novamente.'
-          }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          });
-        }
-        console.log('Turnstile verification passed');
-      } catch (turnstileError) {
-        console.error('Turnstile verification error');
-        // Continue without blocking - rate limiting is still in place
-      }
-    } else if (!turnstileToken) {
-      // If no token provided and we have the secret key, require it
-      if (turnstileSecretKey) {
-        console.warn('No Turnstile token provided');
-        return new Response(JSON.stringify({ 
-          success: false,
-          error: 'Verificação de segurança necessária. Por favor, complete o captcha.'
-        }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+    // SECURITY: Turnstile CAPTCHA is REQUIRED unconditionally
+    if (!turnstileSecretKey) {
+      console.error('[SECURITY] TURNSTILE_SECRET_KEY not configured - blocking activation');
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Serviço de ativação temporariamente indisponível.'
+      }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
+    if (!turnstileToken) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Verificação de segurança necessária. Por favor, complete o captcha.'
+      }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    try {
+      const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          secret: turnstileSecretKey,
+          response: turnstileToken,
+          remoteip: clientIP
+        })
+      });
+      const turnstileResult = await turnstileResponse.json();
+      if (!turnstileResult.success) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'Verificação de segurança falhou. Por favor, tente novamente.'
+        }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    } catch (_e) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Falha na verificação de segurança. Tente novamente.'
+      }), { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // SECURITY: Audit log all activation attempts
+    try {
+      await supabase.from('auth_attempt_logs').insert({
+        email: email || 'unknown',
+        attempt_type: 'signup',
+        success: false, // updated to true at end if successful
+        ip_address: clientIP,
+        user_agent: req.headers.get('user-agent') || 'unknown',
+        metadata: { source: 'activate-employee', identifier_present: !!identifier }
+      });
+    } catch (_e) { /* non-blocking */ }
 
     // Validations with generic messages
     if (!identifier || (!isValidCPF(identifier) && !isValidEmployeeNumber(identifier))) {
