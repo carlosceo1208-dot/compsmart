@@ -34,11 +34,7 @@ export const CompanyContextCard = ({ onEditClick }: CompanyContextCardProps) => 
         // SECURITY: avoid select('*'); sensitive billing columns are admin-only
         const { data } = await supabase
           .from("organizational_structure")
-          .select(
-            "id, name, type, code, description, fantasy_name, address, logo_url, " +
-            "industry_sector, root_company_id, subscription_plan_id, subscription_status, " +
-            "trial_ends_at, default_language"
-          )
+          .select("id, name, type, code, description, fantasy_name, address, logo_url, industry_sector, root_company_id, subscription_plan_id, subscription_status, trial_ends_at, default_language")
           .eq("id", profile.root_company_id)
           .single();
 

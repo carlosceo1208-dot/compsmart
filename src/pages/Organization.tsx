@@ -154,12 +154,7 @@ const Organization = () => {
   const fetchEntities = async () => {
     try {
       // SECURITY: do not select sensitive billing columns; fetch them via RPC for admin/HR
-      const safeColumns =
-        "id, name, type, code, description, parent_id, created_at, updated_at, " +
-        "fantasy_name, address, union_name, base_date, root_company_id, logo_url, " +
-        "subscription_plan_id, subscription_status, billing_cycle, trial_ends_at, " +
-        "subscription_started_at, social_charges_percentage, industry_sector, " +
-        "latitude, longitude, default_language, data_deletion_scheduled_at, is_founder";
+      const safeColumns = "id, name, type, code, description, parent_id, created_at, updated_at, fantasy_name, address, union_name, base_date, root_company_id, logo_url, subscription_plan_id, subscription_status, billing_cycle, trial_ends_at, subscription_started_at, social_charges_percentage, industry_sector, latitude, longitude, default_language, data_deletion_scheduled_at, is_founder";
 
       let query = supabase
         .from("organizational_structure")
