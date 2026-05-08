@@ -54,6 +54,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { submissionId, unitName, submittedBy, totalAmount, fiscalYear }: NotificationRequest = await req.json();
 
+    // SECURITY: escape client-supplied strings before HTML interpolation
+    const esc = (s: string) => String(s ?? '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const safeUnit = esc(unitName);
+    const safeSubmittedBy = esc(submittedBy);
+
     console.log('📧 Notificação orçamento:', { submissionId, unitName, fiscalYear, callerCompanyId });
 
     // SECURITY: Only fetch admin/HR users from the SAME company as the caller
