@@ -23,6 +23,11 @@ interface EmailRequest {
   invoiceNumber?: string;
 }
 
+// SECURITY: HTML-escape all user/DB-controlled values before interpolating into email templates
+const esc = (s: unknown): string => String(s ?? '')
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
@@ -314,7 +319,8 @@ serve(async (req) => {
         .single();
       
       if (profile) {
-        userData.userName = profile.full_name || 'Cliente';
+        // SECURITY: escape user-controlled DB field before HTML interpolation
+        userData.userName = esc(profile.full_name || 'Cliente');
         userData.userEmail = profile.email;
       }
     }
@@ -327,22 +333,22 @@ serve(async (req) => {
         .single();
       
       if (company) {
-        userData.companyName = company.name;
+        userData.companyName = esc(company.name);
         userData.billingEmail = company.billing_email;
       }
     }
 
-    // Merge request data with fetched data
+    // SECURITY: escape ALL string values that flow into HTML email templates
     const emailData = {
       ...userData,
-      planName: requestData.planName || 'CompSmart',
+      planName: esc(requestData.planName || 'CompSmart'),
       amount: requestData.amount ? formatCurrency(requestData.amount) : 'N/A',
       paymentMethod: requestData.paymentMethod === 'pix' ? 'PIX' :
                      requestData.paymentMethod === 'credit_card' ? 'Cartão de Crédito' :
                      requestData.paymentMethod === 'debit_card' ? 'Cartão de Débito' :
                      requestData.paymentMethod === 'boleto' ? 'Boleto' : 'N/A',
       nextBillingDate: requestData.nextBillingDate ? formatDate(requestData.nextBillingDate) : null,
-      invoiceNumber: requestData.invoiceNumber,
+      invoiceNumber: esc(requestData.invoiceNumber),
     };
 
     const recipientEmail = userData.billingEmail || userData.userEmail;
