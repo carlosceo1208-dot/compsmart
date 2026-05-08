@@ -139,7 +139,7 @@ const handler = async (req: Request): Promise<Response> => {
                       </p>
                       
                       <p style="margin: 0 0 30px 0; color: #666; font-size: 16px; line-height: 1.6;">
-                        <strong>${fromEmployeeName}</strong> enviou um reconhecimento para você na categoria <strong>${categoryLabel}</strong>:
+                        <strong>${safeFrom}</strong> enviou um reconhecimento para você na categoria <strong>${safeCategoryLabel}</strong>:
                       </p>
                       
                       <!-- Message Box -->
