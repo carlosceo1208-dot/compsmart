@@ -148,12 +148,22 @@ Deno.serve(async (req) => {
       );
     }
 
-    // For auth.users: we need to check if email exists AND belongs to someone else
-    // If it exists as a lead/external user, we'll need to handle that case
-    const { data: authUserWithEmail } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
-    const existingAuthUser = authUserWithEmail?.users?.find(
-      u => u.email?.toLowerCase() === newEmail.toLowerCase() && u.id !== targetUserId
-    );
+    // For auth.users: look up existing auth user by email via profiles table to avoid
+    // unbounded listUsers() calls. If found, fetch the auth record by id.
+    const { data: profileWithEmail } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .ilike('email', newEmail)
+      .neq('id', targetUserId)
+      .maybeSingle();
+
+    let existingAuthUser: { id: string } | null = null;
+    if (profileWithEmail?.id) {
+      const { data: lookup } = await supabaseAdmin.auth.admin.getUserById(profileWithEmail.id);
+      if (lookup?.user && lookup.user.email?.toLowerCase() === newEmail.toLowerCase()) {
+        existingAuthUser = { id: lookup.user.id };
+      }
+    }
 
     if (existingAuthUser) {
       // Check if this auth user belongs to same company (conflict) or different (allowed - we won't touch their auth)
