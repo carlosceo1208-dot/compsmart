@@ -159,15 +159,25 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
 
     try {
       setLoading(true);
+      // SECURITY: avoid select('*'); cnpj is restricted, fetched via admin RPC
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("*")
+        .select(
+          "id, name, type, code, description, parent_id, fantasy_name, address, " +
+          "union_name, base_date, logo_url, industry_sector, root_company_id"
+        )
         .eq("id", entityId)
         .single();
 
       if (error) throw error;
 
+      let cnpjValue = "";
       if (data) {
+        const { data: billing } = await supabase
+          .rpc('get_company_billing_info', { _company_id: entityId })
+          .maybeSingle();
+        cnpjValue = billing?.cnpj || "";
+
         setFormData({
           name: data.name || "",
           code: data.code || "",
@@ -175,7 +185,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           description: data.description || "",
           parent_id: data.parent_id || "",
           fantasy_name: data.fantasy_name || "",
-          cnpj: data.cnpj || "",
+          cnpj: cnpjValue,
           address: data.address || "",
           union_name: data.union_name || "",
           base_date: data.base_date || "",

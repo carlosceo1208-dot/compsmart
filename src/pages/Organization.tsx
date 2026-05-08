@@ -153,11 +153,18 @@ const Organization = () => {
 
   const fetchEntities = async () => {
     try {
+      // SECURITY: do not select sensitive billing columns; fetch them via RPC for admin/HR
+      const safeColumns =
+        "id, name, type, code, description, parent_id, created_at, updated_at, " +
+        "fantasy_name, address, union_name, base_date, root_company_id, logo_url, " +
+        "subscription_plan_id, subscription_status, billing_cycle, trial_ends_at, " +
+        "subscription_started_at, social_charges_percentage, industry_sector, " +
+        "latitude, longitude, default_language, data_deletion_scheduled_at, is_founder";
+
       let query = supabase
         .from("organizational_structure")
-        .select("*");
+        .select(safeColumns);
 
-      // Filtrar por empresa selecionada
       if (selectedCompanyId !== "all") {
         query = query.eq("root_company_id", selectedCompanyId);
       }
@@ -167,23 +174,34 @@ const Organization = () => {
         .order("name", { ascending: true });
 
       if (error) throw error;
-      
+
+      // Fetch CNPJs via secured RPC and merge in
+      const ids = (data || []).map((e: any) => e.id);
+      const billingMap = new Map<string, string | null>();
+      if (ids.length > 0) {
+        const { data: billing } = await supabase
+          .rpc('get_companies_billing_info', { _company_ids: ids });
+        (billing || []).forEach((b: any) => billingMap.set(b.id, b.cnpj));
+      }
+
       // Fetch parent names separately for each entity
       const entitiesWithParents = await Promise.all(
-        (data || []).map(async (entity) => {
+        (data || []).map(async (entity: any) => {
+          const cnpj = billingMap.get(entity.id) ?? null;
           if (entity.parent_id) {
             const { data: parentData } = await supabase
               .from("organizational_structure")
               .select("name")
               .eq("id", entity.parent_id)
               .single();
-            
+
             return {
               ...entity,
+              cnpj,
               parent: parentData ? { name: parentData.name } : null
             };
           }
-          return { ...entity, parent: null };
+          return { ...entity, cnpj, parent: null };
         })
       );
       
