@@ -210,10 +210,11 @@ serve(async (req) => {
     const { data: jobTitles } = await supabase
       .from('job_titles')
       .select('id, code, title, grade, job_family, median_points')
+      .eq('root_company_id', profile.root_company_id)
       .eq('is_active', true)
       .limit(100);
 
-    // Buscar dados de pesquisas salariais ativas (cliente + templates CompSmart)
+    // Buscar dados de pesquisas salariais ativas (cliente + templates CompSmart globais)
     const { data: surveyTables } = await supabase
       .from('survey_tables')
       .select(`
@@ -231,6 +232,7 @@ serve(async (req) => {
           q3_value
         )
       `)
+      .or(`root_company_id.eq.${profile.root_company_id},root_company_id.is.null`)
       .eq('is_active', true)
       .limit(5);
 
