@@ -38,12 +38,31 @@ const categoryEmojis: Record<string, string> = {
 };
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // ============= SECURITY: JWT auth =============
+    const authHeader = req.headers.get('Authorization') ?? '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const token = authHeader.replace('Bearer ', '');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnon = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const supabaseService = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const userClient = createClient(supabaseUrl, supabaseAnon, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claims?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    const callerId = claims.claims.sub as string;
+
     const {
       kudosId,
       toEmployeeId,
@@ -55,9 +74,21 @@ const handler = async (req: Request): Promise<Response> => {
       isPublic,
     }: KudosNotificationRequest = await req.json();
 
-    // Validate required fields
     if (!toEmployeeEmail || !fromEmployeeName || !message) {
       throw new Error("Missing required fields");
+    }
+
+    // SECURITY: Verify recipient belongs to the caller's company
+    const adminClient = createClient(supabaseUrl, supabaseService);
+    const { data: callerProfile } = await adminClient
+      .from('profiles').select('root_company_id').eq('id', callerId).single();
+    const { data: recipientProfile } = await adminClient
+      .from('profiles').select('root_company_id, email').eq('email', toEmployeeEmail).maybeSingle();
+    if (!callerProfile?.root_company_id ||
+        !recipientProfile ||
+        recipientProfile.root_company_id !== callerProfile.root_company_id) {
+      return new Response(JSON.stringify({ error: 'Recipient not in your company' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
     const categoryLabel = categoryLabels[category] || category;

@@ -37,7 +37,8 @@ const ALLOWED_ACCOUNTS = [
 
 // Fixed values for security
 const COMPSMART_COMPANY_ID = 'b4ef7367-2068-4939-b455-f61ad9d7bc8c';
-const FIXED_PASSWORD = 'Consultor@2026!';
+// SECURITY: Password is loaded from env secret, never hardcoded.
+const FIXED_PASSWORD = Deno.env.get('TEST_ACCOUNT_PASSWORD') ?? '';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -55,6 +56,14 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Too many requests. Try again later.' }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!FIXED_PASSWORD) {
+      console.error('[SECURITY] TEST_ACCOUNT_PASSWORD secret not configured');
+      return new Response(
+        JSON.stringify({ error: 'Service not configured' }),
+        { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -122,9 +131,8 @@ serve(async (req) => {
           JSON.stringify({ 
             success: true, 
             action: 'updated',
-            message: `Account ${email} updated successfully`,
-            email,
-            password: FIXED_PASSWORD
+            message: `Account ${email} updated successfully. Use the configured shared credential to sign in.`,
+            email
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -182,9 +190,8 @@ serve(async (req) => {
         JSON.stringify({ 
           success: true, 
           action: 'created',
-          message: `Account ${email} created successfully`,
+          message: `Account ${email} created successfully. Use the configured shared credential to sign in.`,
           email,
-          password: FIXED_PASSWORD,
           userId
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

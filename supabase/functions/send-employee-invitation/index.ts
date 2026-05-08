@@ -156,9 +156,11 @@ serve(async (req) => {
           activationUrl = resetData.properties?.action_link || '';
         } else {
           // Usuário não existe no Auth - criar conta e gerar link
+          // SECURITY: Use a strong random password (user must reset via the recovery link sent below)
+          const randomPassword = crypto.randomUUID() + crypto.randomUUID() + 'Aa1!';
           const { data: authData, error: authError } = await supabase.auth.admin.createUser({
             email: employee.email,
-            password: 'TempPass123!',
+            password: randomPassword,
             email_confirm: true,
             user_metadata: { 
               full_name: employee.full_name,

@@ -23,7 +23,6 @@ interface UnitWithoutSubmission {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -31,9 +30,43 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseAnon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const { fiscalYear, automatic = false }: ReminderRequest = await req.json();
+
+    // ============= SECURITY: Always require auth =============
+    // Automatic invocations must use CRON_SECRET; manual must use a logged-in user JWT.
+    const authHeader = req.headers.get("Authorization") ?? "";
+    if (automatic) {
+      const cronSecret = Deno.env.get("CRON_SECRET");
+      if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    } else {
+      if (!authHeader.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const token = authHeader.replace("Bearer ", "");
+      const userClient = createClient(supabaseUrl, supabaseAnon, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+      if (claimsErr || !claims?.claims?.sub) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const callerId = claims.claims.sub as string;
+      const { data: callerRoles } = await supabase
+        .from("user_roles").select("role").eq("user_id", callerId);
+      const userRoles = (callerRoles ?? []).map((r) => r.role);
+      if (!userRoles.includes("admin") && !userRoles.includes("hr_manager")) {
+        return new Response(JSON.stringify({ error: "Forbidden" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
 
     console.log(`[send-budget-deadline-reminder] Starting - fiscalYear: ${fiscalYear}, automatic: ${automatic}`);
 
