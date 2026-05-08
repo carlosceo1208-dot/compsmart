@@ -145,7 +145,7 @@ const handler = async (req: Request): Promise<Response> => {
                       <!-- Message Box -->
                       <div style="background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 100%); border-left: 4px solid #4f46e5; padding: 20px; border-radius: 8px; margin: 0 0 30px 0;">
                         <p style="margin: 0; color: #333; font-size: 16px; line-height: 1.6; font-style: italic;">
-                          "${message}"
+                          "${safeMessage}"
                         </p>
                       </div>
                       
