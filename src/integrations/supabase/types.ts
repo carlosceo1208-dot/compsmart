@@ -8526,6 +8526,15 @@ export type Database = {
           table_name: string
         }[]
       }
+      audit_sensitive_data_access: {
+        Args: never
+        Returns: {
+          details: string
+          sensitive_field: string
+          status: string
+          table_name: string
+        }[]
+      }
       build_scenario_from_9box: {
         Args: {
           p_filter_box_max?: number
