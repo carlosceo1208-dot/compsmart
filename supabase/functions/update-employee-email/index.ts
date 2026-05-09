@@ -264,7 +264,7 @@ Deno.serve(async (req) => {
     if (authUpdateError) {
       console.error('Auth update error:', authUpdateError);
       return new Response(
-        JSON.stringify({ error: 'Erro ao atualizar email na autenticação: ' + authUpdateError.message }),
+        JSON.stringify({ error: 'Erro ao atualizar email na autenticação' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }

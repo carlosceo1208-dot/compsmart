@@ -54,6 +54,20 @@ serve(async (req) => {
       );
     }
 
+    // ============ ROLE AUTHORIZATION ============
+    const { data: callerRoles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const allowedRoles = ['admin', 'hr_manager', 'super_admin'];
+    const hasAccess = (callerRoles || []).some((r: any) => allowedRoles.includes(r.role));
+    if (!hasAccess) {
+      return new Response(
+        JSON.stringify({ error: 'Acesso negado.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // ============ RATE LIMITING ============
     const { data: allowed } = await supabase.rpc('check_rate_limit', {
       p_user_id: user.id,
