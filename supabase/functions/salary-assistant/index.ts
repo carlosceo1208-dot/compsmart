@@ -766,10 +766,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
   } catch (error: any) {
     console.error('❌ Salary Smart error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message || 'Erro ao processar consulta',
-        details: error.toString() 
-      }),
+      JSON.stringify({ error: 'Erro ao processar consulta' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

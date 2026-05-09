@@ -204,8 +204,8 @@ serve(async (req) => {
     }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
   } catch (error: any) {
-    console.error('[create-employee-user] error:', error?.message);
-    return new Response(JSON.stringify({ success: false, error: error?.message || 'Erro' }),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    console.error('[create-employee-user] error:', error?.message, error);
+    return new Response(JSON.stringify({ success: false, error: 'Erro interno do servidor' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 });

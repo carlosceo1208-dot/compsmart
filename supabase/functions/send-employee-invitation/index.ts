@@ -392,9 +392,9 @@ serve(async (req) => {
     console.error('Error in send-employee-invitation:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: 'Erro interno do servidor'
     }), {
-      status: 400,
+      status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
