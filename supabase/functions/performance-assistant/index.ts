@@ -78,13 +78,41 @@ serve(async (req) => {
       .single();
     const callerCompanyId = callerProfile?.root_company_id;
 
-    // Fetch employee context if provided (tenant-scoped)
+    // Fetch employee context if provided (tenant-scoped + role-gated)
     let employeeContext = '';
     if (employeeId && callerCompanyId) {
+      // Authorization: only privileged roles, the employee themselves, or their direct manager
+      const { data: callerRoles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      const isPrivileged = (callerRoles || []).some((r: any) =>
+        ['admin', 'hr_manager', 'super_admin'].includes(r.role)
+      );
+      const isSelf = employeeId === user.id;
+
+      let isManager = false;
+      if (!isPrivileged && !isSelf) {
+        const { data: targetProfile } = await supabase
+          .from('profiles')
+          .select('manager_id')
+          .eq('id', employeeId)
+          .eq('root_company_id', callerCompanyId)
+          .single();
+        isManager = targetProfile?.manager_id === user.id;
+      }
+
+      if (!isPrivileged && !isSelf && !isManager) {
+        return new Response(
+          JSON.stringify({ error: 'Acesso negado a dados deste colaborador.' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
       const { data: employee } = await supabase
         .from('profiles')
         .select(`
-          full_name, job_title, grade, salary, root_company_id,
+          full_name, job_title, grade, root_company_id,
           unit:organizational_structure!profiles_unit_id_fkey(description)
         `)
         .eq('id', employeeId)

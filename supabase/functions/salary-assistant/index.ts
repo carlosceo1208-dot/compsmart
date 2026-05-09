@@ -141,8 +141,22 @@ serve(async (req) => {
       throw new Error('Usuário não autenticado');
     }
 
-    // ============ RATE LIMITING (30 requests/hora) ============
+    // ============ ROLE CHECK (admin / hr_manager / super_admin) ============
     const serviceSupabase = createClient(supabaseUrl, supabaseKey);
+    const { data: callerRoles } = await serviceSupabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    const allowedRoles = ['admin', 'hr_manager', 'super_admin'];
+    const hasAccess = (callerRoles || []).some((r: any) => allowedRoles.includes(r.role));
+    if (!hasAccess) {
+      return new Response(
+        JSON.stringify({ error: 'Acesso negado. Este recurso é restrito a administradores e RH.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ============ RATE LIMITING (30 requests/hora) ============
     const { data: allowed, error: rlError } = await serviceSupabase.rpc('check_rate_limit', {
       p_user_id: user.id,
       p_function_name: 'salary-assistant',
