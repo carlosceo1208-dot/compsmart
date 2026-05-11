@@ -471,15 +471,15 @@ export const DashboardLayout = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(item.path)}
-                className={`px-2 lg:px-3 transition-all duration-300 border ${
+                className={`px-2 2xl:px-3 shrink-0 transition-all duration-300 border ${
                   currentPath === item.path 
                     ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25" 
                     : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/70"
                 }`}
                 title={item.label}
               >
-                <item.icon className="w-3.5 h-3.5 lg:mr-1" />
-                <span className="hidden lg:inline">{item.label}</span>
+                <item.icon className="w-3.5 h-3.5 2xl:mr-1" />
+                <span className="hidden 2xl:inline">{item.label}</span>
               </Button>
             ))}
             {/* AI Agents Dropdown */}
