@@ -459,3 +459,20 @@ All colors MUST be HSL.
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
+
+/* === NR-1 Module Scope === */
+.nr1-scope {
+  --nr1-primary: 211 100% 50%;       /* #007BFF */
+  --nr1-success: 134 61% 41%;        /* #28A745 */
+  --nr1-warning: 45 100% 51%;        /* #FFC107 */
+  --nr1-danger:  354 70% 54%;        /* #DC3545 */
+  --nr1-soft:    210 50% 97%;
+}
+.nr1-scope .nr1-bg-soft { background-color: hsl(var(--nr1-soft)); }
+.nr1-scope .nr1-text-primary { color: hsl(var(--nr1-primary)); }
+.nr1-scope .nr1-bg-primary { background-color: hsl(var(--nr1-primary)); color: white; }
+.nr1-scope .nr1-bg-primary:hover { background-color: hsl(var(--nr1-primary) / 0.9); }
+.nr1-risk-baixo    { background-color: hsl(var(--nr1-success) / 0.12); color: hsl(var(--nr1-success)); }
+.nr1-risk-moderado { background-color: hsl(var(--nr1-warning) / 0.18); color: hsl(35 90% 35%); }
+.nr1-risk-alto     { background-color: hsl(25 95% 60% / 0.18);          color: hsl(25 95% 40%); }
+.nr1-risk-critico  { background-color: hsl(var(--nr1-danger) / 0.15);  color: hsl(var(--nr1-danger)); }

@@ -206,6 +206,45 @@ const Pricing = () => {
           ))}
         </div>
 
+        {/* NR-1 Add-on Section */}
+        <div className="max-w-5xl mx-auto mt-4 mb-8">
+          <Card className="border-2 border-dashed">
+            <CardHeader>
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle className="text-xl">🛡️ Add-on NR-1 — Saúde, Bem-Estar & Performance</CardTitle>
+                <Badge className="bg-red-100 text-red-700 border-red-200">Obrigatório 2026</Badge>
+              </div>
+              <CardDescription>
+                Conformidade com a NR-1 (riscos psicossociais). <strong>Já incluso no plano Pro e Enterprise.</strong>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid sm:grid-cols-3 gap-3">
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-xs text-muted-foreground">Até 100 colab.</p>
+                  <p className="text-2xl font-bold">R$ 349<span className="text-sm text-muted-foreground">/mês</span></p>
+                </div>
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-xs text-muted-foreground">101 a 500</p>
+                  <p className="text-2xl font-bold">R$ 649<span className="text-sm text-muted-foreground">/mês</span></p>
+                </div>
+                <div className="rounded-lg border p-3 text-center">
+                  <p className="text-xs text-muted-foreground">501+ colab.</p>
+                  <p className="text-2xl font-bold">R$ 1.190<span className="text-sm text-muted-foreground">/mês</span></p>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                <Button variant="outline" asChild>
+                  <a href="/nr1-publico">Saber mais sobre NR-1</a>
+                </Button>
+                <Button onClick={() => navigate('/checkout?plan=nr1_essencial&cycle=monthly')}>
+                  Contratar NR-1 Essencial
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="text-center text-sm text-muted-foreground">
           <p>Todos os planos incluem atualizações gratuitas e segurança de dados.</p>
           <p className="mt-2">

@@ -1,0 +1,133 @@
+import { useParams } from 'react-router-dom';
+import { useNr1Diagnostico } from '@/hooks/useNr1';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/nr1';
+import { Download, Users, AlertTriangle } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+export default function Nr1DiagnosticoDetalhe() {
+  const { id } = useParams<{ id: string }>();
+  const { data, isLoading } = useNr1Diagnostico(id);
+
+  if (isLoading) return <Skeleton className="h-96 w-full" />;
+  if (!data) return <p className="text-center py-10 text-muted-foreground">Diagnóstico não encontrado.</p>;
+
+  const scores = (data.scores_dimensao as Record<string, number> | null) ?? {};
+  const dims = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  const exportar = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`Diagnóstico NR-1 — ${data.ciclo_nome}`, 14, 18);
+    doc.setFontSize(10);
+    doc.text(
+      `Score geral: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Risco: ${
+        data.nivel_risco ? RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL] : '—'
+      } · Respondentes: ${data.total_respondentes}`,
+      14, 26
+    );
+    autoTable(doc, {
+      startY: 34,
+      head: [['Dimensão Psicossocial', 'Score (0-100)']],
+      body: dims.map(([dim, score]) => [DIMENSAO_LABEL[dim as Dimensao] ?? dim, Number(score).toFixed(2)]),
+    });
+    doc.save(`nr1-diagnostico-${data.ciclo_nome}.pdf`);
+  };
+
+  const baixaParticipacao = data.total_respondentes < 5;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold">{data.ciclo_nome}</h2>
+          <p className="text-sm text-muted-foreground">
+            Período: {data.periodo_inicio} {data.periodo_fim ? `→ ${data.periodo_fim}` : '(em andamento)'}
+          </p>
+        </div>
+        <Button onClick={exportar} variant="outline">
+          <Download className="h-4 w-4 mr-1" /> Exportar PDF
+        </Button>
+      </div>
+
+      {/* KPI bar */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Score Geral</p>
+            <p className="text-3xl font-bold">{data.score_geral?.toFixed(1) ?? '—'}<span className="text-base text-muted-foreground">/100</span></p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Nível de Risco</p>
+            {data.nivel_risco ? (
+              <Badge className={`${RISCO_CLASS[data.nivel_risco as keyof typeof RISCO_CLASS]} text-base mt-1`}>
+                {RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL]}
+              </Badge>
+            ) : <p className="text-muted-foreground">—</p>}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Respondentes</p>
+            <p className="text-3xl font-bold flex items-center gap-2">
+              <Users className="h-6 w-6 text-muted-foreground" />
+              {data.total_respondentes}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {baixaParticipacao && (
+        <Card className="border-[hsl(var(--nr1-warning))]">
+          <CardContent className="pt-4 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-[hsl(var(--nr1-warning))] flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <strong>Atenção (LGPD/k-anonimato):</strong> menos de 5 respondentes podem permitir reidentificação.
+              Resultados com baixa participação não devem ser publicados internamente.
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Scores por dimensão */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Scores por Dimensão Psicossocial</CardTitle>
+          <CardDescription>Quanto maior o score, maior o risco identificado naquela dimensão.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {dims.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Sem respostas registradas.</p>
+          ) : (
+            dims.map(([dim, score]) => {
+              const s = Number(score);
+              const risco = s <= 25 ? 'baixo' : s <= 50 ? 'moderado' : s <= 75 ? 'alto' : 'critico';
+              return (
+                <div key={dim} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium">{DIMENSAO_LABEL[dim as Dimensao] ?? dim}</span>
+                    <span className="tabular-nums">
+                      {s.toFixed(1)} —{' '}
+                      <Badge variant="outline" className={RISCO_CLASS[risco as keyof typeof RISCO_CLASS]}>
+                        {RISCO_LABEL[risco as keyof typeof RISCO_LABEL]}
+                      </Badge>
+                    </span>
+                  </div>
+                  <Progress value={s} className="h-2" />
+                </div>
+              );
+            })
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

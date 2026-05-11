@@ -1,91 +1,77 @@
+## Módulo NR-1 — Saúde, Bem-Estar & Performance
 
-## Hardening Completo de Seguranca -- 6 Vulnerabilidades
-
-Plano para resolver todas as 6 vulnerabilidades detectadas, preparando a plataforma para escala de 1000+ usuarios simultaneos por empresa.
-
----
-
-### 1. Senha hardcoded em create-test-account (WARN - Easy)
-
-**Problema:** Senha `Consultor@2026!` exposta no codigo-fonte.
-
-**Solucao:**
-- Arquivo: `supabase/functions/create-test-account/index.ts`
-- Substituir `const FIXED_PASSWORD = 'Consultor@2026!'` por `Deno.env.get('TEST_ACCOUNT_PASSWORD')`
-- Adicionar validacao que retorna erro 500 se o secret nao estiver configurado
-- Remover retorno da senha na resposta JSON (linhas 127, 187) -- resposta deve conter apenas `success: true` sem expor credenciais
-- Sera necessario configurar o secret `TEST_ACCOUNT_PASSWORD` via ferramenta de secrets
+Construção em 3 sprints, modelo comercial **Híbrido** (standalone + add-on/embutido) com landing pública de captura.
 
 ---
 
-### 2. XSS em chart.tsx via dangerouslySetInnerHTML (WARN - Easy)
+### Sprint 1 — Fundação + Diagnóstico + Landing/Isca (esta entrega)
 
-**Problema:** Valores de cor injetados sem sanitizacao no CSS.
+**Backend (Lovable Cloud)**
+- Tabelas:
+  - `nr1_subscriptions` (company_id, plan_tier: essencial/pro, status, trial_ends_at, mrr)
+  - `nr1_questoes` (banco global de perguntas COPSOQ-III adaptado, dimensão, peso)
+  - `nr1_diagnosticos` (company_id, ciclo, score_geral, nivel_risco, status, periodo)
+  - `nr1_diagnostico_respostas` (LGPD: anônimas, agregadas por dimensão)
+  - `nr1_leads` (capturas da landing pública: nome, email, empresa, tamanho, score_free)
+- RLS isolada por `company_id` via `has_company_access()`; `nr1_subscriptions` visível só para admin/hr_manager; `nr1_leads` insert público + leitura só super_admin
+- Seed: ~40 perguntas COPSOQ adaptadas (PT-BR) + 1 questionário curto (10 perguntas) para diagnóstico free
 
-**Solucao:**
-- Arquivo: `src/components/ui/chart.tsx`
-- Adicionar funcao `sanitizeCssColor()` que valida valores contra regex de cores validas (hex, rgb, hsl, oklch, named CSS colors)
-- Aplicar sanitizacao na variavel `color` antes de interpolar no template string (linha 78)
-- Fallback seguro para `transparent` se o valor nao passar na validacao
+**Frontend autenticado (`/nr1`)**
+- Layout com escopo CSS `.nr1-scope` (cores: azul saúde #007BFF, verde #28A745, vermelho #DC3545)
+- `/nr1` — Dashboard: card de assinatura, último diagnóstico, score, alertas básicos
+- `/nr1/diagnostico/novo` — Wizard de aplicação do questionário
+- `/nr1/diagnosticos` — Lista de ciclos com score e nível de risco
+- `/nr1/diagnostico/:id` — Relatório detalhado por dimensão + export PDF (jsPDF)
+- `/nr1/contratar` — Página de upgrade interna (mostra Essencial vs Pro embutido)
 
----
+**Frontend público (isca)**
+- `/nr1` (rota pública, fora do app autenticado) — Landing com:
+  - Headline: "NR-1 obrigatória em 2026. Sua empresa está pronta?"
+  - **Calculadora de multa**: input nº colaboradores → estima exposição (usa tabela do MTE)
+  - **Diagnóstico free** de 10 perguntas (sem login) → grava em `nr1_leads` → mostra score e CTA "Ver plano completo"
+  - Comparativo: Consultor vs SaaS genérico vs CompSmart
+  - 3 planos visíveis (R$ 349 / R$ 649 / R$ 1.190)
+- `/nr1/obrigado` — pós-lead com proposta de demo
 
-### 3. Rate limiting no log-auth-attempt (WARN - Medium)
+**Pricing & catálogo**
+- Adicionar plano `nr1_essencial` em `planFeatures.ts` e `Pricing.tsx` (seção separada "Add-ons")
+- Embutir badge "✅ NR-1 Pro incluso" nos planos Pro e Enterprise existentes
+- Atualizar `useFeatureAccess` para liberar `nr1.full` aos planos Pro/Enterprise; `nr1.essencial` para quem assina o standalone
 
-**Problema:** Endpoint publico sem rate limiting, permitindo flood de logs.
-
-**Solucao:**
-- Arquivo: `supabase/functions/log-auth-attempt/index.ts`
-- Adicionar rate limiting in-memory (mesmo padrao do create-test-account): 30 requests por IP por minuto
-- Adicionar validacao de tamanho dos campos (email max 255 chars, failure_reason max 500 chars)
-- Sanitizar campo metadata (limitar profundidade e tamanho do JSON)
-
----
-
-### 4. compensation-trends sem autenticacao (WARN - Medium)
-
-**Problema:** Endpoint publico que consome API de IA sem nenhuma autenticacao.
-
-**Solucao:**
-- Arquivo: `supabase/functions/compensation-trends/index.ts`
-- Adicionar verificacao de JWT: extrair token do header Authorization, validar via `supabase.auth.getUser(token)`
-- Retornar 401 se nao autenticado
-- Adicionar rate limiting in-memory (10 requests por usuario por hora -- IA e cara)
-- Arquivo: `supabase/config.toml` -- nao precisa alterar pois `verify_jwt=false` e o padrao correto (validacao no codigo)
-
----
-
-### 5. Storage buckets publicos (WARN - Medium)
-
-**Problema:** Buckets avatars, company-logos e videos acessiveis publicamente por URL direta.
-
-**Solucao -- Migracao SQL:**
-- Restringir o bucket `videos` para que apenas admin/HR possam fazer upload e delete (substituir politicas atuais)
-- Para `avatars` e `company-logos`: manter publicos pois sao necessarios para exibicao em interfaces abertas (landing page, perfis), mas documentar a decisao
-- Atualizar o finding para refletir que avatars e logos sao intencionalmente publicos (baixo risco: nao contem PII sensivel), e videos foi corrigido
+**Critérios de aceitação Sprint 1**
+- Visitante anônimo consegue calcular multa + responder diagnóstico free + virar lead
+- RH autenticado consegue rodar diagnóstico completo, ver score por dimensão, exportar PDF
+- Admin consegue ver assinatura NR-1 da empresa
+- Pricing exibe NR-1 Essencial como produto separado e NR-1 Pro como bônus dos planos altos
 
 ---
 
-### 6. Client-side auth checks e SECURITY DEFINER (WARN - Hard)
+### Sprint 2 — Plano de Ação + Treinamentos (próxima request)
+- `nr1_planos_acao` + Kanban + evidências em storage `nr1-evidencias`
+- `nr1_treinamentos` (embed YouTube/Vimeo) + quizzes + certificados PDF em `nr1-certificados`
+- Notificações in-app de prazos
 
-**Problema:** 77 funcoes SECURITY DEFINER e checks de role no frontend.
-
-**Solucao:**
-- **Client-side checks**: Marcar como ignorado com justificativa -- RLS e a camada real de seguranca, checks no frontend sao UX-only. Isso e arquitetura correta.
-- **SECURITY DEFINER**: Auditar as funcoes existentes (ja listadas no schema). A maioria ja possui `SET search_path = public` e validacoes com `has_role()`/`has_any_role()`. Marcar como ignorado com nota de que a auditoria foi realizada e os controles estao adequados. As funcoes criticas (manage_user_roles, handle_new_user, validate_profile_update) ja implementam verificacoes de autorizacao.
+### Sprint 3 — Inteligência + Cruzamento (diferencial competitivo)
+- `nr1_alertas` + triggers SQL + realtime
+- Edge function `nr1-check-compliance` (cron)
+- **Dashboard de cruzamento**: NR-1 risk × 9Box × eNPS × remuneração → identifica "talento alto + risco psicossocial alto + sub-remunerado" (a killer feature)
+- Edge function `nr1-billing` (cobrança standalone) — Stripe a definir
 
 ---
 
-### Resumo de alteracoes por arquivo
+### Considerações técnicas
+- Stack atual mantida: React + Vite + Lovable Cloud (sem Next.js/Vercel)
+- Reutiliza `CompanyContext` (`activeCompanyId`) e RLS existente
+- Vídeos por embed URL (sem hosting próprio)
+- Respostas individuais armazenadas com `respondent_hash` (LGPD: não-identificável após agregação)
+- Memória do projeto será atualizada para remover restrição "No NR-1 compliance"
 
-| Arquivo | Tipo de Alteracao |
-|---------|------------------|
-| `supabase/functions/create-test-account/index.ts` | Remover senha hardcoded, usar env var |
-| `src/components/ui/chart.tsx` | Adicionar sanitizacao de cores CSS |
-| `supabase/functions/log-auth-attempt/index.ts` | Adicionar rate limiting e validacao de input |
-| `supabase/functions/compensation-trends/index.ts` | Adicionar autenticacao JWT + rate limiting |
-| Migracao SQL | Restringir policies do bucket videos |
-| Security findings | Atualizar/ignorar findings resolvidos |
+### Fora do escopo (intencional)
+- Assinatura digital ICP-Brasil
+- Integração eSocial / SST oficial
+- Módulo médico (atestados, ASOs)
+- App mobile dedicado (responsivo no web já cobre)
 
-### Secret necessario
-- `TEST_ACCOUNT_PASSWORD`: senha para contas de teste (substituindo valor hardcoded)
+---
+
+**Após aprovação:** começo pelo Sprint 1 (fundação + diagnóstico + landing pública com isca). Sprints 2 e 3 viram requests separadas para você validar visualmente cada etapa antes de avançar.

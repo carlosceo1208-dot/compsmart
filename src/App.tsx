@@ -99,6 +99,16 @@ const PerformanceEmployees = lazy(() => import("./pages/performance/PerformanceE
 
 // Lazy — Public
 const ExternalFeedbackForm = lazy(() => import("./pages/public/ExternalFeedbackForm"));
+const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
+const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
+
+// Lazy — NR-1 Module
+const Nr1Layout = lazy(() => import("./components/nr1/Nr1Layout").then((m) => ({ default: m.Nr1Layout })));
+const Nr1Dashboard = lazy(() => import("./pages/nr1/Nr1Dashboard"));
+const Nr1NovoDiagnostico = lazy(() => import("./pages/nr1/Nr1NovoDiagnostico"));
+const Nr1Diagnosticos = lazy(() => import("./pages/nr1/Nr1Diagnosticos"));
+const Nr1DiagnosticoDetalhe = lazy(() => import("./pages/nr1/Nr1DiagnosticoDetalhe"));
+const Nr1Contratar = lazy(() => import("./pages/nr1/Nr1Contratar"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -220,6 +230,19 @@ const App = () => {
                         <Route path="/performance/feedback-360" element={<ExternalFeedback360 />} />
                         <Route path="/performance/glossary" element={<PerformanceGlossary />} />
                         <Route path="/performance/assistant" element={<PerformanceAssistant />} />
+                      </Route>
+
+                      {/* Public NR-1 landing (lead capture) */}
+                      <Route path="/nr1-publico" element={<LandingNr1 />} />
+                      <Route path="/nr1/obrigado" element={<Nr1Obrigado />} />
+
+                      {/* NR-1 Module (authenticated) */}
+                      <Route element={<Nr1Layout />}>
+                        <Route path="/nr1" element={<Nr1Dashboard />} />
+                        <Route path="/nr1/diagnostico/novo" element={<Nr1NovoDiagnostico />} />
+                        <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
+                        <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
+                        <Route path="/nr1/contratar" element={<Nr1Contratar />} />
                       </Route>
 
                       {/* Public */}
