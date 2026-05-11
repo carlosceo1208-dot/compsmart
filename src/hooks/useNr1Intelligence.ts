@@ -55,11 +55,11 @@ export const useNr1Intelligence = (filters: Nr1IntelligenceFilters) => {
         talent = talent.filter((t) => t.unit_id === filters.unitId);
       }
 
-      // 3) Unidades (para nomes)
+      // 3) Unidades (para nomes) — RLS já filtra por root_company_id
       const { data: unitsData } = await supabase
         .from('organizational_structure')
         .select('id, name, type')
-        .in('type', ['unit', 'business_unit', 'division', 'department']);
+        .neq('type', 'company');
       const unitMap = new Map((unitsData ?? []).map((u) => [u.id, u.name]));
 
       // 4) Agregação por unidade
