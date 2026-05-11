@@ -532,7 +532,7 @@ export const DashboardLayout = () => {
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             {/* Company Indicator - Enhanced badge for all users - only on xl+ */}
             {companyName && (
-              <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <div className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
                 {companyLogo ? (
                   <img src={companyLogo} alt={companyName} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
