@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Heart, FileText, ListChecks, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { Activity, Heart, FileText, ListChecks, ShoppingCart, ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -7,6 +7,7 @@ const NAV = [
   { to: '/nr1', label: 'Visão Geral', icon: Activity, end: true },
   { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText },
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
+  { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/contratar', label: 'Plano NR-1', icon: ShoppingCart },
 ];
 

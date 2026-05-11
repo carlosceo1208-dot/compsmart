@@ -109,6 +109,7 @@ const Nr1NovoDiagnostico = lazy(() => import("./pages/nr1/Nr1NovoDiagnostico"));
 const Nr1Diagnosticos = lazy(() => import("./pages/nr1/Nr1Diagnosticos"));
 const Nr1DiagnosticoDetalhe = lazy(() => import("./pages/nr1/Nr1DiagnosticoDetalhe"));
 const Nr1Contratar = lazy(() => import("./pages/nr1/Nr1Contratar"));
+const Nr1Inteligencia = lazy(() => import("./pages/nr1/Nr1Inteligencia"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -242,6 +243,7 @@ const App = () => {
                         <Route path="/nr1/diagnostico/novo" element={<Nr1NovoDiagnostico />} />
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
+                        <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
                         <Route path="/nr1/contratar" element={<Nr1Contratar />} />
                       </Route>
 
