@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
 import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES, estimarMultaAnual } from '@/lib/nr1';
 import { toast } from '@/hooks/use-toast';
-import { Helmet } from 'react-helmet-async';
 
 const leadSchema = z.object({
   nome: z.string().trim().min(2).max(120),

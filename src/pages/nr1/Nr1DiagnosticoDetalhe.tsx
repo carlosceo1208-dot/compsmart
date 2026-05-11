@@ -7,7 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Download, Users, AlertTriangle } from 'lucide-react';
-import { exportToPdf } from '@/lib/pdfExport';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export default function Nr1DiagnosticoDetalhe() {
   const { id } = useParams<{ id: string }>();
@@ -20,22 +21,22 @@ export default function Nr1DiagnosticoDetalhe() {
   const dims = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
   const exportar = () => {
-    const rows = dims.map(([dim, score]) => ({
-      Dimensao: DIMENSAO_LABEL[dim as Dimensao] ?? dim,
-      Score: Number(score).toFixed(2),
-    }));
-    exportToPdf({
-      filename: `nr1-diagnostico-${data.ciclo_nome}.pdf`,
-      title: `Diagnóstico NR-1 — ${data.ciclo_nome}`,
-      subtitle: `Score geral: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Risco: ${
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`Diagnóstico NR-1 — ${data.ciclo_nome}`, 14, 18);
+    doc.setFontSize(10);
+    doc.text(
+      `Score geral: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Risco: ${
         data.nivel_risco ? RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL] : '—'
       } · Respondentes: ${data.total_respondentes}`,
-      columns: [
-        { header: 'Dimensão Psicossocial', accessor: 'Dimensao' },
-        { header: 'Score (0-100)', accessor: 'Score' },
-      ],
-      data: rows,
+      14, 26
+    );
+    autoTable(doc, {
+      startY: 34,
+      head: [['Dimensão Psicossocial', 'Score (0-100)']],
+      body: dims.map(([dim, score]) => [DIMENSAO_LABEL[dim as Dimensao] ?? dim, Number(score).toFixed(2)]),
     });
+    doc.save(`nr1-diagnostico-${data.ciclo_nome}.pdf`);
   };
 
   const baixaParticipacao = data.total_respondentes < 5;
