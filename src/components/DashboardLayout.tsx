@@ -488,11 +488,11 @@ export const DashboardLayout = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="px-2 lg:px-3 transition-all duration-300 border bg-gradient-to-r from-violet-50 to-purple-50 text-violet-700 border-violet-200 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 dark:from-violet-950/50 dark:to-purple-950/50 dark:text-violet-400 dark:border-violet-800 dark:hover:from-violet-900/70 dark:hover:to-purple-900/70"
+                  className="px-2 2xl:px-3 shrink-0 transition-all duration-300 border bg-gradient-to-r from-violet-50 to-purple-50 text-violet-700 border-violet-200 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 dark:from-violet-950/50 dark:to-purple-950/50 dark:text-violet-400 dark:border-violet-800 dark:hover:from-violet-900/70 dark:hover:to-purple-900/70"
                   title="Agentes de IA"
                 >
-                  <Sparkles className="w-3.5 h-3.5 lg:mr-1" />
-                  <span className="hidden lg:inline">IA</span>
+                  <Sparkles className="w-3.5 h-3.5 2xl:mr-1" />
+                  <span className="hidden 2xl:inline">IA</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-64">
