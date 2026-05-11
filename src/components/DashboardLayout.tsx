@@ -463,8 +463,8 @@ export const DashboardLayout = () => {
           </div>
 
           {/* Center: Desktop Navigation - Emerald Buttons */}
-          {/* xl: shows full labels, lg: shows icons only, hidden below lg */}
-          <nav className="hidden lg:flex items-center gap-1 justify-center flex-1 min-w-0">
+          {/* 2xl: shows full labels, lg-xl: icons only */}
+          <nav className="hidden lg:flex items-center gap-1 justify-center flex-1 min-w-0 overflow-hidden">
             {navItems.map((item) => (
               <Button
                 key={item.path}
