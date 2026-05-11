@@ -87,12 +87,20 @@ export default function LandingNr1() {
     setStep('resultado');
   };
 
+  useEffect(() => {
+    document.title = 'NR-1 obrigatória 2026 — Diagnóstico psicossocial grátis | CompSmart';
+    const meta = document.querySelector('meta[name="description"]');
+    const desc = 'Calcule sua exposição a multas da NR-1 e faça o diagnóstico psicossocial grátis em 2 minutos.';
+    if (meta) meta.setAttribute('content', desc);
+    else {
+      const m = document.createElement('meta');
+      m.name = 'description'; m.content = desc;
+      document.head.appendChild(m);
+    }
+  }, []);
+
   return (
     <div className="nr1-scope min-h-screen bg-background">
-      <Helmet>
-        <title>NR-1 obrigatória 2026 — Diagnóstico psicossocial grátis | CompSmart</title>
-        <meta name="description" content="Calcule sua exposição a multas da NR-1 e faça o diagnóstico psicossocial grátis em 2 minutos. Plataforma completa para RH em conformidade." />
-      </Helmet>
 
       {/* Header */}
       <header className="border-b bg-card">
