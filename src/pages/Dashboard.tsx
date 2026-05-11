@@ -18,6 +18,7 @@ import { ExecutiveCompCard } from "@/components/dashboard/ExecutiveCompCard";
 import { EconomicIndicatorsCard } from "@/components/dashboard/EconomicIndicatorsCard";
 import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
 import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
+import { BemEstarModuleCard } from "@/components/dashboard/BemEstarModuleCard";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useFounderStatus } from "@/hooks/useFounderStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
@@ -63,8 +64,11 @@ const Dashboard = () => {
           {/* Card de Segurança - Apenas Super Admin */}
           {isSuperAdmin && <SecurityQuickAccessCard />}
           
-          {/* Card do Módulo de Performance - Destaque */}
-          <PerformanceModuleCard />
+          {/* Cards de Módulos em destaque */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <PerformanceModuleCard />
+            <BemEstarModuleCard />
+          </div>
           
           {/* Mapa de Localização das Unidades */}
           <CompanyMapCard />
