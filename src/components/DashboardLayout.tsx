@@ -463,23 +463,23 @@ export const DashboardLayout = () => {
           </div>
 
           {/* Center: Desktop Navigation - Emerald Buttons */}
-          {/* xl: shows full labels, lg: shows icons only, hidden below lg */}
-          <nav className="hidden lg:flex items-center gap-1 justify-center flex-1 min-w-0">
+          {/* 2xl: shows full labels, lg-xl: icons only */}
+          <nav className="hidden lg:flex items-center gap-1 justify-center flex-1 min-w-0 overflow-hidden">
             {navItems.map((item) => (
               <Button
                 key={item.path}
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(item.path)}
-                className={`px-2 lg:px-3 transition-all duration-300 border ${
+                className={`px-2 2xl:px-3 shrink-0 transition-all duration-300 border ${
                   currentPath === item.path 
                     ? "bg-emerald-500 text-white border-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25" 
                     : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800 dark:hover:bg-emerald-900/70"
                 }`}
                 title={item.label}
               >
-                <item.icon className="w-3.5 h-3.5 lg:mr-1" />
-                <span className="hidden lg:inline">{item.label}</span>
+                <item.icon className="w-3.5 h-3.5 2xl:mr-1" />
+                <span className="hidden 2xl:inline">{item.label}</span>
               </Button>
             ))}
             {/* AI Agents Dropdown */}
@@ -488,11 +488,11 @@ export const DashboardLayout = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="px-2 lg:px-3 transition-all duration-300 border bg-gradient-to-r from-violet-50 to-purple-50 text-violet-700 border-violet-200 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 dark:from-violet-950/50 dark:to-purple-950/50 dark:text-violet-400 dark:border-violet-800 dark:hover:from-violet-900/70 dark:hover:to-purple-900/70"
+                  className="px-2 2xl:px-3 shrink-0 transition-all duration-300 border bg-gradient-to-r from-violet-50 to-purple-50 text-violet-700 border-violet-200 hover:from-violet-100 hover:to-purple-100 hover:border-violet-300 dark:from-violet-950/50 dark:to-purple-950/50 dark:text-violet-400 dark:border-violet-800 dark:hover:from-violet-900/70 dark:hover:to-purple-900/70"
                   title="Agentes de IA"
                 >
-                  <Sparkles className="w-3.5 h-3.5 lg:mr-1" />
-                  <span className="hidden lg:inline">IA</span>
+                  <Sparkles className="w-3.5 h-3.5 2xl:mr-1" />
+                  <span className="hidden 2xl:inline">IA</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-64">
@@ -532,7 +532,7 @@ export const DashboardLayout = () => {
           <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
             {/* Company Indicator - Enhanced badge for all users - only on xl+ */}
             {companyName && (
-              <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <div className="hidden 2xl:flex items-center gap-2 px-3 py-1.5 bg-emerald-100 dark:bg-emerald-900/50 rounded-full border border-emerald-200 dark:border-emerald-800">
                 {companyLogo ? (
                   <img src={companyLogo} alt={companyName} className="h-5 w-5 rounded-full object-cover" />
                 ) : (
