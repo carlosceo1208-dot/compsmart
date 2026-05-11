@@ -1,0 +1,329 @@
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Link, useNavigate } from 'react-router-dom';
+import { Heart, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Check, X } from 'lucide-react';
+import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
+import { useNr1Questoes } from '@/hooks/useNr1';
+import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES, estimarMultaAnual } from '@/lib/nr1';
+import { toast } from '@/hooks/use-toast';
+import { Helmet } from 'react-helmet-async';
+
+const leadSchema = z.object({
+  nome: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(255),
+  empresa: z.string().trim().min(2).max(200),
+  telefone: z.string().trim().max(40).optional().or(z.literal('')),
+  cargo: z.string().trim().max(120).optional().or(z.literal('')),
+  tamanho_empresa: z.string().trim().max(40).optional().or(z.literal('')),
+});
+
+type Step = 'landing' | 'questionario' | 'lead' | 'resultado';
+
+const formatBRL = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+
+export default function LandingNr1() {
+  const [step, setStep] = useState<Step>('landing');
+  const [respostas, setRespostas] = useState<Record<string, number>>({});
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [numColab, setNumColab] = useState(50);
+  const [form, setForm] = useState({ nome: '', email: '', empresa: '', telefone: '', cargo: '', tamanho_empresa: '' });
+  const [scoreFree, setScoreFree] = useState<number | null>(null);
+  const navigate = useNavigate();
+
+  const { data: questoes } = useNr1Questoes(true);
+  const total = questoes?.length ?? 0;
+  const questao = questoes?.[currentIdx];
+  const progress = total > 0 ? ((currentIdx + 1) / total) * 100 : 0;
+
+  const multa = estimarMultaAnual(numColab);
+
+  const responder = (valor: number) => {
+    if (!questao) return;
+    setRespostas((r) => ({ ...r, [questao.id]: valor }));
+    if (currentIdx + 1 < total) {
+      setCurrentIdx(currentIdx + 1);
+    } else {
+      // calcula score (média * 25, considerando reverso)
+      let soma = 0;
+      questoes!.forEach((q) => {
+        const v = q.id === questao.id ? valor : respostas[q.id] ?? 0;
+        soma += (q.reverso ? 4 - v : v);
+      });
+      const media = soma / questoes!.length;
+      setScoreFree(Math.round(media * 25 * 10) / 10);
+      setStep('lead');
+    }
+  };
+
+  const enviarLead = async () => {
+    const parsed = leadSchema.safeParse(form);
+    if (!parsed.success) {
+      toast({ title: 'Verifique os campos', description: 'Nome, email e empresa são obrigatórios.', variant: 'destructive' });
+      return;
+    }
+    const nivel = calcRisco(scoreFree);
+    const { error } = await supabase.from('nr1_leads').insert({
+      nome: parsed.data.nome,
+      email: parsed.data.email,
+      empresa: parsed.data.empresa,
+      telefone: parsed.data.telefone || null,
+      cargo: parsed.data.cargo || null,
+      tamanho_empresa: parsed.data.tamanho_empresa || null,
+      score_free: scoreFree,
+      nivel_risco_free: nivel,
+      respostas_free: respostas,
+      origem: 'landing_nr1',
+    });
+    if (error) {
+      toast({ title: 'Erro', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setStep('resultado');
+  };
+
+  return (
+    <div className="nr1-scope min-h-screen bg-background">
+      <Helmet>
+        <title>NR-1 obrigatória 2026 — Diagnóstico psicossocial grátis | CompSmart</title>
+        <meta name="description" content="Calcule sua exposição a multas da NR-1 e faça o diagnóstico psicossocial grátis em 2 minutos. Plataforma completa para RH em conformidade." />
+      </Helmet>
+
+      {/* Header */}
+      <header className="border-b bg-card">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg flex items-center justify-center nr1-bg-primary">
+              <Heart className="h-4 w-4" />
+            </div>
+            <span className="font-semibold">CompSmart NR-1</span>
+          </Link>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/auth">Entrar</Link>
+          </Button>
+        </div>
+      </header>
+
+      {step === 'landing' && (
+        <>
+          {/* Hero */}
+          <section className="container mx-auto px-4 py-12 lg:py-20 text-center max-w-3xl">
+            <Badge className="nr1-risk-critico mb-4">⚠ Obrigatório a partir de Maio/2026</Badge>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Sua empresa está pronta para a <span className="nr1-text-primary">NR-1</span>?
+            </h1>
+            <p className="text-lg text-muted-foreground mb-8">
+              A nova NR-1 obriga TODAS as empresas a gerenciar riscos psicossociais.
+              Multas começam em R$ 670 e chegam a R$ 6.708 por infração.
+              Descubra sua exposição em 2 minutos.
+            </p>
+            <Button size="lg" className="nr1-bg-primary" onClick={() => setStep('questionario')}>
+              Fazer diagnóstico grátis <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </section>
+
+          {/* Calculadora de multa */}
+          <section className="container mx-auto px-4 pb-12">
+            <Card className="max-w-2xl mx-auto nr1-bg-soft border-[hsl(var(--nr1-primary)/0.3)]">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="h-5 w-5 nr1-text-primary" /> Calculadora de exposição a multas
+                </CardTitle>
+                <CardDescription>Estimativa baseada na tabela do MTE.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="colab">Quantos colaboradores sua empresa tem?</Label>
+                  <Input
+                    id="colab"
+                    type="number"
+                    min={1}
+                    max={1000}
+                    value={numColab}
+                    onChange={(e) => setNumColab(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
+                    className="mt-2"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-3 pt-2">
+                  <Stat label="Mínimo" value={formatBRL(multa.min)} tone="ok" />
+                  <Stat label="Cenário provável" value={formatBRL(multa.cenarioProvavel)} tone="warn" />
+                  <Stat label="Máximo" value={formatBRL(multa.max)} tone="bad" />
+                </div>
+                <p className="text-xs text-muted-foreground pt-2">
+                  💡 Com o CompSmart NR-1 a partir de R$ 349/mês, você fica em conformidade e elimina essa exposição.
+                </p>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Comparativo */}
+          <section className="container mx-auto px-4 pb-12">
+            <h2 className="text-2xl font-bold text-center mb-6">Por que CompSmart?</h2>
+            <div className="max-w-4xl mx-auto overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-3"></th>
+                    <th className="p-3 text-center">Consultor</th>
+                    <th className="p-3 text-center">SaaS SST genérico</th>
+                    <th className="p-3 text-center nr1-bg-soft font-semibold">CompSmart NR-1</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['Diagnóstico', true, true, true],
+                    ['Plano de ação em plataforma', false, 'parcial', true],
+                    ['Monitoramento contínuo', false, 'parcial', true],
+                    ['Treinamento + certificado', false, 'parcial', true],
+                    ['Cruzamento com performance/remuneração', false, false, true],
+                    ['Custo anual (100 colab.)', 'R$ 30k+', 'R$ 8-15k', 'R$ 4.188'],
+                  ].map(([label, ...vals], i) => (
+                    <tr key={i} className="border-b">
+                      <td className="p-3 font-medium">{label}</td>
+                      {vals.map((v, j) => (
+                        <td key={j} className={`p-3 text-center ${j === 2 ? 'nr1-bg-soft' : ''}`}>
+                          {v === true ? <Check className="h-4 w-4 inline text-[hsl(var(--nr1-success))]" />
+                            : v === false ? <X className="h-4 w-4 inline text-muted-foreground" />
+                            : <span className="text-xs">{v}</span>}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* Planos */}
+          <section className="container mx-auto px-4 pb-16">
+            <h2 className="text-2xl font-bold text-center mb-6">Planos NR-1</h2>
+            <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+              {[
+                { n: 'Até 100 colab.', p: 'R$ 349' },
+                { n: '101 a 500 colab.', p: 'R$ 649' },
+                { n: '501+ colab.', p: 'R$ 1.190' },
+              ].map((p) => (
+                <Card key={p.n}>
+                  <CardContent className="pt-6 text-center">
+                    <p className="text-sm text-muted-foreground mb-2">{p.n}</p>
+                    <p className="text-3xl font-bold">{p.p}<span className="text-sm text-muted-foreground">/mês</span></p>
+                    <p className="text-xs text-muted-foreground mt-1">14 dias grátis</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            <p className="text-center mt-6 text-sm text-muted-foreground">
+              Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Pro está incluso no seu plano.</strong>
+            </p>
+          </section>
+        </>
+      )}
+
+      {step === 'questionario' && questao && (
+        <section className="container mx-auto px-4 py-10 max-w-2xl">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between text-xs text-muted-foreground mb-2">
+                <span>Pergunta {currentIdx + 1} de {total}</span>
+                <span>Diagnóstico Express NR-1</span>
+              </div>
+              <Progress value={progress} className="h-2" />
+              <CardTitle className="text-lg mt-4 leading-snug">{questao.enunciado}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RadioGroup
+                key={questao.id}
+                value={respostas[questao.id]?.toString()}
+                onValueChange={(v) => responder(Number(v))}
+                className="space-y-2"
+              >
+                {RESPOSTA_OPCOES.map((opt) => (
+                  <Label key={opt.value} htmlFor={`fopt-${opt.value}`}
+                    className="flex items-center gap-3 p-3 rounded-md border cursor-pointer hover:bg-accent transition-colors">
+                    <RadioGroupItem value={opt.value.toString()} id={`fopt-${opt.value}`} />
+                    <span className="text-sm">{opt.label}</span>
+                  </Label>
+                ))}
+              </RadioGroup>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {step === 'lead' && (
+        <section className="container mx-auto px-4 py-10 max-w-md">
+          <Card>
+            <CardHeader>
+              <CardTitle>Quase lá!</CardTitle>
+              <CardDescription>
+                Informe seus dados para visualizar seu score e receber sugestões personalizadas.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {[
+                ['nome','Nome*'], ['email','Email corporativo*'], ['empresa','Empresa*'],
+                ['cargo','Cargo'], ['telefone','Telefone'], ['tamanho_empresa','Tamanho (ex: 100-500)'],
+              ].map(([k, lab]) => (
+                <div key={k}>
+                  <Label htmlFor={k}>{lab}</Label>
+                  <Input id={k} value={(form as any)[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} maxLength={k === 'email' ? 255 : 200} />
+                </div>
+              ))}
+              <Button onClick={enviarLead} className="w-full nr1-bg-primary mt-2">Ver meu resultado</Button>
+              <p className="text-xs text-muted-foreground text-center">
+                Seus dados são tratados conforme LGPD e usados apenas para enviar o diagnóstico.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      {step === 'resultado' && scoreFree !== null && (
+        <section className="container mx-auto px-4 py-10 max-w-xl">
+          <Card>
+            <CardHeader className="text-center">
+              <ShieldCheck className="h-12 w-12 mx-auto nr1-text-primary mb-2" />
+              <CardTitle>Seu diagnóstico express está pronto</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Score psicossocial estimado</p>
+                <p className="text-5xl font-bold">{scoreFree.toFixed(1)}<span className="text-lg text-muted-foreground">/100</span></p>
+                <Badge className={`${RISCO_CLASS[calcRisco(scoreFree)!]} mt-2 text-base`}>
+                  Risco {RISCO_LABEL[calcRisco(scoreFree)!]}
+                </Badge>
+              </div>
+              <div className="text-left text-sm bg-accent rounded-lg p-4">
+                <strong>⚠ Aviso:</strong> esta é uma amostra com 10 perguntas. O diagnóstico oficial NR-1
+                requer 40 questões em 6 dimensões e aplicação a todos os colaboradores.
+              </div>
+              <Button onClick={() => navigate('/nr1/obrigado')} className="w-full nr1-bg-primary">
+                Quero o diagnóstico completo da minha empresa
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
+      )}
+
+      <footer className="border-t mt-10 py-6 text-center text-xs text-muted-foreground">
+        © {new Date().getFullYear()} CompSmart · NR-1 conforme NR-01 atualizada (Portaria MTE 1.419/2024)
+      </footer>
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'warn' | 'bad' }) {
+  const cls = tone === 'ok' ? 'nr1-risk-baixo' : tone === 'warn' ? 'nr1-risk-moderado' : 'nr1-risk-critico';
+  return (
+    <div className={`rounded-lg p-3 text-center ${cls}`}>
+      <p className="text-xs opacity-80">{label}</p>
+      <p className="font-bold">{value}</p>
+    </div>
+  );
+}
