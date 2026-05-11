@@ -3752,6 +3752,240 @@ export type Database = {
           },
         ]
       }
+      nr1_diagnostico_respostas: {
+        Row: {
+          created_at: string
+          diagnostico_id: string
+          id: string
+          questao_id: string
+          respondent_hash: string
+          resposta: number
+        }
+        Insert: {
+          created_at?: string
+          diagnostico_id: string
+          id?: string
+          questao_id: string
+          respondent_hash: string
+          resposta: number
+        }
+        Update: {
+          created_at?: string
+          diagnostico_id?: string
+          id?: string
+          questao_id?: string
+          respondent_hash?: string
+          resposta?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_diagnostico_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_diagnostico_respostas_questao_id_fkey"
+            columns: ["questao_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_questoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nr1_diagnosticos: {
+        Row: {
+          ciclo_nome: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          nivel_risco: Database["public"]["Enums"]["nr1_nivel_risco"] | null
+          observacoes: string | null
+          periodo_fim: string | null
+          periodo_inicio: string
+          score_geral: number | null
+          scores_dimensao: Json | null
+          status: Database["public"]["Enums"]["nr1_diagnostico_status"]
+          total_respondentes: number
+          updated_at: string
+        }
+        Insert: {
+          ciclo_nome: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nivel_risco?: Database["public"]["Enums"]["nr1_nivel_risco"] | null
+          observacoes?: string | null
+          periodo_fim?: string | null
+          periodo_inicio?: string
+          score_geral?: number | null
+          scores_dimensao?: Json | null
+          status?: Database["public"]["Enums"]["nr1_diagnostico_status"]
+          total_respondentes?: number
+          updated_at?: string
+        }
+        Update: {
+          ciclo_nome?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nivel_risco?: Database["public"]["Enums"]["nr1_nivel_risco"] | null
+          observacoes?: string | null
+          periodo_fim?: string | null
+          periodo_inicio?: string
+          score_geral?: number | null
+          scores_dimensao?: Json | null
+          status?: Database["public"]["Enums"]["nr1_diagnostico_status"]
+          total_respondentes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nr1_leads: {
+        Row: {
+          cargo: string | null
+          created_at: string
+          email: string
+          empresa: string
+          id: string
+          nivel_risco_free:
+            | Database["public"]["Enums"]["nr1_nivel_risco"]
+            | null
+          nome: string
+          origem: string | null
+          respostas_free: Json | null
+          score_free: number | null
+          tamanho_empresa: string | null
+          telefone: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          created_at?: string
+          email: string
+          empresa: string
+          id?: string
+          nivel_risco_free?:
+            | Database["public"]["Enums"]["nr1_nivel_risco"]
+            | null
+          nome: string
+          origem?: string | null
+          respostas_free?: Json | null
+          score_free?: number | null
+          tamanho_empresa?: string | null
+          telefone?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          created_at?: string
+          email?: string
+          empresa?: string
+          id?: string
+          nivel_risco_free?:
+            | Database["public"]["Enums"]["nr1_nivel_risco"]
+            | null
+          nome?: string
+          origem?: string | null
+          respostas_free?: Json | null
+          score_free?: number | null
+          tamanho_empresa?: string | null
+          telefone?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
+      nr1_questoes: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          created_at: string
+          dimensao: Database["public"]["Enums"]["nr1_dimensao"]
+          enunciado: string
+          id: string
+          is_free_diagnostic: boolean
+          ordem: number
+          peso: number
+          reverso: boolean
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          dimensao: Database["public"]["Enums"]["nr1_dimensao"]
+          enunciado: string
+          id?: string
+          is_free_diagnostic?: boolean
+          ordem?: number
+          peso?: number
+          reverso?: boolean
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          dimensao?: Database["public"]["Enums"]["nr1_dimensao"]
+          enunciado?: string
+          id?: string
+          is_free_diagnostic?: boolean
+          ordem?: number
+          peso?: number
+          reverso?: boolean
+        }
+        Relationships: []
+      }
+      nr1_subscriptions: {
+        Row: {
+          company_id: string
+          created_at: string
+          ends_at: string | null
+          id: string
+          max_employees: number | null
+          mrr: number | null
+          plan_tier: Database["public"]["Enums"]["nr1_plan_tier"]
+          started_at: string
+          status: Database["public"]["Enums"]["nr1_subscription_status"]
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          max_employees?: number | null
+          mrr?: number | null
+          plan_tier?: Database["public"]["Enums"]["nr1_plan_tier"]
+          started_at?: string
+          status?: Database["public"]["Enums"]["nr1_subscription_status"]
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          max_employees?: number | null
+          mrr?: number | null
+          plan_tier?: Database["public"]["Enums"]["nr1_plan_tier"]
+          started_at?: string
+          status?: Database["public"]["Enums"]["nr1_subscription_status"]
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       organizational_structure: {
         Row: {
           address: string | null
@@ -9063,6 +9297,14 @@ export type Database = {
         }
         Returns: undefined
       }
+      nr1_calc_risco: {
+        Args: { score: number }
+        Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
+      }
+      nr1_recompute_scores: {
+        Args: { p_diagnostico_id: string }
+        Returns: undefined
+      }
       recalculate_salary_range_percentages: {
         Args: never
         Returns: {
@@ -9167,6 +9409,22 @@ export type Database = {
         | "expired"
         | "cancelled"
       impact_level: "low" | "medium" | "high"
+      nr1_diagnostico_status: "em_andamento" | "concluido" | "arquivado"
+      nr1_dimensao:
+        | "demandas_trabalho"
+        | "organizacao_conteudo"
+        | "relacoes_lideranca"
+        | "interface_trabalho_individuo"
+        | "valores_trabalho"
+        | "saude_bem_estar"
+      nr1_nivel_risco: "baixo" | "moderado" | "alto" | "critico"
+      nr1_plan_tier: "essencial" | "pro"
+      nr1_subscription_status:
+        | "trial"
+        | "active"
+        | "past_due"
+        | "canceled"
+        | "included"
       performance_cycle_status:
         | "draft"
         | "goals"
@@ -9359,6 +9617,24 @@ export const Constants = {
         "cancelled",
       ],
       impact_level: ["low", "medium", "high"],
+      nr1_diagnostico_status: ["em_andamento", "concluido", "arquivado"],
+      nr1_dimensao: [
+        "demandas_trabalho",
+        "organizacao_conteudo",
+        "relacoes_lideranca",
+        "interface_trabalho_individuo",
+        "valores_trabalho",
+        "saude_bem_estar",
+      ],
+      nr1_nivel_risco: ["baixo", "moderado", "alto", "critico"],
+      nr1_plan_tier: ["essencial", "pro"],
+      nr1_subscription_status: [
+        "trial",
+        "active",
+        "past_due",
+        "canceled",
+        "included",
+      ],
       performance_cycle_status: [
         "draft",
         "goals",
