@@ -3,18 +3,13 @@ import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { VideoSection } from "@/components/landing/VideoSection";
 import { LogoSlider } from "@/components/landing/LogoSlider";
 import { BeforeAfterSection } from "@/components/landing/BeforeAfterSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
 import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
-import { IntegrationSection } from "@/components/landing/IntegrationSection";
-import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
-import { TargetAudienceSection } from "@/components/landing/TargetAudienceSection";
 import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
-import { DifferentialsSection } from "@/components/landing/DifferentialsSection";
+import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { SocialProofSection } from "@/components/landing/SocialProofSection";
-import { CompetitiveComparisonSection } from "@/components/landing/CompetitiveComparisonSection";
 import { SecuritySection } from "@/components/landing/SecuritySection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { FAQSection } from "@/components/landing/FAQSection";
@@ -23,6 +18,25 @@ import { Footer } from "@/components/landing/Footer";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
 import { StickyCTABar } from "@/components/landing/StickyCTABar";
 
+/**
+ * Landing page — fluxo enxuto AIDA + StoryBrand:
+ * 1. Hero (atenção + proposta de valor + CTA)
+ * 2. LogoSlider (prova social leve, imediata)
+ * 3. BeforeAfter (problema concreto)
+ * 4. Solution (solução em alto nível)
+ * 5. InteractiveDemo (produto na prática)
+ * 6. SmartAgents (diferencial IA)
+ * 7. HowItWorks (3 passos para começar)
+ * 8. Pricing (decisão)
+ * 9. SocialProof (depoimentos profundos)
+ * 10. Security (confiança/objeções)
+ * 11. FAQ + CTA final
+ *
+ * Removidos para evitar repetição com as seções acima:
+ *   VideoSection, IntegrationSection, TargetAudienceSection,
+ *   DifferentialsSection, CompetitiveComparisonSection.
+ * (Componentes preservados no codebase — basta re-importar para reativar.)
+ */
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
@@ -40,9 +54,7 @@ const Index = () => {
     if (hash) {
       setTimeout(() => {
         const element = document.querySelector(hash);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
+        if (element) element.scrollIntoView({ behavior: "smooth" });
       }, 150);
     }
   }, [location.hash]);
@@ -50,23 +62,41 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={isLoggedIn} />
+
+      {/* 1. Atenção */}
       <HeroSection />
-      <VideoSection />
+
+      {/* 2. Prova social imediata */}
       <LogoSlider />
+
+      {/* 3. Problema */}
       <BeforeAfterSection />
+
+      {/* 4. Solução */}
       <SolutionSection />
+
+      {/* 5. Produto na prática */}
       <InteractiveDemoSection />
-      <IntegrationSection />
-      <HowItWorksSection />
-      <TargetAudienceSection />
+
+      {/* 6. Diferencial IA */}
       <SmartAgentsSection />
-      <DifferentialsSection />
-      <SocialProofSection />
-      <CompetitiveComparisonSection />
-      <SecuritySection />
+
+      {/* 7. Como começar */}
+      <HowItWorksSection />
+
+      {/* 8. Decisão */}
       <PricingSection />
+
+      {/* 9. Prova social profunda */}
+      <SocialProofSection />
+
+      {/* 10. Confiança */}
+      <SecuritySection />
+
+      {/* 11. Objeções + CTA final */}
       <FAQSection />
       <CTASection />
+
       <Footer />
       <LaunchPromoBanner />
       <StickyCTABar />
