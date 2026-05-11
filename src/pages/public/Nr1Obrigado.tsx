@@ -25,7 +25,7 @@ export default function Nr1Obrigado() {
               <Link to="/auth">Criar conta e iniciar trial</Link>
             </Button>
             <Button asChild variant="ghost" className="w-full">
-              <Link to="/nr1">Voltar à página NR-1</Link>
+              <Link to="/nr1-publico">Voltar à página NR-1</Link>
             </Button>
           </div>
         </CardContent>
