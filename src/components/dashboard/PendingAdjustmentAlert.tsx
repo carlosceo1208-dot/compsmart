@@ -58,11 +58,11 @@ export function PendingAdjustmentAlert() {
           {pendingAdjustments.slice(0, 2).map((adj) => (
             <div
               key={adj.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-3 rounded-lg bg-white dark:bg-background border"
+              className="flex flex-col gap-3 p-3 rounded-lg bg-white dark:bg-background border min-w-0"
             >
-              <div className="space-y-1">
-                <p className="font-medium text-foreground">{adj.adjustment_name}</p>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+              <div className="space-y-1 min-w-0">
+                <p className="font-medium text-foreground truncate">{adj.adjustment_name}</p>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
                     {MONTH_NAMES[adj.effective_month - 1]}/{adj.fiscal_year}
@@ -73,11 +73,11 @@ export function PendingAdjustmentAlert() {
                   </span>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   size="sm"
                   variant="default"
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700 flex-1 min-w-[140px]"
                   onClick={() => {
                     setSelectedAdjustment(adj);
                     setShowConfirmDialog(true);
@@ -88,6 +88,7 @@ export function PendingAdjustmentAlert() {
                 <Button
                   size="sm"
                   variant="outline"
+                  className="flex-1 min-w-[120px]"
                   onClick={() => navigate('/salary-analysis-report')}
                 >
                   Ver Detalhes
