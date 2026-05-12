@@ -182,6 +182,7 @@ const App = () => {
                         <Route path="/organograma" element={<Organogram />} />
                         <Route path="/roles" element={<Roles />} />
                         <Route path="/access-control" element={<AccessControl />} />
+                        <Route path="/admin/convidar-socios" element={<ConvidarSocios />} />
                         <Route path="/my-profile" element={<MyProfile />} />
                         <Route path="/salary-ranges" element={<SalaryRanges />} />
                         <Route path="/survey-data" element={<SurveyData />} />
