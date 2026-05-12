@@ -98,7 +98,7 @@ export function BemEstarModuleCard() {
         </div>
 
         <Link to="/nr1">
-          <Button className="w-full gap-2 bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold shadow-md">
+          <Button variant="outline" className="w-full gap-2 !bg-yellow-400 hover:!bg-yellow-500 !text-slate-900 !border-yellow-500 font-semibold shadow-md">
             Acessar Módulo
             <ArrowRight className="h-4 w-4" />
           </Button>
