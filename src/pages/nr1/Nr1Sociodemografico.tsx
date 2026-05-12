@@ -7,6 +7,8 @@ import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useSociodemoData } from '@/hooks/useNr1Cycles';
+import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+import { aplicarKAnonimato, K_ANONIMATO_MINIMO } from '@/lib/nr1Privacy';
 
 const INDICADORES = [
   { key: 'fib', label: 'FIB' },
@@ -37,13 +39,24 @@ export default function Nr1Sociodemografico() {
       .filter((r) => recortesAtivosFinal.includes(r.id))
       .map((r) => {
         const sel = segmentosSel[r.id];
-        const linhas = sel && sel.length > 0 ? r.linhas.filter((l) => sel.includes(l.rotulo)) : r.linhas;
-        return { ...r, linhas };
+        const linhasBase = sel && sel.length > 0 ? r.linhas.filter((l) => sel.includes(l.rotulo)) : r.linhas;
+        // K-anonimato: nunca exibir grupos com menos de K respondentes
+        const { visiveis, suprimidas } = aplicarKAnonimato(linhasBase, K_ANONIMATO_MINIMO);
+        return { ...r, linhas: visiveis, suprimidas };
       });
   }, [RECORTES, recortesAtivosFinal, segmentosSel]);
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
+  }
+
+  if (data.source === 'empty') {
+    return (
+      <Nr1EmptyState
+        titulo="Sem cruzamento sociodemográfico disponível"
+        descricao="Os recortes por gênero, idade, área e tempo de casa aparecem aqui após a coleta do primeiro ciclo, respeitando o piso de k-anonimato (mínimo 5 respondentes por grupo)."
+      />
+    );
   }
 
   const exportarCSV = () => {
@@ -98,9 +111,6 @@ export default function Nr1Sociodemografico() {
           <p className="text-sm text-muted-foreground">
             Resultados consolidados das pesquisas por recortes de perfil. Heatmap 0–100 (verde = saudável, vermelho = crítico).
           </p>
-          {data.source === 'seed' && (
-            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
@@ -111,6 +121,10 @@ export default function Nr1Sociodemografico() {
           </Button>
         </div>
       </div>
+      {data.source === 'seed' && <Nr1SeedAlert />}
+      <p className="text-[11px] text-muted-foreground">
+        🔒 Privacidade: grupos com menos de <strong>{K_ANONIMATO_MINIMO}</strong> respondentes são automaticamente suprimidos (k-anonimato).
+      </p>
 
       <Card>
         <CardHeader>
@@ -202,6 +216,12 @@ export default function Nr1Sociodemografico() {
                     </tbody>
                   </table>
                 </div>
+              )}
+              {(r as any).suprimidas?.length > 0 && (
+                <p className="text-[10px] text-muted-foreground italic mt-2">
+                  🔒 {(r as any).suprimidas.length} segmento(s) suprimido(s) por k-anonimato (n &lt; {K_ANONIMATO_MINIMO}):{' '}
+                  {(r as any).suprimidas.map((s: any) => s.rotulo).join(', ')}
+                </p>
               )}
             </CardContent>
           </Card>

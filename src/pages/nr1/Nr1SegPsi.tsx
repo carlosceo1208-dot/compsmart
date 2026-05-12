@@ -8,6 +8,7 @@ import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
+import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
@@ -29,6 +30,15 @@ export default function Nr1SegPsi() {
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
+  }
+
+  if (data.source === 'empty') {
+    return (
+      <Nr1EmptyState
+        titulo="Nenhum ciclo de Segurança Psicológica coletado"
+        descricao="Quando o primeiro ciclo for aplicado e respondido pelos colaboradores, os scores dos 4 estágios aparecerão aqui automaticamente."
+      />
+    );
   }
 
   const geral = (data.scores.reduce((a, b) => a + b.score, 0) / (data.scores.length || 1)).toFixed(2);
@@ -62,9 +72,6 @@ export default function Nr1SegPsi() {
         <div>
           <h2 className="text-xl font-semibold">Segurança Psicológica — Visão Executiva</h2>
           <p className="text-sm text-muted-foreground">Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.</p>
-          {data.source === 'seed' && (
-            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
@@ -75,6 +82,7 @@ export default function Nr1SegPsi() {
           </Button>
         </div>
       </div>
+      {data.source === 'seed' && <Nr1SeedAlert />}
 
       <div ref={dashboardRef} className="space-y-6 bg-background p-1">
         <div className="grid gap-4 md:grid-cols-4">

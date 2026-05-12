@@ -17,12 +17,23 @@ const ciclos = [
   { nome: 'Empresa', cor: 'hsl(var(--nr1-success))' },
 ];
 
+import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+
 export default function Nr1FIB() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useFibData();
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando ciclo FIB…</div>;
+  }
+
+  if (data.source === 'empty') {
+    return (
+      <Nr1EmptyState
+        titulo="Nenhum ciclo FIB coletado ainda"
+        descricao="Quando o primeiro ciclo de Bem-Estar Integral for aplicado e respondido pelos colaboradores, os resultados aparecerão aqui automaticamente."
+      />
+    );
   }
 
   const radarData = data.scores.map((s) => ({ dim: s.label, Colaborador: s.colaborador, Empresa: s.empresa }));
@@ -61,9 +72,6 @@ export default function Nr1FIB() {
           <p className="text-sm text-muted-foreground">
             Felicidade Interna Bruta — comparativo entre percepção do colaborador e condições oferecidas pela empresa nas 9 dimensões.
           </p>
-          {data.source === 'seed' && (
-            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
@@ -74,6 +82,7 @@ export default function Nr1FIB() {
           </Button>
         </div>
       </div>
+      {data.source === 'seed' && <Nr1SeedAlert />}
 
       <div ref={dashboardRef} className="space-y-6 bg-background p-1">
         <div className="grid gap-4 md:grid-cols-3">

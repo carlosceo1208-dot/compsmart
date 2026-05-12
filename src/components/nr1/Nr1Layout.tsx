@@ -1,7 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 const NAV = [
   { to: '/nr1', label: 'Visão Geral', icon: Activity, end: true },
@@ -16,12 +18,38 @@ const NAV = [
   { to: '/nr1/agente', label: 'Agente Bem-Estar', icon: Bot },
 ];
 
+const useIsSuperAdmin = () =>
+  useQuery({
+    queryKey: ['nr1-is-super-admin'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      const { data } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'super_admin')
+        .maybeSingle();
+      return !!data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
 export const Nr1Layout = () => {
   const location = useLocation();
+  const { data: isSuper } = useIsSuperAdmin();
   return (
     <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
+      {isSuper && (
+        <div className="bg-amber-100 border-b border-amber-300 text-amber-900 text-xs px-4 py-1.5 flex items-center gap-2 justify-center">
+          <ShieldAlert className="h-3.5 w-3.5" />
+          <span>
+            <strong>Modo Super Admin · CompSmart</strong> — alguns painéis podem exibir dados demonstrativos para validação interna.
+            Esses dados <strong>nunca</strong> são exibidos para clientes.
+          </span>
+        </div>
+      )}
       <header className="border-b bg-card relative overflow-hidden">
-        {/* Accent stripe — verde→amarelo (laço verde + setembro amarelo) */}
         <div
           className="absolute inset-x-0 top-0 h-1"
           style={{ background: 'linear-gradient(90deg, hsl(var(--nr1-primary)) 0%, hsl(160 70% 45%) 55%, hsl(var(--nr1-accent)) 100%)' }}
