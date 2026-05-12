@@ -47,7 +47,10 @@ export default function Nr1FIB() {
   const geralEmpresa = Math.round(data.scores.reduce((a, b) => a + b.empresa, 0) / (data.scores.length || 1));
   const gap = geralEmpresa - geralColab;
 
-  const exportarCSV = () =>
+  const exportarCSV = () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'fib' });
+    }
     exportToCSV(
       'fib_bem_estar_integral',
       [
@@ -59,8 +62,12 @@ export default function Nr1FIB() {
       ],
       data.scores,
     );
+  };
 
   const exportarPDF = async () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'fib' });
+    }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
         filename: 'fib_bem_estar_integral',
