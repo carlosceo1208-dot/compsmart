@@ -29,6 +29,7 @@ const Employees = lazy(() => import("./pages/Employees"));
 const Organization = lazy(() => import("./pages/Organization"));
 const Roles = lazy(() => import("./pages/Roles"));
 const AccessControl = lazy(() => import("./pages/AccessControl"));
+const ConvidarSocios = lazy(() => import("./pages/admin/ConvidarSocios"));
 const MyProfile = lazy(() => import("./pages/MyProfile"));
 const SalaryRanges = lazy(() => import("./pages/SalaryRanges"));
 const Settings = lazy(() => import("./pages/Settings"));
