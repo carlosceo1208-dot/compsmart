@@ -54,7 +54,7 @@ export function BemEstarModuleCard() {
             </Tooltip>
             <div className="min-w-0">
               <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                Saúde Mental & NR-1
+                Saúde Mental e Bem Estar
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Info className="h-3.5 w-3.5 text-blue-500 cursor-help shrink-0" />
