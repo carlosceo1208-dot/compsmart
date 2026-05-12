@@ -195,13 +195,30 @@ export default function Nr1Universo() {
               />
             </div>
             <Select value={gradeFiltro} onValueChange={setGradeFiltro}>
-              <SelectTrigger className="md:w-[180px]"><SelectValue placeholder="Grade" /></SelectTrigger>
+              <SelectTrigger className="md:w-[160px]"><SelectValue placeholder="Grade" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todas as grades</SelectItem>
                 {grades.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
               </SelectContent>
             </Select>
-            {(busca || gradeFiltro !== 'todos') && (
+            <Select value={unidadeFiltro} onValueChange={setUnidadeFiltro}>
+              <SelectTrigger className="md:w-[180px]"><SelectValue placeholder="Unidade" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas as unidades</SelectItem>
+                {unidades.map(([id, name]) => <SelectItem key={id} value={id}>{name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={statusFiltro} onValueChange={setStatusFiltro}>
+              <SelectTrigger className="md:w-[160px]"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="active">Apenas ativos (NR-1)</SelectItem>
+                {statusList.filter((s) => s !== 'active').map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(busca || gradeFiltro !== 'todos' || unidadeFiltro !== 'todos' || statusFiltro !== 'active') && (
               <Button variant="ghost" size="sm" onClick={limpar}>
                 <X className="h-4 w-4 mr-1" /> Limpar
               </Button>
