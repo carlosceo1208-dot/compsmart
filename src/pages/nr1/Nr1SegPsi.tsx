@@ -72,9 +72,6 @@ export default function Nr1SegPsi() {
         <div>
           <h2 className="text-xl font-semibold">Segurança Psicológica — Visão Executiva</h2>
           <p className="text-sm text-muted-foreground">Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.</p>
-          {data.source === 'seed' && (
-            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
@@ -85,6 +82,7 @@ export default function Nr1SegPsi() {
           </Button>
         </div>
       </div>
+      {data.source === 'seed' && <Nr1SeedAlert />}
 
       <div ref={dashboardRef} className="space-y-6 bg-background p-1">
         <div className="grid gap-4 md:grid-cols-4">
