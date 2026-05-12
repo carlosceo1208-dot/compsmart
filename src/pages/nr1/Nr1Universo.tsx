@@ -18,6 +18,8 @@ type Linha = {
   status: string | null;
   job_title: string | null;
   grade: string | null;
+  unit_id: string | null;
+  unit_name?: string | null;
 };
 
 export default function Nr1Universo() {
@@ -36,7 +38,7 @@ export default function Nr1Universo() {
       // Lista quem entra no universo NR-1 (active + employee_number)
       const validosRes = await (supabase as any)
         .from('profiles')
-        .select('id, full_name, email, employee_number, status, job_title, grade')
+        .select('id, full_name, email, employee_number, status, job_title, grade, unit_id')
         .eq('root_company_id', activeCompanyId)
         .eq('status', 'active')
         .not('employee_number', 'is', null)
@@ -45,15 +47,27 @@ export default function Nr1Universo() {
       // Excluídos: na empresa, mas faltando algum critério
       const excluidosRes = await (supabase as any)
         .from('profiles')
-        .select('id, full_name, email, employee_number, status, job_title, grade')
+        .select('id, full_name, email, employee_number, status, job_title, grade, unit_id')
         .eq('root_company_id', activeCompanyId)
         .or('status.neq.active,employee_number.is.null')
         .order('full_name', { ascending: true });
 
+      // Unidades da empresa (filiais / sedes / departamentos / áreas)
+      const unitsRes = await (supabase as any)
+        .from('organizational_structure')
+        .select('id, name, type')
+        .eq('root_company_id', activeCompanyId)
+        .in('type', ['headquarters', 'branch', 'department', 'area']);
+      const unitMap = new Map<string, string>();
+      (unitsRes.data ?? []).forEach((u: any) => unitMap.set(u.id, u.name));
+
+      const enrich = (rows: any[]): Linha[] =>
+        rows.map((r) => ({ ...r, unit_name: r.unit_id ? unitMap.get(r.unit_id) ?? null : null }));
+
       return {
         total: Number(totalRes.count ?? 0),
-        validos: (validosRes.data ?? []) as Linha[],
-        excluidos: (excluidosRes.data ?? []) as Linha[],
+        validos: enrich(validosRes.data ?? []),
+        excluidos: enrich(excluidosRes.data ?? []),
       };
     },
   });
@@ -61,6 +75,8 @@ export default function Nr1Universo() {
   // ----- Filtros (hooks devem vir antes de qualquer return) -----
   const [busca, setBusca] = useState('');
   const [gradeFiltro, setGradeFiltro] = useState<string>('todos');
+  const [unidadeFiltro, setUnidadeFiltro] = useState<string>('todos');
+  const [statusFiltro, setStatusFiltro] = useState<string>('active');
   const [buscaDebounced, setBuscaDebounced] = useState('');
 
   // Debounce: aguarda 300ms após o usuário parar de digitar
@@ -73,21 +89,42 @@ export default function Nr1Universo() {
   const excluidos = data?.excluidos ?? [];
   const total = data?.total ?? 0;
 
+  // Combina valid + excluídos para suportar filtros por status (inclui inativos)
+  const todos = useMemo(() => [...validos, ...excluidos], [validos, excluidos]);
+
   const grades = useMemo(() => {
     const s = new Set<string>();
-    validos.forEach((p) => p.grade && s.add(p.grade));
+    todos.forEach((p) => p.grade && s.add(p.grade));
     return Array.from(s).sort();
-  }, [validos]);
+  }, [todos]);
+
+  const unidades = useMemo(() => {
+    const m = new Map<string, string>();
+    todos.forEach((p) => { if (p.unit_id && p.unit_name) m.set(p.unit_id, p.unit_name); });
+    return Array.from(m.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+  }, [todos]);
+
+  const statusList = useMemo(() => {
+    const s = new Set<string>();
+    todos.forEach((p) => p.status && s.add(p.status));
+    return Array.from(s).sort();
+  }, [todos]);
 
   const validosFiltrados = useMemo(() => {
     const term = buscaDebounced.trim().toLowerCase();
-    return validos.filter((p) => {
+    // Fonte muda conforme statusFiltro: 'active' usa apenas o universo NR-1
+    const fonte =
+      statusFiltro === 'active' ? validos
+      : statusFiltro === 'todos' ? todos
+      : todos.filter((p) => (p.status ?? '') === statusFiltro);
+    return fonte.filter((p) => {
       if (gradeFiltro !== 'todos' && (p.grade ?? '') !== gradeFiltro) return false;
+      if (unidadeFiltro !== 'todos' && (p.unit_id ?? '') !== unidadeFiltro) return false;
       if (!term) return true;
-      const blob = `${p.full_name ?? ''} ${p.email ?? ''} ${p.employee_number ?? ''} ${p.job_title ?? ''}`.toLowerCase();
+      const blob = `${p.full_name ?? ''} ${p.email ?? ''} ${p.employee_number ?? ''} ${p.job_title ?? ''} ${p.unit_name ?? ''}`.toLowerCase();
       return blob.includes(term);
     });
-  }, [validos, buscaDebounced, gradeFiltro]);
+  }, [validos, todos, buscaDebounced, gradeFiltro, unidadeFiltro, statusFiltro]);
 
   if (isLoading || !data) {
     return (
@@ -97,7 +134,7 @@ export default function Nr1Universo() {
     );
   }
 
-  const limpar = () => { setBusca(''); setGradeFiltro('todos'); };
+  const limpar = () => { setBusca(''); setGradeFiltro('todos'); setUnidadeFiltro('todos'); setStatusFiltro('active'); };
 
   return (
     <div className="space-y-6">
@@ -158,13 +195,30 @@ export default function Nr1Universo() {
               />
             </div>
             <Select value={gradeFiltro} onValueChange={setGradeFiltro}>
-              <SelectTrigger className="md:w-[180px]"><SelectValue placeholder="Grade" /></SelectTrigger>
+              <SelectTrigger className="md:w-[160px]"><SelectValue placeholder="Grade" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todas as grades</SelectItem>
                 {grades.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
               </SelectContent>
             </Select>
-            {(busca || gradeFiltro !== 'todos') && (
+            <Select value={unidadeFiltro} onValueChange={setUnidadeFiltro}>
+              <SelectTrigger className="md:w-[180px]"><SelectValue placeholder="Unidade" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas as unidades</SelectItem>
+                {unidades.map(([id, name]) => <SelectItem key={id} value={id}>{name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={statusFiltro} onValueChange={setStatusFiltro}>
+              <SelectTrigger className="md:w-[160px]"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="active">Apenas ativos (NR-1)</SelectItem>
+                {statusList.filter((s) => s !== 'active').map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(busca || gradeFiltro !== 'todos' || unidadeFiltro !== 'todos' || statusFiltro !== 'active') && (
               <Button variant="ghost" size="sm" onClick={limpar}>
                 <X className="h-4 w-4 mr-1" /> Limpar
               </Button>
@@ -181,6 +235,7 @@ export default function Nr1Universo() {
                   <TableHead>Nome</TableHead>
                   <TableHead>Matrícula</TableHead>
                   <TableHead>Cargo</TableHead>
+                  <TableHead>Unidade</TableHead>
                   <TableHead>Grade</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -190,10 +245,20 @@ export default function Nr1Universo() {
                   <TableRow key={p.id}>
                     <TableCell className="text-muted-foreground">{i + 1}</TableCell>
                     <TableCell className="font-medium">{p.full_name ?? p.email ?? '—'}</TableCell>
-                    <TableCell><code className="text-xs">{p.employee_number}</code></TableCell>
+                    <TableCell><code className="text-xs">{p.employee_number ?? '—'}</code></TableCell>
                     <TableCell>{p.job_title ?? '—'}</TableCell>
+                    <TableCell>{p.unit_name ?? '—'}</TableCell>
                     <TableCell>{p.grade ?? '—'}</TableCell>
-                    <TableCell><Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">{p.status}</Badge></TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={p.status === 'active'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'}
+                      >
+                        {p.status ?? '—'}
+                      </Badge>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
