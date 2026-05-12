@@ -134,25 +134,35 @@ export const Nr1ConsentGate = () => {
  * Reconfirmação leve embutida no início de cada novo questionário/ciclo.
  * Uso: <Nr1ConsentReconfirm onConfirmed={() => setStep(1)} />
  */
-export const Nr1ConsentReconfirm = ({ onConfirmed, cycleLabel }: { onConfirmed: () => void; cycleLabel?: string }) => {
-  const [ok, setOk] = useState(false);
+export const Nr1ConsentReconfirm = ({
+  onConfirmed,
+  cycleLabel,
+  confirmed: controlled,
+}: {
+  onConfirmed: () => void;
+  cycleLabel?: string;
+  confirmed?: boolean;
+}) => {
+  const [internalOk, setInternalOk] = useState(false);
+  const ok = controlled ?? internalOk;
+  const handleChange = (v: boolean) => {
+    setInternalOk(v);
+    if (v) onConfirmed();
+  };
   return (
-    <div className="rounded-lg border p-4 bg-muted/30 space-y-3">
-      <div className="flex items-center gap-2 text-sm font-semibold">
-        <ShieldCheck className="h-4 w-4 text-[hsl(var(--nr1-primary))]" />
-        Reconfirmação de consentimento {cycleLabel ? `· ${cycleLabel}` : ''}
+    <div className="rounded-lg border-2 border-[hsl(var(--nr1-primary)/0.3)] p-4 bg-[hsl(var(--nr1-primary)/0.04)] space-y-3">
+      <div className="flex items-center gap-2 text-sm font-semibold text-[hsl(var(--nr1-primary))]">
+        <ShieldCheck className="h-4 w-4" />
+        Consentimento {cycleLabel ? `· ${cycleLabel}` : ''}
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-muted-foreground leading-relaxed">
         Confirmo que estou de acordo em participar deste ciclo. Minhas respostas continuam
-        anônimas e agregadas, e posso interromper a qualquer momento.
+        anônimas e agregadas, e posso interromper a qualquer momento. Reler termos completos em <a href="/nr1/consentimento" className="underline">Consentimento LGPD</a>.
       </p>
-      <label className="flex items-center gap-2 cursor-pointer">
-        <Checkbox checked={ok} onCheckedChange={(c) => setOk(!!c)} />
-        <span className="text-sm">Confirmo e desejo iniciar o questionário</span>
+      <label className="flex items-center gap-2 cursor-pointer p-2 rounded-md hover:bg-card">
+        <Checkbox checked={ok} onCheckedChange={(c) => handleChange(!!c)} />
+        <span className="text-sm font-medium">Aceito e quero iniciar o questionário</span>
       </label>
-      <div className="flex justify-end">
-        <Button size="sm" disabled={!ok} onClick={onConfirmed}>Iniciar</Button>
-      </div>
     </div>
   );
 };

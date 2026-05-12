@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { RESPOSTA_OPCOES, respondentHash, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Loader2 } from 'lucide-react';
+import { Nr1ConsentReconfirm } from '@/components/nr1/Nr1ConsentGate';
 
 export default function Nr1NovoDiagnostico() {
   const { activeCompanyId } = useCompanyContext();
@@ -22,6 +23,7 @@ export default function Nr1NovoDiagnostico() {
   const [diagnosticoId, setDiagnosticoId] = useState<string | null>(null);
   const [respostas, setRespostas] = useState<Record<string, number>>({});
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [consentOk, setConsentOk] = useState(false);
 
   const questao = questoes?.[currentIdx];
   const total = questoes?.length ?? 0;
@@ -117,7 +119,18 @@ export default function Nr1NovoDiagnostico() {
               placeholder="Ex: Ciclo 2026 Q1"
             />
           </div>
-          <Button onClick={iniciar} className="nr1-bg-primary w-full sm:w-auto">
+
+          <Nr1ConsentReconfirm
+            cycleLabel={cicloNome.trim() || 'Novo ciclo'}
+            onConfirmed={() => setConsentOk(true)}
+            confirmed={consentOk}
+          />
+
+          <Button
+            onClick={iniciar}
+            disabled={!consentOk}
+            className="nr1-bg-primary w-full sm:w-auto"
+          >
             Começar questionário
           </Button>
         </CardContent>
