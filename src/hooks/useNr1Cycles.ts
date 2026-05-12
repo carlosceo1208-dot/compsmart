@@ -120,11 +120,13 @@ export const useFibData = () => {
           source: 'real',
         };
       }
-      // Fallback ilustrativo — sem respondentes/adesão até existir ciclo real
+      // Fallback ilustrativo — gerado sobre o universo real (workforce)
+      const workforce = await getWorkforceCount(activeCompanyId!);
+      const respondentes = Math.max(0, Math.round(workforce * 0.875)); // 14 de 16 (~87,5%)
       return {
-        ciclo: null,
-        respondentes: 0,
-        adesao: 0,
+        ciclo: 'Ciclo Demo · 2026.1',
+        respondentes,
+        adesao: workforce > 0 ? (respondentes / workforce) * 100 : 0,
         scores: FIB_DIMENSOES.map((d) => ({
           key: d.key,
           label: d.label,
@@ -162,11 +164,13 @@ export const useSegPsiData = () => {
           source: 'real',
         };
       }
-      // Fallback ilustrativo — zera respondentes/adesão (ainda sem ciclo aplicado)
+      // Fallback ilustrativo — gerado sobre o universo real (workforce)
+      const workforce = await getWorkforceCount(activeCompanyId!);
+      const respondentes = Math.max(0, Math.round(workforce * 0.8125)); // 13 de 16 (~81%)
       return {
-        ciclo: null,
-        respondentes: 0,
-        adesao: 0,
+        ciclo: 'Ciclo Demo · 2026.1',
+        respondentes,
+        adesao: workforce > 0 ? (respondentes / workforce) * 100 : 0,
         scores: ESTAGIOS_SEG_PSI.map((e) => ({
           key: e.key,
           label: e.label,
@@ -180,6 +184,34 @@ export const useSegPsiData = () => {
 };
 
 // ---------- Sociodemográfico ----------
+// Para 16 colaboradores, geramos recortes coerentes com o porte real
+const SEED_SOCIODEMO_PE: SociodemoRecorte[] = [
+  { id: 'genero', titulo: 'Por gênero (n=16)', linhas: [
+    { rotulo: 'Feminino (7)', fib: 69, segPsi: 62, hse: 71 },
+    { rotulo: 'Masculino (8)', fib: 73, segPsi: 66, hse: 74 },
+    { rotulo: 'Não-binário (1)', fib: 64, segPsi: 58, hse: 69 },
+  ]},
+  { id: 'idade', titulo: 'Por faixa etária (n=16)', linhas: [
+    { rotulo: '< 25 (2)', fib: 70, segPsi: 60, hse: 72 },
+    { rotulo: '25–34 (6)', fib: 72, segPsi: 65, hse: 74 },
+    { rotulo: '35–44 (5)', fib: 70, segPsi: 67, hse: 73 },
+    { rotulo: '45–54 (2)', fib: 66, segPsi: 64, hse: 70 },
+    { rotulo: '55+ (1)', fib: 64, segPsi: 62, hse: 68 },
+  ]},
+  { id: 'tempo', titulo: 'Por tempo de casa (n=16)', linhas: [
+    { rotulo: '< 1 ano (4)', fib: 74, segPsi: 67, hse: 75 },
+    { rotulo: '1–3 anos (6)', fib: 71, segPsi: 65, hse: 72 },
+    { rotulo: '3–5 anos (4)', fib: 68, segPsi: 63, hse: 70 },
+    { rotulo: '5+ anos (2)', fib: 65, segPsi: 60, hse: 68 },
+  ]},
+  { id: 'area', titulo: 'Por área (n=16)', linhas: [
+    { rotulo: 'Tecnologia (6)', fib: 75, segPsi: 71, hse: 77 },
+    { rotulo: 'Comercial (4)', fib: 70, segPsi: 64, hse: 71 },
+    { rotulo: 'Operações (4)', fib: 62, segPsi: 55, hse: 64 },
+    { rotulo: 'Administrativo (2)', fib: 71, segPsi: 66, hse: 72 },
+  ]},
+];
+
 export const useSociodemoData = () => {
   const { activeCompanyId } = useCompanyContext();
   return useQuery<SociodemoData>({
@@ -194,7 +226,7 @@ export const useSociodemoData = () => {
           return { ciclo: ultimo?.ciclo_nome ?? null, recortes, source: 'real' };
         }
       }
-      return { ciclo: null, recortes: SEED_SOCIODEMO, source: 'seed' };
+      return { ciclo: 'Ciclo Demo · 2026.1', recortes: SEED_SOCIODEMO_PE, source: 'seed' };
     },
   });
 };
