@@ -58,19 +58,13 @@ export default function Nr1Universo() {
     },
   });
 
-  if (isLoading || !data) {
-    return (
-      <div className="flex items-center gap-2 text-muted-foreground py-12 justify-center">
-        <Loader2 className="h-4 w-4 animate-spin" /> Carregando universo de colaboradores…
-      </div>
-    );
-  }
-
-  const { total, validos, excluidos } = data;
-
-  // ----- Filtros -----
+  // ----- Filtros (hooks devem vir antes de qualquer return) -----
   const [busca, setBusca] = useState('');
   const [gradeFiltro, setGradeFiltro] = useState<string>('todos');
+
+  const validos = data?.validos ?? [];
+  const excluidos = data?.excluidos ?? [];
+  const total = data?.total ?? 0;
 
   const grades = useMemo(() => {
     const s = new Set<string>();
@@ -87,6 +81,14 @@ export default function Nr1Universo() {
       return blob.includes(term);
     });
   }, [validos, busca, gradeFiltro]);
+
+  if (isLoading || !data) {
+    return (
+      <div className="flex items-center gap-2 text-muted-foreground py-12 justify-center">
+        <Loader2 className="h-4 w-4 animate-spin" /> Carregando universo de colaboradores…
+      </div>
+    );
+  }
 
   const limpar = () => { setBusca(''); setGradeFiltro('todos'); };
 
