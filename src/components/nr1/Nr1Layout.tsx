@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -16,6 +16,7 @@ const NAV = [
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/agente', label: 'Agente Bem-Estar', icon: Bot },
+  { to: '/nr1/consentimento', label: 'Consentimento', icon: Lock },
 ];
 
 const useIsSuperAdmin = () =>

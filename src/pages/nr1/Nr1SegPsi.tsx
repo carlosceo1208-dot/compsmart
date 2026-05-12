@@ -9,6 +9,9 @@ import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
@@ -27,6 +30,9 @@ export default function Nr1SegPsi() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useSegPsiData();
   const { data: workforce = 0 } = useNr1Workforce();
+  const { activeCompanyId } = useCompanyContext();
+  const { data: roleInfo } = useCurrentUserRole();
+  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
@@ -44,7 +50,10 @@ export default function Nr1SegPsi() {
   const geral = (data.scores.reduce((a, b) => a + b.score, 0) / (data.scores.length || 1)).toFixed(2);
   const fragil = [...data.scores].sort((a, b) => a.score - b.score)[0];
 
-  const exportarCSV = () =>
+  const exportarCSV = () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'segpsi' });
+    }
     exportToCSV(
       'seguranca_psicologica',
       [
@@ -55,8 +64,12 @@ export default function Nr1SegPsi() {
       ],
       data.scores,
     );
+  };
 
   const exportarPDF = async () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'segpsi' });
+    }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
         filename: 'seguranca_psicologica',

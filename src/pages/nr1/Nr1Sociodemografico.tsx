@@ -8,7 +8,9 @@ import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useSociodemoData } from '@/hooks/useNr1Cycles';
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
-import { aplicarKAnonimato, K_ANONIMATO_MINIMO } from '@/lib/nr1Privacy';
+import { aplicarKAnonimato, K_ANONIMATO_MINIMO, registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 const INDICADORES = [
   { key: 'fib', label: 'FIB' },
@@ -26,6 +28,9 @@ function corCelula(v: number) {
 export default function Nr1Sociodemografico() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useSociodemoData();
+  const { activeCompanyId } = useCompanyContext();
+  const { data: roleInfo } = useCurrentUserRole();
+  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
   const RECORTES = data?.recortes ?? [];
 
   const [recortesAtivos, setRecortesAtivos] = useState<string[] | null>(null);
@@ -60,6 +65,16 @@ export default function Nr1Sociodemografico() {
   }
 
   const exportarCSV = () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({
+        companyId: activeCompanyId,
+        actorRole,
+        action: 'export_csv',
+        resource: 'sociodemo',
+        filters: { recortes: recortesAtivosFinal, indicadores: indicadoresAtivos },
+        kValue: K_ANONIMATO_MINIMO,
+      });
+    }
     const rows: any[] = [];
     recortesFiltrados.forEach((r) => {
       r.linhas.forEach((l) => {
@@ -80,6 +95,15 @@ export default function Nr1Sociodemografico() {
   };
 
   const exportarPDF = async () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({
+        companyId: activeCompanyId,
+        actorRole,
+        action: 'export_pdf',
+        resource: 'sociodemo',
+        kValue: K_ANONIMATO_MINIMO,
+      });
+    }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
         filename: 'cruzamento_sociodemografico',

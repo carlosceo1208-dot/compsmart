@@ -18,10 +18,16 @@ const ciclos = [
 ];
 
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 export default function Nr1FIB() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useFibData();
+  const { activeCompanyId } = useCompanyContext();
+  const { data: roleInfo } = useCurrentUserRole();
+  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando ciclo FIB…</div>;
@@ -41,7 +47,10 @@ export default function Nr1FIB() {
   const geralEmpresa = Math.round(data.scores.reduce((a, b) => a + b.empresa, 0) / (data.scores.length || 1));
   const gap = geralEmpresa - geralColab;
 
-  const exportarCSV = () =>
+  const exportarCSV = () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'fib' });
+    }
     exportToCSV(
       'fib_bem_estar_integral',
       [
@@ -53,8 +62,12 @@ export default function Nr1FIB() {
       ],
       data.scores,
     );
+  };
 
   const exportarPDF = async () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'fib' });
+    }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
         filename: 'fib_bem_estar_integral',
