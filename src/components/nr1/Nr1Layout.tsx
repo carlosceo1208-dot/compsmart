@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 
 const NAV = [
   { to: '/nr1', label: 'Visão Geral', icon: Activity, end: true },
@@ -17,7 +18,6 @@ const NAV = [
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/agente', label: 'Agente Bem-Estar', icon: Bot },
-  { to: '/nr1/consentimento', label: 'Consentimento', icon: Lock },
 ];
 
 const useIsSuperAdmin = () =>
@@ -177,6 +177,7 @@ export const Nr1Layout = () => {
       <main className="container mx-auto px-4 py-6">
         <Outlet />
       </main>
+      <Nr1ConsentGate />
     </div>
   );
 };
