@@ -38,7 +38,7 @@ export function BemEstarModuleCard() {
 
   return (
     <TooltipProvider delayDuration={150}>
-    <Card className="overflow-hidden border-2 border-blue-200/60 dark:border-blue-800/30 bg-gradient-to-br from-blue-50 via-white to-sky-50 dark:from-blue-950/30 dark:via-background dark:to-sky-950/30 shadow-lg hover:shadow-xl transition-shadow">
+    <Card className="overflow-hidden border-2 border-emerald-200/60 dark:border-emerald-800/30 bg-gradient-to-br from-emerald-50 via-white to-amber-50 dark:from-emerald-950/30 dark:via-background dark:to-amber-950/20 shadow-lg hover:shadow-xl transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4 gap-3">
           <div className="flex items-center gap-3 min-w-0">
