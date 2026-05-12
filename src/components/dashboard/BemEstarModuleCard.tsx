@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  Brain, ArrowRight, FileText, ListChecks, Sparkles, Bot, ShieldCheck, AlertTriangle,
+  Brain, ArrowRight, FileText, ListChecks, Sparkles, Bot, ShieldCheck, AlertTriangle, Info,
 } from "lucide-react";
 import { useNr1Subscription, useNr1Diagnosticos } from "@/hooks/useNr1";
 import { RISCO_LABEL, RISCO_CLASS, type NivelRisco } from "@/lib/nr1";
