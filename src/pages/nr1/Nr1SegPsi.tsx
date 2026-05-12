@@ -6,7 +6,7 @@ import { Download, FileText, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
-import { useSegPsiData } from '@/hooks/useNr1Cycles';
+import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 
 const cores: Record<string, string> = {
