@@ -111,9 +111,6 @@ export default function Nr1Sociodemografico() {
           <p className="text-sm text-muted-foreground">
             Resultados consolidados das pesquisas por recortes de perfil. Heatmap 0–100 (verde = saudável, vermelho = crítico).
           </p>
-          {data.source === 'seed' && (
-            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
@@ -124,6 +121,10 @@ export default function Nr1Sociodemografico() {
           </Button>
         </div>
       </div>
+      {data.source === 'seed' && <Nr1SeedAlert />}
+      <p className="text-[11px] text-muted-foreground">
+        🔒 Privacidade: grupos com menos de <strong>{K_ANONIMATO_MINIMO}</strong> respondentes são automaticamente suprimidos (k-anonimato).
+      </p>
 
       <Card>
         <CardHeader>
