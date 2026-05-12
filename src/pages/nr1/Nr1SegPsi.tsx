@@ -8,6 +8,7 @@ import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
+import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
