@@ -50,7 +50,10 @@ export default function Nr1SegPsi() {
   const geral = (data.scores.reduce((a, b) => a + b.score, 0) / (data.scores.length || 1)).toFixed(2);
   const fragil = [...data.scores].sort((a, b) => a.score - b.score)[0];
 
-  const exportarCSV = () =>
+  const exportarCSV = () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'segpsi' });
+    }
     exportToCSV(
       'seguranca_psicologica',
       [
@@ -61,8 +64,12 @@ export default function Nr1SegPsi() {
       ],
       data.scores,
     );
+  };
 
   const exportarPDF = async () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'segpsi' });
+    }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
         filename: 'seguranca_psicologica',
