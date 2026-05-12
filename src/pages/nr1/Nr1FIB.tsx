@@ -17,12 +17,23 @@ const ciclos = [
   { nome: 'Empresa', cor: 'hsl(var(--nr1-success))' },
 ];
 
+import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+
 export default function Nr1FIB() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useFibData();
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando ciclo FIB…</div>;
+  }
+
+  if (data.source === 'empty') {
+    return (
+      <Nr1EmptyState
+        titulo="Nenhum ciclo FIB coletado ainda"
+        descricao="Quando o primeiro ciclo de Bem-Estar Integral for aplicado e respondido pelos colaboradores, os resultados aparecerão aqui automaticamente."
+      />
+    );
   }
 
   const radarData = data.scores.map((s) => ({ dim: s.label, Colaborador: s.colaborador, Empresa: s.empresa }));
