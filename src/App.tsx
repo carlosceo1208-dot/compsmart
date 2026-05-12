@@ -29,6 +29,7 @@ const Employees = lazy(() => import("./pages/Employees"));
 const Organization = lazy(() => import("./pages/Organization"));
 const Roles = lazy(() => import("./pages/Roles"));
 const AccessControl = lazy(() => import("./pages/AccessControl"));
+const ConvidarSocios = lazy(() => import("./pages/admin/ConvidarSocios"));
 const MyProfile = lazy(() => import("./pages/MyProfile"));
 const SalaryRanges = lazy(() => import("./pages/SalaryRanges"));
 const Settings = lazy(() => import("./pages/Settings"));
@@ -181,6 +182,7 @@ const App = () => {
                         <Route path="/organograma" element={<Organogram />} />
                         <Route path="/roles" element={<Roles />} />
                         <Route path="/access-control" element={<AccessControl />} />
+                        <Route path="/admin/convidar-socios" element={<ConvidarSocios />} />
                         <Route path="/my-profile" element={<MyProfile />} />
                         <Route path="/salary-ranges" element={<SalaryRanges />} />
                         <Route path="/survey-data" element={<SurveyData />} />
