@@ -106,47 +106,11 @@ export const Nr1Layout = () => {
             <NavLink to="/dashboard"><ArrowLeft className="h-4 w-4 mr-1" />Voltar ao CompSmart</NavLink>
           </Button>
         </div>
-        <div className="container mx-auto px-4 relative">
-          {/* Left fade + arrow */}
-          <button
-            type="button"
-            aria-label="Rolar abas para a esquerda"
-            onClick={() => scrollBy(-1)}
-            className={cn(
-              'absolute left-2 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-card border shadow-sm flex items-center justify-center transition-opacity',
-              canLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            )}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <div
-            className={cn(
-              'pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-card to-transparent transition-opacity z-[5]',
-              canLeft ? 'opacity-100' : 'opacity-0'
-            )}
-          />
-          <div
-            className={cn(
-              'pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-card to-transparent transition-opacity z-[5]',
-              canRight ? 'opacity-100' : 'opacity-0'
-            )}
-          />
-          <button
-            type="button"
-            aria-label="Rolar abas para a direita"
-            onClick={() => scrollBy(1)}
-            className={cn(
-              'absolute right-2 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-card border shadow-sm flex items-center justify-center transition-opacity',
-              canRight ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            )}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-
+        <div className="container mx-auto px-4 pb-3">
           <nav
             ref={navRef}
-            className="flex gap-1 overflow-x-auto scrollbar-hide scroll-smooth"
-            style={{ scrollbarWidth: 'none' }}
+            className="grid gap-2"
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(108px, 1fr))' }}
           >
             {NAV.map((item) => {
               const Icon = item.icon;
@@ -160,14 +124,14 @@ export const Nr1Layout = () => {
                   end={item.end}
                   data-nr1-active={active}
                   className={cn(
-                    'flex items-center gap-2 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap',
+                    'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border transition-all min-h-[64px]',
                     active
-                      ? 'border-[hsl(var(--nr1-primary))] nr1-text-primary font-semibold'
-                      : 'border-transparent text-muted-foreground hover:text-[hsl(var(--nr1-primary))] hover:border-[hsl(var(--nr1-accent))]'
+                      ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
+                      : 'bg-card border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
-                  {item.label}
+                  <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]')} />
+                  <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                 </NavLink>
               );
             })}
