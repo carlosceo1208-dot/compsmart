@@ -18,6 +18,8 @@ type Linha = {
   status: string | null;
   job_title: string | null;
   grade: string | null;
+  unit_id: string | null;
+  unit_name?: string | null;
 };
 
 export default function Nr1Universo() {
