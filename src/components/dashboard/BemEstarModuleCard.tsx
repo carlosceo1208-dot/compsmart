@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Heart, ArrowRight, FileText, ListChecks, Sparkles, Bot, ShieldCheck, AlertTriangle,
+  Brain, ArrowRight, FileText, ListChecks, Sparkles, Bot, ShieldCheck, AlertTriangle,
 } from "lucide-react";
 import { useNr1Subscription, useNr1Diagnosticos } from "@/hooks/useNr1";
 import { RISCO_LABEL, RISCO_CLASS, type NivelRisco } from "@/lib/nr1";
@@ -41,7 +41,7 @@ export function BemEstarModuleCard() {
         <div className="flex items-start justify-between mb-4 gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg shrink-0">
-              <Heart className="h-6 w-6 text-white" />
+              <Brain className="h-6 w-6 text-white" />
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
