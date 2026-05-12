@@ -72,9 +72,6 @@ export default function Nr1FIB() {
           <p className="text-sm text-muted-foreground">
             Felicidade Interna Bruta — comparativo entre percepção do colaborador e condições oferecidas pela empresa nas 9 dimensões.
           </p>
-          {data.source === 'seed' && (
-            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
-          )}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
@@ -85,6 +82,7 @@ export default function Nr1FIB() {
           </Button>
         </div>
       </div>
+      {data.source === 'seed' && <Nr1SeedAlert />}
 
       <div ref={dashboardRef} className="space-y-6 bg-background p-1">
         <div className="grid gap-4 md:grid-cols-3">
