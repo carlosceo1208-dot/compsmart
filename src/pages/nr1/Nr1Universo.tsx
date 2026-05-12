@@ -38,7 +38,7 @@ export default function Nr1Universo() {
       // Lista quem entra no universo NR-1 (active + employee_number)
       const validosRes = await (supabase as any)
         .from('profiles')
-        .select('id, full_name, email, employee_number, status, job_title, grade')
+        .select('id, full_name, email, employee_number, status, job_title, grade, unit_id')
         .eq('root_company_id', activeCompanyId)
         .eq('status', 'active')
         .not('employee_number', 'is', null)
@@ -47,15 +47,27 @@ export default function Nr1Universo() {
       // Excluídos: na empresa, mas faltando algum critério
       const excluidosRes = await (supabase as any)
         .from('profiles')
-        .select('id, full_name, email, employee_number, status, job_title, grade')
+        .select('id, full_name, email, employee_number, status, job_title, grade, unit_id')
         .eq('root_company_id', activeCompanyId)
         .or('status.neq.active,employee_number.is.null')
         .order('full_name', { ascending: true });
 
+      // Unidades da empresa (filiais / sedes / departamentos / áreas)
+      const unitsRes = await (supabase as any)
+        .from('organizational_structure')
+        .select('id, name, type')
+        .eq('root_company_id', activeCompanyId)
+        .in('type', ['headquarters', 'branch', 'department', 'area']);
+      const unitMap = new Map<string, string>();
+      (unitsRes.data ?? []).forEach((u: any) => unitMap.set(u.id, u.name));
+
+      const enrich = (rows: any[]): Linha[] =>
+        rows.map((r) => ({ ...r, unit_name: r.unit_id ? unitMap.get(r.unit_id) ?? null : null }));
+
       return {
         total: Number(totalRes.count ?? 0),
-        validos: (validosRes.data ?? []) as Linha[],
-        excluidos: (excluidosRes.data ?? []) as Linha[],
+        validos: enrich(validosRes.data ?? []),
+        excluidos: enrich(excluidosRes.data ?? []),
       };
     },
   });
@@ -63,6 +75,8 @@ export default function Nr1Universo() {
   // ----- Filtros (hooks devem vir antes de qualquer return) -----
   const [busca, setBusca] = useState('');
   const [gradeFiltro, setGradeFiltro] = useState<string>('todos');
+  const [unidadeFiltro, setUnidadeFiltro] = useState<string>('todos');
+  const [statusFiltro, setStatusFiltro] = useState<string>('active');
   const [buscaDebounced, setBuscaDebounced] = useState('');
 
   // Debounce: aguarda 300ms após o usuário parar de digitar
