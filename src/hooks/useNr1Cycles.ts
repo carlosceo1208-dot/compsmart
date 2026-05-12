@@ -79,6 +79,22 @@ async function safeSelect<T = any>(table: string, companyId: string): Promise<T[
   }
 }
 
+// Conta colaboradores ativos da empresa selecionada (universo real)
+async function getWorkforceCount(companyId: string): Promise<number> {
+  try {
+    const { count, error } = await (supabase as any)
+      .from('employees')
+      .select('id', { count: 'exact', head: true })
+      .eq('company_id', companyId)
+      .eq('status', 'active')
+      .not('employee_number', 'is', null);
+    if (error) return 0;
+    return Number(count ?? 0);
+  } catch {
+    return 0;
+  }
+}
+
 // ---------- FIB ----------
 export const useFibData = () => {
   const { activeCompanyId } = useCompanyContext();
@@ -104,7 +120,7 @@ export const useFibData = () => {
           source: 'real',
         };
       }
-      // Fallback seed
+      // Fallback ilustrativo — sem respondentes/adesão até existir ciclo real
       return {
         ciclo: null,
         respondentes: 0,
@@ -146,10 +162,11 @@ export const useSegPsiData = () => {
           source: 'real',
         };
       }
+      // Fallback ilustrativo — zera respondentes/adesão (ainda sem ciclo aplicado)
       return {
         ciclo: null,
-        respondentes: 1626,
-        adesao: 60.53,
+        respondentes: 0,
+        adesao: 0,
         scores: ESTAGIOS_SEG_PSI.map((e) => ({
           key: e.key,
           label: e.label,
@@ -179,5 +196,15 @@ export const useSociodemoData = () => {
       }
       return { ciclo: null, recortes: SEED_SOCIODEMO, source: 'seed' };
     },
+  });
+};
+
+// ---------- Universo de respondentes (para o cabeçalho dos painéis) ----------
+export const useNr1Workforce = () => {
+  const { activeCompanyId } = useCompanyContext();
+  return useQuery<number>({
+    queryKey: ['nr1-workforce', activeCompanyId],
+    enabled: !!activeCompanyId,
+    queryFn: () => getWorkforceCount(activeCompanyId!),
   });
 };
