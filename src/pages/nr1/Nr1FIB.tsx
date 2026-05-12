@@ -1,5 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { exportToCSV } from '@/lib/csvExport';
 import { FIB_DIMENSOES, INSTRUMENTOS, CATEGORIA_LABEL } from '@/lib/fib';
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
