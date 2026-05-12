@@ -32,6 +32,15 @@ export default function Nr1SegPsi() {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
   }
 
+  if (data.source === 'empty') {
+    return (
+      <Nr1EmptyState
+        titulo="Nenhum ciclo de Segurança Psicológica coletado"
+        descricao="Quando o primeiro ciclo for aplicado e respondido pelos colaboradores, os scores dos 4 estágios aparecerão aqui automaticamente."
+      />
+    );
+  }
+
   const geral = (data.scores.reduce((a, b) => a + b.score, 0) / (data.scores.length || 1)).toFixed(2);
   const fragil = [...data.scores].sort((a, b) => a.score - b.score)[0];
 
