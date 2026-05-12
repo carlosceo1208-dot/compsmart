@@ -1,18 +1,13 @@
+import { useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, FileText, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { exportToCSV } from '@/lib/csvExport';
-import { ESTAGIOS_SEG_PSI } from '@/lib/fib';
+import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
+import { useSegPsiData } from '@/hooks/useNr1Cycles';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
-
-const dados = [
-  { key: 'incluir', score: 71.4 },
-  { key: 'aprender', score: 65.1 },
-  { key: 'contribuir', score: 65.1 },
-  { key: 'desafiar', score: 40.5 },
-];
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
@@ -28,101 +23,122 @@ function tom(score: number) {
 }
 
 export default function Nr1SegPsi() {
-  const geral = (dados.reduce((a, b) => a + b.score, 0) / dados.length).toFixed(2);
-  const chart = dados.map((d) => ({ ...d, label: ESTAGIOS_SEG_PSI.find((e) => e.key === d.key)!.label }));
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const { data, isLoading } = useSegPsiData();
+
+  if (isLoading || !data) {
+    return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
+  }
+
+  const geral = (data.scores.reduce((a, b) => a + b.score, 0) / (data.scores.length || 1)).toFixed(2);
+  const fragil = [...data.scores].sort((a, b) => a.score - b.score)[0];
+
+  const exportarCSV = () =>
+    exportToCSV(
+      'seguranca_psicologica',
+      [
+        { header: 'Estágio', accessor: (r: any) => r.label },
+        { header: 'Score (0-100)', accessor: (r: any) => r.score },
+        { header: 'Classificação', accessor: (r: any) => tom(r.score).label },
+        { header: 'Descrição', accessor: (r: any) => r.descricao },
+      ],
+      data.scores,
+    );
+
+  const exportarPDF = async () => {
+    if (dashboardRef.current) {
+      await exportDashboardToPDF(dashboardRef.current, {
+        filename: 'seguranca_psicologica',
+        title: 'Segurança Psicológica — Visão Executiva',
+        subtitle: data.ciclo ?? '4 estágios (T. Clark)',
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Segurança Psicológica — Visão Executiva</h2>
-          <p className="text-sm text-muted-foreground">
-            Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.
-          </p>
+          <p className="text-sm text-muted-foreground">Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.</p>
+          {data.source === 'seed' && (
+            <Badge variant="outline" className="mt-2 text-[10px]">Dados ilustrativos · sem ciclo coletado</Badge>
+          )}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() =>
-            exportToCSV(
-              'seguranca_psicologica',
-              [
-                { header: 'Estágio', accessor: (r: any) => r.label },
-                { header: 'Score (0-100)', accessor: (r: any) => r.score },
-                { header: 'Classificação', accessor: (r: any) => tom(r.score).label },
-                { header: 'Descrição', accessor: (r: any) => ESTAGIOS_SEG_PSI.find((e) => e.key === r.key)?.descricao ?? '' },
-              ],
-              chart,
-            )
-          }
-        >
-          <Download className="h-4 w-4 mr-2" /> Exportar CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={exportarCSV}>
+            <Download className="h-4 w-4 mr-2" /> CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportarPDF}>
+            <FileText className="h-4 w-4 mr-2" /> PDF
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card><CardContent className="pt-6">
-          <p className="text-xs text-muted-foreground">Respondentes</p>
-          <p className="text-2xl font-semibold">1.626</p>
-        </CardContent></Card>
-        <Card><CardContent className="pt-6">
-          <p className="text-xs text-muted-foreground">Adesão</p>
-          <p className="text-2xl font-semibold">60,53%</p>
-        </CardContent></Card>
-        <Card><CardContent className="pt-6">
-          <p className="text-xs text-muted-foreground">Score geral</p>
-          <p className="text-2xl font-semibold">{geral}</p>
-        </CardContent></Card>
-        <Card><CardContent className="pt-6">
-          <p className="text-xs text-muted-foreground">Estágio mais frágil</p>
-          <p className="text-2xl font-semibold">Desafiar</p>
-        </CardContent></Card>
-      </div>
+      <div ref={dashboardRef} className="space-y-6 bg-background p-1">
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card><CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Respondentes</p>
+            <p className="text-2xl font-semibold">{data.respondentes.toLocaleString('pt-BR')}</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Adesão</p>
+            <p className="text-2xl font-semibold">{data.adesao.toFixed(2)}%</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Score geral</p>
+            <p className="text-2xl font-semibold">{geral}</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-6">
+            <p className="text-xs text-muted-foreground">Estágio mais frágil</p>
+            <p className="text-2xl font-semibold">{fragil?.label ?? '—'}</p>
+          </CardContent></Card>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Score por estágio</CardTitle>
-          <CardDescription>Pontuação 0–100 — escala normalizada.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[280px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chart}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="label" />
-                <YAxis domain={[0, 100]} />
-                <Tooltip />
-                <Bar dataKey="score">
-                  {chart.map((d) => <Cell key={d.key} fill={cores[d.key]} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Score por estágio</CardTitle>
+            <CardDescription>Pontuação 0–100 — escala normalizada.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data.scores}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip />
+                  <Bar dataKey="score">
+                    {data.scores.map((d) => <Cell key={d.key} fill={cores[d.key] ?? 'hsl(var(--nr1-primary))'} />)}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {dados.map((d) => {
-          const e = ESTAGIOS_SEG_PSI.find((x) => x.key === d.key)!;
-          const t = tom(d.score);
-          return (
-            <Card key={d.key}>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-semibold">{e.label}</p>
-                    <p className="text-xs text-muted-foreground">{e.descricao}</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          {data.scores.map((d) => {
+            const t = tom(d.score);
+            return (
+              <Card key={d.key}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold">{d.label}</p>
+                      <p className="text-xs text-muted-foreground">{d.descricao}</p>
+                    </div>
+                    <Badge className={t.cls}>{t.label}</Badge>
                   </div>
-                  <Badge className={t.cls}>{t.label}</Badge>
-                </div>
-                <div className="mt-3">
-                  <Progress value={d.score} className="h-2" />
-                  <p className="text-xs text-muted-foreground mt-1 tabular-nums">{d.score.toFixed(1)} / 100</p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                  <div className="mt-3">
+                    <Progress value={d.score} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-1 tabular-nums">{d.score.toFixed(1)} / 100</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
