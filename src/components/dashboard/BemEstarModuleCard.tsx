@@ -44,7 +44,7 @@ export function BemEstarModuleCard() {
           <div className="flex items-center gap-3 min-w-0">
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg shrink-0 cursor-help">
+                <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl shadow-lg shrink-0 cursor-help">
                   <Brain className="h-6 w-6 text-white" />
                 </div>
               </TooltipTrigger>
@@ -53,11 +53,11 @@ export function BemEstarModuleCard() {
               </TooltipContent>
             </Tooltip>
             <div className="min-w-0">
-              <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
+              <h3 className="font-bold text-lg text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
                 Saúde Mental e Bem Estar
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Info className="h-3.5 w-3.5 text-blue-500 cursor-help shrink-0" />
+                    <Info className="h-3.5 w-3.5 text-emerald-600 cursor-help shrink-0" />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="max-w-xs">
                     Cumprimento obrigatório da NR-1 — Gerenciamento de Riscos Psicossociais (GRO/PGR) com diagnóstico, planos de ação e monitoramento.
@@ -78,7 +78,7 @@ export function BemEstarModuleCard() {
           </div>
         )}
         {!sub && (
-          <div className="mb-3 flex items-center gap-2 rounded-md border border-blue-300/60 bg-blue-50 dark:bg-blue-950/30 px-3 py-2 text-xs text-blue-900 dark:text-blue-200">
+          <div className="mb-3 flex items-center gap-2 rounded-md border border-emerald-300/60 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2 text-xs text-emerald-900 dark:text-emerald-200">
             <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
             Obrigatório por lei (Portaria MTE 1.419/2024). Multa de R$ 670 a R$ 6.708 por infração.
           </div>
@@ -91,14 +91,14 @@ export function BemEstarModuleCard() {
               to={s.to}
               className="flex flex-col items-center p-2 rounded-lg bg-white/60 dark:bg-background/50 hover:bg-white hover:shadow-sm transition-all"
             >
-              <s.icon className="h-4 w-4 text-blue-600 mb-1" />
+              <s.icon className="h-4 w-4 text-emerald-600 mb-1" />
               <span className="text-xs text-muted-foreground text-center">{s.label}</span>
             </Link>
           ))}
         </div>
 
         <Link to="/nr1">
-          <Button className="w-full gap-2 bg-blue-600 hover:bg-blue-700">
+          <Button className="w-full gap-2 bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold shadow-md">
             Acessar Módulo
             <ArrowRight className="h-4 w-4" />
           </Button>
