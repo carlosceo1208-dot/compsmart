@@ -105,5 +105,6 @@ export function BemEstarModuleCard() {
         </Link>
       </CardContent>
     </Card>
+    </TooltipProvider>
   );
 }
