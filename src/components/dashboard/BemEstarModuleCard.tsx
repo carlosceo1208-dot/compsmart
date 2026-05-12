@@ -24,9 +24,9 @@ export function BemEstarModuleCard() {
   );
 
   const subtitle = !sub
-    ? "Conformidade NR-1 · Riscos Psicossociais"
+    ? "Gestão de Riscos Psicossociais conforme NR-1"
     : !ultimo
-      ? "Inicie seu primeiro diagnóstico psicossocial"
+      ? "Inicie seu primeiro diagnóstico de saúde mental"
       : `Último diagnóstico: ${ultimo.ciclo_nome}`;
 
   const shortcuts = [
@@ -37,17 +37,32 @@ export function BemEstarModuleCard() {
   ];
 
   return (
+    <TooltipProvider delayDuration={150}>
     <Card className="overflow-hidden border-2 border-blue-200/60 dark:border-blue-800/30 bg-gradient-to-br from-blue-50 via-white to-sky-50 dark:from-blue-950/30 dark:via-background dark:to-sky-950/30 shadow-lg hover:shadow-xl transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4 gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg shrink-0">
-              <Brain className="h-6 w-6 text-white" />
-            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg shrink-0 cursor-help">
+                  <Brain className="h-6 w-6 text-white" />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs">
+                Módulo dedicado à <strong>Saúde Mental no Trabalho</strong> conforme a <strong>NR-1</strong> (Portaria MTE 1.419/2024): identificação, avaliação e controle de riscos psicossociais.
+              </TooltipContent>
+            </Tooltip>
             <div className="min-w-0">
               <h3 className="font-bold text-lg text-blue-900 dark:text-blue-100 flex items-center gap-2">
-                Saúde, Bem-Estar & Performance
-                <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-blue-300 text-blue-700">NR-1</Badge>
+                Saúde Mental & NR-1
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3.5 w-3.5 text-blue-500 cursor-help shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    Cumprimento obrigatório da NR-1 — Gerenciamento de Riscos Psicossociais (GRO/PGR) com diagnóstico, planos de ação e monitoramento.
+                  </TooltipContent>
+                </Tooltip>
               </h3>
               <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
             </div>
