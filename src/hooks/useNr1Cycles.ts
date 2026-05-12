@@ -83,9 +83,9 @@ async function safeSelect<T = any>(table: string, companyId: string): Promise<T[
 async function getWorkforceCount(companyId: string): Promise<number> {
   try {
     const { count, error } = await (supabase as any)
-      .from('employees')
+      .from('profiles')
       .select('id', { count: 'exact', head: true })
-      .eq('company_id', companyId)
+      .eq('root_company_id', companyId)
       .eq('status', 'active')
       .not('employee_number', 'is', null);
     if (error) return 0;
