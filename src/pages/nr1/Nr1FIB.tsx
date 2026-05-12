@@ -37,11 +37,37 @@ export default function Nr1FIB() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold">Bem-Estar Integral (FIB)</h2>
-        <p className="text-sm text-muted-foreground">
-          Felicidade Interna Bruta — comparativo entre percepção do colaborador e condições oferecidas pela empresa nas 9 dimensões.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold">Bem-Estar Integral (FIB)</h2>
+          <p className="text-sm text-muted-foreground">
+            Felicidade Interna Bruta — comparativo entre percepção do colaborador e condições oferecidas pela empresa nas 9 dimensões.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            exportToCSV(
+              'fib_bem_estar_integral',
+              [
+                { header: 'Dimensão', accessor: (r: any) => r.dim },
+                { header: 'Grupo', accessor: (r: any) => r.grupo },
+                { header: 'Colaborador (%)', accessor: (r: any) => r.Colaborador },
+                { header: 'Empresa (%)', accessor: (r: any) => r.Empresa },
+                { header: 'Δ (Empresa - Colab.)', accessor: (r: any) => r.Empresa - r.Colaborador },
+              ],
+              FIB_DIMENSOES.map((d) => ({
+                dim: d.label,
+                grupo: d.grupo === 'pessoa' ? 'Pessoa' : 'Organização',
+                Colaborador: seedColab[d.key],
+                Empresa: seedEmpresa[d.key],
+              })),
+            )
+          }
+        >
+          <Download className="h-4 w-4 mr-2" /> Exportar CSV
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
