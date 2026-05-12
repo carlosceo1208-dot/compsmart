@@ -40,6 +40,41 @@ const useIsSuperAdmin = () =>
 export const Nr1Layout = () => {
   const location = useLocation();
   const { data: isSuper } = useIsSuperAdmin();
+  const navRef = useRef<HTMLDivElement | null>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  const updateScrollState = () => {
+    const el = navRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    const el = navRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const active = el.querySelector<HTMLElement>('[data-nr1-active="true"]');
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    updateScrollState();
+  }, [location.pathname]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    navRef.current?.scrollBy({ left: dir * 240, behavior: 'smooth' });
+  };
+
   return (
     <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
       {isSuper && (
