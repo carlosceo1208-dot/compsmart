@@ -197,9 +197,19 @@ export const useSegPsiData = () => {
           source: 'real',
         };
       }
-      // Fallback ilustrativo — gerado sobre o universo real (workforce)
+      // Sem ciclo coletado: só o Super Admin do CompSmart vê seeds ilustrativos.
+      const isSuper = await isCurrentUserSuperAdmin();
       const workforce = await getWorkforceCount(activeCompanyId!);
-      const respondentes = Math.max(0, Math.round(workforce * 0.8125)); // 13 de 16 (~81%)
+      if (!isSuper) {
+        return {
+          ciclo: null,
+          respondentes: 0,
+          adesao: 0,
+          scores: ESTAGIOS_SEG_PSI.map((e) => ({ key: e.key, label: e.label, descricao: e.descricao, score: 0 })),
+          source: 'empty',
+        };
+      }
+      const respondentes = Math.max(0, Math.round(workforce * 0.8125));
       return {
         ciclo: 'Ciclo Demo · 2026.1',
         respondentes,
