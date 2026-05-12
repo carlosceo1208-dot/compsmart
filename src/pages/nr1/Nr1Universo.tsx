@@ -235,6 +235,7 @@ export default function Nr1Universo() {
                   <TableHead>Nome</TableHead>
                   <TableHead>Matrícula</TableHead>
                   <TableHead>Cargo</TableHead>
+                  <TableHead>Unidade</TableHead>
                   <TableHead>Grade</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -244,10 +245,20 @@ export default function Nr1Universo() {
                   <TableRow key={p.id}>
                     <TableCell className="text-muted-foreground">{i + 1}</TableCell>
                     <TableCell className="font-medium">{p.full_name ?? p.email ?? '—'}</TableCell>
-                    <TableCell><code className="text-xs">{p.employee_number}</code></TableCell>
+                    <TableCell><code className="text-xs">{p.employee_number ?? '—'}</code></TableCell>
                     <TableCell>{p.job_title ?? '—'}</TableCell>
+                    <TableCell>{p.unit_name ?? '—'}</TableCell>
                     <TableCell>{p.grade ?? '—'}</TableCell>
-                    <TableCell><Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">{p.status}</Badge></TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={p.status === 'active'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'}
+                      >
+                        {p.status ?? '—'}
+                      </Badge>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
