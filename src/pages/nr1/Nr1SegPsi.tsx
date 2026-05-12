@@ -1,6 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { exportToCSV } from '@/lib/csvExport';
 import { ESTAGIOS_SEG_PSI } from '@/lib/fib';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 
@@ -30,11 +33,31 @@ export default function Nr1SegPsi() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-xl font-semibold">Segurança Psicológica — Visão Executiva</h2>
-        <p className="text-sm text-muted-foreground">
-          Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold">Segurança Psicológica — Visão Executiva</h2>
+          <p className="text-sm text-muted-foreground">
+            Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            exportToCSV(
+              'seguranca_psicologica',
+              [
+                { header: 'Estágio', accessor: (r: any) => r.label },
+                { header: 'Score (0-100)', accessor: (r: any) => r.score },
+                { header: 'Classificação', accessor: (r: any) => tom(r.score).label },
+                { header: 'Descrição', accessor: (r: any) => ESTAGIOS_SEG_PSI.find((e) => e.key === r.key)?.descricao ?? '' },
+              ],
+              chart,
+            )
+          }
+        >
+          <Download className="h-4 w-4 mr-2" /> Exportar CSV
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
