@@ -269,6 +269,10 @@ export const useSociodemoData = () => {
           return { ciclo: ultimo?.ciclo_nome ?? null, recortes, source: 'real' };
         }
       }
+      const isSuper = await isCurrentUserSuperAdmin();
+      if (!isSuper) {
+        return { ciclo: null, recortes: [], source: 'empty' };
+      }
       return { ciclo: 'Ciclo Demo · 2026.1', recortes: SEED_SOCIODEMO_PE, source: 'seed' };
     },
   });
