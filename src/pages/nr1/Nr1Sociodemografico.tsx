@@ -39,13 +39,24 @@ export default function Nr1Sociodemografico() {
       .filter((r) => recortesAtivosFinal.includes(r.id))
       .map((r) => {
         const sel = segmentosSel[r.id];
-        const linhas = sel && sel.length > 0 ? r.linhas.filter((l) => sel.includes(l.rotulo)) : r.linhas;
-        return { ...r, linhas };
+        const linhasBase = sel && sel.length > 0 ? r.linhas.filter((l) => sel.includes(l.rotulo)) : r.linhas;
+        // K-anonimato: nunca exibir grupos com menos de K respondentes
+        const { visiveis, suprimidas } = aplicarKAnonimato(linhasBase, K_ANONIMATO_MINIMO);
+        return { ...r, linhas: visiveis, suprimidas };
       });
   }, [RECORTES, recortesAtivosFinal, segmentosSel]);
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
+  }
+
+  if (data.source === 'empty') {
+    return (
+      <Nr1EmptyState
+        titulo="Sem cruzamento sociodemográfico disponível"
+        descricao="Os recortes por gênero, idade, área e tempo de casa aparecem aqui após a coleta do primeiro ciclo, respeitando o piso de k-anonimato (mínimo 5 respondentes por grupo)."
+      />
+    );
   }
 
   const exportarCSV = () => {
