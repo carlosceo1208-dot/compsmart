@@ -80,11 +80,16 @@ export default function Nr1SegPsi() {
         <div className="grid gap-4 md:grid-cols-4">
           <Card><CardContent className="pt-6">
             <p className="text-xs text-muted-foreground">Respondentes</p>
-            <p className="text-2xl font-semibold">{data.respondentes.toLocaleString('pt-BR')}</p>
+            <p className="text-2xl font-semibold">
+              {data.respondentes.toLocaleString('pt-BR')}
+              <span className="text-sm text-muted-foreground font-normal"> / {workforce}</span>
+            </p>
           </CardContent></Card>
           <Card><CardContent className="pt-6">
             <p className="text-xs text-muted-foreground">Adesão</p>
-            <p className="text-2xl font-semibold">{data.adesao.toFixed(2)}%</p>
+            <p className="text-2xl font-semibold">
+              {workforce > 0 ? ((data.respondentes / workforce) * 100).toFixed(1) : '0,0'}%
+            </p>
           </CardContent></Card>
           <Card><CardContent className="pt-6">
             <p className="text-xs text-muted-foreground">Score geral</p>
