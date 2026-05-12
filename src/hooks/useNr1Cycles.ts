@@ -143,9 +143,19 @@ export const useFibData = () => {
           source: 'real',
         };
       }
-      // Fallback ilustrativo — gerado sobre o universo real (workforce)
+      // Sem ciclo coletado: só o Super Admin do CompSmart vê seeds ilustrativos.
+      const isSuper = await isCurrentUserSuperAdmin();
       const workforce = await getWorkforceCount(activeCompanyId!);
-      const respondentes = Math.max(0, Math.round(workforce * 0.875)); // 14 de 16 (~87,5%)
+      if (!isSuper) {
+        return {
+          ciclo: null,
+          respondentes: 0,
+          adesao: 0,
+          scores: FIB_DIMENSOES.map((d) => ({ key: d.key, label: d.label, grupo: d.grupo, colaborador: 0, empresa: 0 })),
+          source: 'empty',
+        };
+      }
+      const respondentes = Math.max(0, Math.round(workforce * 0.875));
       return {
         ciclo: 'Ciclo Demo · 2026.1',
         respondentes,
