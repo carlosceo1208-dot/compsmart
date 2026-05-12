@@ -9,6 +9,9 @@ import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
