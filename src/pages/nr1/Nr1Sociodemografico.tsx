@@ -7,6 +7,8 @@ import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useSociodemoData } from '@/hooks/useNr1Cycles';
+import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+import { aplicarKAnonimato, K_ANONIMATO_MINIMO } from '@/lib/nr1Privacy';
 
 const INDICADORES = [
   { key: 'fib', label: 'FIB' },
