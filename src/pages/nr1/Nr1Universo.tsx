@@ -89,21 +89,42 @@ export default function Nr1Universo() {
   const excluidos = data?.excluidos ?? [];
   const total = data?.total ?? 0;
 
+  // Combina valid + excluídos para suportar filtros por status (inclui inativos)
+  const todos = useMemo(() => [...validos, ...excluidos], [validos, excluidos]);
+
   const grades = useMemo(() => {
     const s = new Set<string>();
-    validos.forEach((p) => p.grade && s.add(p.grade));
+    todos.forEach((p) => p.grade && s.add(p.grade));
     return Array.from(s).sort();
-  }, [validos]);
+  }, [todos]);
+
+  const unidades = useMemo(() => {
+    const m = new Map<string, string>();
+    todos.forEach((p) => { if (p.unit_id && p.unit_name) m.set(p.unit_id, p.unit_name); });
+    return Array.from(m.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+  }, [todos]);
+
+  const statusList = useMemo(() => {
+    const s = new Set<string>();
+    todos.forEach((p) => p.status && s.add(p.status));
+    return Array.from(s).sort();
+  }, [todos]);
 
   const validosFiltrados = useMemo(() => {
     const term = buscaDebounced.trim().toLowerCase();
-    return validos.filter((p) => {
+    // Fonte muda conforme statusFiltro: 'active' usa apenas o universo NR-1
+    const fonte =
+      statusFiltro === 'active' ? validos
+      : statusFiltro === 'todos' ? todos
+      : todos.filter((p) => (p.status ?? '') === statusFiltro);
+    return fonte.filter((p) => {
       if (gradeFiltro !== 'todos' && (p.grade ?? '') !== gradeFiltro) return false;
+      if (unidadeFiltro !== 'todos' && (p.unit_id ?? '') !== unidadeFiltro) return false;
       if (!term) return true;
-      const blob = `${p.full_name ?? ''} ${p.email ?? ''} ${p.employee_number ?? ''} ${p.job_title ?? ''}`.toLowerCase();
+      const blob = `${p.full_name ?? ''} ${p.email ?? ''} ${p.employee_number ?? ''} ${p.job_title ?? ''} ${p.unit_name ?? ''}`.toLowerCase();
       return blob.includes(term);
     });
-  }, [validos, buscaDebounced, gradeFiltro]);
+  }, [validos, todos, buscaDebounced, gradeFiltro, unidadeFiltro, statusFiltro]);
 
   if (isLoading || !data) {
     return (
@@ -113,7 +134,7 @@ export default function Nr1Universo() {
     );
   }
 
-  const limpar = () => { setBusca(''); setGradeFiltro('todos'); };
+  const limpar = () => { setBusca(''); setGradeFiltro('todos'); setUnidadeFiltro('todos'); setStatusFiltro('active'); };
 
   return (
     <div className="space-y-6">
