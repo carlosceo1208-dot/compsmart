@@ -18,6 +18,9 @@ const ciclos = [
 ];
 
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
+import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 export default function Nr1FIB() {
   const dashboardRef = useRef<HTMLDivElement>(null);
