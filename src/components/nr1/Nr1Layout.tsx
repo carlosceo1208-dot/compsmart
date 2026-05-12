@@ -24,7 +24,7 @@ export const Nr1Layout = () => {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg flex items-center justify-center nr1-bg-primary">
-              <Heart className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-lg font-semibold leading-tight">Saúde, Bem-Estar & Performance</h1>
