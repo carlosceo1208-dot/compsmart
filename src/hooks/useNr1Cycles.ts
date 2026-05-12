@@ -18,14 +18,37 @@ import { FIB_DIMENSOES, ESTAGIOS_SEG_PSI } from '@/lib/fib';
 
 // ---------- Tipos ----------
 export type FibScore = { key: string; label: string; grupo: 'pessoa' | 'organizacao'; colaborador: number; empresa: number };
-export type FibData = { ciclo: string | null; respondentes: number; adesao: number; scores: FibScore[]; source: 'real' | 'seed' };
+export type DataSource = 'real' | 'seed' | 'empty';
+export type FibData = { ciclo: string | null; respondentes: number; adesao: number; scores: FibScore[]; source: DataSource };
 
 export type SegPsiScore = { key: string; label: string; score: number; descricao: string };
-export type SegPsiData = { ciclo: string | null; respondentes: number; adesao: number; scores: SegPsiScore[]; source: 'real' | 'seed' };
+export type SegPsiData = { ciclo: string | null; respondentes: number; adesao: number; scores: SegPsiScore[]; source: DataSource };
 
 export type SociodemoLinha = { rotulo: string; fib: number; segPsi: number; hse: number };
 export type SociodemoRecorte = { id: string; titulo: string; linhas: SociodemoLinha[] };
-export type SociodemoData = { ciclo: string | null; recortes: SociodemoRecorte[]; source: 'real' | 'seed' };
+export type SociodemoData = { ciclo: string | null; recortes: SociodemoRecorte[]; source: DataSource };
+
+/**
+ * Seed/dados ilustrativos só podem ser exibidos para o Super Admin do CompSmart.
+ * Para qualquer cliente real, retornamos `source: 'empty'` quando não houver
+ * ciclo coletado — assim o painel mostra estado vazio em vez de números fictícios.
+ */
+async function isCurrentUserSuperAdmin(): Promise<boolean> {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'super_admin')
+      .maybeSingle();
+    if (error) return false;
+    return !!data;
+  } catch {
+    return false;
+  }
+}
 
 // ---------- Seeds (fallback ilustrativo) ----------
 const SEED_FIB_COLAB: Record<string, number> = {
