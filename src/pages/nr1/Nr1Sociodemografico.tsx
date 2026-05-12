@@ -217,6 +217,12 @@ export default function Nr1Sociodemografico() {
                   </table>
                 </div>
               )}
+              {(r as any).suprimidas?.length > 0 && (
+                <p className="text-[10px] text-muted-foreground italic mt-2">
+                  🔒 {(r as any).suprimidas.length} segmento(s) suprimido(s) por k-anonimato (n &lt; {K_ANONIMATO_MINIMO}):{' '}
+                  {(r as any).suprimidas.map((s: any) => s.rotulo).join(', ')}
+                </p>
+              )}
             </CardContent>
           </Card>
         ))}
