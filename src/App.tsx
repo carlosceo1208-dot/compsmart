@@ -258,6 +258,7 @@ const App = () => {
                        <Route path="/nr1/universo" element={<Nr1Universo />} />
                         <Route path="/nr1/agente" element={<Nr1BemEstarAgente />} />
                         <Route path="/nr1/contratar" element={<Nr1Contratar />} />
+                        <Route path="/nr1/consentimento" element={<Nr1Consentimento />} />
                       </Route>
 
                       {/* Public */}
