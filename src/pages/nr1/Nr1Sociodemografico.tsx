@@ -28,6 +28,9 @@ function corCelula(v: number) {
 export default function Nr1Sociodemografico() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useSociodemoData();
+  const { activeCompanyId } = useCompanyContext();
+  const { data: roleInfo } = useCurrentUserRole();
+  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
   const RECORTES = data?.recortes ?? [];
 
   const [recortesAtivos, setRecortesAtivos] = useState<string[] | null>(null);
