@@ -65,6 +65,16 @@ export default function Nr1Sociodemografico() {
   }
 
   const exportarCSV = () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({
+        companyId: activeCompanyId,
+        actorRole,
+        action: 'export_csv',
+        resource: 'sociodemo',
+        filters: { recortes: recortesAtivosFinal, indicadores: indicadoresAtivos },
+        kValue: K_ANONIMATO_MINIMO,
+      });
+    }
     const rows: any[] = [];
     recortesFiltrados.forEach((r) => {
       r.linhas.forEach((l) => {
@@ -85,6 +95,15 @@ export default function Nr1Sociodemografico() {
   };
 
   const exportarPDF = async () => {
+    if (activeCompanyId) {
+      registrarAcessoNr1({
+        companyId: activeCompanyId,
+        actorRole,
+        action: 'export_pdf',
+        resource: 'sociodemo',
+        kValue: K_ANONIMATO_MINIMO,
+      });
+    }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
         filename: 'cruzamento_sociodemografico',
