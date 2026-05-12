@@ -25,6 +25,7 @@ function tom(score: number) {
 export default function Nr1SegPsi() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useSegPsiData();
+  const { data: workforce = 0 } = useNr1Workforce();
 
   if (isLoading || !data) {
     return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
