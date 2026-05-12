@@ -61,6 +61,13 @@ export default function Nr1Universo() {
   // ----- Filtros (hooks devem vir antes de qualquer return) -----
   const [busca, setBusca] = useState('');
   const [gradeFiltro, setGradeFiltro] = useState<string>('todos');
+  const [buscaDebounced, setBuscaDebounced] = useState('');
+
+  // Debounce: aguarda 300ms após o usuário parar de digitar
+  useEffect(() => {
+    const t = setTimeout(() => setBuscaDebounced(busca), 300);
+    return () => clearTimeout(t);
+  }, [busca]);
 
   const validos = data?.validos ?? [];
   const excluidos = data?.excluidos ?? [];
@@ -73,14 +80,14 @@ export default function Nr1Universo() {
   }, [validos]);
 
   const validosFiltrados = useMemo(() => {
-    const term = busca.trim().toLowerCase();
+    const term = buscaDebounced.trim().toLowerCase();
     return validos.filter((p) => {
       if (gradeFiltro !== 'todos' && (p.grade ?? '') !== gradeFiltro) return false;
       if (!term) return true;
       const blob = `${p.full_name ?? ''} ${p.email ?? ''} ${p.employee_number ?? ''} ${p.job_title ?? ''}`.toLowerCase();
       return blob.includes(term);
     });
-  }, [validos, busca, gradeFiltro]);
+  }, [validos, buscaDebounced, gradeFiltro]);
 
   if (isLoading || !data) {
     return (
