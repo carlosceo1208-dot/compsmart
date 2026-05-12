@@ -460,19 +460,51 @@ All colors MUST be HSL.
   100% { transform: translateX(-50%); }
 }
 
-/* === NR-1 Module Scope === */
+/* === Saúde Mental & Bem-Estar Module Scope ===
+   Paleta inspirada nas campanhas de conscientização:
+   • Verde (laço verde) — saúde mental, esperança, equilíbrio
+   • Amarelo (Setembro Amarelo) — prevenção ao suicídio
+   • Branco — conscientização geral, saúde emocional
+*/
 .nr1-scope {
-  --nr1-primary: 211 100% 50%;       /* #007BFF */
-  --nr1-success: 134 61% 41%;        /* #28A745 */
-  --nr1-warning: 45 100% 51%;        /* #FFC107 */
-  --nr1-danger:  354 70% 54%;        /* #DC3545 */
-  --nr1-soft:    210 50% 97%;
+  --nr1-primary:  152 62% 38%;        /* #25A06A — verde laço */
+  --nr1-primary-dark: 152 70% 28%;
+  --nr1-accent:   45 100% 51%;        /* #FFC107 — amarelo setembro */
+  --nr1-success:  152 62% 38%;
+  --nr1-warning:  38 95% 55%;
+  --nr1-danger:   354 70% 54%;
+  --nr1-soft:     150 45% 97%;
+  --nr1-gradient: linear-gradient(135deg, hsl(152 62% 38%) 0%, hsl(160 70% 45%) 60%, hsl(45 100% 60%) 100%);
 }
 .nr1-scope .nr1-bg-soft { background-color: hsl(var(--nr1-soft)); }
 .nr1-scope .nr1-text-primary { color: hsl(var(--nr1-primary)); }
+.nr1-scope .nr1-text-accent { color: hsl(var(--nr1-accent)); }
 .nr1-scope .nr1-bg-primary { background-color: hsl(var(--nr1-primary)); color: white; }
-.nr1-scope .nr1-bg-primary:hover { background-color: hsl(var(--nr1-primary) / 0.9); }
+.nr1-scope .nr1-bg-primary:hover { background-color: hsl(var(--nr1-primary-dark)); }
+.nr1-scope .nr1-bg-accent { background-color: hsl(var(--nr1-accent)); color: hsl(222 47% 11%); }
+.nr1-scope .nr1-bg-gradient { background: var(--nr1-gradient); color: white; }
+.nr1-scope .nr1-ring-accent { box-shadow: 0 0 0 3px hsl(var(--nr1-accent) / 0.35); }
+.nr1-scope .nr1-btn-primary {
+  background: var(--nr1-gradient);
+  color: white;
+  border: 0;
+  box-shadow: 0 6px 20px -8px hsl(var(--nr1-primary) / 0.55);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.nr1-scope .nr1-btn-primary:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 10px 24px -8px hsl(var(--nr1-primary) / 0.65); }
+.nr1-scope .nr1-btn-accent {
+  background: hsl(var(--nr1-accent));
+  color: hsl(222 47% 11%);
+  border: 0;
+  box-shadow: 0 6px 18px -8px hsl(var(--nr1-accent) / 0.7);
+}
+.nr1-scope .nr1-btn-accent:hover { filter: brightness(1.05); }
+.nr1-scope .nr1-card-elevated {
+  background: white;
+  border: 1px solid hsl(var(--nr1-primary) / 0.15);
+  box-shadow: 0 1px 0 hsl(var(--nr1-accent) / 0.6) inset, 0 8px 24px -16px hsl(var(--nr1-primary) / 0.35);
+}
 .nr1-risk-baixo    { background-color: hsl(var(--nr1-success) / 0.12); color: hsl(var(--nr1-success)); }
-.nr1-risk-moderado { background-color: hsl(var(--nr1-warning) / 0.18); color: hsl(35 90% 35%); }
-.nr1-risk-alto     { background-color: hsl(25 95% 60% / 0.18);          color: hsl(25 95% 40%); }
+.nr1-risk-moderado { background-color: hsl(var(--nr1-warning) / 0.18); color: hsl(32 90% 35%); }
+.nr1-risk-alto     { background-color: hsl(25 95% 60% / 0.18);         color: hsl(25 95% 40%); }
 .nr1-risk-critico  { background-color: hsl(var(--nr1-danger) / 0.15);  color: hsl(var(--nr1-danger)); }

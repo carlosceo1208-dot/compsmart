@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Heart, Send, Sparkles, User, Loader2, RotateCcw } from 'lucide-react';
+import { Brain, Send, Sparkles, User, Loader2, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -128,7 +128,7 @@ export default function Nr1BemEstarAgente() {
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full nr1-bg-primary flex items-center justify-center">
-              <Heart className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             </div>
             <div>
               <CardTitle className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export default function Nr1BemEstarAgente() {
           <div className="p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="text-center space-y-4 py-8">
-                <Heart className="h-10 w-10 mx-auto nr1-text-primary" />
+                <Brain className="h-10 w-10 mx-auto nr1-text-primary" />
                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
                   Olá! Sou o agente Bem-Estar. Posso ajudar com a NR-1, interpretar diagnósticos, montar planos de ação e orientar sobre conformidade legal. Como posso ajudar?
                 </p>
@@ -180,7 +180,7 @@ export default function Nr1BemEstarAgente() {
                 >
                   <Avatar className="h-8 w-8 shrink-0">
                     <AvatarFallback className={m.role === 'user' ? 'bg-muted' : 'nr1-bg-primary'}>
-                      {m.role === 'user' ? <User className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
+                      {m.role === 'user' ? <User className="h-4 w-4" /> : <Brain className="h-4 w-4" />}
                     </AvatarFallback>
                   </Avatar>
                   <div
@@ -204,7 +204,7 @@ export default function Nr1BemEstarAgente() {
             )}
             {loading && messages[messages.length - 1]?.role === 'user' && (
               <div className="flex gap-3">
-                <Avatar className="h-8 w-8"><AvatarFallback className="nr1-bg-primary"><Heart className="h-4 w-4" /></AvatarFallback></Avatar>
+                <Avatar className="h-8 w-8"><AvatarFallback className="nr1-bg-primary"><Brain className="h-4 w-4" /></AvatarFallback></Avatar>
                 <div className="bg-muted rounded-lg px-3 py-2 text-sm flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" /> Pensando…
                 </div>

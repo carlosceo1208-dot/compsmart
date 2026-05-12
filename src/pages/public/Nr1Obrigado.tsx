@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Heart, CheckCircle2 } from 'lucide-react';
+import { Brain, CheckCircle2 } from 'lucide-react';
 
 export default function Nr1Obrigado() {
   return (
@@ -13,7 +13,7 @@ export default function Nr1Obrigado() {
           </div>
           <div>
             <h1 className="text-2xl font-bold flex items-center justify-center gap-2">
-              <Heart className="h-5 w-5 nr1-text-primary" /> Obrigado!
+              <Brain className="h-5 w-5 nr1-text-primary" /> Obrigado!
             </h1>
             <p className="text-muted-foreground mt-2">
               Recebemos seus dados. Nossa equipe entrará em contato em até 24h úteis com uma proposta

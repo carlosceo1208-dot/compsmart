@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Check, X } from 'lucide-react';
+import { Brain, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Check, X } from 'lucide-react';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
@@ -107,7 +107,7 @@ export default function LandingNr1() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg flex items-center justify-center nr1-bg-primary">
-              <Heart className="h-4 w-4" />
+              <Brain className="h-4 w-4" />
             </div>
             <span className="font-semibold">CompSmart NR-1</span>
           </Link>
