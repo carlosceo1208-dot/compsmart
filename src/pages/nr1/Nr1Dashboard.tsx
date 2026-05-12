@@ -21,16 +21,12 @@ export default function Nr1Dashboard() {
         <Skeleton className="h-24 w-full" />
       ) : !sub ? (
         <Card className="border-dashed">
-          <CardContent className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h3 className="font-semibold">Sua empresa ainda não ativou o módulo NR-1</h3>
-              <p className="text-sm text-muted-foreground">
-                Comece com 14 dias grátis e fique em conformidade com a obrigatoriedade legal.
-              </p>
-            </div>
-            <Button asChild className="nr1-bg-primary">
-              <Link to="/nr1/contratar">Ativar agora <ArrowRight className="h-4 w-4 ml-1" /></Link>
-            </Button>
+          <CardContent className="pt-6">
+            <h3 className="font-semibold">Sua empresa ainda não ativou o módulo NR-1</h3>
+            <p className="text-sm text-muted-foreground">
+              Conformidade legal, plano de ação e monitoramento de riscos psicossociais.
+              Fale com o nosso time para conhecer as condições.
+            </p>
           </CardContent>
         </Card>
       ) : (
