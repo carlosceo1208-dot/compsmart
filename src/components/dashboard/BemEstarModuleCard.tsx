@@ -15,12 +15,12 @@ export function BemEstarModuleCard() {
   const ultimo = diagnosticos?.[0];
   const risco = (ultimo?.nivel_risco ?? null) as NivelRisco | null;
 
-  const statusBadge = !sub ? (
-    <Badge className="bg-blue-100 text-blue-700 border-blue-200">14 dias grátis</Badge>
-  ) : risco ? (
+  const statusBadge = risco ? (
     <Badge className={RISCO_CLASS[risco]}>Risco {RISCO_LABEL[risco]}</Badge>
+  ) : sub ? (
+    <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">NR-1 Ativo</Badge>
   ) : (
-    <Badge className="bg-blue-100 text-blue-700 border-blue-200">NR-1 Ativo</Badge>
+    <Badge className="bg-amber-100 text-amber-800 border-amber-200">Conformidade NR-1</Badge>
   );
 
   const subtitle = !sub
