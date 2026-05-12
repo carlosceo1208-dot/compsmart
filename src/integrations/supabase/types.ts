@@ -3752,6 +3752,54 @@ export type Database = {
           },
         ]
       }
+      nr1_access_log: {
+        Row: {
+          action: string
+          actor_role: string
+          actor_user_id: string
+          blocked: boolean | null
+          company_id: string
+          created_at: string
+          filters: Json | null
+          id: string
+          ip: unknown
+          k_value: number | null
+          reason: string | null
+          resource: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_role: string
+          actor_user_id: string
+          blocked?: boolean | null
+          company_id: string
+          created_at?: string
+          filters?: Json | null
+          id?: string
+          ip?: unknown
+          k_value?: number | null
+          reason?: string | null
+          resource: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_role?: string
+          actor_user_id?: string
+          blocked?: boolean | null
+          company_id?: string
+          created_at?: string
+          filters?: Json | null
+          id?: string
+          ip?: unknown
+          k_value?: number | null
+          reason?: string | null
+          resource?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       nr1_diagnostico_respostas: {
         Row: {
           created_at: string
@@ -6405,6 +6453,7 @@ export type Database = {
           birth_date: string | null
           cpf: string | null
           created_at: string
+          department: string | null
           email: string | null
           employee_number: string | null
           full_name: string
@@ -6415,8 +6464,12 @@ export type Database = {
           id: string
           job_title: string | null
           job_title_id: string | null
+          leadership_level: string | null
           long_term_incentive: number | null
           manager_id: string | null
+          nr1_consent_at: string | null
+          nr1_consent_version: string | null
+          pcd: boolean | null
           performance_rating: number | null
           phone: string | null
           preferred_language: string | null
@@ -6424,12 +6477,14 @@ export type Database = {
           root_company_id: string | null
           salary: number | null
           salary_range_percentage: number | null
+          shift: string | null
           short_term_incentive: number | null
           status: Database["public"]["Enums"]["user_status"]
           termination_date: string | null
           unit_id: string | null
           updated_at: string
           variable_salary: number | null
+          work_modality: string | null
         }
         Insert: {
           age_range?: string | null
@@ -6438,6 +6493,7 @@ export type Database = {
           birth_date?: string | null
           cpf?: string | null
           created_at?: string
+          department?: string | null
           email?: string | null
           employee_number?: string | null
           full_name: string
@@ -6448,8 +6504,12 @@ export type Database = {
           id: string
           job_title?: string | null
           job_title_id?: string | null
+          leadership_level?: string | null
           long_term_incentive?: number | null
           manager_id?: string | null
+          nr1_consent_at?: string | null
+          nr1_consent_version?: string | null
+          pcd?: boolean | null
           performance_rating?: number | null
           phone?: string | null
           preferred_language?: string | null
@@ -6457,12 +6517,14 @@ export type Database = {
           root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
+          shift?: string | null
           short_term_incentive?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           termination_date?: string | null
           unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
+          work_modality?: string | null
         }
         Update: {
           age_range?: string | null
@@ -6471,6 +6533,7 @@ export type Database = {
           birth_date?: string | null
           cpf?: string | null
           created_at?: string
+          department?: string | null
           email?: string | null
           employee_number?: string | null
           full_name?: string
@@ -6481,8 +6544,12 @@ export type Database = {
           id?: string
           job_title?: string | null
           job_title_id?: string | null
+          leadership_level?: string | null
           long_term_incentive?: number | null
           manager_id?: string | null
+          nr1_consent_at?: string | null
+          nr1_consent_version?: string | null
+          pcd?: boolean | null
           performance_rating?: number | null
           phone?: string | null
           preferred_language?: string | null
@@ -6490,12 +6557,14 @@ export type Database = {
           root_company_id?: string | null
           salary?: number | null
           salary_range_percentage?: number | null
+          shift?: string | null
           short_term_incentive?: number | null
           status?: Database["public"]["Enums"]["user_status"]
           termination_date?: string | null
           unit_id?: string | null
           updated_at?: string
           variable_salary?: number | null
+          work_modality?: string | null
         }
         Relationships: [
           {
