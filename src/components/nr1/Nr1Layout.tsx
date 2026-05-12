@@ -16,6 +16,7 @@ const NAV = [
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/agente', label: 'Agente Bem-Estar', icon: Bot },
+  { to: '/nr1/consentimento', label: 'Consentimento', icon: Lock },
 ];
 
 const useIsSuperAdmin = () =>
