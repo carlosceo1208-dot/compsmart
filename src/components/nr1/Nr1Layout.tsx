@@ -1,10 +1,14 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Heart, FileText, ListChecks, ShoppingCart, ArrowLeft, Sparkles, Bot } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ShoppingCart, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const NAV = [
   { to: '/nr1', label: 'Visão Geral', icon: Activity, end: true },
+  { to: '/nr1/fib', label: 'Bem-Estar Integral', icon: Radar },
+  { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield },
+  { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users },
+  { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch },
   { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText },
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
@@ -20,7 +24,7 @@ export const Nr1Layout = () => {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-lg flex items-center justify-center nr1-bg-primary">
-              <Heart className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             </div>
             <div>
               <h1 className="text-lg font-semibold leading-tight">Saúde, Bem-Estar & Performance</h1>
