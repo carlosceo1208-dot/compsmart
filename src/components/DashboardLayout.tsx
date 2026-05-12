@@ -37,6 +37,7 @@ import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { KudosConfetti } from "@/components/kudos/KudosConfetti";
 import { KudosNotificationPopup } from "@/components/kudos/KudosNotificationPopup";
 import { useKudosNotifications } from "@/hooks/useKudosNotifications";
+import { SuperAdminWelcome } from "@/components/onboarding/SuperAdminWelcome";
 
 interface UserProfile {
   full_name: string;
@@ -680,6 +681,9 @@ export const DashboardLayout = () => {
       
       {/* Support Widget - sempre visível */}
       <SupportWidget />
+
+      {/* Onboarding tour for first-time Super Admins */}
+      <SuperAdminWelcome />
     </div>
   );
 };

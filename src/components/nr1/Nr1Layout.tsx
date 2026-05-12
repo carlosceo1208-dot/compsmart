@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, Lock } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +40,41 @@ const useIsSuperAdmin = () =>
 export const Nr1Layout = () => {
   const location = useLocation();
   const { data: isSuper } = useIsSuperAdmin();
+  const navRef = useRef<HTMLDivElement | null>(null);
+  const [canLeft, setCanLeft] = useState(false);
+  const [canRight, setCanRight] = useState(false);
+
+  const updateScrollState = () => {
+    const el = navRef.current;
+    if (!el) return;
+    setCanLeft(el.scrollLeft > 4);
+    setCanRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    updateScrollState();
+    const el = navRef.current;
+    if (!el) return;
+    el.addEventListener('scroll', updateScrollState, { passive: true });
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return;
+    const active = el.querySelector<HTMLElement>('[data-nr1-active="true"]');
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    updateScrollState();
+  }, [location.pathname]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    navRef.current?.scrollBy({ left: dir * 240, behavior: 'smooth' });
+  };
+
   return (
     <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
       {isSuper && (
@@ -70,30 +106,73 @@ export const Nr1Layout = () => {
             <NavLink to="/dashboard"><ArrowLeft className="h-4 w-4 mr-1" />Voltar ao CompSmart</NavLink>
           </Button>
         </div>
-        <nav className="container mx-auto px-4 flex gap-1 overflow-x-auto">
-          {NAV.map((item) => {
-            const Icon = item.icon;
-            const active = item.end
-              ? location.pathname === item.to
-              : location.pathname.startsWith(item.to);
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={cn(
-                  'flex items-center gap-2 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap',
-                  active
-                    ? 'border-[hsl(var(--nr1-primary))] nr1-text-primary font-semibold'
-                    : 'border-transparent text-muted-foreground hover:text-[hsl(var(--nr1-primary))] hover:border-[hsl(var(--nr1-accent))]'
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </NavLink>
-            );
-          })}
-        </nav>
+        <div className="container mx-auto px-4 relative">
+          {/* Left fade + arrow */}
+          <button
+            type="button"
+            aria-label="Rolar abas para a esquerda"
+            onClick={() => scrollBy(-1)}
+            className={cn(
+              'absolute left-2 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-card border shadow-sm flex items-center justify-center transition-opacity',
+              canLeft ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            )}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div
+            className={cn(
+              'pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-card to-transparent transition-opacity z-[5]',
+              canLeft ? 'opacity-100' : 'opacity-0'
+            )}
+          />
+          <div
+            className={cn(
+              'pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-card to-transparent transition-opacity z-[5]',
+              canRight ? 'opacity-100' : 'opacity-0'
+            )}
+          />
+          <button
+            type="button"
+            aria-label="Rolar abas para a direita"
+            onClick={() => scrollBy(1)}
+            className={cn(
+              'absolute right-2 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-card border shadow-sm flex items-center justify-center transition-opacity',
+              canRight ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            )}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+
+          <nav
+            ref={navRef}
+            className="flex gap-1 overflow-x-auto scrollbar-hide scroll-smooth"
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {NAV.map((item) => {
+              const Icon = item.icon;
+              const active = item.end
+                ? location.pathname === item.to
+                : location.pathname.startsWith(item.to);
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  data-nr1-active={active}
+                  className={cn(
+                    'flex items-center gap-2 px-3 py-2 text-sm border-b-2 transition-colors whitespace-nowrap',
+                    active
+                      ? 'border-[hsl(var(--nr1-primary))] nr1-text-primary font-semibold'
+                      : 'border-transparent text-muted-foreground hover:text-[hsl(var(--nr1-primary))] hover:border-[hsl(var(--nr1-accent))]'
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
       </header>
       <main className="container mx-auto px-4 py-6">
         <Outlet />
