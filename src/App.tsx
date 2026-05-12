@@ -114,6 +114,7 @@ const Nr1BemEstarAgente = lazy(() => import("./pages/nr1/Nr1BemEstarAgente"));
 const Nr1FIB = lazy(() => import("./pages/nr1/Nr1FIB"));
 const Nr1SegPsi = lazy(() => import("./pages/nr1/Nr1SegPsi"));
 const Nr1Sociodemografico = lazy(() => import("./pages/nr1/Nr1Sociodemografico"));
+const Nr1Universo = lazy(() => import("./pages/nr1/Nr1Universo"));
 const Nr1Etapas = lazy(() => import("./pages/nr1/Nr1Etapas"));
 
 const queryClient = new QueryClient({
@@ -253,6 +254,7 @@ const App = () => {
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
+                       <Route path="/nr1/universo" element={<Nr1Universo />} />
                         <Route path="/nr1/agente" element={<Nr1BemEstarAgente />} />
                         <Route path="/nr1/contratar" element={<Nr1Contratar />} />
                       </Route>
