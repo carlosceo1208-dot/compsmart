@@ -114,6 +114,7 @@ const Nr1BemEstarAgente = lazy(() => import("./pages/nr1/Nr1BemEstarAgente"));
 const Nr1FIB = lazy(() => import("./pages/nr1/Nr1FIB"));
 const Nr1SegPsi = lazy(() => import("./pages/nr1/Nr1SegPsi"));
 const Nr1Sociodemografico = lazy(() => import("./pages/nr1/Nr1Sociodemografico"));
+const Nr1Universo = lazy(() => import("./pages/nr1/Nr1Universo"));
 const Nr1Etapas = lazy(() => import("./pages/nr1/Nr1Etapas"));
 
 const queryClient = new QueryClient({
