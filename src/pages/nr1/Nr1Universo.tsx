@@ -1,10 +1,14 @@
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Users, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Loader2, Users, CheckCircle2, AlertCircle, Search, X } from 'lucide-react';
 
 type Linha = {
   id: string;
@@ -64,6 +68,28 @@ export default function Nr1Universo() {
 
   const { total, validos, excluidos } = data;
 
+  // ----- Filtros -----
+  const [busca, setBusca] = useState('');
+  const [gradeFiltro, setGradeFiltro] = useState<string>('todos');
+
+  const grades = useMemo(() => {
+    const s = new Set<string>();
+    validos.forEach((p) => p.grade && s.add(p.grade));
+    return Array.from(s).sort();
+  }, [validos]);
+
+  const validosFiltrados = useMemo(() => {
+    const term = busca.trim().toLowerCase();
+    return validos.filter((p) => {
+      if (gradeFiltro !== 'todos' && (p.grade ?? '') !== gradeFiltro) return false;
+      if (!term) return true;
+      const blob = `${p.full_name ?? ''} ${p.email ?? ''} ${p.employee_number ?? ''} ${p.job_title ?? ''}`.toLowerCase();
+      return blob.includes(term);
+    });
+  }, [validos, busca, gradeFiltro]);
+
+  const limpar = () => { setBusca(''); setGradeFiltro('todos'); };
+
   return (
     <div className="space-y-6">
       <div>
@@ -107,13 +133,37 @@ export default function Nr1Universo() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            Colaboradores incluídos ({validos.length})
+            Colaboradores incluídos ({validosFiltrados.length}{validosFiltrados.length !== validos.length ? ` de ${validos.length}` : ''})
           </CardTitle>
           <CardDescription>Base de cálculo da adesão nos diagnósticos NR-1.</CardDescription>
         </CardHeader>
-        <CardContent>
-          {validos.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nenhum colaborador atende aos critérios.</p>
+        <CardContent className="space-y-4">
+          <div className="flex flex-col md:flex-row gap-2 md:items-center">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar por nome, matrícula, e-mail ou cargo…"
+                className="pl-9"
+              />
+            </div>
+            <Select value={gradeFiltro} onValueChange={setGradeFiltro}>
+              <SelectTrigger className="md:w-[180px]"><SelectValue placeholder="Grade" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas as grades</SelectItem>
+                {grades.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            {(busca || gradeFiltro !== 'todos') && (
+              <Button variant="ghost" size="sm" onClick={limpar}>
+                <X className="h-4 w-4 mr-1" /> Limpar
+              </Button>
+            )}
+          </div>
+
+          {validosFiltrados.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-6 text-center">Nenhum colaborador encontrado com esses filtros.</p>
           ) : (
             <Table>
               <TableHeader>
@@ -127,7 +177,7 @@ export default function Nr1Universo() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {validos.map((p, i) => (
+                {validosFiltrados.map((p, i) => (
                   <TableRow key={p.id}>
                     <TableCell className="text-muted-foreground">{i + 1}</TableCell>
                     <TableCell className="font-medium">{p.full_name ?? p.email ?? '—'}</TableCell>
