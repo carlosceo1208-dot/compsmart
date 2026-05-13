@@ -22,6 +22,7 @@ import {
   ACAO_STATUS_CLASS, ACAO_PRIORIDADE_CLASS,
 } from '@/lib/nr1Risco';
 import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { AssistenteIaPlanoAcaoDialog } from '@/components/nr1/AssistenteIaPlanoAcaoDialog';
 
 const STATUS_OPTS: Nr1AcaoStatus[] = ['pendente', 'em_andamento', 'concluido', 'atrasado'];
 const PRIORIDADE_OPTS: Nr1AcaoPrioridade[] = ['baixa', 'media', 'alta', 'critica'];
@@ -68,9 +69,12 @@ export default function Nr1PlanosAcao() {
             Acompanhe ações corretivas e preventivas com responsáveis, prazos e evidências.
           </p>
         </div>
-        <Button onClick={startNew} className="nr1-bg-primary">
-          <Plus className="h-4 w-4 mr-1" /> Nova ação
-        </Button>
+        <div className="flex gap-2">
+          <AssistenteIaPlanoAcaoDialog />
+          <Button onClick={startNew} className="nr1-bg-primary">
+            <Plus className="h-4 w-4 mr-1" /> Nova ação
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-4">
