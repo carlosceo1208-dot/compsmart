@@ -10,6 +10,34 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const FALLBACK_APP_BASE_URL = "https://compsmart.ia.br";
+const ALLOWED_APP_HOSTS = new Set([
+  "compsmart.ia.br",
+  "www.compsmart.ia.br",
+  "smartcomp.ia.br",
+  "www.smartcomp.ia.br",
+  "compsmart.lovable.app",
+]);
+
+function resolveAppBaseUrl(req: Request) {
+  const candidates = [req.headers.get("origin"), req.headers.get("referer")];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+
+    try {
+      const url = new URL(candidate);
+      if (ALLOWED_APP_HOSTS.has(url.host)) {
+        return `${url.protocol}//${url.host}`;
+      }
+    } catch {
+      // ignore malformed header and continue with the next candidate
+    }
+  }
+
+  return FALLBACK_APP_BASE_URL;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -71,8 +99,8 @@ serve(async (req) => {
       });
     }
 
-    const origin = req.headers.get("origin") ?? "https://compsmart.lovable.app";
-    const redirectTo = `${origin}/reset-password?mode=invite`;
+    const appBaseUrl = resolveAppBaseUrl(req);
+    const redirectTo = `${appBaseUrl}/reset-password?mode=invite`;
 
     const results: any[] = [];
 
