@@ -47,7 +47,10 @@ export default function Nr1Dashboard() {
         </Card>
       )}
 
-      {/* KPIs */}
+      {/* Grau de Risco INSS + Plano de Ação */}
+      <GrauRiscoInssCard />
+
+
       <div className="grid gap-4 md:grid-cols-3">
         <KpiCard
           icon={FileText}
