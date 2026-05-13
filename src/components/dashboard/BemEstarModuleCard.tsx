@@ -8,19 +8,52 @@ import {
 } from "lucide-react";
 import { useNr1Subscription, useNr1Diagnosticos } from "@/hooks/useNr1";
 import { RISCO_LABEL, RISCO_CLASS, type NivelRisco } from "@/lib/nr1";
+import { GRAU_RISCO_INSS, type GrauRiscoInss } from "@/lib/nr1Risco";
 
 export function BemEstarModuleCard() {
   const { data: sub } = useNr1Subscription();
   const { data: diagnosticos } = useNr1Diagnosticos();
   const ultimo = diagnosticos?.[0];
   const risco = (ultimo?.nivel_risco ?? null) as NivelRisco | null;
+  const grau = ((sub as any)?.grau_risco_inss ?? null) as GrauRiscoInss | null;
+  const grauInfo = grau ? GRAU_RISCO_INSS[grau] : null;
 
-  const statusBadge = risco ? (
-    <Badge className={RISCO_CLASS[risco]}>Risco {RISCO_LABEL[risco]}</Badge>
-  ) : sub ? (
-    <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">NR-1 Ativo</Badge>
-  ) : (
-    <Badge className="bg-amber-100 text-amber-800 border-amber-200">Conformidade NR-1</Badge>
+  const statusBadges = (
+    <div className="flex flex-col items-end gap-1.5 shrink-0">
+      {grauInfo ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge className={`${grauInfo.bg} ${grauInfo.cor} border cursor-help`}>
+              Grau {grauInfo.grau} · {grauInfo.label}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs">
+            <p className="font-semibold mb-1">Grau {grauInfo.grau} — {grauInfo.label} ({grauInfo.rat})</p>
+            <p className="text-xs">{grauInfo.exemplos}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : sub ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Link to="/nr1">
+              <Badge className="bg-amber-100 text-amber-800 border-amber-200 cursor-pointer hover:bg-amber-200">
+                Definir Grau de Risco
+              </Badge>
+            </Link>
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-xs">
+            Classifique o grau de risco INSS (CNAE) da empresa para visualizar exigências NR-1.
+          </TooltipContent>
+        </Tooltip>
+      ) : null}
+      {risco ? (
+        <Badge className={RISCO_CLASS[risco]}>Risco {RISCO_LABEL[risco]}</Badge>
+      ) : sub && !grauInfo ? (
+        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">NR-1 Ativo</Badge>
+      ) : !sub ? (
+        <Badge className="bg-amber-100 text-amber-800 border-amber-200">Conformidade NR-1</Badge>
+      ) : null}
+    </div>
   );
 
   const subtitle = !sub
