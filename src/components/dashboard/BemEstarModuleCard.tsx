@@ -100,7 +100,7 @@ export function BemEstarModuleCard() {
               <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
             </div>
           </div>
-          {statusBadge}
+          {statusBadges}
         </div>
 
         {/* Alerta se sem diagnóstico */}
