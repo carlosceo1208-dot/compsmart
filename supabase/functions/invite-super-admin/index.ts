@@ -138,7 +138,7 @@ serve(async (req) => {
           resource: email,
         }).then(() => {}, () => {});
 
-        results.push({ email, ok: true, user_id: userId });
+        results.push({ email, ok: true, user_id: userId, action_link: actionLink });
       } catch (e: any) {
         console.error("[invite-super-admin] erro:", email, e?.message);
         results.push({ email, ok: false, error: e?.message ?? String(e) });
