@@ -3953,6 +3953,68 @@ export type Database = {
         }
         Relationships: []
       }
+      nr1_planos_acao: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          diagnostico_id: string | null
+          dimensao: string | null
+          evidencias: string | null
+          id: string
+          prazo: string | null
+          prioridade: Database["public"]["Enums"]["nr1_acao_prioridade"]
+          progresso: number
+          responsavel: string | null
+          status: Database["public"]["Enums"]["nr1_acao_status"]
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          diagnostico_id?: string | null
+          dimensao?: string | null
+          evidencias?: string | null
+          id?: string
+          prazo?: string | null
+          prioridade?: Database["public"]["Enums"]["nr1_acao_prioridade"]
+          progresso?: number
+          responsavel?: string | null
+          status?: Database["public"]["Enums"]["nr1_acao_status"]
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          diagnostico_id?: string | null
+          dimensao?: string | null
+          evidencias?: string | null
+          id?: string
+          prazo?: string | null
+          prioridade?: Database["public"]["Enums"]["nr1_acao_prioridade"]
+          progresso?: number
+          responsavel?: string | null
+          status?: Database["public"]["Enums"]["nr1_acao_status"]
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_planos_acao_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nr1_questoes: {
         Row: {
           ativo: boolean
@@ -3997,6 +4059,7 @@ export type Database = {
           company_id: string
           created_at: string
           ends_at: string | null
+          grau_risco_inss: number | null
           id: string
           max_employees: number | null
           mrr: number | null
@@ -4010,6 +4073,7 @@ export type Database = {
           company_id: string
           created_at?: string
           ends_at?: string | null
+          grau_risco_inss?: number | null
           id?: string
           max_employees?: number | null
           mrr?: number | null
@@ -4023,6 +4087,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           ends_at?: string | null
+          grau_risco_inss?: number | null
           id?: string
           max_employees?: number | null
           mrr?: number | null
@@ -9484,6 +9549,8 @@ export type Database = {
         | "expired"
         | "cancelled"
       impact_level: "low" | "medium" | "high"
+      nr1_acao_prioridade: "baixa" | "media" | "alta" | "critica"
+      nr1_acao_status: "pendente" | "em_andamento" | "concluido" | "atrasado"
       nr1_diagnostico_status: "em_andamento" | "concluido" | "arquivado"
       nr1_dimensao:
         | "demandas_trabalho"
@@ -9699,6 +9766,8 @@ export const Constants = {
         "cancelled",
       ],
       impact_level: ["low", "medium", "high"],
+      nr1_acao_prioridade: ["baixa", "media", "alta", "critica"],
+      nr1_acao_status: ["pendente", "em_andamento", "concluido", "atrasado"],
       nr1_diagnostico_status: ["em_andamento", "concluido", "arquivado"],
       nr1_dimensao: [
         "demandas_trabalho",
