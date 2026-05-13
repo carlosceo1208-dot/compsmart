@@ -72,7 +72,7 @@ serve(async (req) => {
     }
 
     const origin = req.headers.get("origin") ?? "https://compsmart.lovable.app";
-    const redirectTo = `${origin}/auth?mode=invite`;
+    const redirectTo = `${origin}/reset-password?mode=invite`;
 
     const results: any[] = [];
 
