@@ -22,6 +22,7 @@ import {
   ACAO_STATUS_CLASS, ACAO_PRIORIDADE_CLASS,
 } from '@/lib/nr1Risco';
 import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { AssistenteIaPlanoAcaoDialog } from '@/components/nr1/AssistenteIaPlanoAcaoDialog';
 
 const STATUS_OPTS: Nr1AcaoStatus[] = ['pendente', 'em_andamento', 'concluido', 'atrasado'];
 const PRIORIDADE_OPTS: Nr1AcaoPrioridade[] = ['baixa', 'media', 'alta', 'critica'];
