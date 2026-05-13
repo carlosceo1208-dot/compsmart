@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, ShieldCheck, Mail, CheckCircle2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 
 type Invite = { full_name: string; email: string };
-type Result = { email: string; ok: boolean; error?: string; user_id?: string };
+type Result = { email: string; ok: boolean; error?: string; user_id?: string; action_link?: string };
 
 export default function ConvidarSocios() {
   const role = useCurrentUserRole();
@@ -130,16 +130,28 @@ export default function ConvidarSocios() {
                 ) : (
                   <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
                 )}
-                <div>
+                <div className="flex-1 min-w-0">
                   <div className="font-medium">{r.email}</div>
                   <div className="text-muted-foreground text-xs">
-                    {r.ok ? 'Convite enviado. Peça para conferir a caixa de entrada (ou spam).' : `Erro: ${r.error}`}
+                    {r.ok
+                      ? r.action_link
+                        ? 'Usuário já existia. Copie o link de recuperação abaixo e envie manualmente ao sócio (válido por 1h):'
+                        : 'Convite enviado. Peça para conferir a caixa de entrada (ou spam).'
+                      : `Erro: ${r.error}`}
                   </div>
+                  {r.action_link && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <Input readOnly value={r.action_link} className="text-xs font-mono" onFocus={(e) => e.currentTarget.select()} />
+                      <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(r.action_link!)}>
+                        Copiar
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
             <p className="text-xs text-muted-foreground pt-2">
-              💡 Caso o e-mail não chegue em até 5 minutos, peça para o sócio usar a opção <strong>"Esqueci minha senha"</strong> na tela de login com o mesmo e-mail.
+              💡 O envio automático de e-mail usa o SMTP padrão e tem limite baixo. Se o e-mail não chegar, use o link de recuperação acima ou configure um domínio de e-mail próprio em <strong>Cloud → Emails</strong>.
             </p>
           </CardContent>
         </Card>
