@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, ShieldCheck, Mail, CheckCircle2, AlertCircle, Plus, Trash2 } from 'lucide-react';
 
 type Invite = { full_name: string; email: string };
-type Result = { email: string; ok: boolean; error?: string; user_id?: string };
+type Result = { email: string; ok: boolean; error?: string; user_id?: string; action_link?: string };
 
 export default function ConvidarSocios() {
   const role = useCurrentUserRole();
