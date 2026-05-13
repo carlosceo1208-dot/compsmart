@@ -93,17 +93,20 @@ serve(async (req) => {
           });
 
         let userId = inviteData?.user?.id;
+        let actionLink: string | undefined;
 
-        // If user already exists, fall back to a recovery / magic link
+        // If user already exists, fall back to generating a recovery link
         if (inviteErr) {
           if (/already.*registered|exist/i.test(inviteErr.message)) {
             const { data: existing } = await admin.auth.admin.listUsers();
             const found = existing?.users?.find((u: any) => u.email?.toLowerCase() === email);
             if (!found) throw inviteErr;
             userId = found.id;
-            await admin.auth.admin.generateLink({
+            const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
               type: "recovery", email, options: { redirectTo },
             });
+            if (linkErr) throw linkErr;
+            actionLink = (linkData as any)?.properties?.action_link;
           } else {
             throw inviteErr;
           }
