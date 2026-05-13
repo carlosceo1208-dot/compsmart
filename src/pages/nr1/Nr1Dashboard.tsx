@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
 
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
