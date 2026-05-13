@@ -85,30 +85,44 @@ serve(async (req) => {
       }
 
       try {
-        // 1) Invite (creates auth.users + sends email with action link)
-        const { data: inviteData, error: inviteErr } =
-          await admin.auth.admin.inviteUserByEmail(email, {
-            redirectTo,
-            data: { full_name: fullName, invited_role: "super_admin" },
-          });
-
-        let userId = inviteData?.user?.id;
+        let userId: string | undefined;
         let actionLink: string | undefined;
 
-        // If user already exists, fall back to generating a recovery link
-        if (inviteErr) {
-          if (/already.*registered|exist/i.test(inviteErr.message)) {
-            const { data: existing } = await admin.auth.admin.listUsers();
-            const found = existing?.users?.find((u: any) => u.email?.toLowerCase() === email);
-            if (!found) throw inviteErr;
-            userId = found.id;
-            const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
-              type: "recovery", email, options: { redirectTo },
+        // 1) Check if user already exists (avoids hitting email rate limits via invite)
+        const { data: existingList } = await admin.auth.admin.listUsers();
+        const existing = existingList?.users?.find(
+          (u: any) => u.email?.toLowerCase() === email,
+        );
+
+        if (existing) {
+          // User exists → just generate a recovery link (does NOT send email)
+          userId = existing.id;
+          const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+            type: "recovery", email, options: { redirectTo },
+          });
+          if (linkErr) throw linkErr;
+          actionLink = (linkData as any)?.properties?.action_link;
+        } else {
+          // New user → invite (creates auth.users + sends email)
+          const { data: inviteData, error: inviteErr } =
+            await admin.auth.admin.inviteUserByEmail(email, {
+              redirectTo,
+              data: { full_name: fullName, invited_role: "super_admin" },
             });
-            if (linkErr) throw linkErr;
-            actionLink = (linkData as any)?.properties?.action_link;
+          if (inviteErr) {
+            // If invite failed due to email rate limit, try generating a signup link instead
+            if (/rate.?limit/i.test(inviteErr.message)) {
+              const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+                type: "invite", email, options: { data: { full_name: fullName }, redirectTo },
+              });
+              if (linkErr) throw inviteErr;
+              userId = (linkData as any)?.user?.id;
+              actionLink = (linkData as any)?.properties?.action_link;
+            } else {
+              throw inviteErr;
+            }
           } else {
-            throw inviteErr;
+            userId = inviteData?.user?.id;
           }
         }
 
