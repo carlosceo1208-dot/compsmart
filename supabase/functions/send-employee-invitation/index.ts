@@ -101,6 +101,10 @@ serve(async (req) => {
       .eq('id', userProfile.root_company_id)
       .single();
 
+    const requestOrigin = req.headers.get('origin');
+    const appBaseUrl = requestOrigin && /^https?:\/\//.test(requestOrigin)
+      ? requestOrigin.replace(/\/$/, '')
+      : 'https://compsmart.ia.br';
     const companyName = company?.name || 'sua empresa';
     const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
@@ -145,7 +149,7 @@ serve(async (req) => {
             type: 'recovery',
             email: employee.email,
             options: {
-              redirectTo: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/reset-password`
+              redirectTo: `${appBaseUrl}/reset-password`
             }
           });
 
@@ -176,7 +180,7 @@ serve(async (req) => {
                 type: 'recovery',
                 email: employee.email,
                 options: {
-                  redirectTo: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/reset-password`
+                  redirectTo: `${appBaseUrl}/reset-password`
                 }
               });
 
@@ -278,7 +282,7 @@ serve(async (req) => {
               type: 'recovery',
               email: employee.email,
               options: {
-                redirectTo: `${supabaseUrl.replace('.supabase.co', '.lovable.app')}/reset-password`
+                redirectTo: `${appBaseUrl}/reset-password`
               }
             });
 
