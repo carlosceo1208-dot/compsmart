@@ -8,6 +8,34 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const FALLBACK_APP_BASE_URL = 'https://compsmart.ia.br';
+const ALLOWED_APP_HOSTS = new Set([
+  'compsmart.ia.br',
+  'www.compsmart.ia.br',
+  'smartcomp.ia.br',
+  'www.smartcomp.ia.br',
+  'compsmart.lovable.app',
+]);
+
+function resolveAppBaseUrl(req: Request) {
+  const candidates = [req.headers.get('origin'), req.headers.get('referer')];
+
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+
+    try {
+      const url = new URL(candidate);
+      if (ALLOWED_APP_HOSTS.has(url.host)) {
+        return `${url.protocol}//${url.host}`;
+      }
+    } catch {
+      // ignore malformed header and continue with the next candidate
+    }
+  }
+
+  return FALLBACK_APP_BASE_URL;
+}
+
 interface InvitationRequest {
   employee_ids: string[];
   force_send?: boolean; // Se true, envia mesmo se já tiver acesso
@@ -101,10 +129,7 @@ serve(async (req) => {
       .eq('id', userProfile.root_company_id)
       .single();
 
-    const requestOrigin = req.headers.get('origin');
-    const appBaseUrl = requestOrigin && /^https?:\/\//.test(requestOrigin)
-      ? requestOrigin.replace(/\/$/, '')
-      : 'https://compsmart.ia.br';
+    const appBaseUrl = resolveAppBaseUrl(req);
     const companyName = company?.name || 'sua empresa';
     const esc = (s: unknown) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
