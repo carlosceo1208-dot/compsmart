@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
 
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
@@ -46,7 +47,10 @@ export default function Nr1Dashboard() {
         </Card>
       )}
 
-      {/* KPIs */}
+      {/* Grau de Risco INSS + Plano de Ação */}
+      <GrauRiscoInssCard />
+
+
       <div className="grid gap-4 md:grid-cols-3">
         <KpiCard
           icon={FileText}
