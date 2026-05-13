@@ -544,8 +544,21 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           const responseData = response.data as { success?: boolean; error?: string; message?: string } | null;
           
           if (response.error) {
-            // Edge function returned an error - try to get message from data first
-            const errorMessage = responseData?.error || response.error.message || 'Erro ao atualizar email';
+            // FunctionsHttpError: body is in error.context (a Response)
+            let errorMessage = responseData?.error || response.error.message || 'Erro ao atualizar email';
+            try {
+              const ctx: any = (response.error as any).context;
+              if (ctx && typeof ctx.json === 'function') {
+                const body = await ctx.json();
+                if (body?.error) errorMessage = body.error;
+              } else if (ctx && typeof ctx.text === 'function') {
+                const text = await ctx.text();
+                try {
+                  const parsed = JSON.parse(text);
+                  if (parsed?.error) errorMessage = parsed.error;
+                } catch { if (text) errorMessage = text; }
+              }
+            } catch (_) { /* ignore */ }
             toast.error(errorMessage);
             return;
           }
