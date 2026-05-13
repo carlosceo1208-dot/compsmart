@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ const authSchema = z.object({
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -52,10 +53,34 @@ const Auth = () => {
   }, []);
 
   useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const searchParams = new URLSearchParams(location.search);
+    const accessToken = hashParams.get("access_token");
+    const authType = hashParams.get("type");
+    const isInviteOrRecovery = Boolean(accessToken) && (authType === "invite" || authType === "recovery");
+    const redirectToPasswordSetup = () =>
+      navigate(
+        {
+          pathname: "/reset-password",
+          search: location.search,
+          hash: location.hash,
+        },
+        { replace: true }
+      );
+
+    if (isInviteOrRecovery) {
+      redirectToPasswordSetup();
+      return;
+    }
+
     const checkSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          if (searchParams.get("mode") === "invite") {
+            redirectToPasswordSetup();
+            return;
+          }
           navigate("/dashboard");
         }
       } catch (error) {
@@ -69,6 +94,19 @@ const Auth = () => {
     try {
       const authListener = supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
+          const currentHashParams = new URLSearchParams(window.location.hash.substring(1));
+          const currentType = currentHashParams.get("type");
+
+          if (
+            event === "PASSWORD_RECOVERY" ||
+            currentType === "invite" ||
+            currentType === "recovery" ||
+            searchParams.get("mode") === "invite"
+          ) {
+            redirectToPasswordSetup();
+            return;
+          }
+
           navigate("/dashboard");
         }
       });
@@ -82,7 +120,7 @@ const Auth = () => {
         subscription.unsubscribe();
       }
     };
-  }, [navigate]);
+  }, [location.hash, location.search, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
