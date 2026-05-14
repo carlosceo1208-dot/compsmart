@@ -35,6 +35,7 @@ type Metodologia = {
   comoUsamos: string;
   baseLegal?: string;
   referencia: string;
+  formulas?: { label: string; expr: string; nota?: string }[];
 };
 
 const METODOLOGIAS: Metodologia[] = [
@@ -114,11 +115,20 @@ const METODOLOGIAS: Metodologia[] = [
     referencia: 'Bersin, J. (2022). Talent Intelligence: A New Discipline for People-Driven Companies. The Josh Bersin Company.',
   },
   {
-    sigla: 'CCM',
-    nome: 'Calculadora Custo do Medo',
-    origem: 'Metodologia proprietária CompSmart, 2026 (baseada em SHRM e Mercer Health on Demand).',
-    proposito: 'Quantificar em R$ o impacto financeiro da baixa saúde mental: turnover (≈6 meses de salário por reposição), absenteísmo e sinistralidade.',
-    comoUsamos: 'Card interativo na página Vitalidade. Compara custo atual vs. economia projetada com plano de ação. Meta: ROI ≥ 2:1.',
+    sigla: 'CCR',
+    nome: 'Calculadora Custo do Risco',
+    origem: 'Metodologia proprietária CompSmart, 2026 (baseada em SHRM, Mercer Health on Demand e WorldatWork).',
+    proposito: 'Quantificar em R$ o impacto financeiro dos riscos psicossociais: turnover (≈6 meses de salário por reposição), absenteísmo (dias perdidos × custo/dia) e sinistralidade (~3% da folha em casos de risco de saúde mental).',
+    comoUsamos: 'Card interativo na página Vitalidade. Compara custo atual vs. economia projetada com plano de ação. Meta: ROI ≥ 2:1 sobre o investimento em programas de saúde mental.',
+    formulas: [
+      { label: 'Folha anual', expr: 'Headcount × Salário médio × 13,33', nota: '12 meses + 13º + 1/3 férias.' },
+      { label: 'Custo de Turnover', expr: '(Headcount × Turnover %) × Salário médio × 6', nota: '~6 salários por reposição (recrutamento, onboarding, curva de aprendizagem) — SHRM.' },
+      { label: 'Custo de Absenteísmo', expr: 'Headcount × Dias ausentes/colab/ano × (Salário médio ÷ 22)', nota: '22 = dias úteis médios/mês; custo/dia = salário ÷ 22.' },
+      { label: 'Custo de Sinistralidade', expr: 'Folha anual × 3%', nota: 'Estimativa Mercer 2023: impacto saúde mental ≈ 3% da folha em casos de risco.' },
+      { label: 'Custo total anual', expr: 'Turnover + Absenteísmo + Sinistralidade', nota: 'Soma dos três vetores de perda.' },
+      { label: 'Economia potencial', expr: 'Custo total × Redução esperada %', nota: 'Redução típica observada com programas estruturados de saúde mental: 30-50%.' },
+      { label: 'ROI estimado', expr: 'Economia ÷ (Folha anual × 0,5%)', nota: 'Investimento de referência: ~0,5% da folha em programa de saúde mental e bem-estar.' },
+    ],
     referencia: 'SHRM (2022). The Cost of Replacing Employees. & Mercer (2023). Health on Demand Report.',
   },
   {
@@ -175,7 +185,7 @@ const SIGLAS: Sigla[] = [
   { sigla: 'ISP', significado: 'Índice de Segurança Psicológica', descricao: 'Score 0-100 de segurança psicológica por equipe.' },
   { sigla: 'eNPS', significado: 'Employee Net Promoter Score', descricao: 'Indicador de lealdade do colaborador.' },
   { sigla: 'MCPS', significado: 'Matriz Cruzada Performance × Saúde', descricao: 'Visualização em quadrantes para priorização de intervenções.' },
-  { sigla: 'CCM', significado: 'Calculadora Custo do Medo', descricao: 'Quantificação financeira do impacto da baixa saúde mental.' },
+  { sigla: 'CCR', significado: 'Calculadora Custo do Risco', descricao: 'Quantificação financeira do impacto dos riscos psicossociais (turnover, absenteísmo e sinistralidade).' },
   { sigla: 'PGE', significado: 'Programa de Gestão Estratégica', descricao: 'Ciclo estruturado de gestão de riscos psicossociais.' },
   { sigla: 'ISO 45003', significado: 'Norma ISO sobre Saúde e Segurança Psicológica no Trabalho', descricao: 'Guia internacional (2021) para identificação, avaliação e controle de riscos psicossociais dentro de um sistema de gestão de SST. Base técnica para fundamentar o PGR da NR-1.' },
   { sigla: 'PDCA', significado: 'Plan-Do-Check-Act', descricao: 'Ciclo de melhoria contínua de Deming.' },
@@ -422,6 +432,28 @@ export default function Nr1Biblioteca() {
                   <Section label="Origem">{m.origem}</Section>
                   <Section label="Propósito">{m.proposito}</Section>
                   <Section label="Como usamos no CompSmart">{m.comoUsamos}</Section>
+                  {m.formulas && m.formulas.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                        Fórmulas de cálculo
+                      </p>
+                      <div className="space-y-2">
+                        {m.formulas.map((f) => (
+                          <div key={f.label} className="rounded-md border bg-muted/30 p-2.5">
+                            <div className="flex items-baseline gap-2 flex-wrap">
+                              <span className="text-xs font-semibold">{f.label}</span>
+                              <code className="text-[11px] font-mono bg-background border rounded px-1.5 py-0.5">
+                                {f.expr}
+                              </code>
+                            </div>
+                            {f.nota && (
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{f.nota}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {m.baseLegal && <Section label="Base legal">{m.baseLegal}</Section>}
                   <Section label="Referência">{m.referencia}</Section>
                 </AccordionContent>

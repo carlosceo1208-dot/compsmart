@@ -163,7 +163,7 @@ function MatrizMCPS() {
   );
 }
 
-/* ---------------------------- Calculadora Custo do Medo ---------------------------- */
+/* ---------------------------- Calculadora Custo do Risco ---------------------------- */
 
 function CustoDoMedo() {
   const [headcount, setHeadcount] = useState(100);
@@ -197,10 +197,10 @@ function CustoDoMedo() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-amber-700" />
-          Calculadora — Custo do Medo
+          Calculadora — Custo do Risco
         </CardTitle>
         <CardDescription>
-          Quanto a sua organização perde por ano com cultura de medo, burnout e adoecimento mental.
+          Quanto a sua organização perde por ano com cultura de medo, burnout e adoecimento mental (riscos psicossociais NR-1).
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
