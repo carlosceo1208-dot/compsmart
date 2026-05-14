@@ -234,6 +234,49 @@ export default function Nr1FIB() {
 
         <Card>
           <CardHeader>
+            <CardTitle>Correlação — 13 Fatores de Risco NR-1 × 6 Dimensões do Questionário (40 perguntas)</CardTitle>
+            <CardDescription>
+              Mapeamento de cada perigo psicossocial às dimensões do questionário COPSOQ-III adaptado.
+              Permite rastrear, item a item, qual bloco de perguntas captura cada fator.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto rounded-md border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
+                    <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões do questionário</th>
+                    <th className="text-left px-3 py-2 font-semibold">Por quê</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CORRELACAO_FATORES_COPSOQ.map((c, i) => (
+                    <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                      <td className="px-3 py-2 align-top">{c.perigo}</td>
+                      <td className="px-3 py-2 align-top">
+                        <div className="flex flex-wrap gap-1">
+                          {c.dimensoes.map((d) => (
+                            <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+              Dimensões do questionário (40 itens): Demandas (8), Organização e Conteúdo (7), Relações e Liderança (7),
+              Interface Trabalho-Indivíduo (7), Valores no Trabalho (5) e Saúde e Bem-Estar (6). Um fator pode aparecer
+              em mais de uma dimensão — isso é esperado e dá triangulação ao diagnóstico.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Instrumentos da biblioteca</CardTitle>
             <CardDescription>Pesquisas e rastreadores disponíveis para compor o ciclo.</CardDescription>
           </CardHeader>
