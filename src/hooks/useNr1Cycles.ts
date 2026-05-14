@@ -61,7 +61,7 @@ const SEED_FIB_EMP: Record<string, number> = {
 };
 const SEED_SEGPSI: Record<string, number> = { incluir: 71.4, aprender: 65.1, contribuir: 65.1, desafiar: 40.5 };
 const SEED_SOCIODEMO: SociodemoRecorte[] = [
-  { id: 'genero', titulo: 'Por gênero', linhas: [
+  { id: 'genero', titulo: 'Por sexo', linhas: [
     { rotulo: 'Feminino', fib: 68, segPsi: 62, hse: 71 },
     { rotulo: 'Masculino', fib: 72, segPsi: 65, hse: 74 },
     { rotulo: 'Não-binário', fib: 64, segPsi: 58, hse: 69 },
@@ -229,7 +229,7 @@ export const useSegPsiData = () => {
 // ---------- Sociodemográfico ----------
 // Para 16 colaboradores, geramos recortes coerentes com o porte real
 const SEED_SOCIODEMO_PE: SociodemoRecorte[] = [
-  { id: 'genero', titulo: 'Por gênero (n=16)', linhas: [
+  { id: 'genero', titulo: 'Por sexo (n=16)', linhas: [
     { rotulo: 'Feminino (7)', fib: 69, segPsi: 62, hse: 71 },
     { rotulo: 'Masculino (8)', fib: 73, segPsi: 66, hse: 74 },
     { rotulo: 'Não-binário (1)', fib: 64, segPsi: 58, hse: 69 },
