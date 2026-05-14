@@ -538,6 +538,7 @@ const CATEGORIAS = ['Todas', 'Saúde Mental', 'Liderança', 'Cultura', 'Performa
 export default function Nr1Biblioteca() {
   const [busca, setBusca] = useState('');
   const [cat, setCat] = useState<(typeof CATEGORIAS)[number]>('Todas');
+  const [livroSel, setLivroSel] = useState<Livro | null>(null);
 
   const metodologiasFiltered = useMemo(() => {
     const q = busca.toLowerCase().trim();
