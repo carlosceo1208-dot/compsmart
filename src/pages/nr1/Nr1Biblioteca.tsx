@@ -158,6 +158,15 @@ const METODOLOGIAS: Metodologia[] = [
     baseLegal: 'NR-1, item 1.5.3 (GRO — Gerenciamento de Riscos Ocupacionais).',
     referencia: 'Deming, W.E. (1986). Out of the Crisis. MIT Press.',
   },
+  {
+    sigla: 'RQ',
+    nome: 'Racional Questionario — Estrutura das 40 Perguntas NR-1',
+    origem: 'COPSOQ-III (Copenhagen Psychosocial Questionnaire, versão III), adaptado para o contexto brasileiro e alinhado aos requisitos da NR-1 (Portaria MTE 1.419/2024).',
+    proposito: 'Explicar a arquitetura do questionário aplicado no diagnóstico NR-1: 40 perguntas distribuídas em 6 dimensões psicossociais, com sistema de pesos diferenciados (0,80 a 1,50), escala Likert de 5 pontos e total anonimato (LGPD).',
+    comoUsamos: `O questionário é aplicado de forma anônima dentro de ciclos de diagnóstico. As 40 perguntas estão distribuídas assim: Demandas no Trabalho (8), Organização e Conteúdo (7), Relações e Liderança (7), Interface Trabalho-Indivíduo (7), Valores no Trabalho (5) e Saúde e Bem-Estar (6). Cada questão tem peso diferenciado: 1,50 para questões críticas (ex: assédio moral, esgotamento, ansiedade, intenção de demissão), 1,20 para alto impacto (ritmo insustentável, apoio do líder, sono prejudicado), 1,00 para padrão e 0,80 para menor peso. A escala de resposta vai de 0 (Nunca / Discordo totalmente) a 4 (Sempre / Concordo totalmente). O score por dimensão é convertido para escala 0-100 e classificado em Baixo (≤25), Moderado (26-50), Alto (51-75) e Crítico (>75). As respostas individuais são irreversivelmente anonimizadas via hash SHA-256 (user_id + diagnostico_id) — nenhum administrador consegue reidentificar o respondente. Apenas dados agregados por dimensão são exibidos, exigindo mínimo de 5 respondentes por recorte.`,
+    baseLegal: 'NR-1, item 1.5.3.2 — identificação de perigos e avaliação de riscos psicossociais. LGPD, Art. 11 (dados sensíveis de saúde) e Art. 12 (anonimização).',
+    referencia: 'Burr, H. et al. (2019). The Third Version of the Copenhagen Psychosocial Questionnaire. Safety and Health at Work, 10(4). Adaptação CompSmart 2026.',
+  },
 ];
 
 // ============ SIGLAS ============
@@ -186,6 +195,7 @@ const SIGLAS: Sigla[] = [
   { sigla: 'eNPS', significado: 'Employee Net Promoter Score', descricao: 'Indicador de lealdade do colaborador.' },
   { sigla: 'MCPS', significado: 'Matriz Cruzada Performance × Saúde', descricao: 'Visualização em quadrantes para priorização de intervenções.' },
   { sigla: 'CCR', significado: 'Calculadora Custo do Risco', descricao: 'Quantificação financeira do impacto dos riscos psicossociais (turnover, absenteísmo e sinistralidade).' },
+  { sigla: 'RQ', significado: 'Racional Questionario', descricao: 'Estrutura das 40 perguntas do diagnóstico NR-1: 6 dimensões, pesos diferenciados (0,80–1,50), escala Likert 0–4 e anonimização LGPD via hash SHA-256.' },
   { sigla: 'PGE', significado: 'Programa de Gestão Estratégica', descricao: 'Ciclo estruturado de gestão de riscos psicossociais.' },
   { sigla: 'ISO 45003', significado: 'Norma ISO sobre Saúde e Segurança Psicológica no Trabalho', descricao: 'Guia internacional (2021) para identificação, avaliação e controle de riscos psicossociais dentro de um sistema de gestão de SST. Base técnica para fundamentar o PGR da NR-1.' },
   { sigla: 'PDCA', significado: 'Plan-Do-Check-Act', descricao: 'Ciclo de melhoria contínua de Deming.' },
