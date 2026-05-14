@@ -89,11 +89,32 @@ export const useUpdateGrauRiscoInss = () => {
   const { activeCompanyId } = useCompanyContext();
   return useMutation({
     mutationFn: async (grau: GrauRiscoInss) => {
-      const { error } = await supabase
+      // Verifica se já existe assinatura para esta empresa
+      const { data: existing, error: selErr } = await supabase
         .from('nr1_subscriptions')
-        .update({ grau_risco_inss: grau } as any)
-        .eq('company_id', activeCompanyId!);
-      if (error) throw error;
+        .select('id')
+        .eq('company_id', activeCompanyId!)
+        .maybeSingle();
+      if (selErr) throw selErr;
+
+      if (existing) {
+        const { error } = await supabase
+          .from('nr1_subscriptions')
+          .update({ grau_risco_inss: grau } as any)
+          .eq('company_id', activeCompanyId!);
+        if (error) throw error;
+      } else {
+        // Cria assinatura mínima (trial) já com o grau definido
+        const { error } = await supabase
+          .from('nr1_subscriptions')
+          .insert({
+            company_id: activeCompanyId!,
+            plan_tier: 'essencial',
+            status: 'trial',
+            grau_risco_inss: grau,
+          } as any);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['nr1-subscription', activeCompanyId] });

@@ -5,6 +5,7 @@ import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight } fro
 import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
 
@@ -14,6 +15,8 @@ export default function Nr1Dashboard() {
 
   const ultimo = diagnosticos?.[0];
   const concluidos = diagnosticos?.filter((d) => d.status === 'concluido').length ?? 0;
+  const grau = (sub as any)?.grau_risco_inss as GrauRiscoInss | null | undefined;
+  const grauInfo = grau ? GRAU_RISCO_INSS[grau] : null;
 
   return (
     <div className="space-y-6">
@@ -66,7 +69,11 @@ export default function Nr1Dashboard() {
           icon={Activity}
           label="Nível de risco atual"
           value={
-            ultimo?.nivel_risco ? (
+            grauInfo ? (
+              <Badge className={`${grauInfo.bg} ${grauInfo.cor} border`}>
+                Grau {grauInfo.grau} · {grauInfo.label}
+              </Badge>
+            ) : ultimo?.nivel_risco ? (
               <Badge className={RISCO_CLASS[ultimo.nivel_risco as keyof typeof RISCO_CLASS]}>
                 {RISCO_LABEL[ultimo.nivel_risco as keyof typeof RISCO_LABEL]}
               </Badge>
