@@ -396,6 +396,9 @@ export default function Nr1Biblioteca() {
           <TabsTrigger value="biblioteca" className="gap-2">
             <BookOpen className="h-4 w-4" /> Biblioteca ({livrosFiltered.length})
           </TabsTrigger>
+          <TabsTrigger value="fatores" className="gap-2">
+            <AlertTriangle className="h-4 w-4" /> Fatores de Risco ({FATORES_RISCO.length})
+          </TabsTrigger>
         </TabsList>
 
         {/* ====== METODOLOGIAS ====== */}
