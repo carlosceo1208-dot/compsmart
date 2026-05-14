@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle, BookText } from 'lucide-react';
 
 // ============ FATORES DE RISCO PSICOSSOCIAL (NR-1) ============
 type FatorRisco = { perigo: string; consequencia: string };
@@ -208,13 +210,16 @@ const SIGLAS: Sigla[] = [
 ];
 
 // ============ BIBLIOTECA ============
+type LinkExterno = { url: string; label: string };
 type Livro = {
   titulo: string;
   autor: string;
   ano: number;
   categoria: 'Saúde Mental' | 'Liderança' | 'Cultura' | 'Performance' | 'Direito' | 'Metodologia';
-  resumo: string;
-  link: string;
+  resumoCurto: string;
+  resumoCompleto: string;
+  linkPrincipal?: LinkExterno;
+  linkCompra?: LinkExterno;
 };
 
 const LIVROS: Livro[] = [
@@ -223,120 +228,308 @@ const LIVROS: Livro[] = [
     autor: 'Mario Sergio Cortella',
     ano: 2016,
     categoria: 'Cultura',
-    resumo: 'Reflexões sobre propósito, ética e sentido no trabalho. Leitura essencial para líderes que querem construir ambientes psicologicamente saudáveis e organizações com vitalidade duradoura.',
-    link: 'https://www.amazon.com.br/dp/8551302035',
+    resumoCurto: 'Reflexões sobre propósito, ética e sentido no trabalho. Leitura essencial para líderes que querem construir ambientes psicologicamente saudáveis e organizações com vitalidade duradoura.',
+    resumoCompleto: `Mario Sergio Cortella, filósofo e educador brasileiro, organiza o livro em torno de uma pergunta provocativa: por que fazemos o que fazemos no trabalho e na vida? A obra é estruturada em capítulos curtos e conversacionais que abordam propósito, ética, motivação, sentido e a relação entre empresa e indivíduo.
+
+A tese central é que trabalho sem sentido adoece — argumento diretamente alinhado ao que a NR-1 chama hoje de risco psicossocial. Cortella diferencia "ocupação" (preencher o tempo), "emprego" (vínculo formal), "trabalho" (esforço produtivo) e "obra" (algo que deixamos no mundo). Pessoas que enxergam suas atividades apenas como ocupação ou emprego tendem a sofrer mais com sobrecarga, falta de reconhecimento e baixo controle — exatamente os fatores de risco mapeados pelo COPSOQ-III.
+
+Outros temas centrais: a diferença entre "carreira" e "trajetória"; ética como prática cotidiana e não como discurso; a armadilha da meritocracia desacompanhada de oportunidades reais; e o papel do líder como construtor de contexto, não apenas cobrador de resultado.
+
+**Aplicação no CompSmart:** este livro é referência para o pilar "Cultura & Sentido" do FIB (Felicidade Interna Bruta) e para a justificativa qualitativa dos programas de Reconhecimento. Líderes que leem Cortella tendem a estruturar 1:1s com perguntas de propósito, e não apenas de tarefa — reduzindo o fator de risco "Baixas recompensas e reconhecimento".`,
+    linkPrincipal: { url: 'https://www.companhiadasletras.com.br/autor/22091/mario-sergio-cortella', label: 'Página do autor (editora)' },
+    linkCompra: { url: 'https://www.amazon.com.br/Por-Fazemos-Que-Fazemos-Cortella/dp/8551302035', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'A Coragem de Ser Imperfeito',
     autor: 'Brené Brown',
     ano: 2013,
     categoria: 'Saúde Mental',
-    resumo: 'Brown revela como a vulnerabilidade — e não a perfeição — é a base da conexão humana e da segurança psicológica. Fundamental para entender o ISP em equipes.',
-    link: 'https://www.amazon.com.br/dp/8543108683',
+    resumoCurto: 'Brown revela como a vulnerabilidade — e não a perfeição — é a base da conexão humana e da segurança psicológica. Fundamental para entender o ISP em equipes.',
+    resumoCompleto: `Brené Brown, pesquisadora da Universidade de Houston, sintetiza mais de uma década de pesquisa qualitativa sobre vergonha, vulnerabilidade e coragem. O livro original "Daring Greatly" parte do conceito de que a vulnerabilidade — capacidade de se expor sem garantia de retorno — é o berço da inovação, da criatividade e da confiança no trabalho.
+
+A autora demonstra, com dados de mais de 12 mil entrevistas, que ambientes que punem o erro produzem profissionais que escondem problemas, evitam feedback e param de sugerir ideias. Esse comportamento é hoje a definição operacional de baixa segurança psicológica — exatamente o construto que Amy Edmondson formalizou na pesquisa do Google (Project Aristotle).
+
+Capítulos-chave: (1) "A escassez nunca é suficiente" — como a cultura do "nunca o bastante" gera burnout; (2) "Desfazendo mitos da vulnerabilidade" — vulnerabilidade não é fraqueza nem oversharing; (3) "Cheque sua armadura" — quais defesas líderes usam para evitar conexão (perfeccionismo, cinismo, controle); (4) "Liderança ousada" — como dar feedback duro com cuidado.
+
+**Aplicação no CompSmart:** referência direta para o ISP (Índice de Segurança Psicológica) calculado na dimensão "Relações e Liderança" do questionário NR-1. Recomendamos para gestores que lideram equipes com baixo eNPS ou alta rotatividade voluntária, pois aborda diretamente os fatores de risco "Falta de suporte", "Baixa justiça organizacional" e "Maus relacionamentos".`,
+    linkPrincipal: { url: 'https://brenebrown.com/book/daring-greatly/', label: 'Site oficial da autora' },
+    linkCompra: { url: 'https://www.amazon.com.br/coragem-ser-imperfeito-Bren%C3%A9-Brown/dp/8543108683', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'The Fearless Organization',
     autor: 'Amy C. Edmondson',
     ano: 2018,
     categoria: 'Liderança',
-    resumo: 'A criadora do conceito de Segurança Psicológica mostra como construir times que falam, erram e aprendem sem medo. Base teórica do nosso ISP.',
-    link: 'https://www.amazon.com.br/dp/1119477247',
+    resumoCurto: 'A criadora do conceito de Segurança Psicológica mostra como construir times que falam, erram e aprendem sem medo. Base teórica do nosso ISP.',
+    resumoCompleto: `Amy Edmondson, professora de Harvard Business School, é a pesquisadora que cunhou o termo "psychological safety" em 1999. Este livro consolida 25 anos de pesquisa em hospitais, fábricas, escritórios e equipes de software, definindo segurança psicológica como "a crença compartilhada de que o time é seguro para tomar riscos interpessoais — falar, discordar, admitir erro, fazer perguntas".
+
+A obra desmonta três mitos: (1) segurança psicológica não é "ser legal" — equipes seguras debatem com mais intensidade, não menos; (2) não é sinônimo de baixa exigência — a matriz 2x2 de Edmondson cruza segurança com padrões de performance, e o quadrante ideal é "alto/alto" (zona de aprendizado); (3) não é responsabilidade exclusiva do RH — é construída no comportamento diário do líder direto.
+
+A segunda parte traz casos concretos: a Pixar e a "braintrust", a Volkswagen e o escândalo do diesel (caso clássico de baixa segurança levando a fraude), Barry-Wehmiller e a liderança que pergunta. Edmondson propõe um framework de 3 passos para o líder: enquadrar o trabalho como aprendizado, convidar a participação genuinamente, e responder produtivamente quando alguém fala (sem matar o mensageiro).
+
+**Aplicação no CompSmart:** este é o livro-base do ISP. As 7 perguntas da dimensão "Relações e Liderança" do questionário NR-1 derivam diretamente da escala de 7 itens de Edmondson, validada e adaptada para o português. Líderes com ISP baixo recebem este livro como leitura prioritária no PDI.`,
+    linkPrincipal: { url: 'https://fearlessorganization.com/the-fearless-organization', label: 'Site oficial do livro' },
+    linkCompra: { url: 'https://www.amazon.com.br/Fearless-Organization-Psychological-Workplace-Innovation/dp/1119477247', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'Burnout: O Segredo para Romper o Ciclo do Estresse',
     autor: 'Emily & Amelia Nagoski',
     ano: 2020,
     categoria: 'Saúde Mental',
-    resumo: 'As autoras explicam a diferença entre estresse e estressor, e como completar o ciclo do estresse para evitar o burnout. Leitura essencial para o Programa de Bem-Estar.',
-    link: 'https://www.amazon.com.br/dp/8543109965',
+    resumoCurto: 'As autoras explicam a diferença entre estresse e estressor, e como completar o ciclo do estresse para evitar o burnout. Leitura essencial para o Programa de Bem-Estar.',
+    resumoCompleto: `As irmãs Nagoski — Emily, PhD em educação sexual com formação em saúde, e Amelia, regente de coral e DMA — combinam neurociência, fisiologia e experiência clínica para explicar por que o burnout atinge desproporcionalmente as mulheres e por que descansar "no fim de semana" não resolve.
+
+Conceito central: existe diferença entre o **estressor** (a situação que gera estresse — o chefe difícil, a planilha, o engarrafamento) e o **estresse** (a resposta fisiológica do corpo: cortisol, adrenalina, tensão muscular). Eliminar o estressor não elimina o estresse já acumulado no corpo. Para fechar o ciclo, é preciso ação física: exercício (20–60 min é o mais eficaz), respiração profunda, interação social positiva, riso genuíno, afeto, choro ou expressão criativa.
+
+A segunda tese é a "Síndrome do Doador Humano" (Human Giver Syndrome): a expectativa cultural de que mulheres existem para servir o conforto dos outros, sem direito a necessidades próprias. Essa pressão se reproduz no ambiente corporativo via sobrecarga emocional invisível, e está ligada estatisticamente a maiores taxas de burnout em líderes mulheres.
+
+Capítulos práticos cobrem: como identificar os 3 sinais clínicos do burnout (exaustão, despersonalização, queda de eficácia — Maslach), como negociar com o "monitor interno" que diz para você continuar mesmo exausta, e como construir um "bubble of love" — rede de apoio mínima para sustentação.
+
+**Aplicação no CompSmart:** base do agente "Bem-Estar" e dos planos de ação para colaboradores com FIB baixo na dimensão Saúde. Também sustenta a recomendação de pausas ativas e a campanha de não-resposta a e-mails fora do expediente.`,
+    linkPrincipal: { url: 'https://www.burnoutbook.net/', label: 'Site oficial das autoras' },
+    linkCompra: { url: 'https://www.amazon.com.br/Burnout-segredo-romper-ciclo-estresse/dp/8543109965', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'Drive — A Surpreendente Verdade Sobre o Que Nos Motiva',
     autor: 'Daniel H. Pink',
     ano: 2009,
     categoria: 'Performance',
-    resumo: 'Pink demonstra que autonomia, propósito e domínio motivam mais do que recompensas externas. Insight fundamental para conectar Remuneração ↔ Saúde Mental.',
-    link: 'https://www.amazon.com.br/dp/8539004917',
+    resumoCurto: 'Pink demonstra que autonomia, propósito e domínio motivam mais do que recompensas externas. Insight fundamental para conectar Remuneração ↔ Saúde Mental.',
+    resumoCompleto: `Daniel Pink revisa 50 anos de pesquisa em psicologia da motivação (Deci, Ryan, Csikszentmihalyi, Amabile) e mostra que o modelo "cenoura e chicote" — bônus por meta, punição por erro — funciona apenas em tarefas mecânicas e repetitivas. Para qualquer trabalho que exija criatividade, julgamento ou resolução de problemas (ou seja, praticamente todo trabalho de conhecimento), recompensas extrínsecas pioram a performance.
+
+O experimento mais famoso citado é o de Glucksberg (1962) com o "problema da vela": grupos sob pressão de recompensa demoraram 3,5 minutos a mais para resolver o desafio do que grupos sem pressão. Quando o problema foi simplificado para tarefa mecânica, a recompensa acelerou — confirmando que dinheiro funciona como motivador apenas em tarefas algorítmicas.
+
+A alternativa (Motivação 3.0) tem três pilares: **Autonomia** (sobre tarefa, tempo, técnica e time), **Domínio** (a busca contínua de melhorar em algo que importa) e **Propósito** (sentir que o trabalho serve a algo maior que o lucro trimestral). Empresas como Atlassian (FedEx Days), 3M (15% de tempo livre) e a antiga Google (20% de tempo) são citadas como casos onde autonomia produziu mais inovação do que campanhas de bônus.
+
+Pink também critica o "if-then reward" (se você fizer X, então ganha Y), mostrando que ele estreita o foco, suprime criatividade e estimula trapaça (caso Wells Fargo, Volkswagen, Enron).
+
+**Aplicação no CompSmart:** este livro é o argumento por trás do equilíbrio "Total Cash + Total Compensation + reconhecimento não-monetário". Sustenta a recomendação de que metas de bônus não devem cobrir mais de 30% da remuneração-alvo de funções criativas, e justifica o investimento em programas de reconhecimento.`,
+    linkPrincipal: { url: 'https://www.danpink.com/books/drive/', label: 'Site oficial do autor' },
+    linkCompra: { url: 'https://www.amazon.com.br/Motiva%C3%A7%C3%A3o-3-0-Daniel-H-Pink/dp/8539004917', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'Florescer (Flourish)',
     autor: 'Martin E. P. Seligman',
     ano: 2011,
     categoria: 'Saúde Mental',
-    resumo: 'O pai da Psicologia Positiva apresenta o modelo PERMA (Positive emotion, Engagement, Relationships, Meaning, Accomplishment) — base do nosso FIB.',
-    link: 'https://www.amazon.com.br/dp/8580631688',
+    resumoCurto: 'O pai da Psicologia Positiva apresenta o modelo PERMA (Positive emotion, Engagement, Relationships, Meaning, Accomplishment) — base do nosso FIB.',
+    resumoCompleto: `Martin Seligman, ex-presidente da American Psychological Association e fundador da Psicologia Positiva, apresenta neste livro a evolução de sua teoria. Em 2002 (Felicidade Autêntica), ele havia proposto que felicidade era composta de prazer + engajamento + sentido. Aqui, ele atualiza o modelo para PERMA, com cinco elementos mensuráveis e independentes:
+
+**P – Positive Emotion** (emoções positivas): alegria, gratidão, esperança. Medíveis e cultiváveis com práticas como o exercício "três coisas boas" antes de dormir.
+**E – Engagement** (engajamento / flow): estado descrito por Csikszentmihalyi de imersão total na tarefa, em que tempo desaparece. Surge quando habilidade e desafio estão equilibrados.
+**R – Relationships** (relacionamentos): "outras pessoas são o melhor antídoto para os pioras da vida". Conexões profundas explicam mais variância em bem-estar do que renda.
+**M – Meaning** (significado): pertencer e servir a algo maior que si.
+**A – Accomplishment** (realização): perseguir maestria por si só, não pelo prêmio.
+
+A segunda parte do livro descreve o programa do Exército dos EUA (Comprehensive Soldier Fitness), em que 1,1 milhão de soldados foram treinados em PERMA para reduzir TEPT — primeiro experimento em larga escala de bem-estar como prevenção. Também inclui o programa de Geelong Grammar (Austrália), pioneiro em educação positiva.
+
+Crítica importante de Seligman: bem-estar não é "ausência de doença mental". As duas dimensões são independentes — alguém pode estar sem depressão e ainda assim "languido" (Adam Grant, 2021).
+
+**Aplicação no CompSmart:** o FIB (Felicidade Interna Bruta) é estruturado nos cinco eixos do PERMA, traduzidos para o contexto corporativo. Cada dimensão tem perguntas específicas no ciclo de check-in trimestral.`,
+    linkPrincipal: { url: 'https://ppc.sas.upenn.edu/people/martin-ep-seligman', label: 'Página acadêmica do autor' },
+    linkCompra: { url: 'https://www.amazon.com.br/Florescer-Compreens%C3%A3o-cient%C3%ADfica-felicidade-bem-estar/dp/8580631688', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'Mindset: A Nova Psicologia do Sucesso',
     autor: 'Carol S. Dweck',
     ano: 2017,
     categoria: 'Performance',
-    resumo: 'Dweck contrasta mentalidade fixa vs. crescimento. Aplica-se diretamente ao PDI, sucessão e cultura de aprendizagem segura.',
-    link: 'https://www.amazon.com.br/dp/8547000267',
+    resumoCurto: 'Dweck contrasta mentalidade fixa vs. crescimento. Aplica-se diretamente ao PDI, sucessão e cultura de aprendizagem segura.',
+    resumoCompleto: `Carol Dweck, professora de Stanford, publicou em 2006 (com revisão em 2017) a síntese de 30 anos de pesquisa sobre como crenças sobre inteligência e talento moldam comportamento. A distinção central:
+
+**Mindset Fixo:** crença de que inteligência e talento são traços fixos. Quem tem essa mentalidade tende a evitar desafios (porque erros expõem "falta de talento"), desistir diante de obstáculos, ver esforço como sinal de incompetência, ignorar críticas úteis e sentir-se ameaçado pelo sucesso alheio.
+
+**Mindset de Crescimento:** crença de que habilidades são desenvolvíveis com prática, estratégia e feedback. Pessoas com essa mentalidade buscam desafios, persistem, valorizam esforço como caminho da maestria, aprendem com críticas e se inspiram (não se ameaçam) com o sucesso dos outros.
+
+A pesquisa empírica é robusta: estudantes ensinados sobre neuroplasticidade melhoram notas; atletas que veem treino como aprendizado superam os que veem como prova de talento (Michael Jordan é o caso clássico — cortado do time do colégio); e ambientes corporativos que celebram aprendizado, não apenas resultado, geram mais inovação.
+
+Dweck também alerta sobre o "False Growth Mindset": empresas que dizem ter cultura de crescimento mas demitem após o primeiro fracasso, ou líderes que elogiam esforço de criança que falhou (sem mostrar caminho de melhoria). Mindset de crescimento não é positividade vazia — exige feedback honesto e estratégia de melhoria.
+
+Capítulo crítico: como pais, professores e líderes formam mindset com a linguagem do elogio. Elogiar processo ("você tentou várias estratégias") gera crescimento; elogiar traço ("você é tão inteligente") gera fixo.
+
+**Aplicação no CompSmart:** sustenta a metodologia do PDI (Plano de Desenvolvimento Individual) e o template de avaliação 9-Box, em que o eixo "potencial" é tratado como desenvolvível, não inato. Também guia a redação de feedback nas avaliações 360.`,
+    linkPrincipal: { url: 'https://profiles.stanford.edu/carol-dweck', label: 'Página acadêmica da autora' },
+    linkCompra: { url: 'https://www.amazon.com.br/Mindset-nova-psicologia-sucesso-Carol/dp/8547000267', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'Lost Connections',
     autor: 'Johann Hari',
     ano: 2018,
     categoria: 'Saúde Mental',
-    resumo: 'Hari investiga as causas sociais e organizacionais da depressão e ansiedade modernas, com forte crítica ao isolamento no trabalho. Essencial para entender riscos psicossociais.',
-    link: 'https://www.amazon.com.br/dp/1408878690',
+    resumoCurto: 'Hari investiga as causas sociais e organizacionais da depressão e ansiedade modernas, com forte crítica ao isolamento no trabalho. Essencial para entender riscos psicossociais.',
+    resumoCompleto: `Johann Hari, jornalista britânico, viajou por três continentes entrevistando neurocientistas, psiquiatras e antropólogos para responder por que a depressão explodiu em sociedades ricas. A tese central é polêmica e respaldada por meta-análises: o modelo "depressão = desequilíbrio químico" explica menos do que se diz (e foi parcialmente refutado pela própria FDA). A depressão e ansiedade modernas são, em grande parte, **respostas saudáveis a vidas insalubres**.
+
+Hari sistematiza nove causas das "conexões perdidas":
+1. Desconexão do trabalho com sentido (Gallup: apenas 13% dos trabalhadores no mundo se sentem engajados)
+2. Desconexão de outras pessoas (epidemia de solidão)
+3. Desconexão de valores significativos (cultura materialista)
+4. Desconexão de trauma da infância (estudos ACE)
+5. Desconexão de status e respeito (hierarquias rígidas)
+6. Desconexão do mundo natural
+7. Desconexão de futuro esperançoso (precariedade)
+8. Causas genuinamente biológicas e genéticas (real, mas menor do que vendido)
+9. Desconexão de poder e controle sobre o próprio trabalho
+
+A causa #9 é especialmente relevante para a NR-1: o estudo de Whitehall (Marmot, funcionalismo público britânico) mostrou que servidores com baixo controle sobre o trabalho tinham 2x mais infartos e depressão do que executivos seniores — independentemente de salário, tabagismo ou genética. Baixo controle no trabalho é hoje fator de risco psicossocial reconhecido pela OMS.
+
+A última parte propõe "reconexões": renda básica como antidepressivo, cooperativas de trabalho como vacina contra depressão (caso Baltimore Bicycle Works), e a recuperação do tempo de não-trabalho.
+
+**Aplicação no CompSmart:** referência para a justificativa qualitativa do fator de risco "Baixo controle no trabalho / Falta de autonomia" do COPSOQ-III e para o desenho de planos de ação que devolvem decisão à equipe.`,
+    linkPrincipal: { url: 'https://thelostconnections.com/', label: 'Site oficial do livro' },
+    linkCompra: { url: 'https://www.amazon.com.br/Lost-Connections-Uncovering-Depression-Unexpected/dp/1408878690', label: 'Comprar na Amazon' },
   },
   {
-    titulo: 'A Arte de Cuidar de Si Mesmo no Trabalho',
+    titulo: 'A Mente Vencedora — Cuidando da Saúde Mental no Trabalho',
     autor: 'Ana Beatriz Barbosa Silva',
     ano: 2019,
     categoria: 'Saúde Mental',
-    resumo: 'Psiquiatra brasileira referência em saúde mental no trabalho aborda burnout, ansiedade e estratégias práticas de autocuidado em ambientes corporativos exigentes.',
-    link: 'https://www.amazon.com.br/dp/8525067962',
+    resumoCurto: 'Psiquiatra brasileira referência em saúde mental no trabalho aborda burnout, ansiedade e estratégias práticas de autocuidado em ambientes corporativos exigentes.',
+    resumoCompleto: `Ana Beatriz Barbosa Silva é psiquiatra brasileira e uma das principais comunicadoras públicas sobre saúde mental no país. Sua obra ("Mentes Ansiosas", "Mentes Inquietas", "Mentes & Manias", entre outras) traz para o contexto brasileiro a pesquisa internacional sobre transtornos mentais comuns no trabalho, com casos clínicos reais do consultório.
+
+Os temas centrais relevantes ao CompSmart: (1) **Síndrome do Pensamento Acelerado (SPA)** — quadro descrito pela autora como hiperatividade mental crônica, alimentada por excesso de estímulos digitais e jornadas sem pausa, antessala do burnout; (2) **Ansiedade generalizada no ambiente corporativo** — diferenciação clínica entre preocupação saudável e TAG; (3) **Diferença entre tristeza, depressão e burnout** — três quadros frequentemente confundidos por gestores; (4) **Estratégias práticas de autocuidado** que cabem na rotina: higiene do sono, jejum digital, exercícios de respiração, supervisão da rede social mínima.
+
+A autora também aborda o papel da família e da empresa como suporte. Ressalta que sintomas como irritabilidade, esquecimentos, atrasos e queda de produtividade muitas vezes são interpretados como "problema de atitude" pelo gestor, quando são sinais clínicos. Defende treinamento de líderes para reconhecer sinais precoces — exatamente o que a NR-1 passa a exigir como ação preventiva.
+
+Texto acessível, com vocabulário sem jargão médico, escrito para o público leigo. É hoje uma das obras mais usadas em treinamentos corporativos brasileiros sobre saúde mental.
+
+**Aplicação no CompSmart:** referência brasileira para o programa Bem-Estar e para o conteúdo de microlearning enviado a líderes via agente de comunicação. Adapta conceitos internacionais à realidade jurídica e cultural do Brasil.`,
+    linkPrincipal: { url: 'https://draanabeatrizbsilva.com.br/', label: 'Site oficial da autora' },
+    linkCompra: { url: 'https://www.amazon.com.br/s?k=Ana+Beatriz+Barbosa+Silva&i=stripbooks', label: 'Ver livros da autora na Amazon' },
   },
   {
     titulo: 'Manual de Saúde Mental no Trabalho',
     autor: 'Duílio Antero de Camargo',
     ano: 2021,
     categoria: 'Direito',
-    resumo: 'Obra técnica que conecta legislação trabalhista, NR-1, CID-11 e práticas de prevenção. Referência para a área de SST e RH na adequação à NR-1.',
-    link: 'https://www.amazon.com.br/dp/6555153342',
+    resumoCurto: 'Obra técnica que conecta legislação trabalhista, NR-1, CID-11 e práticas de prevenção. Referência para a área de SST e RH na adequação à NR-1.',
+    resumoCompleto: `Duílio Antero de Camargo é médico psiquiatra, perito judicial e professor com décadas de atuação na interface entre saúde mental, medicina do trabalho e Direito. O Manual é organizado como obra de referência técnico-jurídica para profissionais de SESMT, RH, jurídico trabalhista e perícia.
+
+A primeira parte cobre **fundamentos clínicos**: classificação CID-10/CID-11 dos transtornos mentais e comportamentais, com foco nos quadros relacionados ao trabalho (F32 depressão, F41 ansiedade, F43 reações ao estresse grave, Z73 burnout pré-CID-11, e a entrada de **QD85 burnout** na CID-11 a partir de 2022). Para cada quadro, traz critérios diagnósticos, diagnóstico diferencial e prognóstico ocupacional.
+
+A segunda parte é **jurídica**: análise da CLT (art. 157, 158), das NRs (com foco em NR-1, NR-7 e NR-17), da Lei 8.213/91 (acidentes e nexo técnico epidemiológico — NTEP), súmulas do TST sobre dano existencial, assédio moral e reparação por adoecimento mental. Discute o conceito de "doença ocupacional equiparada" e o papel da CAT (Comunicação de Acidente do Trabalho) em transtornos mentais.
+
+A terceira parte é **prática**: como conduzir o exame médico ocupacional (admissional, periódico, demissional) frente a riscos psicossociais; como elaborar o PCMSO atualizado com NR-1; como o RH deve construir trilha de cuidado (acolhimento → encaminhamento → afastamento → retorno → readaptação).
+
+A quarta parte traz **modelos documentais**: termo de acolhimento, ficha de avaliação de risco psicossocial, comunicação interna, política de saúde mental — todos prontos para customização.
+
+**Aplicação no CompSmart:** principal referência jurídica do módulo NR-1. Os relatórios de evidência documental gerados pela plataforma seguem a estrutura do Manual para garantir aderência em fiscalização do MTE e em eventual perícia trabalhista.`,
+    linkPrincipal: { url: 'https://www.grupogen.com.br/livro-manual-de-saude-mental-no-trabalho-duilio-camargo', label: 'Página da editora (Grupo GEN)' },
+    linkCompra: { url: 'https://www.amazon.com.br/s?k=Du%C3%ADlio+Antero+Camargo+sa%C3%BAde+mental&i=stripbooks', label: 'Buscar na Amazon' },
   },
   {
     titulo: 'Reinventando as Organizações',
     autor: 'Frederic Laloux',
     ano: 2014,
     categoria: 'Cultura',
-    resumo: 'Laloux apresenta organizações Teal — autogestionadas, com propósito evolutivo e plenitude. Modelo inspirador para empresas que querem ir além da conformidade NR-1.',
-    link: 'https://www.amazon.com.br/dp/8568014046',
+    resumoCurto: 'Laloux apresenta organizações Teal — autogestionadas, com propósito evolutivo e plenitude. Modelo inspirador para empresas que querem ir além da conformidade NR-1.',
+    resumoCompleto: `Frederic Laloux, ex-consultor da McKinsey, estudou em profundidade 12 organizações pioneiras (Buurtzorg, Patagonia, Morning Star, FAVI, Sun Hydraulics, AES, Heiligenfeld, entre outras) e codificou o que chama de paradigma organizacional **Teal** (verde-azulado), o quinto estágio na evolução dos modelos de gestão.
+
+Os estágios anteriores: **Vermelho** (chefe alpha, impulso, gangues e máfias), **Âmbar** (hierarquia, igreja, exército, escola tradicional), **Laranja** (meritocracia, KPIs, multinacional moderna), **Verde** (cultura, valores, stakeholders, B-Corps). Cada estágio resolveu um problema do anterior mas criou novos limites.
+
+**Teal** é caracterizado por três avanços: (1) **Autogestão** — fim da pirâmide tradicional, decisões tomadas por quem está mais perto do problema usando o "advice process" (consultar especialistas e afetados, decidir, comunicar); (2) **Plenitude (wholeness)** — ambientes que convidam o profissional a trazer o ser humano completo ao trabalho, e não apenas a "máscara profissional"; (3) **Propósito evolutivo** — a organização tem um propósito que evolui, sentido por quem trabalha nela como vocação, não como missão imposta de cima.
+
+Casos detalhados: **Buurtzorg** (enfermagem domiciliar holandesa, 14 mil enfermeiras em equipes autogeridas de 12, com 40% menos custo que concorrentes tradicionais e maior satisfação do paciente); **Morning Star** (maior processadora de tomate dos EUA, sem chefes, com CLOUs — Colleague Letter of Understanding); **Patagonia** (políticas de bem-estar pioneiras, como creche corporativa e licenças generosas).
+
+Crítica e contraponto: a literatura posterior (incluindo casos de empresas que tentaram migrar para Teal e falharam) mostra que o modelo exige maturidade cultural prévia. Não é receita pronta.
+
+**Aplicação no CompSmart:** referência aspiracional para empresas que, depois de cumprir NR-1, querem evoluir para modelos genuinamente saudáveis — não apenas evitar adoecimento. Sustenta o conceito de "empresa vital" no FIB nível 5.`,
+    linkPrincipal: { url: 'https://www.reinventingorganizations.com/', label: 'Site oficial do autor' },
+    linkCompra: { url: 'https://www.amazon.com.br/Reinventando-organiza%C3%A7%C3%B5es-Frederic-Laloux/dp/8568014046', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'Liderança: A Inteligência Emocional na Formação do Líder de Sucesso',
     autor: 'Daniel Goleman',
     ano: 2015,
     categoria: 'Liderança',
-    resumo: 'Goleman compila décadas de pesquisa sobre como inteligência emocional do líder afeta diretamente o clima e a saúde mental da equipe.',
-    link: 'https://www.amazon.com.br/dp/8539006359',
+    resumoCurto: 'Goleman compila décadas de pesquisa sobre como inteligência emocional do líder afeta diretamente o clima e a saúde mental da equipe.',
+    resumoCompleto: `Daniel Goleman, psicólogo e jornalista científico que popularizou o conceito de Inteligência Emocional (IE) em 1995, reúne neste volume seus principais artigos da Harvard Business Review sobre liderança. A tese central, sustentada por pesquisa em mais de 3 mil executivos: **a IE explica até 90% da diferença entre líderes excepcionais e medianos** em cargos seniores — mais do que QI ou competência técnica.
+
+Goleman estrutura a IE em quatro domínios e doze competências:
+- **Autoconsciência:** consciência emocional, autoavaliação precisa, autoconfiança.
+- **Autogestão:** autocontrole emocional, adaptabilidade, orientação para resultado, perspectiva positiva.
+- **Consciência social:** empatia, consciência organizacional.
+- **Gestão de relacionamentos:** influência, mentoria, gestão de conflitos, trabalho em equipe, liderança inspiradora.
+
+A pesquisa de Hay/McBer com 3.871 executivos identificou **seis estilos de liderança** e seu impacto no clima organizacional: (1) Coercitivo — "faça o que eu mando", impacto negativo; (2) Diretivo / Visionário — "venham comigo", impacto muito positivo; (3) Afetivo — "as pessoas vêm primeiro", positivo; (4) Democrático — "o que vocês acham?", positivo; (5) Modelador — "faça como eu, agora", negativo se único; (6) Coach — "tente isto", muito positivo.
+
+Goleman demonstra que líderes excepcionais usam ao menos quatro estilos com fluidez, alternando conforme o contexto. Líderes medíocres dominam um só (geralmente Coercitivo ou Modelador) e o aplicam em todas as situações.
+
+A obra também aborda o conceito de "ressonância" — líderes ressonantes sintonizam com o estado emocional da equipe e elevam o clima; líderes dissonantes contaminam negativamente. O clima emocional do líder direto é o **maior preditor de engajamento** — mais do que cultura corporativa global.
+
+**Aplicação no CompSmart:** sustenta o módulo de Avaliação 360 e o feedback dado a líderes com baixo eNPS de equipe. As perguntas sobre estilo de liderança no questionário NR-1 derivam dos seis estilos de Goleman.`,
+    linkPrincipal: { url: 'https://www.danielgoleman.info/', label: 'Site oficial do autor' },
+    linkCompra: { url: 'https://www.amazon.com.br/Lideran%C3%A7a-intelig%C3%AAncia-emocional-forma%C3%A7%C3%A3o-sucesso/dp/8539006359', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'O Poder do Hábito',
     autor: 'Charles Duhigg',
     ano: 2012,
     categoria: 'Performance',
-    resumo: 'Duhigg explica como hábitos individuais e organizacionais se formam — base para criar rituais de check-in de vitalidade e cultura de cuidado.',
-    link: 'https://www.amazon.com.br/dp/8539004119',
+    resumoCurto: 'Duhigg explica como hábitos individuais e organizacionais se formam — base para criar rituais de check-in de vitalidade e cultura de cuidado.',
+    resumoCompleto: `Charles Duhigg, jornalista vencedor do Pulitzer pelo New York Times, sintetiza a neurociência dos hábitos com base em pesquisas do MIT, da Duke e da Universidade da Califórnia. A descoberta central: ~40% das ações diárias não são decisões, mas hábitos — comportamentos automáticos disparados por gatilhos contextuais, executados sem deliberação consciente.
+
+Todo hábito segue o **loop neural em três partes**: (1) **deixa** (cue) — gatilho ambiental que ativa o cérebro a entrar em modo automático; (2) **rotina** (routine) — comportamento físico, mental ou emocional executado; (3) **recompensa** (reward) — sinal que ensina o cérebro se vale a pena guardar o loop. Com repetição, surge a **fissura** (craving) — desejo antecipado da recompensa, que torna o hábito difícil de quebrar.
+
+A "Regra de Ouro da Mudança de Hábito": não é possível extinguir um hábito enraizado, mas é possível **trocar a rotina** mantendo deixa e recompensa. Caso clássico: alcoólicos anônimos não eliminam a deixa (estresse) nem a recompensa (alívio social), trocam apenas a rotina (em vez de beber, vão à reunião).
+
+A segunda parte aborda **hábitos organizacionais**. Caso da Alcoa sob Paul O'Neill: ao escolher um único "hábito-chave" — segurança do trabalhador — o CEO reformulou comunicação, processos e cultura, e a empresa quintuplicou de valor. Hábitos-chave (keystone habits) têm efeito cascata sobre outros comportamentos.
+
+A terceira parte cobre **hábitos sociais**: como o boicote dos ônibus de Montgomery e a igreja de Saddleback usaram a mesma engenharia de hábitos para mobilizar milhões.
+
+**Aplicação no CompSmart:** sustenta o desenho dos rituais semanais (check-in de vitalidade, 1:1 estruturado, retrospectiva de equipe). Também justifica a estratégia de **micro-hábitos** nos planos de ação NR-1 — em vez de pedir transformação cultural ampla, identificamos um hábito-chave por equipe e instrumentamos o loop completo.`,
+    linkPrincipal: { url: 'https://charlesduhigg.com/the-power-of-habit/', label: 'Site oficial do autor' },
+    linkCompra: { url: 'https://www.amazon.com.br/Poder-h%C3%A1bito-Charles-Duhigg/dp/8539004119', label: 'Comprar na Amazon' },
   },
   {
     titulo: 'NR-1 Comentada — Riscos Psicossociais',
-    autor: 'João Bosco Ribeiro',
+    autor: 'Equipe técnica MTE / referências consolidadas',
     ano: 2025,
     categoria: 'Direito',
-    resumo: 'Análise artigo por artigo da NR-1 atualizada pela Portaria MTE 1.419/2024, com foco em conformidade, evidências documentais e defesa em fiscalização.',
-    link: 'https://www.google.com/search?tbm=bks&q=%22NR-1+Comentada%22+Riscos+Psicossociais',
+    resumoCurto: 'Análise artigo por artigo da NR-1 atualizada pela Portaria MTE 1.419/2024, com foco em conformidade, evidências documentais e defesa em fiscalização.',
+    resumoCompleto: `**Nota:** este conteúdo é uma síntese técnica preparada pela equipe CompSmart a partir da legislação oficial e de obras de comentário em circulação no mercado jurídico brasileiro em 2025. Não há, até o momento, uma única obra-livro consolidada de domínio público sobre a NR-1 atualizada — recomendamos sempre consultar a Portaria MTE 1.419/2024 diretamente no site do governo.
+
+**Contexto histórico.** A NR-1 (Disposições Gerais e Gerenciamento de Riscos Ocupacionais) foi a primeira norma regulamentadora publicada em 1978. A reformulação de 2020 (Portaria 6.730) introduziu o conceito de **GRO – Gerenciamento de Riscos Ocupacionais** e o **PGR – Programa de Gerenciamento de Riscos**, substituindo o antigo PPRA. A Portaria MTE **1.419/2024** representa o terceiro grande marco: pela primeira vez, **riscos psicossociais** entram explicitamente no escopo do PGR, com vigência fiscalizatória a partir de **maio de 2026**.
+
+**O que mudou na prática.**
+1. **Identificação obrigatória de perigos psicossociais** (assédio, sobrecarga, baixo controle, falta de suporte, baixa justiça organizacional, etc.) usando metodologia validada.
+2. **Avaliação de risco** com critérios técnicos — não basta listar, é preciso classificar severidade × probabilidade.
+3. **Plano de ação** com responsáveis, prazos e evidência de execução.
+4. **Reavaliação periódica** — mínimo anual, ou após mudança organizacional relevante.
+5. **Documentação rastreável** — registros que sustentem fiscalização do MTE e eventual perícia trabalhista.
+
+**Instrumentos aceitos.** A norma não impõe um instrumento único, mas a literatura técnica (Fundacentro, ISO 45003, OMS) recomenda questionários psicossociais validados — COPSOQ-III, Karasek, JCQ. O CompSmart adota COPSOQ-III adaptado, com 40 itens cobrindo 6 dimensões.
+
+**Penalidades.** Multas por descumprimento variam de R$ 1.875 a R$ 6.708 por item, podendo ser dobradas em caso de reincidência (Portaria MTb 667/2021). Em caso de adoecimento mental relacionado, pode haver responsabilização civil (dano moral, dano existencial) e criminal (art. 132 CP).
+
+**Defesa em fiscalização.** Os principais pontos checados pelo Auditor-Fiscal do Trabalho: (a) evidência de aplicação de instrumento; (b) participação dos trabalhadores; (c) plano de ação com prazos; (d) execução comprovada; (e) reavaliação documentada.
+
+**Aplicação no CompSmart:** o módulo NR-1 da plataforma gera automaticamente todos os artefatos exigidos — relatório por dimensão, plano de ação assistido por IA, log de execução e dossiê de evidência exportável em PDF para fiscalização.`,
+    linkPrincipal: { url: 'https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/normas-regulamentadoras/nr-01-atualizada-2024.pdf', label: 'NR-1 atualizada (PDF oficial MTE)' },
+    linkCompra: { url: 'https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/inspecao-do-trabalho/seguranca-e-saude-no-trabalho/ctpp-nrs/normas-regulamentadoras-nrs', label: 'Portal das NRs (gov.br)' },
   },
   {
     titulo: 'Talent Intelligence: A New Discipline for People-Driven Companies',
     autor: 'Josh Bersin',
     ano: 2022,
     categoria: 'Metodologia',
-    resumo: 'Bersin define a nova disciplina que integra Performance, Remuneração e Saúde em um único sistema de inteligência de talentos — base teórica da Matriz MCPS.',
-    link: 'https://joshbersin.com/research/',
+    resumoCurto: 'Bersin define a nova disciplina que integra Performance, Remuneração e Saúde em um único sistema de inteligência de talentos — base teórica da Matriz MCPS.',
+    resumoCompleto: `Josh Bersin, fundador da Bersin & Associates (vendida à Deloitte) e hoje da The Josh Bersin Company, é o analista mais influente do mundo em tecnologia de RH. Em "Talent Intelligence" — distribuído como pesquisa-livro em sua plataforma — ele formaliza uma disciplina que vinha emergindo desde 2018: a integração de dados de performance, remuneração, saúde, aprendizado e mercado externo em um único sistema de tomada de decisão sobre pessoas.
+
+**A tese central:** a maioria das empresas trata avaliação de desempenho, gestão de remuneração, mobilidade interna, sucessão e saúde mental como módulos isolados, geridos por times diferentes, com dados que não conversam. O resultado é incoerência: o melhor performer não é o mais bem pago; o mais alto potencial não está no plano de sucessão; o colaborador adoecendo não foi sinalizado pelo gestor. **Talent Intelligence** propõe um sistema único, com dados conectados, em que cada decisão informa as demais.
+
+**Quatro camadas do sistema:**
+1. **Workforce data** — quem está na empresa, em que cargo, com que histórico, salário, performance e engajamento.
+2. **External market data** — benchmarks salariais, disponibilidade de talento, salários de referência por região.
+3. **Skill intelligence** — mapeamento dinâmico de competências (skill ontology) e gaps de skill por equipe.
+4. **Employee experience signals** — eNPS, pulse surveys, sinais comportamentais (uso de ferramentas, padrão de e-mail, ausências), com governança LGPD.
+
+**Casos discutidos:** IBM e a IA Watson para sucessão; Unilever e a triagem por entrevista assíncrona; Spotify e o framework de squads + tribes para mobilidade; Google e o Project Oxygen para gestão de líderes.
+
+Bersin é claro sobre o risco: sem governança forte de dados (privacidade, consentimento, viés algorítmico), Talent Intelligence vira vigilância. Com governança, vira estratégia.
+
+**Aplicação no CompSmart:** este é o livro-base da arquitetura conceitual da plataforma. A integração entre Core (remuneração), Insight (mercado) e o módulo NR-1 (saúde) materializa o sistema único de inteligência de talentos proposto por Bersin. A Matriz MCPS (Mérito, Competência, Performance, Saúde) é nossa adaptação prática.`,
+    linkPrincipal: { url: 'https://joshbersin.com/research/', label: 'Pesquisas oficiais do autor' },
+    linkCompra: { url: 'https://joshbersin.com/josh-bersin-academy/', label: 'Josh Bersin Academy' },
   },
 ];
 
@@ -345,6 +538,7 @@ const CATEGORIAS = ['Todas', 'Saúde Mental', 'Liderança', 'Cultura', 'Performa
 export default function Nr1Biblioteca() {
   const [busca, setBusca] = useState('');
   const [cat, setCat] = useState<(typeof CATEGORIAS)[number]>('Todas');
+  const [livroSel, setLivroSel] = useState<Livro | null>(null);
 
   const metodologiasFiltered = useMemo(() => {
     const q = busca.toLowerCase().trim();
@@ -376,7 +570,8 @@ export default function Nr1Biblioteca() {
         !q ||
         l.titulo.toLowerCase().includes(q) ||
         l.autor.toLowerCase().includes(q) ||
-        l.resumo.toLowerCase().includes(q);
+        l.resumoCurto.toLowerCase().includes(q) ||
+        l.resumoCompleto.toLowerCase().includes(q);
       return matchCat && matchQ;
     });
   }, [busca, cat]);
@@ -524,16 +719,14 @@ export default function Nr1Biblioteca() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
-                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">{l.resumo}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">{l.resumoCurto}</p>
                   <Button
-                    asChild
                     variant="link"
                     size="sm"
+                    onClick={() => setLivroSel(l)}
                     className="self-start px-0 text-[hsl(var(--nr1-primary))] mt-3"
                   >
-                    <a href={l.link} target="_blank" rel="noopener noreferrer">
-                      Saiba mais <ExternalLink className="h-3.5 w-3.5 ml-1" />
-                    </a>
+                    Ler resumo <BookText className="h-3.5 w-3.5 ml-1" />
                   </Button>
                 </CardContent>
               </Card>
@@ -586,6 +779,50 @@ export default function Nr1Biblioteca() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* ====== DIALOG: Resumo do livro ====== */}
+      <Dialog open={!!livroSel} onOpenChange={(o) => !o && setLivroSel(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] p-0">
+          {livroSel && (
+            <>
+              <DialogHeader className="p-6 pb-3">
+                <Badge variant="outline" className="w-fit text-[10px] mb-2">{livroSel.categoria}</Badge>
+                <DialogTitle className="text-xl leading-tight">{livroSel.titulo}</DialogTitle>
+                <DialogDescription className="text-sm">
+                  {livroSel.autor} · {livroSel.ano}
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="max-h-[55vh] px-6">
+                <div className="space-y-3 pb-4">
+                  {livroSel.resumoCompleto.split('\n\n').map((par, i) => (
+                    <p key={i} className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                      {par}
+                    </p>
+                  ))}
+                </div>
+              </ScrollArea>
+              <DialogFooter className="px-6 py-4 border-t bg-muted/30 gap-2 sm:gap-2 flex-col sm:flex-row sm:justify-end">
+                {livroSel.linkPrincipal && (
+                  <Button asChild variant="outline" size="sm">
+                    <a href={livroSel.linkPrincipal.url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                      {livroSel.linkPrincipal.label}
+                    </a>
+                  </Button>
+                )}
+                {livroSel.linkCompra && (
+                  <Button asChild size="sm" className="bg-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.9)]">
+                    <a href={livroSel.linkCompra.url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                      {livroSel.linkCompra.label}
+                    </a>
+                  </Button>
+                )}
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
