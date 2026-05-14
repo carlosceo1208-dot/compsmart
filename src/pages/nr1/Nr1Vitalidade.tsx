@@ -163,7 +163,7 @@ function MatrizMCPS() {
   );
 }
 
-/* ---------------------------- Calculadora Custo do Medo ---------------------------- */
+/* ---------------------------- Calculadora Custo do Risco ---------------------------- */
 
 function CustoDoMedo() {
   const [headcount, setHeadcount] = useState(100);
