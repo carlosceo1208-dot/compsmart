@@ -21,7 +21,7 @@ const NAV = [
   { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
-  { to: '/nr1/agente', label: 'Agente Bem-Estar', icon: Bot },
+  
 ];
 
 const useIsSuperAdmin = () =>
