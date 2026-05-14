@@ -119,6 +119,7 @@ const Nr1Universo = lazy(() => import("./pages/nr1/Nr1Universo"));
 const Nr1Etapas = lazy(() => import("./pages/nr1/Nr1Etapas"));
 const Nr1Consentimento = lazy(() => import("./pages/nr1/Nr1Consentimento"));
 const Nr1PlanosAcao = lazy(() => import("./pages/nr1/Nr1PlanosAcao"));
+const Nr1Vitalidade = lazy(() => import("./pages/nr1/Nr1Vitalidade"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
