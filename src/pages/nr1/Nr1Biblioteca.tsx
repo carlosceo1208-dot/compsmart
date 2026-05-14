@@ -779,6 +779,50 @@ export default function Nr1Biblioteca() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* ====== DIALOG: Resumo do livro ====== */}
+      <Dialog open={!!livroSel} onOpenChange={(o) => !o && setLivroSel(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] p-0">
+          {livroSel && (
+            <>
+              <DialogHeader className="p-6 pb-3">
+                <Badge variant="outline" className="w-fit text-[10px] mb-2">{livroSel.categoria}</Badge>
+                <DialogTitle className="text-xl leading-tight">{livroSel.titulo}</DialogTitle>
+                <DialogDescription className="text-sm">
+                  {livroSel.autor} · {livroSel.ano}
+                </DialogDescription>
+              </DialogHeader>
+              <ScrollArea className="max-h-[55vh] px-6">
+                <div className="space-y-3 pb-4">
+                  {livroSel.resumoCompleto.split('\n\n').map((par, i) => (
+                    <p key={i} className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                      {par}
+                    </p>
+                  ))}
+                </div>
+              </ScrollArea>
+              <DialogFooter className="px-6 py-4 border-t bg-muted/30 gap-2 sm:gap-2 flex-col sm:flex-row sm:justify-end">
+                {livroSel.linkPrincipal && (
+                  <Button asChild variant="outline" size="sm">
+                    <a href={livroSel.linkPrincipal.url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                      {livroSel.linkPrincipal.label}
+                    </a>
+                  </Button>
+                )}
+                {livroSel.linkCompra && (
+                  <Button asChild size="sm" className="bg-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.9)]">
+                    <a href={livroSel.linkCompra.url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                      {livroSel.linkCompra.label}
+                    </a>
+                  </Button>
+                )}
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
