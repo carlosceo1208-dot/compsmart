@@ -139,8 +139,7 @@ export const Nr1BemEstarFloating = () => {
                 aria-label="Agente Bem-Estar"
                 className={cn(
                   'h-14 w-14 rounded-full shadow-xl transition-all hover:scale-110',
-                  'bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900',
-                  !open && 'animate-pulse'
+                  'bg-gradient-to-br from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900'
                 )}
               >
                 {open ? <X className="h-6 w-6 text-white" /> : <Bot className="h-7 w-7 text-white" />}
