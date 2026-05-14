@@ -289,7 +289,7 @@ const LIVROS: Livro[] = [
     ano: 2025,
     categoria: 'Direito',
     resumo: 'Análise artigo por artigo da NR-1 atualizada pela Portaria MTE 1.419/2024, com foco em conformidade, evidências documentais e defesa em fiscalização.',
-    link: 'https://www.google.com/search?q=NR-1+Comentada+Riscos+Psicossociais',
+    link: 'https://www.google.com/search?tbm=bks&q=%22NR-1+Comentada%22+Riscos+Psicossociais',
   },
   {
     titulo: 'Talent Intelligence: A New Discipline for People-Driven Companies',
