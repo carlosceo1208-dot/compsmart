@@ -69,7 +69,11 @@ export default function Nr1Dashboard() {
           icon={Activity}
           label="Nível de risco atual"
           value={
-            ultimo?.nivel_risco ? (
+            grauInfo ? (
+              <Badge className={`${grauInfo.bg} ${grauInfo.cor} border`}>
+                Grau {grauInfo.grau} · {grauInfo.label}
+              </Badge>
+            ) : ultimo?.nivel_risco ? (
               <Badge className={RISCO_CLASS[ultimo.nivel_risco as keyof typeof RISCO_CLASS]}>
                 {RISCO_LABEL[ultimo.nivel_risco as keyof typeof RISCO_LABEL]}
               </Badge>
