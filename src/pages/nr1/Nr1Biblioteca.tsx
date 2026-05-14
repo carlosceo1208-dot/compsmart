@@ -195,6 +195,7 @@ const SIGLAS: Sigla[] = [
   { sigla: 'eNPS', significado: 'Employee Net Promoter Score', descricao: 'Indicador de lealdade do colaborador.' },
   { sigla: 'MCPS', significado: 'Matriz Cruzada Performance × Saúde', descricao: 'Visualização em quadrantes para priorização de intervenções.' },
   { sigla: 'CCR', significado: 'Calculadora Custo do Risco', descricao: 'Quantificação financeira do impacto dos riscos psicossociais (turnover, absenteísmo e sinistralidade).' },
+  { sigla: 'RQ', significado: 'Racional Questionario', descricao: 'Estrutura das 40 perguntas do diagnóstico NR-1: 6 dimensões, pesos diferenciados (0,80–1,50), escala Likert 0–4 e anonimização LGPD via hash SHA-256.' },
   { sigla: 'PGE', significado: 'Programa de Gestão Estratégica', descricao: 'Ciclo estruturado de gestão de riscos psicossociais.' },
   { sigla: 'ISO 45003', significado: 'Norma ISO sobre Saúde e Segurança Psicológica no Trabalho', descricao: 'Guia internacional (2021) para identificação, avaliação e controle de riscos psicossociais dentro de um sistema de gestão de SST. Base técnica para fundamentar o PGR da NR-1.' },
   { sigla: 'PDCA', significado: 'Plan-Do-Check-Act', descricao: 'Ciclo de melhoria contínua de Deming.' },
