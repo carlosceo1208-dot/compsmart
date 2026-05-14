@@ -719,16 +719,14 @@ export default function Nr1Biblioteca() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
-                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">{l.resumo}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">{l.resumoCurto}</p>
                   <Button
-                    asChild
                     variant="link"
                     size="sm"
+                    onClick={() => setLivroSel(l)}
                     className="self-start px-0 text-[hsl(var(--nr1-primary))] mt-3"
                   >
-                    <a href={l.link} target="_blank" rel="noopener noreferrer">
-                      Saiba mais <ExternalLink className="h-3.5 w-3.5 ml-1" />
-                    </a>
+                    Ler resumo <BookText className="h-3.5 w-3.5 ml-1" />
                   </Button>
                 </CardContent>
               </Card>
