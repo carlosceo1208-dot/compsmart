@@ -35,6 +35,24 @@ const CORRELACAO_FATORES_FIB: Correlacao[] = [
   { perigo: 'Trabalho remoto e isolado', dimensoes: ['Vitalidade Comunitária', 'Meio Ambiente'], nota: 'Isolamento social e ergonomia do posto.' },
 ];
 
+// Correlação dos 13 fatores de risco psicossocial (NR-1) com as 6 dimensões do questionário (COPSOQ-III adaptado, 40 perguntas)
+type CorrelacaoCopsoq = { perigo: string; dimensoes: string[]; nota: string };
+const CORRELACAO_FATORES_COPSOQ: CorrelacaoCopsoq[] = [
+  { perigo: 'Assédio de qualquer natureza no trabalho', dimensoes: ['Relações e Liderança', 'Saúde e Bem-Estar'], nota: 'Itens de respeito, conflito e sofrimento psíquico.' },
+  { perigo: 'Má gestão de mudanças organizacionais', dimensoes: ['Organização e Conteúdo', 'Valores no Trabalho'], nota: 'Previsibilidade, comunicação e confiança institucional.' },
+  { perigo: 'Baixa clareza de papel/função', dimensoes: ['Organização e Conteúdo'], nota: 'Itens de clareza de papel e previsibilidade.' },
+  { perigo: 'Baixas recompensas e reconhecimento', dimensoes: ['Valores no Trabalho', 'Relações e Liderança'], nota: 'Reconhecimento e justiça (esforço × recompensa).' },
+  { perigo: 'Falta de suporte/apoio no trabalho', dimensoes: ['Relações e Liderança'], nota: 'Apoio social do líder e dos pares.' },
+  { perigo: 'Baixo controle no trabalho / Falta de autonomia', dimensoes: ['Organização e Conteúdo'], nota: 'Influência no trabalho e possibilidades de desenvolvimento.' },
+  { perigo: 'Baixa justiça organizacional', dimensoes: ['Valores no Trabalho'], nota: 'Justiça procedimental, equidade e confiança vertical.' },
+  { perigo: 'Eventos violentos ou traumáticos', dimensoes: ['Saúde e Bem-Estar', 'Relações e Liderança'], nota: 'Estresse, sintomas e segurança no ambiente.' },
+  { perigo: 'Baixa demanda no trabalho (subcarga)', dimensoes: ['Demandas', 'Organização e Conteúdo'], nota: 'Subutilização de competências e tédio.' },
+  { perigo: 'Excesso de demandas no trabalho (sobrecarga)', dimensoes: ['Demandas', 'Saúde e Bem-Estar'], nota: 'Demandas quantitativas, ritmo e exaustão.' },
+  { perigo: 'Maus relacionamentos no local de trabalho', dimensoes: ['Relações e Liderança'], nota: 'Qualidade dos vínculos, conflitos e cooperação.' },
+  { perigo: 'Trabalho em condições de difícil comunicação', dimensoes: ['Organização e Conteúdo', 'Relações e Liderança'], nota: 'Clareza de informação e canais de feedback.' },
+  { perigo: 'Trabalho remoto e isolado', dimensoes: ['Interface Trabalho-Indivíduo', 'Relações e Liderança'], nota: 'Conflito trabalho–vida e isolamento social.' },
+];
+
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
 import { useCompanyContext } from '@/contexts/CompanyContext';
