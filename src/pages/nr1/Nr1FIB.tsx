@@ -35,6 +35,24 @@ const CORRELACAO_FATORES_FIB: Correlacao[] = [
   { perigo: 'Trabalho remoto e isolado', dimensoes: ['Vitalidade Comunitária', 'Meio Ambiente'], nota: 'Isolamento social e ergonomia do posto.' },
 ];
 
+// Correlação dos 13 fatores de risco psicossocial (NR-1) com as 6 dimensões do questionário (COPSOQ-III adaptado, 40 perguntas)
+type CorrelacaoCopsoq = { perigo: string; dimensoes: string[]; nota: string };
+const CORRELACAO_FATORES_COPSOQ: CorrelacaoCopsoq[] = [
+  { perigo: 'Assédio de qualquer natureza no trabalho', dimensoes: ['Relações e Liderança', 'Saúde e Bem-Estar'], nota: 'Itens de respeito, conflito e sofrimento psíquico.' },
+  { perigo: 'Má gestão de mudanças organizacionais', dimensoes: ['Organização e Conteúdo', 'Valores no Trabalho'], nota: 'Previsibilidade, comunicação e confiança institucional.' },
+  { perigo: 'Baixa clareza de papel/função', dimensoes: ['Organização e Conteúdo'], nota: 'Itens de clareza de papel e previsibilidade.' },
+  { perigo: 'Baixas recompensas e reconhecimento', dimensoes: ['Valores no Trabalho', 'Relações e Liderança'], nota: 'Reconhecimento e justiça (esforço × recompensa).' },
+  { perigo: 'Falta de suporte/apoio no trabalho', dimensoes: ['Relações e Liderança'], nota: 'Apoio social do líder e dos pares.' },
+  { perigo: 'Baixo controle no trabalho / Falta de autonomia', dimensoes: ['Organização e Conteúdo'], nota: 'Influência no trabalho e possibilidades de desenvolvimento.' },
+  { perigo: 'Baixa justiça organizacional', dimensoes: ['Valores no Trabalho'], nota: 'Justiça procedimental, equidade e confiança vertical.' },
+  { perigo: 'Eventos violentos ou traumáticos', dimensoes: ['Saúde e Bem-Estar', 'Relações e Liderança'], nota: 'Estresse, sintomas e segurança no ambiente.' },
+  { perigo: 'Baixa demanda no trabalho (subcarga)', dimensoes: ['Demandas', 'Organização e Conteúdo'], nota: 'Subutilização de competências e tédio.' },
+  { perigo: 'Excesso de demandas no trabalho (sobrecarga)', dimensoes: ['Demandas', 'Saúde e Bem-Estar'], nota: 'Demandas quantitativas, ritmo e exaustão.' },
+  { perigo: 'Maus relacionamentos no local de trabalho', dimensoes: ['Relações e Liderança'], nota: 'Qualidade dos vínculos, conflitos e cooperação.' },
+  { perigo: 'Trabalho em condições de difícil comunicação', dimensoes: ['Organização e Conteúdo', 'Relações e Liderança'], nota: 'Clareza de informação e canais de feedback.' },
+  { perigo: 'Trabalho remoto e isolado', dimensoes: ['Interface Trabalho-Indivíduo', 'Relações e Liderança'], nota: 'Conflito trabalho–vida e isolamento social.' },
+];
+
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
 import { useCompanyContext } from '@/contexts/CompanyContext';
@@ -210,6 +228,49 @@ export default function Nr1FIB() {
               Fonte: cruzamento entre os 13 perigos psicossociais da NR-1 (orientação técnica GRO/PGR) e as 9 dimensões
               do Bem-Estar Integral (FIB). Uma mesma dimensão pode receber sinal de múltiplos fatores — quanto mais
               perigos apontam para ela, maior a prioridade no plano de ação.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Correlação — 13 Fatores de Risco NR-1 × 6 Dimensões do Questionário (40 perguntas)</CardTitle>
+            <CardDescription>
+              Mapeamento de cada perigo psicossocial às dimensões do questionário COPSOQ-III adaptado.
+              Permite rastrear, item a item, qual bloco de perguntas captura cada fator.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto rounded-md border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
+                    <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões do questionário</th>
+                    <th className="text-left px-3 py-2 font-semibold">Por quê</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CORRELACAO_FATORES_COPSOQ.map((c, i) => (
+                    <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                      <td className="px-3 py-2 align-top">{c.perigo}</td>
+                      <td className="px-3 py-2 align-top">
+                        <div className="flex flex-wrap gap-1">
+                          {c.dimensoes.map((d) => (
+                            <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+              Dimensões do questionário (40 itens): Demandas (8), Organização e Conteúdo (7), Relações e Liderança (7),
+              Interface Trabalho-Indivíduo (7), Valores no Trabalho (5) e Saúde e Bem-Estar (6). Um fator pode aparecer
+              em mais de uma dimensão — isso é esperado e dá triangulação ao diagnóstico.
             </p>
           </CardContent>
         </Card>
