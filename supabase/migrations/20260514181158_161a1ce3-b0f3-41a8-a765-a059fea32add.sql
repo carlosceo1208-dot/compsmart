@@ -1,0 +1,1 @@
+DELETE FROM public.profiles WHERE id = 'b96b14de-ad1e-4ade-a631-4b888cfe8014';
