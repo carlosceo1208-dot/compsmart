@@ -432,6 +432,28 @@ export default function Nr1Biblioteca() {
                   <Section label="Origem">{m.origem}</Section>
                   <Section label="Propósito">{m.proposito}</Section>
                   <Section label="Como usamos no CompSmart">{m.comoUsamos}</Section>
+                  {m.formulas && m.formulas.length > 0 && (
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                        Fórmulas de cálculo
+                      </p>
+                      <div className="space-y-2">
+                        {m.formulas.map((f) => (
+                          <div key={f.label} className="rounded-md border bg-muted/30 p-2.5">
+                            <div className="flex items-baseline gap-2 flex-wrap">
+                              <span className="text-xs font-semibold">{f.label}</span>
+                              <code className="text-[11px] font-mono bg-background border rounded px-1.5 py-0.5">
+                                {f.expr}
+                              </code>
+                            </div>
+                            {f.nota && (
+                              <p className="text-[11px] text-muted-foreground mt-1 leading-snug">{f.nota}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {m.baseLegal && <Section label="Base legal">{m.baseLegal}</Section>}
                   <Section label="Referência">{m.referencia}</Section>
                 </AccordionContent>
