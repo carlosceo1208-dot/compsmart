@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
+import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 
 const NAV = [
   { to: '/nr1', label: 'Visão Geral', icon: Activity, end: true },
