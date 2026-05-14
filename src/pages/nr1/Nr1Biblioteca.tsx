@@ -569,7 +569,8 @@ export default function Nr1Biblioteca() {
         !q ||
         l.titulo.toLowerCase().includes(q) ||
         l.autor.toLowerCase().includes(q) ||
-        l.resumo.toLowerCase().includes(q);
+        l.resumoCurto.toLowerCase().includes(q) ||
+        l.resumoCompleto.toLowerCase().includes(q);
       return matchCat && matchQ;
     });
   }, [busca, cat]);
