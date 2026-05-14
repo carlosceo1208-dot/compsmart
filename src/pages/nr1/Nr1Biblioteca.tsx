@@ -37,6 +37,15 @@ const METODOLOGIAS: Metodologia[] = [
     referencia: 'HSE (2019). Tackling work-related stress using the Management Standards approach. HSE Books.',
   },
   {
+    sigla: 'ISO 45003',
+    nome: 'ISO 45003:2021 — Saúde e Segurança Psicológica no Trabalho',
+    origem: 'Organização Internacional de Normalização (ISO), 2021.',
+    proposito: 'Fornecer orientações práticas para identificar, avaliar e controlar riscos psicossociais no trabalho dentro de um sistema de gestão de SST. Aborda design de cargos, carga de trabalho, controle, apoio social, violência e assédio.',
+    comoUsamos: 'Referência normativa internacional que fundamenta as práticas do módulo NR-1 perante fiscalização. Usada para validar o PGR, a avaliação de riscos psicossociais e a implementação de controles organizacionais.',
+    baseLegal: 'NR-1 (itens 1.5.3 e 1.5.4) — identificação e controle de riscos psicossociais.',
+    referencia: 'ISO 45003:2021. Occupational health and safety management — Psychological health and safety at work — Guidelines.',
+  },
+  {
     sigla: 'SRQ-20',
     nome: 'Self-Reporting Questionnaire (20 itens)',
     origem: 'Organização Mundial da Saúde (OMS), 1994.',
