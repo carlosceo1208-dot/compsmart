@@ -35,6 +35,7 @@ type Metodologia = {
   comoUsamos: string;
   baseLegal?: string;
   referencia: string;
+  formulas?: { label: string; expr: string; nota?: string }[];
 };
 
 const METODOLOGIAS: Metodologia[] = [
