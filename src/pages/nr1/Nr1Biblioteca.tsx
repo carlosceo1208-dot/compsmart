@@ -37,6 +37,15 @@ const METODOLOGIAS: Metodologia[] = [
     referencia: 'HSE (2019). Tackling work-related stress using the Management Standards approach. HSE Books.',
   },
   {
+    sigla: 'ISO 45003',
+    nome: 'ISO 45003:2021 — Saúde e Segurança Psicológica no Trabalho',
+    origem: 'Organização Internacional de Normalização (ISO), 2021.',
+    proposito: 'Fornecer orientações práticas para identificar, avaliar e controlar riscos psicossociais no trabalho dentro de um sistema de gestão de SST. Aborda design de cargos, carga de trabalho, controle, apoio social, violência e assédio.',
+    comoUsamos: 'Referência normativa internacional que fundamenta as práticas do módulo NR-1 perante fiscalização. Usada para validar o PGR, a avaliação de riscos psicossociais e a implementação de controles organizacionais.',
+    baseLegal: 'NR-1 (itens 1.5.3 e 1.5.4) — identificação e controle de riscos psicossociais.',
+    referencia: 'ISO 45003:2021. Occupational health and safety management — Psychological health and safety at work — Guidelines.',
+  },
+  {
     sigla: 'SRQ-20',
     nome: 'Self-Reporting Questionnaire (20 itens)',
     origem: 'Organização Mundial da Saúde (OMS), 1994.',
@@ -149,6 +158,7 @@ const SIGLAS: Sigla[] = [
   { sigla: 'MCPS', significado: 'Matriz Cruzada Performance × Saúde', descricao: 'Visualização em quadrantes para priorização de intervenções.' },
   { sigla: 'CCM', significado: 'Calculadora Custo do Medo', descricao: 'Quantificação financeira do impacto da baixa saúde mental.' },
   { sigla: 'PGE', significado: 'Programa de Gestão Estratégica', descricao: 'Ciclo estruturado de gestão de riscos psicossociais.' },
+  { sigla: 'ISO 45003', significado: 'Norma ISO sobre Saúde e Segurança Psicológica no Trabalho', descricao: 'Guia internacional (2021) para identificação, avaliação e controle de riscos psicossociais dentro de um sistema de gestão de SST. Base técnica para fundamentar o PGR da NR-1.' },
   { sigla: 'PDCA', significado: 'Plan-Do-Check-Act', descricao: 'Ciclo de melhoria contínua de Deming.' },
   { sigla: 'PDI', significado: 'Plano de Desenvolvimento Individual', descricao: 'Documento que descreve metas de desenvolvimento do colaborador.' },
   { sigla: 'SST', significado: 'Saúde e Segurança do Trabalho', descricao: 'Conjunto de normas e práticas para preservação da saúde do trabalhador.' },
