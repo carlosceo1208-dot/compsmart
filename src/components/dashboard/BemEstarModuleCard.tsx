@@ -46,13 +46,13 @@ export function BemEstarModuleCard() {
           </TooltipContent>
         </Tooltip>
       ) : null}
-      {risco ? (
+      {grauInfo ? null : risco ? (
         <Badge className={RISCO_CLASS[risco]}>Risco {RISCO_LABEL[risco]}</Badge>
-      ) : sub && !grauInfo ? (
+      ) : sub ? (
         <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">NR-1 Ativo</Badge>
-      ) : !sub ? (
+      ) : (
         <Badge className="bg-amber-100 text-amber-800 border-amber-200">Conformidade NR-1</Badge>
-      ) : null}
+      )}
     </div>
   );
 
