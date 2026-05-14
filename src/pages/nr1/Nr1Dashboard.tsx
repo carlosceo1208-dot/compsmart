@@ -15,6 +15,8 @@ export default function Nr1Dashboard() {
 
   const ultimo = diagnosticos?.[0];
   const concluidos = diagnosticos?.filter((d) => d.status === 'concluido').length ?? 0;
+  const grau = (sub as any)?.grau_risco_inss as GrauRiscoInss | null | undefined;
+  const grauInfo = grau ? GRAU_RISCO_INSS[grau] : null;
 
   return (
     <div className="space-y-6">
