@@ -5,7 +5,26 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText } from 'lucide-react';
+import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle } from 'lucide-react';
+
+// ============ FATORES DE RISCO PSICOSSOCIAL (NR-1) ============
+type FatorRisco = { perigo: string; consequencia: string };
+
+const FATORES_RISCO: FatorRisco[] = [
+  { perigo: 'Assédio de qualquer natureza no trabalho', consequencia: 'Transtorno mental' },
+  { perigo: 'Má gestão de mudanças organizacionais', consequencia: 'Transtorno mental; DORT' },
+  { perigo: 'Baixa clareza de papel/função', consequencia: 'Transtorno mental' },
+  { perigo: 'Baixas recompensas e reconhecimento', consequencia: 'Transtorno mental' },
+  { perigo: 'Falta de suporte/apoio no trabalho', consequencia: 'Transtorno mental' },
+  { perigo: 'Baixo controle no trabalho / Falta de autonomia', consequencia: 'Transtorno mental; DORT' },
+  { perigo: 'Baixa justiça organizacional', consequencia: 'Transtorno mental' },
+  { perigo: 'Eventos violentos ou traumáticos', consequencia: 'Transtorno mental' },
+  { perigo: 'Baixa demanda no trabalho (subcarga)', consequencia: 'Transtorno mental' },
+  { perigo: 'Excesso de demandas no trabalho (sobrecarga)', consequencia: 'Transtorno mental; DORT' },
+  { perigo: 'Más relacionamentos no local de trabalho', consequencia: 'Transtorno mental' },
+  { perigo: 'Trabalho em condições de difícil comunicação', consequencia: 'Transtorno mental' },
+  { perigo: 'Trabalho remoto e isolado', consequencia: 'Transtorno mental; Fadiga' },
+];
 
 // ============ METODOLOGIAS ============
 type Metodologia = {
