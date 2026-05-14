@@ -113,6 +113,7 @@ export const Nr1Layout = () => {
         <Outlet />
       </main>
       <Nr1ConsentGate />
+      <Nr1BemEstarFloating />
     </div>
   );
 };
