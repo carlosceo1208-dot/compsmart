@@ -229,7 +229,7 @@ export const useSegPsiData = () => {
 // ---------- Sociodemográfico ----------
 // Para 16 colaboradores, geramos recortes coerentes com o porte real
 const SEED_SOCIODEMO_PE: SociodemoRecorte[] = [
-  { id: 'genero', titulo: 'Por gênero (n=16)', linhas: [
+  { id: 'genero', titulo: 'Por sexo (n=16)', linhas: [
     { rotulo: 'Feminino (7)', fib: 69, segPsi: 62, hse: 71 },
     { rotulo: 'Masculino (8)', fib: 73, segPsi: 66, hse: 74 },
     { rotulo: 'Não-binário (1)', fib: 64, segPsi: 58, hse: 69 },
