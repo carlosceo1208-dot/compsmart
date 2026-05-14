@@ -158,6 +158,7 @@ const SIGLAS: Sigla[] = [
   { sigla: 'MCPS', significado: 'Matriz Cruzada Performance × Saúde', descricao: 'Visualização em quadrantes para priorização de intervenções.' },
   { sigla: 'CCM', significado: 'Calculadora Custo do Medo', descricao: 'Quantificação financeira do impacto da baixa saúde mental.' },
   { sigla: 'PGE', significado: 'Programa de Gestão Estratégica', descricao: 'Ciclo estruturado de gestão de riscos psicossociais.' },
+  { sigla: 'ISO 45003', significado: 'Norma ISO sobre Saúde e Segurança Psicológica no Trabalho', descricao: 'Guia internacional (2021) para identificação, avaliação e controle de riscos psicossociais dentro de um sistema de gestão de SST. Base técnica para fundamentar o PGR da NR-1.' },
   { sigla: 'PDCA', significado: 'Plan-Do-Check-Act', descricao: 'Ciclo de melhoria contínua de Deming.' },
   { sigla: 'PDI', significado: 'Plano de Desenvolvimento Individual', descricao: 'Documento que descreve metas de desenvolvimento do colaborador.' },
   { sigla: 'SST', significado: 'Saúde e Segurança do Trabalho', descricao: 'Conjunto de normas e práticas para preservação da saúde do trabalhador.' },
