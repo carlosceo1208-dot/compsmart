@@ -503,6 +503,46 @@ export default function Nr1Biblioteca() {
             )}
           </div>
         </TabsContent>
+
+        {/* ====== FATORES DE RISCO ====== */}
+        <TabsContent value="fatores">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-[hsl(var(--nr1-primary))]" />
+                13 Fatores de Risco Psicossocial — NR-1
+              </CardTitle>
+              <CardDescription>
+                Lista de perigos (fatores de risco) psicossociais e suas possíveis consequências (lesão ou agravo),
+                conforme orientação técnica para o GRO/PGR após a inclusão dos riscos psicossociais na NR-1.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto rounded-md border">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/50">
+                    <tr>
+                      <th className="text-left px-4 py-2 font-semibold w-[55%]">Perigo (fator de risco)</th>
+                      <th className="text-left px-4 py-2 font-semibold">Possível consequência (lesão ou agravo)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {FATORES_RISCO.map((f, i) => (
+                      <tr key={f.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                        <td className="px-4 py-2.5 align-top">{f.perigo}</td>
+                        <td className="px-4 py-2.5 align-top text-muted-foreground">{f.consequencia}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+                <strong>DORT:</strong> Distúrbios Osteomusculares Relacionados ao Trabalho. Esta tabela serve como
+                referência para o mapeamento de riscos do PGR e para a fundamentação dos planos de ação do módulo NR-1.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
