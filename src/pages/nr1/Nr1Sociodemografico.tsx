@@ -59,7 +59,7 @@ export default function Nr1Sociodemografico() {
     return (
       <Nr1EmptyState
         titulo="Sem cruzamento sociodemográfico disponível"
-        descricao="Os recortes por gênero, idade, área e tempo de casa aparecem aqui após a coleta do primeiro ciclo, respeitando o piso de k-anonimato (mínimo 5 respondentes por grupo)."
+        descricao="Os recortes por sexo, idade, área e tempo de casa aparecem aqui após a coleta do primeiro ciclo, respeitando o piso de k-anonimato (mínimo 5 respondentes por grupo)."
       />
     );
   }
