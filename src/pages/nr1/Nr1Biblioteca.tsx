@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle, BookText } from 'lucide-react';
 
 // ============ FATORES DE RISCO PSICOSSOCIAL (NR-1) ============
 type FatorRisco = { perigo: string; consequencia: string };
