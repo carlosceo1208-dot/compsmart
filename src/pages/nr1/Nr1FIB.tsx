@@ -17,6 +17,24 @@ const ciclos = [
   { nome: 'Empresa', cor: 'hsl(var(--nr1-success))' },
 ];
 
+// Correlação dos 13 fatores de risco psicossocial (NR-1) com as 9 dimensões FIB
+type Correlacao = { perigo: string; dimensoes: string[]; nota: string };
+const CORRELACAO_FATORES_FIB: Correlacao[] = [
+  { perigo: 'Assédio de qualquer natureza no trabalho', dimensoes: ['Cultura', 'Bem-Estar Psicológico'], nota: 'Erosão de respeito e segurança psíquica.' },
+  { perigo: 'Má gestão de mudanças organizacionais', dimensoes: ['Governança', 'Bem-Estar Psicológico'], nota: 'Falta de transparência e participação.' },
+  { perigo: 'Baixa clareza de papel/função', dimensoes: ['Governança', 'Educação'], nota: 'Ausência de descrição/competências claras.' },
+  { perigo: 'Baixas recompensas e reconhecimento', dimensoes: ['Padrão de Vida', 'Cultura'], nota: 'Desequilíbrio esforço–recompensa.' },
+  { perigo: 'Falta de suporte/apoio no trabalho', dimensoes: ['Vitalidade Comunitária', 'Cultura'], nota: 'Apoio social de pares e líder.' },
+  { perigo: 'Baixo controle no trabalho / Falta de autonomia', dimensoes: ['Governança', 'Bem-Estar Psicológico'], nota: 'Estudo Whitehall: autonomia protege saúde.' },
+  { perigo: 'Baixa justiça organizacional', dimensoes: ['Governança', 'Cultura'], nota: 'Equidade procedimental e distributiva.' },
+  { perigo: 'Eventos violentos ou traumáticos', dimensoes: ['Saúde', 'Bem-Estar Psicológico'], nota: 'Demanda cuidado clínico (SRQ-20/DASS-21).' },
+  { perigo: 'Baixa demanda no trabalho (subcarga)', dimensoes: ['Uso do Tempo', 'Educação'], nota: 'Subutilização de competências.' },
+  { perigo: 'Excesso de demandas no trabalho (sobrecarga)', dimensoes: ['Uso do Tempo', 'Saúde'], nota: 'Burnout e DORT por jornada/ritmo.' },
+  { perigo: 'Maus relacionamentos no local de trabalho', dimensoes: ['Vitalidade Comunitária', 'Cultura'], nota: 'Conflitos crônicos não mediados.' },
+  { perigo: 'Trabalho em condições de difícil comunicação', dimensoes: ['Governança', 'Vitalidade Comunitária'], nota: 'Ruído de canais e feedback.' },
+  { perigo: 'Trabalho remoto e isolado', dimensoes: ['Vitalidade Comunitária', 'Meio Ambiente'], nota: 'Isolamento social e ergonomia do posto.' },
+];
+
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
 import { useCompanyContext } from '@/contexts/CompanyContext';
@@ -150,6 +168,49 @@ export default function Nr1FIB() {
                 );
               })}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Correlação — 13 Fatores de Risco NR-1 × Dimensões FIB</CardTitle>
+            <CardDescription>
+              Mapeamento de cada perigo psicossocial às dimensões de Bem-Estar Integral mais sensíveis.
+              Use para priorizar ações: um fator alto deve elevar investimento nas dimensões correlatas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto rounded-md border">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
+                    <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões FIB impactadas</th>
+                    <th className="text-left px-3 py-2 font-semibold">Por quê</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CORRELACAO_FATORES_FIB.map((c, i) => (
+                    <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                      <td className="px-3 py-2 align-top">{c.perigo}</td>
+                      <td className="px-3 py-2 align-top">
+                        <div className="flex flex-wrap gap-1">
+                          {c.dimensoes.map((d) => (
+                            <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+              Fonte: cruzamento entre os 13 perigos psicossociais da NR-1 (orientação técnica GRO/PGR) e as 9 dimensões
+              do Bem-Estar Integral (FIB). Uma mesma dimensão pode receber sinal de múltiplos fatores — quanto mais
+              perigos apontam para ela, maior a prioridade no plano de ação.
+            </p>
           </CardContent>
         </Card>
 
