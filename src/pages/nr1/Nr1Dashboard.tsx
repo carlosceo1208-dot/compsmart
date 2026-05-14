@@ -5,6 +5,7 @@ import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight } fro
 import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
 
