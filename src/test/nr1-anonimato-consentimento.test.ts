@@ -84,10 +84,6 @@ describe("NR-1 · Frontend gate de consentimento", () => {
 });
 
 describe("NR-1 · Prompt do agente Bem-Estar (privacidade)", () => {
-  const promptSrc = readFileSync(
-    resolve(__dirname, "../../supabase/functions/nr1-bem-estar-agent/index.ts"),
-    "utf-8",
-  );
 
   it("anonimato é a configuração padrão de diagnóstico (screening + COPSOQ)", () => {
     expect(promptSrc).toMatch(
