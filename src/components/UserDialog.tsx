@@ -103,6 +103,7 @@ interface Profile {
   variable_salary: number | null;
   salary_range_percentage: number | null;
   performance_rating: number | null;
+  work_modality: string | null;
   unit_id: string | null;
   manager_id: string | null;
   job_title_id: string | null;
