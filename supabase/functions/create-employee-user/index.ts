@@ -168,10 +168,13 @@ serve(async (req) => {
     if (email) {
       // SECURITY: Strong random password; user must set their own via the invitation flow.
       const randomPassword = crypto.randomUUID() + crypto.randomUUID() + 'Aa1!';
+      // email_confirm: true to bypass SMTP confirmation step (which was returning 500
+      // when the project's transactional email isn't configured for the verify endpoint).
+      // The user still cannot log in until they set a password via the invitation flow.
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email,
         password: randomPassword,
-        email_confirm: false, // requires email verification before first login
+        email_confirm: true,
         user_metadata: { full_name, root_company_id },
       });
       if (authError) throw new Error(`Erro ao criar usuário: ${authError.message}`);

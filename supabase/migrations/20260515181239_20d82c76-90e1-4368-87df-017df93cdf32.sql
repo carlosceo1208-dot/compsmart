@@ -1,0 +1,3 @@
+DELETE FROM auth.identities WHERE user_id = '2032f368-7905-43f9-94a7-adae52168058';
+DELETE FROM auth.users WHERE id = '2032f368-7905-43f9-94a7-adae52168058';
+DELETE FROM public.profiles WHERE id = '2032f368-7905-43f9-94a7-adae52168058';
