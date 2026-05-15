@@ -1,49 +1,62 @@
 ## Objetivo
 
-Resolver o problema dos links da Biblioteca (15 livros) que hoje:
-- Levam para Amazon (às vezes para o livro errado, ou bloqueada em iframe)
-- Em um caso (NR-1 Comentada) caem em busca do Google que pode bloquear
-- Não têm fallback quando o link falha
+Adicionar à **Biblioteca NR-1** (`/nr1/biblioteca`) uma nova seção dedicada a **Privacidade, Anonimato & Consentimento (LGPD)** que materialize, em forma navegável, todas as regras que hoje vivem apenas no prompt do agente Bem-Estar e nos testes de regressão.
 
-## Solução proposta
+## Por que faz sentido
 
-Para cada um dos 15 livros, em vez de **um link só** para a Amazon, vou estruturar **três níveis de acesso**, do mais confiável para o de fallback:
+- Auditor fiscal / DPO pode abrir a biblioteca e ver, escrito, como o módulo trata dados sensíveis.
+- Colaborador entende o que acontece com a resposta dele antes de aceitar o consentimento.
+- RH tem um manual único do que pode e não pode cruzar com liderança direta.
+- A biblioteca já é o ponto canônico de "fonte da verdade metodológica" — é coerente.
 
-1. **Resumo expandido in-app** (1 página, ~250–400 palavras) — sempre disponível, escrito por nós, descrevendo tese central, capítulos-chave e aplicação no contexto NR-1/CompSmart. É o conteúdo que o usuário vê **antes** de sair da plataforma.
-2. **Link primário curado** — fonte oficial e estável (site do autor, editora brasileira, Skoob, Goodreads, página oficial do livro). Esses domínios não bloqueiam em iframe e raramente quebram.
-3. **Link secundário** — Amazon BR com ISBN validado (verificarei cada um) **ou** Google Books com ID estável (`books.google.com/books?id=...`), usado como "comprar / ver mais edições".
+## Estrutura proposta
 
-## Mudanças no código (apenas frontend, 1 arquivo)
+### 1. Nova aba na biblioteca
 
-Arquivo: `src/pages/nr1/Nr1Biblioteca.tsx`
+`Tabs` ganha um 5º trigger: **"Privacidade & LGPD"** (ícone `ShieldCheck`).
 
-1. **Tipo `Livro`** — substituir `link: string` por:
-   ```ts
-   resumoCurto: string;       // o atual "resumo" (4-6 linhas, mostrado no card)
-   resumoCompleto: string;    // novo, ~1 página, mostrado no dialog
-   linkPrincipal?: { url: string; label: string };  // ex: site do autor
-   linkCompra?: { url: string; label: string };     // Amazon/editora validada
-   ```
-2. **Validar e atualizar todos os 15 ISBNs** — vou pesquisar cada livro no Google Books API antes de gravar a URL, para evitar Amazon abrindo "outro livro". Se um ISBN não bater, removo o link de compra e mantenho só o resumo + link do autor.
-3. **Substituir o botão "Saiba mais"** (que hoje abre link externo direto) por:
-   - Botão **"Ler resumo"** → abre um `Dialog` (shadcn) com o resumo completo de ~1 página, autor, ano, categoria, e os botões de link externo (quando existirem) no rodapé do dialog.
-   - Isso garante que **mesmo se todos os links externos falharem**, o usuário recebe o conteúdo prometido sem sair do CompSmart.
-4. **Casos especiais**:
-   - "NR-1 Comentada" (João Bosco Ribeiro, 2025) — remover o link Google Books search; manter só resumo + link da editora se localizável.
-   - "Talent Intelligence" (Bersin) — manter link `joshbersin.com` como principal (já é estável).
-   - Livros estrangeiros sem edição BR confiável → resumo em pt-BR + link Goodreads.
+### 2. Conteúdo (4 blocos em accordion)
 
-## O que o usuário verá
+**Bloco A — Anonimato por Padrão**
+- Tabela `nr1_diagnostico_respostas` guarda apenas `respondent_hash` (sem user_id, e-mail, CPF).
+- Nem super-admin consegue reabrir resposta individual.
+- Diagnóstico (screening DASS-21 subset + COPSOQ-III) é SEMPRE anônimo e agregado.
+- Regra de k-anonimato: mínimo de **5 respondentes** por recorte (área, equipe, gestor) antes de exibir agregado.
 
-- **Card** continua igual visualmente (categoria, título, autor, ano, resumo curto).
-- Botão "Saiba mais" passa a abrir um **modal interno** com:
-  - Resumo de 1 página (sempre acessível)
-  - 1 ou 2 botões de link externo no final, com rótulos claros ("Site do autor", "Comprar na Amazon", "Ver no Google Books")
-  - Os links externos abrem em nova aba com `noopener`
+**Bloco B — Consentimento Explícito (LGPD Art. 7º, 8º, 9º)**
+- 3 aceites obrigatórios no primeiro acesso (uso, anonimato, revogação).
+- Versionamento do termo (`NR1_CONSENT_VERSION`) — mudança de versão dispara reaceite.
+- Reconfirmação leve a cada novo ciclo de questionário.
+- Persistência em `profiles.nr1_consent_at` + `nr1_consent_version`.
 
-## Fora de escopo
+**Bloco C — Cruzamento com Liderança Direta & RH**
+- Antes do consentimento de identificação (passo 7): só agregação por área/equipe.
+- Depois do consentimento: pode vincular plano de ação ao colaborador, gerar flag crítico para RH/SESMT.
+- Dashboard RH **nunca** recebe linhas individuais; flags identificadas só com autorização.
+- Vedações: nunca pedir CPF, endereço residencial, dados de saúde de familiares.
 
-- Não vou criar página de detalhe roteada por URL (modal é suficiente)
-- Não vou adicionar novos livros nem mudar categorias
-- Não vou tocar nas outras abas (Metodologias, Siglas, Fatores de Risco)
-- Sem mudanças de backend/banco — todo o conteúdo dos resumos fica como constante TypeScript no próprio arquivo
+**Bloco D — Direitos do Titular & Protocolo de Crise**
+- LGPD Art. 18: direito de pausar, encerrar ciclo de 12 semanas, solicitar exclusão a qualquer momento.
+- Protocolo de risco crítico (ideação suicida, autolesão, pânico agudo): CVV 188, SAMU 192, CAPS, SESMT/EAP.
+- Recusa de consentimento não impacta vínculo nem avaliação.
+
+### 3. Inclusão também em Metodologias e Siglas
+
+- **Metodologias**: nova entrada `LGPD-NR1` com base legal (Lei 13.709/2018 Art. 7º, 9º, 18; NR-1 1.5.3.2; ISO 45003 §5.4) e como aplicamos.
+- **Siglas**: `LGPD`, `DPO`, `EAP`, `CVV`, `CAPS`, `SESMT`, `PCMSO` — adicionar as que ainda faltarem.
+- **Fatores de Risco**: já existem os 13 — apenas reforçar no novo bloco a relação com COPSOQ-III.
+
+## Arquivos afetados
+
+- `src/pages/nr1/Nr1Biblioteca.tsx` — nova `TabsTrigger` + `TabsContent`, dataset `PRIVACIDADE_BLOCOS`, complementos a `METODOLOGIAS` e `SIGLAS`.
+- Nenhuma migração de banco; nenhuma mudança no agente; nenhum novo teste necessário (a regra continua testada em `nr1-anonimato-consentimento.test.ts`, agora com a biblioteca como reflexo visual da mesma fonte).
+
+## Não-objetivos
+
+- Não duplicar o termo de consentimento que já vive em `/nr1/consentimento` — a biblioteca **referencia** essa página com link.
+- Não criar página nova de rota — fica tudo dentro da biblioteca para manter "tudo num lugar só".
+- Não mexer no design system NR-1 (`.nr1-scope` continua igual).
+
+## Resultado esperado
+
+Ao abrir `/nr1/biblioteca` → aba "Privacidade & LGPD", o usuário vê 4 accordions com regras citáveis, base legal e links para CVV/SAMU/CAPS, alinhados 1:1 com o que o agente Bem-Estar pratica em runtime.
