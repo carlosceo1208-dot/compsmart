@@ -50,10 +50,6 @@ const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // Static (filesystem) checks — sempre rodam
 // ──────────────────────────────────────────────────────────────────────
 describe("NR-1 · Frontend gate de consentimento", () => {
-  const gateSrc = readFileSync(
-    resolve(__dirname, "../components/nr1/Nr1ConsentGate.tsx"),
-    "utf-8",
-  );
 
   it("expõe NR1_CONSENT_VERSION versionada", () => {
     expect(gateSrc).toMatch(/export const NR1_CONSENT_VERSION = ['"][\d.]+['"]/);
