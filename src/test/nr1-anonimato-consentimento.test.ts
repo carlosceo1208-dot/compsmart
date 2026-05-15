@@ -30,11 +30,17 @@
  * 4–5 são estáticos (sempre rodam).
  */
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { readFileSync } = require("fs") as typeof import("fs");
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const { resolve, dirname } = require("path") as typeof import("path");
+import { fileURLToPath } from "url";
 import { createClient } from "@supabase/supabase-js";
 
 declare const process: { env: Record<string, string | undefined> };
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const SUPABASE_URL =
   process.env.VITE_SUPABASE_URL ||
