@@ -170,9 +170,16 @@ const METODOLOGIAS: Metodologia[] = [
     baseLegal: 'NR-1, item 1.5.3.2 — identificação de perigos e avaliação de riscos psicossociais. LGPD, Art. 11 (dados sensíveis de saúde) e Art. 12 (anonimização).',
     referencia: 'Burr, H. et al. (2019). The Third Version of the Copenhagen Psychosocial Questionnaire. Safety and Health at Work, 10(4). Adaptação CompSmart 2026.',
   },
+  {
+    sigla: 'LGPD-NR1',
+    nome: 'Privacidade & Anonimato no Diagnóstico Psicossocial',
+    origem: 'Lei Geral de Proteção de Dados (Lei 13.709/2018), NR-1 item 1.5.3.2 e ISO 45003:2021 §5.4 (proteção da confidencialidade no relato de riscos psicossociais).',
+    proposito: 'Definir como o módulo NR-1 do CompSmart trata dados sensíveis de saúde mental: anonimato por padrão, consentimento explícito, k-anonimato (mínimo 5 respondentes) e regras de cruzamento com liderança direta e RH.',
+    comoUsamos: 'Toda resposta de diagnóstico (screening + COPSOQ-III) é gravada apenas com um hash irreversível (respondent_hash) — sem user_id, e-mail, CPF ou nome. Mesmo o super-admin não consegue reabrir uma resposta individual. Antes do primeiro acesso ao módulo, o colaborador precisa aceitar 3 cláusulas (uso, anonimato, revogação) com versionamento (NR1_CONSENT_VERSION); mudança de versão dispara reaceite. Identificação só ocorre se o colaborador autorizar explicitamente vincular o plano de ação ao seu nome (passo 7 do fluxo). Antes disso, dados sobre liderança direta só podem ser cruzados/alertados ao RH em base agregada por equipe (mín. 5 respondentes). O dashboard RH nunca exibe linhas individuais. Direito ao encerramento antecipado (LGPD Art. 18) é lembrado a cada check-in.',
+    baseLegal: 'LGPD Art. 7º, 8º e 9º (bases legais e consentimento), Art. 11 (dados sensíveis de saúde), Art. 12 (anonimização), Art. 18 (direitos do titular). NR-1 item 1.5.3.2. ISO 45003:2021 §5.4.',
+    referencia: 'Brasil. Lei nº 13.709/2018 (LGPD). ISO 45003:2021. Sweeney, L. (2002). k-anonymity: a model for protecting privacy. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, 10(5).',
+  },
 ];
-
-// ============ SIGLAS ============
 type Sigla = { sigla: string; significado: string; descricao: string };
 
 const SIGLAS: Sigla[] = [
