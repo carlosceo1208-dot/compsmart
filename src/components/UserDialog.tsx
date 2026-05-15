@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, ChevronsUpDown } from "lucide-react";
 import { calculateSalaryRangePercentage, formatSalaryPercentage, getSalaryStatusBadge } from "@/lib/salaryCalculations";
@@ -900,6 +901,23 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   onChange={(e) => setFormData({ ...formData, hire_date: e.target.value })}
                   disabled={loading}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="work_modality">Modalidade de Trabalho</Label>
+                <Select
+                  value={formData.work_modality || ""}
+                  onValueChange={(value) => setFormData({ ...formData, work_modality: value })}
+                  disabled={loading}
+                >
+                  <SelectTrigger id="work_modality">
+                    <SelectValue placeholder="Selecione a modalidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="presencial">Presencial</SelectItem>
+                    <SelectItem value="home_office">Home Office</SelectItem>
+                    <SelectItem value="hibrido">Híbrido</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="termination_date" className="flex items-center gap-2">
