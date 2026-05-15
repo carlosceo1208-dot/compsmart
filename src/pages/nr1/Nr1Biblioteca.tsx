@@ -924,6 +924,90 @@ export default function Nr1Biblioteca() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* ====== PRIVACIDADE & LGPD ====== */}
+        <TabsContent value="privacidade" className="space-y-4">
+          <Card className="border-[hsl(var(--nr1-primary)/0.3)] bg-[hsl(var(--nr1-primary)/0.04)]">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-[hsl(var(--nr1-primary))]" />
+                Como o CompSmart protege os dados de saúde mental
+              </CardTitle>
+              <CardDescription className="text-sm leading-relaxed">
+                Esta seção é a fonte da verdade sobre privacidade no módulo NR-1. Cada cláusula aqui descrita
+                é refletida no código (gate de consentimento, prompt do agente Bem-Estar, modelo do banco) e
+                validada por testes automatizados. Auditores fiscais e DPOs podem usar este conteúdo como
+                evidência documental.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2 pt-0">
+              <Button asChild variant="outline" size="sm">
+                <RouterLink to="/nr1/consentimento">
+                  <FileText className="h-3.5 w-3.5 mr-2" />
+                  Termo de consentimento completo
+                </RouterLink>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <a href="https://www.cvv.org.br" target="_blank" rel="noopener noreferrer">
+                  <Phone className="h-3.5 w-3.5 mr-2" />
+                  CVV — 188 (24h, gratuito)
+                </a>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <a href="https://www.gov.br/anpd" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                  ANPD (autoridade LGPD)
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Accordion type="multiple" className="space-y-2" defaultValue={['anonimato']}>
+            {PRIVACIDADE_BLOCOS.map((b) => (
+              <AccordionItem
+                key={b.id}
+                value={b.id}
+                className="border rounded-lg px-4 bg-card"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-start gap-3 text-left">
+                    <Badge variant="outline" className="font-mono shrink-0 mt-0.5">
+                      {b.id}
+                    </Badge>
+                    <div>
+                      <span className="font-semibold block">{b.titulo}</span>
+                      <span className="text-xs text-muted-foreground font-normal mt-0.5 block leading-snug">
+                        {b.resumo}
+                      </span>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pt-2">
+                  {b.itens.map((it) => (
+                    <div
+                      key={it.titulo}
+                      className="rounded-md border bg-muted/20 p-3 space-y-1.5"
+                    >
+                      <p className="text-sm font-semibold leading-snug">{it.titulo}</p>
+                      <p className="text-sm leading-relaxed text-foreground/90">{it.texto}</p>
+                      {it.baseLegal && (
+                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1 border-t">
+                          <strong className="not-italic">Base legal:</strong> {it.baseLegal}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          <p className="text-xs text-muted-foreground leading-relaxed border-t pt-3">
+            <strong>Versão deste conteúdo:</strong> alinhada ao termo NR1_CONSENT_VERSION publicado em produção.
+            Mudanças estruturais (novas bases legais, novos cruzamentos de dados, alteração do limiar de
+            k-anonimato) disparam reaceite obrigatório e atualização desta página simultaneamente.
+          </p>
+        </TabsContent>
       </Tabs>
 
       {/* ====== DIALOG: Resumo do livro ====== */}
