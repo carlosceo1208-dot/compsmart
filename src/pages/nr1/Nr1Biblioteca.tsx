@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle, BookText } from 'lucide-react';
+import { BookOpen, FlaskConical, Library, Search, ExternalLink, FileText, AlertTriangle, BookText, ShieldCheck, Phone } from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
 
 // ============ FATORES DE RISCO PSICOSSOCIAL (NR-1) ============
 type FatorRisco = { perigo: string; consequencia: string };
@@ -169,9 +170,16 @@ const METODOLOGIAS: Metodologia[] = [
     baseLegal: 'NR-1, item 1.5.3.2 — identificação de perigos e avaliação de riscos psicossociais. LGPD, Art. 11 (dados sensíveis de saúde) e Art. 12 (anonimização).',
     referencia: 'Burr, H. et al. (2019). The Third Version of the Copenhagen Psychosocial Questionnaire. Safety and Health at Work, 10(4). Adaptação CompSmart 2026.',
   },
+  {
+    sigla: 'LGPD-NR1',
+    nome: 'Privacidade & Anonimato no Diagnóstico Psicossocial',
+    origem: 'Lei Geral de Proteção de Dados (Lei 13.709/2018), NR-1 item 1.5.3.2 e ISO 45003:2021 §5.4 (proteção da confidencialidade no relato de riscos psicossociais).',
+    proposito: 'Definir como o módulo NR-1 do CompSmart trata dados sensíveis de saúde mental: anonimato por padrão, consentimento explícito, k-anonimato (mínimo 5 respondentes) e regras de cruzamento com liderança direta e RH.',
+    comoUsamos: 'Toda resposta de diagnóstico (screening + COPSOQ-III) é gravada apenas com um hash irreversível (respondent_hash) — sem user_id, e-mail, CPF ou nome. Mesmo o super-admin não consegue reabrir uma resposta individual. Antes do primeiro acesso ao módulo, o colaborador precisa aceitar 3 cláusulas (uso, anonimato, revogação) com versionamento (NR1_CONSENT_VERSION); mudança de versão dispara reaceite. Identificação só ocorre se o colaborador autorizar explicitamente vincular o plano de ação ao seu nome (passo 7 do fluxo). Antes disso, dados sobre liderança direta só podem ser cruzados/alertados ao RH em base agregada por equipe (mín. 5 respondentes). O dashboard RH nunca exibe linhas individuais. Direito ao encerramento antecipado (LGPD Art. 18) é lembrado a cada check-in.',
+    baseLegal: 'LGPD Art. 7º, 8º e 9º (bases legais e consentimento), Art. 11 (dados sensíveis de saúde), Art. 12 (anonimização), Art. 18 (direitos do titular). NR-1 item 1.5.3.2. ISO 45003:2021 §5.4.',
+    referencia: 'Brasil. Lei nº 13.709/2018 (LGPD). ISO 45003:2021. Sweeney, L. (2002). k-anonymity: a model for protecting privacy. International Journal of Uncertainty, Fuzziness and Knowledge-Based Systems, 10(5).',
+  },
 ];
-
-// ============ SIGLAS ============
 type Sigla = { sigla: string; significado: string; descricao: string };
 
 const SIGLAS: Sigla[] = [
@@ -207,6 +215,141 @@ const SIGLAS: Sigla[] = [
   { sigla: 'Grau de Risco INSS', significado: 'Classificação da atividade econômica', descricao: 'Grau 1 (Leve), 2 (Médio), 3 (Grave), 4 (Máximo) — define alíquota SAT/RAT e exigências de SESMT.' },
   { sigla: 'CID-10/CID-11', significado: 'Classificação Internacional de Doenças', descricao: 'Códigos OMS usados para registro de afastamentos por transtornos mentais (F00-F99).' },
   { sigla: 'Burnout', significado: 'Síndrome do Esgotamento Profissional (CID-11: QD85)', descricao: 'Reconhecida pela OMS desde 2022 como fenômeno ocupacional.' },
+  { sigla: 'DPO', significado: 'Data Protection Officer (Encarregado de Dados)', descricao: 'Pessoa indicada pelo controlador para atuar como canal de comunicação entre titulares, ANPD e empresa (LGPD Art. 41).' },
+  { sigla: 'CVV', significado: 'Centro de Valorização da Vida', descricao: 'Serviço gratuito de apoio emocional 24h. Telefone 188 (chamada gratuita) ou chat em cvv.org.br. Acionado pelo agente Bem-Estar em casos de risco crítico.' },
+  { sigla: 'SAMU', significado: 'Serviço de Atendimento Móvel de Urgência', descricao: 'Telefone 192 — emergência médica (incluindo crises psiquiátricas agudas).' },
+  { sigla: 'CAPS', significado: 'Centros de Atenção Psicossocial', descricao: 'Rede pública (SUS) de atendimento em saúde mental para acompanhamento contínuo.' },
+  { sigla: 'PCMSO', significado: 'Programa de Controle Médico de Saúde Ocupacional (NR-7)', descricao: 'Programa obrigatório de monitoramento médico dos colaboradores; passa a integrar avaliações de saúde mental a partir da NR-1 atualizada.' },
+  { sigla: 'k-anonimato', significado: 'Modelo de privacidade por agregação', descricao: 'Técnica que exige um número mínimo (k) de registros indistinguíveis em qualquer recorte. CompSmart usa k=5 — nenhum dado psicossocial é exibido para grupos com menos de 5 respondentes.' },
+];
+
+// ============ PRIVACIDADE & LGPD ============
+type PrivacidadeItem = { titulo: string; texto: string; baseLegal?: string };
+type PrivacidadeBloco = {
+  id: string;
+  titulo: string;
+  resumo: string;
+  itens: PrivacidadeItem[];
+};
+
+const PRIVACIDADE_BLOCOS: PrivacidadeBloco[] = [
+  {
+    id: 'anonimato',
+    titulo: 'A · Anonimato por Padrão',
+    resumo:
+      'Toda resposta de diagnóstico nasce anônima. Não existe caminho técnico para reidentificar um respondente individual.',
+    itens: [
+      {
+        titulo: 'Hash irreversível, sem identificadores',
+        texto:
+          'A tabela nr1_diagnostico_respostas guarda apenas um respondent_hash (SHA-256 de user_id + diagnóstico). Não existem colunas user_id, e-mail, CPF, nome ou cargo nessa tabela. Auditado em CI pelo teste nr1-anonimato-consentimento.',
+        baseLegal: 'LGPD Art. 12 (anonimização) — dado anonimizado não é dado pessoal.',
+      },
+      {
+        titulo: 'Nem o super-admin reabre uma resposta',
+        texto:
+          'A regra é estrutural, não de policy: como não há FK para o usuário, não existe consulta SQL que reconstrua "quem respondeu o quê". Apenas o próprio colaborador, no seu navegador, conhece seu hash durante o ciclo.',
+      },
+      {
+        titulo: 'k-anonimato ≥ 5 respondentes',
+        texto:
+          'Nenhum recorte (área, equipe, gestor, modalidade) é exibido com menos de 5 respondentes. Abaixo desse limiar o sistema mostra "amostra insuficiente" para evitar reidentificação por inferência.',
+        baseLegal: 'Sweeney (2002) — k-anonymity como modelo de proteção.',
+      },
+      {
+        titulo: 'Instrumentos cobertos',
+        texto:
+          'Quick Screening (subset DASS-21, 5–7 itens) e Diagnóstico Completo (COPSOQ-III, 6 dimensões / ~40 itens) são SEMPRE anônimos. Subset não equivale a diagnóstico clínico — apenas sinaliza necessidade de aprofundamento.',
+      },
+    ],
+  },
+  {
+    id: 'consentimento',
+    titulo: 'B · Consentimento Explícito (LGPD)',
+    resumo:
+      'O acesso ao módulo é bloqueado até o colaborador aceitar 3 cláusulas, com versionamento e direito de revogação a qualquer tempo.',
+    itens: [
+      {
+        titulo: 'Três aceites obrigatórios',
+        texto:
+          'No primeiro acesso, o gate exibe um diálogo modal não-dispensável com 3 checkboxes independentes: (1) uso das respostas para diagnóstico NR-1, (2) ciência de que serão tratadas de forma anônima e agregada, (3) ciência do direito de revogação. O botão "Aceitar e continuar" só habilita com os três marcados.',
+        baseLegal: 'LGPD Art. 7º V e Art. 8º §1º — consentimento livre, informado e inequívoco.',
+      },
+      {
+        titulo: 'Versionamento do termo',
+        texto:
+          'O termo aceito é gravado em profiles.nr1_consent_at + nr1_consent_version. Quando publicamos uma nova versão, o gate é exibido novamente para reaceite — o consentimento antigo não vale para o termo novo.',
+      },
+      {
+        titulo: 'Reconfirmação por ciclo',
+        texto:
+          'Antes de cada novo questionário, exibimos uma reconfirmação leve (Nr1ConsentReconfirm) reafirmando anonimato e direito de pausar. O ciclo só inicia após o aceite.',
+      },
+      {
+        titulo: 'Recusa não tem impacto',
+        texto:
+          'Recusar o consentimento não afeta vínculo empregatício, avaliação de desempenho, remuneração ou qualquer outro processo. O colaborador volta para o dashboard padrão.',
+        baseLegal: 'LGPD Art. 8º §5º — direito de revogação a qualquer tempo, sem ônus.',
+      },
+    ],
+  },
+  {
+    id: 'cruzamento',
+    titulo: 'C · Cruzamento com Liderança Direta & RH',
+    resumo:
+      'Antes do consentimento de identificação, RH e gestor só veem agregados. Depois, regras estritas para flags identificadas.',
+    itens: [
+      {
+        titulo: 'Antes do consentimento de identificação',
+        texto:
+          'Dados sobre o líder direto só podem ser cruzados em base agregada por área/equipe (mín. 5 respondentes). O dashboard RH nunca exibe linhas individuais — apenas scores por dimensão COPSOQ-III, distribuição de risco e total de respondentes.',
+      },
+      {
+        titulo: 'Depois do consentimento (passo 7 do fluxo)',
+        texto:
+          'O colaborador pode optar por vincular o plano de ação ao seu nome para receber acompanhamento personalizado. Só nesse momento o agente Bem-Estar pode gerar flag identificado para RH/SESMT, e ainda assim limitado ao escopo do plano consentido.',
+      },
+      {
+        titulo: 'Protocolo de risco crítico',
+        texto:
+          'Se o agente identificar ideação suicida, autolesão, crise de pânico aguda, sintomas psicóticos ou ameaça a si/terceiros, ele acolhe sem julgar e encaminha imediatamente para CVV 188, SAMU 192 ou pronto-socorro — independentemente de consentimento. Flag ao RH só é gerado se houver consentimento prévio; do contrário, o próprio colaborador é orientado a buscar ajuda.',
+      },
+      {
+        titulo: 'Vedações ao agente',
+        texto:
+          'O agente Bem-Estar nunca solicita CPF, endereço residencial, dados de saúde de familiares ou qualquer informação não essencial ao escopo psicossocial ocupacional. Também nunca dá diagnóstico clínico individual — sempre encaminha ao SESMT, médico do trabalho ou EAP.',
+      },
+    ],
+  },
+  {
+    id: 'direitos',
+    titulo: 'D · Direitos do Titular & Encerramento',
+    resumo:
+      'O colaborador é dono dos próprios dados e pode pausar, encerrar ou solicitar exclusão a qualquer momento.',
+    itens: [
+      {
+        titulo: 'Direito ao encerramento antecipado',
+        texto:
+          'O ciclo padrão de acompanhamento é de 12 semanas, mas o colaborador pode pausar, encerrar ou solicitar exclusão dos dados a qualquer momento. Lembramos essa opção em todo check-in semanal.',
+        baseLegal: 'LGPD Art. 18 — direitos do titular.',
+      },
+      {
+        titulo: 'Revisão de consentimento',
+        texto:
+          'O colaborador pode revisar o termo aceito e revogar em "Meu Perfil" ou na página de Consentimento NR-1. Revogação encerra ciclos em andamento e bloqueia novos questionários.',
+      },
+      {
+        titulo: 'Canal com o DPO',
+        texto:
+          'Solicitações formais (acesso, correção, anonimização adicional, portabilidade, exclusão) devem ser encaminhadas ao Encarregado de Dados (DPO) da empresa contratante. CompSmart atua como operador (Art. 39 LGPD).',
+      },
+      {
+        titulo: 'Validação contínua',
+        texto:
+          'Estas regras são verificadas a cada build pelo conjunto de testes nr1-anonimato-consentimento.test.ts (vitest), que falha o pipeline se qualquer cláusula desta página deixar de ser refletida no código.',
+      },
+    ],
+  },
 ];
 
 // ============ BIBLIOTECA ============
@@ -614,6 +757,9 @@ export default function Nr1Biblioteca() {
           <TabsTrigger value="fatores" className="gap-2">
             <AlertTriangle className="h-4 w-4" /> Fatores de Risco ({FATORES_RISCO.length})
           </TabsTrigger>
+          <TabsTrigger value="privacidade" className="gap-2">
+            <ShieldCheck className="h-4 w-4" /> Privacidade & LGPD ({PRIVACIDADE_BLOCOS.length})
+          </TabsTrigger>
         </TabsList>
 
         {/* ====== METODOLOGIAS ====== */}
@@ -777,6 +923,90 @@ export default function Nr1Biblioteca() {
               </p>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ====== PRIVACIDADE & LGPD ====== */}
+        <TabsContent value="privacidade" className="space-y-4">
+          <Card className="border-[hsl(var(--nr1-primary)/0.3)] bg-[hsl(var(--nr1-primary)/0.04)]">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5 text-[hsl(var(--nr1-primary))]" />
+                Como o CompSmart protege os dados de saúde mental
+              </CardTitle>
+              <CardDescription className="text-sm leading-relaxed">
+                Esta seção é a fonte da verdade sobre privacidade no módulo NR-1. Cada cláusula aqui descrita
+                é refletida no código (gate de consentimento, prompt do agente Bem-Estar, modelo do banco) e
+                validada por testes automatizados. Auditores fiscais e DPOs podem usar este conteúdo como
+                evidência documental.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2 pt-0">
+              <Button asChild variant="outline" size="sm">
+                <RouterLink to="/nr1/consentimento">
+                  <FileText className="h-3.5 w-3.5 mr-2" />
+                  Termo de consentimento completo
+                </RouterLink>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <a href="https://www.cvv.org.br" target="_blank" rel="noopener noreferrer">
+                  <Phone className="h-3.5 w-3.5 mr-2" />
+                  CVV — 188 (24h, gratuito)
+                </a>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <a href="https://www.gov.br/anpd" target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                  ANPD (autoridade LGPD)
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Accordion type="multiple" className="space-y-2" defaultValue={['anonimato']}>
+            {PRIVACIDADE_BLOCOS.map((b) => (
+              <AccordionItem
+                key={b.id}
+                value={b.id}
+                className="border rounded-lg px-4 bg-card"
+              >
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-start gap-3 text-left">
+                    <Badge variant="outline" className="font-mono shrink-0 mt-0.5">
+                      {b.id}
+                    </Badge>
+                    <div>
+                      <span className="font-semibold block">{b.titulo}</span>
+                      <span className="text-xs text-muted-foreground font-normal mt-0.5 block leading-snug">
+                        {b.resumo}
+                      </span>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-3 pt-2">
+                  {b.itens.map((it) => (
+                    <div
+                      key={it.titulo}
+                      className="rounded-md border bg-muted/20 p-3 space-y-1.5"
+                    >
+                      <p className="text-sm font-semibold leading-snug">{it.titulo}</p>
+                      <p className="text-sm leading-relaxed text-foreground/90">{it.texto}</p>
+                      {it.baseLegal && (
+                        <p className="text-[11px] text-muted-foreground italic leading-relaxed pt-1 border-t">
+                          <strong className="not-italic">Base legal:</strong> {it.baseLegal}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          <p className="text-xs text-muted-foreground leading-relaxed border-t pt-3">
+            <strong>Versão deste conteúdo:</strong> alinhada ao termo NR1_CONSENT_VERSION publicado em produção.
+            Mudanças estruturais (novas bases legais, novos cruzamentos de dados, alteração do limiar de
+            k-anonimato) disparam reaceite obrigatório e atualização desta página simultaneamente.
+          </p>
         </TabsContent>
       </Tabs>
 
