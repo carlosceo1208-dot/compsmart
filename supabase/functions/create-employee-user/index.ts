@@ -69,7 +69,7 @@ serve(async (req) => {
     const {
       email, full_name, employee_number, phone, cpf, birth_date, hire_date, termination_date,
       job_title, job_title_id, grade, salary, variable_salary, salary_range_percentage,
-      performance_rating, unit_id, manager_id, has_system_access,
+      performance_rating, work_modality, unit_id, manager_id, has_system_access,
     } = body;
     const requestedRoles: string[] = Array.isArray(body.roles) ? body.roles : ['employee'];
 
@@ -120,6 +120,7 @@ serve(async (req) => {
       variable_salary: variable_salary || null,
       salary_range_percentage: salary_range_percentage || null,
       performance_rating: performance_rating || null,
+      work_modality: work_modality || null,
       unit_id: unit_id || null,
       manager_id: manager_id || null,
       root_company_id,
