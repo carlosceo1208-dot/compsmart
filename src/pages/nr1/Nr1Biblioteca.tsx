@@ -215,6 +215,12 @@ const SIGLAS: Sigla[] = [
   { sigla: 'Grau de Risco INSS', significado: 'Classificação da atividade econômica', descricao: 'Grau 1 (Leve), 2 (Médio), 3 (Grave), 4 (Máximo) — define alíquota SAT/RAT e exigências de SESMT.' },
   { sigla: 'CID-10/CID-11', significado: 'Classificação Internacional de Doenças', descricao: 'Códigos OMS usados para registro de afastamentos por transtornos mentais (F00-F99).' },
   { sigla: 'Burnout', significado: 'Síndrome do Esgotamento Profissional (CID-11: QD85)', descricao: 'Reconhecida pela OMS desde 2022 como fenômeno ocupacional.' },
+  { sigla: 'DPO', significado: 'Data Protection Officer (Encarregado de Dados)', descricao: 'Pessoa indicada pelo controlador para atuar como canal de comunicação entre titulares, ANPD e empresa (LGPD Art. 41).' },
+  { sigla: 'CVV', significado: 'Centro de Valorização da Vida', descricao: 'Serviço gratuito de apoio emocional 24h. Telefone 188 (chamada gratuita) ou chat em cvv.org.br. Acionado pelo agente Bem-Estar em casos de risco crítico.' },
+  { sigla: 'SAMU', significado: 'Serviço de Atendimento Móvel de Urgência', descricao: 'Telefone 192 — emergência médica (incluindo crises psiquiátricas agudas).' },
+  { sigla: 'CAPS', significado: 'Centros de Atenção Psicossocial', descricao: 'Rede pública (SUS) de atendimento em saúde mental para acompanhamento contínuo.' },
+  { sigla: 'PCMSO', significado: 'Programa de Controle Médico de Saúde Ocupacional (NR-7)', descricao: 'Programa obrigatório de monitoramento médico dos colaboradores; passa a integrar avaliações de saúde mental a partir da NR-1 atualizada.' },
+  { sigla: 'k-anonimato', significado: 'Modelo de privacidade por agregação', descricao: 'Técnica que exige um número mínimo (k) de registros indistinguíveis em qualquer recorte. CompSmart usa k=5 — nenhum dado psicossocial é exibido para grupos com menos de 5 respondentes.' },
 ];
 
 // ============ BIBLIOTECA ============
