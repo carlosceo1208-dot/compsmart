@@ -33,9 +33,9 @@ import { describe, it, expect } from "vitest";
 import { createClient } from "@supabase/supabase-js";
 // Conteúdo dos arquivos importado em build-time (Vite ?raw) — evita
 // dependência de @types/node nos testes.
-// @ts-expect-error vite raw import
+// @ts-ignore vite raw import
 import gateSrc from "../components/nr1/Nr1ConsentGate.tsx?raw";
-// @ts-expect-error vite raw import
+// @ts-ignore vite raw import
 import promptSrc from "../../supabase/functions/nr1-bem-estar-agent/index.ts?raw";
 
 declare const process: { env: Record<string, string | undefined> };
