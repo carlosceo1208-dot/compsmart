@@ -109,7 +109,7 @@ describe("NR-1 · Prompt do agente Bem-Estar (privacidade)", () => {
 
   it("dashboard RH só recebe dados agregados; flags identificados só com autorização", () => {
     expect(promptSrc).toMatch(
-      /Dashboard RH:\s*apenas dados agregados, nunca individuais/i,
+      /Dashboard RH[:*\s]+apenas dados agregados, nunca individuais/i,
     );
     expect(promptSrc).toMatch(
       /flags? críticos? com identificação somente quando o colaborador autorizou/i,
