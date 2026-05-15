@@ -757,6 +757,9 @@ export default function Nr1Biblioteca() {
           <TabsTrigger value="fatores" className="gap-2">
             <AlertTriangle className="h-4 w-4" /> Fatores de Risco ({FATORES_RISCO.length})
           </TabsTrigger>
+          <TabsTrigger value="privacidade" className="gap-2">
+            <ShieldCheck className="h-4 w-4" /> Privacidade & LGPD ({PRIVACIDADE_BLOCOS.length})
+          </TabsTrigger>
         </TabsList>
 
         {/* ====== METODOLOGIAS ====== */}
