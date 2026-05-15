@@ -3800,6 +3800,44 @@ export type Database = {
         }
         Relationships: []
       }
+      nr1_checkins_semanais: {
+        Row: {
+          acoes_executadas: Json
+          comentario: string | null
+          criado_em: string
+          humor_1_10: number
+          id: string
+          jornada_id: string
+          semana: number
+        }
+        Insert: {
+          acoes_executadas?: Json
+          comentario?: string | null
+          criado_em?: string
+          humor_1_10: number
+          id?: string
+          jornada_id: string
+          semana: number
+        }
+        Update: {
+          acoes_executadas?: Json
+          comentario?: string | null
+          criado_em?: string
+          humor_1_10?: number
+          id?: string
+          jornada_id?: string
+          semana?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_checkins_semanais_jornada_id_fkey"
+            columns: ["jornada_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_jornadas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nr1_diagnostico_respostas: {
         Row: {
           created_at: string
@@ -3890,6 +3928,89 @@ export type Database = {
           status?: Database["public"]["Enums"]["nr1_diagnostico_status"]
           total_respondentes?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      nr1_jornada_mensagens: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          jornada_id: string
+          momento: number | null
+          role: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          jornada_id: string
+          momento?: number | null
+          role: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          jornada_id?: string
+          momento?: number | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_jornada_mensagens_jornada_id_fkey"
+            columns: ["jornada_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_jornadas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nr1_jornadas: {
+        Row: {
+          company_id: string
+          concluded_at: string | null
+          consent_anonimo_at: string | null
+          consent_id_at: string | null
+          created_at: string
+          encerramento_motivo: string | null
+          id: string
+          momento_atual: number
+          semana_atual: number
+          started_at: string
+          status: Database["public"]["Enums"]["nr1_jornada_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          concluded_at?: string | null
+          consent_anonimo_at?: string | null
+          consent_id_at?: string | null
+          created_at?: string
+          encerramento_motivo?: string | null
+          id?: string
+          momento_atual?: number
+          semana_atual?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["nr1_jornada_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          concluded_at?: string | null
+          consent_anonimo_at?: string | null
+          consent_id_at?: string | null
+          created_at?: string
+          encerramento_motivo?: string | null
+          id?: string
+          momento_atual?: number
+          semana_atual?: number
+          started_at?: string
+          status?: Database["public"]["Enums"]["nr1_jornada_status"]
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -8056,6 +8177,17 @@ export type Database = {
           },
         ]
       }
+      nr1_checkins_agregado: {
+        Row: {
+          company_id: string | null
+          humor_medio: number | null
+          primeira_resposta: string | null
+          semana: number | null
+          total_respondentes: number | null
+          ultima_resposta: string | null
+        }
+        Relationships: []
+      }
       organizational_structure_public: {
         Row: {
           code: string | null
@@ -9559,6 +9691,11 @@ export type Database = {
         | "interface_trabalho_individuo"
         | "valores_trabalho"
         | "saude_bem_estar"
+      nr1_jornada_status:
+        | "ativa"
+        | "pausada"
+        | "concluida"
+        | "encerrada_pelo_usuario"
       nr1_nivel_risco: "baixo" | "moderado" | "alto" | "critico"
       nr1_plan_tier: "essencial" | "pro"
       nr1_subscription_status:
@@ -9776,6 +9913,12 @@ export const Constants = {
         "interface_trabalho_individuo",
         "valores_trabalho",
         "saude_bem_estar",
+      ],
+      nr1_jornada_status: [
+        "ativa",
+        "pausada",
+        "concluida",
+        "encerrada_pelo_usuario",
       ],
       nr1_nivel_risco: ["baixo", "moderado", "alto", "critico"],
       nr1_plan_tier: ["essencial", "pro"],
