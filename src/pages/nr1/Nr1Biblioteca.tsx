@@ -223,6 +223,135 @@ const SIGLAS: Sigla[] = [
   { sigla: 'k-anonimato', significado: 'Modelo de privacidade por agregação', descricao: 'Técnica que exige um número mínimo (k) de registros indistinguíveis em qualquer recorte. CompSmart usa k=5 — nenhum dado psicossocial é exibido para grupos com menos de 5 respondentes.' },
 ];
 
+// ============ PRIVACIDADE & LGPD ============
+type PrivacidadeItem = { titulo: string; texto: string; baseLegal?: string };
+type PrivacidadeBloco = {
+  id: string;
+  titulo: string;
+  resumo: string;
+  itens: PrivacidadeItem[];
+};
+
+const PRIVACIDADE_BLOCOS: PrivacidadeBloco[] = [
+  {
+    id: 'anonimato',
+    titulo: 'A · Anonimato por Padrão',
+    resumo:
+      'Toda resposta de diagnóstico nasce anônima. Não existe caminho técnico para reidentificar um respondente individual.',
+    itens: [
+      {
+        titulo: 'Hash irreversível, sem identificadores',
+        texto:
+          'A tabela nr1_diagnostico_respostas guarda apenas um respondent_hash (SHA-256 de user_id + diagnóstico). Não existem colunas user_id, e-mail, CPF, nome ou cargo nessa tabela. Auditado em CI pelo teste nr1-anonimato-consentimento.',
+        baseLegal: 'LGPD Art. 12 (anonimização) — dado anonimizado não é dado pessoal.',
+      },
+      {
+        titulo: 'Nem o super-admin reabre uma resposta',
+        texto:
+          'A regra é estrutural, não de policy: como não há FK para o usuário, não existe consulta SQL que reconstrua "quem respondeu o quê". Apenas o próprio colaborador, no seu navegador, conhece seu hash durante o ciclo.',
+      },
+      {
+        titulo: 'k-anonimato ≥ 5 respondentes',
+        texto:
+          'Nenhum recorte (área, equipe, gestor, modalidade) é exibido com menos de 5 respondentes. Abaixo desse limiar o sistema mostra "amostra insuficiente" para evitar reidentificação por inferência.',
+        baseLegal: 'Sweeney (2002) — k-anonymity como modelo de proteção.',
+      },
+      {
+        titulo: 'Instrumentos cobertos',
+        texto:
+          'Quick Screening (subset DASS-21, 5–7 itens) e Diagnóstico Completo (COPSOQ-III, 6 dimensões / ~40 itens) são SEMPRE anônimos. Subset não equivale a diagnóstico clínico — apenas sinaliza necessidade de aprofundamento.',
+      },
+    ],
+  },
+  {
+    id: 'consentimento',
+    titulo: 'B · Consentimento Explícito (LGPD)',
+    resumo:
+      'O acesso ao módulo é bloqueado até o colaborador aceitar 3 cláusulas, com versionamento e direito de revogação a qualquer tempo.',
+    itens: [
+      {
+        titulo: 'Três aceites obrigatórios',
+        texto:
+          'No primeiro acesso, o gate exibe um diálogo modal não-dispensável com 3 checkboxes independentes: (1) uso das respostas para diagnóstico NR-1, (2) ciência de que serão tratadas de forma anônima e agregada, (3) ciência do direito de revogação. O botão "Aceitar e continuar" só habilita com os três marcados.',
+        baseLegal: 'LGPD Art. 7º V e Art. 8º §1º — consentimento livre, informado e inequívoco.',
+      },
+      {
+        titulo: 'Versionamento do termo',
+        texto:
+          'O termo aceito é gravado em profiles.nr1_consent_at + nr1_consent_version. Quando publicamos uma nova versão, o gate é exibido novamente para reaceite — o consentimento antigo não vale para o termo novo.',
+      },
+      {
+        titulo: 'Reconfirmação por ciclo',
+        texto:
+          'Antes de cada novo questionário, exibimos uma reconfirmação leve (Nr1ConsentReconfirm) reafirmando anonimato e direito de pausar. O ciclo só inicia após o aceite.',
+      },
+      {
+        titulo: 'Recusa não tem impacto',
+        texto:
+          'Recusar o consentimento não afeta vínculo empregatício, avaliação de desempenho, remuneração ou qualquer outro processo. O colaborador volta para o dashboard padrão.',
+        baseLegal: 'LGPD Art. 8º §5º — direito de revogação a qualquer tempo, sem ônus.',
+      },
+    ],
+  },
+  {
+    id: 'cruzamento',
+    titulo: 'C · Cruzamento com Liderança Direta & RH',
+    resumo:
+      'Antes do consentimento de identificação, RH e gestor só veem agregados. Depois, regras estritas para flags identificadas.',
+    itens: [
+      {
+        titulo: 'Antes do consentimento de identificação',
+        texto:
+          'Dados sobre o líder direto só podem ser cruzados em base agregada por área/equipe (mín. 5 respondentes). O dashboard RH nunca exibe linhas individuais — apenas scores por dimensão COPSOQ-III, distribuição de risco e total de respondentes.',
+      },
+      {
+        titulo: 'Depois do consentimento (passo 7 do fluxo)',
+        texto:
+          'O colaborador pode optar por vincular o plano de ação ao seu nome para receber acompanhamento personalizado. Só nesse momento o agente Bem-Estar pode gerar flag identificado para RH/SESMT, e ainda assim limitado ao escopo do plano consentido.',
+      },
+      {
+        titulo: 'Protocolo de risco crítico',
+        texto:
+          'Se o agente identificar ideação suicida, autolesão, crise de pânico aguda, sintomas psicóticos ou ameaça a si/terceiros, ele acolhe sem julgar e encaminha imediatamente para CVV 188, SAMU 192 ou pronto-socorro — independentemente de consentimento. Flag ao RH só é gerado se houver consentimento prévio; do contrário, o próprio colaborador é orientado a buscar ajuda.',
+      },
+      {
+        titulo: 'Vedações ao agente',
+        texto:
+          'O agente Bem-Estar nunca solicita CPF, endereço residencial, dados de saúde de familiares ou qualquer informação não essencial ao escopo psicossocial ocupacional. Também nunca dá diagnóstico clínico individual — sempre encaminha ao SESMT, médico do trabalho ou EAP.',
+      },
+    ],
+  },
+  {
+    id: 'direitos',
+    titulo: 'D · Direitos do Titular & Encerramento',
+    resumo:
+      'O colaborador é dono dos próprios dados e pode pausar, encerrar ou solicitar exclusão a qualquer momento.',
+    itens: [
+      {
+        titulo: 'Direito ao encerramento antecipado',
+        texto:
+          'O ciclo padrão de acompanhamento é de 12 semanas, mas o colaborador pode pausar, encerrar ou solicitar exclusão dos dados a qualquer momento. Lembramos essa opção em todo check-in semanal.',
+        baseLegal: 'LGPD Art. 18 — direitos do titular.',
+      },
+      {
+        titulo: 'Revisão de consentimento',
+        texto:
+          'O colaborador pode revisar o termo aceito e revogar em "Meu Perfil" ou na página de Consentimento NR-1. Revogação encerra ciclos em andamento e bloqueia novos questionários.',
+      },
+      {
+        titulo: 'Canal com o DPO',
+        texto:
+          'Solicitações formais (acesso, correção, anonimização adicional, portabilidade, exclusão) devem ser encaminhadas ao Encarregado de Dados (DPO) da empresa contratante. CompSmart atua como operador (Art. 39 LGPD).',
+      },
+      {
+        titulo: 'Validação contínua',
+        texto:
+          'Estas regras são verificadas a cada build pelo conjunto de testes nr1-anonimato-consentimento.test.ts (vitest), que falha o pipeline se qualquer cláusula desta página deixar de ser refletida no código.',
+      },
+    ],
+  },
+];
+
 // ============ BIBLIOTECA ============
 type LinkExterno = { url: string; label: string };
 type Livro = {
