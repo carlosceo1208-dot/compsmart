@@ -30,17 +30,15 @@
  * 4–5 são estáticos (sempre rodam).
  */
 import { describe, it, expect } from "vitest";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { readFileSync } = require("fs") as typeof import("fs");
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { resolve, dirname } = require("path") as typeof import("path");
-import { fileURLToPath } from "url";
 import { createClient } from "@supabase/supabase-js";
+// Conteúdo dos arquivos importado em build-time (Vite ?raw) — evita
+// dependência de @types/node nos testes.
+// @ts-expect-error vite raw import
+import gateSrc from "../components/nr1/Nr1ConsentGate.tsx?raw";
+// @ts-expect-error vite raw import
+import promptSrc from "../../supabase/functions/nr1-bem-estar-agent/index.ts?raw";
 
 declare const process: { env: Record<string, string | undefined> };
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const SUPABASE_URL =
   process.env.VITE_SUPABASE_URL ||
