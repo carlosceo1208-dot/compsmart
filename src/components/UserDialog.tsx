@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, ChevronsUpDown } from "lucide-react";
 import { calculateSalaryRangePercentage, formatSalaryPercentage, getSalaryStatusBadge } from "@/lib/salaryCalculations";
@@ -47,6 +48,7 @@ const userSchema = z.object({
       const num = parseFloat(val);
       return num >= 0 && num <= 10;
     }, { message: "Nota deve estar entre 0 e 10" }),
+  work_modality: z.enum(["presencial", "home_office", "hibrido"]).optional().or(z.literal('')),
 });
 
 interface UserDialogProps {
@@ -71,6 +73,7 @@ interface UserData {
   variable_salary?: string;
   salary_range_percentage?: string;
   performance_rating?: string;
+  work_modality?: string;
   unit_id?: string;
   manager_id?: string;
   job_title_id?: string;
@@ -101,6 +104,7 @@ interface Profile {
   variable_salary: number | null;
   salary_range_percentage: number | null;
   performance_rating: number | null;
+  work_modality: string | null;
   unit_id: string | null;
   manager_id: string | null;
   job_title_id: string | null;
@@ -290,7 +294,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       let query = supabase
         .from("profiles")
-        .select("id, full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .select("id, full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, work_modality, unit_id, manager_id, job_title_id")
         .eq("status", "active")
         .not("employee_number", "is", null);
       
@@ -344,6 +348,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         : "",
       salary_range_percentage: employee.salary_range_percentage?.toString() || "",
       performance_rating: employee.performance_rating?.toString() || "",
+      work_modality: employee.work_modality || "",
       unit_id: employee.unit_id || "",
       manager_id: employee.manager_id || "",
       job_title_id: employee.job_title_id || "",
@@ -358,7 +363,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
     try {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, unit_id, manager_id, job_title_id")
+        .select("full_name, email, employee_number, phone, cpf, birth_date, hire_date, termination_date, job_title, grade, salary, variable_salary, salary_range_percentage, performance_rating, work_modality, unit_id, manager_id, job_title_id")
         .eq("id", userId)
         .single();
 
@@ -383,12 +388,13 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           ? profile.variable_salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : "",
         salary_range_percentage: profile.salary_range_percentage?.toString() || "",
-        performance_rating: profile.performance_rating?.toString() || "",
-        unit_id: profile.unit_id || "",
-        manager_id: profile.manager_id || "",
-        job_title_id: profile.job_title_id || "",
-        roles: userRoles.map((r: any) => r.role),
-      });
+      performance_rating: profile.performance_rating?.toString() || "",
+      work_modality: (profile as any).work_modality || "",
+      unit_id: profile.unit_id || "",
+      manager_id: profile.manager_id || "",
+      job_title_id: profile.job_title_id || "",
+      roles: userRoles.map((r: any) => r.role),
+    });
 
       // Store original email to detect changes
       setOriginalEmail(profile.email || "");
@@ -422,6 +428,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       variable_salary: "",
       salary_range_percentage: "",
       performance_rating: "",
+      work_modality: "",
       unit_id: "",
       manager_id: "",
       job_title_id: "",
@@ -595,6 +602,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
+            work_modality: formData.work_modality || null,
             unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
             job_title_id: formData.job_title_id || null,
@@ -658,6 +666,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
+            work_modality: formData.work_modality || null,
             unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
             has_system_access: !!validation.email,
@@ -892,6 +901,23 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
                   onChange={(e) => setFormData({ ...formData, hire_date: e.target.value })}
                   disabled={loading}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="work_modality">Modalidade de Trabalho</Label>
+                <Select
+                  value={formData.work_modality || ""}
+                  onValueChange={(value) => setFormData({ ...formData, work_modality: value })}
+                  disabled={loading}
+                >
+                  <SelectTrigger id="work_modality">
+                    <SelectValue placeholder="Selecione a modalidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="presencial">Presencial</SelectItem>
+                    <SelectItem value="home_office">Home Office</SelectItem>
+                    <SelectItem value="hibrido">Híbrido</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="termination_date" className="flex items-center gap-2">

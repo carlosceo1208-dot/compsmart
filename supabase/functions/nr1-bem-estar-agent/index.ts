@@ -48,6 +48,13 @@ async function buildCompanyContext(supabase: any, userId: string): Promise<strin
       .eq("id", companyId)
       .maybeSingle();
 
+    // Contexto demográfico do colaborador atual (cargo, área, modalidade, tempo de empresa)
+    const { data: me } = await supabase
+      .from("profiles")
+      .select("full_name, job_title, department, work_modality, hire_date, leadership_level")
+      .eq("id", userId)
+      .maybeSingle();
+
     const { data: diags } = await supabase
       .from("nr1_diagnosticos")
       .select("ciclo_nome, periodo_inicio, periodo_fim, score_geral, nivel_risco, total_respondentes, scores_dimensao, status")
@@ -58,6 +65,23 @@ async function buildCompanyContext(supabase: any, userId: string): Promise<strin
 
     let ctx = `- Empresa: ${company?.name ?? "(sem nome)"}\n`;
     if (company?.industry_sector) ctx += `- Setor: ${company.industry_sector}\n`;
+
+    if (me) {
+      const modalidadeLabel: Record<string, string> = {
+        presencial: "Presencial",
+        home_office: "Home Office",
+        hibrido: "Híbrido",
+      };
+      ctx += `- Colaborador: ${me.full_name ?? "(sem nome)"}\n`;
+      if (me.job_title) ctx += `  • Cargo: ${me.job_title}\n`;
+      if (me.department) ctx += `  • Área/Departamento: ${me.department}\n`;
+      if (me.leadership_level) ctx += `  • Nível de liderança: ${me.leadership_level}\n`;
+      if (me.work_modality) ctx += `  • Modalidade de trabalho: ${modalidadeLabel[me.work_modality] ?? me.work_modality}\n`;
+      if (me.hire_date) {
+        const anos = Math.max(0, Math.floor((Date.now() - new Date(me.hire_date).getTime()) / (1000 * 60 * 60 * 24 * 365)));
+        ctx += `  • Tempo de empresa: ~${anos} ano(s) (admissão ${me.hire_date})\n`;
+      }
+    }
 
     if (!diags || diags.length === 0) {
       ctx += "- Diagnósticos NR-1: nenhum diagnóstico concluído ainda. Sugira iniciar um diagnóstico em /nr1/diagnostico/novo.\n";
