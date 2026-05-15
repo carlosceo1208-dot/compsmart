@@ -347,6 +347,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
         : "",
       salary_range_percentage: employee.salary_range_percentage?.toString() || "",
       performance_rating: employee.performance_rating?.toString() || "",
+      work_modality: employee.work_modality || "",
       unit_id: employee.unit_id || "",
       manager_id: employee.manager_id || "",
       job_title_id: employee.job_title_id || "",
