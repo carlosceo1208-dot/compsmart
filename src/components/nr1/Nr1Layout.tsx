@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,9 +19,10 @@ const NAV = [
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
   { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
   { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
+  { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart },
+  { to: '/nr1/acompanhamento', label: 'Check-in Semanal', icon: CalendarCheck },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
-  
 ];
 
 const useIsSuperAdmin = () =>

@@ -1,0 +1,1 @@
+ALTER VIEW public.nr1_checkins_agregado SET (security_invoker = on);
