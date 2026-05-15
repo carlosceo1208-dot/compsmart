@@ -112,6 +112,8 @@ const Nr1DiagnosticoDetalhe = lazy(() => import("./pages/nr1/Nr1DiagnosticoDetal
 const Nr1Contratar = lazy(() => import("./pages/nr1/Nr1Contratar"));
 const Nr1Inteligencia = lazy(() => import("./pages/nr1/Nr1Inteligencia"));
 const Nr1BemEstarAgente = lazy(() => import("./pages/nr1/Nr1BemEstarAgente"));
+const Nr1JornadaBemEstar = lazy(() => import("./pages/nr1/Nr1JornadaBemEstar"));
+const Nr1Acompanhamento = lazy(() => import("./pages/nr1/Nr1Acompanhamento"));
 const Nr1FIB = lazy(() => import("./pages/nr1/Nr1FIB"));
 const Nr1SegPsi = lazy(() => import("./pages/nr1/Nr1SegPsi"));
 const Nr1Sociodemografico = lazy(() => import("./pages/nr1/Nr1Sociodemografico"));
@@ -262,6 +264,8 @@ const App = () => {
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
                        <Route path="/nr1/universo" element={<Nr1Universo />} />
                         <Route path="/nr1/agente" element={<Nr1BemEstarAgente />} />
+                        <Route path="/nr1/jornada" element={<Nr1JornadaBemEstar />} />
+                        <Route path="/nr1/acompanhamento" element={<Nr1Acompanhamento />} />
                         <Route path="/nr1/contratar" element={<Nr1Contratar />} />
                         <Route path="/nr1/consentimento" element={<Nr1Consentimento />} />
                        <Route path="/nr1/planos-acao" element={<Nr1PlanosAcao />} />
