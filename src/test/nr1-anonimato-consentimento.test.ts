@@ -104,7 +104,7 @@ describe("NR-1 · Prompt do agente Bem-Estar (privacidade)", () => {
   });
 
   it("aplica k-anonimato mínimo de 5 respondentes para evitar reidentificação", () => {
-    expect(promptSrc).toMatch(/mínimo de 5 respondentes/i);
+    expect(promptSrc).toMatch(/mínimo\s+(de\s+)?5\s+respondentes/i);
   });
 
   it("dashboard RH só recebe dados agregados; flags identificados só com autorização", () => {
