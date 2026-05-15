@@ -47,6 +47,7 @@ const userSchema = z.object({
       const num = parseFloat(val);
       return num >= 0 && num <= 10;
     }, { message: "Nota deve estar entre 0 e 10" }),
+  work_modality: z.enum(["presencial", "home_office", "hibrido"]).optional().or(z.literal('')),
 });
 
 interface UserDialogProps {
@@ -71,6 +72,7 @@ interface UserData {
   variable_salary?: string;
   salary_range_percentage?: string;
   performance_rating?: string;
+  work_modality?: string;
   unit_id?: string;
   manager_id?: string;
   job_title_id?: string;
@@ -383,12 +385,13 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
           ? profile.variable_salary.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
           : "",
         salary_range_percentage: profile.salary_range_percentage?.toString() || "",
-        performance_rating: profile.performance_rating?.toString() || "",
-        unit_id: profile.unit_id || "",
-        manager_id: profile.manager_id || "",
-        job_title_id: profile.job_title_id || "",
-        roles: userRoles.map((r: any) => r.role),
-      });
+      performance_rating: profile.performance_rating?.toString() || "",
+      work_modality: (profile as any).work_modality || "",
+      unit_id: profile.unit_id || "",
+      manager_id: profile.manager_id || "",
+      job_title_id: profile.job_title_id || "",
+      roles: userRoles.map((r: any) => r.role),
+    });
 
       // Store original email to detect changes
       setOriginalEmail(profile.email || "");
@@ -422,6 +425,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
       variable_salary: "",
       salary_range_percentage: "",
       performance_rating: "",
+      work_modality: "",
       unit_id: "",
       manager_id: "",
       job_title_id: "",
@@ -595,6 +599,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
+            work_modality: formData.work_modality || null,
             unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
             job_title_id: formData.job_title_id || null,
@@ -658,6 +663,7 @@ export const UserDialog = ({ open, onOpenChange, userId, onSuccess }: UserDialog
             variable_salary: parseBRCurrency(formData.variable_salary),
             salary_range_percentage: formData.salary_range_percentage ? parseFloat(formData.salary_range_percentage) : null,
             performance_rating: formData.performance_rating ? parseFloat(formData.performance_rating) : null,
+            work_modality: formData.work_modality || null,
             unit_id: formData.unit_id || null,
             manager_id: formData.manager_id || null,
             has_system_access: !!validation.email,
