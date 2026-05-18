@@ -102,6 +102,7 @@ const PerformanceEmployees = lazy(() => import("./pages/performance/PerformanceE
 const ExternalFeedbackForm = lazy(() => import("./pages/public/ExternalFeedbackForm"));
 const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
 const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
+const LandingCargosSalarios = lazy(() => import("./pages/public/LandingCargosSalarios"));
 
 // Lazy — NR-1 Module
 const Nr1Layout = lazy(() => import("./components/nr1/Nr1Layout").then((m) => ({ default: m.Nr1Layout })));
@@ -246,6 +247,9 @@ const App = () => {
                         <Route path="/performance/glossary" element={<PerformanceGlossary />} />
                         <Route path="/performance/assistant" element={<PerformanceAssistant />} />
                       </Route>
+
+                      {/* Public SEO landing pages */}
+                      <Route path="/plano-de-cargos-e-salarios" element={<LandingCargosSalarios />} />
 
                       {/* Public NR-1 landing (lead capture) */}
                       <Route path="/nr1-publico" element={<LandingNr1 />} />
