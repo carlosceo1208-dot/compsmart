@@ -52,6 +52,7 @@ const moduleGroups: Record<string, Module[]> = {
   ],
   'R-S': [
     { title: 'Relatórios Gerenciais', path: '/reports', icon: FileText, status: 'coming-soon' },
+    { title: 'Saúde Mental & Bem-Estar (NR-1)', path: '/nr1', icon: Brain, status: 'active' },
     { title: 'Simulador de Reajuste', path: '/adjustment-simulator', icon: Calculator, status: 'coming-soon' },
   ],
   'T-Z': [
