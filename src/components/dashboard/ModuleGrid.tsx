@@ -26,6 +26,7 @@ import {
   LucideIcon,
   AlertTriangle,
   FileText,
+  Brain,
 } from 'lucide-react';
 
 interface ModuleDefinition {
