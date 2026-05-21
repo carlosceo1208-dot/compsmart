@@ -19,6 +19,11 @@ const ALLOWED_APP_HOSTS = new Set([
   "compsmart.lovable.app",
 ]);
 
+function isAllowedAppHost(host: string) {
+  if (ALLOWED_APP_HOSTS.has(host)) return true;
+  return host.endsWith(".lovable.app");
+}
+
 function resolveAppBaseUrl(req: Request) {
   const candidates = [req.headers.get("origin"), req.headers.get("referer")];
 
@@ -27,7 +32,7 @@ function resolveAppBaseUrl(req: Request) {
 
     try {
       const url = new URL(candidate);
-      if (ALLOWED_APP_HOSTS.has(url.host)) {
+      if (isAllowedAppHost(url.host)) {
         return `${url.protocol}//${url.host}`;
       }
     } catch {
