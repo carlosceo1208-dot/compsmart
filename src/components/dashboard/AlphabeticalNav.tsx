@@ -21,6 +21,7 @@ import {
   Building,
   ArrowLeftRight,
   PiggyBank,
+  Brain,
 } from 'lucide-react';
 
 interface Module {
