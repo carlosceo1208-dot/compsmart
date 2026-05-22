@@ -8,6 +8,7 @@ import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/n
 import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
+import { GerarPgrButton } from '@/components/nr1/GerarPgrButton';
 
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
@@ -45,7 +46,10 @@ export default function Nr1Dashboard() {
                 <p className="text-xs text-muted-foreground capitalize">Status: {sub.status}</p>
               </div>
             </div>
-            <Badge variant="outline">Conformidade Ativa</Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline">Conformidade Ativa</Badge>
+              <GerarPgrButton size="sm" variant="default" className="nr1-bg-primary" />
+            </div>
           </CardContent>
         </Card>
       )}
