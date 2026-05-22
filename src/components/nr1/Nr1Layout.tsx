@@ -20,7 +20,7 @@ const NAV = [
   { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
   { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
   { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart },
-  { to: '/nr1/acompanhamento', label: 'Check-in Semanal', icon: CalendarCheck },
+  { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
   { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
