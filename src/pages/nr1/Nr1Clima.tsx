@@ -237,10 +237,13 @@ export default function Nr1Clima() {
                       })}
                   </div>
                 )}
+                {p.status === 'aberta' && canManage && (
+                  <DistribuicaoBlock pesquisa={p} />
+                )}
                 <div className="flex justify-end gap-2 mt-4">
                   {p.status === 'aberta' && (
                     <Button asChild size="sm" variant="outline">
-                      <Link to={`/nr1/clima/${p.id}/responder`}>Responder</Link>
+                      <Link to={`/nr1/clima/${p.id}/responder`}>Responder (preview)</Link>
                     </Button>
                   )}
                 </div>
