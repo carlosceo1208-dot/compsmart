@@ -127,9 +127,6 @@ export default function Nr1Clima() {
                 <Link to="/nr1/clima/governanca"><ShieldCheck className="h-4 w-4 mr-1" /> Governança</Link>
               </Button>
             )}
-            {false && (
-              <>
-            )}
             {canManage && pesquisas.some((p) => p.modalidade === 'com_clientes_externos') && (
               <Button asChild variant="outline" size="sm">
                 <Link to="/nr1/clima/externo"><Users className="h-4 w-4 mr-1" /> Clima externo</Link>
