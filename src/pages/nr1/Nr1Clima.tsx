@@ -117,6 +117,11 @@ export default function Nr1Clima() {
                 <Link to="/nr1/clima/dashboard"><LineChart className="h-4 w-4 mr-1" /> Dashboard analítico</Link>
               </Button>
             )}
+            {canManage && pesquisas.some((p) => p.modalidade === 'com_clientes_externos') && (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/nr1/clima/externo"><Users className="h-4 w-4 mr-1" /> Clima externo</Link>
+              </Button>
+            )}
             {canManage && (
               <Dialog open={openNew} onOpenChange={setOpenNew}>
                 <DialogTrigger asChild>
