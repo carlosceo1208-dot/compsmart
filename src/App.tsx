@@ -280,7 +280,9 @@ const App = () => {
                        <Route path="/nr1/vitalidade" element={<Nr1Vitalidade />} />
                        <Route path="/nr1/biblioteca" element={<Nr1Biblioteca />} />
                        <Route path="/nr1/clima" element={<Nr1Clima />} />
-                       <Route path="/nr1/clima/:id/responder" element={<Nr1ClimaResponder />} />
+                      <Route path="/nr1/clima/:id/responder" element={<Nr1ClimaResponder />} />
+                      <Route path="/nr1/clima/dashboard" element={<Nr1ClimaDashboard />} />
+                      <Route path="/nr1/clima/dashboard/:id" element={<Nr1ClimaDashboard />} />
                       </Route>
 
                       {/* Public */}
