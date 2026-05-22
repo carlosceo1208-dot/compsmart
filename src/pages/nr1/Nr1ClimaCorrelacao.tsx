@@ -284,15 +284,15 @@ export default function Nr1ClimaCorrelacao() {
   );
 }
 
-function GerarPlanoUnificadoBtn({ pares }: { pares: any[] }) {
+function GerarPlanoUnificadoBtn({ pares, climaId, diagnosticoId }: { pares: any[]; climaId: string; diagnosticoId: string }) {
   const gerar = useGerarPlanoUnificado();
   const causasRaiz = pares.filter((p) => p.ambos);
   const rows: CorrelacaoRow[] = causasRaiz.map((p) => ({
     company_id: '',
-    clima_id: p.clima_id ?? '',
+    clima_id: climaId,
     clima_nome: '',
     clima_respondentes: 0,
-    diagnostico_id: p.diagnostico_id ?? '',
+    diagnostico_id: diagnosticoId,
     diag_nome: '',
     diag_respondentes: 0,
     clima_dim: p.cd,
