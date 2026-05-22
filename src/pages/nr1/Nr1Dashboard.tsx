@@ -15,6 +15,12 @@ import { DIMENSAO_LABEL as CLIMA_LABEL, type ClimaDimensao } from '@/lib/climaQu
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
   const { data: diagnosticos, isLoading: diagLoading } = useNr1Diagnosticos();
+  const { data: correlacoes = [] } = useClimaCopsoqCorrelacao();
+
+  const topCorrelacoes = [...correlacoes]
+    .filter((c) => c.prioridade === 'causa_raiz' || c.prioridade === 'atencao')
+    .sort((a, b) => (a.prioridade === 'causa_raiz' ? -1 : 1) - (b.prioridade === 'causa_raiz' ? -1 : 1))
+    .slice(0, 3);
 
   const ultimo = diagnosticos?.[0];
   const concluidos = diagnosticos?.filter((d) => d.status === 'concluido').length ?? 0;
