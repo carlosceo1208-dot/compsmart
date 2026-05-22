@@ -1189,14 +1189,17 @@ export type Database = {
       clima_pesquisas: {
         Row: {
           company_id: string
+          convites_enviados: number
           created_at: string
           created_by: string | null
           id: string
+          last_invite_at: string | null
           modalidade: Database["public"]["Enums"]["clima_modalidade"]
           nome: string
           observacoes: string | null
           periodo_fim: string | null
           periodo_inicio: string
+          public_token: string
           score_geral: number | null
           scores_dimensao: Json | null
           status: Database["public"]["Enums"]["clima_pesquisa_status"]
@@ -1205,14 +1208,17 @@ export type Database = {
         }
         Insert: {
           company_id: string
+          convites_enviados?: number
           created_at?: string
           created_by?: string | null
           id?: string
+          last_invite_at?: string | null
           modalidade?: Database["public"]["Enums"]["clima_modalidade"]
           nome: string
           observacoes?: string | null
           periodo_fim?: string | null
           periodo_inicio?: string
+          public_token?: string
           score_geral?: number | null
           scores_dimensao?: Json | null
           status?: Database["public"]["Enums"]["clima_pesquisa_status"]
@@ -1221,14 +1227,17 @@ export type Database = {
         }
         Update: {
           company_id?: string
+          convites_enviados?: number
           created_at?: string
           created_by?: string | null
           id?: string
+          last_invite_at?: string | null
           modalidade?: Database["public"]["Enums"]["clima_modalidade"]
           nome?: string
           observacoes?: string | null
           periodo_fim?: string | null
           periodo_inicio?: string
+          public_token?: string
           score_geral?: number | null
           scores_dimensao?: Json | null
           status?: Database["public"]["Enums"]["clima_pesquisa_status"]
@@ -9425,6 +9434,18 @@ export type Database = {
           unique_users: number
         }[]
       }
+      get_clima_pesquisa_publica: {
+        Args: { _token: string }
+        Returns: {
+          company_id: string
+          id: string
+          modalidade: string
+          nome: string
+          periodo_fim: string
+          periodo_inicio: string
+          status: string
+        }[]
+      }
       get_companies_billing_info: {
         Args: { _company_ids: string[] }
         Returns: {
@@ -9720,6 +9741,10 @@ export type Database = {
           status: string
         }[]
       }
+      registrar_envio_convites_clima: {
+        Args: { _pesquisa_id: string; _quantidade: number }
+        Returns: undefined
+      }
       revert_merit_from_budget: {
         Args: { p_reason?: string; p_source_id: string; p_source_type: string }
         Returns: string
@@ -9766,6 +9791,21 @@ export type Database = {
           p_notes?: string
           p_root_company_id: string
           p_scenario_id: string
+        }
+        Returns: string
+      }
+      submit_clima_resposta_anonima: {
+        Args: {
+          _departamento: string
+          _funcao_nivel: string
+          _itens: Json
+          _modalidade_trabalho: string
+          _respondent_hash: string
+          _score_geral: number
+          _scores_dimensao: Json
+          _tempo_empresa: string
+          _tipo_respondente: string
+          _token: string
         }
         Returns: string
       }

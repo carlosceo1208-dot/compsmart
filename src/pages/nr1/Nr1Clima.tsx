@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle } from 'lucide-react';
+import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DIMENSAO_LABEL, interpretarClima, CORRELACAO_COPSOQ, type ClimaDimensao } from '@/lib/climaQuestoes';
 
@@ -25,6 +25,9 @@ type Pesquisa = {
   total_respondentes: number;
   score_geral: number | null;
   scores_dimensao: Record<string, number> | null;
+  public_token: string;
+  convites_enviados: number;
+  last_invite_at: string | null;
 };
 
 const STATUS_BADGE: Record<Pesquisa['status'], { label: string; className: string }> = {
@@ -234,10 +237,13 @@ export default function Nr1Clima() {
                       })}
                   </div>
                 )}
+                {p.status === 'aberta' && canManage && (
+                  <DistribuicaoBlock pesquisa={p} />
+                )}
                 <div className="flex justify-end gap-2 mt-4">
                   {p.status === 'aberta' && (
                     <Button asChild size="sm" variant="outline">
-                      <Link to={`/nr1/clima/${p.id}/responder`}>Responder</Link>
+                      <Link to={`/nr1/clima/${p.id}/responder`}>Responder (preview)</Link>
                     </Button>
                   )}
                 </div>
@@ -273,6 +279,96 @@ export default function Nr1Clima() {
           </p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function DistribuicaoBlock({ pesquisa }: { pesquisa: Pesquisa }) {
+  const [sending, setSending] = useState<'invite' | 'reminder' | null>(null);
+  const qc = useQueryClient();
+
+  const publicLink = `${window.location.origin}/clima/publico/${pesquisa.public_token}`;
+
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(publicLink);
+      toast({ title: 'Link copiado', description: 'Compartilhe com seus colaboradores.' });
+    } catch {
+      toast({ title: 'Erro', description: 'Copie manualmente: ' + publicLink, variant: 'destructive' });
+    }
+  };
+
+  const enviar = async (isReminder: boolean) => {
+    setSending(isReminder ? 'reminder' : 'invite');
+    try {
+      const { data, error } = await supabase.functions.invoke('send-clima-invitations', {
+        body: { pesquisa_id: pesquisa.id, is_reminder: isReminder },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast({
+        title: isReminder ? 'Lembretes enviados' : 'Convites enviados',
+        description: `${data.sent_count} colaborador(es) notificado(s)${data.error_count ? ` · ${data.error_count} erro(s)` : ''}.`,
+      });
+      qc.invalidateQueries({ queryKey: ['clima-pesquisas'] });
+    } catch (e: any) {
+      toast({ title: 'Erro ao enviar', description: e.message, variant: 'destructive' });
+    } finally {
+      setSending(null);
+    }
+  };
+
+  return (
+    <div className="mt-4 border-t pt-4 space-y-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-1">
+        <Send className="h-3 w-3" /> Distribuição
+      </p>
+
+      <div className="flex items-center gap-2 p-2 rounded-md bg-muted/50 border">
+        <Link2 className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        <code className="text-xs flex-1 truncate" title={publicLink}>{publicLink}</code>
+        <Button size="sm" variant="ghost" onClick={copiar} className="h-7 px-2">
+          <Copy className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          size="sm"
+          onClick={() => enviar(false)}
+          disabled={sending !== null}
+          className="bg-[hsl(11_77%_60%)] hover:bg-[hsl(11_77%_55%)] text-white"
+        >
+          <Mail className="h-3.5 w-3.5 mr-1.5" />
+          {sending === 'invite' ? 'Enviando…' : 'Enviar convites por e-mail'}
+        </Button>
+        {pesquisa.convites_enviados > 0 && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => enviar(true)}
+            disabled={sending !== null}
+          >
+            {sending === 'reminder' ? 'Enviando…' : 'Enviar lembrete'}
+          </Button>
+        )}
+        <div className="text-xs text-muted-foreground ml-auto">
+          {pesquisa.convites_enviados > 0 ? (
+            <>
+              <strong>{pesquisa.convites_enviados}</strong> convite(s) enviado(s)
+              {pesquisa.last_invite_at && (
+                <> · último em {new Date(pesquisa.last_invite_at).toLocaleDateString('pt-BR')}</>
+              )}
+            </>
+          ) : (
+            'Nenhum convite enviado ainda'
+          )}
+        </div>
+      </div>
+
+      <p className="text-[11px] text-muted-foreground">
+        Envia para todos os colaboradores ativos com e-mail cadastrado. Respostas continuam <strong>100% anônimas</strong>.
+      </p>
     </div>
   );
 }

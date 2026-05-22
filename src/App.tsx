@@ -103,6 +103,7 @@ const ExternalFeedbackForm = lazy(() => import("./pages/public/ExternalFeedbackF
 const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
 const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
 const LandingCargosSalarios = lazy(() => import("./pages/public/LandingCargosSalarios"));
+const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
 
 // Lazy — NR-1 Module
 const Nr1Layout = lazy(() => import("./components/nr1/Nr1Layout").then((m) => ({ default: m.Nr1Layout })));
@@ -283,6 +284,7 @@ const App = () => {
 
                       {/* Public */}
                       <Route path="/feedback/:token" element={<ExternalFeedbackForm />} />
+                      <Route path="/clima/publico/:token" element={<ClimaPublico />} />
 
                       <Route path="*" element={<NotFound />} />
                     </Routes>
