@@ -287,6 +287,8 @@ const App = () => {
                       <Route path="/nr1/clima/dashboard" element={<Nr1ClimaDashboard />} />
                       <Route path="/nr1/clima/dashboard/:id" element={<Nr1ClimaDashboard />} />
                       <Route path="/nr1/clima/correlacao" element={<Nr1ClimaCorrelacao />} />
+                      <Route path="/nr1/clima/externo" element={<Nr1ClimaExternoDashboard />} />
+                      <Route path="/nr1/clima/externo/:id" element={<Nr1ClimaExternoDashboard />} />
                       </Route>
 
                       {/* Public */}
