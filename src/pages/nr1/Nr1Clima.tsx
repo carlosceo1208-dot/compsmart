@@ -111,13 +111,19 @@ export default function Nr1Clima() {
               </CardDescription>
             </div>
           </div>
-          {canManage && (
-            <Dialog open={openNew} onOpenChange={setOpenNew}>
-              <DialogTrigger asChild>
-                <Button className="bg-[hsl(11_77%_60%)] hover:bg-[hsl(11_77%_55%)] text-white">
-                  <Plus className="h-4 w-4 mr-1" /> Nova pesquisa
-                </Button>
-              </DialogTrigger>
+          <div className="flex flex-wrap items-center gap-2">
+            {canManage && pesquisas.some((p) => p.total_respondentes > 0) && (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/nr1/clima/dashboard"><LineChart className="h-4 w-4 mr-1" /> Dashboard analítico</Link>
+              </Button>
+            )}
+            {canManage && (
+              <Dialog open={openNew} onOpenChange={setOpenNew}>
+                <DialogTrigger asChild>
+                  <Button className="bg-[hsl(11_77%_60%)] hover:bg-[hsl(11_77%_55%)] text-white">
+                    <Plus className="h-4 w-4 mr-1" /> Nova pesquisa
+                  </Button>
+                </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Nova pesquisa de clima</DialogTitle>
