@@ -7,7 +7,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { FileCheck2, Loader2, Download, Printer, Eye, ChevronDown } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { FileCheck2, Loader2, Download, Printer, Eye, ChevronDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
@@ -16,7 +17,6 @@ import { gerarPgrPdf, type PgrDiagnosticoInput, type PgrInput } from '@/lib/nr1P
 import type { GrauRiscoInss } from '@/lib/nr1Risco';
 
 interface Props {
-  /** Quando informado, gera PGR só desse diagnóstico; caso contrário consolida todos os concluídos. */
   diagnostico?: PgrDiagnosticoInput | null;
   variant?: 'default' | 'outline' | 'secondary';
   size?: 'default' | 'sm' | 'lg';
@@ -29,6 +29,8 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
   const { data: diagnosticos } = useNr1Diagnosticos();
   const { data: planos } = useNr1PlanosAcao();
   const [loading, setLoading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [filename, setFilename] = useState('PGR.pdf');
 
   const buildInput = (): PgrInput | null => {
     if (!activeCompany) {
@@ -70,26 +72,43 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
     };
   };
 
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+  };
+
   const run = async (action: 'download' | 'print' | 'preview') => {
     setLoading(true);
     try {
       const input = buildInput();
       if (!input) return;
       const doc = gerarPgrPdf(input);
-      const filename = `PGR_${(activeCompany?.fantasy_name || activeCompany?.name || 'empresa').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      const name = `PGR_${(activeCompany?.fantasy_name || activeCompany?.name || 'empresa').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
+      setFilename(name);
 
       if (action === 'download') {
-        doc.save(filename);
+        doc.save(name);
         toast.success('PGR baixado com sucesso');
-      } else if (action === 'print') {
-        doc.autoPrint();
-        const url = doc.output('bloburl');
-        const w = window.open(url, '_blank');
-        if (!w) toast.error('Bloqueador de pop-up impediu a impressão');
-      } else {
-        const url = doc.output('bloburl');
-        const w = window.open(url, '_blank');
-        if (!w) toast.error('Bloqueador de pop-up impediu a visualização');
+        return;
+      }
+
+      // Preview e Print usam blob URL dentro de iframe (evita ERR_BLOCKED_BY_CLIENT)
+      const blob = doc.output('blob');
+      const url = URL.createObjectURL(blob);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(url);
+
+      if (action === 'print') {
+        // Aguarda iframe montar e dispara print
+        setTimeout(() => {
+          const iframe = document.getElementById('pgr-preview-iframe') as HTMLIFrameElement | null;
+          try {
+            iframe?.contentWindow?.focus();
+            iframe?.contentWindow?.print();
+          } catch {
+            toast.message('Use o botão de impressão dentro do visualizador.');
+          }
+        }, 600);
       }
     } catch (e: any) {
       console.error(e);
@@ -99,27 +118,78 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
     }
   };
 
+  const downloadFromPreview = () => {
+    if (!previewUrl) return;
+    const a = document.createElement('a');
+    a.href = previewUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  const printFromPreview = () => {
+    const iframe = document.getElementById('pgr-preview-iframe') as HTMLIFrameElement | null;
+    try {
+      iframe?.contentWindow?.focus();
+      iframe?.contentWindow?.print();
+    } catch {
+      toast.error('Não foi possível imprimir; baixe o PDF e imprima localmente.');
+    }
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button disabled={loading} variant={variant} size={size} className={className}>
-          {loading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <FileCheck2 className="h-4 w-4 mr-1" />}
-          Gerar PGR
-          <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem onClick={() => run('download')}>
-          <Download className="h-4 w-4 mr-2" /> Baixar PDF
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => run('preview')}>
-          <Eye className="h-4 w-4 mr-2" /> Visualizar
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => run('print')}>
-          <Printer className="h-4 w-4 mr-2" /> Imprimir
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button disabled={loading} variant={variant} size={size} className={className}>
+            {loading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <FileCheck2 className="h-4 w-4 mr-1" />}
+            Gerar PGR
+            <ChevronDown className="h-4 w-4 ml-1 opacity-70" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuItem onClick={() => run('download')}>
+            <Download className="h-4 w-4 mr-2" /> Baixar PDF
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => run('preview')}>
+            <Eye className="h-4 w-4 mr-2" /> Visualizar
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => run('print')}>
+            <Printer className="h-4 w-4 mr-2" /> Imprimir
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={!!previewUrl} onOpenChange={(o) => { if (!o) closePreview(); }}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[90vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-4 py-3 border-b flex flex-row items-center justify-between space-y-0">
+            <DialogTitle className="text-base">Visualização do PGR</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 bg-muted overflow-hidden">
+            {previewUrl && (
+              <iframe
+                id="pgr-preview-iframe"
+                src={previewUrl}
+                title="PGR Preview"
+                className="w-full h-full border-0"
+              />
+            )}
+          </div>
+          <DialogFooter className="px-4 py-3 border-t flex flex-row sm:justify-end gap-2">
+            <Button variant="outline" size="sm" onClick={closePreview}>
+              <X className="h-4 w-4 mr-1" /> Fechar
+            </Button>
+            <Button variant="outline" size="sm" onClick={printFromPreview}>
+              <Printer className="h-4 w-4 mr-1" /> Imprimir
+            </Button>
+            <Button size="sm" onClick={downloadFromPreview}>
+              <Download className="h-4 w-4 mr-1" /> Baixar PDF
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
