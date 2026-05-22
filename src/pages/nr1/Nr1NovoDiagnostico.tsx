@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { RESPOSTA_OPCOES, respondentHash, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { RESPOSTA_OPCOES, respondentHash } from '@/lib/nr1';
 import { Loader2 } from 'lucide-react';
 import { Nr1ConsentReconfirm } from '@/components/nr1/Nr1ConsentGate';
 
@@ -24,10 +24,28 @@ export default function Nr1NovoDiagnostico() {
   const [respostas, setRespostas] = useState<Record<string, number>>({});
   const [currentIdx, setCurrentIdx] = useState(0);
   const [consentOk, setConsentOk] = useState(false);
+  const [ordemEmbaralhada, setOrdemEmbaralhada] = useState<string[]>([]);
 
-  const questao = questoes?.[currentIdx];
-  const total = questoes?.length ?? 0;
+  // Embaralha as questões uma única vez quando carregam (Fisher-Yates)
+  useEffect(() => {
+    if (questoes && questoes.length > 0 && ordemEmbaralhada.length === 0) {
+      const ids = questoes.map((q) => q.id);
+      for (let i = ids.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+      }
+      setOrdemEmbaralhada(ids);
+    }
+  }, [questoes, ordemEmbaralhada.length]);
+
+  const questao = useMemo(() => {
+    if (!questoes || ordemEmbaralhada.length === 0) return undefined;
+    const id = ordemEmbaralhada[currentIdx];
+    return questoes.find((q) => q.id === id);
+  }, [questoes, ordemEmbaralhada, currentIdx]);
+  const total = ordemEmbaralhada.length || questoes?.length || 0;
   const progress = total > 0 ? ((currentIdx + 1) / total) * 100 : 0;
+
 
   const iniciar = async () => {
     if (!activeCompanyId) {
@@ -155,7 +173,6 @@ export default function Nr1NovoDiagnostico() {
       <CardHeader>
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
           <span>Pergunta {currentIdx + 1} de {total}</span>
-          <span>{DIMENSAO_LABEL[questao!.dimensao as Dimensao]}</span>
         </div>
         <Progress value={progress} className="h-2" />
         <CardTitle className="text-lg mt-4 leading-snug">{questao!.enunciado}</CardTitle>
