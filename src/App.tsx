@@ -131,6 +131,7 @@ const Nr1ClimaDashboard = lazy(() => import("./pages/nr1/Nr1ClimaDashboard"));
 const Nr1ClimaCorrelacao = lazy(() => import("./pages/nr1/Nr1ClimaCorrelacao"));
 const Nr1ClimaExternoDashboard = lazy(() => import("./pages/nr1/Nr1ClimaExternoDashboard"));
 const Nr1ClimaRelatorios = lazy(() => import("./pages/nr1/Nr1ClimaRelatorios"));
+const Nr1ClimaGovernanca = lazy(() => import("./pages/nr1/Nr1ClimaGovernanca"));
 const ClimaExternoPublico = lazy(() => import("./pages/public/ClimaExternoPublico"));
 
 const queryClient = new QueryClient({
@@ -291,6 +292,7 @@ const App = () => {
                       <Route path="/nr1/clima/externo" element={<Nr1ClimaExternoDashboard />} />
                      <Route path="/nr1/clima/externo/:id" element={<Nr1ClimaExternoDashboard />} />
                      <Route path="/nr1/clima/relatorios" element={<Nr1ClimaRelatorios />} />
+                     <Route path="/nr1/clima/governanca" element={<Nr1ClimaGovernanca />} />
                       </Route>
 
                       {/* Public */}

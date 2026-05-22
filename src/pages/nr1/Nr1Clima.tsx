@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2, LineChart, FileText } from 'lucide-react';
+import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2, LineChart, FileText, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DIMENSAO_LABEL, interpretarClima, CORRELACAO_COPSOQ, type ClimaDimensao } from '@/lib/climaQuestoes';
 
@@ -121,6 +121,11 @@ export default function Nr1Clima() {
                   <Link to="/nr1/clima/relatorios"><FileText className="h-4 w-4 mr-1" /> Relatórios</Link>
                 </Button>
               </>
+            )}
+            {canManage && (
+              <Button asChild variant="outline" size="sm" className="border-emerald-300 text-emerald-700 hover:bg-emerald-50">
+                <Link to="/nr1/clima/governanca"><ShieldCheck className="h-4 w-4 mr-1" /> Governança</Link>
+              </Button>
             )}
             {canManage && pesquisas.some((p) => p.modalidade === 'com_clientes_externos') && (
               <Button asChild variant="outline" size="sm">
