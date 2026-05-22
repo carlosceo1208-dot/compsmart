@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +23,8 @@ const NAV = [
   { to: '/nr1/acompanhamento', label: 'Check-in Semanal', icon: CalendarCheck },
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
-];
+  { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
+] as Array<{ to: string; label: string; icon: any; end?: boolean; highlight?: boolean }>;
 
 const useIsSuperAdmin = () =>
   useQuery({
@@ -99,10 +100,12 @@ export const Nr1Layout = () => {
                     'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border transition-all min-h-[64px]',
                     active
                       ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
+                      : item.highlight
+                      ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
                       : 'bg-card border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                   )}
                 >
-                  <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]')} />
+                  <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]')} />
                   <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                 </NavLink>
               );

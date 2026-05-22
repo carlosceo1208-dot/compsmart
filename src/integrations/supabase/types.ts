@@ -1186,6 +1186,142 @@ export type Database = {
           },
         ]
       }
+      clima_pesquisas: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          modalidade: Database["public"]["Enums"]["clima_modalidade"]
+          nome: string
+          observacoes: string | null
+          periodo_fim: string | null
+          periodo_inicio: string
+          score_geral: number | null
+          scores_dimensao: Json | null
+          status: Database["public"]["Enums"]["clima_pesquisa_status"]
+          total_respondentes: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          modalidade?: Database["public"]["Enums"]["clima_modalidade"]
+          nome: string
+          observacoes?: string | null
+          periodo_fim?: string | null
+          periodo_inicio?: string
+          score_geral?: number | null
+          scores_dimensao?: Json | null
+          status?: Database["public"]["Enums"]["clima_pesquisa_status"]
+          total_respondentes?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          modalidade?: Database["public"]["Enums"]["clima_modalidade"]
+          nome?: string
+          observacoes?: string | null
+          periodo_fim?: string | null
+          periodo_inicio?: string
+          score_geral?: number | null
+          scores_dimensao?: Json | null
+          status?: Database["public"]["Enums"]["clima_pesquisa_status"]
+          total_respondentes?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      clima_respostas: {
+        Row: {
+          company_id: string
+          created_at: string
+          departamento: string | null
+          funcao_nivel: string | null
+          id: string
+          modalidade_trabalho: string | null
+          pesquisa_id: string
+          respondent_hash: string
+          score_geral: number | null
+          scores_dimensao: Json | null
+          tempo_empresa: string | null
+          tipo_respondente: Database["public"]["Enums"]["clima_tipo_respondente"]
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          departamento?: string | null
+          funcao_nivel?: string | null
+          id?: string
+          modalidade_trabalho?: string | null
+          pesquisa_id: string
+          respondent_hash: string
+          score_geral?: number | null
+          scores_dimensao?: Json | null
+          tempo_empresa?: string | null
+          tipo_respondente?: Database["public"]["Enums"]["clima_tipo_respondente"]
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          departamento?: string | null
+          funcao_nivel?: string | null
+          id?: string
+          modalidade_trabalho?: string | null
+          pesquisa_id?: string
+          respondent_hash?: string
+          score_geral?: number | null
+          scores_dimensao?: Json | null
+          tempo_empresa?: string | null
+          tipo_respondente?: Database["public"]["Enums"]["clima_tipo_respondente"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clima_respostas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "clima_pesquisas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clima_respostas_itens: {
+        Row: {
+          dimensao: string
+          id: string
+          questao_num: number
+          resposta_id: string
+          valor: number
+        }
+        Insert: {
+          dimensao: string
+          id?: string
+          questao_num: number
+          resposta_id: string
+          valor: number
+        }
+        Update: {
+          dimensao?: string
+          id?: string
+          questao_num?: number
+          resposta_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clima_respostas_itens_resposta_id_fkey"
+            columns: ["resposta_id"]
+            isOneToOne: false
+            referencedRelation: "clima_respostas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collective_salary_adjustments: {
         Row: {
           adjustment_name: string
@@ -9673,6 +9809,16 @@ export type Database = {
         | "super_admin"
         | "occupational_health"
       calculation_mode: "manual" | "automatic"
+      clima_modalidade:
+        | "isolada"
+        | "integrada_psicossocial"
+        | "com_clientes_externos"
+      clima_pesquisa_status: "rascunho" | "aberta" | "fechada" | "arquivada"
+      clima_tipo_respondente:
+        | "colaborador"
+        | "lideranca"
+        | "cliente_interno"
+        | "cliente_externo"
       external_evaluator_type: "customer" | "supplier" | "partner" | "other"
       external_feedback_status:
         | "pending"
@@ -9894,6 +10040,18 @@ export const Constants = {
         "occupational_health",
       ],
       calculation_mode: ["manual", "automatic"],
+      clima_modalidade: [
+        "isolada",
+        "integrada_psicossocial",
+        "com_clientes_externos",
+      ],
+      clima_pesquisa_status: ["rascunho", "aberta", "fechada", "arquivada"],
+      clima_tipo_respondente: [
+        "colaborador",
+        "lideranca",
+        "cliente_interno",
+        "cliente_externo",
+      ],
       external_evaluator_type: ["customer", "supplier", "partner", "other"],
       external_feedback_status: [
         "pending",
