@@ -173,7 +173,6 @@ export default function Nr1NovoDiagnostico() {
       <CardHeader>
         <div className="flex justify-between text-xs text-muted-foreground mb-2">
           <span>Pergunta {currentIdx + 1} de {total}</span>
-          <span>{DIMENSAO_LABEL[questao!.dimensao as Dimensao]}</span>
         </div>
         <Progress value={progress} className="h-2" />
         <CardTitle className="text-lg mt-4 leading-snug">{questao!.enunciado}</CardTitle>
