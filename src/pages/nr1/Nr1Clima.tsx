@@ -153,7 +153,8 @@ export default function Nr1Clima() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          )}
+            )}
+          </div>
         </CardHeader>
       </Card>
 
