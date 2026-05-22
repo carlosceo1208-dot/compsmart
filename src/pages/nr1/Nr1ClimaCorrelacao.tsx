@@ -273,7 +273,7 @@ export default function Nr1ClimaCorrelacao() {
                   <Button asChild size="sm" variant="outline">
                     <Link to="/nr1/planos-acao">Ver Planos de Ação</Link>
                   </Button>
-                  <GerarPlanoUnificadoBtn pares={pares} />
+                  <GerarPlanoUnificadoBtn pares={pares} climaId={climaAtual.id} diagnosticoId={diagAtual.id} />
                 </div>
               </CardContent>
             </Card>
