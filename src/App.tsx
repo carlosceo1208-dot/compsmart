@@ -129,6 +129,8 @@ const Nr1Clima = lazy(() => import("./pages/nr1/Nr1Clima"));
 const Nr1ClimaResponder = lazy(() => import("./pages/nr1/Nr1ClimaResponder"));
 const Nr1ClimaDashboard = lazy(() => import("./pages/nr1/Nr1ClimaDashboard"));
 const Nr1ClimaCorrelacao = lazy(() => import("./pages/nr1/Nr1ClimaCorrelacao"));
+const Nr1ClimaExternoDashboard = lazy(() => import("./pages/nr1/Nr1ClimaExternoDashboard"));
+const ClimaExternoPublico = lazy(() => import("./pages/public/ClimaExternoPublico"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
