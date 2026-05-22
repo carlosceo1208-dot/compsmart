@@ -4280,53 +4280,83 @@ export type Database = {
       }
       nr1_planos_acao: {
         Row: {
+          aprovacao_status: Database["public"]["Enums"]["nr1_aprovacao_status"]
+          clima_pesquisa_id: string | null
           company_id: string
           created_at: string
           created_by: string | null
+          custo_estimado: number | null
           descricao: string | null
           diagnostico_id: string | null
           dimensao: string | null
           evidencias: string | null
           id: string
+          impacto_estimado: string | null
+          observacao_aprovacao: string | null
+          origem: string | null
           prazo: string | null
           prioridade: Database["public"]["Enums"]["nr1_acao_prioridade"]
           progresso: number
           responsavel: string | null
+          revisado_em: string | null
+          revisado_por: string | null
           status: Database["public"]["Enums"]["nr1_acao_status"]
+          submetido_em: string | null
+          submetido_por: string | null
           titulo: string
           updated_at: string
         }
         Insert: {
+          aprovacao_status?: Database["public"]["Enums"]["nr1_aprovacao_status"]
+          clima_pesquisa_id?: string | null
           company_id: string
           created_at?: string
           created_by?: string | null
+          custo_estimado?: number | null
           descricao?: string | null
           diagnostico_id?: string | null
           dimensao?: string | null
           evidencias?: string | null
           id?: string
+          impacto_estimado?: string | null
+          observacao_aprovacao?: string | null
+          origem?: string | null
           prazo?: string | null
           prioridade?: Database["public"]["Enums"]["nr1_acao_prioridade"]
           progresso?: number
           responsavel?: string | null
+          revisado_em?: string | null
+          revisado_por?: string | null
           status?: Database["public"]["Enums"]["nr1_acao_status"]
+          submetido_em?: string | null
+          submetido_por?: string | null
           titulo: string
           updated_at?: string
         }
         Update: {
+          aprovacao_status?: Database["public"]["Enums"]["nr1_aprovacao_status"]
+          clima_pesquisa_id?: string | null
           company_id?: string
           created_at?: string
           created_by?: string | null
+          custo_estimado?: number | null
           descricao?: string | null
           diagnostico_id?: string | null
           dimensao?: string | null
           evidencias?: string | null
           id?: string
+          impacto_estimado?: string | null
+          observacao_aprovacao?: string | null
+          origem?: string | null
           prazo?: string | null
           prioridade?: Database["public"]["Enums"]["nr1_acao_prioridade"]
           progresso?: number
           responsavel?: string | null
+          revisado_em?: string | null
+          revisado_por?: string | null
           status?: Database["public"]["Enums"]["nr1_acao_status"]
+          submetido_em?: string | null
+          submetido_por?: string | null
           titulo?: string
           updated_at?: string
         }
@@ -4336,6 +4366,65 @@ export type Database = {
             columns: ["diagnostico_id"]
             isOneToOne: false
             referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nr1_planos_aprovacao_historico: {
+        Row: {
+          acao: string
+          ator_id: string | null
+          ator_nome: string | null
+          company_id: string
+          created_at: string
+          id: string
+          observacao: string | null
+          plano_id: string
+          status_anterior:
+            | Database["public"]["Enums"]["nr1_aprovacao_status"]
+            | null
+          status_novo:
+            | Database["public"]["Enums"]["nr1_aprovacao_status"]
+            | null
+        }
+        Insert: {
+          acao: string
+          ator_id?: string | null
+          ator_nome?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          plano_id: string
+          status_anterior?:
+            | Database["public"]["Enums"]["nr1_aprovacao_status"]
+            | null
+          status_novo?:
+            | Database["public"]["Enums"]["nr1_aprovacao_status"]
+            | null
+        }
+        Update: {
+          acao?: string
+          ator_id?: string | null
+          ator_nome?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          observacao?: string | null
+          plano_id?: string
+          status_anterior?:
+            | Database["public"]["Enums"]["nr1_aprovacao_status"]
+            | null
+          status_novo?:
+            | Database["public"]["Enums"]["nr1_aprovacao_status"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_planos_aprovacao_historico_plano_id_fkey"
+            columns: ["plano_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_planos_acao"
             referencedColumns: ["id"]
           },
         ]
@@ -9792,6 +9881,46 @@ export type Database = {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
       }
+      nr1_plano_transicao: {
+        Args: {
+          _novo_status: Database["public"]["Enums"]["nr1_aprovacao_status"]
+          _observacao?: string
+          _plano_id: string
+        }
+        Returns: {
+          aprovacao_status: Database["public"]["Enums"]["nr1_aprovacao_status"]
+          clima_pesquisa_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          custo_estimado: number | null
+          descricao: string | null
+          diagnostico_id: string | null
+          dimensao: string | null
+          evidencias: string | null
+          id: string
+          impacto_estimado: string | null
+          observacao_aprovacao: string | null
+          origem: string | null
+          prazo: string | null
+          prioridade: Database["public"]["Enums"]["nr1_acao_prioridade"]
+          progresso: number
+          responsavel: string | null
+          revisado_em: string | null
+          revisado_por: string | null
+          status: Database["public"]["Enums"]["nr1_acao_status"]
+          submetido_em: string | null
+          submetido_por: string | null
+          titulo: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "nr1_planos_acao"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       nr1_recompute_scores: {
         Args: { p_diagnostico_id: string }
         Returns: undefined
@@ -9952,6 +10081,12 @@ export type Database = {
       impact_level: "low" | "medium" | "high"
       nr1_acao_prioridade: "baixa" | "media" | "alta" | "critica"
       nr1_acao_status: "pendente" | "em_andamento" | "concluido" | "atrasado"
+      nr1_aprovacao_status:
+        | "rascunho"
+        | "em_aprovacao"
+        | "aprovado"
+        | "rejeitado"
+        | "revisao_solicitada"
       nr1_diagnostico_status: "em_andamento" | "concluido" | "arquivado"
       nr1_dimensao:
         | "demandas_trabalho"
@@ -10186,6 +10321,13 @@ export const Constants = {
       impact_level: ["low", "medium", "high"],
       nr1_acao_prioridade: ["baixa", "media", "alta", "critica"],
       nr1_acao_status: ["pendente", "em_andamento", "concluido", "atrasado"],
+      nr1_aprovacao_status: [
+        "rascunho",
+        "em_aprovacao",
+        "aprovado",
+        "rejeitado",
+        "revisao_solicitada",
+      ],
       nr1_diagnostico_status: ["em_andamento", "concluido", "arquivado"],
       nr1_dimensao: [
         "demandas_trabalho",
