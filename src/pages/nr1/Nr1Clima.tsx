@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2, LineChart } from 'lucide-react';
+import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2, LineChart, FileText } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DIMENSAO_LABEL, interpretarClima, CORRELACAO_COPSOQ, type ClimaDimensao } from '@/lib/climaQuestoes';
 
@@ -113,9 +113,14 @@ export default function Nr1Clima() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {canManage && pesquisas.some((p) => p.total_respondentes > 0) && (
-              <Button asChild variant="outline" size="sm">
-                <Link to="/nr1/clima/dashboard"><LineChart className="h-4 w-4 mr-1" /> Dashboard analítico</Link>
-              </Button>
+              <>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/nr1/clima/dashboard"><LineChart className="h-4 w-4 mr-1" /> Dashboard analítico</Link>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/nr1/clima/relatorios"><FileText className="h-4 w-4 mr-1" /> Relatórios</Link>
+                </Button>
+              </>
             )}
             {canManage && pesquisas.some((p) => p.modalidade === 'com_clientes_externos') && (
               <Button asChild variant="outline" size="sm">
