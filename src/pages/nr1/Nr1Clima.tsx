@@ -280,10 +280,14 @@ export default function Nr1Clima() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-3 flex items-start gap-1">
-            <AlertTriangle className="h-3 w-3 mt-0.5" />
-            Próxima entrega: dashboard com cálculo de correlação de Pearson entre dimensões e plano de ação integrado.
-          </p>
+          <div className="mt-4 pt-3 border-t flex items-center justify-between gap-2">
+            <p className="text-xs text-muted-foreground">
+              Veja causas raiz confirmadas e plano de ação unificado quando há ambos os instrumentos aplicados.
+            </p>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/nr1/clima/correlacao"><Sparkles className="h-3.5 w-3.5 mr-1" /> Ver correlação</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
