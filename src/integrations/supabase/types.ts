@@ -1186,6 +1186,65 @@ export type Database = {
           },
         ]
       }
+      clima_externo_respostas: {
+        Row: {
+          comentario_pontos_fortes: string | null
+          comentario_pontos_melhoria: string | null
+          company_id: string
+          created_at: string
+          fingerprint: string | null
+          id: string
+          ip_hash: string | null
+          nps: number | null
+          pesquisa_id: string
+          score_geral: number | null
+          scores_dimensao: Json
+          setor: string | null
+          tempo_relacionamento: string | null
+          tipo_stakeholder: string
+        }
+        Insert: {
+          comentario_pontos_fortes?: string | null
+          comentario_pontos_melhoria?: string | null
+          company_id: string
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_hash?: string | null
+          nps?: number | null
+          pesquisa_id: string
+          score_geral?: number | null
+          scores_dimensao?: Json
+          setor?: string | null
+          tempo_relacionamento?: string | null
+          tipo_stakeholder: string
+        }
+        Update: {
+          comentario_pontos_fortes?: string | null
+          comentario_pontos_melhoria?: string | null
+          company_id?: string
+          created_at?: string
+          fingerprint?: string | null
+          id?: string
+          ip_hash?: string | null
+          nps?: number | null
+          pesquisa_id?: string
+          score_geral?: number | null
+          scores_dimensao?: Json
+          setor?: string | null
+          tempo_relacionamento?: string | null
+          tipo_stakeholder?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clima_externo_respostas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "clima_pesquisas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clima_pesquisas: {
         Row: {
           company_id: string
@@ -9434,6 +9493,15 @@ export type Database = {
           unique_users: number
         }[]
       }
+      get_clima_externo_publico: {
+        Args: { p_token: string }
+        Returns: {
+          id: string
+          modalidade: string
+          nome: string
+          status: string
+        }[]
+      }
       get_clima_pesquisa_publica: {
         Args: { _token: string }
         Returns: {
@@ -9791,6 +9859,21 @@ export type Database = {
           p_notes?: string
           p_root_company_id: string
           p_scenario_id: string
+        }
+        Returns: string
+      }
+      submit_clima_externo_resposta: {
+        Args: {
+          p_fingerprint: string
+          p_nps: number
+          p_pontos_fortes: string
+          p_pontos_melhoria: string
+          p_score_geral: number
+          p_scores_dimensao: Json
+          p_setor: string
+          p_tempo_relacionamento: string
+          p_tipo_stakeholder: string
+          p_token: string
         }
         Returns: string
       }
