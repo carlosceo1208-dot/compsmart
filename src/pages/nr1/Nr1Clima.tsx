@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle } from 'lucide-react';
+import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DIMENSAO_LABEL, interpretarClima, CORRELACAO_COPSOQ, type ClimaDimensao } from '@/lib/climaQuestoes';
 
@@ -25,6 +25,9 @@ type Pesquisa = {
   total_respondentes: number;
   score_geral: number | null;
   scores_dimensao: Record<string, number> | null;
+  public_token: string;
+  convites_enviados: number;
+  last_invite_at: string | null;
 };
 
 const STATUS_BADGE: Record<Pesquisa['status'], { label: string; className: string }> = {
