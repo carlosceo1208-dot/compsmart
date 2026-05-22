@@ -6,6 +6,8 @@ import type { GrauRiscoInss } from '@/lib/nr1Risco';
 
 export type Nr1AcaoStatus = 'pendente' | 'em_andamento' | 'concluido' | 'atrasado';
 export type Nr1AcaoPrioridade = 'baixa' | 'media' | 'alta' | 'critica';
+export type Nr1AcaoOrigem = 'manual' | 'nr1' | 'clima' | 'unificado';
+export type Nr1AprovacaoStatus = 'rascunho' | 'em_aprovacao' | 'aprovado' | 'rejeitado' | 'revisao_solicitada';
 
 export interface Nr1PlanoAcao {
   id: string;
@@ -23,6 +25,10 @@ export interface Nr1PlanoAcao {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  origem: Nr1AcaoOrigem | null;
+  clima_pesquisa_id: string | null;
+  aprovacao_status: Nr1AprovacaoStatus | null;
+  dimensoes_relacionadas: string[] | null;
 }
 
 export const useNr1PlanosAcao = () => {
