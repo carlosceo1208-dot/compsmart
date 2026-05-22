@@ -1,44 +1,90 @@
-# Plano: Conhecimento de "Plano Sustentável NR-1" no Agente Bem-Estar
+## Plano de correção do item 3 em diante
 
-## Objetivo
-Expandir o `SYSTEM_PROMPT` do agente `nr1-bem-estar-agent` com uma nova seção metodológica detalhada sobre **como elaborar um Plano Sustentável de NR-1** — cobrindo o ciclo completo (governança → diagnóstico → priorização → ações → monitoramento → melhoria contínua), para que o agente entregue planos consistentes, defensáveis em fiscalização e sustentáveis no tempo.
+### Diagnóstico do travamento
+O item 3 não foi concluído de fato. Hoje existem peças parciais, mas elas não fecham o fluxo prometido:
 
-## Arquivo afetado
-- `supabase/functions/nr1-bem-estar-agent/index.ts` — apenas edição da constante `SYSTEM_PROMPT` (entre as seções atuais "INSTRUMENTOS" e "PROTOCOLO DE RISCO CRÍTICO").
+- A tela `Nr1ClimaCorrelacao.tsx` faz uma correlação apenas no frontend, usando os últimos resultados de clima e NR-1.
+- O “Plano de Ação Unificado” é apenas visual; ele não cria ações unificadas no banco.
+- A tela `Nr1PlanosAcao.tsx` ainda usa o modelo antigo e não exibe `origem`, `aprovacao_status`, `clima_pesquisa_id` nem dimensões relacionadas.
+- A migration existente adicionou governança (`origem`, aprovação etc.), mas não criou a view de correlação nem os campos prometidos para o plano unificado.
+- Há inconsistência de nomenclatura: a governança usa `origem = 'copsoq'`, enquanto o plano anterior previa `nr1` / `clima` / `unificado`.
 
-Nenhuma outra mudança: sem alterações de UI, rotas, banco, RLS ou dependências.
+Conclusão: o bug não está só no item 3; o fluxo ficou incompleto entre os itens 1, 2 e 3. Faz sentido revisar e consolidar a arquitetura antes de seguir.
 
-## Conteúdo a adicionar (nova seção do prompt)
+### O que vou corrigir
 
-**## METODOLOGIA: PLANO SUSTENTÁVEL DE NR-1 (ciclo PDCA + ISO 45003)**
+#### 1. Consolidar o modelo de dados dos planos de ação
+Vou revisar `nr1_planos_acao` para suportar corretamente o fluxo final:
+- padronizar `origem` para valores coerentes com o produto: `manual`, `nr1`, `clima`, `unificado`
+- adicionar `dimensoes_relacionadas text[]` para registrar vínculos múltiplos entre clima e NR-1
+- manter compatibilidade com o que já foi criado na governança
+- preservar multi-tenant e RLS por `company_id`
 
-Estrutura em 8 etapas que o agente deve seguir/recomendar sempre que o usuário pedir "plano NR-1", "como começar", "plano de ação sustentável", "implantação NR-1":
+Se necessário, a migration também normaliza registros antigos que hoje estejam como `copsoq`.
 
-1. **Governança e patrocínio** — comitê multidisciplinar (RH, SESMT, jurídico, liderança executiva, representação dos trabalhadores/CIPA), política formal aprovada pela alta direção, orçamento dedicado, responsáveis nomeados (RACI), cadência de reuniões.
-2. **Mapeamento de contexto (baseline)** — inventário de processos, jornadas, modalidades (presencial/híbrido/home office), turnos, populações vulneráveis, histórico de afastamentos CID-F (eSocial S-2220/S-2240), absenteísmo, turnover, reclamações no canal de ética, indicadores de clima.
-3. **Diagnóstico psicossocial** — Quick Screening (DASS-21 subset) + COPSOQ-III-BR completo, garantindo anonimato (mín. 5 respondentes por recorte), consentimento LGPD, comunicação prévia, meta de adesão ≥ 60%.
-4. **Análise e priorização (matriz risco × esforço)** — cruzar as 6 dimensões COPSOQ × 13 fatores NR-1, classificar risco (baixo/moderado/alto/crítico), ranquear por gravidade × nº de expostos × esforço/custo de mitigação; usar critério ISO 45003 (eliminar > substituir > controles administrativos > EPI psicossocial).
-5. **Desenho do plano de ação** — para cada risco prioritário entregar: **objetivo SMART → ação (com base científica) → responsável → prazo → recurso → indicador de sucesso → evidência documental**. Combinar ações de 3 níveis (Cox & Griffiths):
-   - **Primárias** (eliminar a fonte: redesenho de carga, jornada, liderança, metas)
-   - **Secundárias** (capacitar pessoas: treinamento de líderes, mindfulness, comunicação não-violenta)
-   - **Terciárias** (tratar quem já adoeceu: EAP, retorno ao trabalho, reabilitação)
-6. **Implementação e comunicação** — cronograma realista (quick wins em 30/60/90 dias + ações estruturais em 6–18 meses), comunicação transparente dos resultados agregados, treinamento obrigatório de líderes (item 1.5.3.2 da NR-1), integração com onboarding e PDI.
-7. **Monitoramento contínuo (KPIs sustentáveis)** — pulse checks trimestrais, rediagnóstico COPSOQ anual, indicadores: índice de risco psicossocial, eNPS, absenteísmo CID-F, turnover voluntário, taxa de adesão a EAP, nº de afastamentos > 15 dias, ROI (custo evitado de turnover/afastamento × investimento).
-8. **Revisão crítica e melhoria contínua (PDCA)** — análise crítica pela alta direção a cada 12 meses, atualização da matriz de riscos, lições aprendidas, ajuste de metas, documentação completa para fiscalização (atas, evidências de treinamento, planos, indicadores, ações tomadas).
+#### 2. Criar a camada de correlação no backend
+Em vez de depender só de cálculo no frontend, vou criar a estrutura correta no banco:
+- view SQL de correlação Clima × COPSOQ por `company_id`
+- uso da pesquisa de clima respondida mais recente + diagnóstico NR-1 concluído mais recente
+- cálculo de severidade combinada, convergência/divergência e gap entre instrumentos
+- ordenação pronta para consumo pelo dashboard e pela página de correlação
 
-**Princípios de sustentabilidade** (sempre reforçar):
-- Não é projeto pontual: é **sistema de gestão contínuo**, integrado ao SGSST.
-- Liderança como variável crítica — sem líder treinado, plano não sobrevive.
-- Dados conectados (psicossocial + performance + remuneração) para evitar decisões isoladas.
-- Transparência radical com agregados; sigilo absoluto com individuais.
-- Cultura > campanha: ações estruturais (carga, autonomia, reconhecimento) > ações cosméticas (yoga na sexta).
+Isso reduz fragilidade do frontend e resolve a base do item 3.
 
-**Bases científicas/normativas a citar:** NR-1 itens 1.5.3 e 1.5.4, ISO 45003:2021, OIT Guidelines on Mental Health at Work (2022), HSE Management Standards, modelo JD-R (Demerouti & Bakker), Cox & Griffiths (primária/secundária/terciária), LaMontagne et al. (integrated approach), Karasek (demand-control), Edmondson (segurança psicológica).
+#### 3. Refatorar o acesso frontend à correlação
+Vou substituir a lógica solta da página por um hook dedicado, para o fluxo ficar estável e reutilizável:
+- criar `useClimaCopsoqCorrelacao`
+- consumir a view do banco
+- devolver lista pronta com scores, status, prioridade e sugestão de ação
 
-## Detalhes técnicos
-- Edição localizada na string `SYSTEM_PROMPT` (linhas ~10–59) — inserir nova seção `## METODOLOGIA: PLANO SUSTENTÁVEL DE NR-1` após a seção "INSTRUMENTOS — USO CORRETO" e antes de "PROTOCOLO DE RISCO CRÍTICO".
-- Deploy automático do edge function após salvar.
-- Não requer migração, secret, ou mudança de tipos.
+Assim o dashboard, a página de correlação e a geração de plano passam a falar a mesma linguagem.
 
-## Critério de aceite
-Ao perguntar ao agente "Como elaboro um plano sustentável de NR-1 para minha empresa?", a resposta deve enumerar as 8 etapas, com objetivo/ações/indicadores, citar NR-1 + ISO 45003 + Cox & Griffiths, e reforçar os princípios de sustentabilidade.
+#### 4. Finalizar a página de correlação
+Em `Nr1ClimaCorrelacao.tsx`, vou concluir o que foi prometido:
+- manter a leitura analítica da correlação
+- mostrar causas raiz priorizadas
+- trocar o CTA genérico por ação real de “Gerar plano de ação unificado”
+- permitir gerar plano já vinculado às dimensões correlacionadas
+
+#### 5. Corrigir a tela Plano de Ação para o modelo novo
+Em `Nr1PlanosAcao.tsx` e `useNr1PlanosAcao.ts`, vou atualizar a tela para refletir o estado real do produto:
+- incluir `origem` nos cards
+- incluir `aprovacao_status` quando houver
+- incluir referência a pesquisa de clima / vínculo unificado
+- incluir `dimensoes_relacionadas`
+- ajustar criação/edição para não quebrar o fluxo atual
+
+Isso fecha a parte que hoje ficou “travada” ao abrir `/nr1/planos-acao` depois da expansão do módulo.
+
+#### 6. Adicionar o card no dashboard NR-1
+Em `Nr1Dashboard.tsx`, vou inserir o card “Correlações de Risco” com:
+- top 3 correlações prioritárias
+- destaque visual para convergência crítica
+- atalho para `/nr1/clima/correlacao`
+
+#### 7. Garantir compatibilidade com os itens 1 e 2 já entregues
+Vou revisar os pontos anteriores para não quebrar o que já funciona:
+- links públicos e convites de clima permanecem como estão
+- dashboard e listagem de pesquisas continuam funcionando
+- governança continua operando sobre `nr1_planos_acao`
+- se houver conflito de nomenclatura/estado herdado, faço migração de compatibilidade em vez de sobrescrever do zero
+
+### Arquivos que devo alterar
+- `supabase/migrations/<nova_migration>.sql`
+- `src/hooks/useNr1PlanosAcao.ts`
+- `src/pages/nr1/Nr1PlanosAcao.tsx`
+- `src/pages/nr1/Nr1ClimaCorrelacao.tsx`
+- `src/pages/nr1/Nr1Dashboard.tsx`
+- `src/hooks/useClimaCopsoqCorrelacao.ts` (novo)
+- possivelmente um componente novo para o card de correlação no dashboard
+
+### Resultado esperado
+Ao final:
+- a correlação Clima × COPSOQ deixa de ser apenas visual e passa a ter base consistente
+- o botão/CTA de plano unificado cria ações reais
+- `/nr1/planos-acao` volta a representar corretamente o fluxo completo
+- a governança continua compatível
+- o item 3 deixa de travar e os próximos itens passam a ter base segura para continuação
+
+### Observação técnica
+Não vou refazer os itens 1 e 2 do zero, a menos que encontre incompatibilidade estrutural grave. A abordagem será de correção incremental com compatibilidade, porque já existe valor implementado e o problema principal está na integração e no fechamento do fluxo.

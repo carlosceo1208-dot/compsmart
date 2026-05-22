@@ -6,8 +6,9 @@ import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, GitCompare, AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react';
+import { ArrowLeft, GitCompare, AlertTriangle, CheckCircle2, Lightbulb, Sparkles } from 'lucide-react';
 import { DIMENSAO_LABEL, type ClimaDimensao } from '@/lib/climaQuestoes';
+import { useGerarPlanoUnificado, type CorrelacaoRow } from '@/hooks/useClimaCopsoqCorrelacao';
 
 type Nr1Dimensao =
   | 'demandas_trabalho' | 'organizacao_conteudo' | 'relacoes_lideranca'
@@ -268,10 +269,11 @@ export default function Nr1ClimaCorrelacao() {
                     </li>
                   ))}
                 </ol>
-                <div className="mt-4 pt-3 border-t flex justify-end">
-                  <Button asChild size="sm">
-                    <Link to="/nr1/planos-acao">Criar plano de ação formal →</Link>
+                <div className="mt-4 pt-3 border-t flex justify-end gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/nr1/planos-acao">Ver Planos de Ação</Link>
                   </Button>
+                  <GerarPlanoUnificadoBtn pares={pares} climaId={climaAtual.id} diagnosticoId={diagAtual.id} />
                 </div>
               </CardContent>
             </Card>
@@ -279,5 +281,33 @@ export default function Nr1ClimaCorrelacao() {
         </>
       )}
     </div>
+  );
+}
+
+function GerarPlanoUnificadoBtn({ pares, climaId, diagnosticoId }: { pares: any[]; climaId: string; diagnosticoId: string }) {
+  const gerar = useGerarPlanoUnificado();
+  const causasRaiz = pares.filter((p) => p.ambos);
+  const rows: CorrelacaoRow[] = causasRaiz.map((p) => ({
+    company_id: '',
+    clima_id: climaId,
+    clima_nome: '',
+    clima_respondentes: 0,
+    diagnostico_id: diagnosticoId,
+    diag_nome: '',
+    diag_respondentes: 0,
+    clima_dim: p.cd,
+    copsoq_dim: p.nd,
+    clima_score: p.climaScore,
+    copsoq_score_raw: p.copsoqRaw,
+    copsoq_score_eq: p.copsoqEq,
+    clima_status: p.climaStatus,
+    copsoq_status: p.copsoqStatus,
+    prioridade: 'causa_raiz',
+  }));
+  return (
+    <Button size="sm" disabled={gerar.isPending || rows.length === 0} onClick={() => gerar.mutate(rows)}>
+      <Sparkles className="h-3.5 w-3.5 mr-1" />
+      {gerar.isPending ? 'Gerando...' : `Gerar Plano Unificado (${rows.length})`}
+    </Button>
   );
 }
