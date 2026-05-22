@@ -1243,6 +1243,13 @@ export type Database = {
             referencedRelation: "clima_pesquisas"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "clima_externo_respostas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["clima_id"]
+          },
         ]
       }
       clima_pesquisas: {
@@ -1355,6 +1362,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "clima_pesquisas"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clima_respostas_pesquisa_id_fkey"
+            columns: ["pesquisa_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["clima_id"]
           },
         ]
       }
@@ -4076,6 +4090,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "nr1_diagnostico_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+          {
             foreignKeyName: "nr1_diagnostico_respostas_questao_id_fkey"
             columns: ["questao_id"]
             isOneToOne: false
@@ -4289,6 +4310,7 @@ export type Database = {
           descricao: string | null
           diagnostico_id: string | null
           dimensao: string | null
+          dimensoes_relacionadas: string[] | null
           evidencias: string | null
           id: string
           impacto_estimado: string | null
@@ -4316,6 +4338,7 @@ export type Database = {
           descricao?: string | null
           diagnostico_id?: string | null
           dimensao?: string | null
+          dimensoes_relacionadas?: string[] | null
           evidencias?: string | null
           id?: string
           impacto_estimado?: string | null
@@ -4343,6 +4366,7 @@ export type Database = {
           descricao?: string | null
           diagnostico_id?: string | null
           dimensao?: string | null
+          dimensoes_relacionadas?: string[] | null
           evidencias?: string | null
           id?: string
           impacto_estimado?: string | null
@@ -4367,6 +4391,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "nr1_diagnosticos"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_planos_acao_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
           },
         ]
       }
@@ -9295,6 +9326,26 @@ export type Database = {
           },
         ]
       }
+      vw_nr1_clima_copsoq_correlacao: {
+        Row: {
+          clima_dim: string | null
+          clima_id: string | null
+          clima_nome: string | null
+          clima_respondentes: number | null
+          clima_score: number | null
+          clima_status: string | null
+          company_id: string | null
+          copsoq_dim: string | null
+          copsoq_score_eq: number | null
+          copsoq_score_raw: number | null
+          copsoq_status: string | null
+          diag_nome: string | null
+          diag_respondentes: number | null
+          diagnostico_id: string | null
+          prioridade: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       apply_merit_to_budget: {
@@ -9897,6 +9948,7 @@ export type Database = {
           descricao: string | null
           diagnostico_id: string | null
           dimensao: string | null
+          dimensoes_relacionadas: string[] | null
           evidencias: string | null
           id: string
           impacto_estimado: string | null
