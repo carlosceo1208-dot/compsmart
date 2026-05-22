@@ -9,6 +9,7 @@ import { DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/n
 import { Download, Users, AlertTriangle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { GerarPgrButton } from '@/components/nr1/GerarPgrButton';
 
 export default function Nr1DiagnosticoDetalhe() {
   const { id } = useParams<{ id: string }>();
@@ -51,9 +52,24 @@ export default function Nr1DiagnosticoDetalhe() {
             Período: {data.periodo_inicio} {data.periodo_fim ? `→ ${data.periodo_fim}` : '(em andamento)'}
           </p>
         </div>
-        <Button onClick={exportar} variant="outline">
-          <Download className="h-4 w-4 mr-1" /> Exportar PDF
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button onClick={exportar} variant="outline">
+            <Download className="h-4 w-4 mr-1" /> Exportar PDF
+          </Button>
+          <GerarPgrButton
+            size="default"
+            className="nr1-bg-primary"
+            diagnostico={{
+              ciclo_nome: data.ciclo_nome,
+              periodo_inicio: data.periodo_inicio,
+              periodo_fim: data.periodo_fim,
+              score_geral: data.score_geral as number | null,
+              nivel_risco: data.nivel_risco as string | null,
+              scores_dimensao: data.scores_dimensao as Record<string, number> | null,
+              total_respondentes: data.total_respondentes,
+            }}
+          />
+        </div>
       </div>
 
       {/* KPI bar */}
