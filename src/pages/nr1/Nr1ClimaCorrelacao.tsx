@@ -6,8 +6,9 @@ import { useCompanyContext } from '@/contexts/CompanyContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, GitCompare, AlertTriangle, CheckCircle2, Lightbulb } from 'lucide-react';
+import { ArrowLeft, GitCompare, AlertTriangle, CheckCircle2, Lightbulb, Sparkles } from 'lucide-react';
 import { DIMENSAO_LABEL, type ClimaDimensao } from '@/lib/climaQuestoes';
+import { useGerarPlanoUnificado, type CorrelacaoRow } from '@/hooks/useClimaCopsoqCorrelacao';
 
 type Nr1Dimensao =
   | 'demandas_trabalho' | 'organizacao_conteudo' | 'relacoes_lideranca'
