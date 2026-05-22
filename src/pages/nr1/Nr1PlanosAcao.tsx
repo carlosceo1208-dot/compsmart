@@ -112,8 +112,25 @@ export default function Nr1PlanosAcao() {
                       <Badge className={ACAO_PRIORIDADE_CLASS[p.prioridade]}>
                         Prioridade {ACAO_PRIORIDADE_LABEL[p.prioridade]}
                       </Badge>
+                      {p.origem && p.origem !== 'manual' && (
+                        <Badge variant="outline" className={
+                          p.origem === 'unificado' ? 'border-rose-300 text-rose-700 bg-rose-50'
+                          : p.origem === 'clima' ? 'border-amber-300 text-amber-700 bg-amber-50'
+                          : 'border-sky-300 text-sky-700 bg-sky-50'
+                        }>
+                          {p.origem === 'unificado' ? '⚡ Unificado' : p.origem === 'clima' ? '🌡️ Clima' : '🧠 NR-1'}
+                        </Badge>
+                      )}
+                      {p.aprovacao_status && p.aprovacao_status !== 'rascunho' && (
+                        <Badge variant="outline" className="text-xs">Aprovação: {p.aprovacao_status.replace('_', ' ')}</Badge>
+                      )}
                       {p.dimensao && (
                         <Badge variant="outline">{DIMENSAO_LABEL[p.dimensao as Dimensao] ?? p.dimensao}</Badge>
+                      )}
+                      {p.dimensoes_relacionadas && p.dimensoes_relacionadas.length > 0 && (
+                        <Badge variant="outline" className="text-xs">
+                          {p.dimensoes_relacionadas.length} dimensões relacionadas
+                        </Badge>
                       )}
                       {p.prazo && <Badge variant="outline">Prazo: {new Date(p.prazo).toLocaleDateString('pt-BR')}</Badge>}
                     </div>
