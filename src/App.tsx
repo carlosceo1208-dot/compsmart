@@ -294,6 +294,7 @@ const App = () => {
                       {/* Public */}
                       <Route path="/feedback/:token" element={<ExternalFeedbackForm />} />
                       <Route path="/clima/publico/:token" element={<ClimaPublico />} />
+                      <Route path="/clima-externo/:token" element={<ClimaExternoPublico />} />
 
                       <Route path="*" element={<NotFound />} />
                     </Routes>
