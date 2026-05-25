@@ -60,6 +60,16 @@ export default function ClimaPublico() {
   const total = QUESTOES.length;
   const progresso = (answered / total) * 100;
 
+  // Embaralhar perguntas (Fisher–Yates) para evitar indução por dimensão; estável durante a sessão
+  const questoesEmbaralhadas = useMemo(() => {
+    const arr = [...QUESTOES];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, []);
+
   const enviar = async () => {
     if (!token || !pesquisa) return;
     setSubmitting(true);
