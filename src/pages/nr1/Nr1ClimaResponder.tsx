@@ -42,6 +42,16 @@ export default function Nr1ClimaResponder() {
   const total = QUESTOES.length;
   const progresso = (answered / total) * 100;
 
+  // Embaralhar perguntas (Fisher–Yates) para evitar indução por dimensão; estável durante a sessão
+  const questoesEmbaralhadas = useMemo(() => {
+    const arr = [...QUESTOES];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, []);
+
   const enviar = async () => {
     if (!id) return;
     setSubmitting(true);
@@ -203,41 +213,32 @@ export default function Nr1ClimaResponder() {
         <Progress value={progresso} />
       </div>
 
-      {DIMENSOES.map((dim) => {
-        const itens = QUESTOES.filter((q) => q.dimensao === dim);
+      {questoesEmbaralhadas.map((q, idx) => {
+        const key = `${q.dimensao}_${q.num}`;
         return (
-          <Card key={dim}>
-            <CardHeader>
-              <CardTitle className="text-base">{DIMENSAO_LABEL[dim]}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {itens.map((q) => {
-                const key = `${q.dimensao}_${q.num}`;
-                return (
-                  <div key={key} className="space-y-1.5">
-                    <p className="text-sm font-medium">{q.num}. {q.texto}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {ESCALA_OPCOES.map((o) => {
-                        const selected = respostas[key] === o.value;
-                        return (
-                          <button
-                            key={o.value}
-                            type="button"
-                            onClick={() => setRespostas({ ...respostas, [key]: o.value })}
-                            className={`px-2.5 py-1.5 rounded-md border text-xs transition-all ${
-                              selected
-                                ? 'bg-[hsl(var(--nr1-primary))] text-white border-[hsl(var(--nr1-primary))]'
-                                : 'border-border hover:border-[hsl(var(--nr1-primary))]'
-                            }`}
-                          >
-                            {o.value} · {o.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+          <Card key={key}>
+            <CardContent className="space-y-3 py-4">
+              <p className="text-xs font-semibold text-muted-foreground">Pergunta {idx + 1} de {total}</p>
+              <p className="text-sm font-medium">{q.texto}</p>
+              <div className="flex flex-wrap gap-1.5">
+                {ESCALA_OPCOES.map((o) => {
+                  const selected = respostas[key] === o.value;
+                  return (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => setRespostas({ ...respostas, [key]: o.value })}
+                      className={`px-2.5 py-1.5 rounded-md border text-xs transition-all ${
+                        selected
+                          ? 'bg-[hsl(var(--nr1-primary))] text-white border-[hsl(var(--nr1-primary))]'
+                          : 'border-border hover:border-[hsl(var(--nr1-primary))]'
+                      }`}
+                    >
+                      {o.value} · {o.label}
+                    </button>
+                  );
+                })}
+              </div>
             </CardContent>
           </Card>
         );
