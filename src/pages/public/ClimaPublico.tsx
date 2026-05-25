@@ -265,41 +265,32 @@ export default function ClimaPublico() {
               <Progress value={progresso} />
             </div>
 
-            {DIMENSOES.map((dim) => {
-              const itens = QUESTOES.filter((q) => q.dimensao === dim);
+            {questoesEmbaralhadas.map((q, idx) => {
+              const key = `${q.dimensao}_${q.num}`;
               return (
-                <Card key={dim}>
-                  <CardHeader>
-                    <CardTitle className="text-base">{DIMENSAO_LABEL[dim]}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {itens.map((q) => {
-                      const key = `${q.dimensao}_${q.num}`;
-                      return (
-                        <div key={key} className="space-y-1.5">
-                          <p className="text-sm font-medium">{q.num}. {q.texto}</p>
-                          <div className="flex flex-wrap gap-1.5">
-                            {ESCALA_OPCOES.map((o) => {
-                              const selected = respostas[key] === o.value;
-                              return (
-                                <button
-                                  key={o.value}
-                                  type="button"
-                                  onClick={() => setRespostas({ ...respostas, [key]: o.value })}
-                                  className={`px-2.5 py-1.5 rounded-md border text-xs transition-all ${
-                                    selected
-                                      ? 'bg-[hsl(11_77%_60%)] text-white border-[hsl(11_77%_60%)]'
-                                      : 'border-border hover:border-[hsl(11_77%_60%)]'
-                                  }`}
-                                >
-                                  {o.value} · {o.label}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
+                <Card key={key}>
+                  <CardContent className="space-y-3 py-4">
+                    <p className="text-xs font-semibold text-muted-foreground">Pergunta {idx + 1} de {total}</p>
+                    <p className="text-sm font-medium">{q.texto}</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {ESCALA_OPCOES.map((o) => {
+                        const selected = respostas[key] === o.value;
+                        return (
+                          <button
+                            key={o.value}
+                            type="button"
+                            onClick={() => setRespostas({ ...respostas, [key]: o.value })}
+                            className={`px-2.5 py-1.5 rounded-md border text-xs transition-all ${
+                              selected
+                                ? 'bg-[hsl(11_77%_60%)] text-white border-[hsl(11_77%_60%)]'
+                                : 'border-border hover:border-[hsl(11_77%_60%)]'
+                            }`}
+                          >
+                            {o.value} · {o.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </CardContent>
                 </Card>
               );
