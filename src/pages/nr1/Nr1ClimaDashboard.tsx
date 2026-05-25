@@ -7,8 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { ArrowLeft, AlertTriangle, TrendingUp, TrendingDown, Users, Smile, Frown, Meh } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, TrendingUp, TrendingDown, Users, Smile, Frown, Meh, Radar as RadarIcon, LineChart as LineChartIcon, BarChart3 } from 'lucide-react';
 import { DIMENSAO_LABEL, type ClimaDimensao, interpretarClima } from '@/lib/climaQuestoes';
+import {
+  ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, BarChart, Bar,
+} from 'recharts';
 
 type Pesquisa = {
   id: string; nome: string; status: string; periodo_inicio: string;
