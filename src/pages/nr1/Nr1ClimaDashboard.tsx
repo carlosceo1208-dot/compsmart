@@ -143,6 +143,42 @@ export default function Nr1ClimaDashboard() {
       .map((p) => ({ nome: p.nome, data: p.periodo_inicio, score: p.score_geral!, n: p.total_respondentes }));
   }, [pesquisas]);
 
+  // Radar: dimensões atuais vs ciclo anterior
+  const radarData = useMemo(() => {
+    if (!pesquisaAtual?.scores_dimensao) return [];
+    const idx = pesquisas.findIndex((p) => p.id === pesquisaAtual.id);
+    const anterior = idx > 0 ? pesquisas[idx - 1] : null;
+    return dimensoes.map((d) => ({
+      dim: DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' '),
+      atual: Number((pesquisaAtual.scores_dimensao?.[d] ?? 0).toFixed(2)),
+      anterior: anterior?.scores_dimensao?.[d] != null ? Number(anterior.scores_dimensao[d].toFixed(2)) : null,
+    }));
+  }, [pesquisaAtual, pesquisas]);
+
+  // Evolução por dimensão entre ciclos
+  const evolucaoDim = useMemo(() => {
+    return pesquisas
+      .filter((p) => p.scores_dimensao)
+      .map((p) => {
+        const row: any = { nome: p.nome.length > 14 ? p.nome.slice(0, 12) + '…' : p.nome };
+        for (const d of dimensoes) {
+          const v = p.scores_dimensao?.[d];
+          if (typeof v === 'number') row[d] = Number(v.toFixed(2));
+        }
+        return row;
+      });
+  }, [pesquisas]);
+
+  // Top/bottom segmentos por score geral
+  const topBottom = useMemo(() => {
+    const ranked = heatmap.filter((r) => r.geral != null);
+    const top = ranked.slice(0, 5).map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
+    const bottom = ranked.slice(-5).reverse().map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
+    return { top, bottom };
+  }, [heatmap]);
+
+  // placeholder removed
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
