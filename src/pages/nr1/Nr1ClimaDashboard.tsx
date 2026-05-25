@@ -7,8 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { ArrowLeft, AlertTriangle, TrendingUp, TrendingDown, Users, Smile, Frown, Meh } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, TrendingUp, TrendingDown, Users, Smile, Frown, Meh, Radar as RadarIcon, LineChart as LineChartIcon, BarChart3 } from 'lucide-react';
 import { DIMENSAO_LABEL, type ClimaDimensao, interpretarClima } from '@/lib/climaQuestoes';
+import {
+  ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+  LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, BarChart, Bar,
+} from 'recharts';
 
 type Pesquisa = {
   id: string; nome: string; status: string; periodo_inicio: string;
@@ -138,6 +142,42 @@ export default function Nr1ClimaDashboard() {
       .filter((p) => p.score_geral != null)
       .map((p) => ({ nome: p.nome, data: p.periodo_inicio, score: p.score_geral!, n: p.total_respondentes }));
   }, [pesquisas]);
+
+  // Radar: dimensões atuais vs ciclo anterior
+  const radarData = useMemo(() => {
+    if (!pesquisaAtual?.scores_dimensao) return [];
+    const idx = pesquisas.findIndex((p) => p.id === pesquisaAtual.id);
+    const anterior = idx > 0 ? pesquisas[idx - 1] : null;
+    return dimensoes.map((d) => ({
+      dim: DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' '),
+      atual: Number((pesquisaAtual.scores_dimensao?.[d] ?? 0).toFixed(2)),
+      anterior: anterior?.scores_dimensao?.[d] != null ? Number(anterior.scores_dimensao[d].toFixed(2)) : null,
+    }));
+  }, [pesquisaAtual, pesquisas]);
+
+  // Evolução por dimensão entre ciclos
+  const evolucaoDim = useMemo(() => {
+    return pesquisas
+      .filter((p) => p.scores_dimensao)
+      .map((p) => {
+        const row: any = { nome: p.nome.length > 14 ? p.nome.slice(0, 12) + '…' : p.nome };
+        for (const d of dimensoes) {
+          const v = p.scores_dimensao?.[d];
+          if (typeof v === 'number') row[d] = Number(v.toFixed(2));
+        }
+        return row;
+      });
+  }, [pesquisas]);
+
+  // Top/bottom segmentos por score geral
+  const topBottom = useMemo(() => {
+    const ranked = heatmap.filter((r) => r.geral != null);
+    const top = ranked.slice(0, 5).map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
+    const bottom = ranked.slice(-5).reverse().map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
+    return { top, bottom };
+  }, [heatmap]);
+
+  // placeholder removed
 
   return (
     <div className="space-y-4">
@@ -318,7 +358,111 @@ export default function Nr1ClimaDashboard() {
             </Card>
           )}
 
-          {/* eNPS detalhado */}
+          {/* Radar: atual vs ciclo anterior */}
+          {radarData.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2"><RadarIcon className="h-4 w-4" /> Radar de Dimensões — Atual vs Ciclo Anterior</CardTitle>
+                <CardDescription className="text-xs">Compare o perfil das 10 dimensões entre o ciclo selecionado e o anterior (escala 1–5).</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[340px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={radarData} outerRadius="75%">
+                      <PolarGrid stroke="hsl(var(--border))" />
+                      <PolarAngleAxis dataKey="dim" tick={{ fontSize: 10, fill: 'hsl(var(--foreground))' }} />
+                      <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fontSize: 9 }} />
+                      {radarData.some((r) => r.anterior != null) && (
+                        <Radar name="Ciclo anterior" dataKey="anterior" stroke="hsl(var(--muted-foreground))" fill="hsl(var(--muted-foreground))" fillOpacity={0.15} />
+                      )}
+                      <Radar name="Ciclo atual" dataKey="atual" stroke="hsl(160 70% 40%)" fill="hsl(160 70% 40%)" fillOpacity={0.35} />
+                      <Legend wrapperStyle={{ fontSize: 11 }} />
+                      <Tooltip contentStyle={{ fontSize: 11 }} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Evolução por dimensão entre ciclos */}
+          {evolucaoDim.length > 1 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2"><LineChartIcon className="h-4 w-4" /> Evolução por Dimensão</CardTitle>
+                <CardDescription className="text-xs">Trajetória de cada dimensão entre os ciclos de pesquisa.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[320px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={evolucaoDim} margin={{ top: 6, right: 12, left: -16, bottom: 4 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="nome" tick={{ fontSize: 10 }} />
+                      <YAxis domain={[1, 5]} tick={{ fontSize: 10 }} />
+                      <Tooltip contentStyle={{ fontSize: 11 }} />
+                      <Legend wrapperStyle={{ fontSize: 10 }} />
+                      {dimensoes.map((d, i) => (
+                        <Line
+                          key={d}
+                          type="monotone"
+                          dataKey={d}
+                          name={DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' ')}
+                          stroke={`hsl(${(i * 36) % 360} 65% 50%)`}
+                          strokeWidth={1.8}
+                          dot={{ r: 2 }}
+                        />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Top vs Bottom segmentos */}
+          {(topBottom.top.length > 0 || topBottom.bottom.length > 0) && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2 text-emerald-700"><BarChart3 className="h-4 w-4" /> Top 5 — {SEG_LABEL[segmento]}</CardTitle>
+                  <CardDescription className="text-xs">Maiores scores gerais por {SEG_LABEL[segmento].toLowerCase()}.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={topBottom.top} layout="vertical" margin={{ top: 4, right: 12, left: 8, bottom: 4 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis type="number" domain={[0, 5]} tick={{ fontSize: 10 }} />
+                        <YAxis type="category" dataKey="nome" tick={{ fontSize: 10 }} width={120} />
+                        <Tooltip contentStyle={{ fontSize: 11 }} />
+                        <Bar dataKey="score" fill="hsl(160 70% 40%)" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2 text-red-700"><BarChart3 className="h-4 w-4" /> Bottom 5 — {SEG_LABEL[segmento]}</CardTitle>
+                  <CardDescription className="text-xs">Menores scores — prioridade de ação.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={topBottom.bottom} layout="vertical" margin={{ top: 4, right: 12, left: 8, bottom: 4 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                        <XAxis type="number" domain={[0, 5]} tick={{ fontSize: 10 }} />
+                        <YAxis type="category" dataKey="nome" tick={{ fontSize: 10 }} width={120} />
+                        <Tooltip contentStyle={{ fontSize: 11 }} />
+                        <Bar dataKey="score" fill="hsl(0 70% 50%)" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {enps && (
             <Card>
               <CardHeader className="pb-2">
