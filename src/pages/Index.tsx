@@ -16,7 +16,7 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
-import { StickyCTABar } from "@/components/landing/StickyCTABar";
+
 
 /**
  * Landing page — fluxo enxuto AIDA + StoryBrand:
