@@ -21,5 +21,19 @@ Disallow: /admin
 Disallow: /super-admin
 Disallow: /checkout
 Disallow: /onboarding
+Disallow: /auth
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /activate
+Disallow: /my-profile
+Disallow: /performance/
+Disallow: /nr1/painel
+Disallow: /nr1/diagnostico
+Disallow: /nr1/diagnosticos
+Disallow: /nr1/inteligencia
+Disallow: /nr1/clima
+Disallow: /feedback/
+Disallow: /clima/publico/
+Disallow: /clima-externo/
 
 Sitemap: https://www.compsmart.ia.br/sitemap.xml
