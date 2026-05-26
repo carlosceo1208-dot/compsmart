@@ -235,7 +235,7 @@ const Pricing = () => {
               </div>
               <div className="mt-4 flex flex-wrap gap-2 justify-center">
                 <Button variant="outline" asChild>
-                  <a href="/nr1-publico">Saber mais sobre NR-1</a>
+                  <a href="/nr1">Saber mais sobre NR-1</a>
                 </Button>
                 <Button onClick={() => navigate('/checkout?plan=nr1_essencial&cycle=monthly')}>
                   Contratar NR-1 Essencial
