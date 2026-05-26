@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Users, BarChart3, TrendingUp, DollarSign } from "lucide-react";
 import { ImpactCalculator } from "./ImpactCalculator";
 import { Nr1HighlightBanner } from "./Nr1HighlightBanner";
+import { StickyCTABar } from "./StickyCTABar";
 import { useState, useEffect, useRef } from "react";
 
 const COMPANY_CYCLE = [1, 2, 3, 2, 1, 3, 2];
