@@ -58,17 +58,18 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Eyebrow */}
-        <div className="flex justify-center mb-8">
+        <Nr1HighlightBanner />
+
+        {/* Eyebrow - separador para o tema Gestão Estratégica */}
+        <div className="flex justify-center mb-8 mt-4">
           <Badge className="bg-secondary/10 text-secondary border-secondary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
             <Sparkles className="h-3 w-3 mr-2" />
             Gestão Estratégica de Remuneração com Avaliação de Desempenho Integrada
           </Badge>
         </div>
 
-        <Nr1HighlightBanner />
-
         {/* Split layout */}
+
         <div className="grid lg:grid-cols-[45%_55%] gap-10 items-start max-w-6xl mx-auto">
           {/* Left - Calculator */}
           <div className="space-y-6">
