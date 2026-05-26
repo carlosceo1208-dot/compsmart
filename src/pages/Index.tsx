@@ -64,11 +64,13 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={isLoggedIn} />
 
-      {/* 1. Atenção */}
+      {/* 1. NR-1 — destaque máximo (urgência regulatória maio/2026) */}
+      <Nr1HighlightBanner />
+
+      {/* 2. Atenção / Hero */}
       <HeroSection />
 
-      {/* 1.5. Destaque NR-1 — urgência regulatória + categoria nova */}
-      <Nr1HighlightBanner />
+
 
       {/* 2. Prova social imediata */}
       <LogoSlider />
