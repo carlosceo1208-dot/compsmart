@@ -252,35 +252,25 @@ export default function LandingNr1() {
             </div>
           </section>
 
-          {/* Planos */}
-          <section className="container mx-auto px-4 py-14">
-            <div className="text-center max-w-2xl mx-auto mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Planos NR-1</h2>
-              <p className="text-muted-foreground">14 dias grátis · sem cartão de crédito · cancele quando quiser.</p>
+          {/* Fale com um especialista — proposta sob medida */}
+          <section id="fale-conosco" className="container mx-auto px-4 py-14">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">Solicite uma proposta personalizada</h2>
+                <p className="text-muted-foreground">
+                  Cada empresa tem um contexto. Conte para a gente o seu — e montamos um pacote
+                  sob medida (NR-1 + 9Box + remuneração) com o melhor custo-benefício para o seu porte.
+                </p>
+              </div>
+              <Card className="border-2 border-[hsl(var(--nr1-primary)/0.3)]">
+                <CardContent className="pt-6">
+                  <ProposalForm />
+                </CardContent>
+              </Card>
+              <p className="text-center mt-6 text-sm text-muted-foreground">
+                Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
+              </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-              {[
-                { n: 'Até 100 colab.', p: 'R$ 349' },
-                { n: '101 a 500 colab.', p: 'R$ 649', destaque: true },
-                { n: '501+ colab.', p: 'R$ 1.190' },
-              ].map((p) => (
-                <Card key={p.n} className={p.destaque ? 'border-2 border-[hsl(var(--nr1-primary))] shadow-lg' : ''}>
-                  <CardContent className="pt-6 text-center">
-                    {p.destaque && (
-                      <Badge className="nr1-bg-accent mb-2 text-[10px] font-bold uppercase tracking-wider">
-                        Mais escolhido
-                      </Badge>
-                    )}
-                    <p className="text-sm text-muted-foreground mb-2">{p.n}</p>
-                    <p className="text-3xl font-bold">{p.p}<span className="text-sm text-muted-foreground">/mês</span></p>
-                    <p className="text-xs text-muted-foreground mt-1">14 dias grátis</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <p className="text-center mt-6 text-sm text-muted-foreground">
-              Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
-            </p>
           </section>
 
           {/* FAQ */}
