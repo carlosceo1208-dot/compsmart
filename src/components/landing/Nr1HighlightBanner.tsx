@@ -29,7 +29,7 @@ export const Nr1HighlightBanner = () => {
           </div>
 
           <Link
-            to="/nr1-publico"
+            to="/nr1"
             className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold transition-all shadow-lg hover:shadow-emerald-500/40 hover:scale-105"
           >
             Conhecer NR-1
