@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Link, useNavigate } from 'react-router-dom';
 import { Brain, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
 import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
+import { Footer } from '@/components/landing/Footer';
 import Nr1PerguntasChro from '@/components/landing/nr1/Nr1PerguntasChro';
 import Nr1TabelaCategoria from '@/components/landing/nr1/Nr1TabelaCategoria';
 import Nr1ComoFunciona from '@/components/landing/nr1/Nr1ComoFunciona';
@@ -382,6 +383,7 @@ export default function LandingNr1() {
       <footer className="border-t mt-10 py-6 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} CompSmart · NR-1 conforme NR-01 atualizada (Portaria MTE 1.419/2024)
       </footer>
+      <Footer />
     </div>
   );
 }
