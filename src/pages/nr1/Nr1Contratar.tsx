@@ -99,7 +99,7 @@ export default function Nr1Contratar() {
             </ul>
             {proIncluso ? (
               <Button className="w-full nr1-bg-primary" asChild>
-                <Link to="/nr1">Acessar NR-1 Pro</Link>
+                <Link to="/nr1/painel">Acessar NR-1 Pro</Link>
               </Button>
             ) : (
               <Button className="w-full" variant="outline" asChild>

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Clock } from 'lucide-react';
 
 /**
- * Destaque NR-1 na home — chama o lead para a landing dedicada (/nr1-publico).
+ * Destaque NR-1 na home — chama o lead para a landing dedicada (/nr1).
  * Aproveita a urgência regulatória (maio/2026) para gerar cliques qualificados.
  */
 export const Nr1HighlightBanner = () => {
@@ -29,7 +29,7 @@ export const Nr1HighlightBanner = () => {
           </div>
 
           <Link
-            to="/nr1-publico"
+            to="/nr1"
             className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-semibold transition-all shadow-lg hover:shadow-emerald-500/40 hover:scale-105"
           >
             Conhecer NR-1

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { CompanyProvider } from "./contexts/CompanyContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -260,13 +260,15 @@ const App = () => {
                       {/* Public SEO landing pages */}
                       <Route path="/plano-de-cargos-e-salarios" element={<LandingCargosSalarios />} />
 
-                      {/* Public NR-1 landing (lead capture) */}
-                      <Route path="/nr1-publico" element={<LandingNr1 />} />
+                      {/* Public NR-1 landing (lead capture) — nova URL oficial */}
+                      <Route path="/nr1" element={<LandingNr1 />} />
+                      {/* Redirect 301-style da URL antiga para preservar SEO e campanhas */}
+                      <Route path="/nr1-publico" element={<Navigate to="/nr1" replace />} />
                       <Route path="/nr1/obrigado" element={<Nr1Obrigado />} />
 
                       {/* NR-1 Module (authenticated) */}
                       <Route element={<Nr1Layout />}>
-                        <Route path="/nr1" element={<Nr1Dashboard />} />
+                        <Route path="/nr1/painel" element={<Nr1Dashboard />} />
                         <Route path="/nr1/diagnostico/novo" element={<Nr1NovoDiagnostico />} />
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />

@@ -243,7 +243,7 @@ export const ModuleGrid = () => {
       title: 'Saúde Mental & Bem-Estar (NR-1)',
       description: 'Diagnóstico, planos de ação e conformidade NR-1 (Portaria MTE 1.419/2024)',
       icon: Brain,
-      path: '/nr1',
+      path: '/nr1/painel',
       status: 'active',
       category: 'consultation',
     },
