@@ -31,12 +31,16 @@ export default function Nr1Hero({ onDiagnostico, onComoFunciona }: Props) {
             </h1>
 
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-              Cruzamos <strong className="text-foreground">risco psicossocial</strong> com{' '}
-              <strong className="text-foreground">9Box</strong> e{' '}
-              <strong className="text-foreground">remuneração</strong>. Transformamos obrigação
+              A <strong className="nr1-text-primary">única plataforma do Brasil</strong> que cruza{' '}
+              <strong className="text-foreground">riscos psicossociais</strong> com{' '}
+              <strong className="text-foreground">Avaliação de Desempenho</strong>,{' '}
+              <strong className="text-foreground">9Box</strong>,{' '}
+              <strong className="text-foreground">Pesquisa de Clima</strong> e{' '}
+              <strong className="text-foreground">Remuneração</strong>. Transformamos obrigação
               legal em <strong className="nr1-text-primary">inteligência de talentos</strong> —
               antes que o seu top talent peça demissão.
             </p>
+
 
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Button size="lg" className="nr1-btn-primary text-white" onClick={onDiagnostico}>
