@@ -67,7 +67,7 @@ const Index = () => {
       {/* 1. Hero / Headlines */}
       <HeroSection />
 
-      {/* 2. NR-1 — destaque logo abaixo do Hero (urgência regulatória maio/2026) */}
+      {/* 2. NR-1 — destaque logo abaixo da faixa verde/headline */}
       <Nr1HighlightBanner />
 
 
