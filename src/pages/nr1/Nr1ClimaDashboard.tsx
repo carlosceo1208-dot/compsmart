@@ -212,6 +212,14 @@ export default function Nr1ClimaDashboard() {
       });
   }, [pesquisas]);
 
+  // Top/bottom segmentos por score geral
+  const topBottom = useMemo(() => {
+    const ranked = heatmap.filter((r) => r.geral != null);
+    const top = ranked.slice(0, 5).map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
+    const bottom = ranked.slice(-5).reverse().map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
+    return { top, bottom };
+  }, [heatmap]);
+
   // Pesquisas selecionadas para comparação multi-ciclos
   const pesquisasCompare = useMemo(
     () => pesquisas.filter((p) => comparePesquisaIds.includes(p.id)),
