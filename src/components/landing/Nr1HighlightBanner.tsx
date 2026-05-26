@@ -7,7 +7,7 @@ import { ShieldCheck, ArrowRight, Clock, Sparkles } from 'lucide-react';
  */
 export const Nr1HighlightBanner = () => {
   return (
-    <section className="relative w-full py-12 overflow-hidden bg-gradient-to-r from-[hsl(217,91%,15%)] via-[hsl(217,91%,22%)] to-[hsl(217,91%,15%)]">
+    <div className="relative w-full mb-8 overflow-hidden">
       {/* Glow animado de fundo */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
         <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-emerald-500/30 blur-3xl animate-pulse" />
@@ -17,8 +17,8 @@ export const Nr1HighlightBanner = () => {
       {/* Faixa pulsante topo */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-pulse" />
 
-      <div className="container mx-auto px-4 relative">
-        <div className="max-w-6xl mx-auto rounded-2xl bg-white/10 backdrop-blur-md border-2 border-emerald-400/40 p-6 md:p-8 shadow-2xl shadow-emerald-500/20 flex flex-col md:flex-row items-center gap-6 hover:border-emerald-400/70 transition-all">
+      <div className="max-w-6xl mx-auto relative">
+        <div className="rounded-2xl bg-white/10 backdrop-blur-md border-2 border-emerald-400/40 p-6 md:p-8 shadow-2xl shadow-emerald-500/20 flex flex-col md:flex-row items-center gap-6 hover:border-emerald-400/70 transition-all bg-gradient-to-r from-[hsl(217,91%,15%)] via-[hsl(217,91%,22%)] to-[hsl(217,91%,15%)]">
           {/* Ícone animado */}
           <div className="relative flex-shrink-0">
             <div className="absolute inset-0 rounded-2xl bg-emerald-400 blur-xl opacity-60 animate-pulse" />
@@ -64,6 +64,6 @@ export const Nr1HighlightBanner = () => {
           </Link>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
