@@ -732,6 +732,78 @@ export default function Nr1ClimaDashboard() {
           )}
         </>
       )}
+
+      {/* Drill-down: detalhe de dimensão (perguntas que mais impactaram o score) */}
+      <Dialog open={!!drillDim} onOpenChange={(o) => !o && setDrillDim(null)}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" /> {drillData?.label}
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Perguntas da dimensão, do menor para o maior score atual. Use para identificar quais itens mais impactaram a média.
+              {pesquisaAnterior && <> · Comparando <b>{pesquisaAtual?.nome}</b> com <b>{pesquisaAnterior.nome}</b>.</>}
+            </DialogDescription>
+          </DialogHeader>
+
+          {drillData && (
+            <div className="space-y-2">
+              {drillData.rows.map((r) => (
+                <div key={r.num} className="border rounded-md p-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground">Pergunta {r.num}</p>
+                      <p className="text-sm font-medium leading-snug">{r.texto}</p>
+                    </div>
+                    {r.delta != null && (
+                      <Badge
+                        variant="outline"
+                        className={`shrink-0 gap-1 ${r.delta > 0 ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : r.delta < 0 ? 'border-red-300 text-red-700 bg-red-50' : ''}`}
+                      >
+                        {r.delta > 0 ? <TrendingUp className="h-3 w-3" /> : r.delta < 0 ? <TrendingDown className="h-3 w-3" /> : null}
+                        {r.delta > 0 ? '+' : ''}{r.delta.toFixed(2)}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                        Atual · {pesquisaAtual?.nome} ({r.nAtual} resp)
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full" style={{ width: `${((r.atual ?? 0) / 5) * 100}%`, background: corScore(r.atual) }} />
+                        </div>
+                        <span className="font-mono text-sm font-semibold w-10 text-right">{r.atual?.toFixed(2) ?? '—'}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">
+                        Anterior · {pesquisaAnterior?.nome ?? '—'} ({r.nAnterior} resp)
+                      </p>
+                      {r.anterior != null ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full opacity-60" style={{ width: `${(r.anterior / 5) * 100}%`, background: corScore(r.anterior) }} />
+                          </div>
+                          <span className="font-mono text-sm w-10 text-right text-muted-foreground">{r.anterior.toFixed(2)}</span>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-muted-foreground italic">Sem dados do ciclo anterior</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {drillData.rows.every((r) => r.atual == null) && (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  Nenhuma resposta item-a-item disponível para esta dimensão no ciclo atual.
+                </p>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
