@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Users, BarChart3, TrendingUp, DollarSign } from "lucide-react";
 import { ImpactCalculator } from "./ImpactCalculator";
 import { Nr1HighlightBanner } from "./Nr1HighlightBanner";
+import { StickyCTABar } from "./StickyCTABar";
 import { useState, useEffect, useRef } from "react";
 
 const COMPANY_CYCLE = [1, 2, 3, 2, 1, 3, 2];
@@ -59,6 +60,12 @@ export const HeroSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <Nr1HighlightBanner />
+
+        {/* Faixa promocional - separador entre NR-1 e Gestão Estratégica */}
+        <div className="my-6 -mx-4">
+          <StickyCTABar />
+        </div>
+
 
         {/* Eyebrow - separador para o tema Gestão Estratégica */}
         <div className="flex justify-center mb-8 mt-4">
