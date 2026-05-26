@@ -2,9 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Mail, Rocket, Users, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 
 export const CTASection = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
+
 
   return (
     <section className="py-20 bg-gradient-to-br from-primary via-primary-hover to-secondary relative overflow-hidden">
@@ -35,7 +38,7 @@ export const CTASection = () => {
             <Button 
               size="lg"
               className="bg-amber-400 text-gray-900 hover:bg-amber-300 hover:scale-105 text-lg px-10 py-4 shadow-2xl w-full sm:w-auto font-bold transition-all duration-300 group border-2 border-amber-300"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate(ctaTo)}
             >
               Criar Conta Grátis
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

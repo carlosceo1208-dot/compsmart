@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle, AlertTriangle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 
 const features = [
   {
@@ -91,6 +92,7 @@ const StatusIcon = ({ status }: { status: string }) => {
 
 export const CompetitiveComparisonSection = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
 
   return (
     <section className="py-20 bg-background">
@@ -190,7 +192,7 @@ export const CompetitiveComparisonSection = () => {
         </div>
 
         <div className="text-center mt-8">
-          <Button className="cta-action" onClick={() => navigate("/auth")}>
+          <Button className="cta-action" onClick={() => navigate(ctaTo)}>
             Experimentar a Diferença (30 dias grátis)
           </Button>
         </div>

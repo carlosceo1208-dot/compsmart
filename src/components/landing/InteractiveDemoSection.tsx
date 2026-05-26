@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { useNavigate } from "react-router-dom";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 import { Star, CheckCircle2, AlertTriangle, ArrowRight, PartyPopper, User, DollarSign, Brain, TrendingUp } from "lucide-react";
 
 const AGILITY_DIMENSIONS = [
@@ -34,6 +35,7 @@ const get9BoxLabel = (score: number) => {
 
 export const InteractiveDemoSection = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
   const [step, setStep] = useState(0);
   const [ratings, setRatings] = useState(AGILITY_DIMENSIONS.map((c) => c.default));
   const [newSalary, setNewSalary] = useState(6200);
@@ -247,7 +249,7 @@ export const InteractiveDemoSection = () => {
               <Button
                 variant="secondary"
                 className="w-full bg-card text-primary hover:bg-card/90 font-bold group"
-                onClick={() => navigate("/auth")}
+                onClick={() => navigate(ctaTo)}
               >
                 Começar Teste Grátis Agora (30 dias)
                 <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

@@ -18,6 +18,7 @@ import Nr1Faq, { NR1_FAQ_JSONLD } from '@/components/landing/nr1/Nr1Faq';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
+import { useAuthCTA } from '@/hooks/useAuthCTA';
 import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES, estimarMultaAnual } from '@/lib/nr1';
 import { toast } from '@/hooks/use-toast';
 
@@ -42,6 +43,7 @@ export default function LandingNr1() {
   const [form, setForm] = useState({ nome: '', email: '', empresa: '', telefone: '', cargo: '', tamanho_empresa: '' });
   const [scoreFree, setScoreFree] = useState<number | null>(null);
   const navigate = useNavigate();
+  const { ctaTo, isLoggedIn } = useAuthCTA();
 
   const { data: questoes } = useNr1Questoes(true);
   const total = questoes?.length ?? 0;
@@ -132,7 +134,7 @@ export default function LandingNr1() {
             <span className="font-semibold">CompSmart NR-1</span>
           </Link>
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/auth">Entrar</Link>
+            <Link to={ctaTo}>{isLoggedIn ? 'Ir para o app' : 'Entrar'}</Link>
           </Button>
         </div>
       </header>

@@ -5,9 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Zap, Clock, TrendingDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 
 export const ImpactCalculator = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
   const [employees, setEmployees] = useState(500);
   const [hoursPerMonth, setHoursPerMonth] = useState(80);
   const [costPerHour, setCostPerHour] = useState(150);
@@ -91,7 +93,7 @@ export const ImpactCalculator = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
             className="cta-action flex-1 group"
-            onClick={() => navigate("/auth")}
+            onClick={() => navigate(ctaTo)}
           >
             Eliminar Esse Custo Agora 🚀
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
