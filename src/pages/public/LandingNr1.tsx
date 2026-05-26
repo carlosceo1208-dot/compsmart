@@ -138,30 +138,44 @@ export default function LandingNr1() {
 
       {step === 'landing' && (
         <>
-          {/* Hero */}
-          <section className="container mx-auto px-4 py-12 lg:py-20 text-center max-w-3xl">
-            <Badge className="nr1-risk-critico mb-4">⚠ Obrigatório a partir de Maio/2026</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Sua empresa está pronta para a <span className="nr1-text-primary">NR-1</span>?
-            </h1>
-            <p className="text-lg text-muted-foreground mb-8">
-              A nova NR-1 obriga TODAS as empresas a gerenciar riscos psicossociais.
-              Multas começam em R$ 670 e chegam a R$ 6.708 por infração.
-              Descubra sua exposição em 2 minutos.
-            </p>
-            <Button size="lg" className="nr1-bg-primary" onClick={() => setStep('questionario')}>
-              Fazer diagnóstico grátis <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
+          {/* HERO — categoria nova */}
+          <Nr1Hero
+            onDiagnostico={() => setStep('questionario')}
+            onComoFunciona={() => scrollToId('como-funciona')}
+          />
+
+          {/* Faixa de urgência inteligente */}
+          <section className="bg-foreground text-background">
+            <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-center gap-3 text-center md:text-left">
+              <Clock className="h-5 w-5 nr1-text-accent flex-shrink-0" />
+              <p className="text-sm md:text-base">
+                <strong>Fiscalização: maio/2026.</strong>{' '}
+                <span className="opacity-80">
+                  Mas os dados que você perde se não integrar agora — não voltam.
+                </span>
+              </p>
+            </div>
           </section>
 
-          {/* Calculadora de multa */}
-          <section className="container mx-auto px-4 pb-12">
+          {/* 3 perguntas que só a CompSmart responde */}
+          <Nr1PerguntasChro />
+
+          {/* Tabela NR-1 Tradicional vs. Inteligente */}
+          <Nr1TabelaCategoria />
+
+          {/* Como funciona — 5 passos */}
+          <Nr1ComoFunciona idAnchor="como-funciona" />
+
+          {/* Calculadora de multa — reposicionada como "piso" */}
+          <section className="container mx-auto px-4 py-10">
             <Card className="max-w-2xl mx-auto nr1-bg-soft border-[hsl(var(--nr1-primary)/0.3)]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calculator className="h-5 w-5 nr1-text-primary" /> Calculadora de exposição a multas
+                  <Calculator className="h-5 w-5 nr1-text-primary" /> Piso de risco: exposição a multas
                 </CardTitle>
-                <CardDescription>Estimativa baseada na tabela do MTE.</CardDescription>
+                <CardDescription>
+                  Multa é o <em>piso</em> do problema. O custo real é perder talento — calcule o piso primeiro.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -182,61 +196,78 @@ export default function LandingNr1() {
                   <Stat label="Máximo" value={formatBRL(multa.max)} tone="bad" />
                 </div>
                 <p className="text-xs text-muted-foreground pt-2">
-                  💡 Com o CompSmart NR-1 a partir de R$ 349/mês, você fica em conformidade e elimina essa exposição.
+                  💡 A partir de R$ 349/mês a CompSmart elimina essa exposição{' '}
+                  <strong>e</strong> ainda te entrega inteligência de retenção.
                 </p>
               </CardContent>
             </Card>
           </section>
 
-          {/* Comparativo */}
-          <section className="container mx-auto px-4 pb-12">
-            <h2 className="text-2xl font-bold text-center mb-6">Por que CompSmart?</h2>
-            <div className="max-w-4xl mx-auto overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-3"></th>
-                    <th className="p-3 text-center">Consultor</th>
-                    <th className="p-3 text-center">SaaS SST genérico</th>
-                    <th className="p-3 text-center nr1-bg-soft font-semibold">CompSmart NR-1</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    ['Diagnóstico', true, true, true],
-                    ['Plano de ação em plataforma', false, 'parcial', true],
-                    ['Monitoramento contínuo', false, 'parcial', true],
-                    ['Treinamento + certificado', false, 'parcial', true],
-                    ['Cruzamento com performance/remuneração', false, false, true],
-                    ['Custo anual (100 colab.)', 'R$ 30k+', 'R$ 8-15k', 'R$ 4.188'],
-                  ].map(([label, ...vals], i) => (
-                    <tr key={i} className="border-b">
-                      <td className="p-3 font-medium">{label}</td>
-                      {vals.map((v, j) => (
-                        <td key={j} className={`p-3 text-center ${j === 2 ? 'nr1-bg-soft' : ''}`}>
-                          {v === true ? <Check className="h-4 w-4 inline text-[hsl(var(--nr1-success))]" />
-                            : v === false ? <X className="h-4 w-4 inline text-muted-foreground" />
-                            : <span className="text-xs">{v}</span>}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Diagnóstico express CTA — conversor principal */}
+          <section className="container mx-auto px-4 py-10">
+            <div className="max-w-3xl mx-auto rounded-2xl p-8 md:p-10 text-center nr1-bg-gradient text-white">
+              <h2 className="text-2xl md:text-3xl font-bold mb-3">
+                Faça o diagnóstico NR-1 da sua empresa agora
+              </h2>
+              <p className="opacity-90 mb-6 max-w-xl mx-auto">
+                10 perguntas · 2 minutos · score psicossocial estimado + nível de risco.
+                Sem cartão de crédito.
+              </p>
+              <Button
+                size="lg"
+                className="bg-white text-foreground hover:bg-white/90"
+                onClick={() => setStep('questionario')}
+              >
+                Iniciar diagnóstico grátis <ArrowRight className="h-4 w-4 ml-1.5" />
+              </Button>
+            </div>
+          </section>
+
+          {/* Prova social de correlação */}
+          <Nr1ProvaCorrelacao />
+
+          {/* Conformidade técnica */}
+          <section className="container mx-auto px-4 py-10">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-center text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
+                Conformidade técnica garantida
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  { icon: FileCheck, label: 'COPSOQ-III', sub: '6 dimensões · 40 questões' },
+                  { icon: ShieldCheck, label: 'Portaria MTE', sub: '1.419/2024 · Anexo III' },
+                  { icon: Award, label: 'PGR integrado', sub: 'Plano de ação compliant' },
+                  { icon: Lock, label: 'LGPD', sub: 'Respostas 100% anônimas' },
+                ].map((c, i) => (
+                  <div key={i} className="border rounded-lg p-4 text-center bg-card">
+                    <c.icon className="h-5 w-5 mx-auto nr1-text-primary mb-2" />
+                    <p className="text-sm font-semibold">{c.label}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{c.sub}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
 
           {/* Planos */}
-          <section className="container mx-auto px-4 pb-16">
-            <h2 className="text-2xl font-bold text-center mb-6">Planos NR-1</h2>
+          <section className="container mx-auto px-4 py-14">
+            <div className="text-center max-w-2xl mx-auto mb-8">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">Planos NR-1</h2>
+              <p className="text-muted-foreground">14 dias grátis · sem cartão de crédito · cancele quando quiser.</p>
+            </div>
             <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {[
                 { n: 'Até 100 colab.', p: 'R$ 349' },
-                { n: '101 a 500 colab.', p: 'R$ 649' },
+                { n: '101 a 500 colab.', p: 'R$ 649', destaque: true },
                 { n: '501+ colab.', p: 'R$ 1.190' },
               ].map((p) => (
-                <Card key={p.n}>
+                <Card key={p.n} className={p.destaque ? 'border-2 border-[hsl(var(--nr1-primary))] shadow-lg' : ''}>
                   <CardContent className="pt-6 text-center">
+                    {p.destaque && (
+                      <Badge className="nr1-bg-accent mb-2 text-[10px] font-bold uppercase tracking-wider">
+                        Mais escolhido
+                      </Badge>
+                    )}
                     <p className="text-sm text-muted-foreground mb-2">{p.n}</p>
                     <p className="text-3xl font-bold">{p.p}<span className="text-sm text-muted-foreground">/mês</span></p>
                     <p className="text-xs text-muted-foreground mt-1">14 dias grátis</p>
@@ -245,8 +276,26 @@ export default function LandingNr1() {
               ))}
             </div>
             <p className="text-center mt-6 text-sm text-muted-foreground">
-              Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Pro está incluso no seu plano.</strong>
+              Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
             </p>
+          </section>
+
+          {/* FAQ */}
+          <Nr1Faq />
+
+          {/* CTA final */}
+          <section className="container mx-auto px-4 pb-16">
+            <div className="max-w-2xl mx-auto text-center space-y-4">
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Comece pelo diagnóstico. Decida com dados.
+              </h2>
+              <p className="text-muted-foreground">
+                Resultado em 2 minutos · sem cartão · 100% LGPD-compliant.
+              </p>
+              <Button size="lg" className="nr1-btn-primary text-white" onClick={() => setStep('questionario')}>
+                Diagnóstico grátis NR-1 <ArrowRight className="h-4 w-4 ml-1.5" />
+              </Button>
+            </div>
           </section>
         </>
       )}
