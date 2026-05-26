@@ -58,7 +58,7 @@ export const HeroSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Eyebrow */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-8">
           <Badge className="bg-secondary/10 text-secondary border-secondary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
             <Sparkles className="h-3 w-3 mr-2" />
             Gestão Estratégica de Remuneração com Avaliação de Desempenho Integrada
