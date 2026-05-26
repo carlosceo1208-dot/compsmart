@@ -50,6 +50,8 @@ export default function Nr1ClimaDashboard() {
   const { id: focusPesquisaId } = useParams<{ id: string }>();
   const [segmento, setSegmento] = useState<Segmento>('departamento');
   const [pesquisaSel, setPesquisaSel] = useState<string>(focusPesquisaId ?? 'all');
+  const [comparePesquisaIds, setComparePesquisaIds] = useState<string[]>([]);
+  const [drillDim, setDrillDim] = useState<ClimaDimensao | null>(null);
 
   const { data: pesquisas = [] } = useQuery({
     queryKey: ['clima-dash-pesquisas', activeCompanyId],
