@@ -99,6 +99,17 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               FAQ
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
             </button>
+            <button
+              onClick={() => navigate('/nr1')}
+              className="relative text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-md shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 transition-all"
+            >
+              <ShieldCheck className="h-3.5 w-3.5" />
+              NR-1
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+              </span>
+            </button>
             {isChangelogVisible && (
               <button 
                 onClick={() => navigate('/changelog')} 
