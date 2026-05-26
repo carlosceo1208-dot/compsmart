@@ -98,6 +98,44 @@ export default function Nr1ClimaDashboard() {
     },
   });
 
+  // Inicializa comparação com os últimos 3 ciclos quando carregam as pesquisas
+  useEffect(() => {
+    if (pesquisas.length > 0 && comparePesquisaIds.length === 0) {
+      const ultimos = pesquisas.slice(-Math.min(3, pesquisas.length)).map((p) => p.id);
+      setComparePesquisaIds(ultimos);
+    }
+  }, [pesquisas, comparePesquisaIds.length]);
+
+  // Ciclo anterior (para o radar tradicional e drill-down)
+  const pesquisaAnterior = useMemo(() => {
+    if (!pesquisaAtual) return null;
+    const idx = pesquisas.findIndex((p) => p.id === pesquisaAtual.id);
+    return idx > 0 ? pesquisas[idx - 1] : null;
+  }, [pesquisaAtual, pesquisas]);
+
+  // Itens da pesquisa anterior — carregados sob demanda (apenas quando drill-down ativo)
+  const { data: itensAnterior = [] } = useQuery({
+    queryKey: ['clima-dash-itens-anterior', pesquisaAnterior?.id],
+    enabled: !!drillDim && !!pesquisaAnterior,
+    queryFn: async () => {
+      const { data: resps, error: e1 } = await (supabase as any)
+        .from('clima_respostas')
+        .select('id')
+        .eq('pesquisa_id', pesquisaAnterior!.id);
+      if (e1) throw e1;
+      const ids = (resps ?? []).map((r: any) => r.id);
+      if (ids.length === 0) return [] as Item[];
+      const { data, error } = await (supabase as any)
+        .from('clima_respostas_itens')
+        .select('resposta_id,dimensao,questao_num,valor')
+        .in('resposta_id', ids);
+      if (error) throw error;
+      return (data ?? []) as Item[];
+    },
+  });
+
+
+
   const dimensoes = Object.keys(DIMENSAO_LABEL) as ClimaDimensao[];
 
   // Heatmap: segmento × dimensão
