@@ -17,6 +17,7 @@ import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
 import { StickyCTABar } from "@/components/landing/StickyCTABar";
+import { Nr1HighlightBanner } from "@/components/landing/Nr1HighlightBanner";
 
 /**
  * Landing page — fluxo enxuto AIDA + StoryBrand:
@@ -65,6 +66,9 @@ const Index = () => {
 
       {/* 1. Atenção */}
       <HeroSection />
+
+      {/* 1.5. Destaque NR-1 — urgência regulatória + categoria nova */}
+      <Nr1HighlightBanner />
 
       {/* 2. Prova social imediata */}
       <LogoSlider />
