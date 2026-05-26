@@ -217,7 +217,6 @@ export default function LandingNr1() {
               </h2>
               <p className="opacity-90 mb-6 max-w-xl mx-auto">
                 10 perguntas · 2 minutos · score psicossocial estimado + nível de risco.
-                Sem cartão de crédito.
               </p>
               <Button
                 size="lg"
