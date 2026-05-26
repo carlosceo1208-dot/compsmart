@@ -2,8 +2,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Brain, CheckCircle2 } from 'lucide-react';
+import { useAuthCTA } from '@/hooks/useAuthCTA';
 
 export default function Nr1Obrigado() {
+  const { ctaTo, isLoggedIn } = useAuthCTA();
   return (
     <div className="nr1-scope min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
@@ -22,7 +24,7 @@ export default function Nr1Obrigado() {
           </div>
           <div className="space-y-2 pt-2">
             <Button asChild className="w-full nr1-bg-primary">
-              <Link to="/auth">Criar conta e iniciar trial</Link>
+              <Link to={ctaTo}>{isLoggedIn ? 'Ir para o app' : 'Criar conta e iniciar trial'}</Link>
             </Button>
             <Button asChild variant="ghost" className="w-full">
               <Link to="/nr1">Voltar à página NR-1</Link>

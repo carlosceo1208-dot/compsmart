@@ -57,8 +57,8 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="/auth" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Começar Grátis
+                <a href="/dashboard" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Acessar app
                 </a>
               </li>
             </ul>

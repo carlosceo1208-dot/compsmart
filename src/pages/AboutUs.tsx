@@ -2,8 +2,10 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import compsmartLogo from "@/assets/compsmart-logo.png";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 
 const AboutUs = () => {
+  const { ctaTo, ctaLabel } = useAuthCTA();
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -74,7 +76,7 @@ const AboutUs = () => {
         {/* CTA */}
         <div className="mt-12 text-center">
           <Button asChild size="lg">
-            <Link to="/auth">Começar Agora</Link>
+            <Link to={ctaTo}>{ctaLabel}</Link>
           </Button>
         </div>
       </main>
