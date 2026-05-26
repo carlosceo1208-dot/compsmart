@@ -33,7 +33,7 @@ export default function Nr1Consentimento() {
         .eq('id', user.id);
       if (error) throw error;
       toast({ title: 'Consentimento registrado', description: 'Obrigado. Você pode iniciar o questionário.' });
-      navigate('/nr1');
+      navigate('/nr1/painel');
     } catch (e: any) {
       toast({ title: 'Erro ao registrar consentimento', description: e.message, variant: 'destructive' });
     } finally {
