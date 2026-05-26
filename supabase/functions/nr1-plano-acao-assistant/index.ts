@@ -210,7 +210,7 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("nr1-plano-acao-assistant error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Erro desconhecido" }), {
+    return new Response(JSON.stringify({ error: 'Erro interno do servidor' }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
