@@ -35,6 +35,7 @@ const get9BoxLabel = (score: number) => {
 
 export const InteractiveDemoSection = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
   const [step, setStep] = useState(0);
   const [ratings, setRatings] = useState(AGILITY_DIMENSIONS.map((c) => c.default));
   const [newSalary, setNewSalary] = useState(6200);

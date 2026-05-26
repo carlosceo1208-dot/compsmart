@@ -23,6 +23,7 @@ const benefits = [
 
 export const BeforeAfterSection = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
 
   return (
     <section className="py-20 bg-muted/30">

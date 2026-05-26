@@ -92,6 +92,7 @@ const StatusIcon = ({ status }: { status: string }) => {
 
 export const CompetitiveComparisonSection = () => {
   const navigate = useNavigate();
+  const { ctaTo } = useAuthCTA();
 
   return (
     <section className="py-20 bg-background">
