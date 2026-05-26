@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,8 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
-import { ArrowLeft, AlertTriangle, TrendingUp, TrendingDown, Users, Smile, Frown, Meh, Radar as RadarIcon, LineChart as LineChartIcon, BarChart3 } from 'lucide-react';
-import { DIMENSAO_LABEL, type ClimaDimensao, interpretarClima } from '@/lib/climaQuestoes';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { ArrowLeft, AlertTriangle, TrendingUp, TrendingDown, Users, Smile, Frown, Meh, Radar as RadarIcon, LineChart as LineChartIcon, BarChart3, ChevronDown, MousePointerClick } from 'lucide-react';
+import { DIMENSAO_LABEL, type ClimaDimensao, interpretarClima, QUESTOES } from '@/lib/climaQuestoes';
 import {
   ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   LineChart, Line, XAxis, YAxis, Tooltip, Legend, CartesianGrid, BarChart, Bar,
