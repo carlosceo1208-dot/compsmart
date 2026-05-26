@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ShieldCheck, ArrowRight, Clock } from 'lucide-react';
 
 /**
- * Destaque NR-1 na home — chama o lead para a landing dedicada (/nr1-publico).
+ * Destaque NR-1 na home — chama o lead para a landing dedicada (/nr1).
  * Aproveita a urgência regulatória (maio/2026) para gerar cliques qualificados.
  */
 export const Nr1HighlightBanner = () => {
