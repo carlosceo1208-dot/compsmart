@@ -493,8 +493,23 @@ function ProposalForm() {
         <Input id="pf-tel" value={data.telefone} onChange={(e) => setData({ ...data, telefone: e.target.value })} maxLength={40} />
       </div>
       <div>
+        <Label htmlFor="pf-wpp">WhatsApp</Label>
+        <Input id="pf-wpp" placeholder="(11) 99999-9999" value={data.whatsapp} onChange={(e) => setData({ ...data, whatsapp: e.target.value })} maxLength={40} />
+      </div>
+      <div>
         <Label htmlFor="pf-tam">Nº de colaboradores</Label>
         <Input id="pf-tam" placeholder="ex: 250" value={data.tamanho_empresa} onChange={(e) => setData({ ...data, tamanho_empresa: e.target.value })} maxLength={40} />
+      </div>
+      <div>
+        <Label htmlFor="pf-grau">Grau de risco INSS (CNAE)</Label>
+        <Select value={data.grau_risco} onValueChange={(v) => setData({ ...data, grau_risco: v })}>
+          <SelectTrigger id="pf-grau"><SelectValue placeholder="Selecione o grau de risco" /></SelectTrigger>
+          <SelectContent>
+            {GRAU_RISCO_OPTIONS.map((o) => (
+              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="md:col-span-2">
         <Label htmlFor="pf-msg">Conte rapidamente seu contexto (opcional)</Label>
