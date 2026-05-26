@@ -17,6 +17,15 @@ const labelStatus = {
   planejada: { txt: 'Planejada', cls: 'bg-muted text-muted-foreground' },
 };
 
+// Paleta semântica por etapa (HSL)
+const etapaCores: Record<string, { main: string; soft: string; border: string }> = {
+  preparacao:     { main: '217 91% 60%', soft: '217 91% 60% / 0.12', border: '217 91% 60% / 0.5' },
+  mensuracao:     { main: '173 80% 40%', soft: '173 80% 40% / 0.12', border: '173 80% 40% / 0.5' },
+  apreciacao:     { main: '38 92% 50%',  soft: '38 92% 50% / 0.15',  border: '38 92% 50% / 0.5'  },
+  conscientizacao:{ main: '262 83% 58%', soft: '262 83% 58% / 0.12', border: '262 83% 58% / 0.5' },
+  transformacao:  { main: '160 84% 39%', soft: '160 84% 39% / 0.12', border: '160 84% 39% / 0.5' },
+};
+
 export default function Nr1Etapas() {
   return (
     <div className="space-y-6">
@@ -37,11 +46,26 @@ export default function Nr1Etapas() {
             {ETAPAS_PROGRAMA.map((e, i) => {
               const st = status[e.key];
               const Icon = st === 'concluida' ? CheckCircle2 : Circle;
+              const cor = etapaCores[e.key];
+              const isPlanejada = st === 'planejada';
               return (
                 <div key={e.key} className="flex items-center gap-2">
-                  <div className={`flex items-center gap-2 px-3 py-2 rounded-md border ${st === 'em_andamento' ? 'nr1-bg-soft border-[hsl(var(--nr1-primary)/0.4)]' : ''}`}>
-                    <Icon className={`h-4 w-4 ${st === 'concluida' ? 'text-green-600' : st === 'em_andamento' ? 'nr1-text-primary' : 'text-muted-foreground'}`} />
-                    <span className="text-sm font-medium">{e.label}</span>
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 rounded-md border transition"
+                    style={{
+                      backgroundColor: `hsl(${cor.soft})`,
+                      borderColor: `hsl(${cor.border})`,
+                      opacity: isPlanejada ? 0.6 : 1,
+                      boxShadow: st === 'em_andamento' ? `0 0 0 2px hsl(${cor.main} / 0.25)` : undefined,
+                    }}
+                  >
+                    <Icon
+                      className="h-4 w-4"
+                      style={{ color: `hsl(${cor.main})` }}
+                    />
+                    <span className="text-sm font-medium" style={{ color: `hsl(${cor.main})` }}>
+                      {e.label}
+                    </span>
                   </div>
                   {i < ETAPAS_PROGRAMA.length - 1 && <ArrowRight className="h-4 w-4 text-muted-foreground" />}
                 </div>
@@ -55,13 +79,28 @@ export default function Nr1Etapas() {
         {ETAPAS_PROGRAMA.map((e, i) => {
           const st = status[e.key];
           const meta = labelStatus[st];
+          const cor = etapaCores[e.key];
           return (
-            <Card key={e.key}>
+            <Card
+              key={e.key}
+              className="overflow-hidden border-l-4"
+              style={{ borderLeftColor: `hsl(${cor.main})` }}
+            >
               <CardContent className="pt-6">
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-xs text-muted-foreground">Etapa {i + 1}</p>
-                    <p className="font-semibold">{e.label}</p>
+                    <span
+                      className="inline-block text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded mb-1"
+                      style={{
+                        backgroundColor: `hsl(${cor.soft})`,
+                        color: `hsl(${cor.main})`,
+                      }}
+                    >
+                      Etapa {i + 1}
+                    </span>
+                    <p className="font-semibold" style={{ color: `hsl(${cor.main})` }}>
+                      {e.label}
+                    </p>
                   </div>
                   <Badge className={meta.cls}>{meta.txt}</Badge>
                 </div>
