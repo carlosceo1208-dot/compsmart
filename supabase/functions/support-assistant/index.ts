@@ -607,7 +607,7 @@ Pergunta do usuário: ${question}`;
     console.error('[Support Assistant] Error:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Erro desconhecido' 
+        error: 'Erro interno do servidor' 
       }),
       {
         status: 500,

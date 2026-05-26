@@ -216,7 +216,7 @@ Analise os candidatos e recomende o melhor para a sucessão, justificando sua es
     console.error('Error in succession-ai-analysis:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Erro desconhecido' 
+        error: 'Erro interno do servidor' 
       }),
       { 
         status: 500, 

@@ -181,7 +181,7 @@ serve(async (req) => {
         results.push({
           companyId: company.id,
           status: 'update_failed',
-          error: updateError.message
+          error: 'Falha ao atualizar registro'
         });
         continue;
       }
@@ -241,7 +241,7 @@ serve(async (req) => {
           email: recipientEmail,
           status: 'processed',
           emailSent: false,
-          emailError: emailError.message
+          emailError: 'Falha ao enviar email'
         });
       }
     }
@@ -260,7 +260,7 @@ serve(async (req) => {
 
   } catch (error: any) {
     console.error("Error in process-trial-expiration:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: 'Erro interno do servidor' }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
