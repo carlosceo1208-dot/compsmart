@@ -10,5 +10,16 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
 User-agent: *
 Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /admin
+Disallow: /super-admin
+Disallow: /checkout
+Disallow: /onboarding
+
+Sitemap: https://www.compsmart.ia.br/sitemap.xml
