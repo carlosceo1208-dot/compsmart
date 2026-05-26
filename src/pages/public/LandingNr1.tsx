@@ -94,16 +94,29 @@ export default function LandingNr1() {
   };
 
   useEffect(() => {
-    document.title = 'NR-1 obrigatória 2026 — Diagnóstico psicossocial grátis | CompSmart';
-    const meta = document.querySelector('meta[name="description"]');
-    const desc = 'Calcule sua exposição a multas da NR-1 e faça o diagnóstico psicossocial grátis em 2 minutos.';
-    if (meta) meta.setAttribute('content', desc);
-    else {
-      const m = document.createElement('meta');
-      m.name = 'description'; m.content = desc;
-      document.head.appendChild(m);
-    }
+    document.title = 'NR-1 Inteligente — Cruze risco psicossocial com 9Box e remuneração | CompSmart';
+    const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
+      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+      if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
+      el.setAttribute('content', content);
+    };
+    const desc = 'A 1ª plataforma do Brasil a cruzar NR-1 com 9Box e remuneração. Conformidade legal + inteligência de talentos em um só lugar. Diagnóstico grátis em 2 min.';
+    setMeta('description', desc);
+    setMeta('og:title', 'NR-1 Inteligente | CompSmart', 'property');
+    setMeta('og:description', desc, 'property');
+    setMeta('og:type', 'website', 'property');
+
+    // JSON-LD FAQ
+    const ldId = 'nr1-faq-jsonld';
+    let ld = document.getElementById(ldId) as HTMLScriptElement | null;
+    if (!ld) { ld = document.createElement('script'); ld.id = ldId; ld.type = 'application/ld+json'; document.head.appendChild(ld); }
+    ld.textContent = JSON.stringify(NR1_FAQ_JSONLD);
+    return () => { document.getElementById(ldId)?.remove(); };
   }, []);
+
+  const scrollToId = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="nr1-scope min-h-screen bg-background">
