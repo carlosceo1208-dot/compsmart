@@ -196,8 +196,11 @@ export default function LandingNr1() {
                   <Stat label="Máximo" value={formatBRL(multa.max)} tone="bad" />
                 </div>
                 <p className="text-xs text-muted-foreground pt-2">
-                  💡 A partir de R$ 349/mês a CompSmart elimina essa exposição{' '}
-                  <strong>e</strong> ainda te entrega inteligência de retenção.
+                  💡 A CompSmart elimina essa exposição <strong>e</strong> ainda te entrega
+                  inteligência de retenção.{' '}
+                  <button onClick={() => scrollToId('fale-conosco')} className="underline nr1-text-primary font-semibold">
+                    Solicite uma proposta
+                  </button>.
                 </p>
               </CardContent>
             </Card>
