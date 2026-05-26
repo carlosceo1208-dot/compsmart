@@ -395,3 +395,102 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: 'ok'
     </div>
   );
 }
+
+function ProposalForm() {
+  const [data, setData] = useState({
+    nome: '', email: '', empresa: '', cargo: '', telefone: '', tamanho_empresa: '', mensagem: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const schema = z.object({
+    nome: z.string().trim().min(2, 'Informe seu nome').max(120),
+    email: z.string().trim().email('Email inválido').max(255),
+    empresa: z.string().trim().min(2, 'Informe a empresa').max(200),
+    cargo: z.string().trim().max(120).optional().or(z.literal('')),
+    telefone: z.string().trim().max(40).optional().or(z.literal('')),
+    tamanho_empresa: z.string().trim().max(40).optional().or(z.literal('')),
+    mensagem: z.string().trim().max(1000).optional().or(z.literal('')),
+  });
+
+  const submit = async () => {
+    const parsed = schema.safeParse(data);
+    if (!parsed.success) {
+      toast({ title: 'Verifique os campos', description: parsed.error.issues[0]?.message, variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.from('nr1_leads').insert({
+      nome: parsed.data.nome,
+      email: parsed.data.email,
+      empresa: parsed.data.empresa,
+      cargo: parsed.data.cargo || null,
+      telefone: parsed.data.telefone || null,
+      tamanho_empresa: parsed.data.tamanho_empresa || null,
+      respostas_free: parsed.data.mensagem ? { mensagem: parsed.data.mensagem } : null,
+      origem: 'landing_nr1_proposta',
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: 'Erro ao enviar', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setSent(true);
+    toast({ title: 'Recebido!', description: 'Nossa equipe entra em contato em até 24h úteis.' });
+  };
+
+  if (sent) {
+    return (
+      <div className="text-center py-6 space-y-3">
+        <ShieldCheck className="h-12 w-12 mx-auto nr1-text-primary" />
+        <h3 className="text-xl font-bold">Obrigado! Recebemos sua solicitação.</h3>
+        <p className="text-sm text-muted-foreground">
+          Um especialista CompSmart entrará em contato em até <strong>24h úteis</strong> com uma proposta
+          personalizada para sua empresa.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-2 gap-3">
+      <div>
+        <Label htmlFor="pf-nome">Nome*</Label>
+        <Input id="pf-nome" value={data.nome} onChange={(e) => setData({ ...data, nome: e.target.value })} maxLength={120} />
+      </div>
+      <div>
+        <Label htmlFor="pf-email">Email corporativo*</Label>
+        <Input id="pf-email" type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} maxLength={255} />
+      </div>
+      <div>
+        <Label htmlFor="pf-empresa">Empresa*</Label>
+        <Input id="pf-empresa" value={data.empresa} onChange={(e) => setData({ ...data, empresa: e.target.value })} maxLength={200} />
+      </div>
+      <div>
+        <Label htmlFor="pf-cargo">Cargo</Label>
+        <Input id="pf-cargo" value={data.cargo} onChange={(e) => setData({ ...data, cargo: e.target.value })} maxLength={120} />
+      </div>
+      <div>
+        <Label htmlFor="pf-tel">Telefone</Label>
+        <Input id="pf-tel" value={data.telefone} onChange={(e) => setData({ ...data, telefone: e.target.value })} maxLength={40} />
+      </div>
+      <div>
+        <Label htmlFor="pf-tam">Nº de colaboradores</Label>
+        <Input id="pf-tam" placeholder="ex: 250" value={data.tamanho_empresa} onChange={(e) => setData({ ...data, tamanho_empresa: e.target.value })} maxLength={40} />
+      </div>
+      <div className="md:col-span-2">
+        <Label htmlFor="pf-msg">Conte rapidamente seu contexto (opcional)</Label>
+        <Input id="pf-msg" placeholder="Ex: precisamos implementar NR-1 antes de maio/2026 e já temos 9Box rodando" value={data.mensagem} onChange={(e) => setData({ ...data, mensagem: e.target.value })} maxLength={1000} />
+      </div>
+      <div className="md:col-span-2 pt-2">
+        <Button onClick={submit} disabled={loading} className="w-full nr1-bg-primary text-white" size="lg">
+          {loading ? 'Enviando...' : 'Quero falar com um especialista'}
+          <ArrowRight className="h-4 w-4 ml-1.5" />
+        </Button>
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          Resposta em até 24h úteis · Seus dados são tratados conforme LGPD.
+        </p>
+      </div>
+    </div>
+  );
+}
