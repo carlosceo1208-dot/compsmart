@@ -212,15 +212,78 @@ export default function Nr1ClimaDashboard() {
       });
   }, [pesquisas]);
 
-  // Top/bottom segmentos por score geral
-  const topBottom = useMemo(() => {
-    const ranked = heatmap.filter((r) => r.geral != null);
-    const top = ranked.slice(0, 5).map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
-    const bottom = ranked.slice(-5).reverse().map((r) => ({ nome: r.segmento, score: Number((r.geral as number).toFixed(2)), n: r.n }));
-    return { top, bottom };
-  }, [heatmap]);
+  // Pesquisas selecionadas para comparação multi-ciclos
+  const pesquisasCompare = useMemo(
+    () => pesquisas.filter((p) => comparePesquisaIds.includes(p.id)),
+    [pesquisas, comparePesquisaIds],
+  );
 
-  // placeholder removed
+  // Radar multi-ciclos: cada eixo = dimensão, cada série = ciclo selecionado
+  const radarMulti = useMemo(() => {
+    return dimensoes.map((d) => {
+      const row: any = {
+        dim: DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' '),
+        _dimKey: d,
+      };
+      for (const p of pesquisasCompare) {
+        const v = p.scores_dimensao?.[d];
+        if (typeof v === 'number') row[p.id] = Number(v.toFixed(2));
+      }
+      return row;
+    });
+  }, [pesquisasCompare]);
+
+  // Evolução por dimensão filtrada pelos ciclos selecionados
+  const evolucaoDimCompare = useMemo(() => {
+    return pesquisasCompare
+      .filter((p) => p.scores_dimensao)
+      .map((p) => {
+        const row: any = { nome: p.nome.length > 14 ? p.nome.slice(0, 12) + '…' : p.nome };
+        for (const d of dimensoes) {
+          const v = p.scores_dimensao?.[d];
+          if (typeof v === 'number') row[d] = Number(v.toFixed(2));
+        }
+        return row;
+      });
+  }, [pesquisasCompare]);
+
+  // Mapa label-curto → chave de dimensão (para resolver clique no radar)
+  const dimByShortLabel = useMemo(() => {
+    const m = new Map<string, ClimaDimensao>();
+    for (const d of dimensoes) {
+      m.set(DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' '), d);
+    }
+    return m;
+  }, []);
+
+  // Drill-down: agregação item-a-item da dimensão selecionada
+  const drillData = useMemo(() => {
+    if (!drillDim) return null;
+    const questoesDim = QUESTOES.filter((q) => q.dimensao === drillDim);
+    const atuais = itens.filter((i) => i.dimensao === drillDim);
+    const anteriores = itensAnterior.filter((i) => i.dimensao === drillDim);
+    const rows = questoesDim.map((q) => {
+      const a = atuais.filter((i) => i.questao_num === q.num).map((i) => i.valor);
+      const p = anteriores.filter((i) => i.questao_num === q.num).map((i) => i.valor);
+      const avg = (xs: number[]) => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : null);
+      const atual = avg(a);
+      const anterior = avg(p);
+      const delta = atual != null && anterior != null ? atual - anterior : null;
+      return { num: q.num, texto: q.texto, atual, anterior, delta, nAtual: a.length, nAnterior: p.length };
+    });
+    // Ordena por menor score atual (itens mais impactantes vêm primeiro)
+    rows.sort((x, y) => (x.atual ?? 999) - (y.atual ?? 999));
+    return { rows, label: DIMENSAO_LABEL[drillDim] };
+  }, [drillDim, itens, itensAnterior]);
+
+  // Cor estável por id de pesquisa (consistente nos gráficos)
+  function corPesquisa(pesquisaId: string): string {
+    const idx = pesquisas.findIndex((p) => p.id === pesquisaId);
+    const hue = (idx * 53) % 360;
+    return `hsl(${hue} 65% 50%)`;
+  }
+
+
 
   return (
     <div className="space-y-4">
