@@ -101,6 +101,7 @@ const PerformanceEmployees = lazy(() => import("./pages/performance/PerformanceE
 // Lazy — Public
 const ExternalFeedbackForm = lazy(() => import("./pages/public/ExternalFeedbackForm"));
 const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
+const LandingNr1Ads = lazy(() => import("./pages/public/LandingNr1Ads"));
 const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
 const LandingCargosSalarios = lazy(() => import("./pages/public/LandingCargosSalarios"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
