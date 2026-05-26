@@ -310,7 +310,7 @@ Retorne o melhor match com score (0-100), justificativa, e recomendações de a�
 
     if (insErr) {
       console.error("Insert error:", insErr);
-      return new Response(JSON.stringify({ error: insErr.message }), {
+      return new Response(JSON.stringify({ error: "Erro ao processar solicitação" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -322,7 +322,7 @@ Retorne o melhor match com score (0-100), justificativa, e recomendações de a�
   } catch (e) {
     console.error("Function error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown" }),
+      JSON.stringify({ error: "Erro interno do servidor" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
