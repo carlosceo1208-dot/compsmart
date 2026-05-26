@@ -56,11 +56,14 @@ export const Nr1HighlightBanner = () => {
 
           <Link
             to="/nr1"
-            className="group flex-shrink-0 inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-[hsl(217,91%,15%)] font-bold text-base transition-all shadow-2xl shadow-emerald-500/50 hover:shadow-emerald-400/60 hover:scale-105"
+            className="group relative flex-shrink-0 inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-[hsl(217,91%,15%)] font-bold text-base transition-all shadow-2xl shadow-emerald-500/50 hover:shadow-emerald-400/60 hover:scale-105 animate-pulse"
           >
-            <Sparkles className="h-5 w-5" />
-            Conhecer NR-1
-            <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            {/* Glow pulsante ao redor do botão */}
+            <span className="absolute inset-0 rounded-xl bg-emerald-400/40 blur-md animate-ping" style={{ animationDuration: '2s' }} />
+            <span className="absolute -inset-1 rounded-xl border-2 border-emerald-300/60 animate-pulse" />
+            <Sparkles className="relative h-5 w-5" />
+            <span className="relative">Conhecer NR-1</span>
+            <ArrowRight className="relative h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
       </div>
