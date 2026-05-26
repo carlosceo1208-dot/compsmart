@@ -101,6 +101,7 @@ const PerformanceEmployees = lazy(() => import("./pages/performance/PerformanceE
 // Lazy — Public
 const ExternalFeedbackForm = lazy(() => import("./pages/public/ExternalFeedbackForm"));
 const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
+const LandingNr1Ads = lazy(() => import("./pages/public/LandingNr1Ads"));
 const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
 const LandingCargosSalarios = lazy(() => import("./pages/public/LandingCargosSalarios"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
@@ -264,6 +265,8 @@ const App = () => {
                       <Route path="/nr1" element={<LandingNr1 />} />
                       {/* Redirect 301-style da URL antiga para preservar SEO e campanhas */}
                       <Route path="/nr1-publico" element={<Navigate to="/nr1" replace />} />
+                      {/* URL comercial dedicada para anúncios pagos (Google Ads / Meta / LinkedIn) */}
+                      <Route path="/landing-nr1" element={<LandingNr1Ads />} />
                       <Route path="/nr1/obrigado" element={<Nr1Obrigado />} />
 
                       {/* NR-1 Module (authenticated) */}
