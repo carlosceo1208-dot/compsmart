@@ -36,6 +36,7 @@ const categoryIcons: Record<string, React.ReactNode> = {
   ferramentas: <LayoutGrid className="h-4 w-4" />,
   reconhecimento: <Award className="h-4 w-4" />,
   sucessao: <Users className="h-4 w-4" />,
+  nr1: <AlertTriangle className="h-4 w-4" />,
 };
 
 const categoryColors: Record<string, string> = {
@@ -45,6 +46,7 @@ const categoryColors: Record<string, string> = {
   ferramentas: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
   reconhecimento: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
   sucessao: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
+  nr1: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
 };
 
 function GlossaryTermCard({ term }: { term: PerformanceGlossaryTerm }) {
