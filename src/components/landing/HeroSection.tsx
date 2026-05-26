@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Users, BarChart3, TrendingUp, DollarSign } from "lucide-react";
 import { ImpactCalculator } from "./ImpactCalculator";
+import { Nr1HighlightBanner } from "./Nr1HighlightBanner";
 import { useState, useEffect, useRef } from "react";
 
 const COMPANY_CYCLE = [1, 2, 3, 2, 1, 3, 2];
@@ -58,12 +59,14 @@ export const HeroSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Eyebrow */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-8">
           <Badge className="bg-secondary/10 text-secondary border-secondary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
             <Sparkles className="h-3 w-3 mr-2" />
             Gestão Estratégica de Remuneração com Avaliação de Desempenho Integrada
           </Badge>
         </div>
+
+        <Nr1HighlightBanner />
 
         {/* Split layout */}
         <div className="grid lg:grid-cols-[45%_55%] gap-10 items-start max-w-6xl mx-auto">

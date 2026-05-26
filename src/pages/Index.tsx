@@ -17,7 +17,6 @@ import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
 import { StickyCTABar } from "@/components/landing/StickyCTABar";
-import { Nr1HighlightBanner } from "@/components/landing/Nr1HighlightBanner";
 
 /**
  * Landing page — fluxo enxuto AIDA + StoryBrand:
@@ -64,11 +63,8 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header isLoggedIn={isLoggedIn} />
 
-      {/* 1. Hero / Headlines */}
+      {/* 1. Hero / Headlines + destaque NR-1 */}
       <HeroSection />
-
-      {/* 2. NR-1 — destaque logo abaixo do Hero (urgência regulatória maio/2026) */}
-      <Nr1HighlightBanner />
 
 
 
