@@ -67,4 +67,5 @@ export const ETAPAS_PROGRAMA = [
   { key: 'apreciacao', label: 'Apreciação de Resultados', descricao: 'Leitura executiva, recortes sociodemográficos.' },
   { key: 'conscientizacao', label: 'Conscientização', descricao: 'Devolutivas a líderes e times, plano de ação.' },
   { key: 'transformacao', label: 'Transformação', descricao: 'Execução do plano e novo ciclo de mensuração.' },
+  { key: 'gestao_projeto', label: 'Gestão do Projeto', descricao: 'Fechamento do ciclo, consolidação de entregas e relatório final de gestão.' },
 ];
