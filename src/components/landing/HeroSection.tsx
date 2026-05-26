@@ -61,6 +61,12 @@ export const HeroSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <Nr1HighlightBanner />
 
+        {/* Faixa promocional - separador entre NR-1 e Gestão Estratégica */}
+        <div className="my-6 -mx-4">
+          <StickyCTABar />
+        </div>
+
+
         {/* Eyebrow - separador para o tema Gestão Estratégica */}
         <div className="flex justify-center mb-8 mt-4">
           <Badge className="bg-secondary/10 text-secondary border-secondary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
