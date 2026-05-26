@@ -7,7 +7,7 @@ import { ShieldCheck, ArrowRight, Clock, Sparkles } from 'lucide-react';
  */
 export const Nr1HighlightBanner = () => {
   return (
-    <section className="relative w-full py-12 overflow-hidden bg-gradient-to-r from-[hsl(217,91%,15%)] via-[hsl(217,91%,22%)] to-[hsl(217,91%,15%)]">
+    <section className="relative w-full pt-36 md:pt-40 pb-12 overflow-hidden bg-gradient-to-r from-[hsl(217,91%,15%)] via-[hsl(217,91%,22%)] to-[hsl(217,91%,15%)]">
       {/* Glow animado de fundo */}
       <div className="absolute inset-0 opacity-30 pointer-events-none">
         <div className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-emerald-500/30 blur-3xl animate-pulse" />
