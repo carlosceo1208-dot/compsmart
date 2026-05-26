@@ -213,9 +213,8 @@ Deno.serve(async (req) => {
     
   } catch (error) {
     console.error('Error in check-security-alerts:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: 'Erro interno do servidor' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -231,6 +231,6 @@ serve(async (req) => {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[ERROR] create-test-account:', errorMessage);
-    return json({ error: errorMessage }, 500);
+    return json({ error: 'Erro interno do servidor' }, 500);
   }
 });
