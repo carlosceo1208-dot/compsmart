@@ -73,6 +73,7 @@ const features = [
 ];
 
 export default function LandingCargosSalarios() {
+  const { ctaTo, isLoggedIn } = useAuthCTA();
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -118,9 +119,9 @@ export default function LandingCargosSalarios() {
               decisão de remuneração seja justa, competitiva e defensável.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/auth">
+              <Link to={ctaTo}>
                 <Button size="lg" className="gap-2">
-                  Começar teste grátis de 14 dias
+                  {isLoggedIn ? 'Ir para o app' : 'Começar teste grátis de 14 dias'}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -263,9 +264,9 @@ export default function LandingCargosSalarios() {
               Teste grátis por 14 dias. Sem cartão. Sem implantação.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to="/auth">
+              <Link to={ctaTo}>
                 <Button size="lg" variant="secondary" className="gap-2">
-                  Começar agora
+                  {isLoggedIn ? 'Ir para o app' : 'Começar agora'}
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
