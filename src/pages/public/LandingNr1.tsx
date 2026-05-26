@@ -382,6 +382,7 @@ export default function LandingNr1() {
       <footer className="border-t mt-10 py-6 text-center text-xs text-muted-foreground">
         © {new Date().getFullYear()} CompSmart · NR-1 conforme NR-01 atualizada (Portaria MTE 1.419/2024)
       </footer>
+      <Footer />
     </div>
   );
 }
