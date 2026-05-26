@@ -8,6 +8,8 @@ const LINHAS: Array<[string, string | boolean, string | boolean]> = [
   ['Identifica top talent em burnout antes do pedido de demissão', false, true],
   ['Plano de ação priorizado por ROI (não só compliance)', false, true],
   ['Linguagem para o board (não só para o analista SST)', false, true],
+  ['Cruza risco com pesquisa de clima', false, true],
+  ['Gestão do projeto NR-1 ponta a ponta', false, true],
   ['Entrega final', 'Laudo para arquivar', 'Decisão estratégica de pessoas'],
 ];
 
