@@ -472,49 +472,169 @@ export default function Nr1ClimaDashboard() {
             </Card>
           )}
 
-          {/* Radar: atual vs ciclo anterior */}
-          {radarData.length > 0 && (
+          {/* Seletor de comparação multi-ciclos */}
+          {pesquisas.length >= 2 && (
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2"><RadarIcon className="h-4 w-4" /> Radar de Dimensões — Atual vs Ciclo Anterior</CardTitle>
-                <CardDescription className="text-xs">Compare o perfil das 10 dimensões entre o ciclo selecionado e o anterior (escala 1–5).</CardDescription>
+              <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3 flex-wrap">
+                <div>
+                  <CardTitle className="text-base">Comparação multi-ciclos</CardTitle>
+                  <CardDescription className="text-xs">
+                    Selecione 2 ou mais pesquisas para comparar a evolução agregada por dimensão.
+                    Clique em uma dimensão (radar ou linha) para detalhar perguntas.
+                  </CardDescription>
+                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      {comparePesquisaIds.length} ciclo{comparePesquisaIds.length === 1 ? '' : 's'} selecionado{comparePesquisaIds.length === 1 ? '' : 's'}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-[300px] max-h-[360px] overflow-y-auto">
+                    <p className="text-xs font-medium mb-2">Ciclos para comparar</p>
+                    <div className="space-y-1.5">
+                      {pesquisas.map((p) => {
+                        const checked = comparePesquisaIds.includes(p.id);
+                        return (
+                          <label key={p.id} className="flex items-start gap-2 text-xs cursor-pointer hover:bg-muted/50 rounded p-1.5">
+                            <Checkbox
+                              checked={checked}
+                              onCheckedChange={(v) => {
+                                setComparePesquisaIds((prev) =>
+                                  v ? [...prev, p.id] : prev.filter((x) => x !== p.id),
+                                );
+                              }}
+                              className="mt-0.5"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">{p.nome}</p>
+                              <p className="text-[10px] text-muted-foreground">
+                                {new Date(p.periodo_inicio).toLocaleDateString('pt-BR')} · {p.total_respondentes} resp · score {p.score_geral?.toFixed(2) ?? '—'}
+                              </p>
+                            </div>
+                            <span className="h-3 w-3 rounded-full mt-1" style={{ background: corPesquisa(p.id) }} />
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <div className="flex gap-2 mt-3 pt-2 border-t">
+                      <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setComparePesquisaIds(pesquisas.slice(-3).map((p) => p.id))}>
+                        Últimos 3
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setComparePesquisaIds(pesquisas.map((p) => p.id))}>
+                        Todos
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-xs h-7" onClick={() => setComparePesquisaIds([])}>
+                        Limpar
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </CardHeader>
               <CardContent>
-                <div className="h-[340px]">
+                {comparePesquisaIds.length < 2 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">
+                    Selecione pelo menos 2 ciclos para visualizar a comparação.
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {pesquisasCompare.map((p) => (
+                      <Badge key={p.id} variant="outline" className="gap-1.5 text-xs">
+                        <span className="h-2 w-2 rounded-full" style={{ background: corPesquisa(p.id) }} />
+                        {p.nome} · {p.score_geral?.toFixed(2) ?? '—'}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Radar multi-ciclos */}
+          {comparePesquisaIds.length >= 2 && radarMulti.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <RadarIcon className="h-4 w-4" /> Radar de Dimensões — Comparação entre ciclos
+                </CardTitle>
+                <CardDescription className="text-xs flex items-center gap-1">
+                  <MousePointerClick className="h-3 w-3" /> Clique em uma dimensão para detalhar as perguntas que mais impactaram o score.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[380px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={radarData} outerRadius="75%">
+                    <RadarChart
+                      data={radarMulti}
+                      outerRadius="75%"
+                      onClick={(state: any) => {
+                        const label = state?.activeLabel;
+                        if (label && dimByShortLabel.has(label)) setDrillDim(dimByShortLabel.get(label)!);
+                      }}
+                    >
                       <PolarGrid stroke="hsl(var(--border))" />
-                      <PolarAngleAxis dataKey="dim" tick={{ fontSize: 10, fill: 'hsl(var(--foreground))' }} />
+                      <PolarAngleAxis
+                        dataKey="dim"
+                        tick={{ fontSize: 10, fill: 'hsl(var(--foreground))', cursor: 'pointer' }}
+                      />
                       <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fontSize: 9 }} />
-                      {radarData.some((r) => r.anterior != null) && (
-                        <Radar name="Ciclo anterior" dataKey="anterior" stroke="hsl(var(--muted-foreground))" fill="hsl(var(--muted-foreground))" fillOpacity={0.15} />
-                      )}
-                      <Radar name="Ciclo atual" dataKey="atual" stroke="hsl(160 70% 40%)" fill="hsl(160 70% 40%)" fillOpacity={0.35} />
+                      {pesquisasCompare.map((p) => (
+                        <Radar
+                          key={p.id}
+                          name={p.nome.length > 18 ? p.nome.slice(0, 16) + '…' : p.nome}
+                          dataKey={p.id}
+                          stroke={corPesquisa(p.id)}
+                          fill={corPesquisa(p.id)}
+                          fillOpacity={0.18}
+                        />
+                      ))}
                       <Legend wrapperStyle={{ fontSize: 11 }} />
                       <Tooltip contentStyle={{ fontSize: 11 }} />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <span className="text-[10px] text-muted-foreground self-center mr-1">Detalhar dimensão:</span>
+                  {dimensoes.map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setDrillDim(d)}
+                      className="text-[10px] px-2 py-0.5 rounded-full border border-border hover:bg-primary hover:text-primary-foreground transition"
+                    >
+                      {DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' ')}
+                    </button>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Evolução por dimensão entre ciclos */}
-          {evolucaoDim.length > 1 && (
+          {/* Evolução por dimensão entre ciclos selecionados */}
+          {comparePesquisaIds.length >= 2 && evolucaoDimCompare.length > 1 && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2"><LineChartIcon className="h-4 w-4" /> Evolução por Dimensão</CardTitle>
-                <CardDescription className="text-xs">Trajetória de cada dimensão entre os ciclos de pesquisa.</CardDescription>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <LineChartIcon className="h-4 w-4" /> Evolução por Dimensão — ciclos selecionados
+                </CardTitle>
+                <CardDescription className="text-xs flex items-center gap-1">
+                  <MousePointerClick className="h-3 w-3" /> Clique em uma linha (ou na legenda) para abrir o drill-down da dimensão.
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[320px]">
+                <div className="h-[340px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={evolucaoDim} margin={{ top: 6, right: 12, left: -16, bottom: 4 }}>
+                    <LineChart data={evolucaoDimCompare} margin={{ top: 6, right: 12, left: -16, bottom: 4 }}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                       <XAxis dataKey="nome" tick={{ fontSize: 10 }} />
                       <YAxis domain={[1, 5]} tick={{ fontSize: 10 }} />
                       <Tooltip contentStyle={{ fontSize: 11 }} />
-                      <Legend wrapperStyle={{ fontSize: 10 }} />
+                      <Legend
+                        wrapperStyle={{ fontSize: 10, cursor: 'pointer' }}
+                        onClick={(o: any) => {
+                          const key = o?.dataKey as ClimaDimensao | undefined;
+                          if (key && (DIMENSAO_LABEL as any)[key]) setDrillDim(key);
+                        }}
+                      />
                       {dimensoes.map((d, i) => (
                         <Line
                           key={d}
@@ -523,7 +643,8 @@ export default function Nr1ClimaDashboard() {
                           name={DIMENSAO_LABEL[d].split(' ').slice(0, 2).join(' ')}
                           stroke={`hsl(${(i * 36) % 360} 65% 50%)`}
                           strokeWidth={1.8}
-                          dot={{ r: 2 }}
+                          dot={{ r: 3, cursor: 'pointer' }}
+                          activeDot={{ r: 5, cursor: 'pointer', onClick: () => setDrillDim(d) }}
                         />
                       ))}
                     </LineChart>
@@ -532,6 +653,7 @@ export default function Nr1ClimaDashboard() {
               </CardContent>
             </Card>
           )}
+
 
           {/* Top vs Bottom segmentos */}
           {(topBottom.top.length > 0 || topBottom.bottom.length > 0) && (
