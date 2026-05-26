@@ -1,49 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const StickyCTABar = () => {
   const navigate = useNavigate();
-  const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    let scrollHandler: (() => void) | null = null;
-
-    const show = () => {
-      if (!dismissed) setVisible(true);
-    };
-
-    timer = setTimeout(show, 30000);
-
-    scrollHandler = () => {
-      const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-      if (scrollPercent > 0.5) show();
-    };
-    window.addEventListener("scroll", scrollHandler, { passive: true });
-
-    return () => {
-      clearTimeout(timer);
-      if (scrollHandler) window.removeEventListener("scroll", scrollHandler);
-    };
-  }, [dismissed]);
-
-  // Reappear after 2min
-  useEffect(() => {
-    if (!dismissed) return;
-    const timer = setTimeout(() => {
-      setDismissed(false);
-      setVisible(true);
-    }, 120000);
-    return () => clearTimeout(timer);
-  }, [dismissed]);
-
-  if (!visible || dismissed) return null;
+  if (dismissed) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground shadow-lg">
+    <div className="relative z-10 bg-primary text-primary-foreground shadow-md">
       <div className="container mx-auto px-4 py-2 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-sm min-w-0 flex-1 overflow-hidden">
           <Sparkles className="h-4 w-4 shrink-0" />
@@ -53,7 +20,7 @@ export const StickyCTABar = () => {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Button
             size="sm"
             variant="secondary"
@@ -63,7 +30,7 @@ export const StickyCTABar = () => {
             Começar Agora
           </Button>
           <button
-            onClick={() => { setDismissed(true); setVisible(false); }}
+            onClick={() => setDismissed(true)}
             className="p-1 hover:bg-primary-hover rounded"
             aria-label="Fechar"
           >
