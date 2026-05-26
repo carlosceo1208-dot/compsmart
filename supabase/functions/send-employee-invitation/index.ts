@@ -179,7 +179,7 @@ serve(async (req) => {
           });
 
           if (resetError) {
-            results.errors.push({ name: employee.full_name, error: resetError.message });
+            results.errors.push({ name: employee.full_name, error: 'Falha ao gerar link de recuperação' });
             continue;
           }
 
@@ -210,13 +210,13 @@ serve(async (req) => {
               });
 
               if (resetError) {
-                results.errors.push({ name: employee.full_name, error: resetError.message });
+                results.errors.push({ name: employee.full_name, error: 'Falha ao gerar link de recuperação' });
                 continue;
               }
 
               activationUrl = resetData.properties?.action_link || '';
             } else {
-              results.errors.push({ name: employee.full_name, error: authError.message });
+              results.errors.push({ name: employee.full_name, error: 'Falha ao criar usuário' });
               continue;
             }
           } else if (authData?.user) {
@@ -312,7 +312,7 @@ serve(async (req) => {
             });
 
             if (resetError) {
-              results.errors.push({ name: employee.full_name, error: resetError.message });
+              results.errors.push({ name: employee.full_name, error: 'Falha ao gerar link de recuperação' });
               continue;
             }
 
@@ -389,7 +389,7 @@ serve(async (req) => {
         });
 
         if (emailError) {
-          results.errors.push({ name: employee.full_name, error: `Erro ao enviar email: ${emailError.message}` });
+          results.errors.push({ name: employee.full_name, error: 'Falha ao enviar email' });
           continue;
         }
 
@@ -397,7 +397,7 @@ serve(async (req) => {
         console.log(`Invitation sent to ${employee.email}`);
 
       } catch (err: any) {
-        results.errors.push({ name: employee.full_name, error: err.message });
+        results.errors.push({ name: employee.full_name, error: 'Erro ao processar colaborador' });
       }
     }
 

@@ -188,7 +188,7 @@ serve(async (req) => {
         results.push({ email, ok: true, user_id: userId, action_link: actionLink });
       } catch (e: any) {
         console.error("[invite-super-admin] erro:", email, e?.message);
-        results.push({ email, ok: false, error: e?.message ?? String(e) });
+        results.push({ email, ok: false, error: 'Falha ao convidar' });
       }
     }
 
@@ -197,7 +197,7 @@ serve(async (req) => {
     });
   } catch (err: any) {
     console.error("[invite-super-admin] fatal:", err);
-    return new Response(JSON.stringify({ error: err?.message ?? "Erro interno" }), {
+    return new Response(JSON.stringify({ error: 'Erro interno do servidor' }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }

@@ -181,7 +181,7 @@ Responda APENAS com o JSON, sem texto adicional.`;
     console.error('Erro em suggest-job-competencies:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'Erro desconhecido' 
+        error: 'Erro interno do servidor' 
       }),
       { 
         status: 500, 

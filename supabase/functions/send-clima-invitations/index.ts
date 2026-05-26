@@ -160,12 +160,12 @@ serve(async (req) => {
           html,
         });
         if (sendErr) {
-          errors.push({ name: emp.full_name, error: sendErr.message });
+          errors.push({ name: emp.full_name, error: 'Falha ao enviar convite' });
         } else {
           sent.push(emp.full_name);
         }
       } catch (e: any) {
-        errors.push({ name: emp.full_name, error: e.message });
+        errors.push({ name: emp.full_name, error: 'Erro ao processar' });
       }
     }
 
@@ -188,7 +188,7 @@ serve(async (req) => {
     );
   } catch (e: any) {
     console.error('send-clima-invitations error:', e);
-    return new Response(JSON.stringify({ error: e.message }), {
+    return new Response(JSON.stringify({ error: 'Erro interno do servidor' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
