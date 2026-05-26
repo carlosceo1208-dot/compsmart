@@ -103,7 +103,6 @@ const Index = () => {
 
       <Footer />
       <LaunchPromoBanner />
-      <StickyCTABar />
     </div>
   );
 };
