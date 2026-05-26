@@ -52,7 +52,7 @@ export default function Nr1Hero({ onDiagnostico, onComoFunciona }: Props) {
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Sem cartão de crédito · Resultado imediato · LGPD-compliant
+              Resultado imediato · 100% LGPD-compliant · Proposta sob medida
             </p>
           </div>
 
