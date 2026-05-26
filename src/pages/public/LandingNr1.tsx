@@ -196,8 +196,11 @@ export default function LandingNr1() {
                   <Stat label="Máximo" value={formatBRL(multa.max)} tone="bad" />
                 </div>
                 <p className="text-xs text-muted-foreground pt-2">
-                  💡 A partir de R$ 349/mês a CompSmart elimina essa exposição{' '}
-                  <strong>e</strong> ainda te entrega inteligência de retenção.
+                  💡 A CompSmart elimina essa exposição <strong>e</strong> ainda te entrega
+                  inteligência de retenção.{' '}
+                  <button onClick={() => scrollToId('fale-conosco')} className="underline nr1-text-primary font-semibold">
+                    Solicite uma proposta
+                  </button>.
                 </p>
               </CardContent>
             </Card>
@@ -249,35 +252,25 @@ export default function LandingNr1() {
             </div>
           </section>
 
-          {/* Planos */}
-          <section className="container mx-auto px-4 py-14">
-            <div className="text-center max-w-2xl mx-auto mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Planos NR-1</h2>
-              <p className="text-muted-foreground">14 dias grátis · sem cartão de crédito · cancele quando quiser.</p>
+          {/* Fale com um especialista — proposta sob medida */}
+          <section id="fale-conosco" className="container mx-auto px-4 py-14">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl md:text-4xl font-bold mb-2">Solicite uma proposta personalizada</h2>
+                <p className="text-muted-foreground">
+                  Cada empresa tem um contexto. Conte para a gente o seu — e montamos um pacote
+                  sob medida (NR-1 + 9Box + remuneração) com o melhor custo-benefício para o seu porte.
+                </p>
+              </div>
+              <Card className="border-2 border-[hsl(var(--nr1-primary)/0.3)]">
+                <CardContent className="pt-6">
+                  <ProposalForm />
+                </CardContent>
+              </Card>
+              <p className="text-center mt-6 text-sm text-muted-foreground">
+                Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
+              </p>
             </div>
-            <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-              {[
-                { n: 'Até 100 colab.', p: 'R$ 349' },
-                { n: '101 a 500 colab.', p: 'R$ 649', destaque: true },
-                { n: '501+ colab.', p: 'R$ 1.190' },
-              ].map((p) => (
-                <Card key={p.n} className={p.destaque ? 'border-2 border-[hsl(var(--nr1-primary))] shadow-lg' : ''}>
-                  <CardContent className="pt-6 text-center">
-                    {p.destaque && (
-                      <Badge className="nr1-bg-accent mb-2 text-[10px] font-bold uppercase tracking-wider">
-                        Mais escolhido
-                      </Badge>
-                    )}
-                    <p className="text-sm text-muted-foreground mb-2">{p.n}</p>
-                    <p className="text-3xl font-bold">{p.p}<span className="text-sm text-muted-foreground">/mês</span></p>
-                    <p className="text-xs text-muted-foreground mt-1">14 dias grátis</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <p className="text-center mt-6 text-sm text-muted-foreground">
-              Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
-            </p>
           </section>
 
           {/* FAQ */}
@@ -399,6 +392,105 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: 'ok'
     <div className={`rounded-lg p-3 text-center ${cls}`}>
       <p className="text-xs opacity-80">{label}</p>
       <p className="font-bold">{value}</p>
+    </div>
+  );
+}
+
+function ProposalForm() {
+  const [data, setData] = useState({
+    nome: '', email: '', empresa: '', cargo: '', telefone: '', tamanho_empresa: '', mensagem: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const schema = z.object({
+    nome: z.string().trim().min(2, 'Informe seu nome').max(120),
+    email: z.string().trim().email('Email inválido').max(255),
+    empresa: z.string().trim().min(2, 'Informe a empresa').max(200),
+    cargo: z.string().trim().max(120).optional().or(z.literal('')),
+    telefone: z.string().trim().max(40).optional().or(z.literal('')),
+    tamanho_empresa: z.string().trim().max(40).optional().or(z.literal('')),
+    mensagem: z.string().trim().max(1000).optional().or(z.literal('')),
+  });
+
+  const submit = async () => {
+    const parsed = schema.safeParse(data);
+    if (!parsed.success) {
+      toast({ title: 'Verifique os campos', description: parsed.error.issues[0]?.message, variant: 'destructive' });
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.from('nr1_leads').insert({
+      nome: parsed.data.nome,
+      email: parsed.data.email,
+      empresa: parsed.data.empresa,
+      cargo: parsed.data.cargo || null,
+      telefone: parsed.data.telefone || null,
+      tamanho_empresa: parsed.data.tamanho_empresa || null,
+      respostas_free: parsed.data.mensagem ? { mensagem: parsed.data.mensagem } : null,
+      origem: 'landing_nr1_proposta',
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: 'Erro ao enviar', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setSent(true);
+    toast({ title: 'Recebido!', description: 'Nossa equipe entra em contato em até 24h úteis.' });
+  };
+
+  if (sent) {
+    return (
+      <div className="text-center py-6 space-y-3">
+        <ShieldCheck className="h-12 w-12 mx-auto nr1-text-primary" />
+        <h3 className="text-xl font-bold">Obrigado! Recebemos sua solicitação.</h3>
+        <p className="text-sm text-muted-foreground">
+          Um especialista CompSmart entrará em contato em até <strong>24h úteis</strong> com uma proposta
+          personalizada para sua empresa.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid md:grid-cols-2 gap-3">
+      <div>
+        <Label htmlFor="pf-nome">Nome*</Label>
+        <Input id="pf-nome" value={data.nome} onChange={(e) => setData({ ...data, nome: e.target.value })} maxLength={120} />
+      </div>
+      <div>
+        <Label htmlFor="pf-email">Email corporativo*</Label>
+        <Input id="pf-email" type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} maxLength={255} />
+      </div>
+      <div>
+        <Label htmlFor="pf-empresa">Empresa*</Label>
+        <Input id="pf-empresa" value={data.empresa} onChange={(e) => setData({ ...data, empresa: e.target.value })} maxLength={200} />
+      </div>
+      <div>
+        <Label htmlFor="pf-cargo">Cargo</Label>
+        <Input id="pf-cargo" value={data.cargo} onChange={(e) => setData({ ...data, cargo: e.target.value })} maxLength={120} />
+      </div>
+      <div>
+        <Label htmlFor="pf-tel">Telefone</Label>
+        <Input id="pf-tel" value={data.telefone} onChange={(e) => setData({ ...data, telefone: e.target.value })} maxLength={40} />
+      </div>
+      <div>
+        <Label htmlFor="pf-tam">Nº de colaboradores</Label>
+        <Input id="pf-tam" placeholder="ex: 250" value={data.tamanho_empresa} onChange={(e) => setData({ ...data, tamanho_empresa: e.target.value })} maxLength={40} />
+      </div>
+      <div className="md:col-span-2">
+        <Label htmlFor="pf-msg">Conte rapidamente seu contexto (opcional)</Label>
+        <Input id="pf-msg" placeholder="Ex: precisamos implementar NR-1 antes de maio/2026 e já temos 9Box rodando" value={data.mensagem} onChange={(e) => setData({ ...data, mensagem: e.target.value })} maxLength={1000} />
+      </div>
+      <div className="md:col-span-2 pt-2">
+        <Button onClick={submit} disabled={loading} className="w-full nr1-bg-primary text-white" size="lg">
+          {loading ? 'Enviando...' : 'Quero falar com um especialista'}
+          <ArrowRight className="h-4 w-4 ml-1.5" />
+        </Button>
+        <p className="text-xs text-muted-foreground text-center mt-3">
+          Resposta em até 24h úteis · Seus dados são tratados conforme LGPD.
+        </p>
+      </div>
     </div>
   );
 }
