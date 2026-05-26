@@ -15,6 +15,7 @@ export const performanceGlossaryCategories = [
   { id: "ferramentas", label: "Ferramentas", icon: "LayoutGrid" },
   { id: "reconhecimento", label: "Reconhecimento", icon: "Award" },
   { id: "sucessao", label: "Sucessão", icon: "Users" },
+  { id: "nr1", label: "NR-1 & Riscos Psicossociais", icon: "AlertTriangle" },
 ] as const;
 
 export const performanceGlossaryTerms: PerformanceGlossaryTerm[] = [
