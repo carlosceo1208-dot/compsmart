@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Check, Sparkles } from 'lucide-react';
+import { Check, Sparkles, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 
@@ -11,7 +11,7 @@ const ESSENCIAL = [
   'Relatório com score por dimensão',
   'Exportação PDF para fiscalização',
   'Dashboard de risco psicossocial',
-  '1 admin · respondentes ilimitados',
+  'Respondentes ilimitados',
 ];
 
 const PRO = [
@@ -30,9 +30,9 @@ export default function Nr1Contratar() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold">Escolha seu plano NR-1</h2>
+        <h2 className="text-3xl font-bold">Escolha sua modalidade NR-1</h2>
         <p className="text-muted-foreground">
-          Conformidade legal, plano de ação e monitoramento — sem precisar de consultor.
+          Conformidade legal, plano de ação e monitoramento — com proposta sob medida para o porte da sua empresa.
         </p>
       </div>
 
@@ -42,13 +42,6 @@ export default function Nr1Contratar() {
           <CardHeader>
             <CardTitle>NR-1 Essencial</CardTitle>
             <CardDescription>Para quem precisa começar pela conformidade.</CardDescription>
-            <div className="mt-3">
-              <span className="text-3xl font-bold">R$ 349</span>
-              <span className="text-muted-foreground">/mês · até 100 colab.</span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              R$ 649/mês até 500 · R$ 1.190/mês acima de 500 · 14 dias grátis
-            </p>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 mb-6">
@@ -59,7 +52,11 @@ export default function Nr1Contratar() {
                 </li>
               ))}
             </ul>
-            <Button className="w-full nr1-bg-primary">Começar trial de 14 dias</Button>
+            <Button className="w-full nr1-bg-primary" asChild>
+              <Link to="/nr1#fale-conosco">
+                <MessageSquare className="h-4 w-4 mr-2" /> Solicitar proposta
+              </Link>
+            </Button>
           </CardContent>
         </Card>
 
@@ -74,19 +71,6 @@ export default function Nr1Contratar() {
               {proIncluso && <Badge className="nr1-risk-baixo">Já incluso no seu plano!</Badge>}
             </CardTitle>
             <CardDescription>Compliance + ação + inteligência integrada ao seu RH.</CardDescription>
-            <div className="mt-3">
-              {proIncluso ? (
-                <span className="text-2xl font-bold text-[hsl(var(--nr1-success))]">Grátis para você</span>
-              ) : (
-                <>
-                  <span className="text-3xl font-bold">+R$ 299</span>
-                  <span className="text-muted-foreground">/mês como add-on</span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Ou faça upgrade para CompSmart Pro/Enterprise e ganhe NR-1 Pro sem custo adicional.
-                  </p>
-                </>
-              )}
-            </div>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2 mb-6">
@@ -102,8 +86,10 @@ export default function Nr1Contratar() {
                 <Link to="/nr1/painel">Acessar NR-1 Pro</Link>
               </Button>
             ) : (
-              <Button className="w-full" variant="outline" asChild>
-                <Link to="/pricing">Ver planos CompSmart</Link>
+              <Button className="w-full nr1-bg-primary" asChild>
+                <Link to="/nr1#fale-conosco">
+                  <MessageSquare className="h-4 w-4 mr-2" /> Solicitar proposta
+                </Link>
               </Button>
             )}
           </CardContent>
