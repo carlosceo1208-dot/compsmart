@@ -285,7 +285,7 @@ export default function LandingNr1() {
                 Comece pelo diagnóstico. Decida com dados.
               </h2>
               <p className="text-muted-foreground">
-                Resultado em 2 minutos · sem cartão · 100% LGPD-compliant.
+                Resultado em 2 minutos · 100% LGPD-compliant · Proposta sob medida.
               </p>
               <Button size="lg" className="nr1-btn-primary text-white" onClick={() => setStep('questionario')}>
                 Diagnóstico grátis NR-1 <ArrowRight className="h-4 w-4 ml-1.5" />
