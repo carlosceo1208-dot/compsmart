@@ -399,9 +399,17 @@ function Stat({ label, value, tone }: { label: string; value: string; tone: 'ok'
   );
 }
 
+const GRAU_RISCO_OPTIONS = [
+  { value: '1', label: 'Grau 1 — Risco Leve (1% RAT) · ex: escritórios, TI, comércio' },
+  { value: '2', label: 'Grau 2 — Risco Médio (2% RAT) · ex: indústria leve, hotelaria, hospitais' },
+  { value: '3', label: 'Grau 3 — Risco Grave (3% RAT) · ex: construção civil, química, transporte de carga' },
+  { value: '4', label: 'Grau 4 — Risco Gravíssimo (3% RAT máx) · ex: mineração, petroquímica, energia' },
+  { value: 'nao_sei', label: 'Não sei informar — quero ajuda do especialista' },
+];
+
 function ProposalForm() {
   const [data, setData] = useState({
-    nome: '', email: '', empresa: '', cargo: '', telefone: '', tamanho_empresa: '', mensagem: '',
+    nome: '', email: '', empresa: '', cargo: '', telefone: '', whatsapp: '', tamanho_empresa: '', grau_risco: '', mensagem: '',
   });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -412,7 +420,9 @@ function ProposalForm() {
     empresa: z.string().trim().min(2, 'Informe a empresa').max(200),
     cargo: z.string().trim().max(120).optional().or(z.literal('')),
     telefone: z.string().trim().max(40).optional().or(z.literal('')),
+    whatsapp: z.string().trim().max(40).optional().or(z.literal('')),
     tamanho_empresa: z.string().trim().max(40).optional().or(z.literal('')),
+    grau_risco: z.string().trim().max(20).optional().or(z.literal('')),
     mensagem: z.string().trim().max(1000).optional().or(z.literal('')),
   });
 
@@ -423,6 +433,10 @@ function ProposalForm() {
       return;
     }
     setLoading(true);
+    const extras: Record<string, string> = {};
+    if (parsed.data.mensagem) extras.mensagem = parsed.data.mensagem;
+    if (parsed.data.whatsapp) extras.whatsapp = parsed.data.whatsapp;
+    if (parsed.data.grau_risco) extras.grau_risco_inss = parsed.data.grau_risco;
     const { error } = await supabase.from('nr1_leads').insert({
       nome: parsed.data.nome,
       email: parsed.data.email,
@@ -430,7 +444,7 @@ function ProposalForm() {
       cargo: parsed.data.cargo || null,
       telefone: parsed.data.telefone || null,
       tamanho_empresa: parsed.data.tamanho_empresa || null,
-      respostas_free: parsed.data.mensagem ? { mensagem: parsed.data.mensagem } : null,
+      respostas_free: Object.keys(extras).length ? extras : null,
       origem: 'landing_nr1_proposta',
     });
     setLoading(false);
