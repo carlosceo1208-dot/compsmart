@@ -388,7 +388,7 @@ Gere texto completo, profissional e humanizado.
   } catch (error) {
     console.error('[PerformAI 2.0] Error:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Erro interno' }),
+      JSON.stringify({ error: 'Erro interno do servidor' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

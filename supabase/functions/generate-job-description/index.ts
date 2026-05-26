@@ -285,7 +285,7 @@ Retorne JSON com:
   } catch (error: any) {
     console.error('Error in generate-job-description:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Erro ao gerar descrição' }),
+      JSON.stringify({ error: 'Erro ao gerar descrição' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
