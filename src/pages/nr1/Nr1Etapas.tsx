@@ -9,6 +9,7 @@ const status: Record<string, 'concluida' | 'em_andamento' | 'planejada'> = {
   apreciacao: 'planejada',
   conscientizacao: 'planejada',
   transformacao: 'planejada',
+  gestao_projeto: 'planejada',
 };
 
 const labelStatus = {
@@ -24,6 +25,7 @@ const etapaCores: Record<string, { main: string; soft: string; border: string }>
   apreciacao:     { main: '38 92% 50%',  soft: '38 92% 50% / 0.15',  border: '38 92% 50% / 0.5'  },
   conscientizacao:{ main: '262 83% 58%', soft: '262 83% 58% / 0.12', border: '262 83% 58% / 0.5' },
   transformacao:  { main: '160 84% 39%', soft: '160 84% 39% / 0.12', border: '160 84% 39% / 0.5' },
+  gestao_projeto: { main: '8 72% 59%',   soft: '8 72% 59% / 0.12',   border: '8 72% 59% / 0.5'   },
 };
 
 export default function Nr1Etapas() {
