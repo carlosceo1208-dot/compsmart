@@ -15,6 +15,7 @@ export const performanceGlossaryCategories = [
   { id: "ferramentas", label: "Ferramentas", icon: "LayoutGrid" },
   { id: "reconhecimento", label: "Reconhecimento", icon: "Award" },
   { id: "sucessao", label: "Sucessão", icon: "Users" },
+  { id: "nr1", label: "NR-1 & Riscos Psicossociais", icon: "AlertTriangle" },
 ] as const;
 
 export const performanceGlossaryTerms: PerformanceGlossaryTerm[] = [
@@ -1055,5 +1056,52 @@ Reconhecimento é uma prática peer-to-peer (entre pares) que complementa o reco
       "Pergunte ao colaborador como foi a experiência da avaliação",
       "Use pesquisas de EX para medir satisfação com o processo"
     ]
-  }
+  },
+  // ===== NR-1 & RISCOS PSICOSSOCIAIS =====
+  {
+    term: "NR-1 (Norma Regulamentadora nº 1)",
+    category: "nr1",
+    summary: "Norma do Ministério do Trabalho atualizada pela Portaria MTE 1.419/2024 que obriga empresas a gerenciar riscos psicossociais no PGR a partir de maio/2026.",
+    fullContent: `A **NR-1** estabelece as disposições gerais sobre Segurança e Saúde no Trabalho aplicáveis a todas as empresas com colaboradores CLT.\n\n## O que mudou em 2024?\n\nA **Portaria MTE 1.419/2024** incluiu formalmente os **riscos psicossociais** (estresse, burnout, assédio, sobrecarga) no escopo obrigatório do **PGR — Programa de Gerenciamento de Riscos**.\n\n## Prazos\n\n- **26/05/2025** — início do prazo de adequação\n- **25/05/2026** — fim da fiscalização orientadora; multas passam a ser aplicadas\n\n## Por que importa para o RH?\n\nRisco psicossocial não é mais tema só do SESMT. Sai do laudo técnico e entra na pauta do board, conectado a desempenho, retenção e remuneração.`,
+    tips: [
+      "Use o COPSOQ-III como instrumento validado de mensuração",
+      "Garanta anonimato com N mínimo de respondentes por recorte (LGPD)",
+      "Cruze o risco psicossocial com 9Box e faixa salarial para priorizar ações",
+    ],
+  },
+  {
+    term: "Riscos Psicossociais",
+    category: "nr1",
+    summary: "Aspectos da organização do trabalho que podem causar danos psicológicos, sociais ou físicos. Devem ser identificados, avaliados e tratados conforme o Anexo III da NR-1.",
+    fullContent: `**Riscos psicossociais** são fatores no ambiente de trabalho que afetam a saúde mental e o bem-estar do colaborador.\n\n## Categorias principais (COPSOQ-III)\n\n- **Demandas do trabalho** — sobrecarga, ritmo, demandas emocionais\n- **Organização e conteúdo** — autonomia, sentido, previsibilidade\n- **Relações sociais e liderança** — suporte do gestor, qualidade da liderança, reconhecimento\n- **Interface trabalho-indivíduo** — equilíbrio vida-trabalho, insegurança no emprego\n- **Valores no local de trabalho** — confiança, justiça, inclusão\n- **Saúde e bem-estar** — burnout, estresse, sintomas depressivos\n\n## Tratamento\n\nTodo risco psicossocial identificado deve gerar um plano de ação com responsável, prazo e indicador de eficácia.`,
+  },
+  {
+    term: "PGR (Programa de Gerenciamento de Riscos)",
+    category: "nr1",
+    summary: "Documento obrigatório da NR-1 que consolida o inventário de riscos ocupacionais e o plano de ação para mitigá-los — agora incluindo riscos psicossociais.",
+    fullContent: `O **PGR** é o documento mestre da gestão de SST. Ele deve conter:\n\n1. **Inventário de Riscos** — todos os perigos a que os colaboradores estão expostos\n2. **Plano de Ação** — medidas preventivas e corretivas priorizadas\n3. **Análise crítica anual** — revisão obrigatória\n\nA partir de 2026, o PGR sem capítulo de riscos psicossociais é considerado **incompleto** e gera multa.`,
+  },
+  {
+    term: "COPSOQ-III",
+    category: "nr1",
+    summary: "Copenhagen Psychosocial Questionnaire (3ª versão) — instrumento internacional validado para mensurar dimensões psicossociais do trabalho.",
+    fullContent: `O **COPSOQ-III** é o questionário mais usado no mundo para diagnóstico de riscos psicossociais.\n\n## Por que o CompSmart adota o COPSOQ-III?\n\n- Validação científica em mais de 40 países\n- Versões curta, média e longa\n- Compatível com o Anexo III da NR-1\n- Permite benchmark internacional`,
+  },
+  {
+    term: "Correlação Risco × Faixa Salarial",
+    category: "nr1",
+    summary: "Análise exclusiva do CompSmart que cruza risco psicossocial com posição na faixa salarial para identificar top talents em burnout antes do pedido de demissão.",
+    fullContent: `Essa correlação é o diferencial do **NR-1 Inteligente** vs plataformas tradicionais de compliance.\n\n## Como funciona\n\n1. Diagnóstico NR-1 classifica o risco psicossocial por área/cargo\n2. Sistema cruza com a faixa salarial e o 9Box do colaborador\n3. Gera alerta de **risco de perda** para top talents em burnout\n4. Plano de ação priorizado por **ROI**, não só por compliance\n\n## Por que importa\n\nPerder um top talent custa de 1,5 a 3× o salário anual. Identificar antes do pedido de demissão = ROI claro para o CFO.`,
+    tips: [
+      "Use o alerta como gatilho para conversa 1:1 do gestor",
+      "Combine com revisão de mérito fora de ciclo quando justificado",
+      "Apresente o ROI da retenção ao board com dados consolidados",
+    ],
+  },
+  {
+    term: "Multa NR-1",
+    category: "nr1",
+    summary: "Penalidade por descumprimento — pode chegar a R$ 4.025 por colaborador exposto, conforme gradação prevista na NR-28, além de embargo e responsabilização civil.",
+    fullContent: `A **multa NR-1** segue a gradação da NR-28 e considera porte da empresa e gravidade da infração.\n\n## Cálculo aproximado\n\n- Empresa com 250 colaboradores\n- Infração grau médio: ~R$ 2.000 por colaborador exposto\n- **Exposição financeira: ~R$ 500.000**\n\nSem contar embargo de atividades, responsabilização civil em caso de adoecimento e impacto reputacional.`,
+  },
 ];

@@ -237,6 +237,77 @@ const glossaryTerms: GlossaryTerm[] = [
     term: "Metas Individuais, Departamentais e Corporativas",
     definition: "Três níveis de metas cascateadas com pesos configuráveis: da empresa para o departamento e do departamento para o colaborador, garantindo alinhamento estratégico.",
     category: "Avaliação de Desempenho"
+  },
+  // ===== NR-1 =====
+  {
+    term: "NR-1 (Norma Regulamentadora nº 1)",
+    definition: "Norma do Ministério do Trabalho que estabelece as disposições gerais sobre Segurança e Saúde no Trabalho. Atualizada pela Portaria MTE 1.419/2024, exige o gerenciamento de riscos psicossociais no PGR a partir de maio/2026.",
+    category: "NR-1"
+  },
+  {
+    term: "Riscos Psicossociais",
+    definition: "Aspectos da organização do trabalho que podem causar danos psicológicos, sociais ou físicos (estresse, burnout, assédio, sobrecarga). Devem ser identificados, avaliados e tratados conforme o Anexo III da NR-1.",
+    category: "NR-1"
+  },
+  {
+    term: "PGR (Programa de Gerenciamento de Riscos)",
+    definition: "Documento obrigatório da NR-1 que consolida o inventário de riscos ocupacionais (físicos, químicos, biológicos, ergonômicos e psicossociais) e o plano de ação para mitigá-los.",
+    category: "NR-1"
+  },
+  {
+    term: "Inventário de Riscos",
+    definition: "Levantamento sistemático de todos os perigos e riscos a que os colaboradores estão expostos, com classificação por severidade, probabilidade e nível de controle. Componente central do PGR.",
+    category: "NR-1"
+  },
+  {
+    term: "Plano de Ação NR-1",
+    definition: "Conjunto de medidas preventivas e corretivas priorizadas por ROI e severidade, com responsáveis, prazos e indicadores de eficácia para tratar os riscos identificados no PGR.",
+    category: "NR-1"
+  },
+  {
+    term: "COPSOQ-III",
+    definition: "Copenhagen Psychosocial Questionnaire (3ª versão) — instrumento internacional validado para mensurar dimensões psicossociais do trabalho. Base científica usada pelo CompSmart no diagnóstico NR-1.",
+    category: "NR-1"
+  },
+  {
+    term: "Anexo III da NR-1",
+    definition: "Anexo que detalha os critérios para identificação, avaliação e controle dos fatores de risco psicossocial relacionados ao trabalho. Obrigatório para todas as empresas com colaboradores CLT.",
+    category: "NR-1"
+  },
+  {
+    term: "Portaria MTE 1.419/2024",
+    definition: "Norma que atualizou a NR-1, incluindo a obrigação formal de gestão de riscos psicossociais. Prazo de adequação iniciou em 26/05/2025 com fiscalização orientadora até 25/05/2026.",
+    category: "NR-1"
+  },
+  {
+    term: "Burnout (CID-11 QD85)",
+    definition: "Síndrome reconhecida pela OMS resultante do estresse crônico no trabalho não gerenciado. Caracterizada por exaustão, distanciamento mental e queda de eficácia profissional. Mapeada no diagnóstico NR-1.",
+    category: "NR-1"
+  },
+  {
+    term: "Fiscalização Orientadora",
+    definition: "Período inicial em que o auditor-fiscal do trabalho orienta a empresa sobre adequações à NR-1 sem aplicar multa, desde que haja evidência de boa-fé e plano de adequação em curso.",
+    category: "NR-1"
+  },
+  {
+    term: "Multa NR-1",
+    definition: "Penalidade por descumprimento da norma — pode chegar a R$ 4.025 por colaborador exposto, conforme gradação prevista na NR-28, além de embargo e responsabilização civil em caso de adoecimento.",
+    category: "NR-1"
+  },
+  {
+    term: "Correlação Risco × Faixa Salarial",
+    definition: "Análise exclusiva do CompSmart que cruza o risco psicossocial mapeado pela NR-1 com a posição do colaborador na faixa salarial, identificando top talents em burnout antes do pedido de demissão.",
+    category: "NR-1"
+  },
+  {
+    term: "Pesquisa de Clima Integrada",
+    definition: "Integração entre a pesquisa de clima organizacional e o diagnóstico NR-1, permitindo cruzar percepção subjetiva (clima) com risco objetivo (psicossocial) para decisões mais assertivas.",
+    category: "NR-1"
+  },
+  {
+    term: "LGPD-Anonymous (NR-1)",
+    definition: "Modelo de coleta de respostas do diagnóstico NR-1 que preserva o anonimato individual (mínimo de N respondentes por recorte) para atender à LGPD e garantir respostas honestas.",
+    category: "NR-1"
   }
 ];
 
