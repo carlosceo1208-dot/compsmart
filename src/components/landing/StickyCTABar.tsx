@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 
 export const StickyCTABar = () => {
   const navigate = useNavigate();
+  const { ctaTo, ctaLabel } = useAuthCTA();
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
@@ -25,9 +27,9 @@ export const StickyCTABar = () => {
             size="sm"
             variant="secondary"
             className="bg-card text-primary hover:bg-card/90 text-xs font-bold"
-            onClick={() => navigate("/auth")}
+            onClick={() => navigate(ctaTo)}
           >
-            Começar Agora
+            {ctaLabel}
           </Button>
           <button
             onClick={() => setDismissed(true)}

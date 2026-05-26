@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuthCTA } from "@/hooks/useAuthCTA";
 import { XCircle, CheckCircle2, DollarSign, FileSpreadsheet, Brain, AlertTriangle, BarChart3, Zap, Shield, TrendingUp, Award, Scale } from "lucide-react";
 
 const problems = [
@@ -89,7 +90,7 @@ export const BeforeAfterSection = () => {
           <Button
             size="lg"
             className="bg-secondary hover:bg-secondary-hover text-secondary-foreground font-semibold"
-            onClick={() => navigate("/auth")}
+            onClick={() => navigate(ctaTo)}
           >
             Quero Essa Transformação Agora
           </Button>
