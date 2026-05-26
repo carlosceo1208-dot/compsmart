@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link, useNavigate } from 'react-router-dom';
 import { Brain, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
 import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
