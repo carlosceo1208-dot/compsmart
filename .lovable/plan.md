@@ -1,28 +1,32 @@
 ## Objetivo
+Atribuir uma cor distinta a cada uma das 5 etapas do programa NR-1 na página `/nr1/etapas`, tanto na **linha do tempo** (chips) quanto nos **cards** abaixo (borda lateral + ícone + badge "Etapa N").
 
-Aplicar no questionário de Clima (60 perguntas) o mesmo critério já usado no diagnóstico NR-1 (40 perguntas): **ocultar o nome da dimensão** durante a resposta e **embaralhar as perguntas** para evitar indução de respostas. O link pergunta ↔ dimensão continua existindo internamente (via `dimensao_num`) e é usado normalmente no cálculo dos scores por dimensão e nos relatórios.
+## Paleta sugerida (semântica por fase do ciclo)
 
-## Arquivos afetados
+| # | Etapa | Cor | HSL | Racional |
+|---|-------|-----|-----|----------|
+| 1 | Preparação | Azul (Blue 500) | `217 91% 60%` | Planejamento, base |
+| 2 | Mensuração | Verde-azulado (Teal 500) | `173 80% 40%` | Coleta de dados, diagnóstico |
+| 3 | Apreciação de Resultados | Âmbar (Amber 500) | `38 92% 50%` | Análise, insights |
+| 4 | Conscientização | Violeta (Violet 500) | `262 83% 58%` | Educação, mudança cultural |
+| 5 | Transformação | Coral/Esmeralda (Emerald 600) | `160 84% 39%` | Ação, resultado, evolução |
 
-1. `src/pages/nr1/Nr1ClimaResponder.tsx` — fluxo interno (colaborador logado)
-2. `src/pages/public/ClimaPublico.tsx` — fluxo público (link anônimo)
+Status (Concluída/Em andamento/Planejada) continua diferenciado por **opacidade/preenchimento**, não substitui a cor da etapa:
+- Concluída → cor cheia + ✓
+- Em andamento → cor + ring + pulse sutil
+- Planejada → cor com 30% opacidade
 
-## Mudanças
+## Mudanças técnicas
 
-Em ambas as telas, na seção de resposta:
+**Arquivo único:** `src/pages/nr1/Nr1Etapas.tsx`
 
-- Remover o agrupamento atual por dimensão (loop `DIMENSOES.map → QUESTOES.filter(dimensao)` com `<CardTitle>{DIMENSAO_LABEL[dim]}</CardTitle>`).
-- Gerar uma **lista única embaralhada** de 60 perguntas usando Fisher–Yates dentro de um `useMemo([])` (embaralhamento estável por sessão, novo a cada abertura).
-- Renderizar cada pergunta com cabeçalho neutro: **"Pergunta X de 60"** + barra de progresso, sem citar a dimensão.
-- Manter a `key` interna `${q.dimensao}_${q.num}` para que o cálculo dos scores por dimensão (`calcularScores`) e o envio das respostas continuem 100% funcionais.
+1. Adicionar mapa `etapaCores: Record<string, { bg, border, text, ring }>` indexado por `e.key` (`preparacao`, `mensuracao`, `apreciacao`, `conscientizacao`, `transformacao`).
+2. **Linha do tempo (chips):** aplicar `border-l-4` colorido, ícone na cor da etapa, fundo suave (`{cor}/10`) quando em andamento.
+3. **Cards de etapa:** adicionar `border-l-4` colorido à esquerda do `Card`, badge "Etapa N" com fundo da cor da etapa, badge de status mantém cores atuais (verde/azul/cinza).
+4. Usar classes Tailwind diretas com HSL inline via `style` OU adicionar tokens no `index.css` (`--nr1-etapa-1`...`--nr1-etapa-5`) e classes utilitárias. **Preferência:** tokens em `index.css` para consistência com o resto do módulo NR-1.
 
-## O que NÃO muda
+## Fora de escopo
+- Não altera `JornadaStepper` (stepper da jornada de bem-estar, contexto diferente).
+- Não altera lógica de status nem dados em `ETAPAS_PROGRAMA`.
 
-- `src/lib/climaQuestoes.ts` (perguntas, dimensões, função `calcularScores`).
-- Resultados, dashboards, correlação Clima × COPSOQ — continuam mostrando as dimensões normalmente, pois o vínculo é preservado nos dados gravados.
-- Schema do banco.
-
-## Validação
-
-1. Abrir `/nr1/clima/responder/:id` e o link público de clima → confirmar que não aparece nome de dimensão e a ordem das perguntas muda entre acessos.
-2. Submeter um questionário de teste e conferir que `scores_dimensao` é calculado corretamente nas 10 dimensões.
+Posso seguir com essa paleta ou prefere ajustar alguma cor antes?
