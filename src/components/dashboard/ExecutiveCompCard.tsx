@@ -19,7 +19,7 @@ export const ExecutiveCompCard = () => {
   const totalProjected = sims.reduce((s, x) => s + Number(x.total_value_at_vest ?? 0), 0);
 
   return (
-    <Card className="border-primary/20 hover:shadow-lg transition-shadow">
+    <Card className="glass-effect border-primary/20 hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Briefcase className="h-4 w-4 text-primary" />

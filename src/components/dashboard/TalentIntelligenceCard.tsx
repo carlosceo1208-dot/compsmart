@@ -18,7 +18,7 @@ export const TalentIntelligenceCard = () => {
   if (!(role?.isAdmin || role?.isSuperAdmin || role?.isHR)) return null;
 
   return (
-    <Card className="border-primary/20 hover:shadow-lg transition-shadow">
+    <Card className="glass-effect border-primary/20 hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
