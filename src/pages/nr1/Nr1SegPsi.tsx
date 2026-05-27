@@ -161,6 +161,71 @@ export default function Nr1SegPsi() {
           </CardContent>
         </Card>
 
+        {(() => {
+          const ultimo = diagnosticos?.find((d) => d.status === 'concluido');
+          const scoresDim = (ultimo?.scores_dimensao as Record<string, number> | null) ?? null;
+          const dadosDim = DIMENSOES_COPSOQ.map((d) => ({
+            ...d,
+            score: scoresDim ? Number(scoresDim[d.key] ?? 0) : 0,
+          }));
+          const temDados = scoresDim && dadosDim.some((d) => d.score > 0);
+          return (
+            <Card>
+              <CardHeader>
+                <CardTitle>Score por dimensão COPSOQ-III</CardTitle>
+                <CardDescription>
+                  6 dimensões psicossociais (0–100) — base do diagnóstico NR-1 e da Matriz de Risco.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!temDados ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center">
+                    Nenhum diagnóstico NR-1 concluído ainda. Aplique a Pesquisa Saúde Bem-Estar para visualizar.
+                  </p>
+                ) : (
+                  <>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={dadosDim} margin={{ left: 0, right: 16, top: 8, bottom: 8 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={0} angle={-12} textAnchor="end" height={70} />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip
+                            formatter={(v: number) => [`${v.toFixed(1)} / 100`, 'Score']}
+                            labelFormatter={(l) => l}
+                          />
+                          <Bar dataKey="score" radius={[6, 6, 0, 0]}>
+                            {dadosDim.map((d) => (
+                              <Cell key={d.key} fill={corDimensao(d.score)} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="grid gap-2 md:grid-cols-2 mt-4">
+                      {dadosDim.map((d) => {
+                        const t = tom(d.score);
+                        return (
+                          <div key={d.key} className="flex items-center justify-between gap-3 p-2 rounded-md border border-border/50">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium truncate">{d.label}</p>
+                              <p className="text-xs text-muted-foreground truncate">{d.descricao}</p>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="text-sm font-semibold tabular-nums">{d.score.toFixed(1)}</span>
+                              <Badge className={t.cls}>{t.label}</Badge>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         <div className="grid gap-3 md:grid-cols-2">
           {data.scores.map((d) => {
             const t = tom(d.score);
