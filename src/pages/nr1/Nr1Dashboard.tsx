@@ -375,6 +375,60 @@ export default function Nr1Dashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Editar ciclo */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Renomear ciclo</DialogTitle>
+            <DialogDescription>Atualize o nome do ciclo de diagnóstico.</DialogDescription>
+          </DialogHeader>
+          <Input
+            value={editing?.nome ?? ''}
+            onChange={(e) => setEditing((s) => (s ? { ...s, nome: e.target.value } : s))}
+            placeholder="Ex.: Maio 2026"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button
+              className="nr1-bg-primary"
+              disabled={!editing?.nome?.trim() || updateMut.isPending}
+              onClick={async () => {
+                if (!editing) return;
+                await updateMut.mutateAsync({ id: editing.id, ciclo_nome: editing.nome.trim() });
+                setEditing(null);
+              }}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Excluir ciclo */}
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir ciclo "{deleting?.nome}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Todas as respostas associadas serão removidas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (!deleting) return;
+                await deleteMut.mutateAsync(deleting.id);
+                setDeleting(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
