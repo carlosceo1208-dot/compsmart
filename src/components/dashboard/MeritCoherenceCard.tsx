@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, AlertTriangle, ShieldCheck, Users, Download, Lock } from 'lucide-react';
 import { useCompensationMismatchKPI, useTopMismatches } from '@/hooks/useMeritIntelligence';
+import { AiBadge } from '@/components/ui/ai-badge';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Link } from 'react-router-dom';
 import { exportToCSV } from '@/lib/csvExport';
@@ -97,7 +98,7 @@ export function MeritCoherenceCard() {
               <TrendingUp className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-base">Coerência Mérito × Salário</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">Coerência Mérito × Salário <AiBadge variant="subtle" /></CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Performance vs. posição na faixa
               </p>

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Briefcase, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLtipSimulations } from '@/hooks/useExecutiveCompensation';
+import { AiBadge } from '@/components/ui/ai-badge';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 const formatBRL = (v: number) =>
@@ -23,6 +24,7 @@ export const ExecutiveCompCard = () => {
         <CardTitle className="text-base flex items-center gap-2">
           <Briefcase className="h-4 w-4 text-primary" />
           Executive Compensation
+          <AiBadge variant="subtle" />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

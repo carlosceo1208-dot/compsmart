@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AiBadge } from "@/components/ui/ai-badge";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -100,6 +101,7 @@ export const CompensationTrendsCard = () => {
             <CardTitle className="text-base font-semibold flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
               <span className="text-primary">Tendências de Gestão de Remuneração 2026</span>
+              <AiBadge variant="subtle" />
             </CardTitle>
             <Button 
               variant="ghost" 
