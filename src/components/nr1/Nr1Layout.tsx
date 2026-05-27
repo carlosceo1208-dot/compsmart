@@ -24,6 +24,7 @@ const NAV = [
   { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
   { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
   { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
+  { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart },
 ] as Array<{ to: string; label: string; icon: any; end?: boolean; highlight?: boolean }>;
 
 const useIsSuperAdmin = () =>

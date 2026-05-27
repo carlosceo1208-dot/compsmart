@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, Heart } from 'lucide-react';
+import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
@@ -67,87 +67,51 @@ export default function Nr1Dashboard() {
       {/* Grau de Risco INSS + Plano de Ação */}
       <GrauRiscoInssCard />
 
-      {/* Correlações de Risco Clima × COPSOQ  +  FIB (lado a lado) */}
-      <div className={`grid gap-4 ${topCorrelacoes.length > 0 ? 'lg:grid-cols-2' : ''}`}>
-        {topCorrelacoes.length > 0 && (
-          <Card className="border-[hsl(var(--nr1-primary)/0.3)]">
-            <CardHeader className="pb-2">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <GitCompare className="h-4 w-4 nr1-text-primary" />
-                    Correlações de Risco — Clima × COPSOQ
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Top {topCorrelacoes.length} dimensões com convergência crítica entre os dois instrumentos.
-                  </CardDescription>
-                </div>
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/nr1/clima/correlacao">Ver análise <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {topCorrelacoes.map((c, i) => (
-                  <li key={`${c.clima_dim}-${i}`} className="flex items-center justify-between gap-3 p-2 rounded-md border bg-card">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {c.prioridade === 'causa_raiz' ? (
-                        <Badge className="bg-red-100 text-red-700 border-red-300">Causa raiz</Badge>
-                      ) : (
-                        <Badge variant="outline" className="border-amber-400 text-amber-700">Atenção</Badge>
-                      )}
-                      <span className="text-sm font-medium truncate">
-                        {CLIMA_LABEL[c.clima_dim as ClimaDimensao] ?? c.clima_dim}
-                      </span>
-                      <span className="text-xs text-muted-foreground hidden sm:inline">↔ {DIMENSAO_LABEL[c.copsoq_dim as Dimensao] ?? c.copsoq_dim}</span>
-                    </div>
-                    <div className="text-xs tabular-nums text-muted-foreground whitespace-nowrap">
-                      Clima {c.clima_score?.toFixed(1) ?? '—'}/5 · COPSOQ {c.copsoq_score_raw?.toFixed(0) ?? '—'}/100
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Card FIB — Bem-Estar Integral */}
+      {/* Correlações de Risco Clima × COPSOQ */}
+      {topCorrelacoes.length > 0 && (
         <Card className="border-[hsl(var(--nr1-primary)/0.3)]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Heart className="h-4 w-4 nr1-text-primary" />
-                  FIB — Bem-Estar Integral
+                  <GitCompare className="h-4 w-4 nr1-text-primary" />
+                  Correlações de Risco — Clima × COPSOQ
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Visão consolidada das 9 dimensões: KPIs, radar Colaborador × Empresa, detalhe, correlações e instrumentos.
+                  Top {topCorrelacoes.length} dimensões com convergência crítica entre os dois instrumentos.
                 </CardDescription>
               </div>
               <Button asChild variant="outline" size="sm">
-                <Link to="/nr1/fib">Abrir FIB <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
+                <Link to="/nr1/clima/correlacao">Ver análise completa <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
               </Button>
             </div>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center justify-between p-2 rounded-md border bg-card">
-                <span className="text-muted-foreground">Pessoa</span>
-                <span className="font-medium">Bem-Estar Psicológico · Saúde · Uso do Tempo · Vitalidade</span>
-              </li>
-              <li className="flex items-center justify-between p-2 rounded-md border bg-card">
-                <span className="text-muted-foreground">Organização</span>
-                <span className="font-medium">Cultura · Educação · Governança · Meio Ambiente · Padrão de Vida</span>
-              </li>
-              <li className="flex items-center justify-between p-2 rounded-md border bg-card">
-                <span className="text-muted-foreground">Correlação NR-1</span>
-                <Badge variant="outline" className="text-[10px]">13 fatores mapeados</Badge>
-              </li>
+            <ul className="space-y-2">
+              {topCorrelacoes.map((c, i) => (
+                <li key={`${c.clima_dim}-${i}`} className="flex items-center justify-between gap-3 p-2 rounded-md border bg-card">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {c.prioridade === 'causa_raiz' ? (
+                      <Badge className="bg-red-100 text-red-700 border-red-300">Causa raiz</Badge>
+                    ) : (
+                      <Badge variant="outline" className="border-amber-400 text-amber-700">Atenção</Badge>
+                    )}
+                    <span className="text-sm font-medium truncate">
+                      {CLIMA_LABEL[c.clima_dim as ClimaDimensao] ?? c.clima_dim}
+                    </span>
+                    <span className="text-xs text-muted-foreground hidden sm:inline">↔ {DIMENSAO_LABEL[c.copsoq_dim as Dimensao] ?? c.copsoq_dim}</span>
+                  </div>
+                  <div className="text-xs tabular-nums text-muted-foreground whitespace-nowrap">
+                    Clima {c.clima_score?.toFixed(1) ?? '—'}/5 · COPSOQ {c.copsoq_score_raw?.toFixed(0) ?? '—'}/100
+                  </div>
+                </li>
+              ))}
             </ul>
           </CardContent>
         </Card>
-      </div>
+      )}
+
+
 
 
 

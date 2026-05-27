@@ -118,6 +118,7 @@ const Nr1BemEstarAgente = lazy(() => import("./pages/nr1/Nr1BemEstarAgente"));
 const Nr1JornadaBemEstar = lazy(() => import("./pages/nr1/Nr1JornadaBemEstar"));
 const Nr1Acompanhamento = lazy(() => import("./pages/nr1/Nr1Acompanhamento"));
 const Nr1FIB = lazy(() => import("./pages/nr1/Nr1FIB"));
+const Nr1FibCard = lazy(() => import("./pages/nr1/Nr1FibCard"));
 const Nr1SegPsi = lazy(() => import("./pages/nr1/Nr1SegPsi"));
 const Nr1Sociodemografico = lazy(() => import("./pages/nr1/Nr1Sociodemografico"));
 const Nr1Universo = lazy(() => import("./pages/nr1/Nr1Universo"));
@@ -277,6 +278,7 @@ const App = () => {
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
                        <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
                        <Route path="/nr1/fib" element={<Nr1FIB />} />
+                       <Route path="/nr1/fib-bem-estar" element={<Nr1FibCard />} />
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
