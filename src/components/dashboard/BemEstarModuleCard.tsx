@@ -35,7 +35,7 @@ export function BemEstarModuleCard() {
       ) : sub ? (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link to="/nr1">
+            <Link to="/nr1/painel">
               <Badge className="bg-amber-100 text-amber-800 border-amber-200 cursor-pointer hover:bg-amber-200">
                 Definir Grau de Risco
               </Badge>
@@ -130,7 +130,7 @@ export function BemEstarModuleCard() {
           ))}
         </div>
 
-        <Link to="/nr1">
+        <Link to="/nr1/painel">
           <Button variant="outline" className="w-full gap-2 !bg-yellow-400 hover:!bg-yellow-500 !text-slate-900 !border-yellow-500 font-semibold shadow-md">
             Acessar Módulo
             <ArrowRight className="h-4 w-4" />
