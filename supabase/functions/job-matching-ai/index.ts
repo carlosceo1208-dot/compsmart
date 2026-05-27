@@ -136,7 +136,7 @@ Retorne o melhor match com score (0-100), justificativa, e recomendações de a�
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
+          model: "google/gemini-3-pro-preview",
           messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
@@ -250,7 +250,7 @@ Retorne o melhor match com score (0-100), justificativa, e recomendações de a�
 
     const score = Math.max(0, Math.min(100, Number(args.match_score)));
     const parameters = {
-      model: "google/gemini-3-flash-preview",
+      model: "google/gemini-3-pro-preview",
       market_catalog_size: marketRows?.length ?? 0,
       employees_in_role: salaries.length,
       job_snapshot: {

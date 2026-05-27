@@ -86,7 +86,7 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-3.1-flash-lite-preview",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: "Gere 5 tendências de remuneração concisas para o Brasil 2025/2026." }

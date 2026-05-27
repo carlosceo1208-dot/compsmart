@@ -670,7 +670,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
+        model: 'openai/gpt-5.4',
         messages,
         max_tokens: 8000,
       }),
