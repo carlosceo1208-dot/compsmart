@@ -46,6 +46,7 @@ export default function Nr1SegPsi() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useSegPsiData();
   const { data: workforce = 0 } = useNr1Workforce();
+  const { data: diagnosticos } = useNr1Diagnosticos();
   const { activeCompanyId } = useCompanyContext();
   const { data: roleInfo } = useCurrentUserRole();
   const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
