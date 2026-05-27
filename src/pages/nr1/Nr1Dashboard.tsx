@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, History, Scale, Pencil, Trash2, Plus } from 'lucide-react';
+import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, History, Scale, Pencil, Trash2, Plus, TrendingUp, TrendingDown, Minus, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useNr1Diagnosticos, useNr1Subscription, useUpdateNr1Diagnostico, useDeleteNr1Diagnostico } from '@/hooks/useNr1';
@@ -244,6 +244,19 @@ export default function Nr1Dashboard() {
                           {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
                         </Badge>
                       )}
+                      {!vazio && (
+                        <Button
+                          asChild
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7"
+                          title="Plano de ação"
+                        >
+                          <Link to={`/nr1/diagnostico/${c.id}#plano-acao`}>
+                            <ClipboardList className="h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
+                      )}
                       <Button
                         size="icon"
                         variant="ghost"
@@ -306,13 +319,45 @@ export default function Nr1Dashboard() {
                     </Select>
                   </div>
 
-                  {cicloA && cicloB && (
-                    <div className="rounded-md border overflow-hidden">
-                      <div className="grid grid-cols-3 text-xs font-medium bg-muted/50 px-3 py-2">
-                        <span>Métrica</span>
-                        <span className="text-center">{cicloA.ciclo_nome}</span>
-                        <span className="text-center">{cicloB.ciclo_nome}</span>
-                      </div>
+                  {cicloA && cicloB && (() => {
+                    const deltaScore = typeof cicloA.score_geral === 'number' && typeof cicloB.score_geral === 'number'
+                      ? (cicloB.score_geral as number) - (cicloA.score_geral as number)
+                      : null;
+                    const evoluiu = deltaScore !== null && deltaScore > 0.5;
+                    const piorou = deltaScore !== null && deltaScore < -0.5;
+                    const estavel = deltaScore !== null && !evoluiu && !piorou;
+                    return (
+                      <>
+                        {deltaScore !== null && (
+                          <div className={`flex items-start gap-3 p-3 rounded-md border ${
+                            evoluiu ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900' :
+                            piorou ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900' :
+                            'bg-muted/30'
+                          }`}>
+                            {evoluiu ? <TrendingUp className="h-5 w-5 text-emerald-600 shrink-0" /> :
+                             piorou ? <TrendingDown className="h-5 w-5 text-red-600 shrink-0" /> :
+                             <Minus className="h-5 w-5 text-muted-foreground shrink-0" />}
+                            <div className="text-sm">
+                              <p className="font-semibold">
+                                {evoluiu && `Evolução positiva: +${deltaScore.toFixed(1)} pontos`}
+                                {piorou && `Regressão: ${deltaScore.toFixed(1)} pontos`}
+                                {estavel && 'Resultado estável entre os ciclos'}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Comparando <strong>{cicloA.ciclo_nome}</strong> → <strong>{cicloB.ciclo_nome}</strong>.
+                                {evoluiu && ' O plano de ação demonstra efetividade — mantenha as iniciativas.'}
+                                {piorou && ' Reavalie o plano de ação e identifique novas causas raiz.'}
+                                {estavel && ' Considere ações mais incisivas nas dimensões críticas.'}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                  <div className="rounded-md border overflow-hidden">
+                    <div className="grid grid-cols-3 text-xs font-medium bg-muted/50 px-3 py-2">
+                      <span>Métrica</span>
+                      <span className="text-center">{cicloA.ciclo_nome}</span>
+                      <span className="text-center">{cicloB.ciclo_nome}</span>
+                    </div>
                       {[
                         { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => v?.toFixed(1) ?? '—' },
                         { label: 'Respondentes', a: cicloA.total_respondentes, b: cicloB.total_respondentes, fmt: (v: any) => v ?? '—' },
@@ -363,8 +408,10 @@ export default function Nr1Dashboard() {
                           })}
                         </>
                       )}
-                    </div>
-                  )}
+                  </div>
+                      </>
+                    );
+                  })()}
                 </>
               )}
             </div>
