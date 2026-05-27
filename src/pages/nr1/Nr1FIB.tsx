@@ -357,15 +357,6 @@ function KpiMini({ label, value, tone = 'ok' }: { label: string; value: string; 
   );
 }
 
-function KpiBox({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <Card><CardContent className="pt-6">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="text-2xl font-semibold mt-1">{value}</p>
-      {hint && <p className="text-[11px] text-muted-foreground mt-1">{hint}</p>}
-    </CardContent></Card>
-  );
-}
 
 function Stat({ label, value, tone = 'ok' }: { label: string; value: string; tone?: 'ok' | 'warn' }) {
   return (
