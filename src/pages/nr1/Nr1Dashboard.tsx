@@ -200,45 +200,74 @@ export default function Nr1Dashboard() {
       )}
 
       {/* Ciclos & Comparação */}
-      {ciclosConcluidos.length > 0 && (
+      {(diagnosticos?.length ?? 0) > 0 && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-2 flex-wrap">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
                 <History className="h-4 w-4 nr1-text-primary" />
-                Ciclos de Diagnóstico ({ciclosConcluidos.length})
+                Ciclos de Diagnóstico ({diagnosticos?.length ?? 0})
               </CardTitle>
               <CardDescription className="text-xs">
-                Acompanhe a evolução entre ciclos e compare resultados lado a lado.
+                Edite, exclua ciclos vazios ou crie um novo. Acompanhe a evolução e compare resultados.
               </CardDescription>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/nr1/diagnosticos">Ver histórico completo <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild size="sm" className="nr1-bg-primary">
+                <Link to="/nr1/diagnostico/novo"><Plus className="h-3.5 w-3.5 mr-1" />Novo ciclo</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/nr1/diagnosticos">Histórico <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Lista compacta dos últimos ciclos */}
+            {/* Lista de todos os ciclos com ações */}
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {ciclosConcluidos.slice(0, 6).map((c) => (
-                <Link
-                  key={c.id}
-                  to={`/nr1/diagnostico/${c.id}`}
-                  className="flex items-center justify-between gap-2 p-3 rounded-md border hover:bg-muted/50 transition"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{c.ciclo_nome}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {c.total_respondentes} resp · Score {c.score_geral?.toFixed(1) ?? '—'}
-                    </p>
+              {(diagnosticos ?? []).map((c) => {
+                const vazio = !c.total_respondentes || c.total_respondentes === 0;
+                return (
+                  <div
+                    key={c.id}
+                    className={`flex items-center justify-between gap-2 p-3 rounded-md border ${vazio ? 'bg-muted/30 border-dashed' : 'hover:bg-muted/50'} transition`}
+                  >
+                    <Link to={`/nr1/diagnostico/${c.id}`} className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{c.ciclo_nome}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {c.total_respondentes ?? 0} resp · Score {c.score_geral?.toFixed(1) ?? '—'}
+                        {vazio && <span className="ml-1 text-amber-600">· vazio</span>}
+                      </p>
+                    </Link>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {c.nivel_risco && !vazio && (
+                        <Badge className={`${RISCO_CLASS[c.nivel_risco as keyof typeof RISCO_CLASS]} hidden md:inline-flex`}>
+                          {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
+                        </Badge>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => setEditing({ id: c.id, nome: c.ciclo_nome })}
+                        title="Renomear"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        onClick={() => setDeleting({ id: c.id, nome: c.ciclo_nome })}
+                        title="Excluir"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
-                  {c.nivel_risco && (
-                    <Badge className={RISCO_CLASS[c.nivel_risco as keyof typeof RISCO_CLASS]}>
-                      {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
-                    </Badge>
-                  )}
-                </Link>
-              ))}
+                );
+              })}
             </div>
+
 
             {/* Comparador */}
             {ciclosConcluidos.length >= 2 && (
