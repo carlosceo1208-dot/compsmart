@@ -7,11 +7,27 @@ import { Progress } from '@/components/ui/progress';
 import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
+import { useNr1Diagnosticos } from '@/hooks/useNr1';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+
+const DIMENSOES_COPSOQ: { key: string; label: string; descricao: string }[] = [
+  { key: 'demandas_trabalho', label: 'Demandas do Trabalho', descricao: 'Volume, ritmo, pressão de tempo, demandas emocionais e cognitivas.' },
+  { key: 'organizacao_conteudo', label: 'Organização e Conteúdo', descricao: 'Autonomia, clareza de papel, previsibilidade, sentido do trabalho.' },
+  { key: 'relacoes_lideranca', label: 'Relações & Liderança', descricao: 'Apoio do líder e dos pares, qualidade da liderança, feedback.' },
+  { key: 'interface_trabalho_individuo', label: 'Interface Trabalho-Indivíduo', descricao: 'Conflito trabalho-família, insegurança no emprego.' },
+  { key: 'valores_trabalho', label: 'Valores no Trabalho', descricao: 'Justiça organizacional, confiança, reconhecimento.' },
+  { key: 'saude_bem_estar', label: 'Saúde & Bem-Estar', descricao: 'Estresse, burnout, sofrimento psíquico, segurança mental.' },
+];
+
+function corDimensao(score: number) {
+  if (score >= 70) return 'hsl(var(--nr1-success))';
+  if (score >= 55) return 'hsl(var(--nr1-primary))';
+  return 'hsl(var(--nr1-danger))';
+}
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
