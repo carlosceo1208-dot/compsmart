@@ -249,29 +249,6 @@ export default function Nr1SegPsi() {
             </Card>
           );
         })()}
-
-        <div className="grid gap-3 md:grid-cols-2">
-          {data.scores.map((d) => {
-            const t = tom(d.score);
-            return (
-              <Card key={d.key}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold">{d.label}</p>
-                      <p className="text-xs text-muted-foreground">{d.descricao}</p>
-                    </div>
-                    <Badge className={t.cls}>{t.label}</Badge>
-                  </div>
-                  <div className="mt-3">
-                    <Progress value={d.score} className="h-2" />
-                    <p className="text-xs text-muted-foreground mt-1 tabular-nums">{d.score.toFixed(1)} / 100</p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
       </div>
     </div>
   );
