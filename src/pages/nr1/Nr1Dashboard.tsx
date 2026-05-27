@@ -31,6 +31,11 @@ export default function Nr1Dashboard() {
   const cicloA = ciclosConcluidos.find((c) => c.id === cicloAId);
   const cicloB = ciclosConcluidos.find((c) => c.id === cicloBId);
 
+  const updateMut = useUpdateNr1Diagnostico();
+  const deleteMut = useDeleteNr1Diagnostico();
+  const [editing, setEditing] = useState<{ id: string; nome: string } | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; nome: string } | null>(null);
+
   const topCorrelacoes = [...correlacoes]
     .filter((c) => c.prioridade === 'causa_raiz' || c.prioridade === 'atencao')
     .sort((a, b) => (a.prioridade === 'causa_raiz' ? -1 : 1) - (b.prioridade === 'causa_raiz' ? -1 : 1))
