@@ -56,7 +56,9 @@ export default function Nr1Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline">Conformidade Ativa</Badge>
-              <GerarPgrButton size="sm" variant="default" className="nr1-bg-primary" />
+              <Button asChild size="sm" className="nr1-bg-primary">
+                <Link to="/nr1/fib">Abrir Matriz de Risco <ArrowRight className="h-4 w-4 ml-1" /></Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
