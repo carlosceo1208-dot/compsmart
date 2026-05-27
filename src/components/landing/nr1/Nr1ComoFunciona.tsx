@@ -1,4 +1,4 @@
-import { ClipboardCheck, Grid3x3, Wallet, BrainCircuit, Target } from 'lucide-react';
+import { ClipboardCheck, Grid3x3, Wallet, BrainCircuit, Target, HeartPulse, LineChart } from 'lucide-react';
 
 const STEPS = [
   {
@@ -9,24 +9,36 @@ const STEPS = [
   },
   {
     n: '02',
-    icon: Grid3x3,
-    titulo: 'Importação 9Box',
-    sub: 'Conectamos sua matriz de desempenho × potencial. Se você ainda não tem 9Box, a CompSmart constrói para você.',
+    icon: HeartPulse,
+    titulo: 'Pesquisa de Clima',
+    sub: 'Cruzamos percepção do colaborador (eNPS, engajamento, liderança) com os fatores psicossociais para identificar causas-raiz.',
   },
   {
     n: '03',
-    icon: Wallet,
-    titulo: 'Cruzamento de Remuneração',
-    sub: 'Mapeamos faixas salariais, defasagem em relação ao mercado e posicionamento individual em cada cargo.',
+    icon: LineChart,
+    titulo: 'Avaliação de Desempenho',
+    sub: 'Integramos ciclos de avaliação (90°, 180°, 360°), metas e competências para conectar entrega × risco psicossocial.',
   },
   {
     n: '04',
-    icon: BrainCircuit,
-    titulo: 'Dashboard de Inteligência',
-    sub: 'Clusters automáticos de risco × potencial × salário. Alertas de retenção priorizados por impacto financeiro.',
+    icon: Grid3x3,
+    titulo: 'Matriz 9Box',
+    sub: 'Cruzamos desempenho × potencial. Se você ainda não tem 9Box, a CompSmart constrói automaticamente a partir dos seus ciclos.',
   },
   {
     n: '05',
+    icon: Wallet,
+    titulo: 'Remuneração & Equidade',
+    sub: 'Mapeamos faixas salariais, defasagem de mercado, compa-ratio e posicionamento individual em cada cargo.',
+  },
+  {
+    n: '06',
+    icon: BrainCircuit,
+    titulo: 'Dashboard de Inteligência',
+    sub: 'Clusters automáticos de risco × clima × desempenho × 9Box × salário. Alertas priorizados por impacto financeiro de retenção.',
+  },
+  {
+    n: '07',
     icon: Target,
     titulo: 'Plano de ação por ROI',
     sub: 'Não é apenas compliance: cada ação tem custo, ganho de retenção estimado e responsável. Pronto para o board.',
@@ -36,17 +48,20 @@ const STEPS = [
 export default function Nr1ComoFunciona({ idAnchor }: { idAnchor?: string }) {
   return (
     <section id={idAnchor} className="container mx-auto px-4 py-14">
-      <div className="text-center max-w-2xl mx-auto mb-10">
+      <div className="text-center max-w-3xl mx-auto mb-10">
         <h2 className="text-3xl md:text-4xl font-bold mb-3">
-          Como funciona o cruzamento <span className="nr1-text-primary">NR-1 × 9Box × Remuneração</span>
+          Como funciona o cruzamento{' '}
+          <span className="nr1-text-primary">
+            NR-1 × Clima × Desempenho × 9Box × Remuneração
+          </span>
         </h2>
         <p className="text-muted-foreground">
-          5 passos. Do dado bruto à decisão estratégica de retenção.
+          7 passos. Do dado bruto à decisão estratégica de retenção, com coerência entre pessoas, performance e folha.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
-        {STEPS.map((s, i) => (
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto">
+        {STEPS.map((s) => (
           <div key={s.n} className="relative">
             <div className="bg-card border rounded-xl p-5 h-full hover:shadow-md transition-shadow space-y-3">
               <div className="flex items-center justify-between">
@@ -58,11 +73,6 @@ export default function Nr1ComoFunciona({ idAnchor }: { idAnchor?: string }) {
               <p className="font-semibold leading-snug">{s.titulo}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">{s.sub}</p>
             </div>
-            {i < STEPS.length - 1 && (
-              <div className="hidden lg:block absolute top-1/2 -right-2 -translate-y-1/2 text-muted-foreground/30 font-light text-xl z-10">
-                →
-              </div>
-            )}
           </div>
         ))}
       </div>
