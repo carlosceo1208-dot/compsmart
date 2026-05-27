@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare } from 'lucide-react';
+import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
