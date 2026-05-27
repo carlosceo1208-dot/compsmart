@@ -5,6 +5,7 @@ import { Sparkles, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTalentKPIs } from '@/hooks/useTalentIntelligence';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { AiBadge } from '@/components/ui/ai-badge';
 
 const formatBRL = (v: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', notation: 'compact' }).format(v);
@@ -22,6 +23,7 @@ export const TalentIntelligenceCard = () => {
         <CardTitle className="text-base flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
           Talent Intelligence
+          <AiBadge variant="subtle" />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

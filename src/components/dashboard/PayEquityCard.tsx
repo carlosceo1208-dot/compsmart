@@ -5,6 +5,7 @@ import { Scale, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePayEquityAlerts } from '@/hooks/usePayEquity';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { AiBadge } from '@/components/ui/ai-badge';
 
 export const PayEquityCard = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export const PayEquityCard = () => {
         <CardTitle className="text-base flex items-center gap-2">
           <Scale className="h-4 w-4 text-primary" />
           Pay Equity & Fairness
+          <AiBadge variant="subtle" />
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

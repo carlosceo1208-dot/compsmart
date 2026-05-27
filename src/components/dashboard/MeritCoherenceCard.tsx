@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, AlertTriangle, ShieldCheck, Users, Download, Lock } from 'lucide-react';
 import { useCompensationMismatchKPI, useTopMismatches } from '@/hooks/useMeritIntelligence';
+import { AiBadge } from '@/components/ui/ai-badge';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Link } from 'react-router-dom';
 import { exportToCSV } from '@/lib/csvExport';
