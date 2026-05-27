@@ -795,7 +795,7 @@ Inclua SEMPRE ao final das respostas:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
+        model: 'openai/gpt-5.4-pro',
         messages: messages,
         temperature: 0.3,
         max_tokens: 8000,
