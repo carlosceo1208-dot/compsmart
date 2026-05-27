@@ -244,6 +244,19 @@ export default function Nr1Dashboard() {
                           {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
                         </Badge>
                       )}
+                      {!vazio && (
+                        <Button
+                          asChild
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7"
+                          title="Plano de ação"
+                        >
+                          <Link to={`/nr1/diagnostico/${c.id}#plano-acao`}>
+                            <ClipboardList className="h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
+                      )}
                       <Button
                         size="icon"
                         variant="ghost"
