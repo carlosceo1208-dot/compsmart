@@ -55,11 +55,17 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[350px_1fr] gap-4 md:gap-5 lg:gap-6 p-4 md:p-5 lg:p-6">
         {/* Coluna Esquerda: KPIs */}
         <div className="space-y-4">
-          <div className="dashboard-welcome rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-4 md:p-6 lg:p-8 border-2 border-primary/30 shadow-primary">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="dashboard-welcome rounded-xl bg-gradient-to-br from-primary via-primary-hover to-secondary/30 p-4 md:p-6 lg:p-8 border-2 border-primary/30 shadow-primary"
+          >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
               <div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-white">CompSmart</h1>
+                  <AiBadge variant="solid" label="AI 2026" className="mb-2" />
                   {isFounder && <FounderBadge className="mb-2" />}
                 </div>
                 <p className="text-xs sm:text-sm text-white/90 font-medium">
@@ -70,57 +76,41 @@ const Dashboard = () => {
                 <DateTimeDisplay />
               </div>
             </div>
-          </div>
+          </motion.div>
           
-          {/* Warning de Ajuste Pendente */}
           <PendingAdjustmentAlert />
-          
-          {/* Alerta Educativo - Tabela Salarial */}
           <SalaryTableSetupAlert />
+          {isSuperAdmin && <Item i={0}><SecurityQuickAccessCard /></Item>}
           
-          {/* Card de Segurança - Apenas Super Admin */}
-          {isSuperAdmin && <SecurityQuickAccessCard />}
-          
-          {/* Cards de Módulos em destaque */}
           <div className="grid gap-4 grid-cols-1">
-            <PerformanceModuleCard />
-            <BemEstarModuleCard />
+            <Item i={1}><PerformanceModuleCard /></Item>
+            <Item i={2}><BemEstarModuleCard /></Item>
           </div>
           
-          {/* Mapa de Localização das Unidades */}
-          <CompanyMapCard />
-          
-          <OrganizationalIdentityCard />
-          
-          <KPIDashboard currency={currency} showWithCharges={showWithCharges} />
-          
-          <ExportCard />
+          <Item i={3}><CompanyMapCard /></Item>
+          <Item i={4}><OrganizationalIdentityCard /></Item>
+          <Item i={5}><KPIDashboard currency={currency} showWithCharges={showWithCharges} /></Item>
+          <Item i={6}><ExportCard /></Item>
         </div>
         
         {/* Coluna Direita: Indicadores + Navegação + Módulos */}
         <div className="space-y-4">
-          <EconomicIndicators 
-            currency={currency} 
-            onCurrencyChange={setCurrency}
-            showWithCharges={showWithCharges}
-            onShowWithChargesChange={setShowWithCharges}
-          />
-          
-          <CompensationTrendsCard />
-          
-          <MeritCoherenceCard />
-          
-          <TalentIntelligenceCard />
-          
-          <PayEquityCard />
-          
-          <ExecutiveCompCard />
-          
-          <EconomicIndicatorsCard />
-          
-          <AlphabeticalNav />
-          
-          <ModuleGrid />
+          <Item i={0}>
+            <EconomicIndicators 
+              currency={currency} 
+              onCurrencyChange={setCurrency}
+              showWithCharges={showWithCharges}
+              onShowWithChargesChange={setShowWithCharges}
+            />
+          </Item>
+          <Item i={1}><CompensationTrendsCard /></Item>
+          <Item i={2}><MeritCoherenceCard /></Item>
+          <Item i={3}><TalentIntelligenceCard /></Item>
+          <Item i={4}><PayEquityCard /></Item>
+          <Item i={5}><ExecutiveCompCard /></Item>
+          <Item i={6}><EconomicIndicatorsCard /></Item>
+          <Item i={7}><AlphabeticalNav /></Item>
+          <Item i={8}><ModuleGrid /></Item>
         </div>
       </div>
     </div>
