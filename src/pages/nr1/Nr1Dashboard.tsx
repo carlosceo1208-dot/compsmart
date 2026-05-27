@@ -1,15 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, History, Scale } from 'lucide-react';
+import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, History, Scale, Pencil, Trash2, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useMemo } from 'react';
-import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
+import { useNr1Diagnosticos, useNr1Subscription, useUpdateNr1Diagnostico, useDeleteNr1Diagnostico } from '@/hooks/useNr1';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 import { useClimaCopsoqCorrelacao } from '@/hooks/useClimaCopsoqCorrelacao';
 import { DIMENSAO_LABEL as CLIMA_LABEL, type ClimaDimensao } from '@/lib/climaQuestoes';
@@ -27,6 +30,11 @@ export default function Nr1Dashboard() {
   const [cicloBId, setCicloBId] = useState<string>('');
   const cicloA = ciclosConcluidos.find((c) => c.id === cicloAId);
   const cicloB = ciclosConcluidos.find((c) => c.id === cicloBId);
+
+  const updateMut = useUpdateNr1Diagnostico();
+  const deleteMut = useDeleteNr1Diagnostico();
+  const [editing, setEditing] = useState<{ id: string; nome: string } | null>(null);
+  const [deleting, setDeleting] = useState<{ id: string; nome: string } | null>(null);
 
   const topCorrelacoes = [...correlacoes]
     .filter((c) => c.prioridade === 'causa_raiz' || c.prioridade === 'atencao')
@@ -192,45 +200,74 @@ export default function Nr1Dashboard() {
       )}
 
       {/* Ciclos & Comparação */}
-      {ciclosConcluidos.length > 0 && (
+      {(diagnosticos?.length ?? 0) > 0 && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-2 flex-wrap">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
                 <History className="h-4 w-4 nr1-text-primary" />
-                Ciclos de Diagnóstico ({ciclosConcluidos.length})
+                Ciclos de Diagnóstico ({diagnosticos?.length ?? 0})
               </CardTitle>
               <CardDescription className="text-xs">
-                Acompanhe a evolução entre ciclos e compare resultados lado a lado.
+                Edite, exclua ciclos vazios ou crie um novo. Acompanhe a evolução e compare resultados.
               </CardDescription>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/nr1/diagnosticos">Ver histórico completo <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild size="sm" className="nr1-bg-primary">
+                <Link to="/nr1/diagnostico/novo"><Plus className="h-3.5 w-3.5 mr-1" />Novo ciclo</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/nr1/diagnosticos">Histórico <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Lista compacta dos últimos ciclos */}
+            {/* Lista de todos os ciclos com ações */}
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {ciclosConcluidos.slice(0, 6).map((c) => (
-                <Link
-                  key={c.id}
-                  to={`/nr1/diagnostico/${c.id}`}
-                  className="flex items-center justify-between gap-2 p-3 rounded-md border hover:bg-muted/50 transition"
-                >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{c.ciclo_nome}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {c.total_respondentes} resp · Score {c.score_geral?.toFixed(1) ?? '—'}
-                    </p>
+              {(diagnosticos ?? []).map((c) => {
+                const vazio = !c.total_respondentes || c.total_respondentes === 0;
+                return (
+                  <div
+                    key={c.id}
+                    className={`flex items-center justify-between gap-2 p-3 rounded-md border ${vazio ? 'bg-muted/30 border-dashed' : 'hover:bg-muted/50'} transition`}
+                  >
+                    <Link to={`/nr1/diagnostico/${c.id}`} className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{c.ciclo_nome}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {c.total_respondentes ?? 0} resp · Score {c.score_geral?.toFixed(1) ?? '—'}
+                        {vazio && <span className="ml-1 text-amber-600">· vazio</span>}
+                      </p>
+                    </Link>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {c.nivel_risco && !vazio && (
+                        <Badge className={`${RISCO_CLASS[c.nivel_risco as keyof typeof RISCO_CLASS]} hidden md:inline-flex`}>
+                          {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
+                        </Badge>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => setEditing({ id: c.id, nome: c.ciclo_nome })}
+                        title="Renomear"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive"
+                        onClick={() => setDeleting({ id: c.id, nome: c.ciclo_nome })}
+                        title="Excluir"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
-                  {c.nivel_risco && (
-                    <Badge className={RISCO_CLASS[c.nivel_risco as keyof typeof RISCO_CLASS]}>
-                      {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
-                    </Badge>
-                  )}
-                </Link>
-              ))}
+                );
+              })}
             </div>
+
 
             {/* Comparador */}
             {ciclosConcluidos.length >= 2 && (
@@ -338,6 +375,60 @@ export default function Nr1Dashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Editar ciclo */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Renomear ciclo</DialogTitle>
+            <DialogDescription>Atualize o nome do ciclo de diagnóstico.</DialogDescription>
+          </DialogHeader>
+          <Input
+            value={editing?.nome ?? ''}
+            onChange={(e) => setEditing((s) => (s ? { ...s, nome: e.target.value } : s))}
+            placeholder="Ex.: Maio 2026"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>Cancelar</Button>
+            <Button
+              className="nr1-bg-primary"
+              disabled={!editing?.nome?.trim() || updateMut.isPending}
+              onClick={async () => {
+                if (!editing) return;
+                await updateMut.mutateAsync({ id: editing.id, ciclo_nome: editing.nome.trim() });
+                setEditing(null);
+              }}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Excluir ciclo */}
+      <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir ciclo "{deleting?.nome}"?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. Todas as respostas associadas serão removidas.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={async () => {
+                if (!deleting) return;
+                await deleteMut.mutateAsync(deleting.id);
+                setDeleting(null);
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
