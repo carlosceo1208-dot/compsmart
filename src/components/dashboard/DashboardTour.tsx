@@ -111,12 +111,25 @@ export const DashboardTour = ({ onComplete }: DashboardTourProps) => {
 
   useEffect(() => {
     setMounted(true);
-    
-    // Só dispara se NUNCA completou o tour
-    if (!hasCompletedTour) {
-      const timer = setTimeout(() => setRunTour(true), 1000);
-      return () => clearTimeout(timer);
-    }
+    if (hasCompletedTour) return;
+
+    // Aguarda qualquer dialog (ex.: boas-vindas do Super Admin) ser fechado
+    // antes de iniciar o tour, evitando dois overlays bloqueando cliques.
+    let cancelled = false;
+    const tryStart = () => {
+      if (cancelled) return;
+      const dialogOpen = document.querySelector('[role="dialog"][data-state="open"]');
+      if (dialogOpen) {
+        setTimeout(tryStart, 500);
+        return;
+      }
+      setRunTour(true);
+    };
+    const timer = setTimeout(tryStart, 1200);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [hasCompletedTour]);
 
   const handleJoyrideCallback = (data: CallBackProps) => {
