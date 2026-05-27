@@ -118,6 +118,7 @@ const Nr1BemEstarAgente = lazy(() => import("./pages/nr1/Nr1BemEstarAgente"));
 const Nr1JornadaBemEstar = lazy(() => import("./pages/nr1/Nr1JornadaBemEstar"));
 const Nr1Acompanhamento = lazy(() => import("./pages/nr1/Nr1Acompanhamento"));
 const Nr1FIB = lazy(() => import("./pages/nr1/Nr1FIB"));
+const Nr1FibCard = lazy(() => import("./pages/nr1/Nr1FibCard"));
 const Nr1SegPsi = lazy(() => import("./pages/nr1/Nr1SegPsi"));
 const Nr1Sociodemografico = lazy(() => import("./pages/nr1/Nr1Sociodemografico"));
 const Nr1Universo = lazy(() => import("./pages/nr1/Nr1Universo"));
