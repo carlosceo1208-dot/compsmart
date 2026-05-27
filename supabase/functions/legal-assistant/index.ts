@@ -799,131 +799,150 @@ Inclua SEMPRE ao final das respostas:
         messages: messages,
         temperature: 0.3,
         max_tokens: 8000,
+        stream: true,
       }),
     });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
+    if (!aiResponse.ok || !aiResponse.body) {
+      const errorText = await aiResponse.text().catch(() => '');
       console.error('AI API Error:', aiResponse.status, errorText);
-      
-      // Tratamento específico para erro 503 (Service Unavailable)
-      if (aiResponse.status === 503) {
-        return new Response(
-          JSON.stringify({ 
-            error: 'O serviço de IA está temporariamente indisponível. Por favor, tente novamente em alguns instantes.' 
-          }),
-          { 
-            status: 503,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-      
-      // Tratamento para erro 429 (Rate Limit)
-      if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ 
-            error: 'Limite de requisições atingido. Por favor, aguarde alguns momentos e tente novamente.' 
-          }),
-          { 
-            status: 429,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          }
-        );
-      }
-      
-      throw new Error(`AI API error: ${aiResponse.status}`);
+      const msg = aiResponse.status === 503
+        ? 'O serviço de IA está temporariamente indisponível. Por favor, tente novamente em alguns instantes.'
+        : aiResponse.status === 429
+          ? 'Limite de requisições atingido. Por favor, aguarde alguns momentos e tente novamente.'
+          : aiResponse.status === 402
+            ? 'Créditos de IA esgotados. Adicione créditos ao workspace.'
+            : `Erro ao processar com IA (${aiResponse.status})`;
+      return new Response(JSON.stringify({ error: msg }), {
+        status: aiResponse.status || 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const aiData = await aiResponse.json();
-    
-    // Verificar se é primeira interação do usuário
+    // Verificar se é primeira interação do usuário (antes do stream para incluir saudação)
     const { data: previousConversations } = await supabase
       .from('legal_assistant_conversations')
       .select('id')
       .eq('user_id', user.id)
       .limit(1);
-
     const isFirstInteraction = !previousConversations || previousConversations.length === 0;
 
-    let answer = aiData.choices[0]?.message?.content || 'Desculpe, não consegui gerar uma resposta.';
+    const encoder = new TextEncoder();
+    const upstream = aiResponse.body;
 
-    // Adicionar saudação se for primeira interação
-    if (isFirstInteraction) {
-      answer = `${initialGreeting}${answer}`;
-    }
-    
-    const tokensUsed = aiData.usage?.total_tokens || 0;
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (event: string, data: any) => {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        };
 
-    // ============ EXTRAÇÃO ROBUSTA DE FONTES LEGAIS ============
-    const extractedSources = extractLegalSources(answer);
-    
-    // Converter para formato legacy (compatibilidade)
-    const legalReferences = extractedSources.map(s => ({
-      type: s.source_category,
-      reference: s.source_reference
-    }));
+        let fullAnswer = '';
+        let tokensUsed = 0;
 
-    const responseTime = Date.now() - startTime;
+        try {
+          // Emite saudação como primeiro delta se for a 1ª interação
+          if (isFirstInteraction) {
+            fullAnswer += initialGreeting;
+            send('delta', { text: initialGreeting });
+          }
 
-    // Gerar ID da conversa para vincular às citações
-    const conversationId = crypto.randomUUID();
+          const reader = upstream.getReader();
+          const decoder = new TextDecoder();
+          let buf = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let nl: number;
+            while ((nl = buf.indexOf('\n')) !== -1) {
+              const line = buf.slice(0, nl).trim();
+              buf = buf.slice(nl + 1);
+              if (!line.startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') continue;
+              try {
+                const j = JSON.parse(payload);
+                const delta = j.choices?.[0]?.delta?.content;
+                if (delta) {
+                  fullAnswer += delta;
+                  send('delta', { text: delta });
+                }
+                if (j.usage?.total_tokens) tokensUsed = j.usage.total_tokens;
+              } catch { /* ignore non-JSON keepalives */ }
+            }
+          }
 
-    const { error: insertError } = await supabase
-      .from('legal_assistant_conversations')
-      .insert({
-        id: conversationId,
-        user_id: user.id,
-        session_id: session_id || null,
-        question,
-        answer,
-        document_text,
-        document_name,
-        operation_mode: operationMode,
-        legal_references: legalReferences.length > 0 ? legalReferences : null,
-        tokens_used: tokensUsed,
-        response_time_ms: responseTime,
-      });
+          if (!fullAnswer) fullAnswer = 'Desculpe, não consegui gerar uma resposta.';
 
-    if (insertError) {
-      console.error('Error saving conversation:', insertError);
-    }
+          // ============ EXTRAÇÃO + PERSISTÊNCIA ============
+          const extractedSources = extractLegalSources(fullAnswer);
+          const legalReferences = extractedSources.map(s => ({
+            type: s.source_category,
+            reference: s.source_reference,
+          }));
+          const responseTime = Date.now() - startTime;
+          const conversationId = crypto.randomUUID();
 
-    // ============ SALVAR FONTES NA TABELA DE AUDITORIA ============
-    if (extractedSources.length > 0) {
-      const sourcesToInsert = extractedSources.map(source => ({
-        conversation_id: conversationId,
-        agent_type: 'legal',
-        source_type: source.source_type,
-        source_reference: source.source_reference,
-        source_category: source.source_category,
-        citation_context: source.citation_context.substring(0, 500),
-        verified: false
-      }));
+          const { error: insertError } = await supabase
+            .from('legal_assistant_conversations')
+            .insert({
+              id: conversationId,
+              user_id: user.id,
+              session_id: session_id || null,
+              question,
+              answer: fullAnswer,
+              document_text,
+              document_name,
+              operation_mode: operationMode,
+              legal_references: legalReferences.length > 0 ? legalReferences : null,
+              tokens_used: tokensUsed,
+              response_time_ms: responseTime,
+            });
+          if (insertError) console.error('Error saving conversation:', insertError);
 
-      const { error: citationError } = await supabase
-        .from('agent_source_citations')
-        .insert(sourcesToInsert);
+          if (extractedSources.length > 0) {
+            const sourcesToInsert = extractedSources.map(source => ({
+              conversation_id: conversationId,
+              agent_type: 'legal',
+              source_type: source.source_type,
+              source_reference: source.source_reference,
+              source_category: source.source_category,
+              citation_context: source.citation_context.substring(0, 500),
+              verified: false,
+            }));
+            const { error: citationError } = await supabase
+              .from('agent_source_citations')
+              .insert(sourcesToInsert);
+            if (citationError) console.error('Error saving source citations:', citationError);
+            else console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes legais para auditoria`);
+          }
 
-      if (citationError) {
-        console.error('Error saving source citations:', citationError);
-      } else {
-        console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes legais para auditoria`);
-      }
-    }
+          send('done', {
+            answer: fullAnswer,
+            legal_references: legalReferences,
+            tokens_used: tokensUsed,
+            response_time_ms: responseTime,
+            operation_mode: operationMode,
+            conversation_id: conversationId,
+          });
+        } catch (err) {
+          console.error('Stream error:', err);
+          send('error', { error: (err as Error).message || 'Erro no streaming' });
+        } finally {
+          controller.close();
+        }
+      },
+    });
 
-    return new Response(
-      JSON.stringify({
-        answer,
-        legal_references: legalReferences,
-        tokens_used: tokensUsed,
-        response_time_ms: responseTime,
-        operation_mode: operationMode,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',
+        Connection: 'keep-alive',
+      },
+    });
 
   } catch (error) {
     console.error('Error in legal-assistant function:', error);
