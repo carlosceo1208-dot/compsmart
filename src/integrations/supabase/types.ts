@@ -4549,12 +4549,8 @@ export type Database = {
           address: string | null
           base_date: string | null
           billing_cycle: string | null
-          billing_email: string | null
-          cnpj: string | null
           code: string | null
           created_at: string
-          custom_annual_price: number | null
-          custom_monthly_price: number | null
           data_deletion_scheduled_at: string | null
           default_language: string | null
           description: string | null
@@ -4582,12 +4578,8 @@ export type Database = {
           address?: string | null
           base_date?: string | null
           billing_cycle?: string | null
-          billing_email?: string | null
-          cnpj?: string | null
           code?: string | null
           created_at?: string
-          custom_annual_price?: number | null
-          custom_monthly_price?: number | null
           data_deletion_scheduled_at?: string | null
           default_language?: string | null
           description?: string | null
@@ -4615,12 +4607,8 @@ export type Database = {
           address?: string | null
           base_date?: string | null
           billing_cycle?: string | null
-          billing_email?: string | null
-          cnpj?: string | null
           code?: string | null
           created_at?: string
-          custom_annual_price?: number | null
-          custom_monthly_price?: number | null
           data_deletion_scheduled_at?: string | null
           default_language?: string | null
           description?: string | null
