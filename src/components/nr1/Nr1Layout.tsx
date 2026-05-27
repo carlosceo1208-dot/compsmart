@@ -11,7 +11,7 @@ import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 const NAV = [
   { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true },
   { to: '/nr1/universo', label: 'Universo', icon: UserCheck },
-  { to: '/nr1/fib', label: 'Bem-Estar Integral', icon: Radar },
+  { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3 },
   { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield },
   { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users },
   { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch },
