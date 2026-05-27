@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ShieldAlert, ListChecks, CheckCircle2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ShieldAlert, CheckCircle2 } from 'lucide-react';
+
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -39,11 +39,6 @@ export function GrauRiscoInssCard() {
             )}
             <Button size="sm" variant="outline" onClick={() => setEditing((v) => !v)}>
               {editing ? 'Fechar' : grau ? 'Alterar' : 'Definir'}
-            </Button>
-            <Button size="sm" className="nr1-bg-primary" asChild>
-              <Link to="/nr1/planos-acao">
-                <ListChecks className="h-4 w-4 mr-1" /> Plano de Ação
-              </Link>
             </Button>
           </div>
         </div>

@@ -8,7 +8,7 @@ import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/n
 import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
-import { GerarPgrButton } from '@/components/nr1/GerarPgrButton';
+
 import { useClimaCopsoqCorrelacao } from '@/hooks/useClimaCopsoqCorrelacao';
 import { DIMENSAO_LABEL as CLIMA_LABEL, type ClimaDimensao } from '@/lib/climaQuestoes';
 
@@ -56,7 +56,9 @@ export default function Nr1Dashboard() {
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline">Conformidade Ativa</Badge>
-              <GerarPgrButton size="sm" variant="default" className="nr1-bg-primary" />
+              <Button asChild size="sm" className="nr1-bg-primary">
+                <Link to="/nr1/fib">Abrir Matriz de Risco <ArrowRight className="h-4 w-4 ml-1" /></Link>
+              </Button>
             </div>
           </CardContent>
         </Card>

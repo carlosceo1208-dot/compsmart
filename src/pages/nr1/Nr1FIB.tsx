@@ -1,12 +1,15 @@
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Loader2 } from 'lucide-react';
+import { Download, FileText, Loader2, ListChecks } from 'lucide-react';
 import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { INSTRUMENTOS, CATEGORIA_LABEL } from '@/lib/fib';
 import { useFibData } from '@/hooks/useNr1Cycles';
+import { GerarPgrButton } from '@/components/nr1/GerarPgrButton';
+import { Nr1MatrizRisco } from '@/components/nr1/Nr1MatrizRisco';
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Legend, Tooltip,
@@ -65,16 +68,58 @@ export default function Nr1FIB() {
   const { data: roleInfo } = useCurrentUserRole();
   const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
 
+  const ComplianceActions = (
+    <Card className="nr1-bg-soft border-[hsl(var(--nr1-primary)/0.2)]">
+      <CardContent className="pt-6 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <p className="font-semibold">Ações de Conformidade NR-1</p>
+          <p className="text-xs text-muted-foreground">Gere o PGR e gerencie o Plano de Ação a partir do diagnóstico atual.</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="outline">Conformidade Ativa</Badge>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/nr1/planos-acao"><ListChecks className="h-4 w-4 mr-1" /> Plano de Ação</Link>
+          </Button>
+          <GerarPgrButton size="sm" variant="default" className="nr1-bg-primary" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const PageHeader = (
+    <div>
+      <h2 className="text-xl font-semibold">Matriz de Risco NR-1</h2>
+      <p className="text-sm text-muted-foreground">
+        Matriz 5×5 de Severidade × Probabilidade alimentada pelo questionário de 40 perguntas (COPSOQ-III adaptado),
+        complementada pela visão de Bem-Estar Integral (FIB).
+      </p>
+    </div>
+  );
+
   if (isLoading || !data) {
-    return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando ciclo FIB…</div>;
+    return (
+      <div className="space-y-6">
+        {PageHeader}
+        {ComplianceActions}
+        <Nr1MatrizRisco />
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Carregando dados complementares de FIB…
+        </div>
+      </div>
+    );
   }
 
   if (data.source === 'empty') {
     return (
-      <Nr1EmptyState
-        titulo="Nenhum ciclo FIB coletado ainda"
-        descricao="Quando o primeiro ciclo de Bem-Estar Integral for aplicado e respondido pelos colaboradores, os resultados aparecerão aqui automaticamente."
-      />
+      <div className="space-y-6">
+        {PageHeader}
+        {ComplianceActions}
+        <Nr1MatrizRisco />
+        <Nr1EmptyState
+          titulo="Sem ciclo FIB para enriquecer a matriz"
+          descricao="Quando o primeiro ciclo de Bem-Estar Integral for aplicado, a comparação Colaborador × Empresa aparecerá aqui."
+        />
+      </div>
     );
   }
 
@@ -106,8 +151,8 @@ export default function Nr1FIB() {
     }
     if (dashboardRef.current) {
       await exportDashboardToPDF(dashboardRef.current, {
-        filename: 'fib_bem_estar_integral',
-        title: 'Bem-Estar Integral (FIB)',
+        filename: 'matriz_risco_nr1',
+        title: 'Matriz de Risco NR-1',
         subtitle: data.ciclo ?? 'Visão executiva',
       });
     }
@@ -115,13 +160,8 @@ export default function Nr1FIB() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold">Bem-Estar Integral (FIB)</h2>
-          <p className="text-sm text-muted-foreground">
-            Felicidade Interna Bruta — comparativo entre percepção do colaborador e condições oferecidas pela empresa nas 9 dimensões.
-          </p>
-        </div>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        {PageHeader}
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={exportarCSV}>
             <Download className="h-4 w-4 mr-2" /> CSV
@@ -131,6 +171,10 @@ export default function Nr1FIB() {
           </Button>
         </div>
       </div>
+
+      {ComplianceActions}
+      <Nr1MatrizRisco />
+
       {data.source === 'seed' && <Nr1SeedAlert />}
 
       <div ref={dashboardRef} className="space-y-6 bg-background p-1">
