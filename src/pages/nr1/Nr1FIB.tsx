@@ -179,168 +179,180 @@ export default function Nr1FIB() {
       {data.source === 'seed' && <Nr1SeedAlert />}
 
       <div ref={dashboardRef} className="space-y-6 bg-background p-1">
-        <div className="grid gap-4 md:grid-cols-3">
-          <KpiBox label="Visão Colaborador" value={`${geralColab}%`} />
-          <KpiBox label="Visão Empresa" value={`${geralEmpresa}%`} />
-          <KpiBox label="Gap percepção" value={`${gap > 0 ? '+' : ''}${gap} pts`} hint={gap >= 0 ? 'Empresa entrega mais que percebido' : 'Colaborador percebe menos do que empresa entrega'} />
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Radar FIB — Colaborador vs. Empresa</CardTitle>
-            <CardDescription>Pontuação 0–100 por dimensão.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[420px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={radarData} outerRadius="75%">
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="dim" tick={{ fontSize: 11 }} />
-                  <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-                  <Radar name="Colaborador" dataKey="Colaborador" stroke={ciclos[0].cor} fill={ciclos[0].cor} fillOpacity={0.35} />
-                  <Radar name="Empresa" dataKey="Empresa" stroke={ciclos[1].cor} fill={ciclos[1].cor} fillOpacity={0.25} />
-                  <Legend />
-                  <Tooltip />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Detalhe por dimensão</CardTitle>
-            <CardDescription>Percentuais por questão, grupo e dimensão.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2 md:grid-cols-3">
-              {data.scores.map((s) => {
-                const diff = s.empresa - s.colaborador;
-                return (
-                  <div key={s.key} className="rounded-md border p-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{s.label}</span>
-                      <Badge variant="outline" className="text-[10px]">{s.grupo === 'pessoa' ? 'Pessoa' : 'Organização'}</Badge>
-                    </div>
-                    <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-                      <Stat label="Colab." value={`${s.colaborador}%`} />
-                      <Stat label="Empresa" value={`${s.empresa}%`} />
-                      <Stat label="Δ" value={`${diff > 0 ? '+' : ''}${diff}`} tone={Math.abs(diff) > 10 ? 'warn' : 'ok'} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Correlação — 13 Fatores de Risco NR-1 × Dimensões FIB</CardTitle>
-            <CardDescription>
-              Mapeamento de cada perigo psicossocial às dimensões de Bem-Estar Integral mais sensíveis.
-              Use para priorizar ações: um fator alto deve elevar investimento nas dimensões correlatas.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto rounded-md border">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
-                    <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões FIB impactadas</th>
-                    <th className="text-left px-3 py-2 font-semibold">Por quê</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CORRELACAO_FATORES_FIB.map((c, i) => (
-                    <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
-                      <td className="px-3 py-2 align-top">{c.perigo}</td>
-                      <td className="px-3 py-2 align-top">
-                        <div className="flex flex-wrap gap-1">
-                          {c.dimensoes.map((d) => (
-                            <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-              Fonte: cruzamento entre os 13 perigos psicossociais da NR-1 (orientação técnica GRO/PGR) e as 9 dimensões
-              do Bem-Estar Integral (FIB). Uma mesma dimensão pode receber sinal de múltiplos fatores — quanto mais
-              perigos apontam para ela, maior a prioridade no plano de ação.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Correlação — 13 Fatores de Risco NR-1 × 6 Dimensões do Questionário (40 perguntas)</CardTitle>
-            <CardDescription>
-              Mapeamento de cada perigo psicossocial às dimensões do questionário COPSOQ-III adaptado.
-              Permite rastrear, item a item, qual bloco de perguntas captura cada fator.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto rounded-md border">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
-                    <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões do questionário</th>
-                    <th className="text-left px-3 py-2 font-semibold">Por quê</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CORRELACAO_FATORES_COPSOQ.map((c, i) => (
-                    <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
-                      <td className="px-3 py-2 align-top">{c.perigo}</td>
-                      <td className="px-3 py-2 align-top">
-                        <div className="flex flex-wrap gap-1">
-                          {c.dimensoes.map((d) => (
-                            <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-              Dimensões do questionário (40 itens): Demandas (8), Organização e Conteúdo (7), Relações e Liderança (7),
-              Interface Trabalho-Indivíduo (7), Valores no Trabalho (5) e Saúde e Bem-Estar (6). Um fator pode aparecer
-              em mais de uma dimensão — isso é esperado e dá triangulação ao diagnóstico.
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Instrumentos da biblioteca</CardTitle>
-            <CardDescription>Pesquisas e rastreadores disponíveis para compor o ciclo.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2 md:grid-cols-2">
-              {INSTRUMENTOS.map((i) => (
-                <div key={i.key} className="flex items-start justify-between gap-3 rounded-md border p-3">
-                  <div>
-                    <p className="text-sm font-medium">{i.nome}</p>
-                    <p className="text-xs text-muted-foreground">{i.descricao}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1">{i.itens} itens · {i.duracao}</p>
-                  </div>
-                  <Badge variant="outline" className="text-[10px] whitespace-nowrap">{CATEGORIA_LABEL[i.categoria]}</Badge>
+        <Card className="border-[hsl(var(--nr1-primary)/0.3)]">
+          <CardHeader className="border-b bg-[hsl(var(--nr1-primary)/0.05)]">
+            <div className="flex items-start justify-between gap-3 flex-wrap">
+              <div className="flex items-start gap-3">
+                <div className="rounded-md nr1-bg-primary p-2 text-white">
+                  <Heart className="h-5 w-5" />
                 </div>
-              ))}
+                <div>
+                  <CardTitle className="text-lg">FIB — Bem-Estar Integral</CardTitle>
+                  <CardDescription>
+                    Toda a visão FIB num só lugar: KPIs, comparação Colaborador × Empresa, detalhe por dimensão,
+                    correlações com os 13 fatores da NR-1 e instrumentos disponíveis.
+                  </CardDescription>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 min-w-[260px]">
+                <KpiMini label="Colab." value={`${geralColab}%`} />
+                <KpiMini label="Empresa" value={`${geralEmpresa}%`} />
+                <KpiMini label="Gap" value={`${gap > 0 ? '+' : ''}${gap}`} tone={Math.abs(gap) > 10 ? 'warn' : 'ok'} />
+              </div>
             </div>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <Accordion type="multiple" defaultValue={['radar']} className="w-full">
+              <AccordionItem value="radar">
+                <AccordionTrigger>Radar FIB — Colaborador vs. Empresa</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-xs text-muted-foreground mb-2">Pontuação 0–100 por dimensão.</p>
+                  <div className="h-[380px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart data={radarData} outerRadius="75%">
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="dim" tick={{ fontSize: 11 }} />
+                        <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <Radar name="Colaborador" dataKey="Colaborador" stroke={ciclos[0].cor} fill={ciclos[0].cor} fillOpacity={0.35} />
+                        <Radar name="Empresa" dataKey="Empresa" stroke={ciclos[1].cor} fill={ciclos[1].cor} fillOpacity={0.25} />
+                        <Legend />
+                        <Tooltip />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="detalhe">
+                <AccordionTrigger>Detalhe por dimensão</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-xs text-muted-foreground mb-2">Percentuais por questão, grupo e dimensão.</p>
+                  <div className="grid gap-2 md:grid-cols-3">
+                    {data.scores.map((s) => {
+                      const diff = s.empresa - s.colaborador;
+                      return (
+                        <div key={s.key} className="rounded-md border p-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-medium">{s.label}</span>
+                            <Badge variant="outline" className="text-[10px]">{s.grupo === 'pessoa' ? 'Pessoa' : 'Organização'}</Badge>
+                          </div>
+                          <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+                            <Stat label="Colab." value={`${s.colaborador}%`} />
+                            <Stat label="Empresa" value={`${s.empresa}%`} />
+                            <Stat label="Δ" value={`${diff > 0 ? '+' : ''}${diff}`} tone={Math.abs(diff) > 10 ? 'warn' : 'ok'} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="corr-fib">
+                <AccordionTrigger>Correlação — 13 Fatores NR-1 × Dimensões FIB</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Mapeamento de cada perigo psicossocial às dimensões FIB mais sensíveis.
+                  </p>
+                  <div className="overflow-x-auto rounded-md border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
+                          <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões FIB impactadas</th>
+                          <th className="text-left px-3 py-2 font-semibold">Por quê</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {CORRELACAO_FATORES_FIB.map((c, i) => (
+                          <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                            <td className="px-3 py-2 align-top">{c.perigo}</td>
+                            <td className="px-3 py-2 align-top">
+                              <div className="flex flex-wrap gap-1">
+                                {c.dimensoes.map((d) => (
+                                  <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="corr-copsoq">
+                <AccordionTrigger>Correlação — 13 Fatores NR-1 × 6 Dimensões do Questionário (40 perguntas)</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Rastreio item a item: qual bloco de perguntas captura cada fator.
+                  </p>
+                  <div className="overflow-x-auto rounded-md border">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/50">
+                        <tr>
+                          <th className="text-left px-3 py-2 font-semibold w-[38%]">Fator de risco (NR-1)</th>
+                          <th className="text-left px-3 py-2 font-semibold w-[32%]">Dimensões do questionário</th>
+                          <th className="text-left px-3 py-2 font-semibold">Por quê</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {CORRELACAO_FATORES_COPSOQ.map((c, i) => (
+                          <tr key={c.perigo} className={i % 2 === 0 ? 'bg-card' : 'bg-muted/20'}>
+                            <td className="px-3 py-2 align-top">{c.perigo}</td>
+                            <td className="px-3 py-2 align-top">
+                              <div className="flex flex-wrap gap-1">
+                                {c.dimensoes.map((d) => (
+                                  <Badge key={d} variant="outline" className="text-[10px]">{d}</Badge>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 align-top text-muted-foreground text-xs">{c.nota}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+                    Dimensões do questionário (40 itens): Demandas (8), Organização e Conteúdo (7), Relações e Liderança (7),
+                    Interface Trabalho-Indivíduo (7), Valores no Trabalho (5) e Saúde e Bem-Estar (6).
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="instrumentos">
+                <AccordionTrigger>Instrumentos da biblioteca</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-xs text-muted-foreground mb-2">Pesquisas e rastreadores disponíveis para compor o ciclo.</p>
+                  <div className="grid gap-2 md:grid-cols-2">
+                    {INSTRUMENTOS.map((i) => (
+                      <div key={i.key} className="flex items-start justify-between gap-3 rounded-md border p-3">
+                        <div>
+                          <p className="text-sm font-medium">{i.nome}</p>
+                          <p className="text-xs text-muted-foreground">{i.descricao}</p>
+                          <p className="text-[11px] text-muted-foreground mt-1">{i.itens} itens · {i.duracao}</p>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] whitespace-nowrap">{CATEGORIA_LABEL[i.categoria]}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function KpiMini({ label, value, tone = 'ok' }: { label: string; value: string; tone?: 'ok' | 'warn' }) {
+  return (
+    <div className={`rounded-md border bg-card px-3 py-2 text-center ${tone === 'warn' ? 'border-orange-400' : ''}`}>
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className={`text-sm font-bold tabular-nums ${tone === 'warn' ? 'text-orange-600' : ''}`}>{value}</div>
     </div>
   );
 }
