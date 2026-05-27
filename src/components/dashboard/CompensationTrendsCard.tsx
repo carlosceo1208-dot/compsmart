@@ -100,6 +100,7 @@ export const CompensationTrendsCard = () => {
             <CardTitle className="text-base font-semibold flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
               <span className="text-primary">Tendências de Gestão de Remuneração 2026</span>
+              <AiBadge variant="subtle" />
             </CardTitle>
             <Button 
               variant="ghost" 
