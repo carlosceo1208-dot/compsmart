@@ -1,9 +1,10 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Loader2, ListChecks } from 'lucide-react';
+import { Download, FileText, Loader2, ListChecks, Heart } from 'lucide-react';
 import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { INSTRUMENTOS, CATEGORIA_LABEL } from '@/lib/fib';
