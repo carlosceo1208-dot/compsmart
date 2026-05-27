@@ -40,11 +40,6 @@ export function GrauRiscoInssCard() {
             <Button size="sm" variant="outline" onClick={() => setEditing((v) => !v)}>
               {editing ? 'Fechar' : grau ? 'Alterar' : 'Definir'}
             </Button>
-            <Button size="sm" className="nr1-bg-primary" asChild>
-              <Link to="/nr1/planos-acao">
-                <ListChecks className="h-4 w-4 mr-1" /> Plano de Ação
-              </Link>
-            </Button>
           </div>
         </div>
       </CardHeader>
