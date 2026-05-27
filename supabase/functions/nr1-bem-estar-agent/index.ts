@@ -196,7 +196,10 @@ serve(async (req) => {
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages.slice(-20),
+          ...messages.slice(-20).map((m: any) => ({
+            role: ["user", "assistant"].includes(m?.role) ? m.role : "user",
+            content: typeof m?.content === "string" ? m.content.slice(0, 4000) : "",
+          })),
         ],
         stream: true,
       }),
