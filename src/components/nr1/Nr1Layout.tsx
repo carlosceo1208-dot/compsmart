@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Radar, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
