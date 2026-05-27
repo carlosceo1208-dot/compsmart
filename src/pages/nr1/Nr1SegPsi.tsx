@@ -7,11 +7,27 @@ import { Progress } from '@/components/ui/progress';
 import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
 import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
+import { useNr1Diagnosticos } from '@/hooks/useNr1';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
 import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+
+const DIMENSOES_COPSOQ: { key: string; label: string; descricao: string }[] = [
+  { key: 'demandas_trabalho', label: 'Demandas do Trabalho', descricao: 'Volume, ritmo, pressão de tempo, demandas emocionais e cognitivas.' },
+  { key: 'organizacao_conteudo', label: 'Organização e Conteúdo', descricao: 'Autonomia, clareza de papel, previsibilidade, sentido do trabalho.' },
+  { key: 'relacoes_lideranca', label: 'Relações & Liderança', descricao: 'Apoio do líder e dos pares, qualidade da liderança, feedback.' },
+  { key: 'interface_trabalho_individuo', label: 'Interface Trabalho-Indivíduo', descricao: 'Conflito trabalho-família, insegurança no emprego.' },
+  { key: 'valores_trabalho', label: 'Valores no Trabalho', descricao: 'Justiça organizacional, confiança, reconhecimento.' },
+  { key: 'saude_bem_estar', label: 'Saúde & Bem-Estar', descricao: 'Estresse, burnout, sofrimento psíquico, segurança mental.' },
+];
+
+function corDimensao(score: number) {
+  if (score >= 70) return 'hsl(var(--nr1-success))';
+  if (score >= 55) return 'hsl(var(--nr1-primary))';
+  return 'hsl(var(--nr1-danger))';
+}
 
 const cores: Record<string, string> = {
   incluir: 'hsl(var(--nr1-success))',
@@ -30,6 +46,7 @@ export default function Nr1SegPsi() {
   const dashboardRef = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useSegPsiData();
   const { data: workforce = 0 } = useNr1Workforce();
+  const { data: diagnosticos } = useNr1Diagnosticos();
   const { activeCompanyId } = useCompanyContext();
   const { data: roleInfo } = useCurrentUserRole();
   const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
@@ -143,6 +160,71 @@ export default function Nr1SegPsi() {
             </div>
           </CardContent>
         </Card>
+
+        {(() => {
+          const ultimo = diagnosticos?.find((d) => d.status === 'concluido');
+          const scoresDim = (ultimo?.scores_dimensao as Record<string, number> | null) ?? null;
+          const dadosDim = DIMENSOES_COPSOQ.map((d) => ({
+            ...d,
+            score: scoresDim ? Number(scoresDim[d.key] ?? 0) : 0,
+          }));
+          const temDados = scoresDim && dadosDim.some((d) => d.score > 0);
+          return (
+            <Card>
+              <CardHeader>
+                <CardTitle>Score por dimensão COPSOQ-III</CardTitle>
+                <CardDescription>
+                  6 dimensões psicossociais (0–100) — base do diagnóstico NR-1 e da Matriz de Risco.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!temDados ? (
+                  <p className="text-sm text-muted-foreground py-8 text-center">
+                    Nenhum diagnóstico NR-1 concluído ainda. Aplique a Pesquisa Saúde Bem-Estar para visualizar.
+                  </p>
+                ) : (
+                  <>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={dadosDim} margin={{ left: 0, right: 16, top: 8, bottom: 8 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={0} angle={-12} textAnchor="end" height={70} />
+                          <YAxis domain={[0, 100]} />
+                          <Tooltip
+                            formatter={(v: number) => [`${v.toFixed(1)} / 100`, 'Score']}
+                            labelFormatter={(l) => l}
+                          />
+                          <Bar dataKey="score" radius={[6, 6, 0, 0]}>
+                            {dadosDim.map((d) => (
+                              <Cell key={d.key} fill={corDimensao(d.score)} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="grid gap-2 md:grid-cols-2 mt-4">
+                      {dadosDim.map((d) => {
+                        const t = tom(d.score);
+                        return (
+                          <div key={d.key} className="flex items-center justify-between gap-3 p-2 rounded-md border border-border/50">
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium truncate">{d.label}</p>
+                              <p className="text-xs text-muted-foreground truncate">{d.descricao}</p>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className="text-sm font-semibold tabular-nums">{d.score.toFixed(1)}</span>
+                              <Badge className={t.cls}>{t.label}</Badge>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         <div className="grid gap-3 md:grid-cols-2">
           {data.scores.map((d) => {
