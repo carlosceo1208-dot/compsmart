@@ -673,95 +673,133 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
         model: 'openai/gpt-5.4',
         messages,
         max_tokens: 8000,
+        stream: true,
       }),
     });
 
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text();
+    if (!aiResponse.ok || !aiResponse.body) {
+      const errorText = await aiResponse.text().catch(() => '');
       console.error('Lovable AI error:', aiResponse.status, errorText);
-      
-      if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns segundos.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Créditos de IA esgotados. Adicione créditos ao workspace.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      throw new Error(`Erro ao processar com IA: ${aiResponse.status}`);
+      const msg = aiResponse.status === 429
+        ? 'Limite de requisições excedido. Tente novamente em alguns segundos.'
+        : aiResponse.status === 402
+          ? 'Créditos de IA esgotados. Adicione créditos ao workspace.'
+          : `Erro ao processar com IA (${aiResponse.status})`;
+      return new Response(JSON.stringify({ error: msg }), {
+        status: aiResponse.status || 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const aiData = await aiResponse.json();
-    const answer = aiData.choices[0].message.content;
-    const tokensUsed = aiData.usage?.total_tokens || 0;
-    const responseTime = Date.now() - startTime;
+    const encoder = new TextEncoder();
+    const upstream = aiResponse.body;
 
-    // ============ EXTRAÇÃO DE FONTES SALARIAIS ============
-    const extractedSources = extractSalarySources(answer);
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (event: string, data: any) => {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        };
 
-    // Gerar ID da conversa para vincular às citações
-    const conversationId = crypto.randomUUID();
+        let fullAnswer = '';
+        let tokensUsed = 0;
 
-    // Salvar conversa
-    await supabase.from('salary_assistant_conversations').insert({
-      id: conversationId,
-      user_id: user.id,
-      session_id: session_id || null,
-      question,
-      answer,
-      context_data: contextData,
-      document_name: document_name || null,
-      operation_mode: operationMode,
-      tokens_used: tokensUsed,
-      response_time_ms: responseTime,
+        try {
+          const reader = upstream.getReader();
+          const decoder = new TextDecoder();
+          let buf = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let nl: number;
+            while ((nl = buf.indexOf('\n')) !== -1) {
+              const line = buf.slice(0, nl).trim();
+              buf = buf.slice(nl + 1);
+              if (!line.startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') continue;
+              try {
+                const j = JSON.parse(payload);
+                const delta = j.choices?.[0]?.delta?.content;
+                if (delta) {
+                  fullAnswer += delta;
+                  send('delta', { text: delta });
+                }
+                if (j.usage?.total_tokens) tokensUsed = j.usage.total_tokens;
+              } catch { /* ignore */ }
+            }
+          }
+
+          if (!fullAnswer) fullAnswer = 'Desculpe, não consegui gerar uma resposta.';
+
+          const responseTime = Date.now() - startTime;
+          const extractedSources = extractSalarySources(fullAnswer);
+          const conversationId = crypto.randomUUID();
+
+          await supabase.from('salary_assistant_conversations').insert({
+            id: conversationId,
+            user_id: user.id,
+            session_id: session_id || null,
+            question,
+            answer: fullAnswer,
+            context_data: contextData,
+            document_name: document_name || null,
+            operation_mode: operationMode,
+            tokens_used: tokensUsed,
+            response_time_ms: responseTime,
+          });
+
+          if (extractedSources.length > 0) {
+            const sourcesToInsert = extractedSources.map(source => ({
+              conversation_id: conversationId,
+              agent_type: 'salary',
+              source_type: source.source_type,
+              source_reference: source.source_reference,
+              source_category: source.source_category,
+              citation_context: source.citation_context.substring(0, 500),
+              verified: false,
+            }));
+            const { error: citationError } = await supabase
+              .from('agent_source_citations')
+              .insert(sourcesToInsert);
+            if (citationError) console.error('Error saving source citations:', citationError);
+            else console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes salariais para auditoria`);
+          }
+
+          console.log(`✅ Salary Smart processed for ${profile.email} (${tokensUsed} tokens, ${responseTime}ms, industry: ${industrySector})`);
+
+          send('done', {
+            answer: fullAnswer,
+            operation_mode: operationMode,
+            tokens_used: tokensUsed,
+            response_time_ms: responseTime,
+            conversation_id: conversationId,
+            context_summary: {
+              has_salary_table: !!activeSalaryTable,
+              has_survey_data: !!surveyTables?.length,
+              employee_count: contextData.employee_stats?.total_employees || 0,
+              knowledge_docs: knowledgeDocs?.length || 0,
+              industry_sector: industrySector,
+            },
+          });
+        } catch (err) {
+          console.error('Stream error:', err);
+          send('error', { error: (err as Error).message || 'Erro no streaming' });
+        } finally {
+          controller.close();
+        }
+      },
     });
 
-    // ============ SALVAR FONTES NA TABELA DE AUDITORIA ============
-    if (extractedSources.length > 0) {
-      const sourcesToInsert = extractedSources.map(source => ({
-        conversation_id: conversationId,
-        agent_type: 'salary',
-        source_type: source.source_type,
-        source_reference: source.source_reference,
-        source_category: source.source_category,
-        citation_context: source.citation_context.substring(0, 500),
-        verified: false
-      }));
-
-      const { error: citationError } = await supabase
-        .from('agent_source_citations')
-        .insert(sourcesToInsert);
-
-      if (citationError) {
-        console.error('Error saving source citations:', citationError);
-      } else {
-        console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes salariais para auditoria`);
-      }
-    }
-
-    console.log(`✅ Salary Smart processed for ${profile.email} (${tokensUsed} tokens, ${responseTime}ms, industry: ${industrySector})`);
-
-    return new Response(
-      JSON.stringify({
-        answer,
-        operation_mode: operationMode,
-        tokens_used: tokensUsed,
-        response_time_ms: responseTime,
-        context_summary: {
-          has_salary_table: !!activeSalaryTable,
-          has_survey_data: !!surveyTables?.length,
-          employee_count: contextData.employee_stats?.total_employees || 0,
-          knowledge_docs: knowledgeDocs?.length || 0,
-          industry_sector: industrySector,
-        }
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',
+        Connection: 'keep-alive',
+      },
+    });
 
   } catch (error: any) {
     console.error('❌ Salary Smart error:', error);
