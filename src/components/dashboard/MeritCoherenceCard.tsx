@@ -98,7 +98,7 @@ export function MeritCoherenceCard() {
               <TrendingUp className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <CardTitle className="text-base">Coerência Mérito × Salário</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">Coerência Mérito × Salário <AiBadge variant="subtle" /></CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Performance vs. posição na faixa
               </p>
