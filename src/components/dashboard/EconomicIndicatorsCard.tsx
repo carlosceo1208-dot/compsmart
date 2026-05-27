@@ -17,7 +17,7 @@ export const EconomicIndicatorsCard = () => {
   const usdChange = usd?.metadata?.pctChange ? Number(usd.metadata.pctChange) : 0;
 
   return (
-    <Card>
+    <Card className="glass-effect border-primary/20">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <Activity className="h-4 w-4 text-primary" />

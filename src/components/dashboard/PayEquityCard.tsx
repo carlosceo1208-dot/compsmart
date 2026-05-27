@@ -18,7 +18,7 @@ export const PayEquityCard = () => {
   const critical = alerts.filter((a) => a.severity === 'critical' && a.status === 'open').length;
 
   return (
-    <Card className="border-primary/20 hover:shadow-lg transition-shadow">
+    <Card className="glass-effect border-primary/20 hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Scale className="h-4 w-4 text-primary" />

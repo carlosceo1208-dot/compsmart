@@ -18,7 +18,7 @@ export const TalentIntelligenceCard = () => {
   if (!(role?.isAdmin || role?.isSuperAdmin || role?.isHR)) return null;
 
   return (
-    <Card className="border-primary/20 hover:shadow-lg transition-shadow">
+    <Card className="glass-effect border-primary/20 hover:shadow-lg transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
@@ -28,7 +28,10 @@ export const TalentIntelligenceCard = () => {
       </CardHeader>
       <CardContent className="space-y-3">
         {isLoading ? (
-          <div className="text-sm text-muted-foreground">Carregando...</div>
+          <div className="space-y-2">
+            <div className="h-8 bg-muted rounded animate-pulse" />
+            <div className="h-8 bg-muted rounded animate-pulse" />
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-2">

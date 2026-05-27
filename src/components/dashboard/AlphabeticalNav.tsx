@@ -67,7 +67,7 @@ export const AlphabeticalNav = () => {
   const isCurrentPath = (path: string) => location.pathname === path;
 
   return (
-    <Card>
+    <Card className="glass-effect border-primary/20">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-muted-foreground">Navegação Rápida</h3>

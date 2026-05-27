@@ -67,7 +67,7 @@ export const EconomicIndicators = ({
   const chargesChanged = parseFloat(localCharges) !== socialChargesPercentage;
 
   return (
-    <Card className="border-2 border-primary/30 bg-gradient-to-br from-background via-primary/3 to-primary/8 shadow-lg hover:shadow-primary transition-all duration-300">
+    <Card className="border border-primary/20 glass-effect shadow-lg hover:shadow-primary transition-all duration-300">
       <CardContent className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-bold text-foreground">Indicadores Econômicos</h3>

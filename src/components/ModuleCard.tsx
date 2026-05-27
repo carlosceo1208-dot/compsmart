@@ -91,7 +91,7 @@ export const ModuleCard = ({
             "group transition-all duration-300 h-full relative border-2 overflow-hidden",
             isSmartAgent
               ? "bg-gradient-to-br from-primary/8 via-card to-secondary/8 border-primary/40 hover:border-primary/70 hover:shadow-glow-primary"
-              : "bg-gradient-card hover:bg-gradient-card-hover",
+              : "glass-effect bg-gradient-card hover:bg-gradient-card-hover",
             !isSmartAgent && categoryStyles[category],
             !isSmartAgent && categoryGlow[category],
             isClickable || isLocked ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
