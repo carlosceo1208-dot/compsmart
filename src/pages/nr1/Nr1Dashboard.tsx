@@ -408,8 +408,10 @@ export default function Nr1Dashboard() {
                           })}
                         </>
                       )}
-                    </div>
-                  )}
+                  </div>
+                      </>
+                    );
+                  })()}
                 </>
               )}
             </div>
