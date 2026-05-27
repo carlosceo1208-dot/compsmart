@@ -19,6 +19,15 @@ export default function Nr1Dashboard() {
   const { data: diagnosticos, isLoading: diagLoading } = useNr1Diagnosticos();
   const { data: correlacoes = [] } = useClimaCopsoqCorrelacao();
 
+  const ciclosConcluidos = useMemo(
+    () => (diagnosticos ?? []).filter((d) => d.status === 'concluido'),
+    [diagnosticos]
+  );
+  const [cicloAId, setCicloAId] = useState<string>('');
+  const [cicloBId, setCicloBId] = useState<string>('');
+  const cicloA = ciclosConcluidos.find((c) => c.id === cicloAId);
+  const cicloB = ciclosConcluidos.find((c) => c.id === cicloBId);
+
   const topCorrelacoes = [...correlacoes]
     .filter((c) => c.prioridade === 'causa_raiz' || c.prioridade === 'atencao')
     .sort((a, b) => (a.prioridade === 'causa_raiz' ? -1 : 1) - (b.prioridade === 'causa_raiz' ? -1 : 1))
