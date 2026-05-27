@@ -1,6 +1,41 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
+import { toast } from 'sonner';
+
+export const useUpdateNr1Diagnostico = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, ciclo_nome }: { id: string; ciclo_nome: string }) => {
+      const { error } = await supabase
+        .from('nr1_diagnosticos')
+        .update({ ciclo_nome })
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['nr1-diagnosticos'] });
+      toast.success('Ciclo atualizado');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useDeleteNr1Diagnostico = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('nr1_diagnosticos').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['nr1-diagnosticos'] });
+      toast.success('Ciclo excluído');
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
 
 export const useNr1Subscription = () => {
   const { activeCompanyId } = useCompanyContext();
