@@ -278,6 +278,7 @@ const App = () => {
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
                        <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
                        <Route path="/nr1/fib" element={<Nr1FIB />} />
+                       <Route path="/nr1/fib-bem-estar" element={<Nr1FibCard />} />
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
