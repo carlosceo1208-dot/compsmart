@@ -28,7 +28,10 @@ export const TalentIntelligenceCard = () => {
       </CardHeader>
       <CardContent className="space-y-3">
         {isLoading ? (
-          <div className="text-sm text-muted-foreground">Carregando...</div>
+          <div className="space-y-2">
+            <div className="h-8 bg-muted rounded animate-pulse" />
+            <div className="h-8 bg-muted rounded animate-pulse" />
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-2">
