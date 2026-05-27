@@ -120,7 +120,7 @@ export default function Nr1NovoDiagnostico() {
     return (
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle>Iniciar Novo Diagnóstico NR-1</CardTitle>
+          <CardTitle>Pesquisa Saúde Bem-Estar - NR-1</CardTitle>
           <CardDescription>
             Aplicação anônima de {total} perguntas baseadas em metodologia COPSOQ-III, agrupadas em 6 dimensões psicossociais.
             Suas respostas individuais não são identificadas — apenas dados agregados aparecem no relatório.
