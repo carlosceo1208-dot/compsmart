@@ -292,9 +292,11 @@ const planId = searchParams.get('plan');
 
             if (profile?.root_company_id) {
               await supabase
-                .from('organizational_structure')
-                .update({ cnpj: documentValue.replace(/\D/g, '') })
-                .eq('id', profile.root_company_id);
+                .from('company_billing')
+                .upsert(
+                  { company_id: profile.root_company_id, cnpj: documentValue.replace(/\D/g, '') },
+                  { onConflict: 'company_id' }
+                );
             }
           }
         }
