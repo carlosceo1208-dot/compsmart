@@ -270,92 +270,104 @@ export default function Nr1Dashboard() {
 
 
             {/* Comparador */}
-            {ciclosConcluidos.length >= 2 && (
-              <div className="pt-4 border-t space-y-3">
-                <div className="flex items-center gap-2">
-                  <Scale className="h-4 w-4 nr1-text-primary" />
-                  <h4 className="text-sm font-semibold">Comparar ciclos</h4>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <Select value={cicloAId} onValueChange={setCicloAId}>
-                    <SelectTrigger><SelectValue placeholder="Ciclo A" /></SelectTrigger>
-                    <SelectContent>
-                      {ciclosConcluidos.map((c) => (
-                        <SelectItem key={c.id} value={c.id}>{c.ciclo_nome}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={cicloBId} onValueChange={setCicloBId}>
-                    <SelectTrigger><SelectValue placeholder="Ciclo B" /></SelectTrigger>
-                    <SelectContent>
-                      {ciclosConcluidos.map((c) => (
-                        <SelectItem key={c.id} value={c.id} disabled={c.id === cicloAId}>{c.ciclo_nome}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {cicloA && cicloB && (
-                  <div className="rounded-md border overflow-hidden">
-                    <div className="grid grid-cols-3 text-xs font-medium bg-muted/50 px-3 py-2">
-                      <span>Métrica</span>
-                      <span className="text-center">{cicloA.ciclo_nome}</span>
-                      <span className="text-center">{cicloB.ciclo_nome}</span>
-                    </div>
-                    {[
-                      { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => v?.toFixed(1) ?? '—' },
-                      { label: 'Respondentes', a: cicloA.total_respondentes, b: cicloB.total_respondentes, fmt: (v: any) => v ?? '—' },
-                      { label: 'Nível de risco', a: cicloA.nivel_risco, b: cicloB.nivel_risco, fmt: (v: any) => v ? RISCO_LABEL[v as keyof typeof RISCO_LABEL] : '—' },
-                    ].map((row) => {
-                      const delta = typeof row.a === 'number' && typeof row.b === 'number' ? (row.b as number) - (row.a as number) : null;
-                      return (
-                        <div key={row.label} className="grid grid-cols-3 px-3 py-2 text-sm border-t items-center">
-                          <span className="text-muted-foreground">{row.label}</span>
-                          <span className="text-center tabular-nums">{row.fmt(row.a)}</span>
-                          <span className="text-center tabular-nums">
-                            {row.fmt(row.b)}
-                            {delta !== null && delta !== 0 && (
-                              <span className={`ml-1 text-xs ${delta > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                      );
-                    })}
-
-                    {/* Dimensões */}
-                    {cicloA.scores_dimensao && cicloB.scores_dimensao && (
-                      <>
-                        <div className="px-3 py-2 text-xs font-medium bg-muted/30 border-t">Por dimensão</div>
-                        {Array.from(new Set([
-                          ...Object.keys(cicloA.scores_dimensao as object),
-                          ...Object.keys(cicloB.scores_dimensao as object),
-                        ])).map((dim) => {
-                          const a = (cicloA.scores_dimensao as Record<string, number>)[dim];
-                          const b = (cicloB.scores_dimensao as Record<string, number>)[dim];
-                          const delta = typeof a === 'number' && typeof b === 'number' ? b - a : null;
-                          return (
-                            <div key={dim} className="grid grid-cols-3 px-3 py-2 text-sm border-t items-center">
-                              <span className="text-muted-foreground truncate">{DIMENSAO_LABEL[dim as Dimensao] ?? dim}</span>
-                              <span className="text-center tabular-nums">{typeof a === 'number' ? a.toFixed(1) : '—'}</span>
-                              <span className="text-center tabular-nums">
-                                {typeof b === 'number' ? b.toFixed(1) : '—'}
-                                {delta !== null && delta !== 0 && (
-                                  <span className={`ml-1 text-xs ${delta < 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                                    ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
-                                  </span>
-                                )}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </>
-                    )}
-                  </div>
-                )}
+            <div className="pt-4 border-t space-y-3">
+              <div className="flex items-center gap-2">
+                <Scale className="h-4 w-4 nr1-text-primary" />
+                <h4 className="text-sm font-semibold">Comparar ciclos</h4>
               </div>
-            )}
+
+              {ciclosConcluidos.length < 2 ? (
+                <div className="flex items-center gap-2 p-3 rounded-md border bg-muted/20 text-sm text-muted-foreground">
+                  <History className="h-4 w-4 shrink-0" />
+                  <span>
+                    {ciclosConcluidos.length === 0
+                      ? 'Nenhum ciclo concluído para comparar. Finalize um ciclo para liberar a comparação.'
+                      : 'Você tem apenas 1 ciclo concluído. Inicie outro ciclo para comparar evolução.'}
+                  </span>
+                </div>
+              ) : (
+                <>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <Select value={cicloAId} onValueChange={setCicloAId}>
+                      <SelectTrigger><SelectValue placeholder="Ciclo A" /></SelectTrigger>
+                      <SelectContent>
+                        {ciclosConcluidos.map((c) => (
+                          <SelectItem key={c.id} value={c.id}>{c.ciclo_nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={cicloBId} onValueChange={setCicloBId}>
+                      <SelectTrigger><SelectValue placeholder="Ciclo B" /></SelectTrigger>
+                      <SelectContent>
+                        {ciclosConcluidos.map((c) => (
+                          <SelectItem key={c.id} value={c.id} disabled={c.id === cicloAId}>{c.ciclo_nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {cicloA && cicloB && (
+                    <div className="rounded-md border overflow-hidden">
+                      <div className="grid grid-cols-3 text-xs font-medium bg-muted/50 px-3 py-2">
+                        <span>Métrica</span>
+                        <span className="text-center">{cicloA.ciclo_nome}</span>
+                        <span className="text-center">{cicloB.ciclo_nome}</span>
+                      </div>
+                      {[
+                        { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => v?.toFixed(1) ?? '—' },
+                        { label: 'Respondentes', a: cicloA.total_respondentes, b: cicloB.total_respondentes, fmt: (v: any) => v ?? '—' },
+                        { label: 'Nível de risco', a: cicloA.nivel_risco, b: cicloB.nivel_risco, fmt: (v: any) => v ? RISCO_LABEL[v as keyof typeof RISCO_LABEL] : '—' },
+                      ].map((row) => {
+                        const delta = typeof row.a === 'number' && typeof row.b === 'number' ? (row.b as number) - (row.a as number) : null;
+                        return (
+                          <div key={row.label} className="grid grid-cols-3 px-3 py-2 text-sm border-t items-center">
+                            <span className="text-muted-foreground">{row.label}</span>
+                            <span className="text-center tabular-nums">{row.fmt(row.a)}</span>
+                            <span className="text-center tabular-nums">
+                              {row.fmt(row.b)}
+                              {delta !== null && delta !== 0 && (
+                                <span className={`ml-1 text-xs ${delta > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                  ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        );
+                      })}
+
+                      {/* Dimensões */}
+                      {cicloA.scores_dimensao && cicloB.scores_dimensao && (
+                        <>
+                          <div className="px-3 py-2 text-xs font-medium bg-muted/30 border-t">Por dimensão</div>
+                          {Array.from(new Set([
+                            ...Object.keys(cicloA.scores_dimensao as object),
+                            ...Object.keys(cicloB.scores_dimensao as object),
+                          ])).map((dim) => {
+                            const a = (cicloA.scores_dimensao as Record<string, number>)[dim];
+                            const b = (cicloB.scores_dimensao as Record<string, number>)[dim];
+                            const delta = typeof a === 'number' && typeof b === 'number' ? b - a : null;
+                            return (
+                              <div key={dim} className="grid grid-cols-3 px-3 py-2 text-sm border-t items-center">
+                                <span className="text-muted-foreground truncate">{DIMENSAO_LABEL[dim as Dimensao] ?? dim}</span>
+                                <span className="text-center tabular-nums">{typeof a === 'number' ? a.toFixed(1) : '—'}</span>
+                                <span className="text-center tabular-nums">
+                                  {typeof b === 'number' ? b.toFixed(1) : '—'}
+                                  {delta !== null && delta !== 0 && (
+                                    <span className={`ml-1 text-xs ${delta < 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                      ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
+                                    </span>
+                                  )}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
