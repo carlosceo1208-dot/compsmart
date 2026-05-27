@@ -548,60 +548,95 @@ Pergunta do usuário: ${question}`;
         ],
         temperature: 0.7,
         max_tokens: 1500,
+        stream: true,
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (!response.ok || !response.body) {
+      const errorText = await response.text().catch(() => '');
       console.error('[Support Assistant] AI API error:', response.status, errorText);
-      
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Limite de requisições excedido. Tente novamente em alguns instantes.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Créditos insuficientes. Entre em contato com o administrador.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      throw new Error(`AI API error: ${response.status}`);
-    }
-
-    const aiData = await response.json();
-    const answer = aiData.choices[0]?.message?.content || 'Desculpe, não consegui gerar uma resposta.';
-
-    const responseTime = Date.now() - startTime;
-
-    console.log('[Support Assistant] Response generated in', responseTime, 'ms');
-
-    // Salvar conversa no banco
-    const { error: insertError } = await supabase
-      .from('support_conversations')
-      .insert({
-        user_id: user.id,
-        page_context: pageContext || null,
-        question,
-        answer,
-      });
-
-    if (insertError) {
-      console.error('[Support Assistant] Error saving conversation:', insertError);
-    }
-
-    return new Response(
-      JSON.stringify({
-        answer,
-        responseTime,
-      }),
-      {
+      const msg = response.status === 429
+        ? 'Limite de requisições excedido. Tente novamente em alguns instantes.'
+        : response.status === 402
+          ? 'Créditos insuficientes. Entre em contato com o administrador.'
+          : `Erro ao processar com IA (${response.status})`;
+      return new Response(JSON.stringify({ error: msg }), {
+        status: response.status || 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+      });
+    }
+
+    const encoder = new TextEncoder();
+    const upstream = response.body;
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (event: string, data: any) => {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        };
+
+        let fullAnswer = '';
+
+        try {
+          const reader = upstream.getReader();
+          const decoder = new TextDecoder();
+          let buf = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let nl: number;
+            while ((nl = buf.indexOf('\n')) !== -1) {
+              const line = buf.slice(0, nl).trim();
+              buf = buf.slice(nl + 1);
+              if (!line.startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') continue;
+              try {
+                const j = JSON.parse(payload);
+                const delta = j.choices?.[0]?.delta?.content;
+                if (delta) {
+                  fullAnswer += delta;
+                  send('delta', { text: delta });
+                }
+              } catch { /* ignore */ }
+            }
+          }
+
+          if (!fullAnswer) fullAnswer = 'Desculpe, não consegui gerar uma resposta.';
+
+          const responseTime = Date.now() - startTime;
+          console.log('[Support Assistant] Response generated in', responseTime, 'ms');
+
+          const { error: insertError } = await supabase
+            .from('support_conversations')
+            .insert({
+              user_id: user.id,
+              page_context: pageContext || null,
+              question,
+              answer: fullAnswer,
+            });
+          if (insertError) console.error('[Support Assistant] Error saving conversation:', insertError);
+
+          send('done', { answer: fullAnswer, responseTime });
+        } catch (err) {
+          console.error('[Support Assistant] Stream error:', err);
+          send('error', { error: (err as Error).message || 'Erro no streaming' });
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',
+        Connection: 'keep-alive',
+      },
+    });
 
   } catch (error) {
     console.error('[Support Assistant] Error:', error);

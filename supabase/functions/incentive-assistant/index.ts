@@ -732,106 +732,139 @@ ${document_text.substring(0, 15000)}
           { role: 'user', content: enhancedQuestion || question }
         ],
         max_tokens: 8000,
+        stream: true,
       }),
     });
 
-    if (!aiResponse.ok) {
-      if (aiResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: 'Limite de requisições excedido. Aguarde alguns segundos e tente novamente.' }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: 'Créditos insuficientes. Entre em contato com o suporte.' }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      const errorText = await aiResponse.text();
+    if (!aiResponse.ok || !aiResponse.body) {
+      const errorText = await aiResponse.text().catch(() => '');
       console.error('AI API Error:', aiResponse.status, errorText);
-      throw new Error(`AI API error: ${aiResponse.status}`);
-    }
-
-    const aiData = await aiResponse.json();
-    const answer = aiData.choices[0]?.message?.content || 'Desculpe, não consegui gerar uma resposta.';
-    const tokensUsed = aiData.usage?.total_tokens || 0;
-
-    const responseTime = Date.now() - startTime;
-
-    // ============ EXTRAÇÃO DE FONTES DE INCENTIVOS ============
-    const extractedSources = extractIncentiveSources(answer);
-
-    // Build context data for storage
-    const contextData = {
-      active_salary_table: activeSalaryTable?.name,
-      active_programs: activePrograms?.map(p => p.name),
-      benefits_count: benefits?.length || 0,
-      employees_count: employees?.length || 0,
-      user_grade: profile?.grade,
-      industry_sector: industrySector,
-      company_name: companyName,
-    };
-
-    // Gerar ID da conversa para vincular às citações
-    const conversationId = crypto.randomUUID();
-
-    // Save conversation to database
-    const { error: insertError } = await supabase
-      .from('incentive_assistant_conversations')
-      .insert({
-        id: conversationId,
-        user_id: user.id,
-        session_id: session_id || null,
-        question,
-        answer,
-        document_text,
-        document_name,
-        operation_mode: operationMode,
-        context_data: contextData,
-        tokens_used: tokensUsed,
-        response_time_ms: responseTime,
-      });
-
-    if (insertError) {
-      console.error('Error saving conversation:', insertError);
-    }
-
-    // ============ SALVAR FONTES NA TABELA DE AUDITORIA ============
-    if (extractedSources.length > 0) {
-      const sourcesToInsert = extractedSources.map(source => ({
-        conversation_id: conversationId,
-        agent_type: 'incentive',
-        source_type: source.source_type,
-        source_reference: source.source_reference,
-        source_category: source.source_category,
-        citation_context: source.citation_context.substring(0, 500),
-        verified: false
-      }));
-
-      const { error: citationError } = await supabase
-        .from('agent_source_citations')
-        .insert(sourcesToInsert);
-
-      if (citationError) {
-        console.error('Error saving source citations:', citationError);
-      } else {
-        console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes de incentivos para auditoria`);
-      }
-    }
-
-    return new Response(
-      JSON.stringify({
-        answer,
-        context_data: contextData,
-        tokens_used: tokensUsed,
-        response_time_ms: responseTime,
-        operation_mode: operationMode,
-      }),
-      {
+      const msg = aiResponse.status === 429
+        ? 'Limite de requisições excedido. Aguarde alguns segundos e tente novamente.'
+        : aiResponse.status === 402
+          ? 'Créditos insuficientes. Entre em contato com o suporte.'
+          : `Erro ao processar com IA (${aiResponse.status})`;
+      return new Response(JSON.stringify({ error: msg }), {
+        status: aiResponse.status || 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+      });
+    }
+
+    const encoder = new TextEncoder();
+    const upstream = aiResponse.body;
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const send = (event: string, data: any) => {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`));
+        };
+
+        let fullAnswer = '';
+        let tokensUsed = 0;
+
+        try {
+          const reader = upstream.getReader();
+          const decoder = new TextDecoder();
+          let buf = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buf += decoder.decode(value, { stream: true });
+            let nl: number;
+            while ((nl = buf.indexOf('\n')) !== -1) {
+              const line = buf.slice(0, nl).trim();
+              buf = buf.slice(nl + 1);
+              if (!line.startsWith('data:')) continue;
+              const payload = line.slice(5).trim();
+              if (payload === '[DONE]') continue;
+              try {
+                const j = JSON.parse(payload);
+                const delta = j.choices?.[0]?.delta?.content;
+                if (delta) {
+                  fullAnswer += delta;
+                  send('delta', { text: delta });
+                }
+                if (j.usage?.total_tokens) tokensUsed = j.usage.total_tokens;
+              } catch { /* ignore */ }
+            }
+          }
+
+          if (!fullAnswer) fullAnswer = 'Desculpe, não consegui gerar uma resposta.';
+
+          const responseTime = Date.now() - startTime;
+          const extractedSources = extractIncentiveSources(fullAnswer);
+
+          const contextData = {
+            active_salary_table: activeSalaryTable?.name,
+            active_programs: activePrograms?.map(p => p.name),
+            benefits_count: benefits?.length || 0,
+            employees_count: employees?.length || 0,
+            user_grade: profile?.grade,
+            industry_sector: industrySector,
+            company_name: companyName,
+          };
+
+          const conversationId = crypto.randomUUID();
+          const { error: insertError } = await supabase
+            .from('incentive_assistant_conversations')
+            .insert({
+              id: conversationId,
+              user_id: user.id,
+              session_id: session_id || null,
+              question,
+              answer: fullAnswer,
+              document_text,
+              document_name,
+              operation_mode: operationMode,
+              context_data: contextData,
+              tokens_used: tokensUsed,
+              response_time_ms: responseTime,
+            });
+          if (insertError) console.error('Error saving conversation:', insertError);
+
+          if (extractedSources.length > 0) {
+            const sourcesToInsert = extractedSources.map(source => ({
+              conversation_id: conversationId,
+              agent_type: 'incentive',
+              source_type: source.source_type,
+              source_reference: source.source_reference,
+              source_category: source.source_category,
+              citation_context: source.citation_context.substring(0, 500),
+              verified: false,
+            }));
+            const { error: citationError } = await supabase
+              .from('agent_source_citations')
+              .insert(sourcesToInsert);
+            if (citationError) console.error('Error saving source citations:', citationError);
+            else console.log(`✅ Salvas ${sourcesToInsert.length} citações de fontes de incentivos para auditoria`);
+          }
+
+          send('done', {
+            answer: fullAnswer,
+            context_data: contextData,
+            tokens_used: tokensUsed,
+            response_time_ms: responseTime,
+            operation_mode: operationMode,
+            conversation_id: conversationId,
+          });
+        } catch (err) {
+          console.error('Stream error:', err);
+          send('error', { error: (err as Error).message || 'Erro no streaming' });
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'X-Accel-Buffering': 'no',
+        Connection: 'keep-alive',
+      },
+    });
 
   } catch (error) {
     console.error('Error in incentive-assistant function:', error);

@@ -118,72 +118,72 @@ const SalaryAssistant = () => {
       if (!sessionId) return;
     }
 
+    const userQuestion = question;
+    const userDocName = documentName || undefined;
+
+    setConversations(prev => [
+      ...prev,
+      {
+        question: userQuestion,
+        answer: '',
+        document_name: userDocName,
+        created_at: new Date().toISOString(),
+      } as Conversation,
+    ]);
+    setQuestion('');
+
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('salary-assistant', {
-        body: { 
-          question, 
+      const { streamAssistant } = await import('@/lib/streamAssistant');
+      const meta = await streamAssistant({
+        functionName: 'salary-assistant',
+        body: {
+          question: userQuestion,
           document_text: documentText || undefined,
-          document_name: documentName || undefined,
+          document_name: userDocName,
           session_id: sessionId,
+        },
+        onDelta: (chunk) => {
+          setConversations(prev => {
+            const next = [...prev];
+            const last = next[next.length - 1];
+            if (last) next[next.length - 1] = { ...last, answer: (last.answer || '') + chunk };
+            return next;
+          });
+        },
+        onError: (msg, status) => {
+          let userMessage = msg;
+          if (status === 429) userMessage = 'Muitas requisições. Aguarde alguns minutos e tente novamente.';
+          else if (status === 402) userMessage = 'Créditos de IA insuficientes. Entre em contato com o administrador.';
+          else if (status === 401) userMessage = 'Sessão expirada. Por favor, faça login novamente.';
+          toast({ title: 'Erro', description: userMessage, variant: 'destructive' });
+          setConversations(prev => prev.slice(0, -1));
         },
       });
 
-      // Tratamento de erros HTTP do edge function (429/402/401)
-      if (error) {
-        const ctx = (error as any).context;
-        const status = ctx?.status;
-        let userMessage = error.message || 'Erro ao processar análise';
-
-        if (status === 429) {
-          userMessage = 'Muitas requisições. Aguarde alguns minutos e tente novamente.';
-        } else if (status === 402) {
-          userMessage = 'Créditos de IA insuficientes. Entre em contato com o administrador.';
-        } else if (status === 401) {
-          userMessage = 'Sessão expirada. Por favor, faça login novamente.';
-        }
-
-        toast({
-          title: 'Erro',
-          description: userMessage,
-          variant: 'destructive',
+      if (meta) {
+        setConversations(prev => {
+          const next = [...prev];
+          const last = next[next.length - 1];
+          if (last) {
+            next[next.length - 1] = {
+              ...last,
+              answer: meta.answer ?? last.answer,
+              operation_mode: meta.operation_mode,
+            } as Conversation;
+          }
+          return next;
         });
-        return;
+        toast({
+          title: 'Análise concluída',
+          description: `Consulta processada com sucesso${meta.tokens_used ? ` (${meta.tokens_used} tokens)` : ''}`,
+        });
       }
 
-      if (data?.error) {
-        toast({
-          title: 'Erro',
-          description: data.error,
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Atualização otimista - adiciona conversa imediatamente
-      const newConversation: Conversation = {
-        question,
-        answer: data.answer,
-        operation_mode: data.operation_mode,
-        document_name: documentName || undefined,
-        created_at: new Date().toISOString(),
-      };
-      setConversations(prev => [...prev, newConversation]);
-
-      toast({
-        title: 'Análise concluída',
-        description: `Consulta processada com sucesso${data.tokens_used ? ` (${data.tokens_used} tokens)` : ''}`,
-      });
-
-      setQuestion('');
       handleFileRemove();
       refreshSessions();
     } catch (error: any) {
-      toast({
-        title: 'Erro ao processar análise',
-        description: error.message || 'Erro inesperado',
-        variant: 'destructive',
-      });
+      console.error('[SalaryAssistant] streaming error:', error);
     } finally {
       setLoading(false);
     }
