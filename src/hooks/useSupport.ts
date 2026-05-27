@@ -58,45 +58,40 @@ export const useSupport = () => {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const assistantPlaceholder: Message = {
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage, assistantPlaceholder]);
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('support-assistant', {
-        body: {
-          question: content.trim(),
-          pageContext: location.pathname,
+      const { streamAssistant } = await import('@/lib/streamAssistant');
+      await streamAssistant({
+        functionName: 'support-assistant',
+        body: { question: content.trim(), pageContext: location.pathname },
+        onDelta: (chunk) => {
+          setMessages(prev => {
+            const next = [...prev];
+            const last = next[next.length - 1];
+            if (last && last.role === 'assistant') {
+              next[next.length - 1] = { ...last, content: last.content + chunk };
+            }
+            return next;
+          });
+        },
+        onError: (msg, status) => {
+          if (status === 429) toast.error('Muitas requisições. Aguarde alguns segundos e tente novamente.');
+          else if (status === 402) toast.error('Créditos de IA insuficientes. Entre em contato com o administrador.');
+          else toast.error(msg || 'Erro ao processar sua pergunta. Tente novamente.');
+          // remove placeholder + user message
+          setMessages(prev => prev.slice(0, -2));
         },
       });
-
-      if (error) {
-        console.error('Support assistant error:', error);
-        
-        if (error.message?.includes('429')) {
-          toast.error('Muitas requisições. Aguarde alguns segundos e tente novamente.');
-        } else if (error.message?.includes('402')) {
-          toast.error('Créditos de IA insuficientes. Entre em contato com o administrador.');
-        } else {
-          toast.error('Erro ao processar sua pergunta. Tente novamente.');
-        }
-        
-        // Remover mensagem do usuário em caso de erro
-        setMessages(prev => prev.filter(m => m.timestamp !== userMessage.timestamp));
-        return;
-      }
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: data.answer,
-        timestamp: new Date(),
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Erro ao enviar mensagem. Verifique sua conexão.');
-      setMessages(prev => prev.filter(m => m.timestamp !== userMessage.timestamp));
     } finally {
       setIsLoading(false);
     }
