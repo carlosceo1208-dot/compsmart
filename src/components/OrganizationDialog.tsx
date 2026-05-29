@@ -381,13 +381,19 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         description: formData.description || null,
         parent_id: formData.parent_id || null,
         fantasy_name: isCompanyType ? (formData.fantasy_name || null) : null,
-        cnpj: isCompanyType ? (formData.cnpj || null) : null,
         address: isCompanyType ? (formData.address || null) : null,
         union_name: isCompanyType ? (formData.union_name || null) : null,
         base_date: isCompanyType ? (formData.base_date || null) : null,
         logo_url: formData.type === 'company' ? (formData.logo_url || null) : null,
         industry_sector: formData.type === 'company' ? (formData.industry_sector || null) : null,
       };
+
+      const billingDataToSave = isCompanyType
+        ? {
+            company_id: entityId,
+            cnpj: formData.cnpj || null,
+          }
+        : null;
 
       if (entityId) {
         const { error } = await supabase
@@ -396,13 +402,39 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           .eq("id", entityId);
 
         if (error) throw error;
+
+        if (billingDataToSave) {
+          const { error: billingError } = await supabase
+            .from("company_billing")
+            .upsert(billingDataToSave, { onConflict: "company_id" });
+
+          if (billingError) throw billingError;
+        }
+
         toast.success("Entidade atualizada com sucesso");
       } else {
-        const { error } = await supabase
+        const { data: insertedEntity, error } = await supabase
           .from("organizational_structure")
-          .insert([dataToSave]);
+          .insert(dataToSave)
+          .select("id")
+          .single();
 
         if (error) throw error;
+
+        if (isCompanyType && insertedEntity?.id) {
+          const { error: billingError } = await supabase
+            .from("company_billing")
+            .upsert(
+              {
+                company_id: insertedEntity.id,
+                cnpj: formData.cnpj || null,
+              },
+              { onConflict: "company_id" }
+            );
+
+          if (billingError) throw billingError;
+        }
+
         toast.success("Entidade criada com sucesso");
       }
 
