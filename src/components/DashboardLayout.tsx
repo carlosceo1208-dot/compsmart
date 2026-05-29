@@ -14,7 +14,7 @@ import {
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
   DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield,
-  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare
+  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare, Building2
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
