@@ -14,7 +14,7 @@ import {
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
   DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield,
-  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare
+  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare, Building2
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
@@ -309,6 +309,7 @@ export const DashboardLayout = () => {
   // Navigation items for mobile menu
   const navItems = [
     { icon: Home, label: "Dashboard", path: "/dashboard" },
+    { icon: Building2, label: "Cadastro Empresa", path: "/organization" },
     { icon: UsersIcon, label: "Colaboradores", path: "/employees" },
     { icon: DollarSign, label: "Tabela Salarial", path: "/salary-ranges" },
     { icon: Network, label: "Organograma", path: "/organograma" },
@@ -552,6 +553,16 @@ export const DashboardLayout = () => {
 
             {/* Company Switcher and Notifications - visible on md+ screens */}
             <div className="hidden md:flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/organization")}
+                title="Cadastro / edição de empresa, filiais e estrutura"
+                className="gap-1.5 px-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-900/60 transition-all"
+              >
+                <Building2 className="h-3.5 w-3.5" />
+                <span className="hidden lg:inline text-xs font-semibold">Cadastro Empresa</span>
+              </Button>
               <CompanySwitcher />
               <HeaderNotifications />
             </div>
