@@ -207,6 +207,12 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               FAQ
             </button>
             <button
+              onClick={() => { navigate('/activate'); setIsMenuOpen(false); }}
+              className="text-left text-sm font-medium text-primary hover:text-primary/80 py-2 border-b border-border/50"
+            >
+              Ativar minha conta
+            </button>
+            <button
               onClick={() => { navigate('/nr1'); setIsMenuOpen(false); }}
               className="text-left text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 px-3 py-2.5 rounded-lg flex items-center gap-2 shadow-md shadow-emerald-500/30"
             >
