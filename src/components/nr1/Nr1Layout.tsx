@@ -8,24 +8,65 @@ import { supabase } from '@/integrations/supabase/client';
 import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 
-const NAV = [
-  { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true },
-  { to: '/nr1/universo', label: 'Universo', icon: UserCheck },
-  { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3 },
-  { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield },
-  { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users },
-  { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch },
-  { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText },
-  { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
-  { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
-  { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
-  { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart },
-  { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck },
-  { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
-  { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
-  { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
-  { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart },
-] as Array<{ to: string; label: string; icon: any; end?: boolean; highlight?: boolean }>;
+type NavItem = { to: string; label: string; icon: any; end?: boolean; highlight?: boolean };
+type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
+
+const GROUPS: NavGroup[] = [
+  {
+    title: 'NR-1',
+    tone: 'nr1',
+    items: [
+      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true },
+      { to: '/nr1/universo', label: 'Universo', icon: UserCheck },
+      { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3 },
+      { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield },
+      { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users },
+      { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch },
+      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText },
+      { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
+      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
+      { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
+      { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
+    ],
+  },
+  {
+    title: 'Clima Organizacional',
+    tone: 'clima',
+    items: [
+      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
+    ],
+  },
+  {
+    title: 'Índice de Felicidade',
+    tone: 'fib',
+    items: [
+      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart },
+    ],
+  },
+  {
+    title: 'Acompanhamento Colaborador',
+    tone: 'jornada',
+    items: [
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck },
+    ],
+  },
+  {
+    title: 'Glossário',
+    tone: 'glossario',
+    items: [
+      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
+    ],
+  },
+];
+
+const GROUP_STYLES: Record<NavGroup['tone'], { border: string; bg: string; title: string; dot: string }> = {
+  nr1:       { border: 'border-[hsl(var(--nr1-primary)/0.35)]', bg: 'bg-[hsl(var(--nr1-primary)/0.04)]', title: 'text-[hsl(var(--nr1-primary))]', dot: 'bg-[hsl(var(--nr1-primary))]' },
+  clima:     { border: 'border-[hsl(11_77%_60%/0.45)]',          bg: 'bg-[hsl(11_77%_60%/0.05)]',         title: 'text-[hsl(11_77%_45%)]',         dot: 'bg-[hsl(11_77%_55%)]' },
+  fib:       { border: 'border-amber-300',                       bg: 'bg-amber-50/60',                    title: 'text-amber-700',                 dot: 'bg-amber-500' },
+  jornada:   { border: 'border-rose-300',                        bg: 'bg-rose-50/60',                     title: 'text-rose-700',                  dot: 'bg-rose-500' },
+  glossario: { border: 'border-slate-300',                       bg: 'bg-slate-50/70',                    title: 'text-slate-700',                 dot: 'bg-slate-500' },
+};
 
 const useIsSuperAdmin = () =>
   useQuery({
