@@ -468,14 +468,15 @@ All colors MUST be HSL.
    • Branco — conscientização geral, saúde emocional
 */
 .nr1-scope {
-  --nr1-primary:  152 62% 38%;        /* #25A06A — verde laço */
+  --nr1-primary:  152 62% 38%;        /* verde — acolhedor */
   --nr1-primary-dark: 152 70% 28%;
-  --nr1-accent:   45 100% 51%;        /* #FFC107 — amarelo setembro */
+  --nr1-accent:   45 100% 51%;        /* amarelo — otimismo */
+  --nr1-info:     210 90% 52%;        /* azul — confiança */
   --nr1-success:  152 62% 38%;
   --nr1-warning:  38 95% 55%;
-  --nr1-danger:   354 70% 54%;
+  --nr1-danger:   22 92% 52%;         /* laranja (substitui vermelho) — saúde positiva */
   --nr1-soft:     150 45% 97%;
-  --nr1-gradient: linear-gradient(135deg, hsl(152 62% 38%) 0%, hsl(160 70% 45%) 60%, hsl(45 100% 60%) 100%);
+  --nr1-gradient: linear-gradient(135deg, hsl(152 62% 38%) 0%, hsl(190 70% 48%) 55%, hsl(45 100% 60%) 100%);
 }
 .nr1-scope .nr1-bg-soft { background-color: hsl(var(--nr1-soft)); }
 .nr1-scope .nr1-text-primary { color: hsl(var(--nr1-primary)); }
