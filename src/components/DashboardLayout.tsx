@@ -553,16 +553,6 @@ export const DashboardLayout = () => {
 
             {/* Company Switcher and Notifications - visible on md+ screens */}
             <div className="hidden md:flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/organization")}
-                title="Cadastro / edição de empresa, filiais e estrutura"
-                className="gap-1.5 px-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-900/60 transition-all"
-              >
-                <Building2 className="h-3.5 w-3.5" />
-                <span className="hidden lg:inline text-xs font-semibold">Cadastro Empresa</span>
-              </Button>
               <CompanySwitcher />
               <HeaderNotifications />
             </div>
