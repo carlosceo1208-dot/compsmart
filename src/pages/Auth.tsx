@@ -460,24 +460,29 @@ const Auth = () => {
                 {isLogin ? "Não tem uma conta? Cadastre-se" : "Já tem uma conta? Faça login"}
               </button>
               {isLogin && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => navigate("/forgot-password")}
-                    className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
-                    disabled={loading}
-                  >
-                    Esqueci minha senha
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate("/activate")}
-                    className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
-                    disabled={loading}
-                  >
-                    Ativar minha conta (primeira vez)
-                  </button>
-                </>
+                <div className="pt-4 mt-4 border-t border-border/50">
+                  <p className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wider">
+                    Precisa de ajuda?
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/forgot-password")}
+                      className="text-sm text-muted-foreground hover:text-primary hover:underline block w-full"
+                      disabled={loading}
+                    >
+                      Esqueci minha senha
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/activate")}
+                      className="text-sm text-primary font-medium hover:underline block w-full"
+                      disabled={loading}
+                    >
+                      Ativar minha conta (primeiro acesso)
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </CardContent>

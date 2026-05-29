@@ -100,6 +100,13 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
             </button>
             <button
+              onClick={() => navigate('/activate')}
+              className="relative text-sm font-medium text-muted-foreground hover:text-primary transition-all duration-200 group"
+            >
+              Ativar conta
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-emerald-500 group-hover:w-full transition-all duration-300" />
+            </button>
+            <button
               onClick={() => navigate('/nr1')}
               className="relative text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-md shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 transition-all"
             >
@@ -198,6 +205,12 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
               className="text-left text-sm font-medium text-muted-foreground hover:text-primary py-2 border-b border-border/50"
             >
               FAQ
+            </button>
+            <button
+              onClick={() => { navigate('/activate'); setIsMenuOpen(false); }}
+              className="text-left text-sm font-medium text-primary hover:text-primary/80 py-2 border-b border-border/50"
+            >
+              Ativar minha conta
             </button>
             <button
               onClick={() => { navigate('/nr1'); setIsMenuOpen(false); }}
