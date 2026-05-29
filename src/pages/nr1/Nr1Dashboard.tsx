@@ -111,7 +111,7 @@ export default function Nr1Dashboard() {
                 <li key={`${c.clima_dim}-${i}`} className="flex items-center justify-between gap-3 p-2 rounded-md border bg-card">
                   <div className="flex items-center gap-2 min-w-0">
                     {c.prioridade === 'causa_raiz' ? (
-                      <Badge className="bg-red-100 text-red-700 border-red-300">Causa raiz</Badge>
+                      <Badge className="bg-orange-100 text-orange-700 border-orange-300">Causa raiz</Badge>
                     ) : (
                       <Badge variant="outline" className="border-amber-400 text-amber-700">Atenção</Badge>
                     )}
@@ -331,11 +331,11 @@ export default function Nr1Dashboard() {
                         {deltaScore !== null && (
                           <div className={`flex items-start gap-3 p-3 rounded-md border ${
                             evoluiu ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900' :
-                            piorou ? 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900' :
+                            piorou ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900' :
                             'bg-muted/30'
                           }`}>
                             {evoluiu ? <TrendingUp className="h-5 w-5 text-emerald-600 shrink-0" /> :
-                             piorou ? <TrendingDown className="h-5 w-5 text-red-600 shrink-0" /> :
+                             piorou ? <TrendingDown className="h-5 w-5 text-orange-600 shrink-0" /> :
                              <Minus className="h-5 w-5 text-muted-foreground shrink-0" />}
                             <div className="text-sm">
                               <p className="font-semibold">
@@ -371,7 +371,7 @@ export default function Nr1Dashboard() {
                             <span className="text-center tabular-nums">
                               {row.fmt(row.b)}
                               {delta !== null && delta !== 0 && (
-                                <span className={`ml-1 text-xs ${delta > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                <span className={`ml-1 text-xs ${delta > 0 ? 'text-emerald-600' : 'text-orange-600'}`}>
                                   ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
                                 </span>
                               )}
@@ -398,7 +398,7 @@ export default function Nr1Dashboard() {
                                 <span className="text-center tabular-nums">
                                   {typeof b === 'number' ? b.toFixed(1) : '—'}
                                   {delta !== null && delta !== 0 && (
-                                    <span className={`ml-1 text-xs ${delta < 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                                    <span className={`ml-1 text-xs ${delta < 0 ? 'text-emerald-600' : 'text-orange-600'}`}>
                                       ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
                                     </span>
                                   )}

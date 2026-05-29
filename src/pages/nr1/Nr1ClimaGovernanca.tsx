@@ -54,12 +54,12 @@ const STATUS_META: Record<AprovacaoStatus, { label: string; className: string; i
   rascunho: { label: 'Rascunho', className: 'bg-muted text-muted-foreground', icon: FileText },
   em_aprovacao: { label: 'Em aprovação', className: 'bg-amber-100 text-amber-800 border-amber-200', icon: Clock },
   aprovado: { label: 'Aprovado', className: 'bg-emerald-100 text-emerald-800 border-emerald-200', icon: CheckCircle2 },
-  rejeitado: { label: 'Rejeitado', className: 'bg-rose-100 text-rose-800 border-rose-200', icon: XCircle },
+  rejeitado: { label: 'Rejeitado', className: 'bg-amber-100 text-amber-800 border-amber-200', icon: XCircle },
   revisao_solicitada: { label: 'Revisão solicitada', className: 'bg-indigo-100 text-indigo-800 border-indigo-200', icon: RotateCcw },
 };
 
 const PRIO_COLOR: Record<string, string> = {
-  alta: 'bg-rose-100 text-rose-700',
+  alta: 'bg-amber-100 text-amber-700',
   media: 'bg-amber-100 text-amber-700',
   baixa: 'bg-sky-100 text-sky-700',
 };

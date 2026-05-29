@@ -457,7 +457,7 @@ export default function Nr1ClimaDashboard() {
                             </div>
                             <div className="w-12 text-right font-mono font-semibold">{e.score.toFixed(2)}</div>
                             {delta != null && (
-                              <div className={`w-14 text-right text-xs font-medium ${delta > 0 ? 'text-emerald-600' : delta < 0 ? 'text-red-600' : 'text-muted-foreground'}`}>
+                              <div className={`w-14 text-right text-xs font-medium ${delta > 0 ? 'text-emerald-600' : delta < 0 ? 'text-orange-600' : 'text-muted-foreground'}`}>
                                 {delta > 0 ? '▲' : delta < 0 ? '▼' : '='} {Math.abs(delta).toFixed(2)}
                               </div>
                             )}
@@ -679,7 +679,7 @@ export default function Nr1ClimaDashboard() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm flex items-center gap-2 text-red-700"><BarChart3 className="h-4 w-4" /> Bottom 5 — {SEG_LABEL[segmento]}</CardTitle>
+                  <CardTitle className="text-sm flex items-center gap-2 text-orange-700"><BarChart3 className="h-4 w-4" /> Bottom 5 — {SEG_LABEL[segmento]}</CardTitle>
                   <CardDescription className="text-xs">Menores scores — prioridade de ação.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -719,9 +719,9 @@ export default function Nr1ClimaDashboard() {
                     <p className="text-2xl font-bold text-amber-700">{enps.passivos}</p>
                     <p className="text-xs text-amber-600 mt-1">Passivos (4)</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-red-50 border border-red-200">
-                    <p className="text-2xl font-bold text-red-700">{enps.detratores}</p>
-                    <p className="text-xs text-red-600 mt-1">Detratores (≤3)</p>
+                  <div className="p-3 rounded-lg bg-orange-50 border border-orange-200">
+                    <p className="text-2xl font-bold text-orange-700">{enps.detratores}</p>
+                    <p className="text-xs text-orange-600 mt-1">Detratores (≤3)</p>
                   </div>
                 </div>
                 <p className="text-[11px] text-muted-foreground mt-3 text-center">
@@ -758,7 +758,7 @@ export default function Nr1ClimaDashboard() {
                     {r.delta != null && (
                       <Badge
                         variant="outline"
-                        className={`shrink-0 gap-1 ${r.delta > 0 ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : r.delta < 0 ? 'border-red-300 text-red-700 bg-red-50' : ''}`}
+                        className={`shrink-0 gap-1 ${r.delta > 0 ? 'border-emerald-300 text-emerald-700 bg-emerald-50' : r.delta < 0 ? 'border-orange-300 text-orange-700 bg-orange-50' : ''}`}
                       >
                         {r.delta > 0 ? <TrendingUp className="h-3 w-3" /> : r.delta < 0 ? <TrendingDown className="h-3 w-3" /> : null}
                         {r.delta > 0 ? '+' : ''}{r.delta.toFixed(2)}
