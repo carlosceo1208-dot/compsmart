@@ -39,8 +39,8 @@ const QUADRANTE_INFO: Record<Quadrante, { label: string; descricao: string; bg: 
   critico: {
     label: 'Crítico',
     descricao: 'Baixa entrega + alto risco. Falência do modelo.',
-    bg: 'bg-rose-50 border-rose-300',
-    cor: 'text-rose-800',
+    bg: 'bg-amber-50 border-amber-300',
+    cor: 'text-amber-800',
   },
 };
 
@@ -103,12 +103,12 @@ function MatrizMCPS() {
         ) : (
           <div className="grid lg:grid-cols-[1fr,260px] gap-6">
             {/* Plot */}
-            <div className="relative w-full aspect-square max-w-[520px] mx-auto border-2 rounded-lg overflow-hidden bg-gradient-to-br from-rose-50/40 via-white to-emerald-50/60">
+            <div className="relative w-full aspect-square max-w-[520px] mx-auto border-2 rounded-lg overflow-hidden bg-gradient-to-br from-amber-50/40 via-white to-emerald-50/60">
               {/* quadrant backgrounds */}
               <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
                 <div className="border-r border-b border-dashed border-muted-foreground/30 flex items-start justify-start p-2 text-[10px] font-semibold text-amber-700/70">ALERTA</div>
                 <div className="border-b border-dashed border-muted-foreground/30 flex items-start justify-end p-2 text-[10px] font-semibold text-emerald-700/70">VITALIDADE</div>
-                <div className="border-r border-dashed border-muted-foreground/30 flex items-end justify-start p-2 text-[10px] font-semibold text-rose-700/70">CRÍTICO</div>
+                <div className="border-r border-dashed border-muted-foreground/30 flex items-end justify-start p-2 text-[10px] font-semibold text-amber-700/70">CRÍTICO</div>
                 <div className="flex items-end justify-end p-2 text-[10px] font-semibold text-slate-600/70">ESTAGNAÇÃO</div>
               </div>
               {/* axes labels */}
@@ -125,7 +125,7 @@ function MatrizMCPS() {
                           p.quadrante === 'vitalidade' ? 'bg-emerald-500' :
                           p.quadrante === 'alerta' ? 'bg-amber-500' :
                           p.quadrante === 'estagnacao' ? 'bg-slate-400' :
-                          'bg-rose-500'
+                          'bg-amber-500'
                         }`}
                         style={{ left: `${p.x}%`, bottom: `${p.y}%`, transform: 'translate(-50%, 50%)' }}
                         aria-label={p.label}
@@ -193,7 +193,7 @@ function CustoDoMedo() {
   }, [headcount, salarioMedio, turnoverPct, absenteismoDias, reducaoEstimada]);
 
   return (
-    <Card className="border-2 border-amber-200/60 bg-gradient-to-br from-amber-50/40 via-white to-rose-50/30">
+    <Card className="border-2 border-amber-200/60 bg-gradient-to-br from-amber-50/40 via-white to-amber-50/30">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Calculator className="h-5 w-5 text-amber-700" />
@@ -215,21 +215,21 @@ function CustoDoMedo() {
         <Separator />
 
         <div className="grid sm:grid-cols-3 gap-3">
-          <CostCard label="Turnover" value={calc.custoTurnover} cor="text-rose-700" bg="bg-rose-50/60" />
+          <CostCard label="Turnover" value={calc.custoTurnover} cor="text-amber-700" bg="bg-amber-50/60" />
           <CostCard label="Absenteísmo" value={calc.custoAbsenteismo} cor="text-amber-700" bg="bg-amber-50/60" />
           <CostCard label="Sinistralidade" value={calc.custoSinistralidade} cor="text-orange-700" bg="bg-orange-50/60" />
         </div>
 
-        <div className="rounded-lg border-2 border-rose-300 bg-rose-50/80 p-4">
+        <div className="rounded-lg border-2 border-amber-300 bg-amber-50/80 p-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
-              <p className="text-xs font-semibold text-rose-700 uppercase tracking-wide">Custo anual estimado</p>
-              <p className="text-3xl font-bold text-rose-900">{BRL.format(calc.custoTotal)}</p>
-              <p className="text-[11px] text-rose-700/80">
+              <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Custo anual estimado</p>
+              <p className="text-3xl font-bold text-amber-900">{BRL.format(calc.custoTotal)}</p>
+              <p className="text-[11px] text-amber-700/80">
                 {((calc.custoTotal / Math.max(1, calc.folhaAnual)) * 100).toFixed(1)}% da folha anual
               </p>
             </div>
-            <TrendingDown className="h-10 w-10 text-rose-400" />
+            <TrendingDown className="h-10 w-10 text-amber-400" />
           </div>
         </div>
 

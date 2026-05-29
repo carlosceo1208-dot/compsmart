@@ -45,7 +45,7 @@ function classRisco(r: number) {
   if (r <= 4) return { label: 'Baixo', bg: 'bg-emerald-100 hover:bg-emerald-200 border-emerald-300', text: 'text-emerald-900' };
   if (r <= 9) return { label: 'Moderado', bg: 'bg-yellow-100 hover:bg-yellow-200 border-yellow-300', text: 'text-yellow-900' };
   if (r <= 15) return { label: 'Alto', bg: 'bg-orange-200 hover:bg-orange-300 border-orange-400', text: 'text-orange-900' };
-  return { label: 'Crítico', bg: 'bg-red-200 hover:bg-red-300 border-red-400', text: 'text-red-900' };
+  return { label: 'Crítico', bg: 'bg-orange-200 hover:bg-orange-300 border-orange-400', text: 'text-orange-900' };
 }
 
 export function Nr1MatrizRisco() {
@@ -177,7 +177,7 @@ export function Nr1MatrizRisco() {
             <span className="flex items-center gap-1"><span className="w-4 h-4 rounded bg-emerald-100 border border-emerald-300" /> Baixo (1–4)</span>
             <span className="flex items-center gap-1"><span className="w-4 h-4 rounded bg-yellow-100 border border-yellow-300" /> Moderado (5–9)</span>
             <span className="flex items-center gap-1"><span className="w-4 h-4 rounded bg-orange-200 border border-orange-400" /> Alto (10–15)</span>
-            <span className="flex items-center gap-1"><span className="w-4 h-4 rounded bg-red-200 border border-red-400" /> Crítico (16–25)</span>
+            <span className="flex items-center gap-1"><span className="w-4 h-4 rounded bg-orange-200 border border-orange-400" /> Crítico (16–25)</span>
           </div>
 
           {/* Painel da célula selecionada */}

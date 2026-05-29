@@ -227,12 +227,12 @@ export default function Nr1ClimaCorrelacao() {
                         {p.copsoqEq?.toFixed(2) ?? '—'}
                         {p.copsoqRaw != null && <div className="text-[10px] text-muted-foreground">({p.copsoqRaw.toFixed(0)}/100)</div>}
                       </td>
-                      <td className={`p-2 text-center font-mono ${p.gap != null && Math.abs(p.gap) > 0.5 ? (p.gap > 0 ? 'text-emerald-600' : 'text-red-600') : ''}`}>
+                      <td className={`p-2 text-center font-mono ${p.gap != null && Math.abs(p.gap) > 0.5 ? (p.gap > 0 ? 'text-emerald-600' : 'text-orange-600') : ''}`}>
                         {p.gap != null ? (p.gap > 0 ? '+' : '') + p.gap.toFixed(2) : '—'}
                       </td>
                       <td className="p-2 text-center">
                         {p.ambos ? (
-                          <Badge className="bg-red-100 text-red-700 border-red-300">Causa raiz</Badge>
+                          <Badge className="bg-orange-100 text-orange-700 border-orange-300">Causa raiz</Badge>
                         ) : p.climaStatus === 'critico' || p.copsoqStatus === 'critico' ? (
                           <Badge variant="outline" className="border-amber-400 text-amber-700">Atenção</Badge>
                         ) : (

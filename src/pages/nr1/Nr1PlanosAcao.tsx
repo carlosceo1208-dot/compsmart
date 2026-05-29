@@ -114,7 +114,7 @@ export default function Nr1PlanosAcao() {
                       </Badge>
                       {p.origem && p.origem !== 'manual' && (
                         <Badge variant="outline" className={
-                          p.origem === 'unificado' ? 'border-rose-300 text-rose-700 bg-rose-50'
+                          p.origem === 'unificado' ? 'border-amber-300 text-amber-700 bg-amber-50'
                           : p.origem === 'clima' ? 'border-amber-300 text-amber-700 bg-amber-50'
                           : 'border-sky-300 text-sky-700 bg-sky-50'
                         }>
@@ -242,7 +242,7 @@ export default function Nr1PlanosAcao() {
 function SummaryCard({ label, value, tone }: { label: string; value: number; tone?: 'success' | 'danger' | 'info' }) {
   const toneClass =
     tone === 'success' ? 'text-emerald-600' :
-    tone === 'danger' ? 'text-red-600' :
+    tone === 'danger' ? 'text-orange-600' :
     tone === 'info' ? 'text-blue-600' : 'nr1-text-primary';
   return (
     <Card>

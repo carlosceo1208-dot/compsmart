@@ -39,7 +39,7 @@ const cores: Record<string, string> = {
 function tom(score: number) {
   if (score >= 70) return { label: 'Saudável', cls: 'bg-green-100 text-green-800' };
   if (score >= 55) return { label: 'Atenção', cls: 'bg-yellow-100 text-yellow-800' };
-  return { label: 'Crítico', cls: 'bg-red-100 text-red-800' };
+  return { label: 'Crítico', cls: 'bg-orange-100 text-orange-800' };
 }
 
 export default function Nr1SegPsi() {
