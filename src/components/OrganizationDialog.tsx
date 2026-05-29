@@ -415,16 +415,18 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       } else {
         const { data: insertedEntity, error } = await supabase
           .from("organizational_structure")
-          .insert([dataToSave]);
+          .insert(dataToSave)
+          .select("id")
+          .single();
 
         if (error) throw error;
 
-        if (isCompanyType && insertedEntity?.[0]?.id) {
+        if (isCompanyType && insertedEntity?.id) {
           const { error: billingError } = await supabase
             .from("company_billing")
             .upsert(
               {
-                company_id: insertedEntity[0].id,
+                company_id: insertedEntity.id,
                 cnpj: formData.cnpj || null,
               },
               { onConflict: "company_id" }
