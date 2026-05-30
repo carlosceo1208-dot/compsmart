@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, Network, BarChart3, LayoutGrid, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +9,7 @@ import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 
 type NavItem = { to: string; label: string; icon: any; end?: boolean; highlight?: boolean };
-type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
+type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
   {
@@ -34,6 +34,16 @@ const GROUPS: NavGroup[] = [
     tone: 'clima',
     items: [
       { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
+    ],
+  },
+  {
+    title: 'Cruzamento Riscos Psicossociais',
+    tone: 'cruzamento',
+    items: [
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3 },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign },
     ],
   },
   {
@@ -63,6 +73,7 @@ const GROUPS: NavGroup[] = [
 const GROUP_STYLES: Record<NavGroup['tone'], { border: string; bg: string; title: string; dot: string }> = {
   nr1:       { border: 'border-[hsl(var(--nr1-primary)/0.35)]', bg: 'bg-[hsl(var(--nr1-primary)/0.04)]', title: 'text-[hsl(var(--nr1-primary))]', dot: 'bg-[hsl(var(--nr1-primary))]' },
   clima:     { border: 'border-[hsl(11_77%_60%/0.45)]',          bg: 'bg-[hsl(11_77%_60%/0.05)]',         title: 'text-[hsl(11_77%_45%)]',         dot: 'bg-[hsl(11_77%_55%)]' },
+  cruzamento:{ border: 'border-violet-300',                      bg: 'bg-violet-50/60',                   title: 'text-violet-700',                dot: 'bg-violet-500' },
   fib:       { border: 'border-amber-300',                       bg: 'bg-amber-50/60',                    title: 'text-amber-700',                 dot: 'bg-amber-500' },
   jornada:   { border: 'border-sky-300',                         bg: 'bg-sky-50/60',                      title: 'text-sky-700',                   dot: 'bg-sky-500' },
   glossario: { border: 'border-slate-300',                       bg: 'bg-slate-50/70',                    title: 'text-slate-700',                 dot: 'bg-slate-500' },
@@ -129,13 +140,16 @@ export const Nr1Layout = () => {
               const span =
                 group.tone === 'nr1' ? 'col-span-12 lg:col-span-8'
                 : group.tone === 'clima' ? 'col-span-12 lg:col-span-4'
+                : group.tone === 'cruzamento' ? 'col-span-12'
                 : 'col-span-12 md:col-span-6 lg:col-span-4';
               const innerCols =
                 group.tone === 'nr1'
                   ? 'grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6'
-                  : group.items.length > 1
-                    ? 'grid-cols-2'
-                    : 'grid-cols-1';
+                  : group.tone === 'cruzamento'
+                    ? 'grid-cols-2 md:grid-cols-4'
+                    : group.items.length > 1
+                      ? 'grid-cols-2'
+                      : 'grid-cols-1';
               return (
                 <section
                   key={group.title}
