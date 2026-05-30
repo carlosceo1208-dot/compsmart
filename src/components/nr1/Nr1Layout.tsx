@@ -140,13 +140,16 @@ export const Nr1Layout = () => {
               const span =
                 group.tone === 'nr1' ? 'col-span-12 lg:col-span-8'
                 : group.tone === 'clima' ? 'col-span-12 lg:col-span-4'
+                : group.tone === 'cruzamento' ? 'col-span-12'
                 : 'col-span-12 md:col-span-6 lg:col-span-4';
               const innerCols =
                 group.tone === 'nr1'
                   ? 'grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6'
-                  : group.items.length > 1
-                    ? 'grid-cols-2'
-                    : 'grid-cols-1';
+                  : group.tone === 'cruzamento'
+                    ? 'grid-cols-2 md:grid-cols-4'
+                    : group.items.length > 1
+                      ? 'grid-cols-2'
+                      : 'grid-cols-1';
               return (
                 <section
                   key={group.title}
