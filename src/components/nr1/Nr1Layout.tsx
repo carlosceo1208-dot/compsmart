@@ -37,6 +37,16 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
+    title: 'Cruzamento Riscos Psicossociais',
+    tone: 'cruzamento',
+    items: [
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3 },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign },
+    ],
+  },
+  {
     title: 'Índice de Felicidade',
     tone: 'fib',
     items: [
