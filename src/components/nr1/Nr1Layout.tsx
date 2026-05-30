@@ -9,7 +9,7 @@ import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 
 type NavItem = { to: string; label: string; icon: any; end?: boolean; highlight?: boolean };
-type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
+type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
   {
