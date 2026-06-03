@@ -42,7 +42,10 @@ const GRAU_RISCO_INFO: Record<number, { titulo: string; descricao: string; cor: 
 
 export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
   const upsert = useUpsertTerceiro();
-  const { data: pgrs = [] } = useNr1TerceiroPgrs(terceiro?.id ?? null);
+  const uploadPgr = useUploadPgr();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [currentTerceiroId, setCurrentTerceiroId] = useState<string | null>(terceiro?.id ?? null);
+  const { data: pgrs = [] } = useNr1TerceiroPgrs(currentTerceiroId);
   const [razao, setRazao] = useState('');
   const [fantasia, setFantasia] = useState('');
   const [cnpj, setCnpj] = useState('');
