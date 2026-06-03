@@ -201,6 +201,44 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
               <Label>Observações</Label>
               <Textarea rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
             </div>
+
+            {terceiro && (
+              <div className="md:col-span-2 pt-3 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Documentos PGR enviados</p>
+                  <span className="text-xs text-muted-foreground">{pgrs.length} arquivo(s)</span>
+                </div>
+                {pgrs.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    Nenhum PGR enviado ainda. Use "Gerir PGR" no menu da empresa para enviar.
+                  </p>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {pgrs.map((p) => (
+                      <div key={p.id} className="flex items-center justify-between gap-2 rounded-md border p-2 bg-muted/30">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="h-4 w-4 text-blue-600 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium truncate">{p.file_name}</p>
+                            <p className="text-[11px] text-muted-foreground">
+                              v{p.versao}{p.data_vencimento ? ` • venc. ${new Date(p.data_vencimento).toLocaleDateString('pt-BR')}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => downloadPgr(p.file_path, p.file_name)}
+                        >
+                          <Download className="h-3.5 w-3.5 mr-1" /> Baixar
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <DialogFooter className="px-6 pb-6 pt-2 border-t">
