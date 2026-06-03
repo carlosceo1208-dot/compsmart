@@ -102,6 +102,8 @@ export const Nr1Layout = () => {
   const location = useLocation();
   const { data: isSuper } = useIsSuperAdmin();
   const navRef = useRef<HTMLDivElement | null>(null);
+  const [terceirosOpen, setTerceirosOpen] = useState(false);
+
 
   return (
     <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
