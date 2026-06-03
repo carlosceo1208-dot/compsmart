@@ -4544,6 +4544,116 @@ export type Database = {
         }
         Relationships: []
       }
+      nr1_terceiros: {
+        Row: {
+          area_atuacao: string | null
+          ativo: boolean
+          cnpj: string
+          company_id: string
+          contato_email: string | null
+          contato_nome: string | null
+          contato_telefone: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          nome_fantasia: string | null
+          num_colaboradores: number | null
+          observacoes: string | null
+          razao_social: string
+          updated_at: string
+        }
+        Insert: {
+          area_atuacao?: string | null
+          ativo?: boolean
+          cnpj: string
+          company_id: string
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          num_colaboradores?: number | null
+          observacoes?: string | null
+          razao_social: string
+          updated_at?: string
+        }
+        Update: {
+          area_atuacao?: string | null
+          ativo?: boolean
+          cnpj?: string
+          company_id?: string
+          contato_email?: string | null
+          contato_nome?: string | null
+          contato_telefone?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          nome_fantasia?: string | null
+          num_colaboradores?: number | null
+          observacoes?: string | null
+          razao_social?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nr1_terceiros_pgr: {
+        Row: {
+          company_id: string
+          created_at: string
+          data_emissao: string | null
+          data_vencimento: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          observacoes: string | null
+          terceiro_id: string
+          uploaded_by: string | null
+          versao: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          data_emissao?: string | null
+          data_vencimento?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          observacoes?: string | null
+          terceiro_id: string
+          uploaded_by?: string | null
+          versao: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          data_emissao?: string | null
+          data_vencimento?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          observacoes?: string | null
+          terceiro_id?: string
+          uploaded_by?: string | null
+          versao?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_terceiros_pgr_terceiro_id_fkey"
+            columns: ["terceiro_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_terceiros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizational_structure: {
         Row: {
           address: string | null
