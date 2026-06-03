@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Building2, Plus, Search, MoreVertical, Pencil, Trash2, FileText, FileCheck2,
-  CheckCircle2, AlertTriangle, XCircle, Loader2,
+  CheckCircle2, AlertTriangle, XCircle, Loader2, Download,
 } from 'lucide-react';
 import {
-  useNr1Terceiros, useDeleteTerceiro, statusFromVencimento, type Terceiro, type TerceiroPgr,
+  useNr1Terceiros, useDeleteTerceiro, downloadPgr, statusFromVencimento, type Terceiro, type TerceiroPgr,
 } from '@/hooks/useNr1Terceiros';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -70,6 +70,21 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
   const handleDelete = async (t: Terceiro) => {
     if (!confirm(`Remover ${t.razao_social}?`)) return;
     await del.mutateAsync(t.id);
+  };
+
+  const handleDownloadLatestPgr = async (t: Terceiro) => {
+    const { data, error } = await (supabase as any)
+      .from('nr1_terceiros_pgr')
+      .select('file_path,file_name')
+      .eq('terceiro_id', t.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) {
+      toast.error('Nenhum PGR encontrado para esta empresa.');
+      return;
+    }
+    await downloadPgr(data.file_path, data.file_name);
   };
 
   return (
@@ -132,6 +147,7 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
                     onEdit={() => openEdit(t)}
                     onPgr={() => openPgr(t)}
                     onReport={() => handleReport(t)}
+                    onDownload={() => handleDownloadLatestPgr(t)}
                     onDelete={() => handleDelete(t)}
                   />
                 ))}
@@ -148,10 +164,10 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
 }
 
 function TerceiroRow({
-  idx, terceiro, onEdit, onPgr, onReport, onDelete,
+  idx, terceiro, onEdit, onPgr, onReport, onDownload, onDelete,
 }: {
   idx: number; terceiro: Terceiro;
-  onEdit: () => void; onPgr: () => void; onReport: () => void; onDelete: () => void;
+  onEdit: () => void; onPgr: () => void; onReport: () => void; onDownload: () => void; onDelete: () => void;
 }) {
   // We don't preload PGRs; fetch latest vencimento inline via the hook isn't ideal here,
   // so we render generic until row opened. Use a tiny query for latest.
@@ -183,6 +199,7 @@ function TerceiroRow({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEdit}><Pencil className="h-4 w-4 mr-2" />Editar</DropdownMenuItem>
             <DropdownMenuItem onClick={onPgr}><FileText className="h-4 w-4 mr-2" />Gerir PGR</DropdownMenuItem>
+            <DropdownMenuItem onClick={onDownload}><Download className="h-4 w-4 mr-2" />Baixar último PGR</DropdownMenuItem>
             <DropdownMenuItem onClick={onReport}><FileCheck2 className="h-4 w-4 mr-2" />Relatório de Conformidade</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive">
