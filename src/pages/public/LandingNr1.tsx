@@ -11,6 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Brain, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
 import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
 import { Footer } from '@/components/landing/Footer';
+import { SecuritySection } from '@/components/landing/SecuritySection';
 import Nr1PerguntasChro from '@/components/landing/nr1/Nr1PerguntasChro';
 import Nr1TabelaCategoria from '@/components/landing/nr1/Nr1TabelaCategoria';
 import Nr1ComoFunciona from '@/components/landing/nr1/Nr1ComoFunciona';
@@ -258,6 +259,11 @@ export default function LandingNr1() {
 
           {/* Gestão de Terceiros & PGR — novo diferencial */}
           <Nr1GestaoTerceiros />
+
+          {/* Segurança Enterprise — confiança/objeções */}
+          <SecuritySection />
+
+
 
           {/* Fale com um especialista — proposta sob medida */}
           <section id="fale-conosco" className="container mx-auto px-4 py-14">
