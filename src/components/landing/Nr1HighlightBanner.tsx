@@ -34,7 +34,7 @@ export const Nr1HighlightBanner = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
               </span>
               <Clock className="h-3 w-3" />
-              Novo · Fiscalização inicia em maio/2026
+              Novo: Fiscalização iniciou em maio/2026 — não deixe sua empresa ser autuada, conheça a CompSmart e saiba como podemos evitar
             </div>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
               NR-1 Inteligente:{' '}
