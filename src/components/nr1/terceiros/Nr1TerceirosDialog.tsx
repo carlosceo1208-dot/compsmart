@@ -147,6 +147,7 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
                     onEdit={() => openEdit(t)}
                     onPgr={() => openPgr(t)}
                     onReport={() => handleReport(t)}
+                    onDownload={() => handleDownloadLatestPgr(t)}
                     onDelete={() => handleDelete(t)}
                   />
                 ))}
