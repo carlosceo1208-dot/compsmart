@@ -73,18 +73,21 @@ export function useUpsertTerceiro() {
   const qc = useQueryClient();
   const { activeCompanyId } = useCompanyContext();
   return useMutation({
-    mutationFn: async (input: Partial<Terceiro> & { id?: string }) => {
+    mutationFn: async (input: Partial<Terceiro> & { id?: string }): Promise<{ id: string }> => {
       if (!activeCompanyId) throw new Error('Selecione uma empresa ativa.');
       const payload: any = { ...input, company_id: activeCompanyId };
       if (input.id) {
         const { error } = await (supabase as any)
           .from('nr1_terceiros').update(payload).eq('id', input.id);
         if (error) throw error;
+        return { id: input.id };
       } else {
         const { data: { user } } = await supabase.auth.getUser();
         payload.created_by = user?.id;
-        const { error } = await (supabase as any).from('nr1_terceiros').insert(payload);
+        const { data, error } = await (supabase as any)
+          .from('nr1_terceiros').insert(payload).select('id').single();
         if (error) throw error;
+        return { id: data.id };
       }
     },
     onSuccess: () => {
