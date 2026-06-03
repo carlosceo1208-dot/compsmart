@@ -164,10 +164,10 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
 }
 
 function TerceiroRow({
-  idx, terceiro, onEdit, onPgr, onReport, onDelete,
+  idx, terceiro, onEdit, onPgr, onReport, onDownload, onDelete,
 }: {
   idx: number; terceiro: Terceiro;
-  onEdit: () => void; onPgr: () => void; onReport: () => void; onDelete: () => void;
+  onEdit: () => void; onPgr: () => void; onReport: () => void; onDownload: () => void; onDelete: () => void;
 }) {
   // We don't preload PGRs; fetch latest vencimento inline via the hook isn't ideal here,
   // so we render generic until row opened. Use a tiny query for latest.
