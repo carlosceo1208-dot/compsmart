@@ -79,39 +79,73 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
       setEmergEmail(t?.emergencia_email ?? '');
       setContratoInicio(t?.contrato_inicio ?? '');
       setObs(terceiro?.observacoes ?? '');
+      setCurrentTerceiroId(terceiro?.id ?? null);
       setErrors({});
     }
   }, [open, terceiro]);
 
   const grauInfo = useMemo(() => (grauRisco ? GRAU_RISCO_INFO[parseInt(grauRisco, 10)] : null), [grauRisco]);
 
-  const handleSave = async () => {
+  const buildPayload = () => ({
+    id: currentTerceiroId ?? undefined,
+    razao_social: razao.trim(),
+    nome_fantasia: fantasia.trim() || null,
+    cnpj: onlyDigits(cnpj),
+    contato_nome: contatoNome.trim() || null,
+    contato_email: contatoEmail.trim() || null,
+    contato_telefone: onlyDigits(contatoTelefone) || null,
+    num_colaboradores: numCol ? parseInt(numCol, 10) : null,
+    area_atuacao: area.trim() || null,
+    observacoes: obs.trim() || null,
+    grau_risco: grauRisco ? parseInt(grauRisco, 10) : null,
+    emergencia_nome: emergNome.trim() || null,
+    emergencia_telefone: onlyDigits(emergTelefone) || null,
+    emergencia_email: emergEmail.trim() || null,
+    contrato_inicio: contratoInicio || null,
+  });
+
+  const validate = () => {
     const errs: Record<string, string> = {};
     if (razao.trim().length < 3) errs.razao = 'Razão social com ao menos 3 caracteres.';
     if (!isValidCnpj(cnpj)) errs.cnpj = 'CNPJ inválido.';
     if (contatoEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contatoEmail)) errs.email = 'Email inválido.';
     if (emergEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emergEmail)) errs.emergEmail = 'Email inválido.';
     setErrors(errs);
-    if (Object.keys(errs).length) return;
+    return Object.keys(errs).length === 0;
+  };
 
-    await upsert.mutateAsync({
-      id: terceiro?.id,
-      razao_social: razao.trim(),
-      nome_fantasia: fantasia.trim() || null,
-      cnpj: onlyDigits(cnpj),
-      contato_nome: contatoNome.trim() || null,
-      contato_email: contatoEmail.trim() || null,
-      contato_telefone: onlyDigits(contatoTelefone) || null,
-      num_colaboradores: numCol ? parseInt(numCol, 10) : null,
-      area_atuacao: area.trim() || null,
-      observacoes: obs.trim() || null,
-      grau_risco: grauRisco ? parseInt(grauRisco, 10) : null,
-      emergencia_nome: emergNome.trim() || null,
-      emergencia_telefone: onlyDigits(emergTelefone) || null,
-      emergencia_email: emergEmail.trim() || null,
-      contrato_inicio: contratoInicio || null,
-    } as any);
+  const ensureSaved = async (): Promise<string | null> => {
+    const res = await upsert.mutateAsync(buildPayload() as any);
+    setCurrentTerceiroId(res.id);
+    return res.id;
+  };
+
+  const handleSave = async () => {
+    if (!validate()) return;
+    await ensureSaved();
     onOpenChange(false);
+  };
+
+  const handleAttachClick = () => {
+    if (!validate()) {
+      toast.error('Preencha Razão social e CNPJ antes de anexar o PGR.');
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const id = await ensureSaved();
+      if (!id) return;
+      const versao = `v${pgrs.length + 1}`;
+      await uploadPgr.mutateAsync({ terceiroId: id, file, versao });
+    } catch {
+      // toasts tratados nos hooks
+    }
   };
 
   return (
