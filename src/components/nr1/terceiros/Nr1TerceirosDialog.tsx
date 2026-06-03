@@ -199,6 +199,7 @@ function TerceiroRow({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onEdit}><Pencil className="h-4 w-4 mr-2" />Editar</DropdownMenuItem>
             <DropdownMenuItem onClick={onPgr}><FileText className="h-4 w-4 mr-2" />Gerir PGR</DropdownMenuItem>
+            <DropdownMenuItem onClick={onDownload}><Download className="h-4 w-4 mr-2" />Baixar último PGR</DropdownMenuItem>
             <DropdownMenuItem onClick={onReport}><FileCheck2 className="h-4 w-4 mr-2" />Relatório de Conformidade</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive">
