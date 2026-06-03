@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Terceiro } from '@/hooks/useNr1Terceiros';
-import { useUpsertTerceiro, useNr1TerceiroPgrs, downloadPgr } from '@/hooks/useNr1Terceiros';
+import { useUpsertTerceiro, useNr1TerceiroPgrs, useUploadPgr, downloadPgr } from '@/hooks/useNr1Terceiros';
 import { formatCnpj, formatPhone, isValidCnpj, onlyDigits } from '@/lib/cnpj';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, Upload } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Props {
   open: boolean;
