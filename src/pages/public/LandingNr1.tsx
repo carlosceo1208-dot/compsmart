@@ -16,6 +16,7 @@ import Nr1TabelaCategoria from '@/components/landing/nr1/Nr1TabelaCategoria';
 import Nr1ComoFunciona from '@/components/landing/nr1/Nr1ComoFunciona';
 import Nr1ProvaCorrelacao from '@/components/landing/nr1/Nr1ProvaCorrelacao';
 import Nr1Faq, { NR1_FAQ_JSONLD } from '@/components/landing/nr1/Nr1Faq';
+import Nr1GestaoTerceiros from '@/components/landing/nr1/Nr1GestaoTerceiros';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
@@ -254,6 +255,9 @@ export default function LandingNr1() {
               </div>
             </div>
           </section>
+
+          {/* Gestão de Terceiros & PGR — novo diferencial */}
+          <Nr1GestaoTerceiros />
 
           {/* Fale com um especialista — proposta sob medida */}
           <section id="fale-conosco" className="container mx-auto px-4 py-14">
