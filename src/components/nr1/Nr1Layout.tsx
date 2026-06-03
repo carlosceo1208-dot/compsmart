@@ -26,6 +26,7 @@ const GROUPS: NavGroup[] = [
       { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText },
       { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
       { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
+      { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros' },
       { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
       { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
     ],
