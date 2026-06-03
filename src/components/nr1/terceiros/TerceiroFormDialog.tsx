@@ -41,6 +41,7 @@ const GRAU_RISCO_INFO: Record<number, { titulo: string; descricao: string; cor: 
 
 export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
   const upsert = useUpsertTerceiro();
+  const { data: pgrs = [] } = useNr1TerceiroPgrs(terceiro?.id ?? null);
   const [razao, setRazao] = useState('');
   const [fantasia, setFantasia] = useState('');
   const [cnpj, setCnpj] = useState('');
