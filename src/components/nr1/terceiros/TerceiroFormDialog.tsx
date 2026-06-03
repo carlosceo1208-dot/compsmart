@@ -246,24 +246,31 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
                   <FileText className="h-4 w-4 text-blue-600" />
                   Documentos PGR
                 </p>
-                {terceiro && (
-                  <span className="text-xs text-muted-foreground">{pgrs.length} arquivo(s)</span>
-                )}
+                <span className="text-xs text-muted-foreground">{pgrs.length} arquivo(s)</span>
               </div>
 
-              {!terceiro ? (
-                <p className="text-xs text-muted-foreground italic">
-                  Salve a empresa primeiro para anexar e baixar PGRs.
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,application/pdf"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              <Button
+                type="button"
+                size="sm"
+                className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleAttachClick}
+                disabled={upsert.isPending || uploadPgr.isPending}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {uploadPgr.isPending ? 'Enviando...' : (currentTerceiroId ? 'Anexar novo PGR' : 'Salvar empresa e anexar PGR')}
+              </Button>
+
+              {pgrs.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic text-center py-2">
+                  Nenhum PGR enviado ainda.
                 </p>
-              ) : pgrs.length === 0 ? (
-                <div className="rounded-md border border-dashed p-3 text-center">
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Nenhum PGR enviado ainda.
-                  </p>
-                  <Button type="button" size="sm" variant="outline" disabled>
-                    <Download className="h-3.5 w-3.5 mr-1" /> Baixar PGR (indisponível)
-                  </Button>
-                </div>
               ) : (
                 <>
                   <Button
