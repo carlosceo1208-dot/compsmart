@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Terceiro } from '@/hooks/useNr1Terceiros';
 import { useUpsertTerceiro } from '@/hooks/useNr1Terceiros';
 import { formatCnpj, formatPhone, isValidCnpj, onlyDigits } from '@/lib/cnpj';
@@ -13,6 +14,29 @@ interface Props {
   onOpenChange: (v: boolean) => void;
   terceiro?: Terceiro | null;
 }
+
+const GRAU_RISCO_INFO: Record<number, { titulo: string; descricao: string; cor: string }> = {
+  1: {
+    titulo: 'Grau 1 — Risco Leve',
+    descricao: 'Atividades administrativas, comércio varejista, serviços educacionais e similares. Exigências básicas de SST; PGR simplificado pode ser aplicável conforme porte.',
+    cor: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+  },
+  2: {
+    titulo: 'Grau 2 — Risco Moderado',
+    descricao: 'Atividades como transporte, hotelaria, restaurantes e indústrias leves. Requer PGR completo, treinamentos periódicos e controle de exposições.',
+    cor: 'bg-amber-50 border-amber-200 text-amber-900',
+  },
+  3: {
+    titulo: 'Grau 3 — Risco Alto',
+    descricao: 'Indústrias químicas, metalurgia, frigoríficos e construção em geral. Exige PGR robusto, PCMSO, EPIs específicos, brigada e auditorias frequentes.',
+    cor: 'bg-orange-50 border-orange-200 text-orange-900',
+  },
+  4: {
+    titulo: 'Grau 4 — Risco Crítico',
+    descricao: 'Construção pesada, mineração, energia, óleo e gás, demolição. Requer NR-1/NR-4/NR-18/NR-22 plenos, SESMT dimensionado, controle rigoroso e PPRA/PGR auditável.',
+    cor: 'bg-red-50 border-red-200 text-red-900',
+  },
+};
 
 export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
   const upsert = useUpsertTerceiro();
@@ -24,11 +48,17 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
   const [contatoTelefone, setContatoTelefone] = useState('');
   const [numCol, setNumCol] = useState('');
   const [area, setArea] = useState('');
+  const [grauRisco, setGrauRisco] = useState<string>('');
+  const [emergNome, setEmergNome] = useState('');
+  const [emergTelefone, setEmergTelefone] = useState('');
+  const [emergEmail, setEmergEmail] = useState('');
+  const [contratoInicio, setContratoInicio] = useState('');
   const [obs, setObs] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (open) {
+      const t = terceiro as any;
       setRazao(terceiro?.razao_social ?? '');
       setFantasia(terceiro?.nome_fantasia ?? '');
       setCnpj(formatCnpj(terceiro?.cnpj ?? ''));
@@ -37,16 +67,24 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
       setContatoTelefone(formatPhone(terceiro?.contato_telefone ?? ''));
       setNumCol(terceiro?.num_colaboradores?.toString() ?? '');
       setArea(terceiro?.area_atuacao ?? '');
+      setGrauRisco(t?.grau_risco ? String(t.grau_risco) : '');
+      setEmergNome(t?.emergencia_nome ?? '');
+      setEmergTelefone(formatPhone(t?.emergencia_telefone ?? ''));
+      setEmergEmail(t?.emergencia_email ?? '');
+      setContratoInicio(t?.contrato_inicio ?? '');
       setObs(terceiro?.observacoes ?? '');
       setErrors({});
     }
   }, [open, terceiro]);
+
+  const grauInfo = useMemo(() => (grauRisco ? GRAU_RISCO_INFO[parseInt(grauRisco, 10)] : null), [grauRisco]);
 
   const handleSave = async () => {
     const errs: Record<string, string> = {};
     if (razao.trim().length < 3) errs.razao = 'Razão social com ao menos 3 caracteres.';
     if (!isValidCnpj(cnpj)) errs.cnpj = 'CNPJ inválido.';
     if (contatoEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contatoEmail)) errs.email = 'Email inválido.';
+    if (emergEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emergEmail)) errs.emergEmail = 'Email inválido.';
     setErrors(errs);
     if (Object.keys(errs).length) return;
 
@@ -61,58 +99,109 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
       num_colaboradores: numCol ? parseInt(numCol, 10) : null,
       area_atuacao: area.trim() || null,
       observacoes: obs.trim() || null,
-    });
+      grau_risco: grauRisco ? parseInt(grauRisco, 10) : null,
+      emergencia_nome: emergNome.trim() || null,
+      emergencia_telefone: onlyDigits(emergTelefone) || null,
+      emergencia_email: emergEmail.trim() || null,
+      contrato_inicio: contratoInicio || null,
+    } as any);
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6">
           <DialogTitle>{terceiro ? 'Editar empresa terceira' : 'Nova empresa terceira'}</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="md:col-span-2">
-            <Label>Razão social *</Label>
-            <Input value={razao} onChange={(e) => setRazao(e.target.value)} />
-            {errors.razao && <p className="text-xs text-destructive mt-1">{errors.razao}</p>}
-          </div>
-          <div>
-            <Label>Nome fantasia</Label>
-            <Input value={fantasia} onChange={(e) => setFantasia(e.target.value)} />
-          </div>
-          <div>
-            <Label>CNPJ *</Label>
-            <Input value={cnpj} onChange={(e) => setCnpj(formatCnpj(e.target.value))} placeholder="00.000.000/0000-00" />
-            {errors.cnpj && <p className="text-xs text-destructive mt-1">{errors.cnpj}</p>}
-          </div>
-          <div>
-            <Label>Contato (nome)</Label>
-            <Input value={contatoNome} onChange={(e) => setContatoNome(e.target.value)} />
-          </div>
-          <div>
-            <Label>Email</Label>
-            <Input type="email" value={contatoEmail} onChange={(e) => setContatoEmail(e.target.value)} />
-            {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
-          </div>
-          <div>
-            <Label>Telefone</Label>
-            <Input value={contatoTelefone} onChange={(e) => setContatoTelefone(formatPhone(e.target.value))} placeholder="(11) 99999-9999" />
-          </div>
-          <div>
-            <Label>Nº colaboradores</Label>
-            <Input type="number" min={0} value={numCol} onChange={(e) => setNumCol(e.target.value)} />
-          </div>
-          <div className="md:col-span-2">
-            <Label>Área de atuação</Label>
-            <Input value={area} onChange={(e) => setArea(e.target.value)} placeholder="Ex.: Limpeza, Segurança, TI..." />
-          </div>
-          <div className="md:col-span-2">
-            <Label>Observações</Label>
-            <Textarea rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
+        <div className="flex-1 overflow-y-auto px-6 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="md:col-span-2">
+              <Label>Razão social *</Label>
+              <Input value={razao} onChange={(e) => setRazao(e.target.value)} />
+              {errors.razao && <p className="text-xs text-destructive mt-1">{errors.razao}</p>}
+            </div>
+            <div>
+              <Label>Nome fantasia</Label>
+              <Input value={fantasia} onChange={(e) => setFantasia(e.target.value)} />
+            </div>
+            <div>
+              <Label>CNPJ *</Label>
+              <Input value={cnpj} onChange={(e) => setCnpj(formatCnpj(e.target.value))} placeholder="00.000.000/0000-00" />
+              {errors.cnpj && <p className="text-xs text-destructive mt-1">{errors.cnpj}</p>}
+            </div>
+            <div>
+              <Label>Contato (nome)</Label>
+              <Input value={contatoNome} onChange={(e) => setContatoNome(e.target.value)} />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input type="email" value={contatoEmail} onChange={(e) => setContatoEmail(e.target.value)} />
+              {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
+            </div>
+            <div>
+              <Label>Telefone</Label>
+              <Input value={contatoTelefone} onChange={(e) => setContatoTelefone(formatPhone(e.target.value))} placeholder="(11) 99999-9999" />
+            </div>
+            <div>
+              <Label>Nº colaboradores</Label>
+              <Input type="number" min={0} value={numCol} onChange={(e) => setNumCol(e.target.value)} />
+            </div>
+            <div className="md:col-span-2">
+              <Label>Área de atuação</Label>
+              <Input value={area} onChange={(e) => setArea(e.target.value)} placeholder="Ex.: Limpeza, Segurança, TI..." />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label>Grau de risco (NR-4)</Label>
+              <Select value={grauRisco} onValueChange={setGrauRisco}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o grau de risco" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Grau 1 — Risco Leve</SelectItem>
+                  <SelectItem value="2">Grau 2 — Risco Moderado</SelectItem>
+                  <SelectItem value="3">Grau 3 — Risco Alto</SelectItem>
+                  <SelectItem value="4">Grau 4 — Risco Crítico</SelectItem>
+                </SelectContent>
+              </Select>
+              {grauInfo && (
+                <div className={`mt-2 rounded-md border p-3 text-xs ${grauInfo.cor}`}>
+                  <p className="font-semibold mb-1">{grauInfo.titulo}</p>
+                  <p className="leading-relaxed">{grauInfo.descricao}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="md:col-span-2 pt-2 border-t">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Contato de emergência</p>
+            </div>
+            <div>
+              <Label>Nome</Label>
+              <Input value={emergNome} onChange={(e) => setEmergNome(e.target.value)} />
+            </div>
+            <div>
+              <Label>Telefone</Label>
+              <Input value={emergTelefone} onChange={(e) => setEmergTelefone(formatPhone(e.target.value))} placeholder="(11) 99999-9999" />
+            </div>
+            <div className="md:col-span-2">
+              <Label>Email</Label>
+              <Input type="email" value={emergEmail} onChange={(e) => setEmergEmail(e.target.value)} />
+              {errors.emergEmail && <p className="text-xs text-destructive mt-1">{errors.emergEmail}</p>}
+            </div>
+
+            <div className="md:col-span-2">
+              <Label>Início do contrato de prestação de serviços</Label>
+              <Input type="date" value={contratoInicio} onChange={(e) => setContratoInicio(e.target.value)} />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label>Observações</Label>
+              <Textarea rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
+            </div>
           </div>
         </div>
-        <DialogFooter>
+        <DialogFooter className="px-6 pb-6 pt-2 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={handleSave} disabled={upsert.isPending}>
             {upsert.isPending ? 'Salvando...' : 'Salvar'}
