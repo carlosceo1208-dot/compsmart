@@ -9,7 +9,7 @@ import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
 
-type NavItem = { to: string; label: string; icon: any; end?: boolean; highlight?: boolean };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
