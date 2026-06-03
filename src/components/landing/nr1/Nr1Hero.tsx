@@ -37,8 +37,8 @@ export default function Nr1Hero({ onDiagnostico, onComoFunciona }: Props) {
               <strong className="text-foreground">9Box</strong>,{' '}
               <strong className="text-foreground">Pesquisa de Clima</strong> e{' '}
               <strong className="text-foreground">Remuneração</strong>. Transformamos obrigação
-              legal em <strong className="nr1-text-primary">inteligência de talentos</strong> —
-              antes que o seu top talent peça demissão.
+              legal em <strong className="nr1-text-primary">inteligência que cuida dos riscos dos seus colaboradores e da retenção dos talentos</strong> — antes que o seu top talent peça demissão.{' '}
+              <strong className="text-foreground">Tenha uma IA exclusiva</strong> para trabalhar junto com você em todo o processo da NR-1.
             </p>
 
 
