@@ -202,18 +202,42 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
               <Textarea rows={2} value={obs} onChange={(e) => setObs(e.target.value)} />
             </div>
 
-            {terceiro && (
-              <div className="md:col-span-2 pt-3 border-t">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium">Documentos PGR enviados</p>
+            <div className="md:col-span-2 pt-3 border-t">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-blue-600" />
+                  Documentos PGR
+                </p>
+                {terceiro && (
                   <span className="text-xs text-muted-foreground">{pgrs.length} arquivo(s)</span>
-                </div>
-                {pgrs.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic">
-                    Nenhum PGR enviado ainda. Use "Gerir PGR" no menu da empresa para enviar.
+                )}
+              </div>
+
+              {!terceiro ? (
+                <p className="text-xs text-muted-foreground italic">
+                  Salve a empresa primeiro para anexar e baixar PGRs.
+                </p>
+              ) : pgrs.length === 0 ? (
+                <div className="rounded-md border border-dashed p-3 text-center">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Nenhum PGR enviado ainda.
                   </p>
-                ) : (
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <Button type="button" size="sm" variant="outline" disabled>
+                    <Download className="h-3.5 w-3.5 mr-1" /> Baixar PGR (indisponível)
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => downloadPgr(pgrs[0].file_path, pgrs[0].file_name)}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Baixar último PGR (v{pgrs[0].versao})
+                  </Button>
+                  <div className="space-y-2 max-h-40 overflow-y-auto">
                     {pgrs.map((p) => (
                       <div key={p.id} className="flex items-center justify-between gap-2 rounded-md border p-2 bg-muted/30">
                         <div className="flex items-center gap-2 min-w-0">
@@ -236,9 +260,9 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </div>
         <DialogFooter className="px-6 pb-6 pt-2 border-t">
