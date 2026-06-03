@@ -11,10 +11,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Building2, Plus, Search, MoreVertical, Pencil, Trash2, FileText, FileCheck2,
-  CheckCircle2, AlertTriangle, XCircle, Loader2,
+  CheckCircle2, AlertTriangle, XCircle, Loader2, Download,
 } from 'lucide-react';
 import {
-  useNr1Terceiros, useDeleteTerceiro, statusFromVencimento, type Terceiro, type TerceiroPgr,
+  useNr1Terceiros, useDeleteTerceiro, downloadPgr, statusFromVencimento, type Terceiro, type TerceiroPgr,
 } from '@/hooks/useNr1Terceiros';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
