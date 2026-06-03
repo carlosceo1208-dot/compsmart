@@ -225,6 +225,7 @@ export const Nr1Layout = () => {
       </main>
       <Nr1ConsentGate />
       <Nr1BemEstarFloating />
+      <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
     </div>
   );
 };
