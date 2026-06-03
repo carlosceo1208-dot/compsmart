@@ -4553,8 +4553,13 @@ export type Database = {
           contato_email: string | null
           contato_nome: string | null
           contato_telefone: string | null
+          contrato_inicio: string | null
           created_at: string
           created_by: string | null
+          emergencia_email: string | null
+          emergencia_nome: string | null
+          emergencia_telefone: string | null
+          grau_risco: number | null
           id: string
           nome_fantasia: string | null
           num_colaboradores: number | null
@@ -4570,8 +4575,13 @@ export type Database = {
           contato_email?: string | null
           contato_nome?: string | null
           contato_telefone?: string | null
+          contrato_inicio?: string | null
           created_at?: string
           created_by?: string | null
+          emergencia_email?: string | null
+          emergencia_nome?: string | null
+          emergencia_telefone?: string | null
+          grau_risco?: number | null
           id?: string
           nome_fantasia?: string | null
           num_colaboradores?: number | null
@@ -4587,8 +4597,13 @@ export type Database = {
           contato_email?: string | null
           contato_nome?: string | null
           contato_telefone?: string | null
+          contrato_inicio?: string | null
           created_at?: string
           created_by?: string | null
+          emergencia_email?: string | null
+          emergencia_nome?: string | null
+          emergencia_telefone?: string | null
+          grau_risco?: number | null
           id?: string
           nome_fantasia?: string | null
           num_colaboradores?: number | null
