@@ -172,25 +172,43 @@ export const Nr1Layout = () => {
                   <div className={cn('grid gap-2', innerCols)}>
                     {group.items.map((item) => {
                       const Icon = item.icon;
-                      const active = item.end
-                        ? location.pathname === item.to
-                        : location.pathname.startsWith(item.to);
+                      const active = item.to
+                        ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
+                        : false;
+                      const baseClass = cn(
+                        'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px]',
+                        active
+                          ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
+                          : item.highlight
+                          ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
+                          : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
+                      );
+                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
+                      if (!item.to) {
+                        return (
+                          <button
+                            key={item.label}
+                            type="button"
+                            onClick={() => {
+                              if (item.action === 'open-terceiros') setTerceirosOpen(true);
+                              item.onClick?.();
+                            }}
+                            className={baseClass}
+                          >
+                            <Icon className={iconClass} />
+                            <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
+                          </button>
+                        );
+                      }
                       return (
                         <NavLink
                           key={item.to}
                           to={item.to}
                           end={item.end}
                           data-nr1-active={active}
-                          className={cn(
-                            'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px]',
-                            active
-                              ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
-                              : item.highlight
-                              ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
-                              : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
-                          )}
+                          className={baseClass}
                         >
-                          <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]')} />
+                          <Icon className={iconClass} />
                           <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                         </NavLink>
                       );
