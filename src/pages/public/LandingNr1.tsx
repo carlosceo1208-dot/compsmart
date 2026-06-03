@@ -260,6 +260,11 @@ export default function LandingNr1() {
           {/* Gestão de Terceiros & PGR — novo diferencial */}
           <Nr1GestaoTerceiros />
 
+          {/* Segurança Enterprise — confiança/objeções */}
+          <SecuritySection />
+
+
+
           {/* Fale com um especialista — proposta sob medida */}
           <section id="fale-conosco" className="container mx-auto px-4 py-14">
             <div className="max-w-3xl mx-auto">
