@@ -47,8 +47,9 @@ export const Nr1HighlightBanner = () => {
               <strong className="text-white">riscos psicossociais</strong> com{' '}
               <strong className="text-white">Avaliação de Desempenho</strong>,{' '}
               <strong className="text-white">9Box</strong>,{' '}
-              <strong className="text-white">Pesquisa de Clima</strong> e{' '}
-              <strong className="text-white">Remuneração</strong>.
+              <strong className="text-white">Pesquisa de Clima</strong>,{' '}
+              <strong className="text-white">Remuneração</strong> e o{' '}
+              <strong className="text-white">controle da documentação de empresas terceirizadas</strong>.
               <br className="hidden md:block" />
               <span className="text-emerald-200">Diagnóstico grátis em 2 minutos.</span>
             </p>
