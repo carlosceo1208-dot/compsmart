@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Terceiro } from '@/hooks/useNr1Terceiros';
-import { useUpsertTerceiro } from '@/hooks/useNr1Terceiros';
+import { useUpsertTerceiro, useNr1TerceiroPgrs, downloadPgr } from '@/hooks/useNr1Terceiros';
 import { formatCnpj, formatPhone, isValidCnpj, onlyDigits } from '@/lib/cnpj';
+import { Download, FileText } from 'lucide-react';
 
 interface Props {
   open: boolean;
