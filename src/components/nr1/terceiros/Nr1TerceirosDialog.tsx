@@ -72,6 +72,21 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
     await del.mutateAsync(t.id);
   };
 
+  const handleDownloadLatestPgr = async (t: Terceiro) => {
+    const { data, error } = await (supabase as any)
+      .from('nr1_terceiros_pgr')
+      .select('file_path,file_name')
+      .eq('terceiro_id', t.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data) {
+      toast.error('Nenhum PGR encontrado para esta empresa.');
+      return;
+    }
+    await downloadPgr(data.file_path, data.file_name);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] flex flex-col">
