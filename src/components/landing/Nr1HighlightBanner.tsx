@@ -39,7 +39,7 @@ export const Nr1HighlightBanner = () => {
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 leading-tight">
               NR-1 Inteligente:{' '}
               <span className="bg-gradient-to-r from-emerald-300 to-emerald-100 bg-clip-text text-transparent">
-                cumpra a lei e retenha seus talentos.
+                Mais do que cumprir a lei, cuide dos colaboradores e retenha seus talentos.
               </span>
             </h2>
             <p className="text-white/90 text-sm md:text-base leading-relaxed">
