@@ -817,6 +817,64 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
                 )}
               </div>
 
+              {/* Grau de Risco (CNAE) + Tipo da Unidade (Matriz/Filial) - apenas empresa */}
+              {formData.type === 'company' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="risk_grade" className="flex items-center gap-1">
+                      Grau de Risco (CNAE)
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">
+                              Grau de risco da atividade econômica conforme NR-4 (1 = baixo, 4 = alto).
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </Label>
+                    <Select
+                      value={formData.risk_grade}
+                      onValueChange={(value) => setFormData({ ...formData, risk_grade: value })}
+                    >
+                      <SelectTrigger id="risk_grade">
+                        <SelectValue placeholder="Selecione o grau (1 a 4)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1 — Risco Leve</SelectItem>
+                        <SelectItem value="2">2 — Risco Médio</SelectItem>
+                        <SelectItem value="3">3 — Risco Grave</SelectItem>
+                        <SelectItem value="4">4 — Risco Máximo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="unit_role">Tipo da Unidade</Label>
+                    <Select
+                      value={formData.unit_role}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, unit_role: value as "matriz" | "filial" })
+                      }
+                    >
+                      <SelectTrigger id="unit_role">
+                        <SelectValue placeholder="Este cadastro é Matriz ou Filial?" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="matriz">Matriz</SelectItem>
+                        <SelectItem value="filial">Filial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Indica se este registro representa a Matriz ou uma Filial.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Plano e Módulos - apenas para empresa (company) */}
               {formData.type === 'company' && (
                 <div className="space-y-4 pt-2">
