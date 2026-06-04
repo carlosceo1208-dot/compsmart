@@ -711,7 +711,7 @@ const Organization = () => {
           hasDepartment: forceNewCompany ? false : stats.departments > 0,
           hasSector: forceNewCompany ? false : stats.sectors > 0,
         }}
-        rootCompanyId={selectedCompanyId !== "all" ? selectedCompanyId : undefined}
+        rootCompanyId={forceNewCompany ? undefined : (selectedCompanyId !== "all" ? selectedCompanyId : undefined)}
       />
 
       <AlertDialog open={!!deleteEntityId} onOpenChange={() => setDeleteEntityId(null)}>
