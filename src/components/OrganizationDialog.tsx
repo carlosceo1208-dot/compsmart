@@ -360,6 +360,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       industry_sector: "",
       selected_plan: "",
       selected_modules: [],
+      risk_grade: "",
+      unit_role: "",
     });
   };
 
