@@ -185,6 +185,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
     base_date: "",
     logo_url: "",
     industry_sector: "",
+    selected_plan: "",
+    selected_modules: [],
   });
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
