@@ -249,6 +249,14 @@ const Organization = () => {
   };
 
   const handleNewEntity = () => {
+    // If a specific company is selected, open its full registration dialog for updates
+    // (allows editing company data, organizational structure, and adding units)
+    if (selectedCompanyId && selectedCompanyId !== "all") {
+      setSelectedEntityId(selectedCompanyId);
+      setForceNewCompany(false);
+      setDialogOpen(true);
+      return;
+    }
     setSelectedEntityId(null);
     setForceNewCompany(false);
     setDialogOpen(true);
