@@ -704,12 +704,12 @@ const Organization = () => {
         entityId={selectedEntityId}
         onSuccess={fetchEntities}
         existingStats={{
-          hasCompany: stats.companies > 0,
-          hasHeadquarters: stats.headquarters > 0,
-          hasBranch: stats.branches > 0,
-          hasArea: stats.areas > 0,
-          hasDepartment: stats.departments > 0,
-          hasSector: stats.sectors > 0,
+          hasCompany: forceNewCompany ? false : stats.companies > 0,
+          hasHeadquarters: forceNewCompany ? false : stats.headquarters > 0,
+          hasBranch: forceNewCompany ? false : stats.branches > 0,
+          hasArea: forceNewCompany ? false : stats.areas > 0,
+          hasDepartment: forceNewCompany ? false : stats.departments > 0,
+          hasSector: forceNewCompany ? false : stats.sectors > 0,
         }}
         rootCompanyId={selectedCompanyId !== "all" ? selectedCompanyId : undefined}
       />
