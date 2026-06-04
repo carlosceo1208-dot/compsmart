@@ -38,6 +38,7 @@ const Onboarding = () => {
     createInitialStructure: false,
     subscription_plan_id: null,
     billing_cycle: 'monthly',
+    selected_modules: [],
   });
 
   useEffect(() => {
