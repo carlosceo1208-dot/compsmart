@@ -19,16 +19,14 @@ const MODULES: Array<{
   key: ModuleKey;
   title: string;
   description: string;
-  priceLabel: string;
   icon: React.ComponentType<{ className?: string }>;
-  accent: string; // tailwind classes for selected border + ring
+  accent: string;
   iconWrap: string;
 }> = [
   {
     key: "Core",
     title: "Core",
     description: "Gestão interna de remuneração, estrutura de cargos e desempenho",
-    priceLabel: "R$ 199 – 499 / mês",
     icon: Cog,
     accent: "border-emerald-500 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20",
     iconWrap: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
@@ -37,7 +35,6 @@ const MODULES: Array<{
     key: "Insight",
     title: "Insight",
     description: "Inteligência salarial e comparação com o mercado",
-    priceLabel: "R$ 149 – 299 / mês",
     icon: BarChart3,
     accent: "border-blue-500 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
     iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
@@ -46,7 +43,6 @@ const MODULES: Array<{
     key: "Match",
     title: "Match",
     description: "Descrição de cargos e job matching inteligente",
-    priceLabel: "R$ 99 – 199 / mês",
     icon: Target,
     accent: "border-amber-500 ring-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20",
     iconWrap: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
