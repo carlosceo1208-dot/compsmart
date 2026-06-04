@@ -4689,6 +4689,7 @@ export type Database = {
           name: string
           parent_id: string | null
           root_company_id: string | null
+          selected_modules: string[]
           social_charges_percentage: number | null
           subscription_plan_id: string | null
           subscription_started_at: string | null
@@ -4717,6 +4718,7 @@ export type Database = {
           name: string
           parent_id?: string | null
           root_company_id?: string | null
+          selected_modules?: string[]
           social_charges_percentage?: number | null
           subscription_plan_id?: string | null
           subscription_started_at?: string | null
@@ -4745,6 +4747,7 @@ export type Database = {
           name?: string
           parent_id?: string | null
           root_company_id?: string | null
+          selected_modules?: string[]
           social_charges_percentage?: number | null
           subscription_plan_id?: string | null
           subscription_started_at?: string | null
@@ -7685,6 +7688,9 @@ export type Database = {
           is_public: boolean | null
           max_employees: number | null
           max_users: number | null
+          module_core_price: number | null
+          module_insight_price: number | null
+          module_match_price: number | null
           monthly_price: number
           name: string
           plan_type: string
@@ -7702,6 +7708,9 @@ export type Database = {
           is_public?: boolean | null
           max_employees?: number | null
           max_users?: number | null
+          module_core_price?: number | null
+          module_insight_price?: number | null
+          module_match_price?: number | null
           monthly_price?: number
           name: string
           plan_type: string
@@ -7719,6 +7728,9 @@ export type Database = {
           is_public?: boolean | null
           max_employees?: number | null
           max_users?: number | null
+          module_core_price?: number | null
+          module_insight_price?: number | null
+          module_match_price?: number | null
           monthly_price?: number
           name?: string
           plan_type?: string

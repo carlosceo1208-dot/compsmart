@@ -22,6 +22,7 @@ interface OnboardingData {
   headquartersCode?: string;
   subscription_plan_id: string | null;
   billing_cycle: 'monthly' | 'annual';
+  selected_modules: string[];
 }
 
 const Onboarding = () => {
@@ -37,6 +38,7 @@ const Onboarding = () => {
     createInitialStructure: false,
     subscription_plan_id: null,
     billing_cycle: 'monthly',
+    selected_modules: [],
   });
 
   useEffect(() => {
@@ -109,6 +111,7 @@ const Onboarding = () => {
           billing_cycle: formData.billing_cycle,
           trial_ends_at: trialEndsAt.toISOString(),
           subscription_started_at: new Date().toISOString(),
+          selected_modules: formData.selected_modules,
         })
         .select()
         .single();

@@ -3,7 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, ArrowRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Building2, ArrowRight, Cog, BarChart3, Target } from "lucide-react";
+import { toast } from "sonner";
 
 interface CompanyDataStepProps {
   formData: any;
@@ -11,7 +13,49 @@ interface CompanyDataStepProps {
   onNext: () => void;
 }
 
+type ModuleKey = "Core" | "Insight" | "Match";
+
+const MODULES: Array<{
+  key: ModuleKey;
+  title: string;
+  description: string;
+  priceLabel: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string; // tailwind classes for selected border + ring
+  iconWrap: string;
+}> = [
+  {
+    key: "Core",
+    title: "Core",
+    description: "Gestão interna de remuneração, estrutura de cargos e desempenho",
+    priceLabel: "R$ 199 – 499 / mês",
+    icon: Cog,
+    accent: "border-emerald-500 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20",
+    iconWrap: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  },
+  {
+    key: "Insight",
+    title: "Insight",
+    description: "Inteligência salarial e comparação com o mercado",
+    priceLabel: "R$ 149 – 299 / mês",
+    icon: BarChart3,
+    accent: "border-blue-500 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
+    iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  },
+  {
+    key: "Match",
+    title: "Match",
+    description: "Descrição de cargos e job matching inteligente",
+    priceLabel: "R$ 99 – 199 / mês",
+    icon: Target,
+    accent: "border-amber-500 ring-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20",
+    iconWrap: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  },
+];
+
 export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepProps) => {
+  const selectedModules: string[] = formData.selected_modules ?? [];
+
   const formatCNPJ = (value: string) => {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length <= 14) {
@@ -28,7 +72,25 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
     onUpdate({ ...formData, cnpj: formatted });
   };
 
-  const canContinue = formData.name.trim().length > 0;
+  const toggleModule = (key: ModuleKey) => {
+    const exists = selectedModules.includes(key);
+    const next = exists
+      ? selectedModules.filter((m) => m !== key)
+      : [...selectedModules, key];
+    onUpdate({ ...formData, selected_modules: next });
+  };
+
+  const handleContinue = () => {
+    if (formData.name.trim().length === 0) return;
+    if (selectedModules.length === 0) {
+      toast.error("Selecione pelo menos um módulo para continuar");
+      return;
+    }
+    onNext();
+  };
+
+  const canContinue =
+    formData.name.trim().length > 0 && selectedModules.length > 0;
 
   return (
     <Card>
@@ -82,6 +144,63 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
           />
         </div>
 
+        {/* Módulos / Serviços */}
+        <div className="space-y-3 pt-2">
+          <div>
+            <Label className="text-base font-semibold">
+              Módulos / Serviços <span className="text-destructive">*</span>
+            </Label>
+            <p className="text-xs text-muted-foreground mt-1">
+              Selecione os módulos que sua empresa terá acesso. Você pode combinar quantos quiser.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {MODULES.map((mod) => {
+              const Icon = mod.icon;
+              const isSelected = selectedModules.includes(mod.key);
+              return (
+                <button
+                  type="button"
+                  key={mod.key}
+                  onClick={() => toggleModule(mod.key)}
+                  aria-pressed={isSelected}
+                  className={`relative text-left rounded-lg border-2 p-4 min-h-[140px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    isSelected
+                      ? `${mod.accent} ring-2`
+                      : "border-border bg-card hover:border-primary/40"
+                  }`}
+                >
+                  <div className="absolute top-3 right-3">
+                    <Checkbox checked={isSelected} className="pointer-events-none" />
+                  </div>
+                  <div className={`inline-flex p-2 rounded-md ${mod.iconWrap} mb-2`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="font-semibold text-sm">{mod.title}</div>
+                  <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                    {mod.description}
+                  </p>
+                  <div className="text-xs font-medium mt-2 text-foreground/80">
+                    {mod.priceLabel}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedModules.length > 0 && (
+            <div className="bg-muted/50 border rounded-md p-3 text-xs">
+              <span className="font-medium">Selecionados:</span>{" "}
+              {selectedModules.join(" + ")}
+              <span className="text-muted-foreground">
+                {" "}
+                — preço final calculado na próxima etapa com base no plano escolhido.
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="address">Endereço</Label>
           <Textarea
@@ -94,7 +213,7 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
         </div>
 
         <Button
-          onClick={onNext}
+          onClick={handleContinue}
           disabled={!canContinue}
           className="w-full gap-2"
         >
