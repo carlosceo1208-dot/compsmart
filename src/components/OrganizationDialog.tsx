@@ -113,6 +113,8 @@ interface EntityData {
   industry_sector: string;
   selected_plan: PlanKey | "";
   selected_modules: ModuleKey[];
+  risk_grade: string;
+  unit_role: "matriz" | "filial" | "";
 }
 
 const INDUSTRY_SECTORS = [
