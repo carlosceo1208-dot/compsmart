@@ -374,10 +374,16 @@ const Organization = () => {
             </Badge>
           </div>
         </div>
-        <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
-          <Plus className="w-4 h-4" />
-          + Adicionar Unidade Organizacional
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={handleNewCompany} variant="outline" className="gap-2">
+            <Building2 className="w-4 h-4" />
+            Cadastrar Empresa
+          </Button>
+          <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
+            <Plus className="w-4 h-4" />
+            + Adicionar Unidade Organizacional
+          </Button>
+        </div>
       </div>
 
       {/* Company Selector */}
