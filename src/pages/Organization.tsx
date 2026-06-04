@@ -250,6 +250,13 @@ const Organization = () => {
 
   const handleNewEntity = () => {
     setSelectedEntityId(null);
+    setForceNewCompany(false);
+    setDialogOpen(true);
+  };
+
+  const handleNewCompany = () => {
+    setSelectedEntityId(null);
+    setForceNewCompany(true);
     setDialogOpen(true);
   };
 
