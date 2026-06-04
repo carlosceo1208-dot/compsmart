@@ -81,6 +81,7 @@ const Organization = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [forceNewCompany, setForceNewCompany] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
   const [deleteEntityId, setDeleteEntityId] = useState<string | null>(null);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
