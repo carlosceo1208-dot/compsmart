@@ -257,6 +257,10 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           industry_sector: data.industry_sector || "",
           selected_plan: plan,
           selected_modules: modules,
+          risk_grade: (data as any).risk_grade != null ? String((data as any).risk_grade) : "",
+          unit_role: ((data as any).unit_role === "matriz" || (data as any).unit_role === "filial")
+            ? (data as any).unit_role
+            : "",
         });
       }
     } catch (error: any) {
