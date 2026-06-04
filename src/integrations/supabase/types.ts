@@ -4690,10 +4690,12 @@ export type Database = {
           parent_id: string | null
           root_company_id: string | null
           selected_modules: string[]
+          selected_plan: string | null
           social_charges_percentage: number | null
           subscription_plan_id: string | null
           subscription_started_at: string | null
           subscription_status: string | null
+          total_price: number | null
           trial_ends_at: string | null
           type: string
           union_name: string | null
@@ -4719,10 +4721,12 @@ export type Database = {
           parent_id?: string | null
           root_company_id?: string | null
           selected_modules?: string[]
+          selected_plan?: string | null
           social_charges_percentage?: number | null
           subscription_plan_id?: string | null
           subscription_started_at?: string | null
           subscription_status?: string | null
+          total_price?: number | null
           trial_ends_at?: string | null
           type: string
           union_name?: string | null
@@ -4748,10 +4752,12 @@ export type Database = {
           parent_id?: string | null
           root_company_id?: string | null
           selected_modules?: string[]
+          selected_plan?: string | null
           social_charges_percentage?: number | null
           subscription_plan_id?: string | null
           subscription_started_at?: string | null
           subscription_status?: string | null
+          total_price?: number | null
           trial_ends_at?: string | null
           type?: string
           union_name?: string | null
