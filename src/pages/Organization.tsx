@@ -389,7 +389,7 @@ const Organization = () => {
           </Button>
           <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
             <Plus className="w-4 h-4" />
-            + Adicionar Unidade Organizacional
+            Atualizar Cadastro Empresa + Adicionar Unidade Organizacional
           </Button>
         </div>
       </div>
