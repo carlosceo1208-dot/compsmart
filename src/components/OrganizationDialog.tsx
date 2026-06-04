@@ -805,6 +805,129 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
                 )}
               </div>
 
+              {/* Plano e Módulos - apenas para empresa (company) */}
+              {formData.type === 'company' && (
+                <div className="space-y-4 pt-2">
+                  <div className="border-t pt-4">
+                    <h3 className="text-sm font-semibold text-foreground">Plano e Módulos</h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Defina o plano base e os módulos contratados por esta empresa.
+                    </p>
+                  </div>
+
+                  {/* Planos */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">
+                      Plano <span className="text-destructive">*</span>
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Selecione o plano base para esta empresa
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {PLANS.map((p) => {
+                        const Icon = p.icon;
+                        const isSel = formData.selected_plan === p.key;
+                        return (
+                          <button
+                            type="button"
+                            key={p.key}
+                            onClick={() => setFormData({ ...formData, selected_plan: p.key })}
+                            aria-pressed={isSel}
+                            className={`relative text-left rounded-lg border-2 p-4 min-h-[110px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                              isSel ? p.selectedClass : "border-border bg-card hover:border-primary/40"
+                            }`}
+                          >
+                            <div className="absolute top-3 right-3 h-4 w-4 rounded-full border-2 border-muted-foreground/40 flex items-center justify-center">
+                              {isSel && <div className="h-2 w-2 rounded-full bg-primary" />}
+                            </div>
+                            <div className={`inline-flex p-2 rounded-md ${p.iconWrap} mb-2`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="font-semibold text-sm">{p.key}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">{p.description}</div>
+                            <div className="text-sm font-semibold mt-1">
+                              {formatBRL(p.price)}<span className="text-xs font-normal text-muted-foreground">/mês</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Módulos */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">
+                      Módulos/Serviços <span className="text-destructive">*</span>
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Selecione os módulos que esta empresa terá acesso
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      {MODULES.map((m) => {
+                        const Icon = m.icon;
+                        const isSel = formData.selected_modules.includes(m.key);
+                        const addPrice = formData.selected_plan
+                          ? MODULE_PRICES[m.key][formData.selected_plan as PlanKey]
+                          : null;
+                        return (
+                          <button
+                            type="button"
+                            key={m.key}
+                            onClick={() => {
+                              const next = isSel
+                                ? formData.selected_modules.filter((x) => x !== m.key)
+                                : [...formData.selected_modules, m.key];
+                              setFormData({ ...formData, selected_modules: next });
+                            }}
+                            aria-pressed={isSel}
+                            className={`relative text-left rounded-lg border-2 p-4 min-h-[130px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                              isSel ? m.selectedClass : "border-border bg-card hover:border-primary/40"
+                            }`}
+                          >
+                            <div className="absolute top-3 right-3">
+                              <Checkbox checked={isSel} className="pointer-events-none" />
+                            </div>
+                            <div className={`inline-flex p-2 rounded-md ${m.iconWrap} mb-2`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="font-semibold text-sm">{m.key}</div>
+                            <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                              {m.description}
+                            </p>
+                            <div className="text-sm font-semibold mt-2">
+                              {addPrice !== null ? (
+                                <>+{formatBRL(addPrice)}<span className="text-xs font-normal text-muted-foreground">/mês</span></>
+                              ) : (
+                                <span className="text-xs font-normal text-muted-foreground">Selecione um plano</span>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Resumo */}
+                  {formData.selected_plan && formData.selected_modules.length > 0 && (() => {
+                    const planPrice = PLANS.find((p) => p.key === formData.selected_plan)?.price ?? 0;
+                    const modulesPrice = formData.selected_modules.reduce(
+                      (s, mod) => s + MODULE_PRICES[mod][formData.selected_plan as PlanKey],
+                      0,
+                    );
+                    const total = planPrice + modulesPrice;
+                    return (
+                      <div className="bg-muted/50 border rounded-md p-3 text-sm">
+                        <span className="font-medium">Resumo:</span>{" "}
+                        {formData.selected_plan} + {formData.selected_modules.join(" + ")} ={" "}
+                        <span className="font-semibold">{formatBRL(total)}/mês</span>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+
+
               <div className="space-y-2">
                 <Label htmlFor="address">Endereço Completo</Label>
                 <Textarea
