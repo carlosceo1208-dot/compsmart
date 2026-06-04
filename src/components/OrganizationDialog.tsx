@@ -216,7 +216,9 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       // SECURITY: avoid select('*'); cnpj is restricted, fetched via admin RPC
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name, type, code, description, parent_id, fantasy_name, address, union_name, base_date, logo_url, industry_sector, root_company_id")
+        .select("id, name, type, code, description, parent_id, fantasy_name, address, union_name, base_date, logo_url, industry_sector, root_company_id, selected_plan, selected_modules, total_price")
+        .eq("id", entityId)
+        .single();
         .eq("id", entityId)
         .single();
 
