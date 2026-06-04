@@ -188,7 +188,7 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
               {selectedModules.join(" + ")}
               <span className="text-muted-foreground">
                 {" "}
-                — preço final calculado na próxima etapa com base no plano escolhido.
+                — incluídos no plano contratado na próxima etapa.
               </span>
             </div>
           )}
