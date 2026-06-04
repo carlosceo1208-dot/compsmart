@@ -452,6 +452,18 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
 
       const isCompanyType = ['company', 'headquarters', 'branch'].includes(formData.type);
       
+      const isCompany = formData.type === 'company';
+      const planPrice = isCompany && formData.selected_plan
+        ? PLANS.find(p => p.key === formData.selected_plan)?.price ?? 0
+        : 0;
+      const modulesPrice = isCompany && formData.selected_plan
+        ? formData.selected_modules.reduce(
+            (sum, m) => sum + (MODULE_PRICES[m][formData.selected_plan as PlanKey] ?? 0),
+            0,
+          )
+        : 0;
+      const totalPrice = planPrice + modulesPrice;
+
       const dataToSave = {
         name: formData.name,
         code: formData.code || null,
@@ -464,6 +476,9 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         base_date: isCompanyType ? (formData.base_date || null) : null,
         logo_url: formData.type === 'company' ? (formData.logo_url || null) : null,
         industry_sector: formData.type === 'company' ? (formData.industry_sector || null) : null,
+        selected_plan: isCompany ? formData.selected_plan || null : null,
+        selected_modules: isCompany ? formData.selected_modules : [],
+        total_price: isCompany ? totalPrice : null,
       };
 
       const billingDataToSave = isCompanyType
