@@ -81,6 +81,7 @@ const Organization = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [forceNewCompany, setForceNewCompany] = useState(false);
   const [selectedEntityId, setSelectedEntityId] = useState<string | null>(null);
   const [deleteEntityId, setDeleteEntityId] = useState<string | null>(null);
   const [currentUserRoles, setCurrentUserRoles] = useState<string[]>([]);
@@ -249,6 +250,13 @@ const Organization = () => {
 
   const handleNewEntity = () => {
     setSelectedEntityId(null);
+    setForceNewCompany(false);
+    setDialogOpen(true);
+  };
+
+  const handleNewCompany = () => {
+    setSelectedEntityId(null);
+    setForceNewCompany(true);
     setDialogOpen(true);
   };
 
@@ -366,10 +374,16 @@ const Organization = () => {
             </Badge>
           </div>
         </div>
-        <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
-          <Plus className="w-4 h-4" />
-          + Adicionar Unidade Organizacional
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Button onClick={handleNewCompany} variant="outline" className="gap-2">
+            <Building2 className="w-4 h-4" />
+            Cadastrar Empresa
+          </Button>
+          <Button onClick={handleNewEntity} className="bg-gradient-primary hover:opacity-90 gap-2">
+            <Plus className="w-4 h-4" />
+            + Adicionar Unidade Organizacional
+          </Button>
+        </div>
       </div>
 
       {/* Company Selector */}
@@ -690,14 +704,14 @@ const Organization = () => {
         entityId={selectedEntityId}
         onSuccess={fetchEntities}
         existingStats={{
-          hasCompany: stats.companies > 0,
-          hasHeadquarters: stats.headquarters > 0,
-          hasBranch: stats.branches > 0,
-          hasArea: stats.areas > 0,
-          hasDepartment: stats.departments > 0,
-          hasSector: stats.sectors > 0,
+          hasCompany: forceNewCompany ? false : stats.companies > 0,
+          hasHeadquarters: forceNewCompany ? false : stats.headquarters > 0,
+          hasBranch: forceNewCompany ? false : stats.branches > 0,
+          hasArea: forceNewCompany ? false : stats.areas > 0,
+          hasDepartment: forceNewCompany ? false : stats.departments > 0,
+          hasSector: forceNewCompany ? false : stats.sectors > 0,
         }}
-        rootCompanyId={selectedCompanyId !== "all" ? selectedCompanyId : undefined}
+        rootCompanyId={forceNewCompany ? undefined : (selectedCompanyId !== "all" ? selectedCompanyId : undefined)}
       />
 
       <AlertDialog open={!!deleteEntityId} onOpenChange={() => setDeleteEntityId(null)}>
