@@ -27,8 +27,58 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { Loader2, HelpCircle } from "lucide-react";
+import { Loader2, HelpCircle, Rocket, TrendingUp, Crown, Cog, BarChart3, Target } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { Checkbox } from "@/components/ui/checkbox";
+
+type PlanKey = "Starter" | "Pro" | "Enterprise";
+type ModuleKey = "Core" | "Insight" | "Match";
+
+const PLANS: Array<{
+  key: PlanKey;
+  price: number;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  selectedClass: string;
+  iconWrap: string;
+}> = [
+  { key: "Starter", price: 299, description: "Ideal para pequenas empresas", icon: Rocket,
+    selectedClass: "border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20",
+    iconWrap: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
+  { key: "Pro", price: 899, description: "Para empresas em crescimento", icon: TrendingUp,
+    selectedClass: "border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
+    iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
+  { key: "Enterprise", price: 1900, description: "Para grandes empresas", icon: Crown,
+    selectedClass: "border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/50 dark:bg-purple-950/20",
+    iconWrap: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
+];
+
+const MODULE_PRICES: Record<ModuleKey, Record<PlanKey, number>> = {
+  Core: { Starter: 199, Pro: 349, Enterprise: 499 },
+  Insight: { Starter: 149, Pro: 249, Enterprise: 299 },
+  Match: { Starter: 99, Pro: 149, Enterprise: 199 },
+};
+
+const MODULES: Array<{
+  key: ModuleKey;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  selectedClass: string;
+  iconWrap: string;
+}> = [
+  { key: "Core", description: "Gestão interna de remuneração, estrutura de cargos e desempenho", icon: Cog,
+    selectedClass: "border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20",
+    iconWrap: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
+  { key: "Insight", description: "Inteligência salarial e comparação com o mercado", icon: BarChart3,
+    selectedClass: "border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
+    iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
+  { key: "Match", description: "Descrição de cargos e job matching inteligente", icon: Target,
+    selectedClass: "border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20",
+    iconWrap: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+];
+
+const formatBRL = (v: number) =>
+  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 interface ExistingStats {
   hasCompany: boolean;
