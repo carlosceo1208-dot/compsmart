@@ -111,6 +111,7 @@ const Onboarding = () => {
           billing_cycle: formData.billing_cycle,
           trial_ends_at: trialEndsAt.toISOString(),
           subscription_started_at: new Date().toISOString(),
+          selected_modules: formData.selected_modules,
         })
         .select()
         .single();
