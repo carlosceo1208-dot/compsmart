@@ -22,6 +22,7 @@ interface OnboardingData {
   headquartersCode?: string;
   subscription_plan_id: string | null;
   billing_cycle: 'monthly' | 'annual';
+  selected_modules: string[];
 }
 
 const Onboarding = () => {
