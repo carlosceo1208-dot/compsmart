@@ -414,6 +414,17 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         toast.error("Data base inválida (use formato MM/DD)");
         return;
       }
+
+      if (formData.type === 'company') {
+        if (!formData.selected_plan) {
+          toast.error("Selecione um plano para continuar");
+          return;
+        }
+        if (formData.selected_modules.length === 0) {
+          toast.error("Selecione pelo menos um módulo para continuar");
+          return;
+        }
+      }
     }
 
     // Validar correspondência entre código e tipo
