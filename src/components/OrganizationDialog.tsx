@@ -111,6 +111,8 @@ interface EntityData {
   base_date: string;
   logo_url: string;
   industry_sector: string;
+  selected_plan: PlanKey | "";
+  selected_modules: ModuleKey[];
 }
 
 const INDUSTRY_SECTORS = [
