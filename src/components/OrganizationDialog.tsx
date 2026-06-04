@@ -489,6 +489,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         selected_plan: isCompany ? formData.selected_plan || null : null,
         selected_modules: isCompany ? formData.selected_modules : [],
         total_price: isCompany ? totalPrice : null,
+        risk_grade: isCompany && formData.risk_grade ? parseInt(formData.risk_grade, 10) : null,
+        unit_role: isCompany ? (formData.unit_role || null) : null,
       };
 
       const billingDataToSave = isCompanyType
