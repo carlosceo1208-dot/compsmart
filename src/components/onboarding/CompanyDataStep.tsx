@@ -177,9 +177,6 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
                   <p className="text-xs text-muted-foreground mt-1 leading-snug">
                     {mod.description}
                   </p>
-                  <div className="text-xs font-medium mt-2 text-foreground/80">
-                    {mod.priceLabel}
-                  </div>
                 </button>
               );
             })}
