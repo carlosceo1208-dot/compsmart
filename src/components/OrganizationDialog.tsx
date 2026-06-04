@@ -219,7 +219,6 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         .select("id, name, type, code, description, parent_id, fantasy_name, address, union_name, base_date, logo_url, industry_sector, root_company_id, selected_plan, selected_modules, total_price")
         .eq("id", entityId)
         .single();
-        .eq("id", entityId)
         .single();
 
       if (error) throw error;
@@ -230,6 +229,14 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           .rpc('get_company_billing_info', { _company_id: entityId })
           .maybeSingle();
         cnpjValue = billing?.cnpj || "";
+
+        const rawModules = (data as any).selected_modules;
+        const modules: ModuleKey[] = Array.isArray(rawModules)
+          ? (rawModules as string[]).filter((m): m is ModuleKey => m === "Core" || m === "Insight" || m === "Match")
+          : [];
+        const rawPlan = (data as any).selected_plan;
+        const plan: PlanKey | "" =
+          rawPlan === "Starter" || rawPlan === "Pro" || rawPlan === "Enterprise" ? rawPlan : "";
 
         setFormData({
           name: data.name || "",
@@ -244,6 +251,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           base_date: data.base_date || "",
           logo_url: data.logo_url || "",
           industry_sector: data.industry_sector || "",
+          selected_plan: plan,
+          selected_modules: modules,
         });
       }
     } catch (error: any) {
