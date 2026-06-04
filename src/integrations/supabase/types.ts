@@ -4688,6 +4688,7 @@ export type Database = {
           longitude: number | null
           name: string
           parent_id: string | null
+          risk_grade: number | null
           root_company_id: string | null
           selected_modules: string[]
           selected_plan: string | null
@@ -4699,6 +4700,7 @@ export type Database = {
           trial_ends_at: string | null
           type: string
           union_name: string | null
+          unit_role: string | null
           updated_at: string
         }
         Insert: {
@@ -4719,6 +4721,7 @@ export type Database = {
           longitude?: number | null
           name: string
           parent_id?: string | null
+          risk_grade?: number | null
           root_company_id?: string | null
           selected_modules?: string[]
           selected_plan?: string | null
@@ -4730,6 +4733,7 @@ export type Database = {
           trial_ends_at?: string | null
           type: string
           union_name?: string | null
+          unit_role?: string | null
           updated_at?: string
         }
         Update: {
@@ -4750,6 +4754,7 @@ export type Database = {
           longitude?: number | null
           name?: string
           parent_id?: string | null
+          risk_grade?: number | null
           root_company_id?: string | null
           selected_modules?: string[]
           selected_plan?: string | null
@@ -4761,6 +4766,7 @@ export type Database = {
           trial_ends_at?: string | null
           type?: string
           union_name?: string | null
+          unit_role?: string | null
           updated_at?: string
         }
         Relationships: [
