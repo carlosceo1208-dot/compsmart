@@ -1,6 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCcw, Home } from "lucide-react";
+import { logFrontendError } from "@/lib/errorLogger";
 
 interface Props {
   children: ReactNode;
@@ -26,6 +27,12 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error("ErrorBoundary caught an error:", error);
     console.error("Component stack:", errorInfo.componentStack);
     this.setState({ errorInfo });
+    // Telemetria interna (fire-and-forget, LGPD-safe)
+    logFrontendError({
+      error,
+      componentStack: errorInfo.componentStack ?? undefined,
+      severity: "critical",
+    });
   }
 
   handleReset = () => {
