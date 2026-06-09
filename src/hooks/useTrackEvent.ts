@@ -38,11 +38,11 @@ export const useTrackEvent = () => {
           event_name: input.event_name,
           event_category: input.event_category,
           module_name: input.module_name ?? null,
-          metadata: safeMeta,
+          metadata: safeMeta as never,
           duration_ms: input.duration_ms ?? null,
           route_path: window.location.pathname,
           user_agent: navigator.userAgent.slice(0, 255),
-        });
+        } as never);
       } catch (err) {
         // Telemetria não pode quebrar a aplicação
         if (import.meta.env.DEV) console.warn('[telemetry] track failed:', err);
