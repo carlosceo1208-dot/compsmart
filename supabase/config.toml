@@ -1,94 +1,67 @@
 project_id = "fpkjkqdfufhhicxkyqdw"
 
-[functions.suggest-job-competencies]
-verify_jwt = true
-
-[functions.generate-job-description]
-verify_jwt = true
-
-[functions.succession-ai-analysis]
-verify_jwt = true
-
-[functions.legal-assistant]
-verify_jwt = true
-
-[functions.salary-assistant]
-verify_jwt = true
-
-[functions.incentive-assistant]
-verify_jwt = true
-
-[functions.create-employee-user]
-verify_jwt = true
-
-[functions.send-budget-report]
-verify_jwt = true
-
-[functions.check-agent-alerts]
-verify_jwt = false
-
-[functions.support-assistant]
-verify_jwt = true
-
-[functions.create-checkout-session]
-verify_jwt = true
-
-[functions.pagarme-webhook]
-verify_jwt = false
-
-[functions.validate-coupon]
-verify_jwt = true
-
-[functions.send-budget-deadline-reminder]
-verify_jwt = false
-
-[functions.activate-employee]
-verify_jwt = false
-
-[functions.send-payment-emails]
-verify_jwt = false
-
-[functions.send-trial-reminders]
-verify_jwt = false
-
-[functions.create-test-account]
-verify_jwt = false
-
-[functions.notify-budget-submission]
-verify_jwt = true
-
-[functions.log-auth-attempt]
-verify_jwt = false
-
-[functions.compensation-trends]
-verify_jwt = false
-
-[functions.check-budget-alerts]
-verify_jwt = false
-
-[functions.process-trial-expiration]
-verify_jwt = false
-
-[functions.delete-expired-data]
-verify_jwt = false
-
-[functions.verify-turnstile]
-verify_jwt = false
-
-[functions.check-security-alerts]
-verify_jwt = false
-
-[functions.update-employee-email]
-verify_jwt = false
-
-[functions.send-employee-invitation]
-verify_jwt = true
-
-[functions.send-external-feedback-request]
-verify_jwt = true
-
-[functions.fetch-inpc]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.activate-employee]
+    verify_jwt = false
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.check-agent-alerts]
+    verify_jwt = false
+  [functions.check-budget-alerts]
+    verify_jwt = false
+  [functions.check-security-alerts]
+    verify_jwt = false
+  [functions.compensation-trends]
+    verify_jwt = false
+  [functions.create-checkout-session]
+    verify_jwt = true
+  [functions.create-employee-user]
+    verify_jwt = true
+  [functions.create-test-account]
+    verify_jwt = false
+  [functions.delete-expired-data]
+    verify_jwt = false
+  [functions.fetch-inpc]
+    verify_jwt = false
+  [functions.generate-job-description]
+    verify_jwt = true
+  [functions.incentive-assistant]
+    verify_jwt = true
+  [functions.legal-assistant]
+    verify_jwt = true
+  [functions.log-auth-attempt]
+    verify_jwt = false
+  [functions.notify-budget-submission]
+    verify_jwt = true
+  [functions.pagarme-webhook]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.process-trial-expiration]
+    verify_jwt = false
+  [functions.salary-assistant]
+    verify_jwt = true
+  [functions.send-budget-deadline-reminder]
+    verify_jwt = false
+  [functions.send-budget-report]
+    verify_jwt = true
+  [functions.send-employee-invitation]
+    verify_jwt = true
+  [functions.send-external-feedback-request]
+    verify_jwt = true
+  [functions.send-payment-emails]
+    verify_jwt = false
+  [functions.send-trial-reminders]
+    verify_jwt = false
+  [functions.succession-ai-analysis]
+    verify_jwt = true
+  [functions.suggest-job-competencies]
+    verify_jwt = true
+  [functions.support-assistant]
+    verify_jwt = true
+  [functions.update-employee-email]
+    verify_jwt = false
+  [functions.validate-coupon]
+    verify_jwt = true
+  [functions.verify-turnstile]
+    verify_jwt = false
