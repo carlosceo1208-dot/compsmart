@@ -2481,6 +2481,48 @@ export type Database = {
           },
         ]
       }
+      error_logs: {
+        Row: {
+          company_id: string | null
+          component_stack: string | null
+          created_at: string
+          error_message: string
+          error_stack: string | null
+          id: string
+          metadata: Json | null
+          route_path: string | null
+          severity: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          company_id?: string | null
+          component_stack?: string | null
+          created_at?: string
+          error_message: string
+          error_stack?: string | null
+          id?: string
+          metadata?: Json | null
+          route_path?: string | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          company_id?: string | null
+          component_stack?: string | null
+          created_at?: string
+          error_message?: string
+          error_stack?: string | null
+          id?: string
+          metadata?: Json | null
+          route_path?: string | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       evaluation_potential_dimensions: {
         Row: {
           comment: string | null
@@ -8566,6 +8608,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      usage_events: {
+        Row: {
+          company_id: string
+          created_at: string
+          duration_ms: number | null
+          event_category: string
+          event_name: string
+          id: string
+          metadata: Json | null
+          module_name: string | null
+          route_path: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          duration_ms?: number | null
+          event_category: string
+          event_name: string
+          id?: string
+          metadata?: Json | null
+          module_name?: string | null
+          route_path?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          duration_ms?: number | null
+          event_category?: string
+          event_name?: string
+          id?: string
+          metadata?: Json | null
+          module_name?: string | null
+          route_path?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_feedback: {
         Row: {
