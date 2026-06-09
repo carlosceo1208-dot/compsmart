@@ -10,6 +10,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 import { DashboardLayout } from "./components/DashboardLayout";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import { Skeleton } from "./components/ui/skeleton";
+import { TelemetryTracker } from "./components/TelemetryTracker";
 
 // Eager — critical entry points
 import Index from "./pages/Index";
@@ -175,6 +176,7 @@ const App = () => {
               <Sonner />
               <ErrorBoundary>
                 <BrowserRouter>
+                  <TelemetryTracker />
                   <Suspense fallback={<RouteFallback />}>
                     <Routes>
                       <Route path="/" element={<Index />} />

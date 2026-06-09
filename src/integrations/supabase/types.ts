@@ -9812,6 +9812,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_old_telemetry: { Args: never; Returns: Json }
       cleanup_rate_limit_logs: { Args: never; Returns: undefined }
       compare_scenarios: {
         Args: { p_scenario_ids: string[] }
