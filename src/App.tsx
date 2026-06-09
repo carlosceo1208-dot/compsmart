@@ -22,6 +22,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ActivateAccount = lazy(() => import("./pages/ActivateAccount"));
 const MFAVerify = lazy(() => import("./components/auth/MFAVerify"));
+const MFARequired = lazy(() => import("./pages/MFARequired"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 
 // Lazy — dashboard pages
