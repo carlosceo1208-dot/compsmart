@@ -186,6 +186,7 @@ const App = () => {
                       <Route path="/reset-password" element={<ResetPassword />} />
                       <Route path="/activate" element={<ActivateAccount />} />
                       <Route path="/auth/mfa-verify" element={<MFAVerify />} />
+                      <Route path="/auth/mfa-required" element={<MFARequired />} />
                       <Route path="/onboarding" element={<Onboarding />} />
                       <Route path="/termos-de-uso" element={<TermsOfUse />} />
                       <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
