@@ -1,11 +1,9 @@
 name: RLS Tenant Isolation
 
 on:
-  pull_request:
-    branches: [main]
-  schedule:
-    # Nightly at 03:17 UTC (off-peak, avoids hourly congestion)
-    - cron: "17 3 * * *"
+  # Manual-only — nightly cron and PR triggers disabled to avoid noisy
+  # failure emails caused by transient infra issues (e.g. Bun download 504).
+  # Re-enable schedule/pull_request here when needed.
   workflow_dispatch:
 
 concurrency:
