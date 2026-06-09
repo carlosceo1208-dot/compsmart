@@ -33,7 +33,7 @@ export async function logFrontendError({ error, componentStack, severity = 'erro
       route_path: window.location.pathname,
       user_agent: navigator.userAgent.slice(0, 255),
       severity,
-    });
+    } as never);
   } catch (err) {
     if (import.meta.env.DEV) console.warn('[errorLogger] failed:', err);
   }
