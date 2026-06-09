@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { useMFAStatus } from '@/hooks/useMFAStatus';
 import { useSuperAdminDashboard } from '@/hooks/useSuperAdminDashboard';
 import { SuperAdminKPICards } from '@/components/super-admin/SuperAdminKPICards';
 import { CompanyDistributionCharts } from '@/components/super-admin/CompanyDistributionCharts';
@@ -15,14 +16,20 @@ import { Separator } from '@/components/ui/separator';
 const SuperAdminDashboard = () => {
   const navigate = useNavigate();
   const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
+  const { hasMFA, isLoading: mfaLoading } = useMFAStatus();
   const { data: metrics, isLoading: metricsLoading, error } = useSuperAdminDashboard();
 
   // Redirect if not super admin
   useEffect(() => {
     if (!roleLoading && !roleData?.isSuperAdmin) {
       navigate('/dashboard');
+      return;
     }
-  }, [roleData, roleLoading, navigate]);
+    // ENFORCEMENT: super admin sem MFA → forçar enrollment
+    if (!roleLoading && roleData?.isSuperAdmin && !mfaLoading && !hasMFA) {
+      navigate('/auth/mfa-required');
+    }
+  }, [roleData, roleLoading, hasMFA, mfaLoading, navigate]);
 
   if (roleLoading) {
     return (

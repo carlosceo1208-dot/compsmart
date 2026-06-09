@@ -22,6 +22,7 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const ActivateAccount = lazy(() => import("./pages/ActivateAccount"));
 const MFAVerify = lazy(() => import("./components/auth/MFAVerify"));
+const MFARequired = lazy(() => import("./pages/MFARequired"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 
 // Lazy — dashboard pages
@@ -185,6 +186,7 @@ const App = () => {
                       <Route path="/reset-password" element={<ResetPassword />} />
                       <Route path="/activate" element={<ActivateAccount />} />
                       <Route path="/auth/mfa-verify" element={<MFAVerify />} />
+                      <Route path="/auth/mfa-required" element={<MFARequired />} />
                       <Route path="/onboarding" element={<Onboarding />} />
                       <Route path="/termos-de-uso" element={<TermsOfUse />} />
                       <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
