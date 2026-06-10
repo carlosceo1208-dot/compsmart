@@ -228,6 +228,17 @@ export default function LandingNr1() {
           {/* Prova social de correlação */}
           <Nr1ProvaCorrelacao />
 
+          {/* PLANOS — pricing por faixa de colaboradores */}
+          <Nr1PricingCards onContratar={() => scrollToId('fale-conosco')} />
+
+          {/* Simulador de desconto (mesmos descontos do módulo Remuneração) */}
+          <section className="container mx-auto px-4 pb-14">
+            <Nr1DiscountSimulator onCTA={() => scrollToId('fale-conosco')} />
+          </section>
+
+          {/* NOVIDADES NR-1 */}
+          <Nr1Novidades />
+
           {/* Conformidade técnica */}
           <section className="container mx-auto px-4 py-10">
             <div className="max-w-4xl mx-auto">
@@ -281,7 +292,9 @@ export default function LandingNr1() {
           </section>
 
           {/* FAQ */}
-          <Nr1Faq />
+          <div id="faq">
+            <Nr1Faq />
+          </div>
 
           {/* CTA final */}
           <section className="container mx-auto px-4 pb-16">
