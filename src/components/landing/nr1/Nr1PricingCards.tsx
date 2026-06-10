@@ -9,19 +9,21 @@ import { Check, Sparkles, MessageSquare, CreditCard, ShieldCheck } from 'lucide-
 import { NR1_TIERS, formatBRL0, type Nr1Tier } from '@/lib/nr1Pricing';
 import { useNr1Plans, findNr1PlanIdByTier } from '@/hooks/useNr1Plans';
 
-// Lista consolidada — todos os planos NR-1 entregam o MESMO conjunto de funcionalidades.
-// O que muda entre as faixas é apenas o volume de colaboradores e o preço.
-const NR1_FEATURES_ALL: string[] = [
-  'Diagnóstico COPSOQ-III completo',
-  'Respondentes ilimitados (anônimos, LGPD)',
-  'Dashboard de risco psicossocial',
-  'Relatórios PDF prontos para fiscalização',
-  'Plano de Ação Kanban com evidências',
-  'Pesquisa de Clima integrada + correlação COPSOQ',
-  'Cruzamento NR-1 × 9Box × Remuneração',
-  'Alertas inteligentes e gestão de terceiros (PGR)',
-  'Multi-unidades / multi-CNPJs',
-  'Suporte humano e atualizações contínuas',
+// Os 12 módulos do NR-1 — exatamente os mesmos serviços oferecidos em todas as faixas.
+// Espelha os 12 mini-cards (em verde) do hub "Saúde Mental & Bem-Estar".
+const NR1_FEATURES_ALL: { label: string; desc: string }[] = [
+  { label: 'Visão Geral', desc: 'Painel executivo consolidado do risco psicossocial' },
+  { label: 'Universo', desc: 'Mapeamento de colaboradores elegíveis e cobertura' },
+  { label: 'Matriz de Risco', desc: 'Heatmap das 6 dimensões COPSOQ-III por área' },
+  { label: 'Segurança Psicológica', desc: 'Indicadores de confiança e ambiente psicossocial' },
+  { label: 'Sociodemográfico', desc: 'Cortes por gênero, faixa etária, tempo de casa' },
+  { label: 'Etapas', desc: 'Fluxo guiado do ciclo NR-1 ponta a ponta' },
+  { label: 'Novo Diagnóstico', desc: 'Aplicação do questionário COPSOQ-III (anônimo, LGPD)' },
+  { label: 'Histórico', desc: 'Comparativo entre ciclos e evolução temporal' },
+  { label: 'Plano de Ação', desc: 'Kanban com responsáveis, prazos e evidências' },
+  { label: 'Gestão de Terceiros', desc: 'PGR estendido à cadeia de prestadores' },
+  { label: 'Vitalidade', desc: 'Acompanhamento de bem-estar e jornada do colaborador' },
+  { label: 'Inteligência', desc: 'IA que correlaciona NR-1 × 9Box × Clima × Remuneração' },
 ];
 
 interface Props {
@@ -84,34 +86,35 @@ export default function Nr1PricingCards({ onContratar }: Props) {
 
       <div className="grid gap-6 lg:grid-cols-2 max-w-6xl mx-auto">
         {/* ===== Card de funcionalidades (único, vale para todos os planos) ===== */}
-        <Card className="border-2 border-[hsl(var(--nr1-primary)/0.3)] relative overflow-hidden">
-          <div className="absolute -top-3 left-6 z-10">
-            <Badge className="nr1-bg-primary text-white border-0 gap-1 px-3">
-              <Sparkles className="h-3 w-3" /> Incluso em TODAS as faixas
-            </Badge>
-          </div>
-          <CardHeader className="pt-7">
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-6 w-6 nr1-text-primary" />
-              <CardTitle className="text-xl">O que você recebe</CardTitle>
+        <Card className="border-2 border-[hsl(var(--nr1-primary)/0.3)]">
+          <CardHeader>
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-6 w-6 nr1-text-primary" />
+                <CardTitle className="text-xl">O que você recebe</CardTitle>
+              </div>
+              <Badge className="nr1-bg-primary text-white border-0 gap-1">
+                <Sparkles className="h-3 w-3" /> Incluso em TODAS as faixas
+              </Badge>
             </div>
             <CardDescription>
-              Mesmo conjunto completo de recursos da Essencial à Corporate — sem letras miúdas.
+              Os <strong>12 módulos do NR-1</strong> da Essencial à Corporate — todos os planos
+              entregam exatamente o mesmo conjunto de serviços. O que muda é apenas o volume
+              de colaboradores.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="grid sm:grid-cols-2 gap-x-4 gap-y-2.5">
               {NR1_FEATURES_ALL.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm">
+                <li key={f.label} className="flex items-start gap-2 text-sm">
                   <Check className="h-4 w-4 nr1-text-primary mt-0.5 flex-shrink-0" />
-                  <span>{f}</span>
+                  <div className="leading-tight">
+                    <div className="font-medium">{f.label}</div>
+                    <div className="text-[11px] text-muted-foreground">{f.desc}</div>
+                  </div>
                 </li>
               ))}
             </ul>
-            <div className="mt-5 p-3 rounded-lg bg-[hsl(var(--nr1-primary)/0.06)] border border-[hsl(var(--nr1-primary)/0.15)] text-xs text-muted-foreground">
-              💡 Já é cliente CompSmart Pro ou Enterprise?{' '}
-              <strong className="text-foreground">NR-1 Inteligente está incluso no seu plano.</strong>
-            </div>
           </CardContent>
         </Card>
 
