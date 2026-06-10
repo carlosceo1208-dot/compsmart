@@ -1,30 +1,47 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Check, Sparkles, MessageSquare, Building2, Rocket, TrendingUp, Briefcase, Crown, Shield, CreditCard } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Check, Sparkles, MessageSquare, CreditCard, ShieldCheck } from 'lucide-react';
 import { NR1_TIERS, formatBRL0, type Nr1Tier } from '@/lib/nr1Pricing';
 import { useNr1Plans, findNr1PlanIdByTier } from '@/hooks/useNr1Plans';
 
-const TIER_ICONS: Record<string, typeof Rocket> = {
-  essencial: Shield,
-  crescimento: Rocket,
-  consolidacao: TrendingUp,
-  performance: Briefcase,
-  corporate: Building2,
-  enterprise: Crown,
-};
+// Lista consolidada — todos os planos NR-1 entregam o MESMO conjunto de funcionalidades.
+// O que muda entre as faixas é apenas o volume de colaboradores e o preço.
+const NR1_FEATURES_ALL: string[] = [
+  'Diagnóstico COPSOQ-III completo',
+  'Respondentes ilimitados (anônimos, LGPD)',
+  'Dashboard de risco psicossocial',
+  'Relatórios PDF prontos para fiscalização',
+  'Plano de Ação Kanban com evidências',
+  'Pesquisa de Clima integrada + correlação COPSOQ',
+  'Cruzamento NR-1 × 9Box × Remuneração',
+  'Alertas inteligentes e gestão de terceiros (PGR)',
+  'Multi-unidades / multi-CNPJs',
+  'Suporte humano e atualizações contínuas',
+];
 
 interface Props {
   onContratar: () => void;
 }
 
+function findTierByColab(n: number): Nr1Tier {
+  return (
+    NR1_TIERS.find((t) => n >= t.minColab && (t.maxColab == null || n <= t.maxColab)) ??
+    NR1_TIERS[NR1_TIERS.length - 1]
+  );
+}
+
 export default function Nr1PricingCards({ onContratar }: Props) {
   const [anual, setAnual] = useState(true);
+  const [colab, setColab] = useState(120);
   const navigate = useNavigate();
   const { data: plans } = useNr1Plans();
+
+  const selectedTier = useMemo(() => findTierByColab(colab), [colab]);
 
   const handleSelect = (tier: Nr1Tier) => {
     if (tier.custom) {
@@ -39,6 +56,11 @@ export default function Nr1PricingCards({ onContratar }: Props) {
     navigate(`/checkout?plan=${planId}&cycle=${anual ? 'annual' : 'monthly'}&method=pix`);
   };
 
+  const priceFor = (tier: Nr1Tier) => {
+    if (tier.monthlyPrice == null) return null;
+    return anual ? Math.round(tier.monthlyPrice * 0.9) : tier.monthlyPrice;
+  };
+
   return (
     <section id="planos" className="container mx-auto px-4 py-14">
       <div className="text-center max-w-3xl mx-auto mb-10">
@@ -47,8 +69,8 @@ export default function Nr1PricingCards({ onContratar }: Props) {
           Conformidade NR-1 a <span className="nr1-text-primary">R$ 5,00 por colaborador</span>
         </h2>
         <p className="text-muted-foreground">
-          Mensal recorrente, sem fidelidade. Faixas escalonadas conforme o porte da sua empresa —
-          do diagnóstico inicial à inteligência integrada com 9Box e remuneração.
+          Todos os planos entregam <strong>exatamente as mesmas funcionalidades</strong>.
+          O que muda é apenas o volume de colaboradores — escolha a faixa que cabe na sua empresa.
         </p>
 
         <div className="inline-flex items-center gap-3 mt-6 px-4 py-2 rounded-full border bg-card">
@@ -60,105 +82,161 @@ export default function Nr1PricingCards({ onContratar }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        {NR1_TIERS.map((tier) => (
-          <TierCard key={tier.id} tier={tier} anual={anual} onSelect={() => handleSelect(tier)} />
-        ))}
-      </div>
-
-      <p className="text-center text-xs text-muted-foreground mt-6">
-        💡 Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
-      </p>
-    </section>
-  );
-}
-
-function TierCard({ tier, anual, onSelect }: { tier: Nr1Tier; anual: boolean; onSelect: () => void }) {
-  const Icon = TIER_ICONS[tier.id] ?? Shield;
-
-  const monthly = tier.monthlyPrice;
-  const displayPrice = monthly == null ? null : anual ? Math.round(monthly * 0.9) : monthly;
-
-  return (
-    <Card
-      className={`relative flex flex-col ${
-        tier.popular
-          ? 'border-2 border-[hsl(var(--nr1-primary))] shadow-lg'
-          : tier.custom
-            ? 'border-2 border-dashed border-[hsl(var(--nr1-primary)/0.4)]'
-            : 'border'
-      }`}
-    >
-      {tier.popular && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-          <Badge className="nr1-bg-primary text-white border-0 gap-1 px-3">
-            <Sparkles className="h-3 w-3" /> Mais Popular
-          </Badge>
-        </div>
-      )}
-
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <Icon className="h-5 w-5 nr1-text-primary" />
-          {tier.custom && (
-            <Badge variant="outline" className="text-[10px] nr1-text-primary border-[hsl(var(--nr1-primary)/0.4)]">
-              Sob consulta
+      <div className="grid gap-6 lg:grid-cols-2 max-w-6xl mx-auto">
+        {/* ===== Card de funcionalidades (único, vale para todos os planos) ===== */}
+        <Card className="border-2 border-[hsl(var(--nr1-primary)/0.3)] relative overflow-hidden">
+          <div className="absolute -top-3 left-6 z-10">
+            <Badge className="nr1-bg-primary text-white border-0 gap-1 px-3">
+              <Sparkles className="h-3 w-3" /> Incluso em TODAS as faixas
             </Badge>
-          )}
-        </div>
-        <CardTitle className="text-lg mt-2">{tier.name}</CardTitle>
-        <CardDescription className="text-xs">{tier.rangeLabel}</CardDescription>
-      </CardHeader>
+          </div>
+          <CardHeader className="pt-7">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-6 w-6 nr1-text-primary" />
+              <CardTitle className="text-xl">O que você recebe</CardTitle>
+            </div>
+            <CardDescription>
+              Mesmo conjunto completo de recursos da Essencial à Corporate — sem letras miúdas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="grid sm:grid-cols-2 gap-x-4 gap-y-2.5">
+              {NR1_FEATURES_ALL.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <Check className="h-4 w-4 nr1-text-primary mt-0.5 flex-shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 p-3 rounded-lg bg-[hsl(var(--nr1-primary)/0.06)] border border-[hsl(var(--nr1-primary)/0.15)] text-xs text-muted-foreground">
+              💡 Já é cliente CompSmart Pro ou Enterprise?{' '}
+              <strong className="text-foreground">NR-1 Inteligente está incluso no seu plano.</strong>
+            </div>
+          </CardContent>
+        </Card>
 
-      <CardContent className="flex-1 flex flex-col">
-        <div className="mb-4">
-          {displayPrice == null ? (
-            <>
-              <div className="text-2xl font-bold nr1-text-primary leading-tight">Sob consulta</div>
-              <p className="text-[11px] text-muted-foreground mt-1">{tier.perColabLabel}</p>
-            </>
-          ) : (
-            <>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-bold nr1-text-primary">{formatBRL0(displayPrice)}</span>
-                <span className="text-xs text-muted-foreground">/mês</span>
+        {/* ===== Card de preços + seletor de faixa ===== */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl">Escolha a faixa pelo nº de colaboradores</CardTitle>
+            <CardDescription>
+              Arraste o seletor — destacamos a faixa correspondente.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {/* Slider */}
+            <div>
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="text-sm text-muted-foreground">Colaboradores</span>
+                <span className="text-2xl font-bold nr1-text-primary tabular-nums">
+                  {colab >= 1001 ? '1.000+' : colab.toLocaleString('pt-BR')}
+                </span>
               </div>
-              {anual && (
-                <p className="text-[10px] text-green-600 font-medium mt-0.5">
-                  ~{formatBRL0(displayPrice * 12)}/ano
-                </p>
-              )}
-              <p className="text-[11px] text-muted-foreground mt-1">{tier.perColabLabel}</p>
-            </>
-          )}
-        </div>
+              <Slider
+                value={[colab]}
+                onValueChange={(v) => setColab(v[0])}
+                min={10}
+                max={1100}
+                step={10}
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                <span>10</span>
+                <span>250</span>
+                <span>500</span>
+                <span>750</span>
+                <span>1.000+</span>
+              </div>
+            </div>
 
-        <ul className="space-y-1.5 mb-4 flex-1">
-          {tier.features.map((f) => (
-            <li key={f} className="flex items-start gap-1.5 text-xs">
-              <Check className="h-3.5 w-3.5 nr1-text-primary mt-0.5 flex-shrink-0" />
-              <span>{f}</span>
-            </li>
-          ))}
-        </ul>
+            {/* Tabela de faixas */}
+            <div className="rounded-lg border overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-xs uppercase">
+                  <tr>
+                    <th className="text-left px-3 py-2 font-medium">Plano</th>
+                    <th className="text-left px-3 py-2 font-medium">Faixa</th>
+                    <th className="text-right px-3 py-2 font-medium">{anual ? 'Anual (/mês)' : 'Mensal'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {NR1_TIERS.map((tier) => {
+                    const price = priceFor(tier);
+                    const active = tier.id === selectedTier.id;
+                    return (
+                      <tr
+                        key={tier.id}
+                        className={`border-t transition-colors ${
+                          active
+                            ? 'bg-[hsl(var(--nr1-primary)/0.08)] font-semibold'
+                            : 'hover:bg-muted/30'
+                        }`}
+                      >
+                        <td className="px-3 py-2.5">
+                          <div className="flex items-center gap-1.5">
+                            {active && <span className="h-1.5 w-1.5 rounded-full nr1-bg-primary" />}
+                            <span>{tier.name}</span>
+                            {tier.popular && (
+                              <Badge variant="outline" className="text-[9px] py-0 px-1 border-green-400 text-green-700">
+                                Popular
+                              </Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2.5 text-xs text-muted-foreground">{tier.rangeLabel}</td>
+                        <td className="px-3 py-2.5 text-right tabular-nums nr1-text-primary">
+                          {price == null ? 'Sob consulta' : formatBRL0(price)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
 
-        <Button
-          size="sm"
-          className={`w-full ${tier.popular ? 'nr1-bg-primary text-white' : ''}`}
-          variant={tier.popular ? 'default' : 'outline'}
-          onClick={onSelect}
-        >
-          {tier.custom ? (
-            <>
-              <MessageSquare className="h-3.5 w-3.5 mr-1.5" /> Falar com especialista
-            </>
-          ) : (
-            <>
-              <CreditCard className="h-3.5 w-3.5 mr-1.5" /> Contratar
-            </>
-          )}
-        </Button>
-      </CardContent>
-    </Card>
+            {/* CTA da faixa selecionada */}
+            <div className="rounded-lg border-2 border-[hsl(var(--nr1-primary))] p-4 bg-[hsl(var(--nr1-primary)/0.04)]">
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <div className="text-xs text-muted-foreground">Sua faixa</div>
+                  <div className="text-lg font-bold">{selectedTier.name}</div>
+                  <div className="text-xs text-muted-foreground">{selectedTier.rangeLabel}</div>
+                </div>
+                <div className="text-right">
+                  {priceFor(selectedTier) == null ? (
+                    <div className="text-xl font-bold nr1-text-primary">Sob consulta</div>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold nr1-text-primary leading-tight">
+                        {formatBRL0(priceFor(selectedTier)!)}
+                        <span className="text-xs text-muted-foreground font-normal">/mês</span>
+                      </div>
+                      {anual && (
+                        <div className="text-[10px] text-green-600 font-medium">
+                          ~{formatBRL0(priceFor(selectedTier)! * 12)}/ano
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+              <Button
+                className="w-full nr1-bg-primary text-white hover:opacity-90"
+                onClick={() => handleSelect(selectedTier)}
+              >
+                {selectedTier.custom ? (
+                  <>
+                    <MessageSquare className="h-4 w-4 mr-2" /> Falar com especialista
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-4 w-4 mr-2" /> Contratar {selectedTier.name}
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </section>
   );
 }
