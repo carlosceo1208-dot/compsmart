@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Check, Sparkles, MessageSquare, Building2, Rocket, TrendingUp, Briefcase, Crown, Shield } from 'lucide-react';
+import { Check, Sparkles, MessageSquare, Building2, Rocket, TrendingUp, Briefcase, Crown, Shield, CreditCard } from 'lucide-react';
 import { NR1_TIERS, formatBRL0, type Nr1Tier } from '@/lib/nr1Pricing';
+import { useNr1Plans, findNr1PlanIdByTier } from '@/hooks/useNr1Plans';
 
 const TIER_ICONS: Record<string, typeof Rocket> = {
   essencial: Shield,
