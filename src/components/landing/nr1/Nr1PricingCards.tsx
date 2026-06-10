@@ -73,7 +73,7 @@ export default function Nr1PricingCards({ onContratar }: Props) {
   );
 }
 
-function TierCard({ tier, anual, onContratar }: { tier: Nr1Tier; anual: boolean; onContratar: () => void }) {
+function TierCard({ tier, anual, onSelect }: { tier: Nr1Tier; anual: boolean; onSelect: () => void }) {
   const Icon = TIER_ICONS[tier.id] ?? Shield;
 
   const monthly = tier.monthlyPrice;
@@ -146,14 +146,16 @@ function TierCard({ tier, anual, onContratar }: { tier: Nr1Tier; anual: boolean;
           size="sm"
           className={`w-full ${tier.popular ? 'nr1-bg-primary text-white' : ''}`}
           variant={tier.popular ? 'default' : 'outline'}
-          onClick={onContratar}
+          onClick={onSelect}
         >
           {tier.custom ? (
             <>
               <MessageSquare className="h-3.5 w-3.5 mr-1.5" /> Falar com especialista
             </>
           ) : (
-            'Solicitar proposta'
+            <>
+              <CreditCard className="h-3.5 w-3.5 mr-1.5" /> Contratar
+            </>
           )}
         </Button>
       </CardContent>
