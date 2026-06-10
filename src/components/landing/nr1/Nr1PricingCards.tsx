@@ -9,19 +9,21 @@ import { Check, Sparkles, MessageSquare, CreditCard, ShieldCheck } from 'lucide-
 import { NR1_TIERS, formatBRL0, type Nr1Tier } from '@/lib/nr1Pricing';
 import { useNr1Plans, findNr1PlanIdByTier } from '@/hooks/useNr1Plans';
 
-// Lista consolidada — todos os planos NR-1 entregam o MESMO conjunto de funcionalidades.
-// O que muda entre as faixas é apenas o volume de colaboradores e o preço.
-const NR1_FEATURES_ALL: string[] = [
-  'Diagnóstico COPSOQ-III completo',
-  'Respondentes ilimitados (anônimos, LGPD)',
-  'Dashboard de risco psicossocial',
-  'Relatórios PDF prontos para fiscalização',
-  'Plano de Ação Kanban com evidências',
-  'Pesquisa de Clima integrada + correlação COPSOQ',
-  'Cruzamento NR-1 × 9Box × Remuneração',
-  'Alertas inteligentes e gestão de terceiros (PGR)',
-  'Multi-unidades / multi-CNPJs',
-  'Suporte humano e atualizações contínuas',
+// Os 12 módulos do NR-1 — exatamente os mesmos serviços oferecidos em todas as faixas.
+// Espelha os 12 mini-cards (em verde) do hub "Saúde Mental & Bem-Estar".
+const NR1_FEATURES_ALL: { label: string; desc: string }[] = [
+  { label: 'Visão Geral', desc: 'Painel executivo consolidado do risco psicossocial' },
+  { label: 'Universo', desc: 'Mapeamento de colaboradores elegíveis e cobertura' },
+  { label: 'Matriz de Risco', desc: 'Heatmap das 6 dimensões COPSOQ-III por área' },
+  { label: 'Segurança Psicológica', desc: 'Indicadores de confiança e ambiente psicossocial' },
+  { label: 'Sociodemográfico', desc: 'Cortes por gênero, faixa etária, tempo de casa' },
+  { label: 'Etapas', desc: 'Fluxo guiado do ciclo NR-1 ponta a ponta' },
+  { label: 'Novo Diagnóstico', desc: 'Aplicação do questionário COPSOQ-III (anônimo, LGPD)' },
+  { label: 'Histórico', desc: 'Comparativo entre ciclos e evolução temporal' },
+  { label: 'Plano de Ação', desc: 'Kanban com responsáveis, prazos e evidências' },
+  { label: 'Gestão de Terceiros', desc: 'PGR estendido à cadeia de prestadores' },
+  { label: 'Vitalidade', desc: 'Acompanhamento de bem-estar e jornada do colaborador' },
+  { label: 'Inteligência', desc: 'IA que correlaciona NR-1 × 9Box × Clima × Remuneração' },
 ];
 
 interface Props {
