@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link, useNavigate } from 'react-router-dom';
-import { Brain, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
+import { ShieldCheck, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
 import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
 import { Footer } from '@/components/landing/Footer';
 import { SecuritySection } from '@/components/landing/SecuritySection';
@@ -50,7 +50,7 @@ export default function LandingNr1() {
   const [form, setForm] = useState({ nome: '', email: '', empresa: '', telefone: '', cargo: '', tamanho_empresa: '' });
   const [scoreFree, setScoreFree] = useState<number | null>(null);
   const navigate = useNavigate();
-  const { ctaTo, isLoggedIn } = useAuthCTA();
+  // auth CTA handled by Nr1Header
 
   const { data: questoes } = useNr1Questoes(true);
   const total = questoes?.length ?? 0;
