@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Check, Sparkles, MessageSquare, Building2, Rocket, TrendingUp, Briefcase, Crown, Shield } from 'lucide-react';
+import { Check, Sparkles, MessageSquare, Building2, Rocket, TrendingUp, Briefcase, Crown, Shield, CreditCard } from 'lucide-react';
 import { NR1_TIERS, formatBRL0, type Nr1Tier } from '@/lib/nr1Pricing';
+import { useNr1Plans, findNr1PlanIdByTier } from '@/hooks/useNr1Plans';
 
 const TIER_ICONS: Record<string, typeof Rocket> = {
   essencial: Shield,
@@ -21,6 +23,21 @@ interface Props {
 
 export default function Nr1PricingCards({ onContratar }: Props) {
   const [anual, setAnual] = useState(true);
+  const navigate = useNavigate();
+  const { data: plans } = useNr1Plans();
+
+  const handleSelect = (tier: Nr1Tier) => {
+    if (tier.custom) {
+      onContratar();
+      return;
+    }
+    const planId = findNr1PlanIdByTier(plans, tier.id);
+    if (!planId) {
+      onContratar();
+      return;
+    }
+    navigate(`/checkout?plan=${planId}&cycle=${anual ? 'annual' : 'monthly'}&method=pix`);
+  };
 
   return (
     <section id="planos" className="container mx-auto px-4 py-14">
@@ -45,7 +62,7 @@ export default function Nr1PricingCards({ onContratar }: Props) {
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {NR1_TIERS.map((tier) => (
-          <TierCard key={tier.id} tier={tier} anual={anual} onContratar={onContratar} />
+          <TierCard key={tier.id} tier={tier} anual={anual} onSelect={() => handleSelect(tier)} />
         ))}
       </div>
 
@@ -56,7 +73,7 @@ export default function Nr1PricingCards({ onContratar }: Props) {
   );
 }
 
-function TierCard({ tier, anual, onContratar }: { tier: Nr1Tier; anual: boolean; onContratar: () => void }) {
+function TierCard({ tier, anual, onSelect }: { tier: Nr1Tier; anual: boolean; onSelect: () => void }) {
   const Icon = TIER_ICONS[tier.id] ?? Shield;
 
   const monthly = tier.monthlyPrice;
@@ -129,14 +146,16 @@ function TierCard({ tier, anual, onContratar }: { tier: Nr1Tier; anual: boolean;
           size="sm"
           className={`w-full ${tier.popular ? 'nr1-bg-primary text-white' : ''}`}
           variant={tier.popular ? 'default' : 'outline'}
-          onClick={onContratar}
+          onClick={onSelect}
         >
           {tier.custom ? (
             <>
               <MessageSquare className="h-3.5 w-3.5 mr-1.5" /> Falar com especialista
             </>
           ) : (
-            'Solicitar proposta'
+            <>
+              <CreditCard className="h-3.5 w-3.5 mr-1.5" /> Contratar
+            </>
           )}
         </Button>
       </CardContent>
