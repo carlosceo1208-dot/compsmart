@@ -638,6 +638,7 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
         .from('salary_assistant_conversations')
         .select('question, answer')
         .eq('session_id', session_id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: true })
         .limit(15);
 
