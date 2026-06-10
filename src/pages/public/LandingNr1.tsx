@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link, useNavigate } from 'react-router-dom';
-import { Brain, ShieldCheck, AlertTriangle, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
+import { ShieldCheck, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
 import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
 import { Footer } from '@/components/landing/Footer';
 import { SecuritySection } from '@/components/landing/SecuritySection';
@@ -18,10 +18,14 @@ import Nr1ComoFunciona from '@/components/landing/nr1/Nr1ComoFunciona';
 import Nr1ProvaCorrelacao from '@/components/landing/nr1/Nr1ProvaCorrelacao';
 import Nr1Faq, { NR1_FAQ_JSONLD } from '@/components/landing/nr1/Nr1Faq';
 import Nr1GestaoTerceiros from '@/components/landing/nr1/Nr1GestaoTerceiros';
+import Nr1Header from '@/components/landing/nr1/Nr1Header';
+import Nr1PricingCards from '@/components/landing/nr1/Nr1PricingCards';
+import Nr1DiscountSimulator from '@/components/landing/nr1/Nr1DiscountSimulator';
+import Nr1Novidades from '@/components/landing/nr1/Nr1Novidades';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
-import { useAuthCTA } from '@/hooks/useAuthCTA';
+
 import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES, estimarMultaAnual } from '@/lib/nr1';
 import { toast } from '@/hooks/use-toast';
 
@@ -46,7 +50,7 @@ export default function LandingNr1() {
   const [form, setForm] = useState({ nome: '', email: '', empresa: '', telefone: '', cargo: '', tamanho_empresa: '' });
   const [scoreFree, setScoreFree] = useState<number | null>(null);
   const navigate = useNavigate();
-  const { ctaTo, isLoggedIn } = useAuthCTA();
+  // auth CTA handled by Nr1Header
 
   const { data: questoes } = useNr1Questoes(true);
   const total = questoes?.length ?? 0;
@@ -128,19 +132,7 @@ export default function LandingNr1() {
     <div className="nr1-scope min-h-screen bg-background">
 
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center nr1-bg-primary">
-              <Brain className="h-4 w-4" />
-            </div>
-            <span className="font-semibold">CompSmart NR-1</span>
-          </Link>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to={ctaTo}>{isLoggedIn ? 'Ir para o app' : 'Entrar'}</Link>
-          </Button>
-        </div>
-      </header>
+      <Nr1Header onAnchor={scrollToId} />
 
       {step === 'landing' && (
         <>
@@ -164,7 +156,9 @@ export default function LandingNr1() {
           </section>
 
           {/* 3 perguntas que só a CompSmart responde */}
-          <Nr1PerguntasChro />
+          <div id="funcionalidades">
+            <Nr1PerguntasChro />
+          </div>
 
           {/* Tabela NR-1 Tradicional vs. Inteligente */}
           <Nr1TabelaCategoria />
@@ -234,6 +228,17 @@ export default function LandingNr1() {
           {/* Prova social de correlação */}
           <Nr1ProvaCorrelacao />
 
+          {/* PLANOS — pricing por faixa de colaboradores */}
+          <Nr1PricingCards onContratar={() => scrollToId('fale-conosco')} />
+
+          {/* Simulador de desconto (mesmos descontos do módulo Remuneração) */}
+          <section className="container mx-auto px-4 pb-14">
+            <Nr1DiscountSimulator onCTA={() => scrollToId('fale-conosco')} />
+          </section>
+
+          {/* NOVIDADES NR-1 */}
+          <Nr1Novidades />
+
           {/* Conformidade técnica */}
           <section className="container mx-auto px-4 py-10">
             <div className="max-w-4xl mx-auto">
@@ -287,7 +292,9 @@ export default function LandingNr1() {
           </section>
 
           {/* FAQ */}
-          <Nr1Faq />
+          <div id="faq">
+            <Nr1Faq />
+          </div>
 
           {/* CTA final */}
           <section className="container mx-auto px-4 pb-16">
