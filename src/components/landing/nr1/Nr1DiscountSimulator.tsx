@@ -16,6 +16,8 @@ interface Props {
 }
 
 export default function Nr1DiscountSimulator({ onCTA }: Props) {
+  const navigate = useNavigate();
+  const { data: dbPlans } = useNr1Plans();
   const billable = NR1_TIERS.filter((t) => t.monthlyPrice != null);
   const [selected, setSelected] = useState<string>(billable[1]?.id || billable[0].id);
   const [anual, setAnual] = useState(true);
@@ -163,7 +165,16 @@ export default function Nr1DiscountSimulator({ onCTA }: Props) {
           )}
         </div>
 
-        <Button className="w-full nr1-bg-primary text-white group" size="lg" onClick={onCTA}>
+        <Button
+          className="w-full nr1-bg-primary text-white group"
+          size="lg"
+          onClick={() => {
+            const planId = findNr1PlanIdByTier(dbPlans, tier.id);
+            if (!planId) { onCTA(); return; }
+            const method = pix ? 'pix' : 'credit_card';
+            navigate(`/checkout?plan=${planId}&cycle=${anual ? 'annual' : 'monthly'}&method=${method}`);
+          }}
+        >
           Solicitar proposta {tier.name}
           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
         </Button>
