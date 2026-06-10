@@ -18,6 +18,10 @@ import Nr1ComoFunciona from '@/components/landing/nr1/Nr1ComoFunciona';
 import Nr1ProvaCorrelacao from '@/components/landing/nr1/Nr1ProvaCorrelacao';
 import Nr1Faq, { NR1_FAQ_JSONLD } from '@/components/landing/nr1/Nr1Faq';
 import Nr1GestaoTerceiros from '@/components/landing/nr1/Nr1GestaoTerceiros';
+import Nr1Header from '@/components/landing/nr1/Nr1Header';
+import Nr1PricingCards from '@/components/landing/nr1/Nr1PricingCards';
+import Nr1DiscountSimulator from '@/components/landing/nr1/Nr1DiscountSimulator';
+import Nr1Novidades from '@/components/landing/nr1/Nr1Novidades';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
@@ -128,19 +132,7 @@ export default function LandingNr1() {
     <div className="nr1-scope min-h-screen bg-background">
 
       {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg flex items-center justify-center nr1-bg-primary">
-              <Brain className="h-4 w-4" />
-            </div>
-            <span className="font-semibold">CompSmart NR-1</span>
-          </Link>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to={ctaTo}>{isLoggedIn ? 'Ir para o app' : 'Entrar'}</Link>
-          </Button>
-        </div>
-      </header>
+      <Nr1Header onAnchor={scrollToId} />
 
       {step === 'landing' && (
         <>
@@ -164,7 +156,9 @@ export default function LandingNr1() {
           </section>
 
           {/* 3 perguntas que só a CompSmart responde */}
-          <Nr1PerguntasChro />
+          <div id="funcionalidades">
+            <Nr1PerguntasChro />
+          </div>
 
           {/* Tabela NR-1 Tradicional vs. Inteligente */}
           <Nr1TabelaCategoria />
