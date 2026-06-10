@@ -285,9 +285,6 @@ export default function LandingNr1() {
                   <ProposalForm />
                 </CardContent>
               </Card>
-              <p className="text-center mt-6 text-sm text-muted-foreground">
-                Já é cliente CompSmart Pro ou Enterprise? <strong>NR-1 Inteligente está incluso no seu plano.</strong>
-              </p>
             </div>
           </section>
 
