@@ -23,6 +23,21 @@ interface Props {
 
 export default function Nr1PricingCards({ onContratar }: Props) {
   const [anual, setAnual] = useState(true);
+  const navigate = useNavigate();
+  const { data: plans } = useNr1Plans();
+
+  const handleSelect = (tier: Nr1Tier) => {
+    if (tier.custom) {
+      onContratar();
+      return;
+    }
+    const planId = findNr1PlanIdByTier(plans, tier.id);
+    if (!planId) {
+      onContratar();
+      return;
+    }
+    navigate(`/checkout?plan=${planId}&cycle=${anual ? 'annual' : 'monthly'}&method=pix`);
+  };
 
   return (
     <section id="planos" className="container mx-auto px-4 py-14">
@@ -47,7 +62,7 @@ export default function Nr1PricingCards({ onContratar }: Props) {
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {NR1_TIERS.map((tier) => (
-          <TierCard key={tier.id} tier={tier} anual={anual} onContratar={onContratar} />
+          <TierCard key={tier.id} tier={tier} anual={anual} onSelect={() => handleSelect(tier)} />
         ))}
       </div>
 
