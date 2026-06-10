@@ -25,7 +25,7 @@ import Nr1Novidades from '@/components/landing/nr1/Nr1Novidades';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
-import { useAuthCTA } from '@/hooks/useAuthCTA';
+
 import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES, estimarMultaAnual } from '@/lib/nr1';
 import { toast } from '@/hooks/use-toast';
 
