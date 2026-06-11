@@ -46,13 +46,6 @@ export default function Nr1HeroBento({ onDiagnostico, onComoFunciona }: Props) {
             >
               Diagnóstico grátis em 2 min <ArrowRight className="h-4 w-4 ml-1.5" />
             </Button>
-            <Button
-              size="lg"
-              onClick={onComoFunciona}
-              className="bg-[#1E2761] hover:bg-[#1E2761]/90 text-white rounded-2xl font-bold shadow-xl shadow-[#1E2761]/20"
-            >
-              Ver o cruzamento ao vivo
-            </Button>
           </div>
         </header>
 
