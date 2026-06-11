@@ -142,6 +142,14 @@ export default function LandingNr1() {
             onComoFunciona={() => scrollToId('como-funciona')}
           />
 
+          {/* PLANOS — pricing por faixa de colaboradores (logo após o bento de features) */}
+          <Nr1PricingCards onContratar={() => scrollToId('fale-conosco')} />
+
+          {/* Simulador de desconto (mesmos descontos do módulo Remuneração) */}
+          <section className="container mx-auto px-4 pb-14">
+            <Nr1DiscountSimulator onCTA={() => scrollToId('fale-conosco')} />
+          </section>
+
           {/* Faixa de urgência inteligente */}
           <section className="bg-foreground text-background">
             <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-center gap-3 text-center md:text-left">
@@ -163,76 +171,9 @@ export default function LandingNr1() {
 
           {/* Como funciona — 5 passos */}
           <Nr1ComoFunciona idAnchor="como-funciona" />
-
-          {/* Calculadora de multa — reposicionada como "piso" */}
-          <section className="container mx-auto px-4 py-10">
-            <Card className="max-w-2xl mx-auto nr1-bg-soft border-[hsl(var(--nr1-primary)/0.3)]">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calculator className="h-5 w-5 nr1-text-primary" /> Piso de risco: exposição a multas
-                </CardTitle>
-                <CardDescription>
-                  Multa é o <em>piso</em> do problema. O custo real é perder talento — calcule o piso primeiro.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="colab">Quantos colaboradores sua empresa tem?</Label>
-                  <Input
-                    id="colab"
-                    type="number"
-                    min={1}
-                    max={1000}
-                    value={numColab}
-                    onChange={(e) => setNumColab(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
-                    className="mt-2"
-                  />
-                </div>
-                <div className="grid grid-cols-3 gap-3 pt-2">
-                  <Stat label="Mínimo" value={formatBRL(multa.min)} tone="ok" />
-                  <Stat label="Cenário provável" value={formatBRL(multa.cenarioProvavel)} tone="warn" />
-                  <Stat label="Máximo" value={formatBRL(multa.max)} tone="bad" />
-                </div>
-                <p className="text-xs text-muted-foreground pt-2">
-                  💡 A CompSmart elimina essa exposição <strong>e</strong> ainda te entrega
-                  inteligência de retenção.{' '}
-                  <button onClick={() => scrollToId('fale-conosco')} className="underline nr1-text-primary font-semibold">
-                    Solicite uma proposta
-                  </button>.
-                </p>
-              </CardContent>
-            </Card>
-          </section>
-
-          {/* Diagnóstico express CTA — conversor principal */}
-          <section className="container mx-auto px-4 py-10">
-            <div className="max-w-3xl mx-auto rounded-2xl p-8 md:p-10 text-center nr1-bg-gradient text-white">
-              <h2 className="text-2xl md:text-3xl font-bold mb-3">
-                Faça o diagnóstico NR-1 da sua empresa agora
-              </h2>
-              <p className="opacity-90 mb-6 max-w-xl mx-auto">
-                10 perguntas · 2 minutos · score psicossocial estimado + nível de risco.
-              </p>
-              <Button
-                size="lg"
-                className="bg-white text-foreground hover:bg-white/90"
-                onClick={() => setStep('questionario')}
-              >
-                Iniciar diagnóstico grátis <ArrowRight className="h-4 w-4 ml-1.5" />
-              </Button>
-            </div>
-          </section>
-
+...
           {/* Prova social de correlação */}
           <Nr1ProvaCorrelacao />
-
-          {/* PLANOS — pricing por faixa de colaboradores */}
-          <Nr1PricingCards onContratar={() => scrollToId('fale-conosco')} />
-
-          {/* Simulador de desconto (mesmos descontos do módulo Remuneração) */}
-          <section className="container mx-auto px-4 pb-14">
-            <Nr1DiscountSimulator onCTA={() => scrollToId('fale-conosco')} />
-          </section>
 
           {/* NOVIDADES NR-1 */}
           <Nr1Novidades />
