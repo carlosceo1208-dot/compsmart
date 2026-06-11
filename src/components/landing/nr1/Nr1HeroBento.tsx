@@ -23,28 +23,28 @@ interface Props {
 export default function Nr1HeroBento({ onDiagnostico }: Props) {
   return (
     <section className="bg-[#F5F0EB] text-[#1E2761]">
-      <div className="container mx-auto px-4 pt-10 pb-14 md:pt-12 md:pb-16">
+      <div className="container mx-auto px-4 pt-6 pb-10 sm:pt-8 sm:pb-12 md:pt-12 md:pb-16">
         {/* Hero compacto */}
-        <header className="max-w-4xl mx-auto text-center mb-10 md:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#22C55E] text-white rounded-full text-[10px] font-bold uppercase tracking-widest mb-5">
+        <header className="max-w-4xl mx-auto text-center mb-8 md:mb-10 lg:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#22C55E] text-white rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-5">
             <Sparkles className="h-3 w-3" />
             <span>NR-1 Inteligente · 1ª do Brasil</span>
           </div>
-          <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl leading-tight mb-4">
+          <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl leading-[1.15] md:leading-tight mb-3 md:mb-4">
             NR-1 fez todo mundo mapear.{' '}
             <span className="text-[#22C55E]">Só a CompSmart te diz o que fazer.</span>
           </h1>
-          <p className="text-base md:text-lg text-[#1E2761]/70 mb-6 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-[#1E2761]/70 mb-5 md:mb-6 max-w-xl sm:max-w-2xl mx-auto">
             Transformamos obrigação legal em inteligência preditiva que cuida do bem-estar
             e retém talentos reais — antes que o pedido de demissão chegue.
           </p>
-          <div className="flex justify-center">
+          <div className="flex justify-center px-4 sm:px-0">
             <Button
               size="lg"
               onClick={onDiagnostico}
-              className="bg-[#22C55E] hover:bg-[#22C55E]/90 text-white rounded-2xl font-bold shadow-xl shadow-[#22C55E]/20"
+              className="w-full sm:w-auto bg-[#22C55E] hover:bg-[#22C55E]/90 text-white rounded-2xl font-bold shadow-xl shadow-[#22C55E]/20 h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base"
             >
-              Diagnóstico grátis em 2 min <ArrowRight className="h-4 w-4 ml-1.5" />
+              Diagnóstico grátis em 2 min <ArrowRight className="h-4 w-4 ml-1.5 shrink-0" />
             </Button>
           </div>
         </header>
