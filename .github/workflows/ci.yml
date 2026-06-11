@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    name: Lint, dead-code & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Fails on any unused import/variable (ESLint, --max-warnings=0)
+      - name: ESLint (strict — no warnings allowed)
+        run: npm run lint:strict
+
+      # Fails on unused files, exports, types or dependencies
+      - name: Dead-code scan (knip)
+        run: npm run dead-code:ci
+
+      - name: Build
+        run: npm run build
