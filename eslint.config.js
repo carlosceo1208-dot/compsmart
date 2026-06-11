@@ -22,12 +22,10 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
-      // Disable base rule in favor of the unused-imports plugin
-      "@typescript-eslint/no-unused-vars": "off",
-      "no-unused-vars": "off",
+      // The orphan-prevention rules — these MUST fail CI.
       "unused-imports/no-unused-imports": "error",
       "unused-imports/no-unused-vars": [
-        "warn",
+        "error",
         {
           vars: "all",
           varsIgnorePattern: "^_",
@@ -37,6 +35,22 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      // Disable base rules in favor of the plugin above
+      "@typescript-eslint/no-unused-vars": "off",
+      "no-unused-vars": "off",
+      // Pre-existing code-quality issues — keep as warnings so they don't block
+      // CI on legacy code, but stay visible during development.
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+      "@typescript-eslint/no-empty-object-type": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+      "prefer-const": "warn",
+      "no-empty": "warn",
+      "no-case-declarations": "warn",
+      "no-prototype-builtins": "warn",
+      "no-useless-escape": "warn",
+      "no-irregular-whitespace": "warn",
+      "no-misleading-character-class": "warn",
     },
   },
   // Tests can have broader patterns
