@@ -162,12 +162,13 @@ async function parsearArquivo(file: File): Promise<PreviewData> {
 function parsearTexto(texto: string): PreviewData {
   if (texto.length > MAX_TEXT_LENGTH) return { tipo: 'erro', mensagem: `Texto excede ${MAX_TEXT_LENGTH.toLocaleString('pt-BR')} caracteres.` };
   const r = parsearTextoMatriz(texto);
-  if (!r.ok) {
+  if (r.ok === false) {
     if (r.razao === 'vazio') return { tipo: 'erro', mensagem: r.mensagem };
+    const ls = r.linhas ?? [];
     return {
       tipo: 'texto_livre',
-      linhas: (r.linhas ?? []).slice(0, 15),
-      totalLinhas: (r.linhas ?? []).length,
+      linhas: ls.slice(0, 15),
+      totalLinhas: ls.length,
       totalCaracteres: texto.length,
       razao: r.mensagem,
     };
