@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -7,8 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, FileSpreadsheet, Info, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Upload, FileSpreadsheet, Info, ArrowRight, CheckCircle2, X, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { z } from 'zod';
 
 type Metodologia = 'COPSOQ-III' | 'HSE' | 'JCQ' | 'ERI' | 'OUTRA';
 
@@ -20,36 +23,152 @@ const METODOLOGIAS: Array<{ id: Metodologia; nome: string; origem: string; fator
   { id: 'OUTRA', nome: 'Outra metodologia', origem: 'Consultoria própria / customizada', fatores: 'variável', descricao: 'Será necessário mapear fatores manualmente para o COPSOQ-III.' },
 ];
 
+const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB
+const ALLOWED_EXT = ['xlsx', 'xls', 'csv', 'pdf'] as const;
+const ALLOWED_MIME = new Set([
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // xlsx
+  'application/vnd.ms-excel', // xls
+  'text/csv',
+  'application/csv',
+  'text/plain', // alguns CSVs
+  'application/pdf',
+]);
+
+const formSchema = z.object({
+  metodologia: z.enum(['COPSOQ-III', 'HSE', 'JCQ', 'ERI', 'OUTRA']),
+  metodologiaOutra: z.string().trim().max(120).optional(),
+  consultoria: z.string().trim().max(120).optional(),
+  dataDiagnostico: z.string().optional(),
+  observacoes: z.string().trim().max(2000).optional(),
+}).refine((v) => v.metodologia !== 'OUTRA' || !!v.metodologiaOutra?.trim(), {
+  message: 'Informe o nome da metodologia personalizada.',
+  path: ['metodologiaOutra'],
+});
+
+function validarArquivo(file: File): string | null {
+  if (file.size === 0) return 'O arquivo está vazio.';
+  if (file.size > MAX_FILE_SIZE) return `Arquivo excede o limite de 20 MB (atual: ${(file.size / 1024 / 1024).toFixed(1)} MB).`;
+  const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+  if (!ALLOWED_EXT.includes(ext as typeof ALLOWED_EXT[number])) {
+    return `Extensão ".${ext}" não suportada. Use: ${ALLOWED_EXT.join(', ')}.`;
+  }
+  if (file.type && !ALLOWED_MIME.has(file.type)) {
+    // alguns navegadores devolvem mime vazio — confiamos na extensão nesse caso
+    return `Tipo do arquivo (${file.type}) não corresponde aos formatos aceitos. Use Excel, CSV ou PDF.`;
+  }
+  return null;
+}
+
 export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
+  const { activeCompanyId } = useCompanyContext();
   const [metodologia, setMetodologia] = useState<Metodologia>('COPSOQ-III');
+  const [metodologiaOutra, setMetodologiaOutra] = useState('');
   const [arquivo, setArquivo] = useState<File | null>(null);
+  const [erroArquivo, setErroArquivo] = useState<string | null>(null);
   const [consultoria, setConsultoria] = useState('');
   const [dataDiagnostico, setDataDiagnostico] = useState('');
   const [observacoes, setObservacoes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const reset = () => {
+    setArquivo(null);
+    setErroArquivo(null);
+    setConsultoria('');
+    setDataDiagnostico('');
+    setObservacoes('');
+    setMetodologia('COPSOQ-III');
+    setMetodologiaOutra('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleFileChange = (f: File | null) => {
+    setErroArquivo(null);
+    if (!f) { setArquivo(null); return; }
+    const erro = validarArquivo(f);
+    if (erro) {
+      setArquivo(null);
+      setErroArquivo(erro);
+      toast.error('Arquivo inválido', { description: erro });
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+    setArquivo(f);
+  };
 
   const handleSubmit = async () => {
+    if (!activeCompanyId) {
+      toast.error('Empresa não identificada. Recarregue a página.');
+      return;
+    }
     if (!arquivo) {
       toast.error('Anexe a planilha/PDF da matriz de risco.');
       return;
     }
+
+    const parsed = formSchema.safeParse({ metodologia, metodologiaOutra, consultoria, dataDiagnostico, observacoes });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? 'Verifique os campos do formulário.');
+      return;
+    }
+
     setSubmitting(true);
-    // TODO: persistir em nr1_diagnosticos (origem='importado') + storage do arquivo + de-para de fatores
-    setTimeout(() => {
-      setSubmitting(false);
-      toast.success('Solicitação registrada. Nossa equipe fará o mapeamento dos fatores em até 2 dias úteis.');
+    try {
+      const importacaoId = crypto.randomUUID();
+      const ext = arquivo.name.split('.').pop()?.toLowerCase() ?? 'bin';
+      const safeName = arquivo.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-80);
+      const storagePath = `${activeCompanyId}/${importacaoId}/${Date.now()}_${safeName}`;
+
+      const { error: upErr } = await supabase.storage
+        .from('nr1-importacoes-matriz')
+        .upload(storagePath, arquivo, {
+          contentType: arquivo.type || `application/octet-stream`,
+          upsert: false,
+        });
+      if (upErr) throw upErr;
+
+      const { error: insErr } = await supabase.from('nr1_importacoes_matriz').insert({
+        id: importacaoId,
+        company_id: activeCompanyId,
+        metodologia,
+        metodologia_outra: metodologia === 'OUTRA' ? metodologiaOutra.trim() : null,
+        arquivo_path: storagePath,
+        arquivo_nome: arquivo.name,
+        arquivo_tamanho: arquivo.size,
+        arquivo_mime: arquivo.type || `application/${ext}`,
+        consultoria: consultoria.trim() || null,
+        data_diagnostico: dataDiagnostico || null,
+        observacoes: observacoes.trim() || null,
+        status: 'pendente',
+      });
+      if (insErr) {
+        // rollback do arquivo se o insert falhar
+        await supabase.storage.from('nr1-importacoes-matriz').remove([storagePath]);
+        throw insErr;
+      }
+
+      toast.success('Importação registrada', {
+        description: 'Nossa equipe fará o mapeamento dos fatores em até 2 dias úteis.',
+      });
+      reset();
       onOpenChange(false);
-      setArquivo(null);
-      setConsultoria('');
-      setDataDiagnostico('');
-      setObservacoes('');
-    }, 800);
+    } catch (e: any) {
+      console.error('Erro ao importar matriz', e);
+      const msg = e?.message?.includes('row-level security')
+        ? 'Você não tem permissão para registrar importações nesta empresa.'
+        : e?.message?.includes('Payload')
+        ? 'Arquivo muito grande para envio.'
+        : e?.message ?? 'Falha ao enviar a matriz. Tente novamente.';
+      toast.error('Erro no envio', { description: msg });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const meta = METODOLOGIAS.find(m => m.id === metodologia)!;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -99,6 +218,19 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
             </RadioGroup>
           </div>
 
+          {metodologia === 'OUTRA' && (
+            <div className="space-y-2">
+              <Label htmlFor="met-outra" className="text-sm font-semibold">Nome da metodologia *</Label>
+              <Input
+                id="met-outra"
+                value={metodologiaOutra}
+                onChange={(e) => setMetodologiaOutra(e.target.value)}
+                placeholder="Ex.: Metodologia própria XYZ"
+                maxLength={120}
+              />
+            </div>
+          )}
+
           {metodologia !== 'COPSOQ-III' && (
             <Alert className="border-amber-300 bg-amber-50">
               <ArrowRight className="h-4 w-4" />
@@ -109,44 +241,61 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
           )}
 
           <div className="space-y-2">
-            <Label className="text-sm font-semibold">2. Arquivo da matriz de risco</Label>
+            <Label className="text-sm font-semibold">2. Arquivo da matriz de risco *</Label>
             <div className="flex items-center gap-2">
               <Input
+                ref={fileInputRef}
                 type="file"
-                accept=".xlsx,.xls,.csv,.pdf"
-                onChange={(e) => setArquivo(e.target.files?.[0] ?? null)}
+                accept=".xlsx,.xls,.csv,.pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,application/pdf"
+                onChange={(e) => handleFileChange(e.target.files?.[0] ?? null)}
                 className="cursor-pointer"
+                disabled={submitting}
               />
               {arquivo && (
-                <Badge variant="outline" className="shrink-0">
-                  <FileSpreadsheet className="h-3 w-3 mr-1" />
+                <Badge variant="outline" className="shrink-0 gap-1">
+                  <FileSpreadsheet className="h-3 w-3" />
                   {(arquivo.size / 1024).toFixed(0)} KB
+                  <button
+                    type="button"
+                    onClick={() => handleFileChange(null)}
+                    className="ml-1 hover:text-destructive"
+                    aria-label="Remover arquivo"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </Badge>
               )}
             </div>
-            <p className="text-[11px] text-muted-foreground">Formatos aceitos: Excel (.xlsx, .xls), CSV ou PDF — máx. 20 MB.</p>
+            {erroArquivo ? (
+              <Alert variant="destructive" className="py-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="text-xs">{erroArquivo}</AlertDescription>
+              </Alert>
+            ) : (
+              <p className="text-[11px] text-muted-foreground">Formatos aceitos: Excel (.xlsx, .xls), CSV ou PDF — máx. 20 MB.</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="consultoria" className="text-sm font-semibold">3. Consultoria responsável <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-              <Input id="consultoria" value={consultoria} onChange={(e) => setConsultoria(e.target.value)} placeholder="Ex.: XYZ SST" />
+              <Input id="consultoria" value={consultoria} onChange={(e) => setConsultoria(e.target.value)} placeholder="Ex.: XYZ SST" maxLength={120} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="data" className="text-sm font-semibold">4. Data do diagnóstico</Label>
-              <Input id="data" type="date" value={dataDiagnostico} onChange={(e) => setDataDiagnostico(e.target.value)} />
+              <Input id="data" type="date" value={dataDiagnostico} onChange={(e) => setDataDiagnostico(e.target.value)} max={new Date().toISOString().slice(0, 10)} />
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="obs" className="text-sm font-semibold">5. Observações <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-            <Textarea id="obs" value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={2} placeholder="Ex.: pesquisa aplicada apenas nas unidades fabris; população amostral de 320 colaboradores..." />
+            <Textarea id="obs" value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={2} maxLength={2000} placeholder="Ex.: pesquisa aplicada apenas nas unidades fabris; população amostral de 320 colaboradores..." />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={submitting} className="nr1-bg-primary">
+          <Button onClick={handleSubmit} disabled={submitting || !arquivo} className="nr1-bg-primary">
             {submitting ? 'Enviando...' : 'Enviar para mapeamento'}
           </Button>
         </DialogFooter>
