@@ -550,7 +550,11 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
                 <div className="flex items-center gap-2 flex-wrap text-[11px]">
                   <Badge variant="outline">{preview.totalRows} linhas</Badge>
                   <Badge variant="outline">{preview.totalCols} colunas</Badge>
-                  {preview.delimitador && <Badge variant="outline">delim: {preview.delimitador}</Badge>}
+                  {preview.delimitador && (
+                    <Badge variant="outline" title={preview.delimitador.rationale}>
+                      delim: {preview.delimitador.char} · {(preview.delimitador.confidence * 100).toFixed(0)}%
+                    </Badge>
+                  )}
                   {preview.sheets && preview.sheets.length > 1 && <Badge variant="outline">{preview.sheets.length} abas</Badge>}
                 </div>
               </div>
