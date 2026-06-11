@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
-import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
+import Nr1HeroBento from '@/components/landing/nr1/Nr1HeroBento';
 import { Footer } from '@/components/landing/Footer';
 import { SecuritySection } from '@/components/landing/SecuritySection';
 import Nr1PerguntasChro from '@/components/landing/nr1/Nr1PerguntasChro';
@@ -136,8 +136,8 @@ export default function LandingNr1() {
 
       {step === 'landing' && (
         <>
-          {/* HERO — categoria nova */}
-          <Nr1Hero
+          {/* HERO compacto + Bento das features NR-1 */}
+          <Nr1HeroBento
             onDiagnostico={() => setStep('questionario')}
             onComoFunciona={() => scrollToId('como-funciona')}
           />
@@ -156,9 +156,7 @@ export default function LandingNr1() {
           </section>
 
           {/* 3 perguntas que só a CompSmart responde */}
-          <div id="funcionalidades">
-            <Nr1PerguntasChro />
-          </div>
+          <Nr1PerguntasChro />
 
           {/* Tabela NR-1 Tradicional vs. Inteligente */}
           <Nr1TabelaCategoria />
