@@ -32,10 +32,6 @@ import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
  * 10. Security (confiança/objeções)
  * 11. FAQ + CTA final
  *
- * Removidos para evitar repetição com as seções acima:
- *   VideoSection, IntegrationSection, TargetAudienceSection,
- *   DifferentialsSection, CompetitiveComparisonSection.
- * (Componentes preservados no codebase — basta re-importar para reativar.)
  */
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
