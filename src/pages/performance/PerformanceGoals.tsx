@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Target, Plus, Search, Loader2, Building2, Users, Briefcase, User } from "lucide-react";
 import { usePerformanceGoals, goalLevelLabels, type GoalWithRelations } from "@/hooks/usePerformanceGoals";

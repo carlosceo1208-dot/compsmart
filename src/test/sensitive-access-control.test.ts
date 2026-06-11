@@ -70,7 +70,7 @@ describeIfServiceRole("Sensitive data access control (admin/HR/manager/self)", (
     const passed = rows.filter((r) => r.status === "PASS").length;
 
     if (inconclusive.length > 0) {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `Schema drift on ${inconclusive.length} probe(s) — update audit_sensitive_data_access targets:\n` +
           inconclusive
@@ -79,7 +79,7 @@ describeIfServiceRole("Sensitive data access control (admin/HR/manager/self)", (
       );
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       `Sensitive access audit: ${passed} PASS / ${inconclusive.length} INCONCLUSIVE / ${failures.length} FAIL across ${rows.length} probes`
     );

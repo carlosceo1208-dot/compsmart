@@ -36,8 +36,6 @@ import {
   compareCurves,
   gradeToNumeric,
   generateRegressionLine,
-  type RegressionResult,
-  type CurveComparison,
 } from "@/lib/regressionCalculations";
 
 interface ComparisonRow {

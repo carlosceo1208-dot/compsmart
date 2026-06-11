@@ -26,7 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Gift, Users, DollarSign, Pencil, TrendingUp, Hash, Briefcase, Award, Building2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useBenefitsKPI } from '@/hooks/useBenefitsKPI';
 import { useEmployeeFilters } from '@/hooks/useEmployeeFilters';
-import { formatCurrency, formatCurrencyNoDecimals, formatDecimal, toFixedSafe } from '@/lib/formatters';
+import { formatCurrency, formatCurrencyNoDecimals, formatDecimal } from '@/lib/formatters';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 

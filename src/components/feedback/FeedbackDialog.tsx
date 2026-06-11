@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useFeedback, FeedbackType } from '@/hooks/useFeedback';
-import { Lightbulb, Bug, Heart, HelpCircle, Star, Loader2 } from 'lucide-react';
+import { Lightbulb, Bug, Heart, HelpCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface FeedbackDialogProps {

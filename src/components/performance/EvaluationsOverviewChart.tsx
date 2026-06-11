@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { ClipboardCheck, ArrowRight, Clock, CheckCircle, AlertTriangle, FileQuestion } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LabelList } from "recharts";
 
 interface EvaluationsOverviewChartProps {
   totalEvaluations: number;

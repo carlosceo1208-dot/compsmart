@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { EmployeeCombobox } from "@/components/EmployeeCombobox";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PDIDialogProps {
   open: boolean;

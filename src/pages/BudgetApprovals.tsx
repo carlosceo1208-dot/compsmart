@@ -14,10 +14,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import { 
   FileCheck, Clock, CheckCircle, AlertCircle, ArrowLeft, FileSpreadsheet, 
-  FileText, Mail, UserCog, AlertTriangle, CalendarIcon, Send, ChevronDown, ChevronUp,
+  FileText, Mail, UserCog, AlertTriangle, CalendarIcon, Send, ChevronDown,
   FileEdit
 } from 'lucide-react';
 import { SubmissionReviewDialog } from '@/components/budget/SubmissionReviewDialog';

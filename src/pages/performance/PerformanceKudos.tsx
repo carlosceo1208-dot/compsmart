@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Award, Plus, Loader2, Inbox, Send, Globe } from "lucide-react";
-import { usePerformanceKudos, kudosCategoryLabels, type KudosWithRelations } from "@/hooks/usePerformanceKudos";
+import { usePerformanceKudos, kudosCategoryLabels } from "@/hooks/usePerformanceKudos";
 import { KudosDialog } from "@/components/performance/KudosDialog";
 import { KudosCard } from "@/components/performance/KudosCard";
 import { supabase } from "@/integrations/supabase/client";

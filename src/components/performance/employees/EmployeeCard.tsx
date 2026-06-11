@@ -1,9 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Target, TrendingUp, Users, MessageSquare, Star } from "lucide-react";
+import { Target, TrendingUp, MessageSquare, Star } from "lucide-react";
 import { PerformanceEmployee } from "@/hooks/usePerformanceEmployees";
 
 interface EmployeeCardProps {

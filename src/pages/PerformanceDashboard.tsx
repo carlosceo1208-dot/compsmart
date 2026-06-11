@@ -11,7 +11,6 @@ import {
   ClipboardCheck,
   TrendingUp,
   Calendar,
-  Award,
   LayoutGrid,
   Bot,
   Sparkles,

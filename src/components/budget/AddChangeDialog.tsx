@@ -168,7 +168,7 @@ export const AddChangeDialog = ({
       // Garantir valores numéricos (tratar NULL)
       let projectedSalary = currentData.salary || 0;
       let projectedVariable = currentData.variable_salary || 0;
-      let projectedBenefits = currentData.benefits_value || 0;
+      const projectedBenefits = currentData.benefits_value || 0;
       let projectedJobTitleId = currentData.job_title_id;
       let projectedGrade = currentData.grade;
       let projectedUnitId = currentData.unit_id;

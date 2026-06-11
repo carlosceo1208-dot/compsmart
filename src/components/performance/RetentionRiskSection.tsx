@@ -1,6 +1,5 @@
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { ShieldAlert, DollarSign, MapPin, Briefcase, Cloud, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";

@@ -11,8 +11,7 @@ import { MoreVertical, Pencil, Trash2, FileText, Scale } from "lucide-react";
 import { 
   usePerformanceTemplates, 
   templateTypeLabels,
-  type PerformanceTemplate,
-  type TemplateIndicator
+  type PerformanceTemplate
 } from "@/hooks/usePerformanceTemplates";
 
 interface TemplateCardProps {

@@ -1,4 +1,4 @@
-import { Rocket, Brain, BarChart3, Shield, Users, Sparkles, Gift, Calculator, FileText, Bell, Lock, Zap } from "lucide-react";
+import { Rocket, Brain, BarChart3, Shield, Gift, Calculator, FileText, Bell } from "lucide-react";
 
 export type ChangelogCategory = 'lancamento' | 'novo' | 'melhoria' | 'correcao';
 

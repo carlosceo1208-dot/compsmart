@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
-  Upload, FileSpreadsheet, Info, ArrowRight, CheckCircle2, X, AlertCircle, FileText,
+  Upload, FileSpreadsheet, ArrowRight, CheckCircle2, X, AlertCircle, FileText,
   Loader2, Eye, BookmarkPlus, Bookmark, Sparkles, FileType,
 } from 'lucide-react';
 import { toast } from 'sonner';

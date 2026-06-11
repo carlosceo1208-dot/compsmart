@@ -1,14 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { 
   Target, 
   ClipboardCheck, 
   FileText, 
   Award,
   Calendar,
-  TrendingUp,
   MessageSquare,
-  Users,
   ArrowUp,
   ArrowDown,
   Minus
