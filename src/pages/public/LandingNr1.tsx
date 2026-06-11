@@ -139,7 +139,6 @@ export default function LandingNr1() {
           {/* HERO compacto + Bento das features NR-1 */}
           <Nr1HeroBento
             onDiagnostico={() => setStep('questionario')}
-            onComoFunciona={() => scrollToId('como-funciona')}
           />
 
           {/* PLANOS — pricing por faixa de colaboradores (logo após o bento de features) */}
