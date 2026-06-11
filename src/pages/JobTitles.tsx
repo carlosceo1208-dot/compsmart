@@ -226,8 +226,8 @@ export default function JobTitlesPage() {
   const sortedData = [...filteredData].sort((a, b) => {
     if (!sortField || !sortDirection) return 0;
     
-    let aVal = sortField === "title" ? a.title : normalizeGrade(a.grade);
-    let bVal = sortField === "title" ? b.title : normalizeGrade(b.grade);
+    const aVal = sortField === "title" ? a.title : normalizeGrade(a.grade);
+    const bVal = sortField === "title" ? b.title : normalizeGrade(b.grade);
     
     if (sortField === "grade") {
       const aNum = parseFloat(aVal);

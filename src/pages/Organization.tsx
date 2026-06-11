@@ -139,7 +139,7 @@ const Organization = () => {
 
       // SECURITY: cnpj is restricted; fetch via admin/HR RPC and merge
       const ids = (data || []).map((c: any) => c.id);
-      let billingMap = new Map<string, string | null>();
+      const billingMap = new Map<string, string | null>();
       if (ids.length > 0) {
         const { data: billing } = await supabase
           .rpc('get_companies_billing_info', { _company_ids: ids });

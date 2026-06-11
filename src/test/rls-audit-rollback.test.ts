@@ -57,7 +57,7 @@ describeIfServiceRole("RLS audit rollback under INSERT failure", () => {
     // Skip cleanly if the database doesn't have 2 distinct tenants
     const fixture = rows.find((r) => r.scenario === "fixture");
     if (fixture?.status === "SKIP") {
-      // eslint-disable-next-line no-console
+       
       console.warn(`Self-test skipped: ${fixture.details}`);
       return;
     }
@@ -89,7 +89,7 @@ describeIfServiceRole("RLS audit rollback under INSERT failure", () => {
       throw new Error(`Self-test reported failures:\n${lines}`);
     }
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       "Audit rollback self-test passed: no mutations persisted after simulated mid-INSERT failure."
     );

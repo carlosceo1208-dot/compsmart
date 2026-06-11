@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Users, BarChart3, TrendingUp, DollarSign } from "lucide-react";
+import { Sparkles, BarChart3, TrendingUp, DollarSign } from "lucide-react";
 import { ImpactCalculator } from "./ImpactCalculator";
 import { Nr1HighlightBanner } from "./Nr1HighlightBanner";
 import { StickyCTABar } from "./StickyCTABar";
@@ -33,7 +33,7 @@ const AnimatedCounter = ({ target, suffix = "" }: { target: number; suffix?: str
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting && !started.current) {
         started.current = true;
-        let start = 0;
+        const start = 0;
         const duration = 1500;
         const startTime = performance.now();
         const animate = (now: number) => {

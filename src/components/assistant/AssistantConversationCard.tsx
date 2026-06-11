@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowDown, User, Bot, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { cn } from '@/lib/utils';
 
 interface Conversation {
   id?: string;

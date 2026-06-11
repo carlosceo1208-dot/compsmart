@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { PlanType, useFeatureAccess } from '@/hooks/useFeatureAccess';
-import { Sparkles, Check, X, Crown, Rocket, TrendingUp, Building2 } from 'lucide-react';
+import { Sparkles, Check, Crown, Rocket, TrendingUp, Building2 } from 'lucide-react';
 
 interface UpgradePlanModalProps {
   open: boolean;

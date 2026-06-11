@@ -6,7 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Award, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useEmployeeKudos, type EmployeeKudos } from "@/hooks/useEmployeeKudos";
-import { kudosCategoryEmojis, kudosCategoryLabels, type KudosCategory } from "@/hooks/usePerformanceKudos";
+import { kudosCategoryEmojis, kudosCategoryLabels } from "@/hooks/usePerformanceKudos";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";

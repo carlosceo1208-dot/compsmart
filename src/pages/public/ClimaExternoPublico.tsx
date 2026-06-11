@@ -9,8 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { CheckCircle2, Shield, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import {
-  QUESTOES_EXTERNAS, DIMENSAO_EXT_LABEL, ESCALA,
+import { DIMENSAO_EXT_LABEL, ESCALA,
   questoesPorTipo, calcularScores,
 } from '@/lib/climaExternoQuestoes';
 

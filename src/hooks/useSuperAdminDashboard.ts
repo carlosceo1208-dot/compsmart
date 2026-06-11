@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentUserRole } from './useCurrentUserRole';
-import { differenceInYears, differenceInMonths } from 'date-fns';
+import { differenceInMonths } from 'date-fns';
 
 interface CompanyData {
   id: string;

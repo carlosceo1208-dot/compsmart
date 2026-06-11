@@ -32,7 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Search, UserPlus, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2,
-  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, ChevronDown, Mail, Send, AlertCircle
+  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, Mail, Send, AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";

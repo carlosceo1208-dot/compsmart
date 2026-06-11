@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Building2, ChevronDown, ChevronUp, Loader2, MapPinOff } from "lucide-react";
+import { MapPin, ChevronDown, ChevronUp, Loader2, MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useCompanyLocations } from "@/hooks/useCompanyLocations";

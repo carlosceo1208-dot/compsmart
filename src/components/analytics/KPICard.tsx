@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
-import { formatCurrency, formatNumber, formatPercentage, formatCompactCurrency, formatCurrencyCustom } from '@/lib/formatters';
+import { formatNumber, formatPercentage, formatCompactCurrency, formatCurrencyCustom } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 interface KPICardProps {

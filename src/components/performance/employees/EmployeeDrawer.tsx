@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Target, TrendingUp, ClipboardCheck, Users, MessageSquare, Calendar } from "lucide-react";
+import { Target, TrendingUp, ClipboardCheck, MessageSquare, Calendar } from "lucide-react";
 
 interface EmployeeDrawerProps {
   employee: PerformanceEmployee | null;

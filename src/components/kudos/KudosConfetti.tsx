@@ -89,7 +89,7 @@ export const KudosConfetti = ({ isActive, onComplete }: KudosConfettiProps) => {
       ctx.restore();
     };
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     const duration = 4500; // 4.5 seconds
 
     const animate = () => {

@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
-import { ClipboardList, Sparkles, BarChart3, Plus, ArrowRight, Users, AlertTriangle, Copy, Mail, Send, Link2, LineChart, FileText, ShieldCheck } from 'lucide-react';
+import { ClipboardList, Sparkles, Plus, ArrowRight, Users, Copy, Mail, Send, Link2, LineChart, FileText, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DIMENSAO_LABEL, interpretarClima, CORRELACAO_COPSOQ, type ClimaDimensao } from '@/lib/climaQuestoes';
 

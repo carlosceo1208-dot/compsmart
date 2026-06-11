@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Target, MessageSquare, FileText, CheckSquare, Calendar, Award } from "lucide-react";
+import { Target, FileText, CheckSquare, Calendar, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ProfileExecutiveCardProps {

@@ -16,7 +16,6 @@ import { useEconomicData } from "@/hooks/useEconomicData";
 import { formatCurrency, formatCurrencyCustom } from "@/lib/formatters";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 type ReportType = 

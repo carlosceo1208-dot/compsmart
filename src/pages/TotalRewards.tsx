@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
-import { FileText, Download, DollarSign, Gift, TrendingUp, Users, PieChart } from "lucide-react";
+import { FileText, DollarSign, Gift, TrendingUp, Users, PieChart } from "lucide-react";
 import { formatCurrency } from "@/lib/formatters";
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
 

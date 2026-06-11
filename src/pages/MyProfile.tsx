@@ -8,7 +8,6 @@ import { Separator } from '@/components/ui/separator';
 import { User, Briefcase, DollarSign, Shield, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLabels } from '@/contexts/LabelsContext';
-import { format } from 'date-fns';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { SecuritySettings } from '@/components/profile/SecuritySettings';
 

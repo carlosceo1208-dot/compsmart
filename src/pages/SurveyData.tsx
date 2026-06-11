@@ -107,8 +107,8 @@ export default function SurveyDataPage() {
   const sortedData = [...surveyData].sort((a, b) => {
     if (!sortField || !sortDirection) return 0;
     
-    let aVal = sortField === "job_title" ? a.job_title : normalizeGrade(a.grade);
-    let bVal = sortField === "job_title" ? b.job_title : normalizeGrade(b.grade);
+    const aVal = sortField === "job_title" ? a.job_title : normalizeGrade(a.grade);
+    const bVal = sortField === "job_title" ? b.job_title : normalizeGrade(b.grade);
     
     if (sortField === "grade") {
       const aNum = parseFloat(aVal);

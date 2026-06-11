@@ -14,7 +14,7 @@ import {
   Undo2,
   AlertTriangle
 } from "lucide-react";
-import { CollectiveAdjustment, ScenarioConflict } from "@/hooks/useCollectiveAdjustments";
+import { CollectiveAdjustment } from "@/hooks/useCollectiveAdjustments";
 import { formatCurrency } from "@/lib/formatters";
 import {
   AlertDialog,

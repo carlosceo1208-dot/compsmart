@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
-import { changelogEntries, categoryStyles, categoryLabels, ChangelogCategory } from "@/data/changelog";
+import { changelogEntries, categoryStyles, categoryLabels } from "@/data/changelog";
 
 const Changelog = () => {
   const navigate = useNavigate();

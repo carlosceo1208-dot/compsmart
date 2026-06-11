@@ -20,7 +20,6 @@ import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { SecurityFooter } from "@/components/SecurityFooter";
-import { CompanyLogo } from "@/components/CompanyLogo";
 import { SupportWidget } from "@/components/support/SupportWidget";
 import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";

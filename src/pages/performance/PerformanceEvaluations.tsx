@@ -11,8 +11,6 @@ import { usePerformanceEvaluations, evaluationStatusLabels, evaluationStatusColo
 import { usePerformanceCycles } from "@/hooks/usePerformanceCycles";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { EvaluationDialog } from "@/components/performance/EvaluationDialog";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 export default function PerformanceEvaluations() {
   const [searchTerm, setSearchTerm] = useState("");

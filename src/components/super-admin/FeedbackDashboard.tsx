@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Lightbulb, Bug, Heart, HelpCircle, MessageSquare, TrendingUp, Users, CheckCircle } from 'lucide-react';
+import { Lightbulb, Bug, Heart, HelpCircle, MessageSquare, TrendingUp, CheckCircle } from 'lucide-react';
 import { useAllFeedbacks, useFeedbackKPIs, useUpdateFeedbackStatus, FeedbackType, FeedbackStatus } from '@/hooks/useFeedback';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';

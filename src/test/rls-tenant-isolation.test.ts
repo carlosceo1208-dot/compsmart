@@ -68,7 +68,7 @@ describeIfServiceRole("RLS tenant isolation (auto-discovered)", () => {
     // Useful diagnostic in CI logs
     const inconclusive = rows.filter((r) => r.status === "INCONCLUSIVE").length;
     const passed = rows.filter((r) => r.status === "PASS").length;
-    // eslint-disable-next-line no-console
+     
     console.log(
       `RLS audit: ${passed} PASS / ${inconclusive} INCONCLUSIVE / ${failures.length} FAIL / ${errors.length} ERROR across ${rows.length} probes`
     );

@@ -1,11 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Target, ArrowRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, 
-  BarChart, Bar, XAxis, YAxis, LineChart, Line, CartesianGrid 
+  BarChart, Bar, XAxis, LineChart, Line, CartesianGrid 
 } from "recharts";
 
 interface GoalsProgressChartProps {

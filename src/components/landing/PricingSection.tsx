@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { planFeatures, PlanFeature } from "@/config/planFeatures";
+import { planFeatures } from "@/config/planFeatures";
 import { DiscountCalculator } from "./DiscountCalculator";
 
 interface ColorClasses {

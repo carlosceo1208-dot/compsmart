@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, CheckCircle, Info, Bell, ShieldAlert, TrendingUp } from "lucide-react";
+import { AlertTriangle, CheckCircle, Info, ShieldAlert, TrendingUp } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { Link } from "react-router-dom";
 import type { AlertSummary } from "@/hooks/usePerformanceAlerts";
 
 interface AlertsCardProps {

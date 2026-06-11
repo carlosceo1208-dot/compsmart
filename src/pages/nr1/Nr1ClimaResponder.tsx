@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { respondentHash } from '@/lib/nr1';
-import { QUESTOES, ESCALA_OPCOES, DIMENSAO_LABEL, calcularScores, type ClimaDimensao } from '@/lib/climaQuestoes';
+import { QUESTOES, ESCALA_OPCOES, calcularScores, type ClimaDimensao } from '@/lib/climaQuestoes';
 
 const DIMENSOES = Array.from(new Set(QUESTOES.map((q) => q.dimensao))) as ClimaDimensao[];
 

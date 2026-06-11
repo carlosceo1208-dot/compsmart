@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CompanyLogo } from "@/components/CompanyLogo";
-import { Building2, Edit, Image, Loader2 } from "lucide-react";
+import { Building2, Edit, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface CompanyContextCardProps {

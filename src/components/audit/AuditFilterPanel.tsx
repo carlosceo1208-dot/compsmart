@@ -36,7 +36,7 @@ export const AuditFilterPanel = ({ filters, onFiltersChange, onApply }: AuditFil
   const setPeriod = (type: string) => {
     const now = new Date();
     let start = now;
-    let end = now;
+    const end = now;
 
     switch (type) {
       case '24h':

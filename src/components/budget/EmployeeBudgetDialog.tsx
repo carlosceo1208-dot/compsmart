@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Save } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useBudgetProjections } from '@/hooks/useBudgetProjections';
 import { formatCurrency } from '@/lib/formatters';
 import { Skeleton } from '@/components/ui/skeleton';
