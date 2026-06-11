@@ -70,9 +70,22 @@ function sugerirAlvo(header: string): string {
   return 'ignorar';
 }
 
+import {
+  parsearTextoMatriz, montarMetaDeMatriz, detectarDelimitador as detectarDelim,
+  type ColunaMeta, type DelimiterDetection, tipoLabel, tipoCor,
+} from '@/lib/nr1MatrizParser';
+
 type PreviewData =
-  | { tipo: 'tabela'; origem: 'arquivo' | 'texto'; sheets?: string[]; sheetAtivo?: string; headers: string[]; rows: string[][]; totalRows: number; totalCols: number; delimitador?: string }
-  | { tipo: 'texto_livre'; linhas: string[]; totalLinhas: number; totalCaracteres: number }
+  | {
+      tipo: 'tabela'; origem: 'arquivo' | 'texto';
+      sheets?: string[]; sheetAtivo?: string;
+      headers: string[]; rows: string[][];
+      totalRows: number; totalCols: number;
+      delimitador?: DelimiterDetection;
+      colunas: ColunaMeta[];
+      warnings: string[];
+    }
+  | { tipo: 'texto_livre'; linhas: string[]; totalLinhas: number; totalCaracteres: number; razao: string }
   | { tipo: 'pdf'; tamanhoKb: number }
   | { tipo: 'erro'; mensagem: string };
 
@@ -95,21 +108,35 @@ function validarArquivo(file: File): string | null {
   return null;
 }
 
-function detectarDelimitador(linha: string): string {
-  const candidatos = ['\t', ';', '|', ','];
-  let melhor = ','; let max = 0;
-  for (const c of candidatos) {
-    const n = linha.split(c).length - 1;
-    if (n > max) { max = n; melhor = c; }
-  }
-  return max >= 1 ? melhor : '';
-}
-
 async function parsearArquivo(file: File): Promise<PreviewData> {
   const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
   if (ext === 'pdf') return { tipo: 'pdf', tamanhoKb: Math.round(file.size / 1024) };
   try {
     const buf = await file.arrayBuffer();
+    // CSV: tenta detectar delimitador pelo conteúdo bruto antes de delegar ao XLSX
+    if (ext === 'csv') {
+      const txt = new TextDecoder('utf-8').decode(buf);
+      const linhas = txt.split(/\r?\n/).filter(l => l.trim().length > 0);
+      const delim = detectarDelim(linhas);
+      // Reescreve para tabs para o XLSX (tratamento uniforme)
+      const wb = XLSX.read(buf, { type: 'array', cellDates: false, FS: delim.raw || ',' });
+      const sa = wb.SheetNames[0];
+      const sheet = wb.Sheets[sa];
+      const matriz = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, blankrows: false, defval: '' }) as any[][];
+      if (!matriz.length) return { tipo: 'erro', mensagem: 'O CSV está vazio.' };
+      const headers = (matriz[0] ?? []).map((c) => String(c ?? '').trim());
+      if (headers.every(h => !h)) return { tipo: 'erro', mensagem: 'Cabeçalhos não detectados na primeira linha do CSV.' };
+      const dataRows = matriz.slice(1).map(r => r.map(c => String(c ?? '')));
+      const meta = montarMetaDeMatriz(headers, dataRows);
+      return {
+        tipo: 'tabela', origem: 'arquivo',
+        sheets: wb.SheetNames, sheetAtivo: sa,
+        headers, rows: dataRows.slice(0, 10),
+        totalRows: dataRows.length, totalCols: headers.length,
+        delimitador: delim, colunas: meta.colunas, warnings: meta.warnings,
+      };
+    }
+
     const wb = XLSX.read(buf, { type: 'array', cellDates: false });
     const sheetAtivo = wb.SheetNames[0];
     if (!sheetAtivo) return { tipo: 'erro', mensagem: 'Nenhuma planilha encontrada no arquivo.' };
@@ -119,11 +146,13 @@ async function parsearArquivo(file: File): Promise<PreviewData> {
     const headers = (matriz[0] ?? []).map((c) => String(c ?? '').trim());
     if (headers.every(h => !h)) return { tipo: 'erro', mensagem: 'Cabeçalhos não detectados na primeira linha.' };
     const dataRows = matriz.slice(1).map(r => r.map(c => String(c ?? '')));
+    const meta = montarMetaDeMatriz(headers, dataRows);
     return {
       tipo: 'tabela', origem: 'arquivo',
       sheets: wb.SheetNames, sheetAtivo,
-      headers, rows: dataRows.slice(0, 8),
+      headers, rows: dataRows.slice(0, 10),
       totalRows: dataRows.length, totalCols: headers.length,
+      colunas: meta.colunas, warnings: meta.warnings,
     };
   } catch (e: any) {
     return { tipo: 'erro', mensagem: `Não foi possível ler o arquivo: ${e?.message ?? 'formato inválido'}.` };
@@ -131,31 +160,26 @@ async function parsearArquivo(file: File): Promise<PreviewData> {
 }
 
 function parsearTexto(texto: string): PreviewData {
-  const t = texto.trim();
-  if (!t) return { tipo: 'erro', mensagem: 'Cole o conteúdo da matriz no campo de texto.' };
-  if (t.length > MAX_TEXT_LENGTH) return { tipo: 'erro', mensagem: `Texto excede ${MAX_TEXT_LENGTH.toLocaleString('pt-BR')} caracteres.` };
-  const linhas = t.split(/\r?\n/).filter(l => l.trim().length > 0);
-  if (linhas.length < 2) {
-    return { tipo: 'texto_livre', linhas: linhas.slice(0, 12), totalLinhas: linhas.length, totalCaracteres: t.length };
+  if (texto.length > MAX_TEXT_LENGTH) return { tipo: 'erro', mensagem: `Texto excede ${MAX_TEXT_LENGTH.toLocaleString('pt-BR')} caracteres.` };
+  const r = parsearTextoMatriz(texto);
+  if (r.ok === false) {
+    if (r.razao === 'vazio') return { tipo: 'erro', mensagem: r.mensagem };
+    const ls = r.linhas ?? [];
+    return {
+      tipo: 'texto_livre',
+      linhas: ls.slice(0, 15),
+      totalLinhas: ls.length,
+      totalCaracteres: texto.length,
+      razao: r.mensagem,
+    };
   }
-  const delim = detectarDelimitador(linhas[0]);
-  if (!delim) {
-    return { tipo: 'texto_livre', linhas: linhas.slice(0, 12), totalLinhas: linhas.length, totalCaracteres: t.length };
-  }
-  const headers = linhas[0].split(delim).map(h => h.trim());
-  if (headers.length < 2) {
-    return { tipo: 'texto_livre', linhas: linhas.slice(0, 12), totalLinhas: linhas.length, totalCaracteres: t.length };
-  }
-  const dataRows = linhas.slice(1).map(l => {
-    const cells = l.split(delim).map(c => c.trim());
-    while (cells.length < headers.length) cells.push('');
-    return cells.slice(0, headers.length);
-  });
   return {
     tipo: 'tabela', origem: 'texto',
-    headers, rows: dataRows.slice(0, 8),
-    totalRows: dataRows.length, totalCols: headers.length,
-    delimitador: delim === '\t' ? 'TAB' : delim,
+    headers: r.data.headers, rows: r.data.rows.slice(0, 10),
+    totalRows: r.data.totalRows, totalCols: r.data.totalCols,
+    delimitador: r.data.delimitador,
+    colunas: r.data.colunas,
+    warnings: r.data.warnings,
   };
 }
 
@@ -498,14 +522,15 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
           {/* Preview texto livre não-estruturado */}
           {preview?.tipo === 'texto_livre' && (
             <div className="rounded-lg border-2 border-amber-300 bg-amber-50/40 p-4 space-y-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <FileType className="h-4 w-4 text-amber-700" />
                 <span className="font-semibold text-sm">Texto não-estruturado detectado</span>
                 <Badge variant="outline" className="text-[10px]">{preview.totalLinhas} linhas</Badge>
                 <Badge variant="outline" className="text-[10px]">{preview.totalCaracteres.toLocaleString('pt-BR')} car.</Badge>
               </div>
+              <p className="text-[11px] text-amber-800">{preview.razao}</p>
               <p className="text-[11px] text-muted-foreground">
-                Não foi possível identificar colunas/delimitadores. O texto será analisado pela equipe técnica (NLP + revisão humana) para extração de fatores, severidade e probabilidade.
+                O conteúdo será analisado pela equipe técnica (NLP + revisão humana) para extração de fatores, severidade e probabilidade. Para acelerar, tente colar o conteúdo em formato de <strong>tabela</strong> (com TAB, vírgula, ponto-e-vírgula, pipe ou markdown).
               </p>
               <div className="rounded border bg-background p-2 max-h-40 overflow-auto">
                 {preview.linhas.map((l, i) => (
@@ -526,30 +551,100 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
                 <div className="flex items-center gap-2 flex-wrap text-[11px]">
                   <Badge variant="outline">{preview.totalRows} linhas</Badge>
                   <Badge variant="outline">{preview.totalCols} colunas</Badge>
-                  {preview.delimitador && <Badge variant="outline">delim: {preview.delimitador}</Badge>}
+                  {preview.delimitador && (
+                    <Badge variant="outline" title={preview.delimitador.rationale}>
+                      delim: {preview.delimitador.char} · {(preview.delimitador.confidence * 100).toFixed(0)}%
+                    </Badge>
+                  )}
                   {preview.sheets && preview.sheets.length > 1 && <Badge variant="outline">{preview.sheets.length} abas</Badge>}
                 </div>
               </div>
 
+              {/* Warnings de parsing */}
+              {preview.warnings.length > 0 && (
+                <Alert className="border-amber-300 bg-amber-50 py-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-[11px]">
+                    <ul className="list-disc list-inside space-y-0.5">
+                      {preview.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Aplicar template (botões rápidos) */}
+              {templates && templates.length > 0 && (
+                <div className="rounded border border-dashed bg-background/60 p-2.5 space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 nr1-text-primary" />
+                    <span className="text-[11px] font-semibold">Aplicar template de mapeamento:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {templates.map(t => {
+                      const ativo = templateAplicadoId === t.id;
+                      return (
+                        <Button
+                          key={t.id}
+                          size="sm"
+                          variant={ativo ? 'default' : 'outline'}
+                          className={`h-7 text-[11px] gap-1 ${ativo ? 'nr1-bg-primary' : ''}`}
+                          onClick={() => aplicarTemplate(t.id)}
+                        >
+                          {t.is_default && <span title="Padrão">⭐</span>}
+                          {ativo && <CheckCircle2 className="h-3 w-3" />}
+                          {t.nome}
+                          <span className="opacity-60">({t.uso_count}x)</span>
+                        </Button>
+                      );
+                    })}
+                    {templateAplicadoId && (
+                      <Button size="sm" variant="ghost" className="h-7 text-[11px]" onClick={() => aplicarTemplate('__none')}>
+                        <X className="h-3 w-3 mr-1" />Limpar
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Mapeamento por coluna */}
               <div className="space-y-1.5">
                 <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">De-para para COPSOQ-III</p>
-                <div className="rounded border bg-background overflow-auto max-h-72">
+                <div className="rounded border bg-background overflow-auto max-h-80">
                   <table className="w-full text-[11px]">
                     <thead className="sticky top-0 bg-muted/80">
                       <tr>
-                        <th className="px-2 py-1.5 text-left font-semibold w-6/12">Coluna no arquivo</th>
-                        <th className="px-2 py-1.5 text-left font-semibold w-1/12">→</th>
-                        <th className="px-2 py-1.5 text-left font-semibold w-5/12">Campo CompSmart</th>
+                        <th className="px-2 py-1.5 text-left font-semibold">Coluna detectada</th>
+                        <th className="px-2 py-1.5 text-left font-semibold w-16">Tipo</th>
+                        <th className="px-2 py-1.5 text-left font-semibold w-16">Vazios</th>
+                        <th className="px-2 py-1.5 text-left font-semibold w-6"></th>
+                        <th className="px-2 py-1.5 text-left font-semibold">Campo CompSmart</th>
                       </tr>
                     </thead>
                     <tbody>
                       {headers.map((h, i) => {
                         const alvo = mapeamento[h] ?? 'ignorar';
                         const isUsedTwice = alvo !== 'ignorar' && Object.entries(mapeamento).filter(([k, v]) => k !== h && v === alvo).length > 0;
+                        const col = preview.colunas[i];
                         return (
-                          <tr key={i} className="border-t hover:bg-muted/30">
-                            <td className="px-2 py-1.5 font-medium truncate" title={h}>{h || <span className="italic text-muted-foreground">col {i + 1}</span>}</td>
+                          <tr key={i} className="border-t hover:bg-muted/30 align-top">
+                            <td className="px-2 py-1.5">
+                              <div className="font-medium truncate max-w-[260px]" title={h}>
+                                {h || <span className="italic text-muted-foreground">col {i + 1}</span>}
+                              </div>
+                              {col?.exemplos.length > 0 && (
+                                <div className="text-[10px] text-muted-foreground truncate max-w-[260px]" title={col.exemplos.join(' | ')}>
+                                  ex: {col.exemplos.slice(0, 2).join(' • ')}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5">
+                              {col && (
+                                <Badge variant="outline" className={`text-[9px] py-0 ${tipoCor(col.tipo)}`}>{tipoLabel(col.tipo)}</Badge>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-[10px] text-muted-foreground">
+                              {col ? `${col.vazios}/${preview.totalRows}` : '—'}
+                            </td>
                             <td className="px-2 py-1.5 text-muted-foreground"><ArrowRight className="h-3 w-3" /></td>
                             <td className="px-2 py-1">
                               <Select value={alvo} onValueChange={(v) => setMapeamento(m => ({ ...m, [h]: v }))}>
@@ -574,6 +669,7 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
                   <p className="text-[10px] text-amber-700">⚠ Nenhum campo mapeado ainda — todos serão ignorados.</p>
                 )}
               </div>
+
 
               {/* Amostra de dados */}
               <details className="text-xs">
