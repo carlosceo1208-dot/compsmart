@@ -136,8 +136,8 @@ export default function LandingNr1() {
 
       {step === 'landing' && (
         <>
-          {/* HERO — categoria nova */}
-          <Nr1Hero
+          {/* HERO compacto + Bento das features NR-1 */}
+          <Nr1HeroBento
             onDiagnostico={() => setStep('questionario')}
             onComoFunciona={() => scrollToId('como-funciona')}
           />
@@ -156,9 +156,7 @@ export default function LandingNr1() {
           </section>
 
           {/* 3 perguntas que só a CompSmart responde */}
-          <div id="funcionalidades">
-            <Nr1PerguntasChro />
-          </div>
+          <Nr1PerguntasChro />
 
           {/* Tabela NR-1 Tradicional vs. Inteligente */}
           <Nr1TabelaCategoria />
