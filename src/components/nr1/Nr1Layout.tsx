@@ -236,6 +236,7 @@ export const Nr1Layout = () => {
       <Nr1ConsentGate />
       <Nr1BemEstarFloating />
       <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
+      <Nr1ImportarMatrizDialog open={importMatrizOpen} onOpenChange={setImportMatrizOpen} />
     </div>
   );
 };
