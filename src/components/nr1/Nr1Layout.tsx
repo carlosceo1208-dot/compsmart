@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, Network, BarChart3, LayoutGrid, DollarSign, Building2 } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, Network, BarChart3, LayoutGrid, DollarSign, Building2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
+import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz' };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
@@ -27,6 +28,7 @@ const GROUPS: NavGroup[] = [
       { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
       { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
       { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros' },
+      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz' },
       { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
       { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
     ],
@@ -103,6 +105,7 @@ export const Nr1Layout = () => {
   const { data: isSuper } = useIsSuperAdmin();
   const navRef = useRef<HTMLDivElement | null>(null);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
+  const [importMatrizOpen, setImportMatrizOpen] = useState(false);
 
 
   return (
@@ -176,17 +179,20 @@ export const Nr1Layout = () => {
                         ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
                         : false;
                       const isTerceiros = item.action === 'open-terceiros';
+                      const isImportMatriz = item.action === 'open-import-matriz';
                       const baseClass = cn(
                         'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px]',
                         active
                           ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
                           : isTerceiros
                           ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-sm'
+                          : isImportMatriz
+                          ? 'bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 shadow-sm'
                           : item.highlight
                           ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
                           : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                       );
-                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
+                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
                       if (!item.to) {
                         return (
                           <button
@@ -194,6 +200,7 @@ export const Nr1Layout = () => {
                             type="button"
                             onClick={() => {
                               if (item.action === 'open-terceiros') setTerceirosOpen(true);
+                              if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
                               item.onClick?.();
                             }}
                             className={baseClass}
@@ -229,6 +236,7 @@ export const Nr1Layout = () => {
       <Nr1ConsentGate />
       <Nr1BemEstarFloating />
       <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
+      <Nr1ImportarMatrizDialog open={importMatrizOpen} onOpenChange={setImportMatrizOpen} />
     </div>
   );
 };
