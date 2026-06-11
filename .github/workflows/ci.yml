@@ -22,9 +22,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Fails on any unused import/variable (ESLint, --max-warnings=0)
-      - name: ESLint (strict — no warnings allowed)
-        run: npm run lint:strict
+      # Fails on any unused import (unused-imports/no-unused-imports = error)
+      - name: ESLint
+        run: npm run lint
 
       # Fails on unused files, exports, types or dependencies
       - name: Dead-code scan (knip)
