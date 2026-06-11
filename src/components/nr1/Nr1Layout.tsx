@@ -179,17 +179,20 @@ export const Nr1Layout = () => {
                         ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
                         : false;
                       const isTerceiros = item.action === 'open-terceiros';
+                      const isImportMatriz = item.action === 'open-import-matriz';
                       const baseClass = cn(
                         'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px]',
                         active
                           ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
                           : isTerceiros
                           ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-sm'
+                          : isImportMatriz
+                          ? 'bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 shadow-sm'
                           : item.highlight
                           ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
                           : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                       );
-                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
+                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
                       if (!item.to) {
                         return (
                           <button
@@ -197,6 +200,7 @@ export const Nr1Layout = () => {
                             type="button"
                             onClick={() => {
                               if (item.action === 'open-terceiros') setTerceirosOpen(true);
+                              if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
                               item.onClick?.();
                             }}
                             className={baseClass}
