@@ -522,14 +522,15 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
           {/* Preview texto livre não-estruturado */}
           {preview?.tipo === 'texto_livre' && (
             <div className="rounded-lg border-2 border-amber-300 bg-amber-50/40 p-4 space-y-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <FileType className="h-4 w-4 text-amber-700" />
                 <span className="font-semibold text-sm">Texto não-estruturado detectado</span>
                 <Badge variant="outline" className="text-[10px]">{preview.totalLinhas} linhas</Badge>
                 <Badge variant="outline" className="text-[10px]">{preview.totalCaracteres.toLocaleString('pt-BR')} car.</Badge>
               </div>
+              <p className="text-[11px] text-amber-800">{preview.razao}</p>
               <p className="text-[11px] text-muted-foreground">
-                Não foi possível identificar colunas/delimitadores. O texto será analisado pela equipe técnica (NLP + revisão humana) para extração de fatores, severidade e probabilidade.
+                O conteúdo será analisado pela equipe técnica (NLP + revisão humana) para extração de fatores, severidade e probabilidade. Para acelerar, tente colar o conteúdo em formato de <strong>tabela</strong> (com TAB, vírgula, ponto-e-vírgula, pipe ou markdown).
               </p>
               <div className="rounded border bg-background p-2 max-h-40 overflow-auto">
                 {preview.linhas.map((l, i) => (
