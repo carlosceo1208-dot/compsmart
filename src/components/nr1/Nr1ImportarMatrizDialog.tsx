@@ -70,9 +70,22 @@ function sugerirAlvo(header: string): string {
   return 'ignorar';
 }
 
+import {
+  parsearTextoMatriz, montarMetaDeMatriz, detectarDelimitador as detectarDelim,
+  type ColunaMeta, type DelimiterDetection, tipoLabel, tipoCor,
+} from '@/lib/nr1MatrizParser';
+
 type PreviewData =
-  | { tipo: 'tabela'; origem: 'arquivo' | 'texto'; sheets?: string[]; sheetAtivo?: string; headers: string[]; rows: string[][]; totalRows: number; totalCols: number; delimitador?: string }
-  | { tipo: 'texto_livre'; linhas: string[]; totalLinhas: number; totalCaracteres: number }
+  | {
+      tipo: 'tabela'; origem: 'arquivo' | 'texto';
+      sheets?: string[]; sheetAtivo?: string;
+      headers: string[]; rows: string[][];
+      totalRows: number; totalCols: number;
+      delimitador?: DelimiterDetection;
+      colunas: ColunaMeta[];
+      warnings: string[];
+    }
+  | { tipo: 'texto_livre'; linhas: string[]; totalLinhas: number; totalCaracteres: number; razao: string }
   | { tipo: 'pdf'; tamanhoKb: number }
   | { tipo: 'erro'; mensagem: string };
 
@@ -95,21 +108,35 @@ function validarArquivo(file: File): string | null {
   return null;
 }
 
-function detectarDelimitador(linha: string): string {
-  const candidatos = ['\t', ';', '|', ','];
-  let melhor = ','; let max = 0;
-  for (const c of candidatos) {
-    const n = linha.split(c).length - 1;
-    if (n > max) { max = n; melhor = c; }
-  }
-  return max >= 1 ? melhor : '';
-}
-
 async function parsearArquivo(file: File): Promise<PreviewData> {
   const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
   if (ext === 'pdf') return { tipo: 'pdf', tamanhoKb: Math.round(file.size / 1024) };
   try {
     const buf = await file.arrayBuffer();
+    // CSV: tenta detectar delimitador pelo conteúdo bruto antes de delegar ao XLSX
+    if (ext === 'csv') {
+      const txt = new TextDecoder('utf-8').decode(buf);
+      const linhas = txt.split(/\r?\n/).filter(l => l.trim().length > 0);
+      const delim = detectarDelim(linhas);
+      // Reescreve para tabs para o XLSX (tratamento uniforme)
+      const wb = XLSX.read(buf, { type: 'array', cellDates: false, FS: delim.raw || ',' });
+      const sa = wb.SheetNames[0];
+      const sheet = wb.Sheets[sa];
+      const matriz = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, blankrows: false, defval: '' }) as any[][];
+      if (!matriz.length) return { tipo: 'erro', mensagem: 'O CSV está vazio.' };
+      const headers = (matriz[0] ?? []).map((c) => String(c ?? '').trim());
+      if (headers.every(h => !h)) return { tipo: 'erro', mensagem: 'Cabeçalhos não detectados na primeira linha do CSV.' };
+      const dataRows = matriz.slice(1).map(r => r.map(c => String(c ?? '')));
+      const meta = montarMetaDeMatriz(headers, dataRows);
+      return {
+        tipo: 'tabela', origem: 'arquivo',
+        sheets: wb.SheetNames, sheetAtivo: sa,
+        headers, rows: dataRows.slice(0, 10),
+        totalRows: dataRows.length, totalCols: headers.length,
+        delimitador: delim, colunas: meta.colunas, warnings: meta.warnings,
+      };
+    }
+
     const wb = XLSX.read(buf, { type: 'array', cellDates: false });
     const sheetAtivo = wb.SheetNames[0];
     if (!sheetAtivo) return { tipo: 'erro', mensagem: 'Nenhuma planilha encontrada no arquivo.' };
@@ -119,11 +146,13 @@ async function parsearArquivo(file: File): Promise<PreviewData> {
     const headers = (matriz[0] ?? []).map((c) => String(c ?? '').trim());
     if (headers.every(h => !h)) return { tipo: 'erro', mensagem: 'Cabeçalhos não detectados na primeira linha.' };
     const dataRows = matriz.slice(1).map(r => r.map(c => String(c ?? '')));
+    const meta = montarMetaDeMatriz(headers, dataRows);
     return {
       tipo: 'tabela', origem: 'arquivo',
       sheets: wb.SheetNames, sheetAtivo,
-      headers, rows: dataRows.slice(0, 8),
+      headers, rows: dataRows.slice(0, 10),
       totalRows: dataRows.length, totalCols: headers.length,
+      colunas: meta.colunas, warnings: meta.warnings,
     };
   } catch (e: any) {
     return { tipo: 'erro', mensagem: `Não foi possível ler o arquivo: ${e?.message ?? 'formato inválido'}.` };
@@ -131,31 +160,25 @@ async function parsearArquivo(file: File): Promise<PreviewData> {
 }
 
 function parsearTexto(texto: string): PreviewData {
-  const t = texto.trim();
-  if (!t) return { tipo: 'erro', mensagem: 'Cole o conteúdo da matriz no campo de texto.' };
-  if (t.length > MAX_TEXT_LENGTH) return { tipo: 'erro', mensagem: `Texto excede ${MAX_TEXT_LENGTH.toLocaleString('pt-BR')} caracteres.` };
-  const linhas = t.split(/\r?\n/).filter(l => l.trim().length > 0);
-  if (linhas.length < 2) {
-    return { tipo: 'texto_livre', linhas: linhas.slice(0, 12), totalLinhas: linhas.length, totalCaracteres: t.length };
+  if (texto.length > MAX_TEXT_LENGTH) return { tipo: 'erro', mensagem: `Texto excede ${MAX_TEXT_LENGTH.toLocaleString('pt-BR')} caracteres.` };
+  const r = parsearTextoMatriz(texto);
+  if (!r.ok) {
+    if (r.razao === 'vazio') return { tipo: 'erro', mensagem: r.mensagem };
+    return {
+      tipo: 'texto_livre',
+      linhas: (r.linhas ?? []).slice(0, 15),
+      totalLinhas: (r.linhas ?? []).length,
+      totalCaracteres: texto.length,
+      razao: r.mensagem,
+    };
   }
-  const delim = detectarDelimitador(linhas[0]);
-  if (!delim) {
-    return { tipo: 'texto_livre', linhas: linhas.slice(0, 12), totalLinhas: linhas.length, totalCaracteres: t.length };
-  }
-  const headers = linhas[0].split(delim).map(h => h.trim());
-  if (headers.length < 2) {
-    return { tipo: 'texto_livre', linhas: linhas.slice(0, 12), totalLinhas: linhas.length, totalCaracteres: t.length };
-  }
-  const dataRows = linhas.slice(1).map(l => {
-    const cells = l.split(delim).map(c => c.trim());
-    while (cells.length < headers.length) cells.push('');
-    return cells.slice(0, headers.length);
-  });
   return {
     tipo: 'tabela', origem: 'texto',
-    headers, rows: dataRows.slice(0, 8),
-    totalRows: dataRows.length, totalCols: headers.length,
-    delimitador: delim === '\t' ? 'TAB' : delim,
+    headers: r.data.headers, rows: r.data.rows.slice(0, 10),
+    totalRows: r.data.totalRows, totalCols: r.data.totalCols,
+    delimitador: r.data.delimitador,
+    colunas: r.data.colunas,
+    warnings: r.data.warnings,
   };
 }
 
