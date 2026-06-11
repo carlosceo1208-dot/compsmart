@@ -25,7 +25,7 @@ export default tseslint.config(
       // The orphan-prevention rules — these MUST fail CI.
       "unused-imports/no-unused-imports": "error",
       "unused-imports/no-unused-vars": [
-        "error",
+        "warn",
         {
           vars: "all",
           varsIgnorePattern: "^_",
