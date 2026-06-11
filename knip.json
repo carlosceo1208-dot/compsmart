@@ -7,24 +7,31 @@
     "tailwind.config.ts",
     "postcss.config.js",
     "eslint.config.js",
-    "src/test/**/*.{ts,tsx}",
-    "supabase/functions/**/index.ts"
+    "src/test/**/*.{ts,tsx}"
   ],
   "project": [
-    "src/**/*.{ts,tsx}",
-    "supabase/functions/**/*.{ts,tsx}"
+    "src/**/*.{ts,tsx}"
   ],
   "ignore": [
     "src/integrations/supabase/types.ts",
     "src/components/ui/**",
+    "src/hooks/use-mobile.tsx",
     "src/vite-env.d.ts",
-    "supabase/functions/_shared/email-templates/**"
+    "supabase/**"
   ],
   "ignoreDependencies": [
     "tailwindcss",
     "autoprefixer",
     "postcss",
-    "@types/*"
+    "@types/*",
+    "@radix-ui/react-aspect-ratio",
+    "@radix-ui/react-context-menu",
+    "@radix-ui/react-menubar",
+    "@radix-ui/react-navigation-menu",
+    "embla-carousel-react",
+    "react-resizable-panels",
+    "vaul",
+    "@tailwindcss/typography"
   ],
   "ignoreExportsUsedInFile": true,
   "rules": {
@@ -37,7 +44,6 @@
     "nsExports": "warn",
     "nsTypes": "warn",
     "duplicates": "warn",
-    "enumMembers": "warn",
-    "classMembers": "warn"
+    "enumMembers": "warn"
   }
 }
