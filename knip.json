@@ -17,7 +17,8 @@
   "ignore": [
     "src/integrations/supabase/types.ts",
     "src/components/ui/**",
-    "src/vite-env.d.ts"
+    "src/vite-env.d.ts",
+    "supabase/functions/_shared/email-templates/**"
   ],
   "ignoreDependencies": [
     "tailwindcss",
@@ -25,5 +26,18 @@
     "postcss",
     "@types/*"
   ],
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "unlisted": "error",
+    "binaries": "error",
+    "exports": "warn",
+    "types": "warn",
+    "nsExports": "warn",
+    "nsTypes": "warn",
+    "duplicates": "warn",
+    "enumMembers": "warn",
+    "classMembers": "warn"
+  }
 }
