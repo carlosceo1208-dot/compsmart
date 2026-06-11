@@ -28,6 +28,7 @@ const GROUPS: NavGroup[] = [
       { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
       { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
       { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros' },
+      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz' },
       { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
       { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
     ],
