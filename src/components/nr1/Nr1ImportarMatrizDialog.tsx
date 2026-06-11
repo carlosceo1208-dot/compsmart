@@ -80,7 +80,7 @@ function detectarCampos(headers: string[]): Array<{ campo: string; coluna: strin
     for (const h of headers) {
       if (!h) continue;
       if (def.padroes.test(h) && !used.has(def.chave)) {
-        found.push({ campo: def.chave, coluna: h, cor: (def as any).cor });
+        found.push({ campo: def.chave, coluna: h, cor: def.cor });
         used.add(def.chave);
         break;
       }
