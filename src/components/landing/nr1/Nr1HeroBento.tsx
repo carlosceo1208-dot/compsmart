@@ -12,15 +12,15 @@ import {
 
 interface Props {
   onDiagnostico: () => void;
-  onComoFunciona: () => void;
 }
+
 
 /**
  * Hero compacto + Bento grid das features NR-1.
  * Substitui o hero alto anterior, dando ênfase imediata ao que a CompSmart
  * cobre da norma NR-1. Paleta: Navy #1E2761 / Emerald #22C55E / Sand #F5F0EB / Coral #E8634A.
  */
-export default function Nr1HeroBento({ onDiagnostico, onComoFunciona }: Props) {
+export default function Nr1HeroBento({ onDiagnostico }: Props) {
   return (
     <section className="bg-[#F5F0EB] text-[#1E2761]">
       <div className="container mx-auto px-4 pt-10 pb-14 md:pt-12 md:pb-16">
@@ -38,7 +38,7 @@ export default function Nr1HeroBento({ onDiagnostico, onComoFunciona }: Props) {
             Transformamos obrigação legal em inteligência preditiva que cuida do bem-estar
             e retém talentos reais — antes que o pedido de demissão chegue.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex justify-center">
             <Button
               size="lg"
               onClick={onDiagnostico}
