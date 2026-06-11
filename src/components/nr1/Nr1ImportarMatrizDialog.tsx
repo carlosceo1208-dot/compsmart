@@ -35,13 +35,13 @@ const ALLOWED_MIME = new Set([
 
 // Heurística: palavras-chave que indicam campos de matriz de risco psicossocial
 const CAMPOS_DETECTAVEIS: Array<{ chave: string; padroes: RegExp; cor: string }> = [
-  { chave: 'Fator/Dimensão', padroes: /\b(fator|dimens[ãa]o|categoria|tema|aspecto)\b/i, col: '', cor: 'bg-blue-100 text-blue-700 border-blue-300' } as any,
-  { chave: 'Severidade', padroes: /\b(severidade|gravidade|impacto)\b/i, cor: 'bg-orange-100 text-orange-700 border-orange-300' } as any,
-  { chave: 'Probabilidade', padroes: /\b(probabilidade|frequ[êe]ncia|chance|likelihood)\b/i, cor: 'bg-amber-100 text-amber-700 border-amber-300' } as any,
-  { chave: 'Risco/Score', padroes: /\b(risco|score|pontua[çc][ãa]o|n[íi]vel|rating)\b/i, cor: 'bg-red-100 text-red-700 border-red-300' } as any,
-  { chave: 'Unidade/Setor', padroes: /\b(unidade|setor|[áa]rea|departamento|gerencia|filial)\b/i, cor: 'bg-purple-100 text-purple-700 border-purple-300' } as any,
-  { chave: 'Descrição', padroes: /\b(descri[çc][ãa]o|coment[áa]rio|observa[çc][ãa]o|detalhe)\b/i, cor: 'bg-slate-100 text-slate-700 border-slate-300' } as any,
-  { chave: 'Plano/Ação', padroes: /\b(plano|a[çc][ãa]o|medida|controle|tratamento)\b/i, cor: 'bg-emerald-100 text-emerald-700 border-emerald-300' } as any,
+  { chave: 'Fator/Dimensão', padroes: /\b(fator|dimens[ãa]o|categoria|tema|aspecto)\b/i, cor: 'bg-blue-100 text-blue-700 border-blue-300' },
+  { chave: 'Severidade', padroes: /\b(severidade|gravidade|impacto)\b/i, cor: 'bg-orange-100 text-orange-700 border-orange-300' },
+  { chave: 'Probabilidade', padroes: /\b(probabilidade|frequ[êe]ncia|chance|likelihood)\b/i, cor: 'bg-amber-100 text-amber-700 border-amber-300' },
+  { chave: 'Risco/Score', padroes: /\b(risco|score|pontua[çc][ãa]o|n[íi]vel|rating)\b/i, cor: 'bg-red-100 text-red-700 border-red-300' },
+  { chave: 'Unidade/Setor', padroes: /\b(unidade|setor|[áa]rea|departamento|gerencia|filial)\b/i, cor: 'bg-purple-100 text-purple-700 border-purple-300' },
+  { chave: 'Descrição', padroes: /\b(descri[çc][ãa]o|coment[áa]rio|observa[çc][ãa]o|detalhe)\b/i, cor: 'bg-slate-100 text-slate-700 border-slate-300' },
+  { chave: 'Plano/Ação', padroes: /\b(plano|a[çc][ãa]o|medida|controle|tratamento)\b/i, cor: 'bg-emerald-100 text-emerald-700 border-emerald-300' },
 ];
 
 type PreviewData =
