@@ -9,12 +9,12 @@ import { Check, Sparkles, MessageSquare, CreditCard, ShieldCheck } from 'lucide-
 import { NR1_TIERS, formatBRL0, type Nr1Tier } from '@/lib/nr1Pricing';
 import { useNr1Plans, findNr1PlanIdByTier } from '@/hooks/useNr1Plans';
 
-// Os 12 módulos do NR-1 — exatamente os mesmos serviços oferecidos em todas as faixas.
-// Espelha os 12 mini-cards (em verde) do hub "Saúde Mental & Bem-Estar".
+// Os 13 módulos do NR-1 — exatamente os mesmos serviços oferecidos em todas as faixas.
 const NR1_FEATURES_ALL: { label: string; desc: string }[] = [
   { label: 'Visão Geral', desc: 'Painel executivo consolidado do risco psicossocial' },
   { label: 'Universo', desc: 'Mapeamento de colaboradores elegíveis e cobertura' },
   { label: 'Matriz de Risco', desc: 'Heatmap das 6 dimensões COPSOQ-III por área' },
+  { label: 'Importação de Mapa de Risco', desc: 'Importa matrizes HSE, JCQ, ERI e planilhas livres com templates de mapeamento reutilizáveis' },
   { label: 'Segurança Psicológica', desc: 'Indicadores de confiança e ambiente psicossocial' },
   { label: 'Sociodemográfico', desc: 'Cortes por gênero, faixa etária, tempo de casa' },
   { label: 'Etapas', desc: 'Fluxo guiado do ciclo NR-1 ponta a ponta' },
@@ -98,7 +98,7 @@ export default function Nr1PricingCards({ onContratar }: Props) {
               </Badge>
             </div>
             <CardDescription>
-              Os <strong>12 módulos do NR-1</strong> da Essencial à Corporate — todos os planos
+              Os <strong>13 módulos do NR-1</strong> da Essencial à Corporate — todos os planos
               entregam exatamente o mesmo conjunto de serviços. O que muda é apenas o volume
               de colaboradores.
             </CardDescription>
