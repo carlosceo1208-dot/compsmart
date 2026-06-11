@@ -51,6 +51,8 @@ export default tseslint.config(
       "no-useless-escape": "warn",
       "no-irregular-whitespace": "warn",
       "no-misleading-character-class": "warn",
+      "no-constant-binary-expression": "warn",
+      "@typescript-eslint/no-unused-expressions": "warn",
     },
   },
   // Tests can have broader patterns
