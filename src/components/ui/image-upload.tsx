@@ -77,13 +77,22 @@ export const ImageUpload = ({
 
       setUploadProgress(70);
 
-      const { data: { publicUrl } } = supabase.storage
+      // Use signed URL (10 years) so it works for both public and private buckets
+      const { data: signedData, error: signedErr } = await supabase.storage
         .from(bucket)
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 60 * 60 * 24 * 365 * 10);
 
-      setUploadProgress(100);
-      setPreview(publicUrl);
-      onChange(publicUrl);
+      if (signedErr || !signedData?.signedUrl) {
+        // Fallback to public URL for buckets that remain public
+        const { data: pub } = supabase.storage.from(bucket).getPublicUrl(filePath);
+        setUploadProgress(100);
+        setPreview(pub.publicUrl);
+        onChange(pub.publicUrl);
+      } else {
+        setUploadProgress(100);
+        setPreview(signedData.signedUrl);
+        onChange(signedData.signedUrl);
+      }
 
       toast.success("✨ Imagem enviada com sucesso!");
     } catch (error: any) {
