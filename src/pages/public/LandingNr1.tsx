@@ -169,14 +169,15 @@ export default function LandingNr1() {
           {/* Tabela NR-1 Tradicional vs. Inteligente */}
           <Nr1TabelaCategoria />
 
-          {/* Como funciona — 5 passos */}
+          {/* NOVIDADES NR-1 */}
+          <Nr1Novidades />
+
+          {/* Como funciona — 7 passos */}
           <Nr1ComoFunciona idAnchor="como-funciona" />
-...
+
           {/* Prova social de correlação */}
           <Nr1ProvaCorrelacao />
 
-          {/* NOVIDADES NR-1 */}
-          <Nr1Novidades />
 
           {/* Conformidade técnica */}
           <section className="container mx-auto px-4 py-10">
