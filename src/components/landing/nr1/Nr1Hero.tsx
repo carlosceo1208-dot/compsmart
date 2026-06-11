@@ -4,10 +4,9 @@ import { ArrowRight, Sparkles, AlertTriangle, TrendingUp, DollarSign } from 'luc
 
 interface Props {
   onDiagnostico: () => void;
-  onComoFunciona: () => void;
 }
 
-export default function Nr1Hero({ onDiagnostico, onComoFunciona }: Props) {
+export default function Nr1Hero({ onDiagnostico }: Props) {
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 nr1-bg-soft opacity-60" />
@@ -41,13 +40,9 @@ export default function Nr1Hero({ onDiagnostico, onComoFunciona }: Props) {
               <strong className="text-foreground">Tenha uma IA exclusiva</strong> para trabalhar junto com você em todo o processo da NR-1.
             </p>
 
-
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+            <div className="pt-2">
               <Button size="lg" className="nr1-btn-primary text-white" onClick={onDiagnostico}>
                 Diagnóstico grátis em 2 min <ArrowRight className="h-4 w-4 ml-1.5" />
-              </Button>
-              <Button size="lg" variant="outline" onClick={onComoFunciona}>
-                Ver o cruzamento ao vivo
               </Button>
             </div>
 
