@@ -4287,10 +4287,10 @@ export type Database = {
       }
       nr1_importacoes_matriz: {
         Row: {
-          arquivo_mime: string
-          arquivo_nome: string
-          arquivo_path: string
-          arquivo_tamanho: number
+          arquivo_mime: string | null
+          arquivo_nome: string | null
+          arquivo_path: string | null
+          arquivo_tamanho: number | null
           company_id: string
           consultoria: string | null
           created_at: string
@@ -4299,19 +4299,23 @@ export type Database = {
           diagnostico_id: string | null
           erro_mensagem: string | null
           id: string
+          mapeamento_aplicado: Json | null
           mapeamento_resultado: Json | null
           metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
           metodologia_outra: string | null
+          modo: Database["public"]["Enums"]["nr1_matriz_modo"]
           observacoes: string | null
           processado_em: string | null
           status: Database["public"]["Enums"]["nr1_matriz_status"]
+          template_id: string | null
+          texto_livre: string | null
           updated_at: string
         }
         Insert: {
-          arquivo_mime: string
-          arquivo_nome: string
-          arquivo_path: string
-          arquivo_tamanho: number
+          arquivo_mime?: string | null
+          arquivo_nome?: string | null
+          arquivo_path?: string | null
+          arquivo_tamanho?: number | null
           company_id: string
           consultoria?: string | null
           created_at?: string
@@ -4320,19 +4324,23 @@ export type Database = {
           diagnostico_id?: string | null
           erro_mensagem?: string | null
           id?: string
+          mapeamento_aplicado?: Json | null
           mapeamento_resultado?: Json | null
           metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
           metodologia_outra?: string | null
+          modo?: Database["public"]["Enums"]["nr1_matriz_modo"]
           observacoes?: string | null
           processado_em?: string | null
           status?: Database["public"]["Enums"]["nr1_matriz_status"]
+          template_id?: string | null
+          texto_livre?: string | null
           updated_at?: string
         }
         Update: {
-          arquivo_mime?: string
-          arquivo_nome?: string
-          arquivo_path?: string
-          arquivo_tamanho?: number
+          arquivo_mime?: string | null
+          arquivo_nome?: string | null
+          arquivo_path?: string | null
+          arquivo_tamanho?: number | null
           company_id?: string
           consultoria?: string | null
           created_at?: string
@@ -4341,12 +4349,16 @@ export type Database = {
           diagnostico_id?: string | null
           erro_mensagem?: string | null
           id?: string
+          mapeamento_aplicado?: Json | null
           mapeamento_resultado?: Json | null
           metodologia?: Database["public"]["Enums"]["nr1_matriz_metodologia"]
           metodologia_outra?: string | null
+          modo?: Database["public"]["Enums"]["nr1_matriz_modo"]
           observacoes?: string | null
           processado_em?: string | null
           status?: Database["public"]["Enums"]["nr1_matriz_status"]
+          template_id?: string | null
+          texto_livre?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -4363,6 +4375,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vw_nr1_clima_copsoq_correlacao"
             referencedColumns: ["diagnostico_id"]
+          },
+          {
+            foreignKeyName: "nr1_importacoes_matriz_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_mapeamentos_templates"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -4506,6 +4525,51 @@ export type Database = {
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
+        }
+        Relationships: []
+      }
+      nr1_mapeamentos_templates: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          id: string
+          is_default: boolean
+          mapeamento: Json
+          metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
+          nome: string
+          ultimo_uso_em: string | null
+          updated_at: string
+          uso_count: number
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          is_default?: boolean
+          mapeamento?: Json
+          metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
+          nome: string
+          ultimo_uso_em?: string | null
+          updated_at?: string
+          uso_count?: number
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          is_default?: boolean
+          mapeamento?: Json
+          metodologia?: Database["public"]["Enums"]["nr1_matriz_metodologia"]
+          nome?: string
+          ultimo_uso_em?: string | null
+          updated_at?: string
+          uso_count?: number
         }
         Relationships: []
       }
@@ -10405,6 +10469,10 @@ export type Database = {
         Args: { p_diagnostico_id: string }
         Returns: undefined
       }
+      nr1_template_marcar_uso: {
+        Args: { _template_id: string }
+        Returns: undefined
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -10589,6 +10657,7 @@ export type Database = {
         | "concluida"
         | "encerrada_pelo_usuario"
       nr1_matriz_metodologia: "COPSOQ-III" | "HSE" | "JCQ" | "ERI" | "OUTRA"
+      nr1_matriz_modo: "arquivo" | "texto"
       nr1_matriz_status:
         | "pendente"
         | "em_mapeamento"
@@ -10839,6 +10908,7 @@ export const Constants = {
         "encerrada_pelo_usuario",
       ],
       nr1_matriz_metodologia: ["COPSOQ-III", "HSE", "JCQ", "ERI", "OUTRA"],
+      nr1_matriz_modo: ["arquivo", "texto"],
       nr1_matriz_status: [
         "pendente",
         "em_mapeamento",
