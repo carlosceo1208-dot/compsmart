@@ -9,7 +9,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Calculator, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
-import Nr1Hero from '@/components/landing/nr1/Nr1Hero';
+import Nr1HeroBento from '@/components/landing/nr1/Nr1HeroBento';
 import { Footer } from '@/components/landing/Footer';
 import { SecuritySection } from '@/components/landing/SecuritySection';
 import Nr1PerguntasChro from '@/components/landing/nr1/Nr1PerguntasChro';
