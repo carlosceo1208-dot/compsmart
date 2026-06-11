@@ -4285,6 +4285,87 @@ export type Database = {
         }
         Relationships: []
       }
+      nr1_importacoes_matriz: {
+        Row: {
+          arquivo_mime: string
+          arquivo_nome: string
+          arquivo_path: string
+          arquivo_tamanho: number
+          company_id: string
+          consultoria: string | null
+          created_at: string
+          created_by: string | null
+          data_diagnostico: string | null
+          diagnostico_id: string | null
+          erro_mensagem: string | null
+          id: string
+          mapeamento_resultado: Json | null
+          metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
+          metodologia_outra: string | null
+          observacoes: string | null
+          processado_em: string | null
+          status: Database["public"]["Enums"]["nr1_matriz_status"]
+          updated_at: string
+        }
+        Insert: {
+          arquivo_mime: string
+          arquivo_nome: string
+          arquivo_path: string
+          arquivo_tamanho: number
+          company_id: string
+          consultoria?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_diagnostico?: string | null
+          diagnostico_id?: string | null
+          erro_mensagem?: string | null
+          id?: string
+          mapeamento_resultado?: Json | null
+          metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
+          metodologia_outra?: string | null
+          observacoes?: string | null
+          processado_em?: string | null
+          status?: Database["public"]["Enums"]["nr1_matriz_status"]
+          updated_at?: string
+        }
+        Update: {
+          arquivo_mime?: string
+          arquivo_nome?: string
+          arquivo_path?: string
+          arquivo_tamanho?: number
+          company_id?: string
+          consultoria?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_diagnostico?: string | null
+          diagnostico_id?: string | null
+          erro_mensagem?: string | null
+          id?: string
+          mapeamento_resultado?: Json | null
+          metodologia?: Database["public"]["Enums"]["nr1_matriz_metodologia"]
+          metodologia_outra?: string | null
+          observacoes?: string | null
+          processado_em?: string | null
+          status?: Database["public"]["Enums"]["nr1_matriz_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_importacoes_matriz_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_importacoes_matriz_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+        ]
+      }
       nr1_jornada_mensagens: {
         Row: {
           content: string
@@ -10507,6 +10588,13 @@ export type Database = {
         | "pausada"
         | "concluida"
         | "encerrada_pelo_usuario"
+      nr1_matriz_metodologia: "COPSOQ-III" | "HSE" | "JCQ" | "ERI" | "OUTRA"
+      nr1_matriz_status:
+        | "pendente"
+        | "em_mapeamento"
+        | "mapeado"
+        | "publicado"
+        | "erro"
       nr1_nivel_risco: "baixo" | "moderado" | "alto" | "critico"
       nr1_plan_tier: "essencial" | "pro"
       nr1_subscription_status:
@@ -10749,6 +10837,14 @@ export const Constants = {
         "pausada",
         "concluida",
         "encerrada_pelo_usuario",
+      ],
+      nr1_matriz_metodologia: ["COPSOQ-III", "HSE", "JCQ", "ERI", "OUTRA"],
+      nr1_matriz_status: [
+        "pendente",
+        "em_mapeamento",
+        "mapeado",
+        "publicado",
+        "erro",
       ],
       nr1_nivel_risco: ["baixo", "moderado", "alto", "critico"],
       nr1_plan_tier: ["essencial", "pro"],
