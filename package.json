@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "lint:strict": "eslint . --max-warnings=0",
     "dead-code": "knip",
-    "dead-code:ci": "knip --no-exit-code=false --reporter compact",
+    "dead-code:ci": "knip --reporter compact",
     "ci": "npm run lint:strict && npm run dead-code:ci && npm run build",
     "preview": "vite preview"
   },
