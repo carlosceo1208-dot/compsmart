@@ -1,15 +1,16 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, Network, BarChart3, LayoutGrid, DollarSign, Building2 } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Bot, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, Network, BarChart3, LayoutGrid, DollarSign, Building2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
+import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz' };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
