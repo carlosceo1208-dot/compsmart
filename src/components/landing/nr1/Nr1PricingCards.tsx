@@ -98,7 +98,7 @@ export default function Nr1PricingCards({ onContratar }: Props) {
               </Badge>
             </div>
             <CardDescription>
-              Os <strong>12 módulos do NR-1</strong> da Essencial à Corporate — todos os planos
+              Os <strong>13 módulos do NR-1</strong> da Essencial à Corporate — todos os planos
               entregam exatamente o mesmo conjunto de serviços. O que muda é apenas o volume
               de colaboradores.
             </CardDescription>
