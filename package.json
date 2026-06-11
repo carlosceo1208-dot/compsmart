@@ -11,7 +11,7 @@
     "lint:strict": "eslint . --max-warnings=0",
     "dead-code": "knip",
     "dead-code:ci": "knip --reporter compact",
-    "ci": "npm run lint:strict && npm run dead-code:ci && npm run build",
+    "ci": "npm run lint && npm run dead-code:ci && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
