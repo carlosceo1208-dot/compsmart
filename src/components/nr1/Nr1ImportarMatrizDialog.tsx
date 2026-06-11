@@ -559,25 +559,91 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
                 </div>
               </div>
 
+              {/* Warnings de parsing */}
+              {preview.warnings.length > 0 && (
+                <Alert className="border-amber-300 bg-amber-50 py-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-[11px]">
+                    <ul className="list-disc list-inside space-y-0.5">
+                      {preview.warnings.map((w, i) => <li key={i}>{w}</li>)}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Aplicar template (botões rápidos) */}
+              {templates && templates.length > 0 && (
+                <div className="rounded border border-dashed bg-background/60 p-2.5 space-y-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 nr1-text-primary" />
+                    <span className="text-[11px] font-semibold">Aplicar template de mapeamento:</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {templates.map(t => {
+                      const ativo = templateAplicadoId === t.id;
+                      return (
+                        <Button
+                          key={t.id}
+                          size="sm"
+                          variant={ativo ? 'default' : 'outline'}
+                          className={`h-7 text-[11px] gap-1 ${ativo ? 'nr1-bg-primary' : ''}`}
+                          onClick={() => aplicarTemplate(t.id)}
+                        >
+                          {t.is_default && <span title="Padrão">⭐</span>}
+                          {ativo && <CheckCircle2 className="h-3 w-3" />}
+                          {t.nome}
+                          <span className="opacity-60">({t.uso_count}x)</span>
+                        </Button>
+                      );
+                    })}
+                    {templateAplicadoId && (
+                      <Button size="sm" variant="ghost" className="h-7 text-[11px]" onClick={() => aplicarTemplate('__none')}>
+                        <X className="h-3 w-3 mr-1" />Limpar
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Mapeamento por coluna */}
               <div className="space-y-1.5">
                 <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">De-para para COPSOQ-III</p>
-                <div className="rounded border bg-background overflow-auto max-h-72">
+                <div className="rounded border bg-background overflow-auto max-h-80">
                   <table className="w-full text-[11px]">
                     <thead className="sticky top-0 bg-muted/80">
                       <tr>
-                        <th className="px-2 py-1.5 text-left font-semibold w-6/12">Coluna no arquivo</th>
-                        <th className="px-2 py-1.5 text-left font-semibold w-1/12">→</th>
-                        <th className="px-2 py-1.5 text-left font-semibold w-5/12">Campo CompSmart</th>
+                        <th className="px-2 py-1.5 text-left font-semibold">Coluna detectada</th>
+                        <th className="px-2 py-1.5 text-left font-semibold w-16">Tipo</th>
+                        <th className="px-2 py-1.5 text-left font-semibold w-16">Vazios</th>
+                        <th className="px-2 py-1.5 text-left font-semibold w-6"></th>
+                        <th className="px-2 py-1.5 text-left font-semibold">Campo CompSmart</th>
                       </tr>
                     </thead>
                     <tbody>
                       {headers.map((h, i) => {
                         const alvo = mapeamento[h] ?? 'ignorar';
                         const isUsedTwice = alvo !== 'ignorar' && Object.entries(mapeamento).filter(([k, v]) => k !== h && v === alvo).length > 0;
+                        const col = preview.colunas[i];
                         return (
-                          <tr key={i} className="border-t hover:bg-muted/30">
-                            <td className="px-2 py-1.5 font-medium truncate" title={h}>{h || <span className="italic text-muted-foreground">col {i + 1}</span>}</td>
+                          <tr key={i} className="border-t hover:bg-muted/30 align-top">
+                            <td className="px-2 py-1.5">
+                              <div className="font-medium truncate max-w-[260px]" title={h}>
+                                {h || <span className="italic text-muted-foreground">col {i + 1}</span>}
+                              </div>
+                              {col?.exemplos.length > 0 && (
+                                <div className="text-[10px] text-muted-foreground truncate max-w-[260px]" title={col.exemplos.join(' | ')}>
+                                  ex: {col.exemplos.slice(0, 2).join(' • ')}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5">
+                              {col && (
+                                <Badge variant="outline" className={`text-[9px] py-0 ${tipoCor(col.tipo)}`}>{tipoLabel(col.tipo)}</Badge>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-[10px] text-muted-foreground">
+                              {col ? `${col.vazios}/${preview.totalRows}` : '—'}
+                            </td>
                             <td className="px-2 py-1.5 text-muted-foreground"><ArrowRight className="h-3 w-3" /></td>
                             <td className="px-2 py-1">
                               <Select value={alvo} onValueChange={(v) => setMapeamento(m => ({ ...m, [h]: v }))}>
@@ -602,6 +668,7 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
                   <p className="text-[10px] text-amber-700">⚠ Nenhum campo mapeado ainda — todos serão ignorados.</p>
                 )}
               </div>
+
 
               {/* Amostra de dados */}
               <details className="text-xs">
