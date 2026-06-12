@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Nr1ImportarMatrizDialog } from "./Nr1ImportarMatrizDialog";
+import { Nr1ImportarMatrizDialog, MetodologiaCard, METODOLOGIAS } from "./Nr1ImportarMatrizDialog";
 
 vi.mock("@/contexts/CompanyContext", () => ({
   useCompanyContext: () => ({ activeCompanyId: "test-company-id" }),
@@ -43,6 +43,12 @@ vi.mock("xlsx", () => ({
   },
 }));
 
+vi.mock("@/components/ui/radio-group", () => ({
+  RadioGroupItem: ({ value, id }: { value: string; id?: string }) => (
+    <input type="radio" value={value} id={id} data-testid={`radio-${value}`} />
+  ),
+}));
+
 describe("Nr1ImportarMatrizDialog", () => {
   it("exibe o texto do card Outra metodologia com a citação de viabilidade", () => {
     render(<Nr1ImportarMatrizDialog open={true} onOpenChange={() => {}} />);
@@ -51,5 +57,51 @@ describe("Nr1ImportarMatrizDialog", () => {
       'Será necessário mapear fatores manualmente para o COPSOQ-III ("Depende de análise de viabilidade").';
 
     expect(screen.getByText(texto)).toBeInTheDocument();
+  });
+});
+
+describe("MetodologiaCard — Outra metodologia", () => {
+  const outra = METODOLOGIAS.find((m) => m.id === "OUTRA")!;
+
+  it("exibe a descrição completa com a citação entre aspas", () => {
+    render(
+      <MetodologiaCard
+        m={outra}
+        isSelected={false}
+        onSelect={() => {}}
+      />
+    );
+
+    expect(
+      screen.getByText(
+        'Será necessário mapear fatores manualmente para o COPSOQ-III ("Depende de análise de viabilidade").'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it("snapshot do card Outra metodologia permanece inalterado", () => {
+    const { container } = render(
+      <MetodologiaCard
+        m={outra}
+        isSelected={false}
+        onSelect={() => {}}
+      />
+    );
+
+    expect(container.firstElementChild).toMatchSnapshot();
+  });
+
+  it("exibe mensagem alternativa quando a descrição está vazia", () => {
+    render(
+      <MetodologiaCard
+        m={{ ...outra, descricao: "" }}
+        isSelected={false}
+        onSelect={() => {}}
+      />
+    );
+
+    expect(
+      screen.getByText("Descrição indisponível. Entre em contato com o suporte para mais informações.")
+    ).toBeInTheDocument();
   });
 });
