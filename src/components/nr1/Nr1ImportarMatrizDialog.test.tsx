@@ -44,6 +44,7 @@ vi.mock("xlsx", () => ({
 }));
 
 vi.mock("@/components/ui/radio-group", () => ({
+  RadioGroup: ({ children }: { children: React.ReactNode }) => <div data-testid="radio-group">{children}</div>,
   RadioGroupItem: ({ value, id }: { value: string; id?: string }) => (
     <input type="radio" value={value} id={id} data-testid={`radio-${value}`} />
   ),
