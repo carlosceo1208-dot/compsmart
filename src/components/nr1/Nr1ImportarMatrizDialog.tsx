@@ -25,15 +25,57 @@ import {
 } from '@/hooks/useNr1MapeamentoTemplates';
 
 type Metodologia = MetodologiaMatriz;
-type Modo = 'arquivo' | 'texto';
 
-const METODOLOGIAS: Array<{ id: Metodologia; nome: string; origem: string; fatores: string; descricao: string }> = [
+export interface MetodologiaItem {
+  id: Metodologia;
+  nome: string;
+  origem: string;
+  fatores: string;
+  descricao: string;
+}
+
+export const METODOLOGIAS: MetodologiaItem[] = [
   { id: 'COPSOQ-III', nome: 'COPSOQ-III', origem: 'Dinamarca (padrão CompSmart)', fatores: '13 fatores', descricao: 'Copenhagen Psychosocial Questionnaire — referência ISO 45003 / NR-1.' },
   { id: 'HSE', nome: 'HSE Indicator Tool', origem: 'Reino Unido (Health & Safety Executive)', fatores: '7 dimensões', descricao: 'Demands, Control, Support, Relationships, Role, Change, Peer Support.' },
   { id: 'JCQ', nome: 'JCQ (Karasek)', origem: 'Modelo Demanda-Controle', fatores: '3 eixos', descricao: 'Demanda Psicológica, Controle/Latitude de Decisão, Suporte Social.' },
   { id: 'ERI', nome: 'ERI (Siegrist)', origem: 'Desequilíbrio Esforço-Recompensa', fatores: '3 eixos', descricao: 'Esforço, Recompensa e Overcommitment.' },
   { id: 'OUTRA', nome: 'Outra metodologia', origem: 'Consultoria própria / customizada', fatores: 'variável', descricao: 'Será necessário mapear fatores manualmente para o COPSOQ-III ("Depende de análise de viabilidade").' },
 ];
+
+export interface MetodologiaCardProps {
+  m: MetodologiaItem;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+export function MetodologiaCard({ m, isSelected, onSelect }: MetodologiaCardProps) {
+  return (
+    <label
+      htmlFor={`met-${m.id}`}
+      className={`flex items-start gap-2 rounded-lg border-2 p-2.5 cursor-pointer transition-colors ${
+        isSelected ? 'border-[hsl(var(--nr1-primary))] nr1-bg-soft' : 'border-border hover:border-muted-foreground/40'
+      }`}
+    >
+      <RadioGroupItem value={m.id} id={`met-${m.id}`} className="mt-1" onClick={onSelect} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-semibold text-xs">{m.nome}</span>
+          <Badge variant="outline" className="text-[9px] py-0">{m.fatores}</Badge>
+          {m.id === 'COPSOQ-III' && (
+            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 text-[9px] py-0">
+              <CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />Padrão
+            </Badge>
+          )}
+        </div>
+        <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+          {m.descricao?.trim() || 'Descrição indisponível. Entre em contato com o suporte para mais informações.'}
+        </p>
+      </div>
+    </label>
+  );
+}
+
+type Modo = 'arquivo' | 'texto';
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 const MAX_TEXT_LENGTH = 200_000;
@@ -415,20 +457,16 @@ export function Nr1ImportarMatrizDialog({ open, onOpenChange }: { open: boolean;
             <Label className="text-sm font-semibold">1. Metodologia utilizada</Label>
             <RadioGroup value={metodologia} onValueChange={(v) => { setMetodologia(v as Metodologia); setMapeamento({}); setTemplateAplicadoId(null); }} className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {METODOLOGIAS.map((m) => (
-                <label key={m.id} htmlFor={`met-${m.id}`}
-                  className={`flex items-start gap-2 rounded-lg border-2 p-2.5 cursor-pointer transition-colors ${
-                    metodologia === m.id ? 'border-[hsl(var(--nr1-primary))] nr1-bg-soft' : 'border-border hover:border-muted-foreground/40'
-                  }`}>
-                  <RadioGroupItem value={m.id} id={`met-${m.id}`} className="mt-1" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-semibold text-xs">{m.nome}</span>
-                      <Badge variant="outline" className="text-[9px] py-0">{m.fatores}</Badge>
-                      {m.id === 'COPSOQ-III' && <Badge className="bg-emerald-100 text-emerald-700 border-emerald-300 text-[9px] py-0"><CheckCircle2 className="h-2.5 w-2.5 mr-0.5" />Padrão</Badge>}
-                    </div>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">{m.descricao}</p>
-                  </div>
-                </label>
+                <MetodologiaCard
+                  key={m.id}
+                  m={m}
+                  isSelected={metodologia === m.id}
+                  onSelect={() => {
+                    setMetodologia(m.id);
+                    setMapeamento({});
+                    setTemplateAplicadoId(null);
+                  }}
+                />
               ))}
             </RadioGroup>
             {metodologia === 'OUTRA' && (

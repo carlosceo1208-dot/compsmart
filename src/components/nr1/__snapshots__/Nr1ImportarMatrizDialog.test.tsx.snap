@@ -1,0 +1,38 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`MetodologiaCard — Outra metodologia > snapshot do card Outra metodologia permanece inalterado 1`] = `
+<label
+  class="flex items-start gap-2 rounded-lg border-2 p-2.5 cursor-pointer transition-colors border-border hover:border-muted-foreground/40"
+  for="met-OUTRA"
+>
+  <input
+    data-testid="radio-OUTRA"
+    id="met-OUTRA"
+    type="radio"
+    value="OUTRA"
+  />
+  <div
+    class="flex-1 min-w-0"
+  >
+    <div
+      class="flex items-center gap-1.5 flex-wrap"
+    >
+      <span
+        class="font-semibold text-xs"
+      >
+        Outra metodologia
+      </span>
+      <div
+        class="inline-flex items-center rounded-full border px-2.5 font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground text-[9px] py-0"
+      >
+        variável
+      </div>
+    </div>
+    <p
+      class="text-[10px] text-muted-foreground mt-0.5 leading-snug"
+    >
+      Será necessário mapear fatores manualmente para o COPSOQ-III ("Depende de análise de viabilidade").
+    </p>
+  </div>
+</label>
+`;
