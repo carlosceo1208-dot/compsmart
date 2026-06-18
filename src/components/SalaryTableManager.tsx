@@ -167,7 +167,57 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
     setEditDialogOpen(true);
   };
 
-  const hasActiveTable = tables.some(t => t.is_active);
+  const handleCloneTemplate = async (template: SalaryTable) => {
+    if (!activeCompanyId) return;
+    setActivating(template.id);
+    try {
+      // 1) Create a new table copy for the active company
+      const { data: newTable, error: createErr } = await supabase
+        .from('salary_tables')
+        .insert({
+          name: `${template.name} (cópia)`,
+          effective_month: template.effective_month,
+          effective_year: template.effective_year,
+          is_active: false,
+          is_template: false,
+          root_company_id: activeCompanyId,
+        })
+        .select('id')
+        .single();
+      if (createErr) throw createErr;
+
+      // 2) Copy ranges
+      const { data: srcRanges, error: rangesErr } = await supabase
+        .from('salary_ranges')
+        .select('grade, calculation_mode, min_value, q1_value, median_value, q3_value, max_value, input_median, input_amplitude, reference_points')
+        .eq('salary_table_id', template.id);
+      if (rangesErr) throw rangesErr;
+
+      if (srcRanges && srcRanges.length > 0) {
+        const payload = srcRanges.map((r) => ({ ...r, salary_table_id: newTable.id }));
+        const { error: insErr } = await supabase.from('salary_ranges').insert(payload);
+        if (insErr) throw insErr;
+      }
+
+      toast({
+        title: 'Modelo clonado',
+        description: `Uma cópia editável foi criada na sua empresa (${srcRanges?.length ?? 0} faixas).`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['salary-table-status'] });
+      await fetchTables();
+      onTableActivated?.();
+    } catch (error: any) {
+      console.error('Error cloning template:', error);
+      toast({
+        title: 'Erro ao clonar',
+        description: error?.message ?? 'Não foi possível clonar o modelo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setActivating(null);
+    }
+  };
 
   return (
     <>
