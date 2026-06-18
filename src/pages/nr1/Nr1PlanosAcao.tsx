@@ -84,6 +84,8 @@ export default function Nr1PlanosAcao() {
     concluidos: planos.filter((p) => p.status === 'concluido').length,
     atrasados: planos.filter((p) => p.status === 'atrasado').length,
     emAndamento: planos.filter((p) => p.status === 'em_andamento').length,
+    aprovadas: planos.filter((p) => p.aprovacao_status === 'aprovado').length,
+    pendentes: planos.filter((p) => p.aprovacao_status === 'em_aprovacao').length,
   };
 
   return (
@@ -105,11 +107,13 @@ export default function Nr1PlanosAcao() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         <SummaryCard label="Total de ações" value={totais.total} />
         <SummaryCard label="Em andamento" value={totais.emAndamento} tone="info" />
         <SummaryCard label="Concluídas" value={totais.concluidos} tone="success" />
         <SummaryCard label="Atrasadas" value={totais.atrasados} tone="danger" />
+        <SummaryCard label="Aprovadas" value={totais.aprovadas} tone="success" />
+        <SummaryCard label="Pendentes" value={totais.pendentes} tone="warning" />
       </div>
 
       {isLoading ? (
@@ -327,10 +331,11 @@ export default function Nr1PlanosAcao() {
   );
 }
 
-function SummaryCard({ label, value, tone }: { label: string; value: number; tone?: 'success' | 'danger' | 'info' }) {
+function SummaryCard({ label, value, tone }: { label: string; value: number; tone?: 'success' | 'danger' | 'info' | 'warning' }) {
   const toneClass =
     tone === 'success' ? 'text-emerald-600' :
     tone === 'danger' ? 'text-orange-600' :
+    tone === 'warning' ? 'text-amber-600' :
     tone === 'info' ? 'text-blue-600' : 'nr1-text-primary';
   return (
     <Card>
