@@ -110,6 +110,7 @@ export const Nr1Layout = () => {
 
 
   return (
+    <TooltipProvider delayDuration={150}>
     <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
       {isSuper && (
         <div className="bg-amber-100 border-b border-amber-300 text-amber-900 text-xs px-4 py-1.5 flex items-center gap-2 justify-center">
