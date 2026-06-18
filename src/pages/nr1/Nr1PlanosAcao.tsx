@@ -84,6 +84,8 @@ export default function Nr1PlanosAcao() {
     concluidos: planos.filter((p) => p.status === 'concluido').length,
     atrasados: planos.filter((p) => p.status === 'atrasado').length,
     emAndamento: planos.filter((p) => p.status === 'em_andamento').length,
+    aprovadas: planos.filter((p) => p.aprovacao_status === 'aprovado').length,
+    pendentes: planos.filter((p) => p.aprovacao_status === 'em_aprovacao').length,
   };
 
   return (
