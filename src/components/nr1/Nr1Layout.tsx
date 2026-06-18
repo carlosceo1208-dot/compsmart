@@ -203,7 +203,7 @@ export const Nr1Layout = () => {
                           <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                         </>
                       );
-                      const baseNode = !item.to ? (
+                      const node = !item.to ? (
                         <button
                           key={item.label}
                           type="button"
@@ -228,26 +228,6 @@ export const Nr1Layout = () => {
                         </NavLink>
                       );
 
-                      const ShortcutIcon = item.shortcut?.icon;
-                      const node = item.shortcut ? (
-                        <div className="relative">
-                          {baseNode}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              navigate(item.shortcut!.to);
-                            }}
-                            aria-label={item.shortcut.label}
-                            title={item.shortcut.label}
-                            className="absolute top-1 right-1 h-5 w-5 rounded-md bg-[hsl(var(--nr1-primary))] text-white flex items-center justify-center shadow hover:scale-110 transition-transform z-10"
-                          >
-                            {ShortcutIcon && <ShortcutIcon className="h-3 w-3" />}
-                          </button>
-                        </div>
-                      ) : baseNode;
-
                       if (!item.desc) return node;
                       return (
                         <Tooltip key={item.to ?? item.label} delayDuration={150}>
@@ -266,9 +246,16 @@ export const Nr1Layout = () => {
                               </div>
                             )}
                             {item.shortcut && (
-                              <p className="mt-1.5 pt-1.5 border-t border-border/50 text-[10px] text-[hsl(var(--nr1-primary))] font-semibold">
-                                ↗ Clique no botão no canto para: {item.shortcut.label}
-                              </p>
+                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(item.shortcut!.to)}
+                                  className="text-[10px] text-[hsl(var(--nr1-primary))] font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+                                >
+                                  <item.shortcut.icon className="h-3 w-3" />
+                                  {item.shortcut.label}
+                                </button>
+                              </div>
                             )}
                           </TooltipContent>
                         </Tooltip>
