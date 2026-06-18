@@ -171,14 +171,24 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
     if (!activeCompanyId) return;
     setActivating(template.id);
     try {
-      // 1) Create a new table copy for the active company
+      // 1) Check if company already has an active table
+      const { data: existingActive } = await supabase
+        .from('salary_tables')
+        .select('id')
+        .eq('root_company_id', activeCompanyId)
+        .eq('is_active', true)
+        .eq('is_template', false)
+        .limit(1);
+      const shouldActivate = !existingActive || existingActive.length === 0;
+
+      // 2) Create a new table copy for the active company
       const { data: newTable, error: createErr } = await supabase
         .from('salary_tables')
         .insert({
           name: `${template.name} (cópia)`,
           effective_month: template.effective_month,
           effective_year: template.effective_year,
-          is_active: false,
+          is_active: shouldActivate,
           is_template: false,
           root_company_id: activeCompanyId,
         })
