@@ -184,6 +184,31 @@ export default function Nr1PlanosAcao() {
                     {p.evidencias}
                   </p>
                 )}
+                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                  {p.aprovacao_status === 'rascunho' && canSubmit && (
+                    <Button size="sm" variant="outline" onClick={() => setApprovalTarget({ plano: p, novo_status: 'em_aprovacao' })}>
+                      <Send className="h-3.5 w-3.5 mr-1" /> Enviar para aprovação
+                    </Button>
+                  )}
+                  {p.aprovacao_status === 'em_aprovacao' && isApprover && (
+                    <>
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setApprovalTarget({ plano: p, novo_status: 'aprovado' })}>
+                        <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Aprovar
+                      </Button>
+                      <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => setApprovalTarget({ plano: p, novo_status: 'revisao_solicitada' })}>
+                        <RotateCcw className="h-3.5 w-3.5 mr-1" /> Solicitar revisão
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => setApprovalTarget({ plano: p, novo_status: 'rejeitado' })}>
+                        <XCircle className="h-3.5 w-3.5 mr-1" /> Rejeitar
+                      </Button>
+                    </>
+                  )}
+                  {(p.aprovacao_status === 'revisao_solicitada' || p.aprovacao_status === 'rejeitado') && canSubmit && (
+                    <Button size="sm" variant="outline" onClick={() => setApprovalTarget({ plano: p, novo_status: 'em_aprovacao' })}>
+                      <Send className="h-3.5 w-3.5 mr-1" /> Reenviar para aprovação
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
