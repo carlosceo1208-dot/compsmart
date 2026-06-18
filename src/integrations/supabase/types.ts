@@ -7799,6 +7799,7 @@ export type Database = {
           effective_year: number
           id: string
           is_active: boolean
+          is_template: boolean
           modality: Database["public"]["Enums"]["salary_modality"]
           name: string
           root_company_id: string
@@ -7810,6 +7811,7 @@ export type Database = {
           effective_year: number
           id?: string
           is_active?: boolean
+          is_template?: boolean
           modality?: Database["public"]["Enums"]["salary_modality"]
           name: string
           root_company_id: string
@@ -7821,6 +7823,7 @@ export type Database = {
           effective_year?: number
           id?: string
           is_active?: boolean
+          is_template?: boolean
           modality?: Database["public"]["Enums"]["salary_modality"]
           name?: string
           root_company_id?: string
