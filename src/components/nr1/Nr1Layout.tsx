@@ -203,7 +203,7 @@ export const Nr1Layout = () => {
                           <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                         </>
                       );
-                      const node = !item.to ? (
+                      const baseNode = !item.to ? (
                         <button
                           key={item.label}
                           type="button"
@@ -212,7 +212,7 @@ export const Nr1Layout = () => {
                             if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
                             item.onClick?.();
                           }}
-                          className={baseClass}
+                          className={cn(baseClass, 'w-full')}
                         >
                           {inner}
                         </button>
@@ -222,18 +222,54 @@ export const Nr1Layout = () => {
                           to={item.to}
                           end={item.end}
                           data-nr1-active={active}
-                          className={baseClass}
+                          className={cn(baseClass, 'w-full')}
                         >
                           {inner}
                         </NavLink>
                       );
+
+                      const ShortcutIcon = item.shortcut?.icon;
+                      const node = item.shortcut ? (
+                        <div className="relative">
+                          {baseNode}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              navigate(item.shortcut!.to);
+                            }}
+                            aria-label={item.shortcut.label}
+                            title={item.shortcut.label}
+                            className="absolute top-1 right-1 h-5 w-5 rounded-md bg-[hsl(var(--nr1-primary))] text-white flex items-center justify-center shadow hover:scale-110 transition-transform z-10"
+                          >
+                            {ShortcutIcon && <ShortcutIcon className="h-3 w-3" />}
+                          </button>
+                        </div>
+                      ) : baseNode;
+
                       if (!item.desc) return node;
                       return (
                         <Tooltip key={item.to ?? item.label} delayDuration={150}>
                           <TooltipTrigger asChild>{node}</TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-[260px] text-xs leading-snug">
+                          <TooltipContent side="bottom" className="max-w-[280px] text-xs leading-snug">
                             <p className="font-semibold mb-0.5">{item.label}</p>
                             <p className="text-muted-foreground">{item.desc}</p>
+                            {item.actions && item.actions.length > 0 && (
+                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
+                                <p className="font-semibold text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">Principais ações</p>
+                                <ul className="list-disc list-inside space-y-0.5">
+                                  {item.actions.map((a) => (
+                                    <li key={a}>{a}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {item.shortcut && (
+                              <p className="mt-1.5 pt-1.5 border-t border-border/50 text-[10px] text-[hsl(var(--nr1-primary))] font-semibold">
+                                ↗ Clique no botão no canto para: {item.shortcut.label}
+                              </p>
+                            )}
                           </TooltipContent>
                         </Tooltip>
                       );
