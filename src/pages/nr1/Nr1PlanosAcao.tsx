@@ -331,10 +331,11 @@ export default function Nr1PlanosAcao() {
   );
 }
 
-function SummaryCard({ label, value, tone }: { label: string; value: number; tone?: 'success' | 'danger' | 'info' }) {
+function SummaryCard({ label, value, tone }: { label: string; value: number; tone?: 'success' | 'danger' | 'info' | 'warning' }) {
   const toneClass =
     tone === 'success' ? 'text-emerald-600' :
     tone === 'danger' ? 'text-orange-600' :
+    tone === 'warning' ? 'text-amber-600' :
     tone === 'info' ? 'text-blue-600' : 'nr1-text-primary';
   return (
     <Card>
