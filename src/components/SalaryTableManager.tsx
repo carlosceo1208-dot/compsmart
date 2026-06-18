@@ -219,6 +219,8 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
     }
   };
 
+  const hasActiveTable = tables.some(t => t.is_active && !t.is_template);
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
