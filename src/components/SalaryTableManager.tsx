@@ -17,6 +17,7 @@ interface SalaryTable {
   effective_month: number;
   effective_year: number;
   is_active: boolean;
+  is_template: boolean;
   ranges_count?: number;
 }
 
