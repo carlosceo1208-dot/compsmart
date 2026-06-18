@@ -12,10 +12,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, ListChecks, AlertTriangle } from 'lucide-react';
+import { Plus, Pencil, Trash2, ListChecks, AlertTriangle, CheckCircle2, XCircle, RotateCcw, Send } from 'lucide-react';
 import {
   useNr1PlanosAcao, useUpsertPlanoAcao, useDeletePlanoAcao,
-  type Nr1PlanoAcao, type Nr1AcaoStatus, type Nr1AcaoPrioridade,
+  type Nr1PlanoAcao, type Nr1AcaoStatus, type Nr1AcaoPrioridade, type Nr1AprovacaoStatus,
 } from '@/hooks/useNr1PlanosAcao';
 import {
   ACAO_STATUS_LABEL, ACAO_PRIORIDADE_LABEL,
@@ -23,6 +23,10 @@ import {
 } from '@/lib/nr1Risco';
 import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { AssistenteIaPlanoAcaoDialog } from '@/components/nr1/AssistenteIaPlanoAcaoDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { toast } from '@/hooks/use-toast';
 
 const STATUS_OPTS: Nr1AcaoStatus[] = ['pendente', 'em_andamento', 'concluido', 'atrasado'];
 const PRIORIDADE_OPTS: Nr1AcaoPrioridade[] = ['baixa', 'media', 'alta', 'critica'];
