@@ -246,9 +246,16 @@ export const Nr1Layout = () => {
                               </div>
                             )}
                             {item.shortcut && (
-                              <p className="mt-1.5 pt-1.5 border-t border-border/50 text-[10px] text-[hsl(var(--nr1-primary))] font-semibold">
-                                ↗ Clique no botão no canto para: {item.shortcut.label}
-                              </p>
+                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
+                                <button
+                                  type="button"
+                                  onClick={() => navigate(item.shortcut!.to)}
+                                  className="text-[10px] text-[hsl(var(--nr1-primary))] font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+                                >
+                                  <item.shortcut.icon className="h-3 w-3" />
+                                  {item.shortcut.label}
+                                </button>
+                              </div>
                             )}
                           </TooltipContent>
                         </Tooltip>
