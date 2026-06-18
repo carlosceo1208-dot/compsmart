@@ -1,85 +1,123 @@
 
-## Objetivo
-Reformular a Landing NR-1 com pricing por faixa de colaboradores, simulador de desconto idêntico ao da Gestão de Remuneração e nova navegação no header (Planos, FAQ, Novidades).
+# Passo a passo — Stress test end-to-end NR-1 (CompSmart)
 
-## 1. Modelo de preços NR-1 (mensal recorrente, R$ 5/colaborador)
+Objetivo: validar a NR-1 do começo ao fim com **1 empresa fictícia + 10 colaboradores fictícios**, gerando dados via SQL (mais barato em créditos) e usando a UI só para o que precisa ser visualmente verificado.
 
-| Faixa | Colaboradores | Mensal | Por colaborador |
-|---|---|---|---|
-| Essencial | até 50 | R$ 250 | R$ 5,00 |
-| Crescimento | 51–200 | R$ 1.000 | R$ 5,00 (teto) |
-| Consolidação | 201–500 | R$ 2.500 | R$ 5,00 (teto) |
-| Performance | 501–750 | R$ 3.750 | R$ 5,00 (teto) |
-| Corporate | 751–1.000 | R$ 5.000 | R$ 5,00 (teto) |
-| Enterprise | +1.000 | Sob consulta | — |
+---
 
-Observação: como o valor por colaborador é constante (R$ 5), o card destaca a **faixa** e o **valor mensal** — o "por colaborador" aparece como microcopy ("a partir de R$ 5/colaborador").
+## Etapa 0 — Pré-requisitos (você faz, sem custo de créditos)
 
-## 2. Componentes a criar
+1. Estar logado na plataforma com seu usuário **super_admin**.
+2. Ter o navegador aberto na preview/produção.
+3. Decidir o nome da empresa fictícia (ex.: `Empresa Stress Test NR1 Ltda`). Eu já gero o CNPJ válido fictício no seed.
 
-```
-src/components/landing/nr1/
-├── Nr1Header.tsx           ← header com Planos, FAQ, Novidades, NR-1, Ativar conta
-├── Nr1PricingCards.tsx     ← 6 cards (5 faixas + Sob Consulta)
-├── Nr1DiscountSimulator.tsx← reaproveita lógica do DiscountCalculator (anual -10%, PIX -5%)
-└── Nr1Novidades.tsx        ← seção com 3 destaques
-```
+---
 
-## 3. Cards de preço — layout
+## Etapa 1 — Seed da empresa + 10 colaboradores (1 chamada SQL minha)
 
-- Grid responsivo: `lg:grid-cols-6 md:grid-cols-3 grid-cols-1`
-- Card "Crescimento" (51–200) marcado como **"Mais Popular"** (faixa típica do mercado-alvo)
-- Card "Enterprise" com badge **"Sob Consulta"** e CTA "Falar com especialista"
-- Cada card: ícone + nome da faixa + range de colaboradores + preço mensal grande + microcopy "R$ 5/colaborador" + lista enxuta de 4 features + CTA "Começar trial 14 dias"
-- Toggle **Mensal / Anual** no topo (mostra preço com -10% quando Anual)
-- Paleta `.nr1-scope` (azul #007BFF / verde #28A745)
+Eu rodo **um único `supabase--insert`** que cria:
 
-## 4. Simulador de desconto (idêntico ao módulo de Remuneração)
+- 1 registro em `organizational_structure` (type=`company`, plano Pro/Enterprise com NR-1 ativo, trial 30 dias, CNPJ fictício válido tipo `12.345.678/0001-95`).
+- 1 sede (type=`headquarters`) sob a empresa.
+- 10 registros em `profiles` (status=`active`, `employee_number` preenchido, gênero/idade/área variados para popular sociodemográfico) vinculados a `root_company_id` da empresa criada.
+- Vínculo de você como `admin` da empresa via `super_admin_active_company` para conseguir navegar.
 
-Reaproveitar a lógica de `DiscountCalculator`:
-- Selecionar plano base (Essencial/Crescimento/Consolidação/Performance/Corporate)
-- Checkboxes: Plano Anual (-10%), Pagamento via PIX (-5%), demais descontos existentes
-- Cálculo em tempo real com preço final destacado
-- CTA "Solicitar proposta" → ancora em `#fale-conosco`
+**O que você faz:** apenas confirmar a migração/insert quando eu pedir. Depois recarregar a página.
 
-## 5. Header novo (substitui o atual da LandingNr1)
+---
 
-Botões: **Funcionalidades · Planos · FAQ · Ativar conta · NR-1 (ativo) · Novidades · Ir para Dashboard · Sair**
+## Etapa 2 — Ativar a empresa no seu contexto (UI, 30 s)
 
-Cada item é uma âncora interna (`#planos`, `#faq`, `#novidades`) que faz smooth scroll para a seção correspondente na própria landing NR-1.
+1. No header, trocar a "Empresa ativa" para `Empresa Stress Test NR1 Ltda`.
+2. Confirmar que aparece "10 colaboradores ativos" no dashboard.
 
-## 6. Seção "Novidades NR-1"
+---
 
-Três cards destacando:
-1. **Cruzamento NR-1 × 9Box × Remuneração** — único no mercado; identifica talentos de alto desempenho em zona de burnout
-2. **Pesquisa de Clima integrada + correlação COPSOQ** — causa raiz unificada entre clima organizacional e risco psicossocial
-3. **Relatórios LGPD-compliant** — exportação PDF anonimizada pronta para fiscalização do MTE
+## Etapa 3 — Stress test NR-1 — fluxo guiado
 
-## 7. Seção FAQ
-Reaproveita o `Nr1Faq` existente, agora ancorado em `#faq`.
+Vamos cobrir os 6 blocos da NR-1 nesta ordem. Para cada um eu indico **o que é UI (você clica)** e **o que é seed (eu rodo SQL)**.
 
-## 8. Ordem das seções na Landing
-1. Header (novo)
-2. Hero
-3. Perguntas CHRO
-4. Como Funciona
-5. Prova de Correlação
-6. **Planos (novo)** — 6 cards + simulador de desconto
-7. **Novidades (novo)** — 3 destaques
-8. Tabela Categoria
-9. Gestão Terceiros
-10. FAQ
-11. Fale Conosco / Security / Footer
+### 3.1 Consentimento & Universo (UI)
+- Abrir `/nr1/consentimento` → aceitar termos LGPD.
+- Abrir `/nr1/universo` → conferir que os 10 colaboradores aparecem segmentados.
 
-## Detalhes técnicos
+### 3.2 Diagnóstico inicial (UI + seed)
+- UI: `/nr1/novo-diagnostico` → criar 1 diagnóstico ("Diagnóstico Q1 2026").
+- Seed (eu): inserir respostas de diagnóstico simuladas para os 10 (variando risco baixo/médio/alto) em `nr1_diagnostico_respostas`.
+- UI: `/nr1/diagnosticos` → abrir o detalhe e validar os gráficos.
 
-- Criar `src/lib/nr1Pricing.ts` com array tipado das 6 faixas (id, label, range, monthlyPrice, isPopular, isCustom)
-- `Nr1DiscountSimulator` aceita prop `plans` no mesmo shape do `DiscountCalculator` (id, name, priceMonthly) para máxima reutilização visual
-- Sem mudanças em backend/DB — pricing é estático na landing (lead capture continua via formulário existente)
-- Tipografia/cores: usar tokens `.nr1-scope` já definidos em `index.css`
-- Mobile: cards empilham; toggle Mensal/Anual continua acessível
+### 3.3 Pesquisa de Clima COPSOQ-III (UI + seed grande)
+- UI: `/nr1/clima` → criar 1 pesquisa "Clima COPSOQ Q1 2026" (anônima, COPSOQ-III completo).
+- Seed (eu): inserir 10 `clima_respostas` + ~40 itens por resposta em `clima_respostas_itens` com distribuição realista (mix de favorável/neutro/desfavorável para gerar alertas).
+- UI: `/nr1/clima/dashboard` → validar dimensões COPSOQ, eNPS, alertas.
+- UI: `/nr1/clima/relatorios` → exportar PDF (testa `climaReport.ts`).
+- UI: `/nr1/clima/correlacao` → ver correlação clima × COPSOQ.
 
-## Fora de escopo
-- Não altera tabela `nr1_subscriptions` nem regras de billing reais
-- Não cria checkout para NR-1 (continua "Solicitar proposta")
-- Não toca na landing principal (`/`) nem em `Pricing.tsx`
+### 3.4 Importação de matriz de risco / metodologia (UI)
+- `/nr1` → abrir o `Nr1ImportarMatrizDialog`, testar:
+  - Card "COPSOQ-III" (caminho padrão).
+  - Card "Outra metodologia" (a frase que adicionamos antes precisa aparecer).
+- Confirmar que o template salvo aparece em `nr1_mapeamentos_templates`.
+
+### 3.5 Planos de ação + Governança (UI + seed)
+- Seed (eu): inserir 3 `nr1_planos_acao` (1 baixo, 1 médio, 1 alto risco) com responsáveis = colaboradores fictícios.
+- UI: `/nr1/planos-acao` → aprovar 1, rejeitar 1, deixar 1 pendente (testa `nr1_planos_aprovacao_historico`).
+- UI: `/nr1/clima/governanca` → validar histórico.
+
+### 3.6 Inteligência / Acompanhamento / FIB / Vitalidade (UI – smoke)
+- Abrir em sequência (cada um <30 s): `/nr1/inteligencia`, `/nr1/acompanhamento`, `/nr1/fib`, `/nr1/vitalidade`, `/nr1/seg-psi`, `/nr1/sociodemografico`, `/nr1/bem-estar-agente`, `/nr1/jornada-bem-estar`, `/nr1/etapas`.
+- Para cada um você me diz: "OK" ou cola o erro (console/tela). Eu corrijo só os que falharem.
+
+### 3.7 Páginas públicas (sem login, anônimo)
+- Abrir `/clima-publico/<token>` (eu gero o token no seed) em **janela anônima** → responder 1 vez para validar o fluxo público.
+- Abrir `/clima-externo-publico/<token>` (idem).
+- Abrir `/nr1-landing` → validar lead capture.
+
+---
+
+## Etapa 4 — Validação final (1 chamada SQL minha)
+
+Eu rodo **1 `supabase--read_query`** que retorna um resumo:
+
+- Nº de respostas de clima, diagnóstico, planos, alertas, exports.
+- Distribuição de risco COPSOQ.
+- Confirmação de que todos os RLS continuam isolando a empresa fictícia (nenhum dado vazou para outras empresas).
+
+Você me envia o print final ou um "OK" e encerramos.
+
+---
+
+## Etapa 5 — Cleanup (opcional, 1 chamada SQL)
+
+Quando terminar, eu rodo **1 `supabase--insert`** com `DELETE` em cascata para apagar tudo (empresa + perfis + respostas) e devolver seu workspace limpo.
+
+---
+
+## Custo estimado de créditos
+
+| Bloco | Chamadas LLM |
+|---|---|
+| Seed inicial (empresa + 10 colaboradores) | 1 |
+| Seed diagnóstico | 1 |
+| Seed clima COPSOQ (10 × 40 itens) | 1 |
+| Seed planos de ação | 1 |
+| Query de validação final | 1 |
+| Cleanup | 1 |
+| **Total estimado** | **~6 chamadas SQL** + correções pontuais se algo quebrar |
+
+Tudo o que for *abrir página e ver se renderiza* é feito **por você** na UI, sem custo de créditos meu.
+
+---
+
+## Detalhes técnicos (referência)
+
+- CNPJ fictício é gerado com dígitos verificadores válidos pelo algoritmo da Receita — passa em `src/lib/cnpj.ts`.
+- O onboarding (`src/pages/Onboarding.tsx`) é **pulado** porque criamos a empresa direto no banco com `subscription_status='trial'` e `selected_modules=['Core','Insight','Match']` + flag NR-1.
+- Respostas COPSOQ seguem a estrutura de `src/lib/climaQuestoes.ts` (dimensões + Likert 1–5).
+- RLS é validada lendo dados como a empresa fictícia e como outra empresa qualquer — se nenhuma cross-leak, passa.
+
+---
+
+## Próximo passo
+
+Se aprovar este plano, ao mudar para build mode eu já disparo a **Etapa 1 (seed inicial)** e te aviso para confirmar antes de partir pra UI.
