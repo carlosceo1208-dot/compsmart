@@ -10386,6 +10386,7 @@ export type Database = {
         }[]
       }
       get_user_company_id: { Args: never; Returns: string }
+      get_user_root_company_id_strict: { Args: never; Returns: string }
       get_visible_employees: {
         Args: { p_company_id: string; p_user_id: string }
         Returns: {
