@@ -288,6 +288,41 @@ export default function Nr1PlanosAcao() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!approvalTarget} onOpenChange={(o) => { if (!o) { setApprovalTarget(null); setObs(''); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {approvalTarget?.novo_status === 'aprovado' && 'Aprovar plano'}
+              {approvalTarget?.novo_status === 'rejeitado' && 'Rejeitar plano'}
+              {approvalTarget?.novo_status === 'revisao_solicitada' && 'Solicitar revisão'}
+              {approvalTarget?.novo_status === 'em_aprovacao' && 'Enviar para aprovação'}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {approvalTarget?.novo_status === 'aprovado' && 'O plano será marcado como aprovado e poderá entrar em execução.'}
+            {approvalTarget?.novo_status === 'rejeitado' && 'O plano será rejeitado. Informe o motivo para que possa ser revisado.'}
+            {approvalTarget?.novo_status === 'revisao_solicitada' && 'O plano voltará para ajustes do solicitante.'}
+            {approvalTarget?.novo_status === 'em_aprovacao' && 'O plano será enviado para aprovação dos administradores.'}
+          </p>
+          <Textarea
+            rows={4}
+            placeholder="Observação (opcional, mas recomendada)"
+            value={obs}
+            onChange={(e) => setObs(e.target.value)}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setApprovalTarget(null); setObs(''); }}>Cancelar</Button>
+            <Button
+              disabled={transitar.isPending}
+              onClick={() => approvalTarget && transitar.mutate({ plano_id: approvalTarget.plano.id, novo_status: approvalTarget.novo_status, observacao: obs })}
+              className="nr1-bg-primary"
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
