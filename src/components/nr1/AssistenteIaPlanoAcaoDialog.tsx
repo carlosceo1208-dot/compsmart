@@ -83,12 +83,14 @@ export function AssistenteIaPlanoAcaoDialog() {
     if (items.length === 0) return;
     setLoading(true);
     try {
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       for (const p of items) {
         const prazo = p.prazo_dias != null
           ? new Date(Date.now() + p.prazo_dias * 24 * 3600 * 1000).toISOString().slice(0, 10)
           : null;
+        const validId = p.action === 'update' && p.id && UUID_RE.test(p.id) ? p.id : undefined;
         await upsert.mutateAsync({
-          id: p.action === 'update' ? p.id : undefined,
+          id: validId,
           titulo: p.titulo,
           descricao: p.descricao ?? null,
           dimensao: p.dimensao ?? null,
