@@ -58,8 +58,9 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
       // Fetch tables with range count using activeCompanyId from context
       const { data: tablesData, error } = await supabase
         .from('salary_tables')
-        .select('id, name, effective_month, effective_year, is_active')
-        .eq('root_company_id', activeCompanyId)
+        .select('id, name, effective_month, effective_year, is_active, is_template')
+        .or(`root_company_id.eq.${activeCompanyId},is_template.eq.true`)
+        .order('is_template', { ascending: true })
         .order('is_active', { ascending: false })
         .order('effective_year', { ascending: false })
         .order('effective_month', { ascending: false });
