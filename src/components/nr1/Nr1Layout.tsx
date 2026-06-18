@@ -194,24 +194,26 @@ export const Nr1Layout = () => {
                           : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                       );
                       const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
-                      if (!item.to) {
-                        return (
-                          <button
-                            key={item.label}
-                            type="button"
-                            onClick={() => {
-                              if (item.action === 'open-terceiros') setTerceirosOpen(true);
-                              if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
-                              item.onClick?.();
-                            }}
-                            className={baseClass}
-                          >
-                            <Icon className={iconClass} />
-                            <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
-                          </button>
-                        );
-                      }
-                      return (
+                      const inner = (
+                        <>
+                          <Icon className={iconClass} />
+                          <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
+                        </>
+                      );
+                      const node = !item.to ? (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onClick={() => {
+                            if (item.action === 'open-terceiros') setTerceirosOpen(true);
+                            if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
+                            item.onClick?.();
+                          }}
+                          className={baseClass}
+                        >
+                          {inner}
+                        </button>
+                      ) : (
                         <NavLink
                           key={item.to}
                           to={item.to}
@@ -219,9 +221,18 @@ export const Nr1Layout = () => {
                           data-nr1-active={active}
                           className={baseClass}
                         >
-                          <Icon className={iconClass} />
-                          <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
+                          {inner}
                         </NavLink>
+                      );
+                      if (!item.desc) return node;
+                      return (
+                        <Tooltip key={item.to ?? item.label} delayDuration={150}>
+                          <TooltipTrigger asChild>{node}</TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-[260px] text-xs leading-snug">
+                            <p className="font-semibold mb-0.5">{item.label}</p>
+                            <p className="text-muted-foreground">{item.desc}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       );
                     })}
                   </div>
