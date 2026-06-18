@@ -196,14 +196,10 @@ const Users = () => {
         return;
       }
 
-      // Buscar o root_company_id do usuário atual
-      const { data: currentProfile } = await supabase
-        .from("profiles")
-        .select("root_company_id")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const companyIdToUse = activeCompanyId || currentProfile?.root_company_id;
+      // Empresa ativa: usa o contexto do header quando disponível e,
+      // como fallback seguro, a função do backend que respeita o override do super_admin.
+      const { data: backendActiveCompanyId } = await supabase.rpc("get_user_company_id");
+      const companyIdToUse = activeCompanyId || backendActiveCompanyId;
 
       // CRITICAL: Filtrar APENAS colaboradores da mesma empresa
       // e que tenham employee_number (são colaboradores reais, não apenas usuários)
