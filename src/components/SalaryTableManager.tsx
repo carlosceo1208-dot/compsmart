@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertTriangle, Copy, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SalaryTableDialog } from './SalaryTableDialog';
 import { useCompanyContext } from '@/contexts/CompanyContext';
