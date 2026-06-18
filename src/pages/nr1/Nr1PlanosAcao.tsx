@@ -12,10 +12,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Plus, Pencil, Trash2, ListChecks, AlertTriangle } from 'lucide-react';
+import { Plus, Pencil, Trash2, ListChecks, AlertTriangle, CheckCircle2, XCircle, RotateCcw, Send } from 'lucide-react';
 import {
   useNr1PlanosAcao, useUpsertPlanoAcao, useDeletePlanoAcao,
-  type Nr1PlanoAcao, type Nr1AcaoStatus, type Nr1AcaoPrioridade,
+  type Nr1PlanoAcao, type Nr1AcaoStatus, type Nr1AcaoPrioridade, type Nr1AprovacaoStatus,
 } from '@/hooks/useNr1PlanosAcao';
 import {
   ACAO_STATUS_LABEL, ACAO_PRIORIDADE_LABEL,
@@ -23,6 +23,10 @@ import {
 } from '@/lib/nr1Risco';
 import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { AssistenteIaPlanoAcaoDialog } from '@/components/nr1/AssistenteIaPlanoAcaoDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { toast } from '@/hooks/use-toast';
 
 const STATUS_OPTS: Nr1AcaoStatus[] = ['pendente', 'em_andamento', 'concluido', 'atrasado'];
 const PRIORIDADE_OPTS: Nr1AcaoPrioridade[] = ['baixa', 'media', 'alta', 'critica'];
@@ -33,6 +37,30 @@ export default function Nr1PlanosAcao() {
   const del = useDeletePlanoAcao();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<Nr1PlanoAcao> | null>(null);
+  const qc = useQueryClient();
+  const { data: role } = useCurrentUserRole();
+  const isApprover = !!(role?.isAdmin || role?.isSuperAdmin);
+  const canSubmit = !!(role?.isAdmin || role?.isHR || role?.isSuperAdmin);
+  const [approvalTarget, setApprovalTarget] = useState<{ plano: Nr1PlanoAcao; novo_status: Nr1AprovacaoStatus } | null>(null);
+  const [obs, setObs] = useState('');
+
+  const transitar = useMutation({
+    mutationFn: async ({ plano_id, novo_status, observacao }: { plano_id: string; novo_status: Nr1AprovacaoStatus; observacao?: string }) => {
+      const { data, error } = await (supabase as any).rpc('nr1_plano_transicao', {
+        _plano_id: plano_id, _novo_status: novo_status, _observacao: observacao || null,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: 'Status atualizado', description: 'O fluxo de aprovação foi registrado.' });
+      qc.invalidateQueries({ queryKey: ['nr1-planos-acao'] });
+      qc.invalidateQueries({ queryKey: ['nr1-planos-gov'] });
+      setApprovalTarget(null);
+      setObs('');
+    },
+    onError: (e: any) => toast({ title: 'Erro', description: e.message, variant: 'destructive' }),
+  });
 
   const startNew = () => {
     setEditing({ titulo: '', status: 'pendente', prioridade: 'media', progresso: 0 });
@@ -156,6 +184,31 @@ export default function Nr1PlanosAcao() {
                     {p.evidencias}
                   </p>
                 )}
+                <div className="flex flex-wrap gap-2 pt-2 border-t">
+                  {p.aprovacao_status === 'rascunho' && canSubmit && (
+                    <Button size="sm" variant="outline" onClick={() => setApprovalTarget({ plano: p, novo_status: 'em_aprovacao' })}>
+                      <Send className="h-3.5 w-3.5 mr-1" /> Enviar para aprovação
+                    </Button>
+                  )}
+                  {p.aprovacao_status === 'em_aprovacao' && isApprover && (
+                    <>
+                      <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => setApprovalTarget({ plano: p, novo_status: 'aprovado' })}>
+                        <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Aprovar
+                      </Button>
+                      <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50" onClick={() => setApprovalTarget({ plano: p, novo_status: 'revisao_solicitada' })}>
+                        <RotateCcw className="h-3.5 w-3.5 mr-1" /> Solicitar revisão
+                      </Button>
+                      <Button size="sm" variant="destructive" onClick={() => setApprovalTarget({ plano: p, novo_status: 'rejeitado' })}>
+                        <XCircle className="h-3.5 w-3.5 mr-1" /> Rejeitar
+                      </Button>
+                    </>
+                  )}
+                  {(p.aprovacao_status === 'revisao_solicitada' || p.aprovacao_status === 'rejeitado') && canSubmit && (
+                    <Button size="sm" variant="outline" onClick={() => setApprovalTarget({ plano: p, novo_status: 'em_aprovacao' })}>
+                      <Send className="h-3.5 w-3.5 mr-1" /> Reenviar para aprovação
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}
@@ -232,6 +285,41 @@ export default function Nr1PlanosAcao() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button onClick={save} disabled={upsert.isPending} className="nr1-bg-primary">Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!approvalTarget} onOpenChange={(o) => { if (!o) { setApprovalTarget(null); setObs(''); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {approvalTarget?.novo_status === 'aprovado' && 'Aprovar plano'}
+              {approvalTarget?.novo_status === 'rejeitado' && 'Rejeitar plano'}
+              {approvalTarget?.novo_status === 'revisao_solicitada' && 'Solicitar revisão'}
+              {approvalTarget?.novo_status === 'em_aprovacao' && 'Enviar para aprovação'}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {approvalTarget?.novo_status === 'aprovado' && 'O plano será marcado como aprovado e poderá entrar em execução.'}
+            {approvalTarget?.novo_status === 'rejeitado' && 'O plano será rejeitado. Informe o motivo para que possa ser revisado.'}
+            {approvalTarget?.novo_status === 'revisao_solicitada' && 'O plano voltará para ajustes do solicitante.'}
+            {approvalTarget?.novo_status === 'em_aprovacao' && 'O plano será enviado para aprovação dos administradores.'}
+          </p>
+          <Textarea
+            rows={4}
+            placeholder="Observação (opcional, mas recomendada)"
+            value={obs}
+            onChange={(e) => setObs(e.target.value)}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setApprovalTarget(null); setObs(''); }}>Cancelar</Button>
+            <Button
+              disabled={transitar.isPending}
+              onClick={() => approvalTarget && transitar.mutate({ plano_id: approvalTarget.plano.id, novo_status: approvalTarget.novo_status, observacao: obs })}
+              className="nr1-bg-primary"
+            >
+              Confirmar
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
