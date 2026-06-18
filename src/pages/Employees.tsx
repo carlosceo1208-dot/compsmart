@@ -40,6 +40,7 @@ import { ptBR } from "date-fns/locale";
 import { UserDialog } from "@/components/UserDialog";
 import { EmployeeBulkImport } from "@/components/EmployeeBulkImport";
 import { formatCurrency } from "@/lib/formatters";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 import {
   Select,
   SelectContent,
@@ -96,6 +97,7 @@ const normalizeLabel = (value?: string | null): string => {
 
 const Users = () => {
   const navigate = useNavigate();
+  const { activeCompanyId, isLoading: companyContextLoading } = useCompanyContext();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,8 +124,11 @@ const Users = () => {
   const [confirmBulkInvite, setConfirmBulkInvite] = useState(false);
 
   useEffect(() => {
+    if (companyContextLoading) return;
+
     checkUserPermissions();
     fetchProfiles();
+    setSelectedEmployees(new Set());
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
@@ -132,17 +137,23 @@ const Users = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [activeCompanyId, companyContextLoading]);
 
   useEffect(() => {
     if (profiles.length > 0) {
       const fetchBaseDate = async () => {
-        const { data } = await supabase
+        let query = supabase
           .from("profiles")
           .select("updated_at")
+          .not("employee_number", "is", null)
           .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .limit(1);
+
+        if (activeCompanyId) {
+          query = query.eq("root_company_id", activeCompanyId);
+        }
+
+        const { data } = await query.maybeSingle();
         
         if (data?.updated_at) {
           const date = new Date(data.updated_at);
@@ -151,7 +162,7 @@ const Users = () => {
       };
       fetchBaseDate();
     }
-  }, [profiles]);
+  }, [profiles, activeCompanyId]);
 
   const checkUserPermissions = async () => {
     setPermissionsLoading(true);
@@ -176,6 +187,7 @@ const Users = () => {
 
   const fetchProfiles = async () => {
     try {
+      setLoading(true);
       // CRITICAL: Primeiro obter o root_company_id do usuário logado
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -191,7 +203,7 @@ const Users = () => {
         .eq("id", user.id)
         .maybeSingle();
 
-      const userCompanyId = currentProfile?.root_company_id;
+      const companyIdToUse = activeCompanyId || currentProfile?.root_company_id;
 
       // CRITICAL: Filtrar APENAS colaboradores da mesma empresa
       // e que tenham employee_number (são colaboradores reais, não apenas usuários)
@@ -201,12 +213,12 @@ const Users = () => {
         .not("employee_number", "is", null) // Exclui perfis sem número de registro
         .order("created_at", { ascending: false });
 
-      // Filtrar por empresa se o usuário pertence a uma
-      if (userCompanyId) {
-        query = query.eq("root_company_id", userCompanyId);
+      // Filtrar pela empresa ativa no header; fallback para a empresa do usuário.
+      if (companyIdToUse) {
+        query = query.eq("root_company_id", companyIdToUse);
       } else {
         // Se usuário não tem empresa, não mostrar nenhum colaborador de outras empresas
-        query = query.eq("root_company_id", userCompanyId);
+        query = query.is("root_company_id", null).limit(0);
       }
 
       const { data: profilesData, error: profilesError } = await query;
