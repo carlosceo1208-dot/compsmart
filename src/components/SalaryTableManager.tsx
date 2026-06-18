@@ -268,8 +268,13 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
                 </TableHeader>
                 <TableBody>
                   {tables.map((table) => (
-                    <TableRow key={table.id}>
-                      <TableCell className="font-medium">{table.name}</TableCell>
+                    <TableRow key={table.id} className={table.is_template ? 'bg-muted/30' : ''}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {table.is_template && <BookOpen className="w-4 h-4 text-primary" />}
+                          <span>{table.name}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {MONTHS[table.effective_month - 1]}/{table.effective_year}
                       </TableCell>
@@ -277,7 +282,12 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
                         <Badge variant="secondary">{table.ranges_count}</Badge>
                       </TableCell>
                       <TableCell className="text-center">
-                        {table.is_active ? (
+                        {table.is_template ? (
+                          <Badge className="bg-primary/15 text-primary border-primary/30">
+                            <BookOpen className="w-3 h-3 mr-1" />
+                            Modelo global
+                          </Badge>
+                        ) : table.is_active ? (
                           <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Ativa
@@ -290,32 +300,42 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          {!table.is_active && (
+                          {table.is_template ? (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                              onClick={() => handleActivate(table.id)}
+                              onClick={() => handleCloneTemplate(table)}
                               disabled={activating === table.id}
                             >
-                              {activating === table.id ? 'Ativando...' : 'Ativar'}
+                              <Copy className="w-4 h-4 mr-2" />
+                              {activating === table.id ? 'Clonando...' : 'Clonar para minha empresa'}
                             </Button>
+                          ) : (
+                            <>
+                              {!table.is_active && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
+                                  onClick={() => handleActivate(table.id)}
+                                  disabled={activating === table.id}
+                                >
+                                  {activating === table.id ? 'Ativando...' : 'Ativar'}
+                                </Button>
+                              )}
+                              <Button size="sm" variant="ghost" onClick={() => handleEdit(table.id)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => { setTableToDelete(table); setDeleteDialogOpen(true); }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </>
                           )}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(table.id)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => { setTableToDelete(table); setDeleteDialogOpen(true); }}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
