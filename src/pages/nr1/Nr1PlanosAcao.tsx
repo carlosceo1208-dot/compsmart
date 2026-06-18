@@ -107,11 +107,13 @@ export default function Nr1PlanosAcao() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         <SummaryCard label="Total de ações" value={totais.total} />
         <SummaryCard label="Em andamento" value={totais.emAndamento} tone="info" />
         <SummaryCard label="Concluídas" value={totais.concluidos} tone="success" />
         <SummaryCard label="Atrasadas" value={totais.atrasados} tone="danger" />
+        <SummaryCard label="Aprovadas" value={totais.aprovadas} tone="success" />
+        <SummaryCard label="Pendentes" value={totais.pendentes} tone="warning" />
       </div>
 
       {isLoading ? (
