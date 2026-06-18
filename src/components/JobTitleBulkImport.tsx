@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 interface JobTitleBulkImportProps {
   open: boolean;
@@ -48,6 +49,7 @@ const familyColors: Record<string, string> = {
 };
 
 export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBulkImportProps) {
+  const { activeCompanyId } = useCompanyContext();
   const [loading, setLoading] = useState(false);
   const [rawData, setRawData] = useState("");
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([]);
@@ -191,25 +193,16 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
 
     setLoading(true);
     try {
-      // Get user's company ID for isolation
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('root_company_id')
-        .eq('id', user.id)
-        .single();
-      
-      if (!profile?.root_company_id) throw new Error("Empresa não encontrada");
-      const rootCompanyId = profile.root_company_id;
+      if (!activeCompanyId) throw new Error("Selecione uma empresa para importar cargos");
+      const rootCompanyId = activeCompanyId;
 
       // First, ensure all job families exist
       const uniqueFamilies = [...new Set(parsedRows.map(row => row.job_family))];
       
       const { data: existingFamilies } = await supabase
         .from('job_families')
-        .select('name');
+        .select('name')
+        .or(`root_company_id.eq.${rootCompanyId},root_company_id.is.null`);
       
       const existingFamilyNames = existingFamilies?.map(f => f.name) || [];
       const newFamilies = uniqueFamilies.filter(f => !existingFamilyNames.includes(f));
@@ -220,6 +213,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
           .insert(
             newFamilies.map((name, index) => ({
               name,
+              root_company_id: rootCompanyId,
               color_class: [
                 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
                 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
@@ -276,6 +270,7 @@ export function JobTitleBulkImport({ open, onOpenChange, onSuccess }: JobTitleBu
         const { data: existing, error: searchError } = await supabase
           .from('job_titles')
           .select('id, code, title, grade, cbo, is_active')
+          .eq('root_company_id', rootCompanyId)
           .eq('title', row.title)
           .eq('grade', row.grade)
           .maybeSingle();
