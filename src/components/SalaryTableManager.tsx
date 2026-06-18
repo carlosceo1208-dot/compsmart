@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, AlertTriangle, Copy, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SalaryTableDialog } from './SalaryTableDialog';
 import { useCompanyContext } from '@/contexts/CompanyContext';
@@ -17,6 +17,7 @@ interface SalaryTable {
   effective_month: number;
   effective_year: number;
   is_active: boolean;
+  is_template: boolean;
   ranges_count?: number;
 }
 
@@ -57,8 +58,9 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
       // Fetch tables with range count using activeCompanyId from context
       const { data: tablesData, error } = await supabase
         .from('salary_tables')
-        .select('id, name, effective_month, effective_year, is_active')
-        .eq('root_company_id', activeCompanyId)
+        .select('id, name, effective_month, effective_year, is_active, is_template')
+        .or(`root_company_id.eq.${activeCompanyId},is_template.eq.true`)
+        .order('is_template', { ascending: true })
         .order('is_active', { ascending: false })
         .order('effective_year', { ascending: false })
         .order('effective_month', { ascending: false });
@@ -165,7 +167,59 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
     setEditDialogOpen(true);
   };
 
-  const hasActiveTable = tables.some(t => t.is_active);
+  const handleCloneTemplate = async (template: SalaryTable) => {
+    if (!activeCompanyId) return;
+    setActivating(template.id);
+    try {
+      // 1) Create a new table copy for the active company
+      const { data: newTable, error: createErr } = await supabase
+        .from('salary_tables')
+        .insert({
+          name: `${template.name} (cópia)`,
+          effective_month: template.effective_month,
+          effective_year: template.effective_year,
+          is_active: false,
+          is_template: false,
+          root_company_id: activeCompanyId,
+        })
+        .select('id')
+        .single();
+      if (createErr) throw createErr;
+
+      // 2) Copy ranges
+      const { data: srcRanges, error: rangesErr } = await supabase
+        .from('salary_ranges')
+        .select('grade, calculation_mode, min_value, q1_value, median_value, q3_value, max_value, input_median, input_amplitude, reference_points')
+        .eq('salary_table_id', template.id);
+      if (rangesErr) throw rangesErr;
+
+      if (srcRanges && srcRanges.length > 0) {
+        const payload = srcRanges.map((r) => ({ ...r, salary_table_id: newTable.id }));
+        const { error: insErr } = await supabase.from('salary_ranges').insert(payload);
+        if (insErr) throw insErr;
+      }
+
+      toast({
+        title: 'Modelo clonado',
+        description: `Uma cópia editável foi criada na sua empresa (${srcRanges?.length ?? 0} faixas).`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['salary-table-status'] });
+      await fetchTables();
+      onTableActivated?.();
+    } catch (error: any) {
+      console.error('Error cloning template:', error);
+      toast({
+        title: 'Erro ao clonar',
+        description: error?.message ?? 'Não foi possível clonar o modelo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setActivating(null);
+    }
+  };
+
+  const hasActiveTable = tables.some(t => t.is_active && !t.is_template);
 
   return (
     <>
@@ -214,8 +268,13 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
                 </TableHeader>
                 <TableBody>
                   {tables.map((table) => (
-                    <TableRow key={table.id}>
-                      <TableCell className="font-medium">{table.name}</TableCell>
+                    <TableRow key={table.id} className={table.is_template ? 'bg-muted/30' : ''}>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {table.is_template && <BookOpen className="w-4 h-4 text-primary" />}
+                          <span>{table.name}</span>
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {MONTHS[table.effective_month - 1]}/{table.effective_year}
                       </TableCell>
@@ -223,7 +282,12 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
                         <Badge variant="secondary">{table.ranges_count}</Badge>
                       </TableCell>
                       <TableCell className="text-center">
-                        {table.is_active ? (
+                        {table.is_template ? (
+                          <Badge className="bg-primary/15 text-primary border-primary/30">
+                            <BookOpen className="w-3 h-3 mr-1" />
+                            Modelo global
+                          </Badge>
+                        ) : table.is_active ? (
                           <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Ativa
@@ -236,32 +300,42 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          {!table.is_active && (
+                          {table.is_template ? (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
-                              onClick={() => handleActivate(table.id)}
+                              onClick={() => handleCloneTemplate(table)}
                               disabled={activating === table.id}
                             >
-                              {activating === table.id ? 'Ativando...' : 'Ativar'}
+                              <Copy className="w-4 h-4 mr-2" />
+                              {activating === table.id ? 'Clonando...' : 'Clonar para minha empresa'}
                             </Button>
+                          ) : (
+                            <>
+                              {!table.is_active && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950"
+                                  onClick={() => handleActivate(table.id)}
+                                  disabled={activating === table.id}
+                                >
+                                  {activating === table.id ? 'Ativando...' : 'Ativar'}
+                                </Button>
+                              )}
+                              <Button size="sm" variant="ghost" onClick={() => handleEdit(table.id)}>
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => { setTableToDelete(table); setDeleteDialogOpen(true); }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </>
                           )}
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => handleEdit(table.id)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => { setTableToDelete(table); setDeleteDialogOpen(true); }}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
