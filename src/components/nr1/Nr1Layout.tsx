@@ -103,10 +103,12 @@ const useIsSuperAdmin = () =>
 
 export const Nr1Layout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: isSuper } = useIsSuperAdmin();
   const navRef = useRef<HTMLDivElement | null>(null);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
   const [importMatrizOpen, setImportMatrizOpen] = useState(false);
+
 
 
   return (
