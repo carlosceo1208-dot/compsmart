@@ -37,6 +37,30 @@ export default function Nr1PlanosAcao() {
   const del = useDeletePlanoAcao();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Partial<Nr1PlanoAcao> | null>(null);
+  const qc = useQueryClient();
+  const { data: role } = useCurrentUserRole();
+  const isApprover = !!(role?.isAdmin || role?.isSuperAdmin);
+  const canSubmit = !!(role?.isAdmin || role?.isHR || role?.isSuperAdmin);
+  const [approvalTarget, setApprovalTarget] = useState<{ plano: Nr1PlanoAcao; novo_status: Nr1AprovacaoStatus } | null>(null);
+  const [obs, setObs] = useState('');
+
+  const transitar = useMutation({
+    mutationFn: async ({ plano_id, novo_status, observacao }: { plano_id: string; novo_status: Nr1AprovacaoStatus; observacao?: string }) => {
+      const { data, error } = await (supabase as any).rpc('nr1_plano_transicao', {
+        _plano_id: plano_id, _novo_status: novo_status, _observacao: observacao || null,
+      });
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({ title: 'Status atualizado', description: 'O fluxo de aprovação foi registrado.' });
+      qc.invalidateQueries({ queryKey: ['nr1-planos-acao'] });
+      qc.invalidateQueries({ queryKey: ['nr1-planos-gov'] });
+      setApprovalTarget(null);
+      setObs('');
+    },
+    onError: (e: any) => toast({ title: 'Erro', description: e.message, variant: 'destructive' }),
+  });
 
   const startNew = () => {
     setEditing({ titulo: '', status: 'pendente', prioridade: 'media', progresso: 0 });
