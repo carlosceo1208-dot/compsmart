@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,7 @@ import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialo
 import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string } };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
@@ -19,58 +19,58 @@ const GROUPS: NavGroup[] = [
     title: 'NR-1',
     tone: 'nr1',
     items: [
-      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true, desc: 'Painel executivo com KPIs, score psicossocial e status de conformidade NR-1.' },
-      { to: '/nr1/universo', label: 'Universo', icon: UserCheck, desc: 'Defina o universo elegível para diagnóstico (colaboradores ativos por unidade, área e cargo).' },
-      { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3, desc: 'Matriz 5x5 de probabilidade × severidade dos riscos psicossociais identificados.' },
-      { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield, desc: 'Mede confiança, abertura para erros e voz ativa nas equipes.' },
-      { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users, desc: 'Recortes por gênero, faixa etária, raça/cor e PCD para análise de equidade.' },
-      { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch, desc: 'Roteiro guiado: PGR, diagnóstico, plano de ação e governança NR-1.' },
-      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText, desc: 'Iniciar novo ciclo COPSOQ-III com convites anônimos aos colaboradores.' },
-      { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks, desc: 'Histórico de ciclos concluídos, evolução de score e comparativo entre períodos.' },
-      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck, desc: 'Ações corretivas e preventivas com responsáveis, prazos, evidências e aprovação.' },
-      { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros', desc: 'Cadastro e monitoramento de fornecedores quanto à conformidade NR-1.' },
-      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz', desc: 'Importar matriz de risco existente (planilha) para a plataforma.' },
-      { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse, desc: 'Indicadores de absenteísmo, afastamentos e saúde ocupacional.' },
-      { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles, desc: 'Insights e recomendações geradas por IA com base no diagnóstico e ações.' },
+      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true, desc: 'Painel executivo com KPIs, score psicossocial e status de conformidade NR-1.', actions: ['Ver KPIs e score psicossocial', 'Acompanhar conformidade NR-1', 'Atalho rápido: Plano de Ação'], shortcut: { to: '/nr1/planos-acao', icon: ClipboardCheck, label: 'Ir para Plano de Ação' } },
+      { to: '/nr1/universo', label: 'Universo', icon: UserCheck, desc: 'Defina o universo elegível para diagnóstico (colaboradores ativos por unidade, área e cargo).', actions: ['Filtrar por unidade/área/cargo', 'Validar elegíveis', 'Exportar lista'] },
+      { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3, desc: 'Matriz 5x5 de probabilidade × severidade dos riscos psicossociais identificados.', actions: ['Visualizar matriz 5x5', 'Classificar riscos', 'Gerar plano a partir do risco'] },
+      { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield, desc: 'Mede confiança, abertura para erros e voz ativa nas equipes.', actions: ['Ver score por equipe', 'Comparar áreas', 'Recomendações de IA'] },
+      { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users, desc: 'Recortes por gênero, faixa etária, raça/cor e PCD para análise de equidade.', actions: ['Filtrar recortes', 'Comparar grupos', 'Exportar relatório'] },
+      { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch, desc: 'Roteiro guiado: PGR, diagnóstico, plano de ação e governança NR-1.', actions: ['Avançar etapas do PGR', 'Marcar conclusão', 'Anexar evidências'] },
+      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText, desc: 'Iniciar novo ciclo COPSOQ-III com convites anônimos aos colaboradores.', actions: ['Criar ciclo', 'Enviar convites anônimos', 'Configurar prazo'] },
+      { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks, desc: 'Histórico de ciclos concluídos, evolução de score e comparativo entre períodos.', actions: ['Ver ciclos anteriores', 'Comparar períodos', 'Exportar relatórios'] },
+      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck, desc: 'Ações corretivas e preventivas com responsáveis, prazos, evidências e aprovação.', actions: ['Criar nova ação', 'Aprovar / rejeitar / solicitar revisão', 'Acompanhar prazos e progresso'] },
+      { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros', desc: 'Cadastro e monitoramento de fornecedores quanto à conformidade NR-1.', actions: ['Cadastrar fornecedor', 'Avaliar conformidade', 'Exportar relatório'] },
+      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz', desc: 'Importar matriz de risco existente (planilha) para a plataforma.', actions: ['Baixar template', 'Subir planilha', 'Validar importação'] },
+      { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse, desc: 'Indicadores de absenteísmo, afastamentos e saúde ocupacional.', actions: ['Ver absenteísmo', 'Afastamentos por causa', 'Tendências mensais'] },
+      { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles, desc: 'Insights e recomendações geradas por IA com base no diagnóstico e ações.', actions: ['Gerar insights por IA', 'Recomendações priorizadas', 'Aplicar ao plano'] },
     ],
   },
   {
     title: 'Clima Organizacional',
     tone: 'clima',
     items: [
-      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.' },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
     ],
   },
   {
     title: 'Cruzamento Riscos Psicossociais',
     tone: 'cruzamento',
     items: [
-      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, desc: 'Cruza performance individual com fatores de risco psicossocial.' },
-      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.' },
-      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, desc: 'Resultados de clima cruzados com dimensões NR-1.' },
-      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.' },
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
     ],
   },
   {
     title: 'Índice de Felicidade',
     tone: 'fib',
     items: [
-      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.' },
+      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
     ],
   },
   {
     title: 'Acompanhamento Colaborador',
     tone: 'jornada',
     items: [
-      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.' },
-      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, desc: 'Pulse semanal de humor e energia, com alertas para gestores.' },
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
     ],
   },
   {
     title: 'Glossário',
     tone: 'glossario',
     items: [
-      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003 e referências metodológicas.' },
+      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003 e referências metodológicas.', actions: ['Consultar metodologias', 'Baixar referências', 'Glossário NR-1'] },
     ],
   },
 ];
@@ -103,10 +103,12 @@ const useIsSuperAdmin = () =>
 
 export const Nr1Layout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: isSuper } = useIsSuperAdmin();
   const navRef = useRef<HTMLDivElement | null>(null);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
   const [importMatrizOpen, setImportMatrizOpen] = useState(false);
+
 
 
   return (
@@ -201,7 +203,7 @@ export const Nr1Layout = () => {
                           <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                         </>
                       );
-                      const node = !item.to ? (
+                      const baseNode = !item.to ? (
                         <button
                           key={item.label}
                           type="button"
@@ -210,7 +212,7 @@ export const Nr1Layout = () => {
                             if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
                             item.onClick?.();
                           }}
-                          className={baseClass}
+                          className={cn(baseClass, 'w-full')}
                         >
                           {inner}
                         </button>
@@ -220,18 +222,54 @@ export const Nr1Layout = () => {
                           to={item.to}
                           end={item.end}
                           data-nr1-active={active}
-                          className={baseClass}
+                          className={cn(baseClass, 'w-full')}
                         >
                           {inner}
                         </NavLink>
                       );
+
+                      const ShortcutIcon = item.shortcut?.icon;
+                      const node = item.shortcut ? (
+                        <div className="relative">
+                          {baseNode}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              navigate(item.shortcut!.to);
+                            }}
+                            aria-label={item.shortcut.label}
+                            title={item.shortcut.label}
+                            className="absolute top-1 right-1 h-5 w-5 rounded-md bg-[hsl(var(--nr1-primary))] text-white flex items-center justify-center shadow hover:scale-110 transition-transform z-10"
+                          >
+                            {ShortcutIcon && <ShortcutIcon className="h-3 w-3" />}
+                          </button>
+                        </div>
+                      ) : baseNode;
+
                       if (!item.desc) return node;
                       return (
                         <Tooltip key={item.to ?? item.label} delayDuration={150}>
                           <TooltipTrigger asChild>{node}</TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-[260px] text-xs leading-snug">
+                          <TooltipContent side="bottom" className="max-w-[280px] text-xs leading-snug">
                             <p className="font-semibold mb-0.5">{item.label}</p>
                             <p className="text-muted-foreground">{item.desc}</p>
+                            {item.actions && item.actions.length > 0 && (
+                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
+                                <p className="font-semibold text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">Principais ações</p>
+                                <ul className="list-disc list-inside space-y-0.5">
+                                  {item.actions.map((a) => (
+                                    <li key={a}>{a}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {item.shortcut && (
+                              <p className="mt-1.5 pt-1.5 border-t border-border/50 text-[10px] text-[hsl(var(--nr1-primary))] font-semibold">
+                                ↗ Clique no botão no canto para: {item.shortcut.label}
+                              </p>
+                            )}
                           </TooltipContent>
                         </Tooltip>
                       );
