@@ -14,6 +14,7 @@ import { Sparkles, Loader2 } from "lucide-react";
 import { CompetencyManager } from "./CompetencyManager";
 import { CBOSearchInput } from "./CBOSearchInput";
 import { PointsEvaluationTab } from "./PointsEvaluationTab";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 
 interface JobTitleDialogProps {
   open: boolean;
@@ -55,6 +56,7 @@ interface JobTitleData {
 }
 
 export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: JobTitleDialogProps) {
+  const { activeCompanyId } = useCompanyContext();
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [jobFamilies, setJobFamilies] = useState<string[]>([]);
@@ -101,11 +103,17 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
   }, [jobTitleId, open]);
 
   const fetchJobFamilies = async () => {
-    const { data } = await supabase
+    let query = supabase
       .from('job_families')
       .select('name')
       .eq('is_active', true)
       .order('name');
+
+    if (activeCompanyId) {
+      query = query.or(`root_company_id.eq.${activeCompanyId},root_company_id.is.null`);
+    }
+    
+    const { data } = await query;
     
     if (data) {
       setJobFamilies(data.map(f => f.name));
@@ -116,7 +124,7 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
     if (formData.grade) {
       fetchSalaryRange();
     }
-  }, [formData.grade]);
+  }, [formData.grade, activeCompanyId]);
 
   const fetchJobTitleData = async () => {
     if (!jobTitleId) return;
@@ -142,16 +150,21 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
       // Ex: "3" → "003", "12" → "012", "555" → "555"
       const normalizedGrade = formData.grade.trim().padStart(3, '0');
       
-      const { data, error } = await supabase
+      let query = supabase
         .from("salary_ranges")
         .select(`
           min_value,
           max_value,
-          salary_tables!inner(is_active)
+          salary_tables!inner(is_active, root_company_id)
         `)
         .eq("grade", normalizedGrade)
-        .eq("salary_tables.is_active", true)
-        .maybeSingle();
+        .eq("salary_tables.is_active", true);
+
+      if (activeCompanyId) {
+        query = query.eq("salary_tables.root_company_id", activeCompanyId);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error) throw error;
 
@@ -281,23 +294,13 @@ export function JobTitleDialog({ open, onOpenChange, jobTitleId, onSuccess }: Jo
         if (error) throw error;
         toast.success("Cargo atualizado com sucesso");
       } else {
-        // Get user's company ID for new job titles
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("Usuário não autenticado");
-        
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('root_company_id')
-          .eq('id', user.id)
-          .single();
-        
-        if (!profile?.root_company_id) throw new Error("Empresa não encontrada");
+        if (!activeCompanyId) throw new Error("Selecione uma empresa para criar o cargo");
 
         const { error } = await supabase
           .from("job_titles")
           .insert({
             ...formData,
-            root_company_id: profile.root_company_id
+            root_company_id: activeCompanyId
           });
 
         if (error) throw error;
