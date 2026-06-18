@@ -9,8 +9,9 @@ import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
 import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
 import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz' };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
@@ -18,58 +19,58 @@ const GROUPS: NavGroup[] = [
     title: 'NR-1',
     tone: 'nr1',
     items: [
-      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true },
-      { to: '/nr1/universo', label: 'Universo', icon: UserCheck },
-      { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3 },
-      { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield },
-      { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users },
-      { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch },
-      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText },
-      { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks },
-      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck },
-      { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros' },
-      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz' },
-      { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse },
-      { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles },
+      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true, desc: 'Painel executivo com KPIs, score psicossocial e status de conformidade NR-1.' },
+      { to: '/nr1/universo', label: 'Universo', icon: UserCheck, desc: 'Defina o universo elegível para diagnóstico (colaboradores ativos por unidade, área e cargo).' },
+      { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3, desc: 'Matriz 5x5 de probabilidade × severidade dos riscos psicossociais identificados.' },
+      { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield, desc: 'Mede confiança, abertura para erros e voz ativa nas equipes.' },
+      { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users, desc: 'Recortes por gênero, faixa etária, raça/cor e PCD para análise de equidade.' },
+      { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch, desc: 'Roteiro guiado: PGR, diagnóstico, plano de ação e governança NR-1.' },
+      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText, desc: 'Iniciar novo ciclo COPSOQ-III com convites anônimos aos colaboradores.' },
+      { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks, desc: 'Histórico de ciclos concluídos, evolução de score e comparativo entre períodos.' },
+      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck, desc: 'Ações corretivas e preventivas com responsáveis, prazos, evidências e aprovação.' },
+      { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros', desc: 'Cadastro e monitoramento de fornecedores quanto à conformidade NR-1.' },
+      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz', desc: 'Importar matriz de risco existente (planilha) para a plataforma.' },
+      { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse, desc: 'Indicadores de absenteísmo, afastamentos e saúde ocupacional.' },
+      { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles, desc: 'Insights e recomendações geradas por IA com base no diagnóstico e ações.' },
     ],
   },
   {
     title: 'Clima Organizacional',
     tone: 'clima',
     items: [
-      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.' },
     ],
   },
   {
     title: 'Cruzamento Riscos Psicossociais',
     tone: 'cruzamento',
     items: [
-      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3 },
-      { to: '/performance/9box', label: '9Box', icon: LayoutGrid },
-      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList },
-      { to: '/dashboard', label: 'Remuneração', icon: DollarSign },
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, desc: 'Cruza performance individual com fatores de risco psicossocial.' },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.' },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, desc: 'Resultados de clima cruzados com dimensões NR-1.' },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.' },
     ],
   },
   {
     title: 'Índice de Felicidade',
     tone: 'fib',
     items: [
-      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart },
+      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.' },
     ],
   },
   {
     title: 'Acompanhamento Colaborador',
     tone: 'jornada',
     items: [
-      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart },
-      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck },
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.' },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, desc: 'Pulse semanal de humor e energia, com alertas para gestores.' },
     ],
   },
   {
     title: 'Glossário',
     tone: 'glossario',
     items: [
-      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library },
+      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003 e referências metodológicas.' },
     ],
   },
 ];
@@ -109,6 +110,7 @@ export const Nr1Layout = () => {
 
 
   return (
+    <TooltipProvider delayDuration={150}>
     <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
       {isSuper && (
         <div className="bg-amber-100 border-b border-amber-300 text-amber-900 text-xs px-4 py-1.5 flex items-center gap-2 justify-center">
@@ -193,24 +195,26 @@ export const Nr1Layout = () => {
                           : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                       );
                       const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
-                      if (!item.to) {
-                        return (
-                          <button
-                            key={item.label}
-                            type="button"
-                            onClick={() => {
-                              if (item.action === 'open-terceiros') setTerceirosOpen(true);
-                              if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
-                              item.onClick?.();
-                            }}
-                            className={baseClass}
-                          >
-                            <Icon className={iconClass} />
-                            <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
-                          </button>
-                        );
-                      }
-                      return (
+                      const inner = (
+                        <>
+                          <Icon className={iconClass} />
+                          <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
+                        </>
+                      );
+                      const node = !item.to ? (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onClick={() => {
+                            if (item.action === 'open-terceiros') setTerceirosOpen(true);
+                            if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
+                            item.onClick?.();
+                          }}
+                          className={baseClass}
+                        >
+                          {inner}
+                        </button>
+                      ) : (
                         <NavLink
                           key={item.to}
                           to={item.to}
@@ -218,9 +222,18 @@ export const Nr1Layout = () => {
                           data-nr1-active={active}
                           className={baseClass}
                         >
-                          <Icon className={iconClass} />
-                          <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
+                          {inner}
                         </NavLink>
+                      );
+                      if (!item.desc) return node;
+                      return (
+                        <Tooltip key={item.to ?? item.label} delayDuration={150}>
+                          <TooltipTrigger asChild>{node}</TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-[260px] text-xs leading-snug">
+                            <p className="font-semibold mb-0.5">{item.label}</p>
+                            <p className="text-muted-foreground">{item.desc}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       );
                     })}
                   </div>
@@ -238,5 +251,6 @@ export const Nr1Layout = () => {
       <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
       <Nr1ImportarMatrizDialog open={importMatrizOpen} onOpenChange={setImportMatrizOpen} />
     </div>
+    </TooltipProvider>
   );
 };
