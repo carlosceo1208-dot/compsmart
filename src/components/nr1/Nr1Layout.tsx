@@ -71,7 +71,7 @@ const GROUPS: NavGroup[] = [
     title: 'Glossário',
     tone: 'glossario',
     items: [
-      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003 e referências metodológicas.', actions: ['Consultar metodologias', 'Baixar referências', 'Glossário NR-1'] },
+      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003 e referências metodológicas.', actions: ['Consultar metodologias', 'Baixar referências', 'Glossário NR-1'], resource: { url: manualNr1Asset.url, icon: BookOpen, label: 'Baixar Manual NR-1' } },
     ],
   },
 ];
