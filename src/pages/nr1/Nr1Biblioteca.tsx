@@ -43,6 +43,31 @@ type Metodologia = {
 
 const METODOLOGIAS: Metodologia[] = [
   {
+    sigla: 'Manual NR-1',
+    nome: 'Manual Prático NR-1 — CompSmart',
+    origem: 'CompSmart, 2026. Compilação prática baseada na NR-1 (Portaria MTE 1.419/2024), ISO 45003:2021, Fundacentro e literatura técnica de riscos psicossociais.',
+    proposito: 'Servir como guia operacional do módulo NR-1 do CompSmart: explica o passo a passo do diagnóstico psicossocial, o ciclo PDCA aplicado, papéis e responsabilidades (RH, SESMT, CIPA, gestores, colaboradores), prazos legais e como gerar as evidências exigidas em fiscalização do MTE.',
+    comoUsamos: `Estrutura do manual em 7 capítulos:
+
+1) Contexto regulatório — o que mudou na NR-1 com a Portaria MTE 1.419/2024, prazos de adequação (vigência maio/2026) e o que o AFT (Auditor Fiscal do Trabalho) pode exigir em fiscalização. Riscos psicossociais passam a integrar obrigatoriamente o PGR.
+
+2) Papéis e responsabilidades — RH conduz o ciclo, SESMT valida tecnicamente, CIPA participa do plano de ação (Lei 14.457/2022), gestores executam e colaboradores respondem de forma anônima e voluntária. Super-admin nunca acessa resposta individual.
+
+3) Passo a passo do diagnóstico — (a) abertura do ciclo, (b) aceite de consentimento LGPD versionado, (c) aplicação do Quick Screening (DASS-21 subset, 5–7 itens), (d) Diagnóstico Completo COPSOQ-III (40 itens / 6 dimensões), (e) consolidação com mínimo de 5 respondentes por recorte (k-anonimato), (f) classificação de risco por dimensão (Baixo ≤25, Moderado 26–50, Alto 51–75, Crítico >75), (g) plano de ação opcionalmente vinculado ao colaborador apenas com consentimento explícito.
+
+4) Plano de ação — modelo SMART por dimensão de risco, responsável, prazo e evidência. Ações típicas: redesenho de carga, treinamento de liderança, canal de denúncia de assédio, pausas estruturadas, política de desconexão, EAP. Toda ação alimenta o PGR.
+
+5) Indicadores e governança — eNPS, ISP (Índice de Segurança Psicológica), FIB (Fator de Bem-Estar Integral), MCPS (Matriz Performance × Saúde) e CCR (Custo do Risco em R$). Reuniões mensais de comitê com SESMT + RH + CIPA. Revisão anual obrigatória do PGR.
+
+6) Privacidade e LGPD — hash SHA-256 irreversível por resposta, sem user_id/CPF/e-mail. Consentimento explícito versionado (NR1_CONSENT_VERSION). Direito ao encerramento antecipado (LGPD Art. 18) lembrado a cada check-in. Dados sobre liderança direta apenas em base agregada (mín. 5 respondentes).
+
+7) Evidências para fiscalização — checklist exportável: PGR atualizado, política de saúde mental publicada, termos de consentimento versionados, relatório de ciclo com scores agregados, plano de ação com responsáveis e prazos, ata de comitê, registro de treinamentos de liderança.
+
+Recomendação de uso: o manual deve ser lido por RH, SESMT e CIPA antes da abertura do primeiro ciclo. Para gestores, basta o capítulo 4 (plano de ação). Para colaboradores, basta o capítulo 6 (privacidade).`,
+    baseLegal: 'NR-1 (itens 1.5.3 e 1.5.4), Portaria MTE 1.419/2024, Lei 14.457/2022 (assédio/CIPA), LGPD (Lei 13.709/2018), ISO 45003:2021.',
+    referencia: 'CompSmart (2026). Manual Prático NR-1 — Guia Operacional do Módulo de Saúde Mental. Compilação interna baseada em Fundacentro, ISO 45003:2021 e COPSOQ-III.',
+  },
+  {
     sigla: 'COPSOQ-III',
     nome: 'Copenhagen Psychosocial Questionnaire (versão III)',
     origem: 'Instituto Nacional de Saúde Ocupacional da Dinamarca (NRCWE), 2019.',
