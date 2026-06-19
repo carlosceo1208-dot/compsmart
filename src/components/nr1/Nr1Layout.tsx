@@ -258,6 +258,19 @@ export const Nr1Layout = () => {
                                 </button>
                               </div>
                             )}
+                            {item.resource && (
+                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
+                                <a
+                                  href={item.resource.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] text-[hsl(var(--nr1-primary))] font-semibold flex items-center gap-1 hover:underline cursor-pointer"
+                                >
+                                  <item.resource.icon className="h-3 w-3" />
+                                  {item.resource.label}
+                                </a>
+                              </div>
+                            )}
                           </TooltipContent>
                         </Tooltip>
                       );
