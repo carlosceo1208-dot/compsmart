@@ -40,6 +40,30 @@ const ADDONS: Array<{
     icon: Activity,
     accent: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
   },
+  {
+    key: "fib_addon_enabled",
+    title: "FIB — Felicidade Interna Bruta",
+    description:
+      "Indicador de bem-estar e satisfação geral dos colaboradores, com tendências e benchmarks.",
+    icon: Smile,
+    accent: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  },
+  {
+    key: "psicossociais_addon_enabled",
+    title: "Cruzamento de Riscos Psicossociais",
+    description:
+      "Correlação entre clima organizacional e riscos psicossociais (COPSOQ-III) para diagnóstico avançado.",
+    icon: Network,
+    accent: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+  },
+  {
+    key: "checkup_addon_enabled",
+    title: "Check-up de Colaborador",
+    description:
+      "Acompanhamento contínuo de bem-estar com jornadas, check-ins e alertas preventivos.",
+    icon: HeartPulse,
+    accent: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+  },
 ];
 
 export function AddonsManager({ companyId, canEdit = true, embedded = false }: AddonsManagerProps) {
@@ -48,6 +72,9 @@ export function AddonsManager({ companyId, canEdit = true, embedded = false }: A
   const [values, setValues] = useState<Record<AddonKey, boolean>>({
     nr1_addon_enabled: false,
     clima_addon_enabled: false,
+    fib_addon_enabled: false,
+    psicossociais_addon_enabled: false,
+    checkup_addon_enabled: false,
   });
 
   useEffect(() => {
@@ -56,13 +83,16 @@ export function AddonsManager({ companyId, canEdit = true, embedded = false }: A
       setLoading(true);
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("nr1_addon_enabled, clima_addon_enabled")
+        .select("nr1_addon_enabled, clima_addon_enabled, fib_addon_enabled, psicossociais_addon_enabled, checkup_addon_enabled")
         .eq("id", companyId)
         .maybeSingle();
       if (!error && data) {
         setValues({
           nr1_addon_enabled: !!(data as any).nr1_addon_enabled,
           clima_addon_enabled: !!(data as any).clima_addon_enabled,
+          fib_addon_enabled: !!(data as any).fib_addon_enabled,
+          psicossociais_addon_enabled: !!(data as any).psicossociais_addon_enabled,
+          checkup_addon_enabled: !!(data as any).checkup_addon_enabled,
         });
       }
       setLoading(false);
