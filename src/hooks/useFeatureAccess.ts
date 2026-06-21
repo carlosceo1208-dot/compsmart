@@ -304,15 +304,18 @@ export const useFeatureAccess = (): FeatureAccessResult => {
       feature === 'nr1_planos_acao' ||
       feature === 'nr1_diagnosticos' ||
       feature === 'nr1_biblioteca' ||
-      feature === 'clima_organizacional'
+      feature === 'clima_organizacional' ||
+      feature === 'nr1_fib' ||
+      feature === 'nr1_acompanhamento'
     )) {
       return true;
     }
 
-    // Clima Organizacional add-on: libera o módulo de clima em qualquer plano
-    if (climaAddonEnabled && feature === 'clima_organizacional') {
-      return true;
-    }
+    // Add-ons opcionais individuais
+    if (climaAddonEnabled && feature === 'clima_organizacional') return true;
+    if (fibAddonEnabled && feature === 'nr1_fib') return true;
+    if (psicossociaisAddonEnabled && feature === 'nr1_clima_correlacao') return true;
+    if (checkupAddonEnabled && feature === 'nr1_acompanhamento') return true;
 
     // During trial, grant Pro-level access
     if (status === 'trial' && daysLeftInTrial && daysLeftInTrial > 0) {
