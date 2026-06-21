@@ -115,6 +115,11 @@ interface EntityData {
   selected_modules: ModuleKey[];
   risk_grade: string;
   unit_role: "matriz" | "filial" | "";
+  nr1_addon_enabled: boolean;
+  clima_addon_enabled: boolean;
+  fib_addon_enabled: boolean;
+  psicossociais_addon_enabled: boolean;
+  checkup_addon_enabled: boolean;
 }
 
 const INDUSTRY_SECTORS = [
