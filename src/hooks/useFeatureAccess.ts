@@ -204,11 +204,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
         // Fetch add-ons opcionais (independentes do plano)
         const { data: companyAddon } = await supabase
           .from('organizational_structure')
-          .select('nr1_addon_enabled, clima_addon_enabled')
+          .select('nr1_addon_enabled, clima_addon_enabled, fib_addon_enabled, psicossociais_addon_enabled, checkup_addon_enabled')
           .eq('id', profile.root_company_id)
           .maybeSingle();
         setNr1AddonEnabled(!!(companyAddon as any)?.nr1_addon_enabled);
         setClimaAddonEnabled(!!(companyAddon as any)?.clima_addon_enabled);
+        setFibAddonEnabled(!!(companyAddon as any)?.fib_addon_enabled);
+        setPsicossociaisAddonEnabled(!!(companyAddon as any)?.psicossociais_addon_enabled);
+        setCheckupAddonEnabled(!!(companyAddon as any)?.checkup_addon_enabled);
 
         // Get company subscription with plan details
         const { data: subscription } = await supabase
