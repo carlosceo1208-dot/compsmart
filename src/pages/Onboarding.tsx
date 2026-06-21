@@ -42,6 +42,7 @@ const Onboarding = () => {
     billing_cycle: 'monthly',
     selected_modules: [],
     nr1_addon_enabled: false,
+    clima_addon_enabled: false,
   });
 
   useEffect(() => {
