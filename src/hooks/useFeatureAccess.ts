@@ -160,8 +160,9 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   const [dataDeletionScheduledAt, setDataDeletionScheduledAt] = useState<string | null>(null);
   // Admin override - admins/super_admins bypass plan restrictions
   const [isAdminOrSuperAdmin, setIsAdminOrSuperAdmin] = useState(false);
-  // NR-1 opcional como add-on independente do plano
+  // Add-ons opcionais independentes do plano
   const [nr1AddonEnabled, setNr1AddonEnabled] = useState(false);
+  const [climaAddonEnabled, setClimaAddonEnabled] = useState(false);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
