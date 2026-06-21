@@ -235,7 +235,7 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
                   <div>
                     <div className="font-semibold text-sm">Clima Organizacional</div>
                     <p className="text-xs text-muted-foreground mt-1 leading-snug">
-                      Pesquisas de clima recorrentes, eNPS, segmentação por área/unidade e relatórios — disponível em qualquer plano.
+                      Pesquisas de clima recorrentes, eNPS, segmentação por área/unidade e relatórios.
                     </p>
                   </div>
                   <Switch
@@ -244,6 +244,78 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
                       onUpdate({ ...formData, clima_addon_enabled: checked })
                     }
                     aria-label="Ativar módulo Clima Organizacional"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* FIB Add-on */}
+            <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
+              <div className="p-2 rounded-md bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                <Smile className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-semibold text-sm">FIB — Felicidade Interna Bruta</div>
+                    <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                      Indicador de bem-estar e satisfação geral dos colaboradores, com tendências e benchmarks.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={!!formData.fib_addon_enabled}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...formData, fib_addon_enabled: checked })
+                    }
+                    aria-label="Ativar módulo FIB"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Cruzamento de Riscos Psicossociais Add-on */}
+            <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
+              <div className="p-2 rounded-md bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                <Network className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-semibold text-sm">Cruzamento de Riscos Psicossociais</div>
+                    <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                      Correlação entre clima organizacional e riscos psicossociais (COPSOQ-III).
+                    </p>
+                  </div>
+                  <Switch
+                    checked={!!formData.psicossociais_addon_enabled}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...formData, psicossociais_addon_enabled: checked })
+                    }
+                    aria-label="Ativar Cruzamento de Riscos Psicossociais"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Check-up de Colaborador Add-on */}
+            <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
+              <div className="p-2 rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                <HeartPulse className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-semibold text-sm">Check-up de Colaborador</div>
+                    <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                      Acompanhamento contínuo de bem-estar com jornadas, check-ins e alertas preventivos.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={!!formData.checkup_addon_enabled}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...formData, checkup_addon_enabled: checked })
+                    }
+                    aria-label="Ativar Check-up de Colaborador"
                   />
                 </div>
               </div>
