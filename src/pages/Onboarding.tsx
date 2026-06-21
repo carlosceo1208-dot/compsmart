@@ -25,6 +25,9 @@ interface OnboardingData {
   selected_modules: string[];
   nr1_addon_enabled?: boolean;
   clima_addon_enabled?: boolean;
+  fib_addon_enabled?: boolean;
+  psicossociais_addon_enabled?: boolean;
+  checkup_addon_enabled?: boolean;
 }
 
 const Onboarding = () => {
