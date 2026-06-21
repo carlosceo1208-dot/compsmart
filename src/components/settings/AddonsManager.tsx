@@ -3,10 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { ShieldCheck, Activity, Loader2, Puzzle } from "lucide-react";
+import { ShieldCheck, Activity, Loader2, Puzzle, Smile, Network, HeartPulse } from "lucide-react";
 import { toast } from "sonner";
 
-type AddonKey = "nr1_addon_enabled" | "clima_addon_enabled";
+type AddonKey = "nr1_addon_enabled" | "clima_addon_enabled" | "fib_addon_enabled" | "psicossociais_addon_enabled" | "checkup_addon_enabled";
 
 interface AddonsManagerProps {
   /** ID da empresa (organizational_structure.id) cujo add-ons serão geridos */
