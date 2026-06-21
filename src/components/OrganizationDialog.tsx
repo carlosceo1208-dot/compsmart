@@ -196,6 +196,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
     selected_modules: [],
     risk_grade: "",
     unit_role: "",
+    nr1_addon_enabled: false,
+    clima_addon_enabled: false,
+    fib_addon_enabled: false,
+    psicossociais_addon_enabled: false,
+    checkup_addon_enabled: false,
   });
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
