@@ -40,6 +40,7 @@ const Onboarding = () => {
     subscription_plan_id: null,
     billing_cycle: 'monthly',
     selected_modules: [],
+    nr1_addon_enabled: false,
   });
 
   useEffect(() => {
