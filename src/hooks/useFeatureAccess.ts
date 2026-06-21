@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export type PlanType = 'starter' | 'medium' | 'pro' | 'enterprise';
+export type PlanType = 'starter' | 'medium' | 'pro' | 'enterprise' | 'nr1_essencial';
 
 export type SubscriptionStatus = 'active' | 'trial' | 'canceled' | 'expired' | 'past_due' | 'deleted';
 
@@ -74,6 +74,20 @@ const featureMap: Record<string, PlanType[]> = {
   white_label: ['enterprise'],
   sso: ['enterprise'],
   custom_integrations: ['enterprise'],
+
+  // === NR-1 (módulo híbrido: standalone "Essencial" + incluído em Pro/Enterprise) ===
+  nr1_essencial: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_clima: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_planos_acao: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_diagnosticos: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_biblioteca: ['nr1_essencial', 'pro', 'enterprise'],
+  // NR-1 Pro: recursos avançados, somente Pro/Enterprise
+  nr1_pro: ['pro', 'enterprise'],
+  nr1_inteligencia: ['pro', 'enterprise'],
+  nr1_bem_estar_agent: ['pro', 'enterprise'],
+  nr1_jornada_agent: ['pro', 'enterprise'],
+  nr1_terceiros: ['pro', 'enterprise'],
+  nr1_clima_correlacao: ['pro', 'enterprise'],
 };
 
 // Map route paths to feature keys
