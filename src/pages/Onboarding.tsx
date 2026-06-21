@@ -124,6 +124,9 @@ const Onboarding = () => {
           selected_modules: formData.selected_modules,
           nr1_addon_enabled: !!formData.nr1_addon_enabled,
           clima_addon_enabled: !!formData.clima_addon_enabled,
+          fib_addon_enabled: !!formData.fib_addon_enabled,
+          psicossociais_addon_enabled: !!formData.psicossociais_addon_enabled,
+          checkup_addon_enabled: !!formData.checkup_addon_enabled,
         } as any)
         .select()
         .single();
