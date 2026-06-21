@@ -124,30 +124,32 @@ Deno.serve(async (req) => {
       
       console.log('INPC fetched successfully:', inpcData);
       
-      // Salvar no banco para cache
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      
-      // Upsert INPC mensal
-      await supabase
-        .from('economic_parameters')
-        .upsert({
-          parameter_key: 'inpc_monthly',
-          value: inpcData.monthly,
-          effective_date: new Date().toISOString().split('T')[0],
-          metadata: {
-            accumulated: inpcData.accumulated,
-            period: inpcData.period,
-            referenceMonth: inpcData.referenceMonth,
-            months: months,
-            fetchedAt: new Date().toISOString(),
-          },
-        }, {
-          onConflict: 'parameter_key,effective_date',
-        });
-      
-      console.log('INPC cached in database');
+      // Salvar no banco para cache (apenas cron/admin)
+      if (canWrite) {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Upsert INPC mensal
+        await supabase
+          .from('economic_parameters')
+          .upsert({
+            parameter_key: 'inpc_monthly',
+            value: inpcData.monthly,
+            effective_date: new Date().toISOString().split('T')[0],
+            metadata: {
+              accumulated: inpcData.accumulated,
+              period: inpcData.period,
+              referenceMonth: inpcData.referenceMonth,
+              months: months,
+              fetchedAt: new Date().toISOString(),
+            },
+          }, {
+            onConflict: 'parameter_key,effective_date',
+          });
+
+        console.log('INPC cached in database');
+      }
       
     } catch (ibgeError) {
       console.warn('IBGE API failed, using fallback:', ibgeError);
