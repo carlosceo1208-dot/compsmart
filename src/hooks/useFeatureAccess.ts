@@ -165,6 +165,9 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   // Add-ons opcionais independentes do plano
   const [nr1AddonEnabled, setNr1AddonEnabled] = useState(false);
   const [climaAddonEnabled, setClimaAddonEnabled] = useState(false);
+  const [fibAddonEnabled, setFibAddonEnabled] = useState(false);
+  const [psicossociaisAddonEnabled, setPsicossociaisAddonEnabled] = useState(false);
+  const [checkupAddonEnabled, setCheckupAddonEnabled] = useState(false);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
