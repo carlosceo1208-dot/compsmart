@@ -11,6 +11,7 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import { Skeleton } from "./components/ui/skeleton";
 import { TelemetryTracker } from "./components/TelemetryTracker";
+import { PlanGate } from "./components/PlanGate";
 
 // Eager — critical entry points
 import Index from "./pages/Index";
