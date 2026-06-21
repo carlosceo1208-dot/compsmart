@@ -196,13 +196,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
           return;
         }
 
-        // Fetch NR-1 add-on flag (opcional, independente do plano)
+        // Fetch add-ons opcionais (independentes do plano)
         const { data: companyAddon } = await supabase
           .from('organizational_structure')
-          .select('nr1_addon_enabled')
+          .select('nr1_addon_enabled, clima_addon_enabled')
           .eq('id', profile.root_company_id)
           .maybeSingle();
         setNr1AddonEnabled(!!(companyAddon as any)?.nr1_addon_enabled);
+        setClimaAddonEnabled(!!(companyAddon as any)?.clima_addon_enabled);
 
         // Get company subscription with plan details
         const { data: subscription } = await supabase
