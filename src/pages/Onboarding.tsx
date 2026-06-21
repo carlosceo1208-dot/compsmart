@@ -114,7 +114,8 @@ const Onboarding = () => {
           trial_ends_at: trialEndsAt.toISOString(),
           subscription_started_at: new Date().toISOString(),
           selected_modules: formData.selected_modules,
-        })
+          nr1_addon_enabled: !!formData.nr1_addon_enabled,
+        } as any)
         .select()
         .single();
 
