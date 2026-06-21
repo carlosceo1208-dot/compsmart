@@ -271,6 +271,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           unit_role: ((data as any).unit_role === "matriz" || (data as any).unit_role === "filial")
             ? (data as any).unit_role
             : "",
+          nr1_addon_enabled: !!(data as any).nr1_addon_enabled,
+          clima_addon_enabled: !!(data as any).clima_addon_enabled,
+          fib_addon_enabled: !!(data as any).fib_addon_enabled,
+          psicossociais_addon_enabled: !!(data as any).psicossociais_addon_enabled,
+          checkup_addon_enabled: !!(data as any).checkup_addon_enabled,
         });
       }
     } catch (error: any) {
