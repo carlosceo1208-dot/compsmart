@@ -89,9 +89,11 @@ const featureMap: Record<string, PlanType[]> = {
   nr1_terceiros: ['pro', 'enterprise'],
   nr1_clima_correlacao: ['pro', 'enterprise'],
 
-  // === Clima Organizacional (add-on independente) ===
-  // Liberado quando o add-on `clima_addon_enabled` está ativo OU como parte do NR-1 / Pro / Enterprise
+  // === Add-ons opcionais (independentes do plano) ===
+  // Liberados pelos respectivos flags em organizational_structure OU como parte do NR-1 / Pro / Enterprise
   clima_organizacional: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_fib: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_acompanhamento: ['nr1_essencial', 'pro', 'enterprise'],
 };
 
 // Map route paths to feature keys
