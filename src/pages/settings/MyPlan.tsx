@@ -13,6 +13,7 @@ import {
   Users, Calendar, CreditCard, AlertCircle, Loader2, Star
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
+import { AddonsManager } from '@/components/settings/AddonsManager';
 
 interface SubscriptionPlan {
   id: string;
