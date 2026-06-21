@@ -88,6 +88,10 @@ const featureMap: Record<string, PlanType[]> = {
   nr1_jornada_agent: ['pro', 'enterprise'],
   nr1_terceiros: ['pro', 'enterprise'],
   nr1_clima_correlacao: ['pro', 'enterprise'],
+
+  // === Clima Organizacional (add-on independente) ===
+  // Liberado quando o add-on `clima_addon_enabled` está ativo OU como parte do NR-1 / Pro / Enterprise
+  clima_organizacional: ['nr1_essencial', 'pro', 'enterprise'],
 };
 
 // Map route paths to feature keys
@@ -156,8 +160,9 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   const [dataDeletionScheduledAt, setDataDeletionScheduledAt] = useState<string | null>(null);
   // Admin override - admins/super_admins bypass plan restrictions
   const [isAdminOrSuperAdmin, setIsAdminOrSuperAdmin] = useState(false);
-  // NR-1 opcional como add-on independente do plano
+  // Add-ons opcionais independentes do plano
   const [nr1AddonEnabled, setNr1AddonEnabled] = useState(false);
+  const [climaAddonEnabled, setClimaAddonEnabled] = useState(false);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
@@ -191,13 +196,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
           return;
         }
 
-        // Fetch NR-1 add-on flag (opcional, independente do plano)
+        // Fetch add-ons opcionais (independentes do plano)
         const { data: companyAddon } = await supabase
           .from('organizational_structure')
-          .select('nr1_addon_enabled')
+          .select('nr1_addon_enabled, clima_addon_enabled')
           .eq('id', profile.root_company_id)
           .maybeSingle();
         setNr1AddonEnabled(!!(companyAddon as any)?.nr1_addon_enabled);
+        setClimaAddonEnabled(!!(companyAddon as any)?.clima_addon_enabled);
 
         // Get company subscription with plan details
         const { data: subscription } = await supabase
@@ -289,8 +295,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
       feature === 'nr1_clima' ||
       feature === 'nr1_planos_acao' ||
       feature === 'nr1_diagnosticos' ||
-      feature === 'nr1_biblioteca'
+      feature === 'nr1_biblioteca' ||
+      feature === 'clima_organizacional'
     )) {
+      return true;
+    }
+
+    // Clima Organizacional add-on: libera o módulo de clima em qualquer plano
+    if (climaAddonEnabled && feature === 'clima_organizacional') {
       return true;
     }
 

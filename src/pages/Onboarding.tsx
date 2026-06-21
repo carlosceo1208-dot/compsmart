@@ -24,6 +24,7 @@ interface OnboardingData {
   billing_cycle: 'monthly' | 'annual';
   selected_modules: string[];
   nr1_addon_enabled?: boolean;
+  clima_addon_enabled?: boolean;
 }
 
 const Onboarding = () => {
@@ -41,6 +42,7 @@ const Onboarding = () => {
     billing_cycle: 'monthly',
     selected_modules: [],
     nr1_addon_enabled: false,
+    clima_addon_enabled: false,
   });
 
   useEffect(() => {
@@ -115,6 +117,7 @@ const Onboarding = () => {
           subscription_started_at: new Date().toISOString(),
           selected_modules: formData.selected_modules,
           nr1_addon_enabled: !!formData.nr1_addon_enabled,
+          clima_addon_enabled: !!formData.clima_addon_enabled,
         } as any)
         .select()
         .single();

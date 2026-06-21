@@ -13,6 +13,7 @@ import {
   Users, Calendar, CreditCard, AlertCircle, Loader2, Star
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/formatters';
+import { AddonsManager } from '@/components/settings/AddonsManager';
 
 interface SubscriptionPlan {
   id: string;
@@ -268,6 +269,9 @@ export default function MyPlan() {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Add-ons opcionais (independentes do plano) */}
+      {activeCompanyId && <AddonsManager companyId={activeCompanyId} canEdit />}
 
       {/* Comparar Planos */}
       <div>

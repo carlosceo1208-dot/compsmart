@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building2, ArrowRight, Cog, BarChart3, Target, ShieldCheck } from "lucide-react";
+import { Building2, ArrowRight, Cog, BarChart3, Target, ShieldCheck, Activity } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
@@ -194,26 +194,58 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
             </div>
           )}
 
-          {/* NR-1 Add-on opcional (independente do plano) */}
-          <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
-            <div className="p-2 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="font-semibold text-sm">NR-1 (Saúde Mental & Bem-Estar)</div>
-                  <p className="text-xs text-muted-foreground mt-1 leading-snug">
-                    Módulo opcional para conformidade com a Portaria MTE 1.419/2024 (diagnóstico, planos de ação, clima e biblioteca). Pode ser ativado em qualquer plano.
-                  </p>
+          {/* Add-ons opcionais (independentes do plano) */}
+          <div className="space-y-2 pt-1">
+            <Label className="text-sm font-semibold">Módulos opcionais (add-ons)</Label>
+            <p className="text-xs text-muted-foreground">
+              Contrate de forma independente do plano. Podem ser ativados ou desativados a qualquer momento em Configurações &gt; Meu Plano.
+            </p>
+
+            {/* NR-1 Add-on */}
+            <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
+              <div className="p-2 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-semibold text-sm">NR-1 (Saúde Mental & Bem-Estar)</div>
+                    <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                      Conformidade com a Portaria MTE 1.419/2024 (diagnóstico, planos de ação, clima e biblioteca).
+                    </p>
+                  </div>
+                  <Switch
+                    checked={!!formData.nr1_addon_enabled}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...formData, nr1_addon_enabled: checked })
+                    }
+                    aria-label="Ativar módulo NR-1"
+                  />
                 </div>
-                <Switch
-                  checked={!!formData.nr1_addon_enabled}
-                  onCheckedChange={(checked) =>
-                    onUpdate({ ...formData, nr1_addon_enabled: checked })
-                  }
-                  aria-label="Ativar módulo NR-1"
-                />
+              </div>
+            </div>
+
+            {/* Clima Organizacional Add-on */}
+            <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
+              <div className="p-2 rounded-md bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
+                <Activity className="w-4 h-4" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-semibold text-sm">Clima Organizacional</div>
+                    <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                      Pesquisas de clima recorrentes, eNPS, segmentação por área/unidade e relatórios — disponível em qualquer plano.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={!!formData.clima_addon_enabled}
+                    onCheckedChange={(checked) =>
+                      onUpdate({ ...formData, clima_addon_enabled: checked })
+                    }
+                    aria-label="Ativar módulo Clima Organizacional"
+                  />
+                </div>
               </div>
             </div>
           </div>

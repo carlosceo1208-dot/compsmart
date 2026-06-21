@@ -1,0 +1,1 @@
+ALTER TABLE public.organizational_structure ADD COLUMN IF NOT EXISTS clima_addon_enabled boolean NOT NULL DEFAULT false;

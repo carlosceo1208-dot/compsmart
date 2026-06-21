@@ -4948,6 +4948,7 @@ export type Database = {
           address: string | null
           base_date: string | null
           billing_cycle: string | null
+          clima_addon_enabled: boolean
           code: string | null
           created_at: string
           data_deletion_scheduled_at: string | null
@@ -4982,6 +4983,7 @@ export type Database = {
           address?: string | null
           base_date?: string | null
           billing_cycle?: string | null
+          clima_addon_enabled?: boolean
           code?: string | null
           created_at?: string
           data_deletion_scheduled_at?: string | null
@@ -5016,6 +5018,7 @@ export type Database = {
           address?: string | null
           base_date?: string | null
           billing_cycle?: string | null
+          clima_addon_enabled?: boolean
           code?: string | null
           created_at?: string
           data_deletion_scheduled_at?: string | null
