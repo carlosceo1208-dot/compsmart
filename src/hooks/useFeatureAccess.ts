@@ -89,9 +89,11 @@ const featureMap: Record<string, PlanType[]> = {
   nr1_terceiros: ['pro', 'enterprise'],
   nr1_clima_correlacao: ['pro', 'enterprise'],
 
-  // === Clima Organizacional (add-on independente) ===
-  // Liberado quando o add-on `clima_addon_enabled` está ativo OU como parte do NR-1 / Pro / Enterprise
+  // === Add-ons opcionais (independentes do plano) ===
+  // Liberados pelos respectivos flags em organizational_structure OU como parte do NR-1 / Pro / Enterprise
   clima_organizacional: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_fib: ['nr1_essencial', 'pro', 'enterprise'],
+  nr1_acompanhamento: ['nr1_essencial', 'pro', 'enterprise'],
 };
 
 // Map route paths to feature keys
@@ -163,6 +165,9 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   // Add-ons opcionais independentes do plano
   const [nr1AddonEnabled, setNr1AddonEnabled] = useState(false);
   const [climaAddonEnabled, setClimaAddonEnabled] = useState(false);
+  const [fibAddonEnabled, setFibAddonEnabled] = useState(false);
+  const [psicossociaisAddonEnabled, setPsicossociaisAddonEnabled] = useState(false);
+  const [checkupAddonEnabled, setCheckupAddonEnabled] = useState(false);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
@@ -199,11 +204,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
         // Fetch add-ons opcionais (independentes do plano)
         const { data: companyAddon } = await supabase
           .from('organizational_structure')
-          .select('nr1_addon_enabled, clima_addon_enabled')
+          .select('nr1_addon_enabled, clima_addon_enabled, fib_addon_enabled, psicossociais_addon_enabled, checkup_addon_enabled')
           .eq('id', profile.root_company_id)
           .maybeSingle();
         setNr1AddonEnabled(!!(companyAddon as any)?.nr1_addon_enabled);
         setClimaAddonEnabled(!!(companyAddon as any)?.clima_addon_enabled);
+        setFibAddonEnabled(!!(companyAddon as any)?.fib_addon_enabled);
+        setPsicossociaisAddonEnabled(!!(companyAddon as any)?.psicossociais_addon_enabled);
+        setCheckupAddonEnabled(!!(companyAddon as any)?.checkup_addon_enabled);
 
         // Get company subscription with plan details
         const { data: subscription } = await supabase
@@ -296,15 +304,18 @@ export const useFeatureAccess = (): FeatureAccessResult => {
       feature === 'nr1_planos_acao' ||
       feature === 'nr1_diagnosticos' ||
       feature === 'nr1_biblioteca' ||
-      feature === 'clima_organizacional'
+      feature === 'clima_organizacional' ||
+      feature === 'nr1_fib' ||
+      feature === 'nr1_acompanhamento'
     )) {
       return true;
     }
 
-    // Clima Organizacional add-on: libera o módulo de clima em qualquer plano
-    if (climaAddonEnabled && feature === 'clima_organizacional') {
-      return true;
-    }
+    // Add-ons opcionais individuais
+    if (climaAddonEnabled && feature === 'clima_organizacional') return true;
+    if (fibAddonEnabled && feature === 'nr1_fib') return true;
+    if (psicossociaisAddonEnabled && feature === 'nr1_clima_correlacao') return true;
+    if (checkupAddonEnabled && feature === 'nr1_acompanhamento') return true;
 
     // During trial, grant Pro-level access
     if (status === 'trial' && daysLeftInTrial && daysLeftInTrial > 0) {

@@ -282,15 +282,15 @@ const App = () => {
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
                        <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
-                       <Route path="/nr1/fib" element={<Nr1FIB />} />
-                       <Route path="/nr1/fib-bem-estar" element={<Nr1FibCard />} />
+                       <Route path="/nr1/fib" element={<PlanGate feature="nr1_fib" featureName="FIB — Felicidade Interna Bruta"><Nr1FIB /></PlanGate>} />
+                       <Route path="/nr1/fib-bem-estar" element={<PlanGate feature="nr1_fib" featureName="FIB — Felicidade Interna Bruta"><Nr1FibCard /></PlanGate>} />
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
                        <Route path="/nr1/universo" element={<Nr1Universo />} />
                         <Route path="/nr1/agente" element={<Nr1BemEstarAgente />} />
                         <Route path="/nr1/jornada" element={<Nr1JornadaBemEstar />} />
-                        <Route path="/nr1/acompanhamento" element={<Nr1Acompanhamento />} />
+                        <Route path="/nr1/acompanhamento" element={<PlanGate feature="nr1_acompanhamento" featureName="Check-up de Colaborador"><Nr1Acompanhamento /></PlanGate>} />
                         <Route path="/nr1/contratar" element={<Nr1Contratar />} />
                         <Route path="/nr1/consentimento" element={<Nr1Consentimento />} />
                        <Route path="/nr1/planos-acao" element={<Nr1PlanosAcao />} />

@@ -25,6 +25,9 @@ interface OnboardingData {
   selected_modules: string[];
   nr1_addon_enabled?: boolean;
   clima_addon_enabled?: boolean;
+  fib_addon_enabled?: boolean;
+  psicossociais_addon_enabled?: boolean;
+  checkup_addon_enabled?: boolean;
 }
 
 const Onboarding = () => {
@@ -43,6 +46,9 @@ const Onboarding = () => {
     selected_modules: [],
     nr1_addon_enabled: false,
     clima_addon_enabled: false,
+    fib_addon_enabled: false,
+    psicossociais_addon_enabled: false,
+    checkup_addon_enabled: false,
   });
 
   useEffect(() => {
@@ -118,6 +124,9 @@ const Onboarding = () => {
           selected_modules: formData.selected_modules,
           nr1_addon_enabled: !!formData.nr1_addon_enabled,
           clima_addon_enabled: !!formData.clima_addon_enabled,
+          fib_addon_enabled: !!formData.fib_addon_enabled,
+          psicossociais_addon_enabled: !!formData.psicossociais_addon_enabled,
+          checkup_addon_enabled: !!formData.checkup_addon_enabled,
         } as any)
         .select()
         .single();

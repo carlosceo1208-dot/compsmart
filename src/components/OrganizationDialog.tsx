@@ -27,9 +27,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { Loader2, HelpCircle, Rocket, TrendingUp, Crown, Cog, BarChart3, Target } from "lucide-react";
+import { Loader2, HelpCircle, Rocket, TrendingUp, Crown, Cog, BarChart3, Target, ShieldCheck, Activity, Smile, Network, HeartPulse, Puzzle } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 type PlanKey = "Starter" | "Pro" | "Enterprise";
 type ModuleKey = "Core" | "Insight" | "Match";
@@ -115,6 +116,11 @@ interface EntityData {
   selected_modules: ModuleKey[];
   risk_grade: string;
   unit_role: "matriz" | "filial" | "";
+  nr1_addon_enabled: boolean;
+  clima_addon_enabled: boolean;
+  fib_addon_enabled: boolean;
+  psicossociais_addon_enabled: boolean;
+  checkup_addon_enabled: boolean;
 }
 
 const INDUSTRY_SECTORS = [
@@ -191,6 +197,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
     selected_modules: [],
     risk_grade: "",
     unit_role: "",
+    nr1_addon_enabled: false,
+    clima_addon_enabled: false,
+    fib_addon_enabled: false,
+    psicossociais_addon_enabled: false,
+    checkup_addon_enabled: false,
   });
   const [parentOptions, setParentOptions] = useState<ParentOption[]>([]);
   const [loadingParents, setLoadingParents] = useState(false);
@@ -220,7 +231,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       // SECURITY: avoid select('*'); cnpj is restricted, fetched via admin RPC
       const { data, error } = await supabase
         .from("organizational_structure")
-        .select("id, name, type, code, description, parent_id, fantasy_name, address, union_name, base_date, logo_url, industry_sector, root_company_id, selected_plan, selected_modules, total_price, risk_grade, unit_role")
+        .select("id, name, type, code, description, parent_id, fantasy_name, address, union_name, base_date, logo_url, industry_sector, root_company_id, selected_plan, selected_modules, total_price, risk_grade, unit_role, nr1_addon_enabled, clima_addon_enabled, fib_addon_enabled, psicossociais_addon_enabled, checkup_addon_enabled")
         .eq("id", entityId)
         .single();
 
@@ -261,6 +272,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           unit_role: ((data as any).unit_role === "matriz" || (data as any).unit_role === "filial")
             ? (data as any).unit_role
             : "",
+          nr1_addon_enabled: !!(data as any).nr1_addon_enabled,
+          clima_addon_enabled: !!(data as any).clima_addon_enabled,
+          fib_addon_enabled: !!(data as any).fib_addon_enabled,
+          psicossociais_addon_enabled: !!(data as any).psicossociais_addon_enabled,
+          checkup_addon_enabled: !!(data as any).checkup_addon_enabled,
         });
       }
     } catch (error: any) {
@@ -362,6 +378,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       selected_modules: [],
       risk_grade: "",
       unit_role: "",
+      nr1_addon_enabled: false,
+      clima_addon_enabled: false,
+      fib_addon_enabled: false,
+      psicossociais_addon_enabled: false,
+      checkup_addon_enabled: false,
     });
   };
 
@@ -491,6 +512,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         total_price: isCompany ? totalPrice : null,
         risk_grade: isCompany && formData.risk_grade ? parseInt(formData.risk_grade, 10) : null,
         unit_role: isCompany ? (formData.unit_role || null) : null,
+        nr1_addon_enabled: isCompany ? !!formData.nr1_addon_enabled : false,
+        clima_addon_enabled: isCompany ? !!formData.clima_addon_enabled : false,
+        fib_addon_enabled: isCompany ? !!formData.fib_addon_enabled : false,
+        psicossociais_addon_enabled: isCompany ? !!formData.psicossociais_addon_enabled : false,
+        checkup_addon_enabled: isCompany ? !!formData.checkup_addon_enabled : false,
       };
 
       const billingDataToSave = isCompanyType
@@ -993,8 +1019,56 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
                       </div>
                     );
                   })()}
+
+                  {/* Add-ons opcionais */}
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-center gap-2">
+                      <Puzzle className="w-4 h-4 text-primary" />
+                      <Label className="text-sm font-semibold">
+                        Módulos opcionais (add-ons)
+                      </Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Contrate de forma independente do plano. Quando desativados, os módulos aparecem bloqueados (cadeado) para o cliente.
+                    </p>
+
+                    {([
+                      { key: "nr1_addon_enabled" as const, title: "NR-1 (Saúde Mental & Bem-Estar)", desc: "Diagnóstico, planos de ação, clima e biblioteca da Portaria MTE 1.419/2024.", Icon: ShieldCheck, accent: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300" },
+                      { key: "clima_addon_enabled" as const, title: "Clima Organizacional", desc: "Pesquisas de clima recorrentes, eNPS, segmentação por área/unidade e relatórios.", Icon: Activity, accent: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300" },
+                      { key: "fib_addon_enabled" as const, title: "FIB — Felicidade Interna Bruta", desc: "Indicador de bem-estar e satisfação, com tendências e benchmarks.", Icon: Smile, accent: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+                      { key: "psicossociais_addon_enabled" as const, title: "Cruzamento de Riscos Psicossociais", desc: "Correlação entre clima e riscos psicossociais (COPSOQ-III).", Icon: Network, accent: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300" },
+                      { key: "checkup_addon_enabled" as const, title: "Check-up de Colaborador", desc: "Acompanhamento contínuo com jornadas, check-ins e alertas preventivos.", Icon: HeartPulse, accent: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
+                    ]).map((a) => {
+                      const Icon = a.Icon;
+                      const isOn = !!formData[a.key];
+                      return (
+                        <div key={a.key} className="rounded-lg border-2 border-dashed p-3 flex items-start gap-3 bg-card">
+                          <div className={`p-2 rounded-md ${a.accent}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="font-semibold text-sm">{a.title}</div>
+                                <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{a.desc}</p>
+                              </div>
+                              <Switch
+                                checked={isOn}
+                                onCheckedChange={(checked) =>
+                                  setFormData({ ...formData, [a.key]: checked })
+                                }
+                                aria-label={`Ativar ${a.title}`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
+
+
 
 
 

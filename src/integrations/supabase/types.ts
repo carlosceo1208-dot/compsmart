@@ -4948,6 +4948,7 @@ export type Database = {
           address: string | null
           base_date: string | null
           billing_cycle: string | null
+          checkup_addon_enabled: boolean
           clima_addon_enabled: boolean
           code: string | null
           created_at: string
@@ -4955,6 +4956,7 @@ export type Database = {
           default_language: string | null
           description: string | null
           fantasy_name: string | null
+          fib_addon_enabled: boolean
           id: string
           industry_sector: string | null
           is_founder: boolean | null
@@ -4964,6 +4966,7 @@ export type Database = {
           name: string
           nr1_addon_enabled: boolean
           parent_id: string | null
+          psicossociais_addon_enabled: boolean
           risk_grade: number | null
           root_company_id: string | null
           selected_modules: string[]
@@ -4983,6 +4986,7 @@ export type Database = {
           address?: string | null
           base_date?: string | null
           billing_cycle?: string | null
+          checkup_addon_enabled?: boolean
           clima_addon_enabled?: boolean
           code?: string | null
           created_at?: string
@@ -4990,6 +4994,7 @@ export type Database = {
           default_language?: string | null
           description?: string | null
           fantasy_name?: string | null
+          fib_addon_enabled?: boolean
           id?: string
           industry_sector?: string | null
           is_founder?: boolean | null
@@ -4999,6 +5004,7 @@ export type Database = {
           name: string
           nr1_addon_enabled?: boolean
           parent_id?: string | null
+          psicossociais_addon_enabled?: boolean
           risk_grade?: number | null
           root_company_id?: string | null
           selected_modules?: string[]
@@ -5018,6 +5024,7 @@ export type Database = {
           address?: string | null
           base_date?: string | null
           billing_cycle?: string | null
+          checkup_addon_enabled?: boolean
           clima_addon_enabled?: boolean
           code?: string | null
           created_at?: string
@@ -5025,6 +5032,7 @@ export type Database = {
           default_language?: string | null
           description?: string | null
           fantasy_name?: string | null
+          fib_addon_enabled?: boolean
           id?: string
           industry_sector?: string | null
           is_founder?: boolean | null
@@ -5034,6 +5042,7 @@ export type Database = {
           name?: string
           nr1_addon_enabled?: boolean
           parent_id?: string | null
+          psicossociais_addon_enabled?: boolean
           risk_grade?: number | null
           root_company_id?: string | null
           selected_modules?: string[]
