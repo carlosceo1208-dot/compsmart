@@ -1019,8 +1019,56 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
                       </div>
                     );
                   })()}
+
+                  {/* Add-ons opcionais */}
+                  <div className="space-y-2 pt-2 border-t">
+                    <div className="flex items-center gap-2">
+                      <Puzzle className="w-4 h-4 text-primary" />
+                      <Label className="text-sm font-semibold">
+                        Módulos opcionais (add-ons)
+                      </Label>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Contrate de forma independente do plano. Quando desativados, os módulos aparecem bloqueados (cadeado) para o cliente.
+                    </p>
+
+                    {([
+                      { key: "nr1_addon_enabled" as const, title: "NR-1 (Saúde Mental & Bem-Estar)", desc: "Diagnóstico, planos de ação, clima e biblioteca da Portaria MTE 1.419/2024.", Icon: ShieldCheck, accent: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300" },
+                      { key: "clima_addon_enabled" as const, title: "Clima Organizacional", desc: "Pesquisas de clima recorrentes, eNPS, segmentação por área/unidade e relatórios.", Icon: Activity, accent: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300" },
+                      { key: "fib_addon_enabled" as const, title: "FIB — Felicidade Interna Bruta", desc: "Indicador de bem-estar e satisfação, com tendências e benchmarks.", Icon: Smile, accent: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+                      { key: "psicossociais_addon_enabled" as const, title: "Cruzamento de Riscos Psicossociais", desc: "Correlação entre clima e riscos psicossociais (COPSOQ-III).", Icon: Network, accent: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300" },
+                      { key: "checkup_addon_enabled" as const, title: "Check-up de Colaborador", desc: "Acompanhamento contínuo com jornadas, check-ins e alertas preventivos.", Icon: HeartPulse, accent: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
+                    ]).map((a) => {
+                      const Icon = a.Icon;
+                      const isOn = !!formData[a.key];
+                      return (
+                        <div key={a.key} className="rounded-lg border-2 border-dashed p-3 flex items-start gap-3 bg-card">
+                          <div className={`p-2 rounded-md ${a.accent}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="min-w-0">
+                                <div className="font-semibold text-sm">{a.title}</div>
+                                <p className="text-xs text-muted-foreground mt-0.5 leading-snug">{a.desc}</p>
+                              </div>
+                              <Switch
+                                checked={isOn}
+                                onCheckedChange={(checked) =>
+                                  setFormData({ ...formData, [a.key]: checked })
+                                }
+                                aria-label={`Ativar ${a.title}`}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
+
+
 
 
 
