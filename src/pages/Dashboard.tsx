@@ -20,6 +20,7 @@ import { EconomicIndicatorsCard } from "@/components/dashboard/EconomicIndicator
 import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
 import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
 import { BemEstarModuleCard } from "@/components/dashboard/BemEstarModuleCard";
+import { PlanGate } from "@/components/PlanGate";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useFounderStatus } from "@/hooks/useFounderStatus";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
@@ -84,7 +85,11 @@ const Dashboard = () => {
           
           <div className="grid gap-4 grid-cols-1">
             <Item i={1}><PerformanceModuleCard /></Item>
-            <Item i={2}><BemEstarModuleCard /></Item>
+            <Item i={2}>
+              <PlanGate mode="card" feature="nr1_essencial" featureName="Saúde Mental e Bem-Estar (NR-1)" requiredPlanLabel="NR-1 Essencial">
+                <BemEstarModuleCard />
+              </PlanGate>
+            </Item>
           </div>
           
           <Item i={3}><CompanyMapCard /></Item>
@@ -104,10 +109,26 @@ const Dashboard = () => {
             />
           </Item>
           <Item i={1}><CompensationTrendsCard /></Item>
-          <Item i={2}><MeritCoherenceCard /></Item>
-          <Item i={3}><TalentIntelligenceCard /></Item>
-          <Item i={4}><PayEquityCard /></Item>
-          <Item i={5}><ExecutiveCompCard /></Item>
+          <Item i={2}>
+            <PlanGate mode="card" feature="merit_governance" featureName="Coerência de Mérito" requiredPlanLabel="Pro">
+              <MeritCoherenceCard />
+            </PlanGate>
+          </Item>
+          <Item i={3}>
+            <PlanGate mode="card" feature="advanced_analytics" featureName="Inteligência de Talentos" requiredPlanLabel="Medium">
+              <TalentIntelligenceCard />
+            </PlanGate>
+          </Item>
+          <Item i={4}>
+            <PlanGate mode="card" feature="salary_analysis_report" featureName="Pay Equity" requiredPlanLabel="Pro">
+              <PayEquityCard />
+            </PlanGate>
+          </Item>
+          <Item i={5}>
+            <PlanGate mode="card" feature="incentive_programs" featureName="Remuneração de Executivos (ILP)" requiredPlanLabel="Pro">
+              <ExecutiveCompCard />
+            </PlanGate>
+          </Item>
           <Item i={6}><EconomicIndicatorsCard /></Item>
           <Item i={7}><AlphabeticalNav /></Item>
           <Item i={8}><ModuleGrid /></Item>
