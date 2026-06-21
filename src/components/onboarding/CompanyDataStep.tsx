@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building2, ArrowRight, Cog, BarChart3, Target } from "lucide-react";
+import { Building2, ArrowRight, Cog, BarChart3, Target, ShieldCheck } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 
 interface CompanyDataStepProps {
