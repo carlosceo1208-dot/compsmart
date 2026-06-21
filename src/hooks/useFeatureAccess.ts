@@ -295,8 +295,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
       feature === 'nr1_clima' ||
       feature === 'nr1_planos_acao' ||
       feature === 'nr1_diagnosticos' ||
-      feature === 'nr1_biblioteca'
+      feature === 'nr1_biblioteca' ||
+      feature === 'clima_organizacional'
     )) {
+      return true;
+    }
+
+    // Clima Organizacional add-on: libera o módulo de clima em qualquer plano
+    if (climaAddonEnabled && feature === 'clima_organizacional') {
       return true;
     }
 
