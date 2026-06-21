@@ -23,6 +23,7 @@ interface OnboardingData {
   subscription_plan_id: string | null;
   billing_cycle: 'monthly' | 'annual';
   selected_modules: string[];
+  nr1_addon_enabled?: boolean;
 }
 
 const Onboarding = () => {
