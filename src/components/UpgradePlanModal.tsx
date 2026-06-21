@@ -77,6 +77,18 @@ const planConfig: Record<PlanType, {
       'Gerente de conta dedicado',
     ],
   },
+  nr1_essencial: {
+    name: 'NR-1 Essencial',
+    icon: Sparkles,
+    color: 'text-emerald-600',
+    features: [
+      'Diagnóstico de riscos psicossociais (NR-1)',
+      'Planos de ação',
+      'Pesquisa de clima básica',
+      'Biblioteca metodológica',
+      'Conformidade Portaria MTE 1.419/2024',
+    ],
+  },
 };
 
 const planHierarchy: PlanType[] = ['starter', 'medium', 'pro', 'enterprise'];
