@@ -24,6 +24,7 @@ interface OnboardingData {
   billing_cycle: 'monthly' | 'annual';
   selected_modules: string[];
   nr1_addon_enabled?: boolean;
+  clima_addon_enabled?: boolean;
 }
 
 const Onboarding = () => {
