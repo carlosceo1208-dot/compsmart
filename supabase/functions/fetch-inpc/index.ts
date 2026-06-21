@@ -38,10 +38,13 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // SECURITY: Allow either CRON_SECRET (scheduled) or authenticated user JWT (frontend)
+  // SECURITY: Allow either CRON_SECRET (scheduled) or authenticated user JWT (frontend).
+  // Any authenticated user may read INPC, but only admin/super_admin (or cron) may
+  // trigger service-role cache writes.
   const authHeader = req.headers.get('Authorization') ?? '';
   const cronSecret = Deno.env.get('CRON_SECRET');
-  const isCron = cronSecret && authHeader === `Bearer ${cronSecret}`;
+  const isCron = !!(cronSecret && authHeader === `Bearer ${cronSecret}`);
+  let canWrite = isCron;
 
   if (!isCron) {
     if (!authHeader.startsWith('Bearer ')) {
@@ -63,6 +66,14 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    const userId = claims.claims.sub as string;
+    const { data: roles } = await authClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId);
+    canWrite = !!roles?.some((r: { role: string }) =>
+      ['admin', 'super_admin'].includes(r.role)
+    );
   }
 
   try {
@@ -113,30 +124,32 @@ Deno.serve(async (req) => {
       
       console.log('INPC fetched successfully:', inpcData);
       
-      // Salvar no banco para cache
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      
-      // Upsert INPC mensal
-      await supabase
-        .from('economic_parameters')
-        .upsert({
-          parameter_key: 'inpc_monthly',
-          value: inpcData.monthly,
-          effective_date: new Date().toISOString().split('T')[0],
-          metadata: {
-            accumulated: inpcData.accumulated,
-            period: inpcData.period,
-            referenceMonth: inpcData.referenceMonth,
-            months: months,
-            fetchedAt: new Date().toISOString(),
-          },
-        }, {
-          onConflict: 'parameter_key,effective_date',
-        });
-      
-      console.log('INPC cached in database');
+      // Salvar no banco para cache (apenas cron/admin)
+      if (canWrite) {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
+        // Upsert INPC mensal
+        await supabase
+          .from('economic_parameters')
+          .upsert({
+            parameter_key: 'inpc_monthly',
+            value: inpcData.monthly,
+            effective_date: new Date().toISOString().split('T')[0],
+            metadata: {
+              accumulated: inpcData.accumulated,
+              period: inpcData.period,
+              referenceMonth: inpcData.referenceMonth,
+              months: months,
+              fetchedAt: new Date().toISOString(),
+            },
+          }, {
+            onConflict: 'parameter_key,effective_date',
+          });
+
+        console.log('INPC cached in database');
+      }
       
     } catch (ibgeError) {
       console.warn('IBGE API failed, using fallback:', ibgeError);

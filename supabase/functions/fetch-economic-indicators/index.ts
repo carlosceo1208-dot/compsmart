@@ -35,6 +35,21 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    // SECURITY: Only admins/super_admins may trigger service-role writes
+    const userId = claims.claims.sub as string;
+    const { data: roles } = await authClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId);
+    const allowed = roles?.some((r: { role: string }) =>
+      ['admin', 'super_admin'].includes(r.role)
+    );
+    if (!allowed) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   try {
