@@ -46,6 +46,9 @@ const Onboarding = () => {
     selected_modules: [],
     nr1_addon_enabled: false,
     clima_addon_enabled: false,
+    fib_addon_enabled: false,
+    psicossociais_addon_enabled: false,
+    checkup_addon_enabled: false,
   });
 
   useEffect(() => {
