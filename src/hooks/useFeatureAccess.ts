@@ -156,6 +156,8 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   const [dataDeletionScheduledAt, setDataDeletionScheduledAt] = useState<string | null>(null);
   // Admin override - admins/super_admins bypass plan restrictions
   const [isAdminOrSuperAdmin, setIsAdminOrSuperAdmin] = useState(false);
+  // NR-1 opcional como add-on independente do plano
+  const [nr1AddonEnabled, setNr1AddonEnabled] = useState(false);
 
   useEffect(() => {
     const fetchCompanySubscription = async () => {
@@ -188,6 +190,14 @@ export const useFeatureAccess = (): FeatureAccessResult => {
           setLoading(false);
           return;
         }
+
+        // Fetch NR-1 add-on flag (opcional, independente do plano)
+        const { data: companyAddon } = await supabase
+          .from('organizational_structure')
+          .select('nr1_addon_enabled')
+          .eq('id', profile.root_company_id)
+          .maybeSingle();
+        setNr1AddonEnabled(!!(companyAddon as any)?.nr1_addon_enabled);
 
         // Get company subscription with plan details
         const { data: subscription } = await supabase
@@ -272,18 +282,29 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     if (isAdminOrSuperAdmin) {
       return true;
     }
-    
+
+    // NR-1 add-on: libera os recursos do NR-1 Essencial em qualquer plano contratado
+    if (nr1AddonEnabled && (
+      feature === 'nr1_essencial' ||
+      feature === 'nr1_clima' ||
+      feature === 'nr1_planos_acao' ||
+      feature === 'nr1_diagnosticos' ||
+      feature === 'nr1_biblioteca'
+    )) {
+      return true;
+    }
+
     // During trial, grant Pro-level access
     if (status === 'trial' && daysLeftInTrial && daysLeftInTrial > 0) {
       const trialPlan: PlanType = 'pro';
       return featureMap[feature]?.includes(trialPlan) ?? true;
     }
-    
+
     // Expired/canceled = starter only
     if (status === 'expired' || status === 'canceled') {
       return featureMap[feature]?.includes('starter') ?? true;
     }
-    
+
     return featureMap[feature]?.includes(plan) ?? true;
   };
 

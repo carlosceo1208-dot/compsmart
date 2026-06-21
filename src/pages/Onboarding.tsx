@@ -23,6 +23,7 @@ interface OnboardingData {
   subscription_plan_id: string | null;
   billing_cycle: 'monthly' | 'annual';
   selected_modules: string[];
+  nr1_addon_enabled?: boolean;
 }
 
 const Onboarding = () => {
@@ -39,6 +40,7 @@ const Onboarding = () => {
     subscription_plan_id: null,
     billing_cycle: 'monthly',
     selected_modules: [],
+    nr1_addon_enabled: false,
   });
 
   useEffect(() => {
@@ -112,7 +114,8 @@ const Onboarding = () => {
           trial_ends_at: trialEndsAt.toISOString(),
           subscription_started_at: new Date().toISOString(),
           selected_modules: formData.selected_modules,
-        })
+          nr1_addon_enabled: !!formData.nr1_addon_enabled,
+        } as any)
         .select()
         .single();
 
