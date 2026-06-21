@@ -27,7 +27,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { Loader2, HelpCircle, Rocket, TrendingUp, Crown, Cog, BarChart3, Target } from "lucide-react";
+import { Loader2, HelpCircle, Rocket, TrendingUp, Crown, Cog, BarChart3, Target, ShieldCheck, Activity, Smile, Network, HeartPulse, Puzzle } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Checkbox } from "@/components/ui/checkbox";
 
