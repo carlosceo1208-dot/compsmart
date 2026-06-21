@@ -269,6 +269,9 @@ export default function MyPlan() {
         </Alert>
       )}
 
+      {/* Add-ons opcionais (independentes do plano) */}
+      {activeCompanyId && <AddonsManager companyId={activeCompanyId} canEdit />}
+
       {/* Comparar Planos */}
       <div>
         <h2 className="text-xl font-semibold mb-4">
