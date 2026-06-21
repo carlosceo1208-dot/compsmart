@@ -295,15 +295,15 @@ const App = () => {
                        <Route path="/nr1/planos-acao" element={<Nr1PlanosAcao />} />
                        <Route path="/nr1/vitalidade" element={<Nr1Vitalidade />} />
                        <Route path="/nr1/biblioteca" element={<Nr1Biblioteca />} />
-                       <Route path="/nr1/clima" element={<Nr1Clima />} />
+                       <Route path="/nr1/clima" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1Clima /></PlanGate>} />
                       <Route path="/nr1/clima/:id/responder" element={<Nr1ClimaResponder />} />
-                      <Route path="/nr1/clima/dashboard" element={<Nr1ClimaDashboard />} />
-                      <Route path="/nr1/clima/dashboard/:id" element={<Nr1ClimaDashboard />} />
-                      <Route path="/nr1/clima/correlacao" element={<Nr1ClimaCorrelacao />} />
-                      <Route path="/nr1/clima/externo" element={<Nr1ClimaExternoDashboard />} />
-                     <Route path="/nr1/clima/externo/:id" element={<Nr1ClimaExternoDashboard />} />
-                     <Route path="/nr1/clima/relatorios" element={<Nr1ClimaRelatorios />} />
-                     <Route path="/nr1/clima/governanca" element={<Nr1ClimaGovernanca />} />
+                      <Route path="/nr1/clima/dashboard" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaDashboard /></PlanGate>} />
+                      <Route path="/nr1/clima/dashboard/:id" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaDashboard /></PlanGate>} />
+                      <Route path="/nr1/clima/correlacao" element={<PlanGate feature="nr1_clima_correlacao" featureName="Correlação Clima x Riscos" requiredPlanLabel="Pro"><Nr1ClimaCorrelacao /></PlanGate>} />
+                      <Route path="/nr1/clima/externo" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></PlanGate>} />
+                     <Route path="/nr1/clima/externo/:id" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></PlanGate>} />
+                     <Route path="/nr1/clima/relatorios" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaRelatorios /></PlanGate>} />
+                     <Route path="/nr1/clima/governanca" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaGovernanca /></PlanGate>} />
                       </Route>
 
                       {/* Public */}
