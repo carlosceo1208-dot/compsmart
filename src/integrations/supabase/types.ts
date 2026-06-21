@@ -4961,6 +4961,7 @@ export type Database = {
           logo_url: string | null
           longitude: number | null
           name: string
+          nr1_addon_enabled: boolean
           parent_id: string | null
           risk_grade: number | null
           root_company_id: string | null
@@ -4994,6 +4995,7 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name: string
+          nr1_addon_enabled?: boolean
           parent_id?: string | null
           risk_grade?: number | null
           root_company_id?: string | null
@@ -5027,6 +5029,7 @@ export type Database = {
           logo_url?: string | null
           longitude?: number | null
           name?: string
+          nr1_addon_enabled?: boolean
           parent_id?: string | null
           risk_grade?: number | null
           root_company_id?: string | null

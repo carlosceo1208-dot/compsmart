@@ -1,0 +1,1 @@
+ALTER TABLE public.organizational_structure ADD COLUMN IF NOT EXISTS nr1_addon_enabled boolean NOT NULL DEFAULT false;
