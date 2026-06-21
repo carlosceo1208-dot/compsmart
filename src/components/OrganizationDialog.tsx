@@ -511,6 +511,11 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         total_price: isCompany ? totalPrice : null,
         risk_grade: isCompany && formData.risk_grade ? parseInt(formData.risk_grade, 10) : null,
         unit_role: isCompany ? (formData.unit_role || null) : null,
+        nr1_addon_enabled: isCompany ? !!formData.nr1_addon_enabled : false,
+        clima_addon_enabled: isCompany ? !!formData.clima_addon_enabled : false,
+        fib_addon_enabled: isCompany ? !!formData.fib_addon_enabled : false,
+        psicossociais_addon_enabled: isCompany ? !!formData.psicossociais_addon_enabled : false,
+        checkup_addon_enabled: isCompany ? !!formData.checkup_addon_enabled : false,
       };
 
       const billingDataToSave = isCompanyType
