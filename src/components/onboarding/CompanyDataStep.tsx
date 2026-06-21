@@ -193,6 +193,30 @@ export const CompanyDataStep = ({ formData, onUpdate, onNext }: CompanyDataStepP
               </span>
             </div>
           )}
+
+          {/* NR-1 Add-on opcional (independente do plano) */}
+          <div className="rounded-lg border-2 border-dashed p-4 flex items-start gap-3 bg-card">
+            <div className="p-2 rounded-md bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="font-semibold text-sm">NR-1 (Saúde Mental & Bem-Estar)</div>
+                  <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                    Módulo opcional para conformidade com a Portaria MTE 1.419/2024 (diagnóstico, planos de ação, clima e biblioteca). Pode ser ativado em qualquer plano.
+                  </p>
+                </div>
+                <Switch
+                  checked={!!formData.nr1_addon_enabled}
+                  onCheckedChange={(checked) =>
+                    onUpdate({ ...formData, nr1_addon_enabled: checked })
+                  }
+                  aria-label="Ativar módulo NR-1"
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-2">
