@@ -282,18 +282,29 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     if (isAdminOrSuperAdmin) {
       return true;
     }
-    
+
+    // NR-1 add-on: libera os recursos do NR-1 Essencial em qualquer plano contratado
+    if (nr1AddonEnabled && (
+      feature === 'nr1_essencial' ||
+      feature === 'nr1_clima' ||
+      feature === 'nr1_planos_acao' ||
+      feature === 'nr1_diagnosticos' ||
+      feature === 'nr1_biblioteca'
+    )) {
+      return true;
+    }
+
     // During trial, grant Pro-level access
     if (status === 'trial' && daysLeftInTrial && daysLeftInTrial > 0) {
       const trialPlan: PlanType = 'pro';
       return featureMap[feature]?.includes(trialPlan) ?? true;
     }
-    
+
     // Expired/canceled = starter only
     if (status === 'expired' || status === 'canceled') {
       return featureMap[feature]?.includes('starter') ?? true;
     }
-    
+
     return featureMap[feature]?.includes(plan) ?? true;
   };
 
