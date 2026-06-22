@@ -21,6 +21,7 @@ interface OnboardingData {
   headquartersName?: string;
   headquartersCode?: string;
   subscription_plan_id: string | null;
+  nr1_subscription_plan_id?: string | null;
   billing_cycle: 'monthly' | 'annual';
   selected_modules: string[];
   nr1_addon_enabled?: boolean;
@@ -29,6 +30,7 @@ interface OnboardingData {
   psicossociais_addon_enabled?: boolean;
   checkup_addon_enabled?: boolean;
 }
+
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -42,6 +44,7 @@ const Onboarding = () => {
     logo_url: null,
     createInitialStructure: false,
     subscription_plan_id: null,
+    nr1_subscription_plan_id: null,
     billing_cycle: 'monthly',
     selected_modules: [],
     nr1_addon_enabled: false,
@@ -50,6 +53,7 @@ const Onboarding = () => {
     psicossociais_addon_enabled: false,
     checkup_addon_enabled: false,
   });
+
 
   useEffect(() => {
     checkIfNeedsOnboarding();
@@ -238,13 +242,21 @@ const Onboarding = () => {
         {currentStep === 2 && (
           <PlanSelectionStep
             selectedPlanId={formData.subscription_plan_id}
-            onUpdate={(planId, billingCycle) => 
-              setFormData({ ...formData, subscription_plan_id: planId, billing_cycle: billingCycle })
+            selectedNr1PlanId={formData.nr1_subscription_plan_id}
+            onUpdate={(planId, billingCycle, nr1PlanId) =>
+              setFormData({
+                ...formData,
+                subscription_plan_id: planId || null,
+                nr1_subscription_plan_id: nr1PlanId ?? null,
+                nr1_addon_enabled: !!nr1PlanId || formData.nr1_addon_enabled,
+                billing_cycle: billingCycle,
+              })
             }
             onNext={() => setCurrentStep(3)}
             onBack={() => setCurrentStep(1)}
           />
         )}
+
 
         {currentStep === 3 && (
           <LogoUploadStep

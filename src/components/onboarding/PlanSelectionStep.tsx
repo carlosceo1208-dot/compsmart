@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Check, ArrowRight, ArrowLeft, Sparkles, Loader2 } from "lucide-react";
+import { Check, ArrowRight, ArrowLeft, Sparkles, Loader2, Brain, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 interface Plan {
@@ -13,75 +12,71 @@ interface Plan {
   name: string;
   description: string;
   plan_type: string;
-  monthly_price: number;
-  annual_price: number;
   features: any;
   max_employees: number | null;
   max_users: number | null;
+  sort_order: number;
 }
 
 interface PlanSelectionStepProps {
   selectedPlanId: string | null;
-  onUpdate: (planId: string, billingCycle: 'monthly' | 'annual') => void;
+  selectedNr1PlanId?: string | null;
+  onUpdate: (planId: string, billingCycle: 'monthly' | 'annual', nr1PlanId?: string | null) => void;
   onNext: () => void;
   onBack: () => void;
 }
 
-export const PlanSelectionStep = ({ 
-  selectedPlanId, 
-  onUpdate, 
-  onNext, 
-  onBack 
+const CORE_TYPES = ['starter', 'medium', 'pro', 'enterprise'];
+
+export const PlanSelectionStep = ({
+  selectedPlanId,
+  selectedNr1PlanId = null,
+  onUpdate,
+  onNext,
+  onBack,
 }: PlanSelectionStepProps) => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [billingCycle] = useState<'monthly' | 'annual'>('monthly');
 
   useEffect(() => {
-    fetchPlans();
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('subscription_plans')
+          .select('id, name, description, plan_type, features, max_employees, max_users, sort_order')
+          .eq('is_active', true)
+          .order('sort_order');
+        if (error) throw error;
+        setPlans((data as any) || []);
+      } catch (e: any) {
+        console.error(e);
+        toast.error('Erro ao carregar planos');
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, []);
 
-  const fetchPlans = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('subscription_plans')
-        .select('*')
-        .eq('is_public', true)
-        .eq('is_active', true)
-        .order('sort_order');
+  const corePlans = plans
+    .filter((p) => CORE_TYPES.includes((p.plan_type || '').toLowerCase()))
+    .sort((a, b) => a.sort_order - b.sort_order);
+  const nr1Plans = plans
+    .filter((p) => (p.plan_type || '').toLowerCase() === 'nr1')
+    .sort((a, b) => a.sort_order - b.sort_order);
 
-      if (error) throw error;
-      
-      setPlans(data || []);
-    } catch (error: any) {
-      console.error('Error fetching plans:', error);
-      toast.error('Erro ao carregar planos');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePlanSelect = (planId: string) => {
-    onUpdate(planId, billingCycle);
+  const handleSelectCore = (id: string) => onUpdate(id, billingCycle, selectedNr1PlanId);
+  const handleSelectNr1 = (id: string | null) => {
+    if (selectedPlanId) onUpdate(selectedPlanId, billingCycle, id);
+    else onUpdate('', billingCycle, id);
   };
 
   const handleNext = () => {
-    if (!selectedPlanId) {
-      toast.error('Por favor, selecione um plano');
+    if (!selectedPlanId && !selectedNr1PlanId) {
+      toast.error('Selecione ao menos um plano (Gestão Estratégica ou NR-1)');
       return;
     }
     onNext();
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(price);
-  };
-
-  const getMonthlyEquivalent = (annualPrice: number) => {
-    return annualPrice / 12;
   };
 
   if (loading) {
@@ -94,6 +89,54 @@ export const PlanSelectionStep = ({
     );
   }
 
+  const renderPlanCard = (
+    plan: Plan,
+    selected: boolean,
+    onSelect: () => void,
+    accent: 'primary' | 'emerald'
+  ) => {
+    const ring = selected
+      ? accent === 'emerald'
+        ? 'border-emerald-500 bg-emerald-500/5'
+        : 'border-primary bg-primary/5'
+      : 'border-border hover:border-primary/50';
+    return (
+      <button
+        type="button"
+        key={plan.id}
+        onClick={onSelect}
+        className={`text-left relative border-2 rounded-lg p-4 transition-all ${ring}`}
+      >
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <Label className="text-base font-bold cursor-pointer">{plan.name}</Label>
+          {selected && (
+            <Badge variant="secondary" className="text-xs">
+              <Check className="w-3 h-3 mr-1" /> Selecionado
+            </Badge>
+          )}
+        </div>
+        {plan.description && (
+          <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{plan.description}</p>
+        )}
+        {Array.isArray(plan.features) && plan.features.length > 0 && (
+          <ul className="space-y-1">
+            {plan.features.slice(0, 4).map((f: string, i: number) => (
+              <li key={i} className="flex items-start gap-2 text-xs">
+                <Check className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-muted-foreground">{f}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {(plan.max_employees || plan.max_users) && (
+          <div className="mt-3 pt-3 border-t text-[11px] text-muted-foreground">
+            {plan.max_employees ? `Até ${plan.max_employees} colaboradores` : 'Colaboradores ilimitados'}
+          </div>
+        )}
+      </button>
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -104,151 +147,72 @@ export const PlanSelectionStep = ({
           <div>
             <CardTitle>Escolha seu Plano</CardTitle>
             <CardDescription>
-              Selecione o plano ideal para sua empresa
+              Os valores não são exibidos aqui — você já os conhece da landing page e os confirma no checkout.
             </CardDescription>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Billing Cycle Toggle */}
-        <div className="flex items-center justify-center gap-4 p-4 bg-muted rounded-lg">
-          <Button
-            variant={billingCycle === 'monthly' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setBillingCycle('monthly')}
-          >
-            Mensal
-          </Button>
-          <Button
-            variant={billingCycle === 'annual' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => setBillingCycle('annual')}
-          >
-            Anual
-            <Badge variant="secondary" className="ml-2">
-              -17%
-            </Badge>
-          </Button>
-        </div>
 
-        {/* Plans Grid */}
-        <RadioGroup value={selectedPlanId || ''} onValueChange={handlePlanSelect}>
-          <div className="grid gap-4">
-            {plans.map((plan) => {
-              const price = billingCycle === 'monthly' 
-                ? plan.monthly_price 
-                : getMonthlyEquivalent(plan.annual_price);
-              
-              const isSelected = selectedPlanId === plan.id;
-              const isPopular = plan.plan_type === 'pro';
-
-              return (
-                <div key={plan.id} className="relative">
-                  {isPopular && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                      <Badge className="bg-primary text-primary-foreground">
-                        Mais Popular
-                      </Badge>
-                    </div>
-                  )}
-                  
-                  <div
-                    className={`relative border-2 rounded-lg p-6 cursor-pointer transition-all ${
-                      isSelected
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    onClick={() => handlePlanSelect(plan.id)}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <RadioGroupItem value={plan.id} id={plan.id} />
-                        <div>
-                          <Label htmlFor={plan.id} className="text-lg font-bold cursor-pointer">
-                            {plan.name}
-                          </Label>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {plan.description}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <div className="text-3xl font-bold">
-                          {formatPrice(price)}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          por mês
-                        </div>
-                        {billingCycle === 'annual' && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {formatPrice(plan.annual_price)}/ano
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <div className="space-y-2 mt-4">
-                      {Array.isArray(plan.features) && plan.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Limits */}
-                    <div className="flex gap-4 mt-4 pt-4 border-t text-xs text-muted-foreground">
-                      {plan.max_employees && (
-                        <div>
-                          <strong>{plan.max_employees}</strong> colaboradores
-                        </div>
-                      )}
-                      {plan.max_users && (
-                        <div>
-                          <strong>{plan.max_users}</strong> usuários
-                        </div>
-                      )}
-                      {!plan.max_employees && !plan.max_users && (
-                        <div className="text-primary font-semibold">
-                          Ilimitado
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+      <CardContent className="space-y-8">
+        {/* GRUPO 1 — CORE */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Brain className="w-4 h-4 text-primary" />
+            <h3 className="font-semibold text-sm uppercase tracking-wide">
+              Gestão Estratégica de Remuneração e Avaliação de Desempenho
+            </h3>
           </div>
-        </RadioGroup>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {corePlans.map((p) =>
+              renderPlanCard(p, selectedPlanId === p.id, () => handleSelectCore(p.id), 'primary')
+            )}
+          </div>
+        </section>
 
-        {/* Trial Info */}
+        {/* GRUPO 2 — NR-1 */}
+        {nr1Plans.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-emerald-500" />
+                <h3 className="font-semibold text-sm uppercase tracking-wide">
+                  NR-1 — Saúde Mental & Bem-Estar (opcional)
+                </h3>
+              </div>
+              {selectedNr1PlanId && (
+                <Button variant="ghost" size="sm" onClick={() => handleSelectNr1(null)}>
+                  Limpar seleção
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {nr1Plans.map((p) =>
+                renderPlanCard(
+                  p,
+                  selectedNr1PlanId === p.id,
+                  () => handleSelectNr1(p.id),
+                  'emerald'
+                )
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Trial */}
         <div className="bg-accent/50 border border-accent rounded-lg p-4 text-sm">
           <p className="font-semibold mb-1">🎉 30 dias grátis para teste</p>
           <p className="text-muted-foreground">
-            Experimente todos os recursos do plano escolhido sem compromisso. 
-            Cancele a qualquer momento durante o período de teste.
+            Experimente todos os recursos sem compromisso. Cancele a qualquer momento.
           </p>
         </div>
 
-        {/* Navigation Buttons */}
+        {/* Nav */}
         <div className="flex gap-3">
-          <Button
-            onClick={onBack}
-            variant="outline"
-            className="gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Voltar
+          <Button onClick={onBack} variant="outline" className="gap-2">
+            <ArrowLeft className="w-4 h-4" /> Voltar
           </Button>
-          <Button
-            onClick={handleNext}
-            disabled={!selectedPlanId}
-            className="flex-1 gap-2"
-          >
-            Continuar
-            <ArrowRight className="w-4 h-4" />
+          <Button onClick={handleNext} className="flex-1 gap-2">
+            Continuar <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
       </CardContent>
