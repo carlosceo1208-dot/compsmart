@@ -180,6 +180,7 @@ const App = () => {
               <ErrorBoundary>
                 <BrowserRouter>
                   <TelemetryTracker />
+                  <ViewAsClientToggle />
                   <Suspense fallback={<RouteFallback />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
