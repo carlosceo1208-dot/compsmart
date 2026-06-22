@@ -29,57 +29,57 @@ import {
 import { toast } from "sonner";
 import { Loader2, HelpCircle, Rocket, TrendingUp, Crown, Cog, BarChart3, Target, ShieldCheck, Activity, Smile, Network, HeartPulse, Puzzle } from "lucide-react";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 
-type PlanKey = "Starter" | "Pro" | "Enterprise";
-type ModuleKey = "Core" | "Insight" | "Match";
+type CorePlanKey = "Starter" | "Medium" | "Pro" | "Enterprise";
+type Nr1PlanKey = "Essencial" | "Crescimento" | "Consolidação" | "Performance" | "Corporate";
+
+const NR1_MODULE_PREFIX = "NR1:";
 
 const PLANS: Array<{
-  key: PlanKey;
-  price: number;
+  key: CorePlanKey;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   selectedClass: string;
   iconWrap: string;
 }> = [
-  { key: "Starter", price: 299, description: "Ideal para pequenas empresas", icon: Rocket,
+  { key: "Starter", description: "Entrada para estruturar remuneração e desempenho", icon: Rocket,
     selectedClass: "border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20",
     iconWrap: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
-  { key: "Pro", price: 899, description: "Para empresas em crescimento", icon: TrendingUp,
+  { key: "Medium", description: "Para empresas em crescimento e maior controle", icon: BarChart3,
     selectedClass: "border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
     iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
-  { key: "Enterprise", price: 1900, description: "Para grandes empresas", icon: Crown,
+  { key: "Pro", description: "Gestão avançada com recursos estratégicos", icon: TrendingUp,
+    selectedClass: "border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
+    iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
+  { key: "Enterprise", description: "Para grandes empresas e estruturas complexas", icon: Crown,
     selectedClass: "border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/50 dark:bg-purple-950/20",
     iconWrap: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
 ];
 
-const MODULE_PRICES: Record<ModuleKey, Record<PlanKey, number>> = {
-  Core: { Starter: 199, Pro: 349, Enterprise: 499 },
-  Insight: { Starter: 149, Pro: 249, Enterprise: 299 },
-  Match: { Starter: 99, Pro: 149, Enterprise: 199 },
-};
-
-const MODULES: Array<{
-  key: ModuleKey;
+const NR1_PLANS: Array<{
+  key: Nr1PlanKey;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   selectedClass: string;
   iconWrap: string;
 }> = [
-  { key: "Core", description: "Gestão interna de remuneração, estrutura de cargos e desempenho", icon: Cog,
+  { key: "Essencial", description: "Base NR-1 para diagnóstico e plano de ação", icon: ShieldCheck,
     selectedClass: "border-emerald-500 ring-2 ring-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/20",
     iconWrap: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" },
-  { key: "Insight", description: "Inteligência salarial e comparação com o mercado", icon: BarChart3,
+  { key: "Crescimento", description: "Para ampliar acompanhamento e ações preventivas", icon: TrendingUp,
     selectedClass: "border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/50 dark:bg-blue-950/20",
     iconWrap: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300" },
-  { key: "Match", description: "Descrição de cargos e job matching inteligente", icon: Target,
+  { key: "Consolidação", description: "Para consolidar rotinas de saúde e bem-estar", icon: Cog,
     selectedClass: "border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/50 dark:bg-amber-950/20",
     iconWrap: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" },
+  { key: "Performance", description: "Para gestão avançada e indicadores preventivos", icon: Target,
+    selectedClass: "border-rose-500 ring-2 ring-rose-500/20 bg-rose-50/50 dark:bg-rose-950/20",
+    iconWrap: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300" },
+  { key: "Corporate", description: "Para estruturas corporativas e múltiplas unidades", icon: Crown,
+    selectedClass: "border-purple-500 ring-2 ring-purple-500/20 bg-purple-50/50 dark:bg-purple-950/20",
+    iconWrap: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" },
 ];
-
-const formatBRL = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 interface ExistingStats {
   hasCompany: boolean;
@@ -112,8 +112,9 @@ interface EntityData {
   base_date: string;
   logo_url: string;
   industry_sector: string;
-  selected_plan: PlanKey | "";
-  selected_modules: ModuleKey[];
+  selected_plan: CorePlanKey | "";
+  selected_nr1_plan: Nr1PlanKey | "";
+  selected_modules: string[];
   risk_grade: string;
   unit_role: "matriz" | "filial" | "";
   nr1_addon_enabled: boolean;
@@ -194,6 +195,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
     logo_url: "",
     industry_sector: "",
     selected_plan: "",
+    selected_nr1_plan: "",
     selected_modules: [],
     risk_grade: "",
     unit_role: "",
@@ -246,12 +248,17 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         cnpjValue = billing?.cnpj || "";
 
         const rawModules = (data as any).selected_modules;
-        const modules: ModuleKey[] = Array.isArray(rawModules)
-          ? (rawModules as string[]).filter((m): m is ModuleKey => m === "Core" || m === "Insight" || m === "Match")
-          : [];
+        const modules = Array.isArray(rawModules) ? (rawModules as string[]) : [];
+        const rawNr1Plan = modules
+          .find((m) => m.startsWith(NR1_MODULE_PREFIX))
+          ?.replace(NR1_MODULE_PREFIX, "");
+        const nr1Plan: Nr1PlanKey | "" =
+          rawNr1Plan === "Essencial" || rawNr1Plan === "Crescimento" || rawNr1Plan === "Consolidação" || rawNr1Plan === "Performance" || rawNr1Plan === "Corporate"
+            ? rawNr1Plan
+            : "";
         const rawPlan = (data as any).selected_plan;
-        const plan: PlanKey | "" =
-          rawPlan === "Starter" || rawPlan === "Pro" || rawPlan === "Enterprise" ? rawPlan : "";
+        const plan: CorePlanKey | "" =
+          rawPlan === "Starter" || rawPlan === "Medium" || rawPlan === "Pro" || rawPlan === "Enterprise" ? rawPlan : "";
 
         setFormData({
           name: data.name || "",
@@ -267,6 +274,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
           logo_url: data.logo_url || "",
           industry_sector: data.industry_sector || "",
           selected_plan: plan,
+          selected_nr1_plan: nr1Plan,
           selected_modules: modules,
           risk_grade: (data as any).risk_grade != null ? String((data as any).risk_grade) : "",
           unit_role: ((data as any).unit_role === "matriz" || (data as any).unit_role === "filial")
@@ -375,6 +383,7 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       logo_url: "",
       industry_sector: "",
       selected_plan: "",
+      selected_nr1_plan: "",
       selected_modules: [],
       risk_grade: "",
       unit_role: "",
@@ -447,12 +456,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       }
 
       if (formData.type === 'company') {
-        if (!formData.selected_plan) {
-          toast.error("Selecione um plano para continuar");
-          return;
-        }
-        if (formData.selected_modules.length === 0) {
-          toast.error("Selecione pelo menos um módulo para continuar");
+        if (!formData.selected_plan && !formData.selected_nr1_plan) {
+          toast.error("Selecione pelo menos um plano para continuar");
           return;
         }
       }
@@ -484,16 +489,9 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
       const isCompanyType = ['company', 'headquarters', 'branch'].includes(formData.type);
       
       const isCompany = formData.type === 'company';
-      const planPrice = isCompany && formData.selected_plan
-        ? PLANS.find(p => p.key === formData.selected_plan)?.price ?? 0
-        : 0;
-      const modulesPrice = isCompany && formData.selected_plan
-        ? formData.selected_modules.reduce(
-            (sum, m) => sum + (MODULE_PRICES[m][formData.selected_plan as PlanKey] ?? 0),
-            0,
-          )
-        : 0;
-      const totalPrice = planPrice + modulesPrice;
+      const selectedModulesToSave = isCompany && formData.selected_nr1_plan
+        ? [`${NR1_MODULE_PREFIX}${formData.selected_nr1_plan}`]
+        : [];
 
       const dataToSave = {
         name: formData.name,
@@ -508,8 +506,8 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
         logo_url: formData.type === 'company' ? (formData.logo_url || null) : null,
         industry_sector: formData.type === 'company' ? (formData.industry_sector || null) : null,
         selected_plan: isCompany ? formData.selected_plan || null : null,
-        selected_modules: isCompany ? formData.selected_modules : [],
-        total_price: isCompany ? totalPrice : null,
+        selected_modules: isCompany ? selectedModulesToSave : [],
+        total_price: null,
         risk_grade: isCompany && formData.risk_grade ? parseInt(formData.risk_grade, 10) : null,
         unit_role: isCompany ? (formData.unit_role || null) : null,
         nr1_addon_enabled: isCompany ? !!formData.nr1_addon_enabled : false,
@@ -911,15 +909,15 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
                     </p>
                   </div>
 
-                  {/* Planos */}
+                  {/* Plano Gestão Estratégica */}
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">
-                      Plano <span className="text-destructive">*</span>
+                      Plano Gestão Estratégica Remuneração e Avaliação de Desempenho
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Selecione o plano base para esta empresa
+                      Selecione a modalidade contratada para remuneração e desempenho. Os valores não aparecem nesta tela.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                       {PLANS.map((p) => {
                         const Icon = p.icon;
                         const isSel = formData.selected_plan === p.key;
@@ -941,84 +939,49 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
                             </div>
                             <div className="font-semibold text-sm">{p.key}</div>
                             <div className="text-xs text-muted-foreground mt-0.5">{p.description}</div>
-                            <div className="text-sm font-semibold mt-1">
-                              {formatBRL(p.price)}<span className="text-xs font-normal text-muted-foreground">/mês</span>
-                            </div>
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Módulos */}
+                  {/* Plano NR-1 */}
                   <div className="space-y-2">
                     <Label className="text-sm font-semibold">
-                      Módulos/Serviços <span className="text-destructive">*</span>
+                      Plano NR1
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Selecione os módulos que esta empresa terá acesso
+                      Selecione a modalidade contratada para NR-1. Os opcionais abaixo continuam sendo liberados por flag.
                     </p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {MODULES.map((m) => {
-                        const Icon = m.icon;
-                        const isSel = formData.selected_modules.includes(m.key);
-                        const addPrice = formData.selected_plan
-                          ? MODULE_PRICES[m.key][formData.selected_plan as PlanKey]
-                          : null;
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {NR1_PLANS.map((p) => {
+                        const Icon = p.icon;
+                        const isSel = formData.selected_nr1_plan === p.key;
                         return (
                           <button
                             type="button"
-                            key={m.key}
-                            onClick={() => {
-                              const next = isSel
-                                ? formData.selected_modules.filter((x) => x !== m.key)
-                                : [...formData.selected_modules, m.key];
-                              setFormData({ ...formData, selected_modules: next });
-                            }}
+                            key={p.key}
+                            onClick={() => setFormData({ ...formData, selected_nr1_plan: isSel ? "" : p.key })}
                             aria-pressed={isSel}
-                            className={`relative text-left rounded-lg border-2 p-4 min-h-[130px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                              isSel ? m.selectedClass : "border-border bg-card hover:border-primary/40"
+                            className={`relative text-left rounded-lg border-2 p-4 min-h-[110px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                              isSel ? p.selectedClass : "border-border bg-card hover:border-primary/40"
                             }`}
                           >
-                            <div className="absolute top-3 right-3">
-                              <Checkbox checked={isSel} className="pointer-events-none" />
+                            <div className="absolute top-3 right-3 h-4 w-4 rounded-full border-2 border-muted-foreground/40 flex items-center justify-center">
+                              {isSel && <div className="h-2 w-2 rounded-full bg-primary" />}
                             </div>
-                            <div className={`inline-flex p-2 rounded-md ${m.iconWrap} mb-2`}>
+                            <div className={`inline-flex p-2 rounded-md ${p.iconWrap} mb-2`}>
                               <Icon className="w-4 h-4" />
                             </div>
-                            <div className="font-semibold text-sm">{m.key}</div>
+                            <div className="font-semibold text-sm">{p.key}</div>
                             <p className="text-xs text-muted-foreground mt-1 leading-snug">
-                              {m.description}
+                              {p.description}
                             </p>
-                            <div className="text-sm font-semibold mt-2">
-                              {addPrice !== null ? (
-                                <>+{formatBRL(addPrice)}<span className="text-xs font-normal text-muted-foreground">/mês</span></>
-                              ) : (
-                                <span className="text-xs font-normal text-muted-foreground">Selecione um plano</span>
-                              )}
-                            </div>
                           </button>
                         );
                       })}
                     </div>
                   </div>
-
-                  {/* Resumo */}
-                  {formData.selected_plan && formData.selected_modules.length > 0 && (() => {
-                    const planPrice = PLANS.find((p) => p.key === formData.selected_plan)?.price ?? 0;
-                    const modulesPrice = formData.selected_modules.reduce(
-                      (s, mod) => s + MODULE_PRICES[mod][formData.selected_plan as PlanKey],
-                      0,
-                    );
-                    const total = planPrice + modulesPrice;
-                    return (
-                      <div className="bg-muted/50 border rounded-md p-3 text-sm">
-                        <span className="font-medium">Resumo:</span>{" "}
-                        {formData.selected_plan} + {formData.selected_modules.join(" + ")} ={" "}
-                        <span className="font-semibold">{formatBRL(total)}/mês</span>
-                      </div>
-                    );
-                  })()}
 
                   {/* Add-ons opcionais */}
                   <div className="space-y-2 pt-2 border-t">
