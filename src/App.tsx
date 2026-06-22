@@ -11,6 +11,7 @@ import { DashboardLayout } from "./components/DashboardLayout";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import { Skeleton } from "./components/ui/skeleton";
 import { TelemetryTracker } from "./components/TelemetryTracker";
+import { ViewAsClientToggle } from "./components/ViewAsClientToggle";
 import { PlanGate } from "./components/PlanGate";
 
 // Eager — critical entry points
@@ -179,6 +180,7 @@ const App = () => {
               <ErrorBoundary>
                 <BrowserRouter>
                   <TelemetryTracker />
+                  <ViewAsClientToggle />
                   <Suspense fallback={<RouteFallback />}>
                     <Routes>
                       <Route path="/" element={<Index />} />
