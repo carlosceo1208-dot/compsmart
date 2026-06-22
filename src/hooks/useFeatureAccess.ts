@@ -309,8 +309,11 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   };
 
   const hasAccess = (feature: string): boolean => {
-    // ADMIN OVERRIDE: Admins and Super Admins always have access to all features
-    if (isAdminOrSuperAdmin) {
+    // "Ver como cliente" mode: super admin pode simular acesso de cliente real
+    const viewAsClient = typeof window !== 'undefined' && localStorage.getItem('viewAsClient') === 'true';
+
+    // ADMIN OVERRIDE: Admins and Super Admins always have access — exceto em modo "ver como cliente"
+    if (isAdminOrSuperAdmin && !viewAsClient) {
       return true;
     }
 
