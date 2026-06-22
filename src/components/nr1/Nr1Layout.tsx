@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, BookOpen } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, BookOpen, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,9 +10,11 @@ import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
 import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { toast } from 'sonner';
 import manualNr1Asset from '@/assets/manual-nr1-compsmart.pdf.asset.json';
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string }; resource?: { url: string; icon: any; label: string } };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string }; resource?: { url: string; icon: any; label: string }; feature?: string };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
@@ -39,32 +41,32 @@ const GROUPS: NavGroup[] = [
     title: 'Clima Organizacional',
     tone: 'clima',
     items: [
-      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, feature: 'clima_organizacional', desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
     ],
   },
   {
     title: 'Cruzamento Riscos Psicossociais',
     tone: 'cruzamento',
     items: [
-      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
-      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
-      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
-      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, feature: 'nr1_clima_correlacao', desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, feature: 'nr1_clima_correlacao', desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, feature: 'nr1_clima_correlacao', desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, feature: 'nr1_clima_correlacao', desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
     ],
   },
   {
     title: 'Índice de Felicidade',
     tone: 'fib',
     items: [
-      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
+      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, feature: 'nr1_fib', desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
     ],
   },
   {
     title: 'Acompanhamento Colaborador',
     tone: 'jornada',
     items: [
-      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
-      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, feature: 'nr1_acompanhamento', desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, feature: 'nr1_acompanhamento', desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
     ],
   },
   {
@@ -106,6 +108,7 @@ export const Nr1Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { data: isSuper } = useIsSuperAdmin();
+  const { hasAccess } = useFeatureAccess();
   const navRef = useRef<HTMLDivElement | null>(null);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
   const [importMatrizOpen, setImportMatrizOpen] = useState(false);
@@ -180,14 +183,17 @@ export const Nr1Layout = () => {
                   <div className={cn('grid gap-2', innerCols)}>
                     {group.items.map((item) => {
                       const Icon = item.icon;
-                      const active = item.to
+                      const locked = !!item.feature && !hasAccess(item.feature);
+                      const active = !locked && item.to
                         ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
                         : false;
                       const isTerceiros = item.action === 'open-terceiros';
                       const isImportMatriz = item.action === 'open-import-matriz';
                       const baseClass = cn(
-                        'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px]',
-                        active
+                        'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px] relative',
+                        locked
+                          ? 'opacity-60 cursor-not-allowed border-dashed border-muted-foreground/40 text-muted-foreground hover:border-muted-foreground/60 bg-muted/30'
+                          : active
                           ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
                           : isTerceiros
                           ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-sm'
@@ -197,14 +203,36 @@ export const Nr1Layout = () => {
                           ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
                           : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                       );
-                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
+                      const iconClass = cn('h-4 w-4 shrink-0', locked ? 'text-muted-foreground/60' : active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
                       const inner = (
                         <>
+                          {locked && (
+                            <span className="absolute top-1 right-1 bg-background border border-border rounded-full p-0.5 shadow-sm">
+                              <Lock className="h-2.5 w-2.5 text-muted-foreground" />
+                            </span>
+                          )}
                           <Icon className={iconClass} />
                           <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                         </>
                       );
-                      const node = !item.to ? (
+                      const handleLockedClick = (e: React.MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toast.info('Serviço não contratado', {
+                          description: 'Este módulo opcional não está liberado para sua empresa. Entre em contato com a CompSmart para contratar.',
+                        });
+                      };
+                      const node = locked ? (
+                        <button
+                          key={item.to ?? item.label}
+                          type="button"
+                          onClick={handleLockedClick}
+                          aria-disabled
+                          className={cn(baseClass, 'w-full')}
+                        >
+                          {inner}
+                        </button>
+                      ) : !item.to ? (
                         <button
                           key={item.label}
                           type="button"
