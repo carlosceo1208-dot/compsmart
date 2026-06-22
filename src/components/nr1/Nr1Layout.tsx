@@ -183,14 +183,17 @@ export const Nr1Layout = () => {
                   <div className={cn('grid gap-2', innerCols)}>
                     {group.items.map((item) => {
                       const Icon = item.icon;
-                      const active = item.to
+                      const locked = !!item.feature && !hasAccess(item.feature);
+                      const active = !locked && item.to
                         ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
                         : false;
                       const isTerceiros = item.action === 'open-terceiros';
                       const isImportMatriz = item.action === 'open-import-matriz';
                       const baseClass = cn(
-                        'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px]',
-                        active
+                        'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px] relative',
+                        locked
+                          ? 'opacity-60 cursor-not-allowed border-dashed border-muted-foreground/40 text-muted-foreground hover:border-muted-foreground/60 bg-muted/30'
+                          : active
                           ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
                           : isTerceiros
                           ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-sm'
@@ -200,14 +203,36 @@ export const Nr1Layout = () => {
                           ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
                           : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
                       );
-                      const iconClass = cn('h-4 w-4 shrink-0', active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
+                      const iconClass = cn('h-4 w-4 shrink-0', locked ? 'text-muted-foreground/60' : active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
                       const inner = (
                         <>
+                          {locked && (
+                            <span className="absolute top-1 right-1 bg-background border border-border rounded-full p-0.5 shadow-sm">
+                              <Lock className="h-2.5 w-2.5 text-muted-foreground" />
+                            </span>
+                          )}
                           <Icon className={iconClass} />
                           <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
                         </>
                       );
-                      const node = !item.to ? (
+                      const handleLockedClick = (e: React.MouseEvent) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        toast.info('Serviço não contratado', {
+                          description: 'Este módulo opcional não está liberado para sua empresa. Entre em contato com a CompSmart para contratar.',
+                        });
+                      };
+                      const node = locked ? (
+                        <button
+                          key={item.to ?? item.label}
+                          type="button"
+                          onClick={handleLockedClick}
+                          aria-disabled
+                          className={cn(baseClass, 'w-full')}
+                        >
+                          {inner}
+                        </button>
+                      ) : !item.to ? (
                         <button
                           key={item.label}
                           type="button"
