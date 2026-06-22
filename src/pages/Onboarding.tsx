@@ -44,6 +44,7 @@ const Onboarding = () => {
     logo_url: null,
     createInitialStructure: false,
     subscription_plan_id: null,
+    nr1_subscription_plan_id: null,
     billing_cycle: 'monthly',
     selected_modules: [],
     nr1_addon_enabled: false,
@@ -52,6 +53,7 @@ const Onboarding = () => {
     psicossociais_addon_enabled: false,
     checkup_addon_enabled: false,
   });
+
 
   useEffect(() => {
     checkIfNeedsOnboarding();
