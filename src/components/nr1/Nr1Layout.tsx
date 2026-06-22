@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, BookOpen, Lock } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,7 +12,7 @@ import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialo
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { toast } from 'sonner';
-import manualNr1Asset from '@/assets/manual-nr1-compsmart.pdf.asset.json';
+
 
 type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string }; resource?: { url: string; icon: any; label: string }; feature?: string };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
