@@ -291,33 +291,46 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     fetchCompanySubscription();
   }, []);
 
+  // Features do NR-1 base (incluídas com pagamento do módulo NR-1 OU plano Pro/Enterprise pago)
+  const NR1_BASE_FEATURES = new Set([
+    'nr1_essencial', 'nr1_clima', 'nr1_planos_acao',
+    'nr1_diagnosticos', 'nr1_biblioteca',
+    'nr1_pro', 'nr1_inteligencia', 'nr1_bem_estar_agent',
+    'nr1_jornada_agent', 'nr1_terceiros',
+  ]);
+
+  // Add-ons OPCIONAIS — SEMPRE exigem flag do Super Admin (não liberados por trial nem por plano)
+  // Cliente vê o menu (cross-sell), mas acessa só após negociação com a CompSmart.
+  const OPTIONAL_ADDON_FEATURES: Record<string, boolean> = {
+    clima_organizacional: climaAddonEnabled,
+    nr1_fib: fibAddonEnabled,
+    nr1_clima_correlacao: psicossociaisAddonEnabled, // Cruzamento de Riscos Psicossociais
+    nr1_acompanhamento: checkupAddonEnabled,         // Check-up de Colaborador
+  };
+
   const hasAccess = (feature: string): boolean => {
     // ADMIN OVERRIDE: Admins and Super Admins always have access to all features
     if (isAdminOrSuperAdmin) {
       return true;
     }
 
-    // NR-1 add-on: libera os recursos do NR-1 Essencial em qualquer plano contratado
-    if (nr1AddonEnabled && (
-      feature === 'nr1_essencial' ||
-      feature === 'nr1_clima' ||
-      feature === 'nr1_planos_acao' ||
-      feature === 'nr1_diagnosticos' ||
-      feature === 'nr1_biblioteca' ||
-      feature === 'clima_organizacional' ||
-      feature === 'nr1_fib' ||
-      feature === 'nr1_acompanhamento'
-    )) {
-      return true;
+    // Add-ons opcionais: SEMPRE exigem flag (sem bypass por trial ou plano)
+    if (feature in OPTIONAL_ADDON_FEATURES) {
+      return OPTIONAL_ADDON_FEATURES[feature];
     }
 
-    // Add-ons opcionais individuais
-    if (climaAddonEnabled && feature === 'clima_organizacional') return true;
-    if (fibAddonEnabled && feature === 'nr1_fib') return true;
-    if (psicossociaisAddonEnabled && feature === 'nr1_clima_correlacao') return true;
-    if (checkupAddonEnabled && feature === 'nr1_acompanhamento') return true;
+    // NR-1 base: só libera com pagamento do NR-1 OU plano Pro/Enterprise ATIVO (não trial)
+    if (NR1_BASE_FEATURES.has(feature)) {
+      if (nr1AddonEnabled) return true;
+      if (status === 'active' && (plan === 'pro' || plan === 'enterprise')) {
+        return featureMap[feature]?.includes(plan) ?? false;
+      }
+      return false; // Trial do Core NÃO libera NR-1
+    }
 
-    // During trial, grant Pro-level access
+    // === Daqui pra baixo: features do Core (Remuneração + Desempenho) ===
+
+    // During trial, grant Pro-level access (apenas para Core)
     if (status === 'trial' && daysLeftInTrial && daysLeftInTrial > 0) {
       const trialPlan: PlanType = 'pro';
       return featureMap[feature]?.includes(trialPlan) ?? true;
@@ -326,6 +339,11 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     // Expired/canceled = starter only
     if (status === 'expired' || status === 'canceled') {
       return featureMap[feature]?.includes('starter') ?? true;
+    }
+
+    // Cliente que pagou só NR-1 (plan = nr1_essencial) NÃO acessa Core
+    if (plan === 'nr1_essencial') {
+      return false;
     }
 
     return featureMap[feature]?.includes(plan) ?? true;
