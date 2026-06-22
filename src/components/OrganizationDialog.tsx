@@ -911,39 +911,61 @@ export function OrganizationDialog({ open, onOpenChange, entityId, onSuccess, ex
 
                   {/* Plano Gestão Estratégica */}
                   <div className="space-y-2">
-                    <Label className="text-sm font-semibold">
-                      Plano Gestão Estratégica Remuneração e Avaliação de Desempenho
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      Selecione a modalidade contratada para remuneração e desempenho. Os valores não aparecem nesta tela.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                      {PLANS.map((p) => {
-                        const Icon = p.icon;
-                        const isSel = formData.selected_plan === p.key;
-                        return (
-                          <button
-                            type="button"
-                            key={p.key}
-                            onClick={() => setFormData({ ...formData, selected_plan: p.key })}
-                            aria-pressed={isSel}
-                            className={`relative text-left rounded-lg border-2 p-4 min-h-[110px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                              isSel ? p.selectedClass : "border-border bg-card hover:border-primary/40"
-                            }`}
-                          >
-                            <div className="absolute top-3 right-3 h-4 w-4 rounded-full border-2 border-muted-foreground/40 flex items-center justify-center">
-                              {isSel && <div className="h-2 w-2 rounded-full bg-primary" />}
-                            </div>
-                            <div className={`inline-flex p-2 rounded-md ${p.iconWrap} mb-2`}>
-                              <Icon className="w-4 h-4" />
-                            </div>
-                            <div className="font-semibold text-sm">{p.key}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">{p.description}</div>
-                          </button>
-                        );
-                      })}
+                    <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2">
+                      <div className="min-w-0">
+                        <Label className="text-sm font-semibold">
+                          Plano Gestão Estratégica Remuneração e Avaliação de Desempenho
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Ative para contratar este módulo. Quando desativado, aparece bloqueado (cadeado) para o cliente.
+                        </p>
+                      </div>
+                      <Switch
+                        checked={!!formData.selected_plan}
+                        onCheckedChange={(on) =>
+                          setFormData({
+                            ...formData,
+                            selected_plan: on ? (formData.selected_plan || "Starter") : "",
+                          })
+                        }
+                        aria-label="Ativar Plano Gestão Estratégica"
+                      />
                     </div>
+                    {formData.selected_plan && (
+                      <>
+                        <p className="text-xs text-muted-foreground">
+                          Selecione a modalidade contratada para remuneração e desempenho. Os valores não aparecem nesta tela.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                          {PLANS.map((p) => {
+                            const Icon = p.icon;
+                            const isSel = formData.selected_plan === p.key;
+                            return (
+                              <button
+                                type="button"
+                                key={p.key}
+                                onClick={() => setFormData({ ...formData, selected_plan: p.key })}
+                                aria-pressed={isSel}
+                                className={`relative text-left rounded-lg border-2 p-4 min-h-[110px] transition-all duration-200 ease-in-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                                  isSel ? p.selectedClass : "border-border bg-card hover:border-primary/40"
+                                }`}
+                              >
+                                <div className="absolute top-3 right-3 h-4 w-4 rounded-full border-2 border-muted-foreground/40 flex items-center justify-center">
+                                  {isSel && <div className="h-2 w-2 rounded-full bg-primary" />}
+                                </div>
+                                <div className={`inline-flex p-2 rounded-md ${p.iconWrap} mb-2`}>
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <div className="font-semibold text-sm">{p.key}</div>
+                                <div className="text-xs text-muted-foreground mt-0.5">{p.description}</div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
                   </div>
+
 
                   {/* Plano NR-1 */}
                   <div className="space-y-2">
