@@ -21,6 +21,7 @@ interface OnboardingData {
   headquartersName?: string;
   headquartersCode?: string;
   subscription_plan_id: string | null;
+  nr1_subscription_plan_id?: string | null;
   billing_cycle: 'monthly' | 'annual';
   selected_modules: string[];
   nr1_addon_enabled?: boolean;
@@ -29,6 +30,7 @@ interface OnboardingData {
   psicossociais_addon_enabled?: boolean;
   checkup_addon_enabled?: boolean;
 }
+
 
 const Onboarding = () => {
   const navigate = useNavigate();
