@@ -16,6 +16,7 @@ import { FAQSection } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
+import { VideoSection } from "@/components/landing/VideoSection";
 
 
 /**
@@ -62,9 +63,8 @@ const Index = () => {
       {/* 1. Hero / Headlines + destaque NR-1 */}
       <HeroSection />
 
-
-
-
+      {/* 1.1 Vídeo institucional compacto */}
+      <VideoSection />
 
       {/* 2. Prova social imediata */}
       <LogoSlider />
