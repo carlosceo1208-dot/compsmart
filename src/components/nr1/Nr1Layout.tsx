@@ -41,32 +41,32 @@ const GROUPS: NavGroup[] = [
     title: 'Clima Organizacional',
     tone: 'clima',
     items: [
-      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, feature: 'clima_organizacional', desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
     ],
   },
   {
     title: 'Cruzamento Riscos Psicossociais',
     tone: 'cruzamento',
     items: [
-      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
-      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
-      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
-      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, feature: 'nr1_clima_correlacao', desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, feature: 'nr1_clima_correlacao', desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, feature: 'nr1_clima_correlacao', desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, feature: 'nr1_clima_correlacao', desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
     ],
   },
   {
     title: 'Índice de Felicidade',
     tone: 'fib',
     items: [
-      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
+      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, feature: 'nr1_fib', desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
     ],
   },
   {
     title: 'Acompanhamento Colaborador',
     tone: 'jornada',
     items: [
-      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
-      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, feature: 'nr1_acompanhamento', desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, feature: 'nr1_acompanhamento', desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
     ],
   },
   {
