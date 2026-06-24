@@ -48,8 +48,14 @@ export default function Nr1BemEstarAgente() {
 
     try {
       // Recupera token de autenticação do Supabase
-      const sessionStr = localStorage.getItem('sb-fpkjkqdfufhhicxkyqdw-auth-token');
-      const token = sessionStr ? JSON.parse(sessionStr)?.access_token : import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Sessão expirada. Faça login novamente.');
+        setLoading(false);
+        return;
+      }
+      const token = session.access_token;
+
 
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
