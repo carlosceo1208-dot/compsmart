@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Button } from "@/components/ui/button";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { useAuthCTA } from "@/hooks/useAuthCTA";
@@ -8,6 +9,25 @@ const AboutUs = () => {
   const { ctaTo, ctaLabel } = useAuthCTA();
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Sobre Nós — CompSmart | Remuneração Estratégica + NR-1</title>
+        <meta name="description" content="Conheça a CompSmart: plataforma brasileira criada por executivos de RH para tornar a gestão de remuneração, desempenho e NR-1 simples, auditável e orientada por dados." />
+        <link rel="canonical" href="https://www.compsmart.ia.br/sobre-nos" />
+        <meta property="og:title" content="Sobre Nós — CompSmart" />
+        <meta property="og:description" content="Quem somos, nossa experiência executiva em RH e a visão por trás da plataforma CompSmart." />
+        <meta property="og:url" content="https://www.compsmart.ia.br/sobre-nos" />
+        <meta name="twitter:title" content="Sobre Nós — CompSmart" />
+        <meta name="twitter:description" content="A história e a equipe por trás da plataforma CompSmart de remuneração estratégica." />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'AboutPage',
+            name: 'Sobre a CompSmart',
+            url: 'https://www.compsmart.ia.br/sobre-nos',
+            about: { '@type': 'Organization', name: 'CompSmart', url: 'https://www.compsmart.ia.br' },
+          })}
+        </script>
+      </Helmet>
       {/* Header */}
       <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
