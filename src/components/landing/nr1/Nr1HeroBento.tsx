@@ -58,9 +58,9 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
                 <div className="w-12 h-12 bg-[#22C55E]/10 rounded-2xl flex items-center justify-center mb-5">
                   <BarChart3 className="w-6 h-6 text-[#22C55E]" />
                 </div>
-                <h3 className="font-bold text-xl md:text-2xl mb-2">
+                <h2 className="font-bold text-xl md:text-2xl mb-2">
                   Mapa de Risco Psicossocial
-                </h3>
+                </h2>
                 <p className="text-[#1E2761]/60 mb-5 text-sm md:text-base">
                   Aplicação automatizada do <strong>COPSOQ-III</strong> com 6 dimensões e mais
                   de 13 fatores críticos mapeados — gerando o relatório oficial exigido pela
@@ -86,9 +86,9 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
                 <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-3">
                   <ClipboardCheck className="w-5 h-5 text-[#22C55E]" />
                 </div>
-                <h3 className="font-bold text-lg md:text-xl mb-1">
+                <h2 className="font-bold text-lg md:text-xl mb-1">
                   Plano de Ação NR-1 & PGR
-                </h3>
+                </h2>
                 <p className="text-white/70 text-sm">
                   Geração automática de cronograma, responsáveis e priorização de riscos —
                   integrado ao PGR.
