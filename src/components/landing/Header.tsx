@@ -63,7 +63,7 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
           <div className="flex items-center gap-3">
             <img 
               src={compsmartLogo} 
-              alt="CompSmart" 
+              alt="CompSmart — Plataforma de Gestão de Remuneração" 
               className="h-20 md:h-24 w-auto object-contain hover:scale-105 transition-transform cursor-pointer" 
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             />
@@ -171,6 +171,8 @@ export const Header = ({ isLoggedIn = false }: HeaderProps) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+            aria-expanded={isMenuOpen}
             className="md:hidden p-2.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
           >
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

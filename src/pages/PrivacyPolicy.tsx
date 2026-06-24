@@ -1,11 +1,20 @@
 import { ArrowLeft, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import compsmartLogo from "@/assets/compsmart-logo.png";
 import { Footer } from "@/components/landing/Footer";
 
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Política de Privacidade — CompSmart</title>
+        <meta name="description" content="Como a CompSmart coleta, usa e protege seus dados pessoais em conformidade com a LGPD (Lei nº 13.709/2018). Direitos do titular e contato do DPO." />
+        <link rel="canonical" href="https://www.compsmart.ia.br/politica-de-privacidade" />
+        <meta property="og:title" content="Política de Privacidade — CompSmart" />
+        <meta property="og:description" content="Política LGPD da CompSmart: tratamento de dados, direitos do titular e segurança da informação." />
+        <meta property="og:url" content="https://www.compsmart.ia.br/politica-de-privacidade" />
+      </Helmet>
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">

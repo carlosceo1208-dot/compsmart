@@ -88,4 +88,29 @@
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/auth/mfa-required</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/checkout</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/checkout/success</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/checkout/processing</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/dashboard</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
 </urlset>

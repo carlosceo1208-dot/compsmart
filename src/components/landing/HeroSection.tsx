@@ -81,8 +81,8 @@ export const HeroSection = () => {
           {/* Left - Calculator */}
           <div className="space-y-6">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-foreground">
-              Quanto tempo sua empresa perde com{" "}
-              <span className="text-primary">planilhas de RH</span>?
+              CompSmart — Gestão Estratégica de{" "}
+              <span className="text-primary">Remuneração e Desempenho</span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground">
               Empresas líderes exigem mais que planilhas. Com a CompSmart, você e a inteligência artificial orquestram toda a gestão de <strong className="text-foreground">Cargos, Salários, Benefícios, Incentivos e Desempenho</strong>. Transforme sua remuneração em <strong className="text-primary">vantagem estratégica decisiva</strong>.
