@@ -2,49 +2,49 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.compsmart.ia.br/</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/nr1</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/landing-nr1</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/plano-de-cargos-e-salarios</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/pricing</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/sobre-nos</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/glossario</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/changelog</loc>
-    <lastmod>2026-05-26</lastmod>
+    <lastmod>2026-06-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.4</priority>
   </url>
@@ -52,6 +52,31 @@
     <loc>https://www.compsmart.ia.br/auth</loc>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/forgot-password</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/reset-password</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/activate</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/auth/mfa-verify</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.compsmart.ia.br/onboarding</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
   </url>
   <url>
     <loc>https://www.compsmart.ia.br/termos-de-uso</loc>
