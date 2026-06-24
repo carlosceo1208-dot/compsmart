@@ -10,8 +10,8 @@ const AboutUs = () => {
   return (
     <div className="min-h-screen bg-background">
       <Helmet>
-        <title>Sobre Nós — CompSmart | Remuneração Estratégica + NR-1</title>
-        <meta name="description" content="Conheça a CompSmart: plataforma brasileira criada por executivos de RH para tornar a gestão de remuneração, desempenho e NR-1 simples, auditável e orientada por dados." />
+        <title>Sobre Nós — CompSmart | Remuneração + NR-1</title>
+        <meta name="description" content="Conheça a CompSmart: plataforma criada por executivos de RH para gestão estratégica de remuneração, desempenho e NR-1 orientada por dados." />
         <link rel="canonical" href="https://www.compsmart.ia.br/sobre-nos" />
         <meta property="og:title" content="Sobre Nós — CompSmart" />
         <meta property="og:description" content="Quem somos, nossa experiência executiva em RH e a visão por trás da plataforma CompSmart." />
