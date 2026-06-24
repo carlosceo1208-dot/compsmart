@@ -227,13 +227,13 @@ const getEmailTemplate = (type: EmailType, data: Record<string, any>): { subject
                 <p>Sua assinatura será renovada automaticamente</p>
               </div>
               <div class="content">
-                <h2>Olá, ${data.userName}!</h2>
+                <h2>Olá, ${esc(data.userName)}!</h2>
                 <p>Estamos passando para avisar que sua assinatura do CompSmart será renovada em breve.</p>
                 
                 <div class="highlight-box">
-                  <p><strong>Plano:</strong> ${data.planName}</p>
-                  <p><strong>Valor:</strong> ${data.amount}</p>
-                  <p><strong>Data da Renovação:</strong> ${data.nextBillingDate}</p>
+                  <p><strong>Plano:</strong> ${esc(data.planName)}</p>
+                  <p><strong>Valor:</strong> ${esc(String(data.amount))}</p>
+                  <p><strong>Data da Renovação:</strong> ${esc(data.nextBillingDate)}</p>
                 </div>
                 
                 <p>Se você não deseja renovar, pode cancelar antes da data de renovação nas configurações da sua conta.</p>
