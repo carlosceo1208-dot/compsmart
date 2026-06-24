@@ -1,0 +1,21 @@
+# CompSmart
+
+> Plataforma brasileira de remuneração estratégica que integra NR-1 (riscos psicossociais), avaliação de desempenho (9Box, PDI, sucessão) e gestão salarial em um único sistema, com agentes de IA especializados.
+
+O CompSmart conecta dados de desempenho, salários, benefícios e incentivos para que RH, gestores e CFO tomem decisões coerentes de mérito, equidade e orçamento. O módulo NR-1 Inteligente apoia a conformidade com a Portaria MTE 1.419/2024 (fiscalização a partir de maio/2026), com COPSOQ-III, anonimato LGPD e plano de ação automatizado.
+
+## Pages
+
+- [Home](/): Visão geral da plataforma — remuneração + desempenho + NR-1.
+- [Planos e Preços](/pricing): Starter, Medium, Pro e Enterprise; add-on NR-1.
+- [Plano de Cargos e Salários](/plano-de-cargos-e-salarios): Como o CompSmart estrutura cargos, faixas e curvas salariais.
+- [NR-1 Inteligente](/nr1): Diagnóstico psicossocial, PGR, plano de ação e conformidade NR-1.
+- [Landing NR-1](/landing-nr1): Página de campanha do módulo NR-1.
+- [Sobre Nós](/sobre-nos): Quem somos, experiência da equipe e visão do produto.
+- [Glossário](/glossario): Termos de remuneração, desempenho e NR-1.
+- [Changelog](/changelog): Novidades e melhorias da plataforma.
+
+## Optional
+
+- [Termos de Uso](/termos-de-uso)
+- [Política de Privacidade](/politica-de-privacidade)

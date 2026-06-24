@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -84,6 +85,30 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen p-6">
+      <Helmet>
+        <title>Planos e Preços — CompSmart Remuneração + NR-1</title>
+        <meta name="description" content="Compare os planos Starter, Medium, Pro e Enterprise do CompSmart e o add-on NR-1. Remuneração estratégica, 9Box e conformidade NR-1 em um só lugar." />
+        <link rel="canonical" href="https://www.compsmart.ia.br/pricing" />
+        <meta property="og:title" content="Planos e Preços — CompSmart" />
+        <meta property="og:description" content="Starter, Medium, Pro e Enterprise + add-on NR-1. Escolha o plano ideal de remuneração estratégica para sua empresa." />
+        <meta property="og:url" content="https://www.compsmart.ia.br/pricing" />
+        <meta name="twitter:title" content="Planos e Preços — CompSmart" />
+        <meta name="twitter:description" content="Planos de remuneração estratégica com NR-1, 9Box e IA integrados." />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: 'CompSmart',
+            description: 'Plataforma SaaS de remuneração estratégica com NR-1, desempenho (9Box) e IA integrados.',
+            brand: { '@type': 'Brand', name: 'CompSmart' },
+            offers: [
+              { '@type': 'Offer', name: 'Starter', priceCurrency: 'BRL', price: '299', url: 'https://www.compsmart.ia.br/pricing' },
+              { '@type': 'Offer', name: 'Medium', priceCurrency: 'BRL', price: '899', url: 'https://www.compsmart.ia.br/pricing' },
+              { '@type': 'Offer', name: 'Pro', priceCurrency: 'BRL', price: '1900', url: 'https://www.compsmart.ia.br/pricing' },
+            ],
+          })}
+        </script>
+      </Helmet>
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">

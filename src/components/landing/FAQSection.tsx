@@ -2,6 +2,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { HelpCircle, Bot, Shield, Database, Upload, Zap, Calculator, CreditCard, Clock, Settings, TrendingUp, Bell } from "lucide-react";
 
+export const FAQ_ITEMS: { question: string; answer: string }[] = [
+  { question: "Como funciona a integração entre Remuneração e Desempenho?", answer: "O CompSmart foi construído como plataforma de Gestão Estratégica de Remuneração. A Avaliação de Desempenho — com 6 modelos, 9Box, PDI e Plano de Sucessão — alimenta nativamente as decisões de remuneração." },
+  { question: "Posso usar apenas Remuneração OU apenas Desempenho?", answer: "O foco principal do CompSmart é a Gestão Estratégica de Remuneração. A Avaliação de Desempenho complementa fornecendo dados que fundamentam decisões justas de mérito, sem custo adicional." },
+  { question: "Quanto custa o CompSmart e quais são os planos disponíveis?", answer: "4 planos: Starter (até 50 colaboradores) a partir de R$ 199/mês, Medium (até 200) a partir de R$ 499/mês, Pro (até 500) a partir de R$ 899/mês e Enterprise sob consulta." },
+  { question: "O que está incluso no período de teste grátis?", answer: "Teste grátis de 30 dias com acesso completo ao plano escolhido, sem restrições de funcionalidades e sem necessidade de cartão de crédito." },
+  { question: "Meus dados estão seguros com a IA?", answer: "Sim. Utilizamos criptografia AES-256, somos 100% LGPD compliant e seus dados nunca são usados para treinar modelos externos." },
+];
+
 export const FAQSection = () => {
   const faqs = [
     // INTEGRAÇÃO DESEMPENHO + REMUNERAÇÃO

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
@@ -12,7 +13,7 @@ import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
 import { SocialProofSection } from "@/components/landing/SocialProofSection";
 import { SecuritySection } from "@/components/landing/SecuritySection";
 import { PricingSection } from "@/components/landing/PricingSection";
-import { FAQSection } from "@/components/landing/FAQSection";
+import { FAQSection, FAQ_ITEMS } from "@/components/landing/FAQSection";
 import { CTASection } from "@/components/landing/CTASection";
 import { Footer } from "@/components/landing/Footer";
 import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
@@ -58,6 +59,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <link rel="canonical" href="https://www.compsmart.ia.br/" />
+        <meta property="og:url" content="https://www.compsmart.ia.br/" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: FAQ_ITEMS.map((f) => ({
+              '@type': 'Question',
+              name: f.question,
+              acceptedAnswer: { '@type': 'Answer', text: f.answer },
+            })),
+          })}
+        </script>
+      </Helmet>
       <Header isLoggedIn={isLoggedIn} />
 
       {/* 1. Hero / Headlines + destaque NR-1 */}
