@@ -89,7 +89,7 @@ describe("ChartTooltipContent", () => {
     render(
       <ChartContainer config={config}>
         <BarChart data={data}>
-          <ChartTooltipContent {...props} />
+          <ChartTooltipContent {...(props as React.ComponentProps<typeof ChartTooltipContent>)} />
           <Bar dataKey="revenue" />
         </BarChart>
       </ChartContainer>,
