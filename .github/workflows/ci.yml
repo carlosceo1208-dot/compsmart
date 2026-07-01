@@ -1,5 +1,9 @@
 name: CI
 
+# Runs on every pull request targeting main and every push to main.
+# To enforce as a required status check before merge, add the job name
+# "Lint, typecheck, test, dead-code & build" to Branch Protection rules
+# for `main` in GitHub → Settings → Branches → Branch protection rules.
 on:
   push:
     branches: [main]
@@ -12,7 +16,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint, typecheck, dead-code & build
+    name: Lint, typecheck, test, dead-code & build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,6 +25,31 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
+
+      # Cache Bun's global install cache, keyed on the lockfile so results
+      # stay deterministic. A lockfile change busts the cache automatically.
+      - name: Cache Bun install
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      # Cache Vite + tsgo intermediate outputs to speed up build/typecheck.
+      # Keyed by source tree hash so any code change produces a fresh build.
+      - name: Cache build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/.vite
+            node_modules/.cache
+            .tsbuildinfo
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**/*.{ts,tsx}', 'tsconfig*.json', 'vite.config.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -32,6 +61,10 @@ jobs:
       # Catches TypeScript regressions (e.g. recharts label typing)
       - name: TypeScript typecheck
         run: bunx tsgo --noEmit -p tsconfig.app.json
+
+      # Unit tests (Vitest + React Testing Library) — includes chart regressions
+      - name: Unit tests
+        run: bun run test
 
       # Fails on unused files, exports, types or dependencies
       - name: Dead-code scan (knip)
