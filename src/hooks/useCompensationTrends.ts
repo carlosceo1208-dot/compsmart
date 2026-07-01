@@ -77,12 +77,18 @@ const isRateLimit = (err: unknown): boolean => {
   return msg.includes("429") || msg.includes("rate limit");
 };
 
-const fetchTrends = async (): Promise<CompensationTrendsResult> => {
+const fetchTrends = async (
+  cacheKey: string,
+  params?: Record<string, unknown>
+): Promise<CompensationTrendsResult> => {
   let lastError: unknown = null;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const { data, error } = await supabase.functions.invoke<TrendsResponse>("compensation-trends");
+      const { data, error } = await supabase.functions.invoke<TrendsResponse>(
+        "compensation-trends",
+        params ? { body: params } : undefined
+      );
       if (error) throw error;
       if (data?.error && !data?.trends?.length) throw new Error(data.error);
 
@@ -92,7 +98,7 @@ const fetchTrends = async (): Promise<CompensationTrendsResult> => {
         fallbackReason: data?.fallback ? "rate_limit" : undefined,
         fetchedAt: Date.now(),
       };
-      if (result.trends.length) writeCache(result);
+      if (result.trends.length) writeCache(cacheKey, result);
       return result;
     } catch (err) {
       lastError = err;
@@ -107,7 +113,7 @@ const fetchTrends = async (): Promise<CompensationTrendsResult> => {
   }
 
   // Fall back to cache if we have it
-  const cached = readCache();
+  const cached = readCache(cacheKey);
   if (cached?.trends?.length) {
     return {
       ...cached,
@@ -118,15 +124,17 @@ const fetchTrends = async (): Promise<CompensationTrendsResult> => {
   throw lastError instanceof Error ? lastError : new Error("Erro ao buscar tendências");
 };
 
-export const useCompensationTrends = () => {
+export const useCompensationTrends = (params?: Record<string, unknown>) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const cached = readCache();
+  const { activeCompanyId } = useCompanyContext();
+  const cacheKey = buildCacheKey({ companyId: activeCompanyId, params });
+  const cached = readCache(cacheKey);
   const cacheFresh = cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS ? cached : undefined;
 
   const query = useQuery<CompensationTrendsResult>({
-    queryKey: ["compensation-trends"],
-    queryFn: fetchTrends,
+    queryKey: ["compensation-trends", activeCompanyId, params ?? null],
+    queryFn: () => fetchTrends(cacheKey, params),
     staleTime: CACHE_TTL_MS,
     gcTime: CACHE_TTL_MS,
     retry: false, // handled internally with backoff
@@ -137,7 +145,7 @@ export const useCompensationTrends = () => {
 
   const refetch = async () => {
     try {
-      await queryClient.invalidateQueries({ queryKey: ["compensation-trends"] });
+      await queryClient.invalidateQueries({ queryKey: ["compensation-trends", activeCompanyId, params ?? null] });
       toast({
         title: "Tendências atualizadas",
         description: "As tendências de gestão de remuneração foram atualizadas com sucesso.",
