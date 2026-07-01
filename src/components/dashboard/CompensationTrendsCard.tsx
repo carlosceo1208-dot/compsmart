@@ -128,7 +128,7 @@ export const CompensationTrendsCard = () => {
                     : "Exibindo tendências em cache. Os dados podem estar desatualizados."}
                 </div>
                 {cachedAtLabel && (
-                  <div className="opacity-80">Dados em cache obtidos em {cachedAtLabel}.</div>
+                  <div className="opacity-80">Dados em cache obtidos em {cachedAtLabel} (horário de Brasília).</div>
                 )}
               </div>
             </div>
