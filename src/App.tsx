@@ -54,6 +54,7 @@ const BudgetApprovals = lazy(() => import("./pages/BudgetApprovals"));
 const Benefits = lazy(() => import("./pages/Benefits"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
+const Nr1Auditoria = lazy(() => import("./pages/nr1/Nr1Auditoria"));
 const AlertSettings = lazy(() => import("./pages/AlertSettings"));
 const DataAudit = lazy(() => import("./pages/DataAudit"));
 const Organogram = lazy(() => import("./pages/Organogram"));
