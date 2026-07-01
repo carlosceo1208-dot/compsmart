@@ -28,8 +28,39 @@ export interface CompensationTrendsResult {
 }
 
 const CACHE_PREFIX = "compensation-trends:v2";
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 const MAX_RETRIES = 3;
+
+// TTL is configurable via env (in hours). Default 24h. Min 1h, max 168h (7d).
+const parsePositive = (v: unknown, fallback: number, min: number, max: number) => {
+  const n = Number(v);
+  if (!Number.isFinite(n) || n <= 0) return fallback;
+  return Math.min(Math.max(n, min), max);
+};
+
+const TTL_HOURS = parsePositive(
+  (import.meta as any)?.env?.VITE_COMPENSATION_TRENDS_TTL_HOURS,
+  24,
+  1,
+  24 * 7
+);
+// Near-expiry threshold (in hours) — banner appears when remaining time <= this.
+// Default 2h; capped to below TTL.
+const NEAR_EXPIRY_HOURS = Math.min(
+  parsePositive(
+    (import.meta as any)?.env?.VITE_COMPENSATION_TRENDS_NEAR_EXPIRY_HOURS,
+    2,
+    0.25,
+    TTL_HOURS
+  ),
+  TTL_HOURS - 0.01
+);
+
+export const CACHE_TTL_MS = TTL_HOURS * 60 * 60 * 1000;
+export const NEAR_EXPIRY_MS = NEAR_EXPIRY_HOURS * 60 * 60 * 1000;
+
+export const getCompensationTrendsCacheExpiry = (fetchedAt: number) => fetchedAt + CACHE_TTL_MS;
+export const isCompensationTrendsCacheNearExpiry = (fetchedAt: number, now: number = Date.now()) =>
+  getCompensationTrendsCacheExpiry(fetchedAt) - now <= NEAR_EXPIRY_MS;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
