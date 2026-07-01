@@ -1,7 +1,32 @@
 import * as React from "react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+
+// jsdom has no layout engine, so recharts' ResponsiveContainer collapses to
+// 0×0 and skips rendering. Replace it with a fixed-size wrapper so charts
+// actually paint and RTL can query their DOM.
+vi.mock("recharts", async () => {
+  const actual = await vi.importActual<typeof import("recharts")>("recharts");
+  return {
+    ...actual,
+    ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
+      <div style={{ width: 800, height: 400 }}>
+        {typeof children === "function"
+          ? (children as (size: { width: number; height: number }) => React.ReactNode)({
+              width: 800,
+              height: 400,
+            })
+          : React.isValidElement(children)
+            ? React.cloneElement(children as React.ReactElement, { width: 800, height: 400 })
+            : children}
+      </div>
+    ),
+  };
+});
+
+// eslint-disable-next-line import/first
 import { Bar, BarChart, Line, LineChart, XAxis } from "recharts";
+// eslint-disable-next-line import/first
 import {
   ChartContainer,
   ChartLegend,
@@ -11,9 +36,9 @@ import {
   type ChartConfig,
 } from "./chart";
 
-// Regression suite for the shadcn+recharts wrapper. These tests exist to
-// catch typing/runtime breakages when recharts publishes major upgrades
-// (e.g. the v3 label prop typing regression).
+// Regression suite for the shadcn+recharts wrapper. Catches typing/runtime
+// breakages when recharts publishes major upgrades (e.g. the v3 label prop
+// typing regression that landed silently in the last upgrade).
 
 const config = {
   revenue: { label: "Revenue", color: "hsl(210 90% 50%)" },
@@ -60,7 +85,7 @@ describe("ChartContainer", () => {
 });
 
 describe("ChartTooltipContent", () => {
-  it("returns null when inactive (no runtime errors)", () => {
+  it("returns null when inactive", () => {
     const { container } = render(
       <ChartContainer config={config}>
         <BarChart data={data}>
@@ -69,7 +94,6 @@ describe("ChartTooltipContent", () => {
         </BarChart>
       </ChartContainer>,
     );
-    // Tooltip not triggered → nothing to render.
     expect(container.querySelector(".recharts-tooltip")).toBeNull();
   });
 
@@ -83,7 +107,7 @@ describe("ChartTooltipContent", () => {
           value: 180,
           dataKey: "revenue",
           color: "hsl(210 90% 50%)",
-          payload: { month: "Feb", revenue: 180 },
+          payload: { month: "Feb", revenue: 180, fill: "hsl(210 90% 50%)" },
         },
       ],
     };
@@ -101,17 +125,18 @@ describe("ChartTooltipContent", () => {
 
 describe("ChartLegendContent", () => {
   it("renders labels for each payload entry", () => {
+    const legendProps: Record<string, unknown> = {
+      payload: [
+        { value: "revenue", dataKey: "revenue", color: "hsl(210 90% 50%)" },
+        { value: "cost", dataKey: "cost", color: "hsl(10 90% 50%)" },
+      ],
+    };
     render(
       <ChartContainer config={config}>
         <BarChart data={data}>
           <ChartLegend
             content={
-              <ChartLegendContent
-                payload={[
-                  { value: "revenue", dataKey: "revenue", color: "hsl(210 90% 50%)" } as never,
-                  { value: "cost", dataKey: "cost", color: "hsl(10 90% 50%)" } as never,
-                ]}
-              />
+              <ChartLegendContent {...(legendProps as React.ComponentProps<typeof ChartLegendContent>)} />
             }
           />
           <Bar dataKey="revenue" />
@@ -124,7 +149,15 @@ describe("ChartLegendContent", () => {
   });
 
   it("returns null with an empty payload", () => {
-    const { container } = render(<ChartLegendContent payload={[]} />);
-    expect(container.firstChild).toBeNull();
+    const { container } = render(
+      <ChartContainer config={config}>
+        <BarChart data={data}>
+          <ChartLegendContent payload={[]} />
+          <Bar dataKey="revenue" />
+        </BarChart>
+      </ChartContainer>,
+    );
+    // The empty-payload branch renders nothing — assert no legend list appears.
+    expect(container.querySelector(".recharts-default-legend")).toBeNull();
   });
 });
