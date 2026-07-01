@@ -116,6 +116,16 @@ export const CompensationTrendsCard = () => {
           </div>
         </CardHeader>
         <CardContent>
+          {isFallback && trends.length > 0 && (
+            <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-400">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span>
+                {fallbackReason === "rate_limit"
+                  ? "Limite de requisições atingido — exibindo tendências em cache. Os dados podem estar desatualizados."
+                  : "Exibindo tendências em cache. Os dados podem estar desatualizados."}
+              </span>
+            </div>
+          )}
           {isLoading ? (
             <LoadingSkeleton />
           ) : isError ? (
