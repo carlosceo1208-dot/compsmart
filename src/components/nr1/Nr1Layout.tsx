@@ -74,6 +74,7 @@ const GROUPS: NavGroup[] = [
     tone: 'glossario',
     items: [
       { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003, Manual Prático NR-1 e demais referências metodológicas.', actions: ['Consultar metodologias', 'Ler Manual Prático NR-1', 'Glossário NR-1'] },
+      { to: '/nr1/auditoria', label: 'Auditoria & Segurança', icon: FileSearch, desc: 'Logs de acesso, autenticação, atividade e alterações no Módulo NR-1 por usuário e empresa.', actions: ['Filtrar por usuário/empresa', 'Exportar CSV', 'Ver bloqueios e falhas de login'] },
     ],
   },
 ];
