@@ -24,9 +24,9 @@ vi.mock("recharts", async () => {
   };
 });
 
-// eslint-disable-next-line import/first
+// eslint-disable-next-line
 import { Bar, BarChart, Line, LineChart, XAxis } from "recharts";
-// eslint-disable-next-line import/first
+// eslint-disable-next-line
 import {
   ChartContainer,
   ChartLegend,
