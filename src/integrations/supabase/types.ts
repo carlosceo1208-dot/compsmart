@@ -9975,6 +9975,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_expired_unsubscribe_tokens: { Args: never; Returns: number }
       cleanup_old_telemetry: { Args: never; Returns: Json }
       cleanup_rate_limit_logs: { Args: never; Returns: undefined }
       company_has_plan_tier: {
