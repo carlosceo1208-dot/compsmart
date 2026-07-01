@@ -6,6 +6,16 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const FALLBACK_TRENDS = {
+  trends: [
+    { title: "Remuneração baseada em habilidades", summary: "Foco em competências específicas ao invés de cargos tradicionais", source: "Robert Half", category: "salários", detailed_analysis: "Empresas estão valorizando habilidades técnicas e comportamentais específicas.", impact: "Maior competitividade na atração de talentos", recommendations: ["Mapear habilidades críticas", "Criar trilhas de desenvolvimento"], search_terms: ["skills-based pay Brasil", "remuneração por competências"] },
+    { title: "Benefícios flexíveis", summary: "Pacotes personalizados conforme necessidades individuais", source: "Michael Page", category: "benefícios", detailed_analysis: "Colaboradores podem escolher benefícios que façam sentido para seu momento de vida.", impact: "Aumento no engajamento e satisfação", recommendations: ["Implementar plataforma de benefícios flexíveis", "Pesquisar preferências"], search_terms: ["benefícios flexíveis 2025", "flex benefits Brasil"] },
+    { title: "Transparência salarial", summary: "Maior abertura sobre faixas e critérios de remuneração", source: "Korn Ferry", category: "salários", detailed_analysis: "Tendência global de divulgar faixas salariais em vagas e internamente.", impact: "Redução de desigualdades e maior confiança", recommendations: ["Revisar estrutura de cargos", "Comunicar política salarial"], search_terms: ["transparência salarial Brasil", "pay transparency"] },
+    { title: "Trabalho híbrido estruturado", summary: "Políticas claras para modelos flexíveis de trabalho", source: "Hays", category: "trabalho_remoto", detailed_analysis: "Empresas definindo regras claras para dias presenciais e remotos.", impact: "Equilíbrio entre colaboração e flexibilidade", recommendations: ["Definir política híbrida clara", "Ajustar benefícios para home office"], search_terms: ["trabalho híbrido 2025", "política home office"] },
+    { title: "Incentivos de longo prazo", summary: "Programas de ILP para retenção de talentos-chave", source: "Mercer", category: "liderança", detailed_analysis: "Stock options e RSUs ganham força além das startups tradicionais.", impact: "Maior retenção de profissionais estratégicos", recommendations: ["Avaliar programas de ILP", "Comunicar valor total da remuneração"], search_terms: ["ILP Brasil 2025", "stock options empresas brasileiras"] },
+  ],
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
