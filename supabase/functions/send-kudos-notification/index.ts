@@ -66,22 +66,21 @@ const handler = async (req: Request): Promise<Response> => {
     const {
       kudosId,
       toEmployeeId,
-      fromEmployeeName,
       toEmployeeEmail,
       toEmployeeName,
       category,
       message,
       isPublic,
-    }: KudosNotificationRequest = await req.json();
+    }: Omit<KudosNotificationRequest, 'fromEmployeeName'> = await req.json();
 
-    if (!toEmployeeEmail || !fromEmployeeName || !message) {
+    if (!toEmployeeEmail || !message) {
       throw new Error("Missing required fields");
     }
 
-    // SECURITY: Verify recipient belongs to the caller's company
+    // SECURITY: Verify recipient belongs to caller's company AND fetch caller's real name (prevents sender spoofing)
     const adminClient = createClient(supabaseUrl, supabaseService);
     const { data: callerProfile } = await adminClient
-      .from('profiles').select('root_company_id').eq('id', callerId).single();
+      .from('profiles').select('root_company_id, full_name').eq('id', callerId).single();
     const { data: recipientProfile } = await adminClient
       .from('profiles').select('root_company_id, email').eq('email', toEmployeeEmail).maybeSingle();
     if (!callerProfile?.root_company_id ||
@@ -90,6 +89,8 @@ const handler = async (req: Request): Promise<Response> => {
       return new Response(JSON.stringify({ error: 'Recipient not in your company' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
+    // Server-authoritative sender name — ignore any client-supplied value
+    const fromEmployeeName = callerProfile.full_name || 'Um colega';
 
     const categoryLabel = categoryLabels[category] || category;
     const categoryEmoji = categoryEmojis[category] || "🎉";
