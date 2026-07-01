@@ -2,8 +2,10 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useResolvedStorageUrl } from "@/hooks/useResolvedStorageUrl";
+import { extractStoragePath } from "@/lib/storageUrl";
 
 interface AvatarUploadProps {
   userId: string;
@@ -22,6 +24,8 @@ export function AvatarUpload({
 }: AvatarUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { url: displayUrl, error: brokenUrl, markBroken } = useResolvedStorageUrl('avatars', currentAvatarUrl);
+
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -86,16 +90,14 @@ export function AvatarUpload({
       setDeleting(true);
 
       if (currentAvatarUrl) {
-        // Extrair caminho do arquivo da URL (funciona para signed e public URLs)
-        const match = currentAvatarUrl.match(/\/avatars\/(.+?)(?:\?|$)/);
-        const filePath = match?.[1];
-        
+        const filePath = extractStoragePath('avatars', currentAvatarUrl);
         if (filePath) {
           await supabase.storage
             .from('avatars')
             .remove([filePath]);
         }
       }
+
 
       // Atualizar no banco
       const { error } = await supabase
@@ -127,13 +129,14 @@ export function AvatarUpload({
   return (
     <div className="flex items-center gap-6">
       <Avatar className="h-24 w-24">
-        {currentAvatarUrl && (
-          <AvatarImage src={currentAvatarUrl} alt={userName} />
+        {displayUrl && !brokenUrl && (
+          <AvatarImage src={displayUrl} alt={userName} onError={markBroken} />
         )}
         <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
           {getInitials(userName)}
         </AvatarFallback>
       </Avatar>
+
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
@@ -190,6 +193,16 @@ export function AvatarUpload({
         <p className="text-xs text-muted-foreground">
           JPG, PNG, GIF ou WebP. Máximo 5MB.
         </p>
+
+        {brokenUrl && currentAvatarUrl && (
+          <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-2 text-xs text-destructive">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>
+              Sua foto antiga não pode mais ser exibida (link público expirou após reforço de segurança).
+              Envie novamente para restaurá-la.
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

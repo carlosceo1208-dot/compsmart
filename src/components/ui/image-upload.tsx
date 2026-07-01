@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { extractStoragePath, resolveSignedUrl } from "@/lib/storageUrl";
 
 interface ImageUploadProps {
   value: string | null;
@@ -30,7 +31,30 @@ export const ImageUpload = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [preview, setPreview] = useState<string | null>(value);
+  const [previewBroken, setPreviewBroken] = useState(false);
+  const [justUploaded, setJustUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Resolve legacy public URLs to fresh signed URLs on mount / when value changes.
+  useEffect(() => {
+    let cancelled = false;
+    setPreviewBroken(false);
+    if (!value) {
+      setPreview(null);
+      return;
+    }
+    setPreview(value);
+    if (value.includes("/object/public/")) {
+      resolveSignedUrl(bucket, value).then((u) => {
+        if (cancelled) return;
+        if (u) setPreview(u);
+        else setPreviewBroken(true);
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [value, bucket]);
 
   const validateImage = async (file: File): Promise<boolean> => {
     if (file.size > maxSizeMB * 1024 * 1024) {
@@ -87,13 +111,17 @@ export const ImageUpload = ({
         const { data: pub } = supabase.storage.from(bucket).getPublicUrl(filePath);
         setUploadProgress(100);
         setPreview(pub.publicUrl);
+        setPreviewBroken(false);
         onChange(pub.publicUrl);
       } else {
         setUploadProgress(100);
         setPreview(signedData.signedUrl);
+        setPreviewBroken(false);
         onChange(signedData.signedUrl);
       }
 
+      setJustUploaded(true);
+      window.setTimeout(() => setJustUploaded(false), 4000);
       toast.success("✨ Imagem enviada com sucesso!");
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -108,11 +136,12 @@ export const ImageUpload = ({
     if (!value) return;
 
     try {
-      const fileName = value.split("/").pop();
-      if (fileName) {
-        await supabase.storage.from(bucket).remove([fileName]);
+      const filePath = extractStoragePath(bucket, value) ?? value.split("/").pop();
+      if (filePath) {
+        await supabase.storage.from(bucket).remove([filePath]);
       }
       setPreview(null);
+      setPreviewBroken(false);
       onChange(null);
       toast.success("Imagem removida");
     } catch (error: any) {
@@ -120,6 +149,7 @@ export const ImageUpload = ({
       toast.error("Erro ao remover imagem");
     }
   };
+
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -138,11 +168,27 @@ export const ImageUpload = ({
           <img
             src={preview}
             alt="Preview"
+            onError={() => setPreviewBroken(true)}
             className={cn(
               "w-full h-48 object-contain bg-muted rounded-lg border",
-              previewClassName
+              previewClassName,
+              previewBroken && "opacity-30"
             )}
           />
+          {justUploaded && !isUploading && (
+            <div className="absolute top-2 left-2 flex items-center gap-1 rounded-md bg-emerald-500/90 px-2 py-1 text-xs font-medium text-white shadow">
+              <CheckCircle2 className="h-3 w-3" /> Enviado
+            </div>
+          )}
+          {previewBroken && !isUploading && (
+            <div className="absolute inset-x-2 bottom-2 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>
+                Este link de imagem antigo não está mais acessível (bucket agora privado).
+                Envie a imagem novamente para restaurar.
+              </span>
+            </div>
+          )}
           {isUploading && (
             <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center rounded-lg">
               <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
