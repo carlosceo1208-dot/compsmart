@@ -31,7 +31,30 @@ export const ImageUpload = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [preview, setPreview] = useState<string | null>(value);
+  const [previewBroken, setPreviewBroken] = useState(false);
+  const [justUploaded, setJustUploaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Resolve legacy public URLs to fresh signed URLs on mount / when value changes.
+  useEffect(() => {
+    let cancelled = false;
+    setPreviewBroken(false);
+    if (!value) {
+      setPreview(null);
+      return;
+    }
+    setPreview(value);
+    if (value.includes("/object/public/")) {
+      resolveSignedUrl(bucket, value).then((u) => {
+        if (cancelled) return;
+        if (u) setPreview(u);
+        else setPreviewBroken(true);
+      });
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [value, bucket]);
 
   const validateImage = async (file: File): Promise<boolean> => {
     if (file.size > maxSizeMB * 1024 * 1024) {
