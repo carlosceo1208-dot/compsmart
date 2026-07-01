@@ -33,6 +33,7 @@
     "vaul",
     "@tailwindcss/typography"
   ],
+  "ignoreBinaries": ["tsgo"],
   "ignoreExportsUsedInFile": true,
   "rules": {
     "files": "error",
