@@ -109,11 +109,17 @@
   "overrides": {
     "uuid": "^11.0.0",
     "brace-expansion": "^2.0.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "tmp": "^0.2.4",
+    "minimatch": "^10.0.1",
+    "glob": "^11.0.0"
   },
   "resolutions": {
     "uuid": "^11.0.0",
     "brace-expansion": "^2.0.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "tmp": "^0.2.4",
+    "minimatch": "^10.0.1",
+    "glob": "^11.0.0"
   }
 }
