@@ -54,6 +54,7 @@ const BudgetApprovals = lazy(() => import("./pages/BudgetApprovals"));
 const Benefits = lazy(() => import("./pages/Benefits"));
 const KnowledgeBase = lazy(() => import("./pages/KnowledgeBase"));
 const AuditLogs = lazy(() => import("./pages/AuditLogs"));
+const Nr1Auditoria = lazy(() => import("./pages/nr1/Nr1Auditoria"));
 const AlertSettings = lazy(() => import("./pages/AlertSettings"));
 const DataAudit = lazy(() => import("./pages/DataAudit"));
 const Organogram = lazy(() => import("./pages/Organogram"));
@@ -298,6 +299,7 @@ const App = () => {
                        <Route path="/nr1/planos-acao" element={<Nr1PlanosAcao />} />
                        <Route path="/nr1/vitalidade" element={<Nr1Vitalidade />} />
                        <Route path="/nr1/biblioteca" element={<Nr1Biblioteca />} />
+                       <Route path="/nr1/auditoria" element={<Nr1Auditoria />} />
                        <Route path="/nr1/clima" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1Clima /></PlanGate>} />
                       <Route path="/nr1/clima/:id/responder" element={<Nr1ClimaResponder />} />
                       <Route path="/nr1/clima/dashboard" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaDashboard /></PlanGate>} />

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, Lock } from 'lucide-react';
+import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, Lock, FileSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -74,6 +74,7 @@ const GROUPS: NavGroup[] = [
     tone: 'glossario',
     items: [
       { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003, Manual Prático NR-1 e demais referências metodológicas.', actions: ['Consultar metodologias', 'Ler Manual Prático NR-1', 'Glossário NR-1'] },
+      { to: '/nr1/auditoria', label: 'Auditoria & Segurança', icon: FileSearch, desc: 'Logs de acesso, autenticação, atividade e alterações no Módulo NR-1 por usuário e empresa.', actions: ['Filtrar por usuário/empresa', 'Exportar CSV', 'Ver bloqueios e falhas de login'] },
     ],
   },
 ];
