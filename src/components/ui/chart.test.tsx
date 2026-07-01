@@ -73,7 +73,7 @@ describe("ChartTooltipContent", () => {
   });
 
   it("renders payload rows when active", () => {
-    const props = {
+    const props: Record<string, unknown> = {
       active: true,
       label: "Feb",
       payload: [
@@ -85,7 +85,7 @@ describe("ChartTooltipContent", () => {
           payload: { month: "Feb", revenue: 180 },
         },
       ],
-    } as never;
+    };
     render(
       <ChartContainer config={config}>
         <BarChart data={data}>
