@@ -78,14 +78,11 @@ const describeIfKeys =
 // ---- Helpers ---------------------------------------------------------------
 
 function b64url(input: string) {
-  // Base64url without depending on Node's Buffer types.
   const bytes = new TextEncoder().encode(input);
   let bin = "";
   for (const b of bytes) bin += String.fromCharCode(b);
-  const b64 = (globalThis as any).btoa
-    ? (globalThis as any).btoa(bin)
-    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (require("buffer").Buffer.from(bin, "binary").toString("base64") as string);
+  // vitest runs in node ≥18 which exposes btoa globally.
+  const b64 = (globalThis as unknown as { btoa: (s: string) => string }).btoa(bin);
   return b64.replace(/=+$/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
