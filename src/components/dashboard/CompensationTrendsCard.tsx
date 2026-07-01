@@ -86,9 +86,7 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 
 export const CompensationTrendsCard = () => {
   const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason, fetchedAt } = useCompensationTrends();
-  const cachedAtLabel = fetchedAt
-    ? new Date(fetchedAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
-    : null;
+  const cachedAtLabel = fetchedAt ? formatDateTimePtBR(fetchedAt) : null;
   const [selectedTrend, setSelectedTrend] = useState<CompensationTrend | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
