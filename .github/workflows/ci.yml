@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint, dead-code & build
+    name: Lint, typecheck, dead-code & build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,9 +29,14 @@ jobs:
       - name: ESLint
         run: bun run lint
 
+      # Catches TypeScript regressions (e.g. recharts label typing)
+      - name: TypeScript typecheck
+        run: bunx tsgo --noEmit -p tsconfig.app.json
+
       # Fails on unused files, exports, types or dependencies
       - name: Dead-code scan (knip)
         run: bun run dead-code:ci
 
+      # Production build must succeed
       - name: Build
         run: bun run build

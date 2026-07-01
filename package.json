@@ -9,9 +9,10 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "lint:strict": "eslint . --max-warnings=0",
+    "typecheck": "tsgo --noEmit -p tsconfig.app.json",
     "dead-code": "knip",
     "dead-code:ci": "knip --reporter compact",
-    "ci": "npm run lint && npm run dead-code:ci && npm run build",
+    "ci": "npm run lint && npm run typecheck && npm run dead-code:ci && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
