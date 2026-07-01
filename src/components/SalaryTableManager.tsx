@@ -181,32 +181,47 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
         .limit(1);
       const shouldActivate = !existingActive || existingActive.length === 0;
 
-      // 2) Create a new table copy for the active company (unique name to avoid global collision)
-      const baseName = `${template.name} (cópia)`;
-      let candidateName = baseName;
-      for (let i = 0; i < 5; i++) {
-        const { data: clash } = await supabase
+      // 2) Create a new table copy for the active company.
+      // The database has a global unique constraint on `name`, and RLS can hide
+      // same-name rows from other companies. So do not rely on a pre-check here:
+      // always generate a unique, readable name and retry only on a rare collision.
+      const buildCloneName = (attempt: number) => {
+        const randomPart =
+          typeof crypto !== 'undefined' && 'randomUUID' in crypto
+            ? crypto.randomUUID().slice(0, 8)
+            : Math.random().toString(36).slice(2, 10);
+
+        return `${template.name} (cópia ${Date.now().toString(36)}-${randomPart}${attempt > 0 ? `-${attempt + 1}` : ''})`;
+      };
+
+      let newTable: { id: string } | null = null;
+      let createErr: any = null;
+
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const { data, error } = await supabase
           .from('salary_tables')
+          .insert({
+            name: buildCloneName(attempt),
+            effective_month: template.effective_month,
+            effective_year: template.effective_year,
+            is_active: shouldActivate,
+            is_template: false,
+            root_company_id: activeCompanyId,
+          })
           .select('id')
-          .eq('name', candidateName)
-          .limit(1);
-        if (!clash || clash.length === 0) break;
-        candidateName = `${baseName} ${Date.now().toString(36)}${i > 0 ? `-${i}` : ''}`;
+          .single();
+
+        if (!error && data) {
+          newTable = data;
+          createErr = null;
+          break;
+        }
+
+        createErr = error;
+        if (error?.code !== '23505') break;
       }
 
-      const { data: newTable, error: createErr } = await supabase
-        .from('salary_tables')
-        .insert({
-          name: candidateName,
-          effective_month: template.effective_month,
-          effective_year: template.effective_year,
-          is_active: shouldActivate,
-          is_template: false,
-          root_company_id: activeCompanyId,
-        })
-        .select('id')
-        .single();
-      if (createErr) throw createErr;
+      if (createErr || !newTable) throw createErr ?? new Error('Não foi possível criar a cópia da tabela.');
 
 
       // 2) Copy ranges
