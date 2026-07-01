@@ -132,6 +132,22 @@ export const CompensationTrendsCard = () => {
                 {cachedAtLabel && (
                   <div className="opacity-80">Dados em cache obtidos em {cachedAtLabel} (horário de Brasília).</div>
                 )}
+                {expiresAtLabel && (
+                  <div className="opacity-80">Cache expira em {expiresAtLabel} (horário de Brasília).</div>
+                )}
+              </div>
+            </div>
+          )}
+          {!isFallback && showNearExpiry && (
+            <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/5 p-2.5 text-xs text-amber-700 dark:text-amber-400">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div className="space-y-0.5">
+                <div>
+                  Cache próximo de expirar (em até {nearExpiryHours}h). Atualize para garantir dados recentes.
+                </div>
+                {expiresAtLabel && (
+                  <div className="opacity-80">Expira em {expiresAtLabel} (horário de Brasília).</div>
+                )}
               </div>
             </div>
           )}
