@@ -178,7 +178,8 @@ export function useCreateLtipSimulation() {
           tax_treatment: input.tax_treatment,
           notes: input.notes,
           ...projection,
-        })
+        } as never)
+
         .select()
         .single();
       if (error) throw error;
