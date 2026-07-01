@@ -59,6 +59,10 @@ jobs:
         if: steps.secrets_check.outputs.has_secrets == 'true'
         run: bunx vitest run src/test/rls-negative-and-extended.test.ts --reporter=verbose
 
+      - name: Run E2E login + tenant + edge-function permissions suite
+        if: steps.secrets_check.outputs.has_secrets == 'true'
+        run: bunx vitest run src/test/e2e-login-tenant-permissions.test.ts --reporter=verbose
+
       - name: Upload test output on failure
         if: failure()
         uses: actions/upload-artifact@v4
