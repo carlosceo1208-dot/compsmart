@@ -106,21 +106,13 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required. Please add credits to your workspace." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       console.error("AI gateway error:", response.status);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), {
-        status: 500,
+      // Return fallback with 200 so the client can render something.
+      const reason = response.status === 429 ? "ai_rate_limited"
+                    : response.status === 402 ? "ai_payment_required"
+                    : "ai_gateway_error";
+      return new Response(JSON.stringify({ ...FALLBACK_TRENDS, fallback: true, reason }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -129,7 +121,10 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      throw new Error("No content in AI response");
+      return new Response(JSON.stringify({ ...FALLBACK_TRENDS, fallback: true, reason: "empty_ai_response" }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     // Parse the JSON response
@@ -143,61 +138,7 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
       }
       trends = JSON.parse(cleanContent);
     } catch (_parseError) {
-      // Return fallback trends if parsing fails
-      trends = {
-        trends: [
-          {
-            title: "Remuneração baseada em habilidades",
-            summary: "Foco em competências específicas ao invés de cargos tradicionais",
-            source: "Robert Half",
-            category: "salários",
-            detailed_analysis: "Empresas estão valorizando habilidades técnicas e comportamentais específicas.",
-            impact: "Maior competitividade na atração de talentos",
-            recommendations: ["Mapear habilidades críticas", "Criar trilhas de desenvolvimento"],
-            search_terms: ["skills-based pay Brasil", "remuneração por competências"]
-          },
-          {
-            title: "Benefícios flexíveis",
-            summary: "Pacotes personalizados conforme necessidades individuais",
-            source: "Michael Page",
-            category: "benefícios",
-            detailed_analysis: "Colaboradores podem escolher benefícios que façam sentido para seu momento de vida.",
-            impact: "Aumento no engajamento e satisfação",
-            recommendations: ["Implementar plataforma de benefícios flexíveis", "Pesquisar preferências"],
-            search_terms: ["benefícios flexíveis 2025", "flex benefits Brasil"]
-          },
-          {
-            title: "Transparência salarial",
-            summary: "Maior abertura sobre faixas e critérios de remuneração",
-            source: "Korn Ferry",
-            category: "salários",
-            detailed_analysis: "Tendência global de divulgar faixas salariais em vagas e internamente.",
-            impact: "Redução de desigualdades e maior confiança",
-            recommendations: ["Revisar estrutura de cargos", "Comunicar política salarial"],
-            search_terms: ["transparência salarial Brasil", "pay transparency"]
-          },
-          {
-            title: "Trabalho híbrido estruturado",
-            summary: "Políticas claras para modelos flexíveis de trabalho",
-            source: "Hays",
-            category: "trabalho_remoto",
-            detailed_analysis: "Empresas definindo regras claras para dias presenciais e remotos.",
-            impact: "Equilíbrio entre colaboração e flexibilidade",
-            recommendations: ["Definir política híbrida clara", "Ajustar benefícios para home office"],
-            search_terms: ["trabalho híbrido 2025", "política home office"]
-          },
-          {
-            title: "Incentivos de longo prazo",
-            summary: "Programas de ILP para retenção de talentos-chave",
-            source: "Mercer",
-            category: "liderança",
-            detailed_analysis: "Stock options e RSUs ganham força além das startups tradicionais.",
-            impact: "Maior retenção de profissionais estratégicos",
-            recommendations: ["Avaliar programas de ILP", "Comunicar valor total da remuneração"],
-            search_terms: ["ILP Brasil 2025", "stock options empresas brasileiras"]
-          }
-        ]
-      };
+      trends = { ...FALLBACK_TRENDS, fallback: true, reason: "parse_error" };
     }
 
     return new Response(JSON.stringify(trends), {
@@ -206,9 +147,10 @@ IMPORTANTE: Seja CONCISO. Cada campo deve ser breve.`;
 
   } catch (error) {
     console.error("compensation-trends error:", error instanceof Error ? error.message : "Unknown error");
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
+    return new Response(JSON.stringify({ ...FALLBACK_TRENDS, fallback: true, reason: "internal_error" }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
+
