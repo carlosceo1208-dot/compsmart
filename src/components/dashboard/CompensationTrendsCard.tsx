@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCompensationTrends, CompensationTrend } from "@/hooks/useCompensationTrends";
+import { formatDateTimePtBR } from "@/lib/formatDateTime";
 import { TrendDetailDialog } from "./TrendDetailDialog";
 import { 
   TrendingUp, 
