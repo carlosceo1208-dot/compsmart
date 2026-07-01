@@ -129,13 +129,14 @@ export function AvatarUpload({
   return (
     <div className="flex items-center gap-6">
       <Avatar className="h-24 w-24">
-        {currentAvatarUrl && (
-          <AvatarImage src={currentAvatarUrl} alt={userName} />
+        {displayUrl && !brokenUrl && (
+          <AvatarImage src={displayUrl} alt={userName} onError={markBroken} />
         )}
         <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
           {getInitials(userName)}
         </AvatarFallback>
       </Avatar>
+
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
