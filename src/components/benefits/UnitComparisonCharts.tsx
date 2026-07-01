@@ -192,7 +192,7 @@ export const UnitComparisonCharts = ({ unitsData }: UnitComparisonChartsProps) =
                   outerRadius={120}
                   dataKey="value"
                   nameKey="name"
-                  label={({ name, percentage }) => 
+                  label={({ name, percentage }: any) => 
                     `${name}: ${formatDecimal(percentage, 1)}%`
                   }
                   labelLine={true}
