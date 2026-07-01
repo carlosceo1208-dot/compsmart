@@ -15,7 +15,8 @@ import {
   Cpu, 
   Users,
   AlertCircle,
-  ChevronRight
+  ChevronRight,
+  Info
 } from "lucide-react";
 
 const categoryConfig: Record<string, { icon: React.ElementType; color: string; label: string }> = {
