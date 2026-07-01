@@ -125,7 +125,7 @@ export const AuditChartsSection = ({ filters }: AuditChartsSectionProps) => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={(entry) => `${entry.mode}: ${entry.count}`}
+                  label={(entry: any) => `${entry.mode}: ${entry.count}`}
                   outerRadius={100}
                   fill="hsl(var(--primary))"
                   dataKey="count"
