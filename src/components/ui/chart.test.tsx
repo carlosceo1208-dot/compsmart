@@ -73,20 +73,26 @@ describe("ChartTooltipContent", () => {
   });
 
   it("renders payload rows when active", () => {
+    const props = {
+      active: true,
+      label: "Feb",
+      payload: [
+        {
+          name: "revenue",
+          value: 180,
+          dataKey: "revenue",
+          color: "hsl(210 90% 50%)",
+          payload: { month: "Feb", revenue: 180 },
+        },
+      ],
+    } as never;
     render(
-      <ChartTooltipContent
-        active
-        label="Feb"
-        payload={[
-          {
-            name: "revenue",
-            value: 180,
-            dataKey: "revenue",
-            color: "hsl(210 90% 50%)",
-            payload: { month: "Feb", revenue: 180 },
-          } as never,
-        ]}
-      />,
+      <ChartContainer config={config}>
+        <BarChart data={data}>
+          <ChartTooltipContent {...props} />
+          <Bar dataKey="revenue" />
+        </BarChart>
+      </ChartContainer>,
     );
     expect(screen.getByText("180")).toBeInTheDocument();
   });
