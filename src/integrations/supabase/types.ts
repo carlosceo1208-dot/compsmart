@@ -9977,6 +9977,10 @@ export type Database = {
       }
       cleanup_old_telemetry: { Args: never; Returns: Json }
       cleanup_rate_limit_logs: { Args: never; Returns: undefined }
+      company_has_plan_tier: {
+        Args: { _company_id: string; _min_tier: string }
+        Returns: boolean
+      }
       compare_scenarios: {
         Args: { p_scenario_ids: string[] }
         Returns: {
@@ -10191,6 +10195,7 @@ export type Database = {
           payment_method: string
         }[]
       }
+      get_company_plan: { Args: { _company_id: string }; Returns: string }
       get_compensation_mismatch_kpi: {
         Args: never
         Returns: {

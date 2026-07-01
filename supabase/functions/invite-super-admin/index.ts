@@ -121,15 +121,17 @@ serve(async (req) => {
         let userId: string | undefined;
         let actionLink: string | undefined;
 
-        // 1) Check if user already exists (avoids hitting email rate limits via invite)
-        const { data: existingList } = await admin.auth.admin.listUsers();
-        const existing = existingList?.users?.find(
-          (u: any) => u.email?.toLowerCase() === email,
-        );
+        // SECURITY: Avoid unbounded listUsers(). First check our own profiles
+        // table (scoped, indexed by email) — then fall back to the invite flow
+        // and handle the "already registered" error path from Supabase Auth.
+        const { data: existingProfile } = await admin
+          .from("profiles")
+          .select("id")
+          .eq("email", email)
+          .maybeSingle();
 
-        if (existing) {
-          // User exists → just generate a recovery link (does NOT send email)
-          userId = existing.id;
+        if (existingProfile?.id) {
+          userId = existingProfile.id;
           const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
             type: "recovery", email, options: { redirectTo },
           });
@@ -143,8 +145,16 @@ serve(async (req) => {
               data: { full_name: fullName, invited_role: "super_admin" },
             });
           if (inviteErr) {
-            // If invite failed due to email rate limit, try generating a signup link instead
-            if (/rate.?limit/i.test(inviteErr.message)) {
+            const msg = inviteErr.message || "";
+            // Already registered in auth.users but no profile row yet — generate a recovery link
+            if (/already.*registered|already.*exists|user.*exists/i.test(msg)) {
+              const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
+                type: "recovery", email, options: { redirectTo },
+              });
+              if (linkErr) throw inviteErr;
+              userId = (linkData as any)?.user?.id;
+              actionLink = (linkData as any)?.properties?.action_link;
+            } else if (/rate.?limit/i.test(msg)) {
               const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
                 type: "invite", email, options: { data: { full_name: fullName }, redirectTo },
               });
