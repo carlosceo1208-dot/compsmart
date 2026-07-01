@@ -35,7 +35,10 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Cache is scoped per company + query params to avoid leaking results across
 // contexts (e.g. Super Admin switching companies, or different filters).
-const buildCacheKey = (scope: { companyId: string | null; params?: Record<string, unknown> }) => {
+export const buildCompensationTrendsCacheKey = (scope: {
+  companyId: string | null;
+  params?: Record<string, unknown>;
+}) => {
   const paramsKey = scope.params
     ? JSON.stringify(
         Object.keys(scope.params)
@@ -49,7 +52,7 @@ const buildCacheKey = (scope: { companyId: string | null; params?: Record<string
   return `${CACHE_PREFIX}:${scope.companyId ?? "anon"}:${paramsKey}`;
 };
 
-const readCache = (key: string): CompensationTrendsResult | null => {
+export const readCompensationTrendsCache = (key: string): CompensationTrendsResult | null => {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
@@ -61,13 +64,26 @@ const readCache = (key: string): CompensationTrendsResult | null => {
   }
 };
 
-const writeCache = (key: string, result: CompensationTrendsResult) => {
+export const writeCompensationTrendsCache = (key: string, result: CompensationTrendsResult) => {
   try {
     localStorage.setItem(key, JSON.stringify(result));
   } catch {
     /* ignore quota errors */
   }
 };
+
+export const clearCompensationTrendsCache = (key: string) => {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore */
+  }
+};
+
+// Internal aliases (kept short for the rest of the file).
+const buildCacheKey = buildCompensationTrendsCacheKey;
+const readCache = readCompensationTrendsCache;
+const writeCache = writeCompensationTrendsCache;
 
 const isRateLimit = (err: unknown): boolean => {
   const anyErr = err as any;
