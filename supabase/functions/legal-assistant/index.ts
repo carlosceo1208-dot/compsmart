@@ -284,8 +284,25 @@ serve(async (req) => {
 
     const { question, document_text, document_name, session_id } = await req.json();
 
-    if (!question) {
-      throw new Error('Question is required');
+    if (!question || typeof question !== 'string' || question.length > 4000) {
+      return new Response(
+        JSON.stringify({ error: 'Question is required (max 4000 chars)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    if (document_text !== undefined && document_text !== null) {
+      if (typeof document_text !== 'string' || document_text.length > 50000) {
+        return new Response(
+          JSON.stringify({ error: 'Document too large (max 50000 chars)' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+    if (document_name && (typeof document_name !== 'string' || document_name.length > 255)) {
+      return new Response(
+        JSON.stringify({ error: 'Document name too long (max 255 chars)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // ============ BUSCAR HISTÓRICO DA SESSÃO ============
