@@ -85,7 +85,7 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 export const CompensationTrendsCard = () => {
-  const { trends, isLoading, isError, refetch, isFetching } = useCompensationTrends();
+  const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason } = useCompensationTrends();
   const [selectedTrend, setSelectedTrend] = useState<CompensationTrend | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
