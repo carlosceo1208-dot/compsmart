@@ -90,16 +90,14 @@ export function AvatarUpload({
       setDeleting(true);
 
       if (currentAvatarUrl) {
-        // Extrair caminho do arquivo da URL (funciona para signed e public URLs)
-        const match = currentAvatarUrl.match(/\/avatars\/(.+?)(?:\?|$)/);
-        const filePath = match?.[1];
-        
+        const filePath = extractStoragePath('avatars', currentAvatarUrl);
         if (filePath) {
           await supabase.storage
             .from('avatars')
             .remove([filePath]);
         }
       }
+
 
       // Atualizar no banco
       const { error } = await supabase
