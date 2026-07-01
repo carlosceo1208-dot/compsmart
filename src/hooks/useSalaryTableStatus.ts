@@ -12,21 +12,21 @@ export const useSalaryTableStatus = () => {
         return { hasActiveTable: false, employeeCount: 0 };
       }
 
-      // Consider "configured" if the company has ANY salary table with at least one range,
-      // OR an active salary table. This avoids false alerts when a populated table exists
-      // but isn't flagged as active.
+      // "Configurada" = a empresa possui uma tabela ATIVA, NÃO-template e com pelo menos 1 faixa.
       const { data: tables, error: tablesError } = await supabase
         .from('salary_tables')
-        .select('id, is_active, salary_ranges(id)')
+        .select('id, is_active, is_template, salary_ranges(id)')
         .eq('root_company_id', activeCompanyId);
 
       if (tablesError) throw tablesError;
 
-      const hasConfigured = (tables ?? []).some(
-        (t: any) => t.is_active || (Array.isArray(t.salary_ranges) && t.salary_ranges.length > 0)
+      const hasActiveConfigured = (tables ?? []).some(
+        (t: any) =>
+          t.is_active &&
+          !t.is_template &&
+          Array.isArray(t.salary_ranges) &&
+          t.salary_ranges.length > 0
       );
-
-
 
       // Count employees with salary
       const { count, error: countError } = await supabase
@@ -38,9 +38,10 @@ export const useSalaryTableStatus = () => {
       if (countError) throw countError;
 
       return {
-        hasActiveTable: tables && tables.length > 0,
+        hasActiveTable: hasActiveConfigured,
         employeeCount: count || 0,
       };
+
     },
     enabled: !!activeCompanyId,
     staleTime: 30 * 1000, // 30 seconds - reduced for better responsiveness

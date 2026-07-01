@@ -52,8 +52,9 @@ export function useMFAStatus(): MFAStatus {
         return;
       }
 
-      setCurrentLevel(aalData?.currentLevel || null);
-      setNextLevel(aalData?.nextLevel || null);
+      setCurrentLevel((aalData?.currentLevel as 'aal1' | 'aal2') || null);
+      setNextLevel((aalData?.nextLevel as 'aal1' | 'aal2') || null);
+
     } catch (error) {
       console.error('Error in useMFAStatus:', error);
     } finally {

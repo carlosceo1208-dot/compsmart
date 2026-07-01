@@ -140,7 +140,7 @@ export const useReviewJobMatching = () => {
 
       const { error: upErr } = await supabase
         .from("job_matching_results")
-        .update(updates)
+        .update(updates as never)
         .eq("id", p.resultId);
       if (upErr) throw upErr;
 
