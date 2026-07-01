@@ -168,11 +168,27 @@ export const ImageUpload = ({
           <img
             src={preview}
             alt="Preview"
+            onError={() => setPreviewBroken(true)}
             className={cn(
               "w-full h-48 object-contain bg-muted rounded-lg border",
-              previewClassName
+              previewClassName,
+              previewBroken && "opacity-30"
             )}
           />
+          {justUploaded && !isUploading && (
+            <div className="absolute top-2 left-2 flex items-center gap-1 rounded-md bg-emerald-500/90 px-2 py-1 text-xs font-medium text-white shadow">
+              <CheckCircle2 className="h-3 w-3" /> Enviado
+            </div>
+          )}
+          {previewBroken && !isUploading && (
+            <div className="absolute inset-x-2 bottom-2 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+              <span>
+                Este link de imagem antigo não está mais acessível (bucket agora privado).
+                Envie a imagem novamente para restaurar.
+              </span>
+            </div>
+          )}
           {isUploading && (
             <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center rounded-lg">
               <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
