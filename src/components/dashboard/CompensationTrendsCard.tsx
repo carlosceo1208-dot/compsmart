@@ -86,8 +86,10 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 export const CompensationTrendsCard = () => {
-  const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason, fetchedAt } = useCompensationTrends();
+  const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason, fetchedAt, expiresAt, isNearExpiry, nearExpiryHours } = useCompensationTrends();
   const cachedAtLabel = fetchedAt ? formatDateTimePtBR(fetchedAt) : null;
+  const expiresAtLabel = expiresAt ? formatDateTimePtBR(expiresAt) : null;
+  const showNearExpiry = isNearExpiry && !isLoading && trends.length > 0;
   const [selectedTrend, setSelectedTrend] = useState<CompensationTrend | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
