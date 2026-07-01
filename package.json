@@ -12,7 +12,9 @@
     "typecheck": "tsgo --noEmit -p tsconfig.app.json",
     "dead-code": "knip",
     "dead-code:ci": "knip --reporter compact",
-    "ci": "npm run lint && npm run typecheck && npm run dead-code:ci && npm run build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "ci": "npm run lint && npm run typecheck && npm run test && npm run dead-code:ci && npm run build",
     "preview": "vite preview"
   },
   "dependencies": {
