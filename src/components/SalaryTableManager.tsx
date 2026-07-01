@@ -181,11 +181,23 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
         .limit(1);
       const shouldActivate = !existingActive || existingActive.length === 0;
 
-      // 2) Create a new table copy for the active company
+      // 2) Create a new table copy for the active company (unique name to avoid global collision)
+      const baseName = `${template.name} (cópia)`;
+      let candidateName = baseName;
+      for (let i = 0; i < 5; i++) {
+        const { data: clash } = await supabase
+          .from('salary_tables')
+          .select('id')
+          .eq('name', candidateName)
+          .limit(1);
+        if (!clash || clash.length === 0) break;
+        candidateName = `${baseName} ${Date.now().toString(36)}${i > 0 ? `-${i}` : ''}`;
+      }
+
       const { data: newTable, error: createErr } = await supabase
         .from('salary_tables')
         .insert({
-          name: `${template.name} (cópia)`,
+          name: candidateName,
           effective_month: template.effective_month,
           effective_year: template.effective_year,
           is_active: shouldActivate,
@@ -195,6 +207,7 @@ export function SalaryTableManager({ open, onOpenChange, onTableActivated }: Sal
         .select('id')
         .single();
       if (createErr) throw createErr;
+
 
       // 2) Copy ranges
       const { data: srcRanges, error: rangesErr } = await supabase
