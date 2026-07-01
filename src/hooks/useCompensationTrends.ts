@@ -27,15 +27,31 @@ export interface CompensationTrendsResult {
   fetchedAt: number;
 }
 
-const CACHE_KEY = "compensation-trends:v1";
+const CACHE_PREFIX = "compensation-trends:v2";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
 const MAX_RETRIES = 3;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const readCache = (): CompensationTrendsResult | null => {
+// Cache is scoped per company + query params to avoid leaking results across
+// contexts (e.g. Super Admin switching companies, or different filters).
+const buildCacheKey = (scope: { companyId: string | null; params?: Record<string, unknown> }) => {
+  const paramsKey = scope.params
+    ? JSON.stringify(
+        Object.keys(scope.params)
+          .sort()
+          .reduce<Record<string, unknown>>((acc, k) => {
+            acc[k] = scope.params![k];
+            return acc;
+          }, {})
+      )
+    : "{}";
+  return `${CACHE_PREFIX}:${scope.companyId ?? "anon"}:${paramsKey}`;
+};
+
+const readCache = (key: string): CompensationTrendsResult | null => {
   try {
-    const raw = localStorage.getItem(CACHE_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CompensationTrendsResult;
     if (!parsed?.trends?.length) return null;
@@ -45,9 +61,9 @@ const readCache = (): CompensationTrendsResult | null => {
   }
 };
 
-const writeCache = (result: CompensationTrendsResult) => {
+const writeCache = (key: string, result: CompensationTrendsResult) => {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+    localStorage.setItem(key, JSON.stringify(result));
   } catch {
     /* ignore quota errors */
   }
