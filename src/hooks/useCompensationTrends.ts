@@ -161,7 +161,12 @@ export const useCompensationTrends = (params?: Record<string, unknown>) => {
 
   const refetch = async () => {
     try {
-      await queryClient.invalidateQueries({ queryKey: ["compensation-trends", activeCompanyId, params ?? null] });
+      // Drop the persisted cache so we don't fall back to stale data
+      // if the network call happens to fail.
+      clearCompensationTrendsCache(cacheKey);
+      await queryClient.invalidateQueries({
+        queryKey: ["compensation-trends", activeCompanyId, params ?? null],
+      });
       toast({
         title: "Tendências atualizadas",
         description: "As tendências de gestão de remuneração foram atualizadas com sucesso.",
