@@ -52,6 +52,15 @@ const handler = async (req: Request): Promise<Response> => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
+    // SECURITY: Only manager/admin/HR/super_admin may trigger budget notifications
+    const { data: callerRoles } = await supabase
+      .from('user_roles').select('role').eq('user_id', callerId);
+    const allowed = new Set(['manager', 'admin', 'hr_manager', 'super_admin']);
+    if (!(callerRoles ?? []).some((r: { role: string }) => allowed.has(r.role))) {
+      return new Response(JSON.stringify({ error: 'Forbidden' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
     const { submissionId, unitName, submittedBy, totalAmount, fiscalYear }: NotificationRequest = await req.json();
 
     // SECURITY: escape client-supplied strings before HTML interpolation
