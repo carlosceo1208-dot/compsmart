@@ -2,8 +2,10 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useResolvedStorageUrl } from "@/hooks/useResolvedStorageUrl";
+import { extractStoragePath } from "@/lib/storageUrl";
 
 interface AvatarUploadProps {
   userId: string;
