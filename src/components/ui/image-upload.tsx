@@ -111,13 +111,17 @@ export const ImageUpload = ({
         const { data: pub } = supabase.storage.from(bucket).getPublicUrl(filePath);
         setUploadProgress(100);
         setPreview(pub.publicUrl);
+        setPreviewBroken(false);
         onChange(pub.publicUrl);
       } else {
         setUploadProgress(100);
         setPreview(signedData.signedUrl);
+        setPreviewBroken(false);
         onChange(signedData.signedUrl);
       }
 
+      setJustUploaded(true);
+      window.setTimeout(() => setJustUploaded(false), 4000);
       toast.success("✨ Imagem enviada com sucesso!");
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -132,11 +136,12 @@ export const ImageUpload = ({
     if (!value) return;
 
     try {
-      const fileName = value.split("/").pop();
-      if (fileName) {
-        await supabase.storage.from(bucket).remove([fileName]);
+      const filePath = extractStoragePath(bucket, value) ?? value.split("/").pop();
+      if (filePath) {
+        await supabase.storage.from(bucket).remove([filePath]);
       }
       setPreview(null);
+      setPreviewBroken(false);
       onChange(null);
       toast.success("Imagem removida");
     } catch (error: any) {
@@ -144,6 +149,7 @@ export const ImageUpload = ({
       toast.error("Erro ao remover imagem");
     }
   };
+
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
