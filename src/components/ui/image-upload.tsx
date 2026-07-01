@@ -1,10 +1,11 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { extractStoragePath, resolveSignedUrl } from "@/lib/storageUrl";
 
 interface ImageUploadProps {
   value: string | null;
