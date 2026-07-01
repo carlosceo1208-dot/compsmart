@@ -56,10 +56,12 @@ export function AvatarUpload({
 
       if (uploadError) throw uploadError;
 
-      // Obter URL pública
-      const { data: { publicUrl } } = supabase.storage
+      // Gerar URL assinada de longa duração (bucket privado)
+      const { data: signedData, error: signedErr } = await supabase.storage
         .from('avatars')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 60 * 60 * 24 * 365 * 10);
+      if (signedErr || !signedData?.signedUrl) throw signedErr ?? new Error('Falha ao gerar URL');
+      const publicUrl = signedData.signedUrl;
 
       // Atualizar no banco
       const { error: updateError } = await supabase
@@ -84,8 +86,9 @@ export function AvatarUpload({
       setDeleting(true);
 
       if (currentAvatarUrl) {
-        // Extrair caminho do arquivo da URL
-        const filePath = currentAvatarUrl.split('/avatars/')[1];
+        // Extrair caminho do arquivo da URL (funciona para signed e public URLs)
+        const match = currentAvatarUrl.match(/\/avatars\/(.+?)(?:\?|$)/);
+        const filePath = match?.[1];
         
         if (filePath) {
           await supabase.storage
