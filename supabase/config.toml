@@ -39,6 +39,8 @@ project_id = "fpkjkqdfufhhicxkyqdw"
     verify_jwt = true
   [functions.process-trial-expiration]
     verify_jwt = false
+  [functions.refresh-storage-urls]
+    verify_jwt = true
   [functions.salary-assistant]
     verify_jwt = true
   [functions.send-budget-deadline-reminder]
