@@ -9,6 +9,7 @@ import { ClientsTable } from '@/components/super-admin/ClientsTable';
 import { TenureMetricsCard } from '@/components/super-admin/TenureMetricsCard';
 import { FeedbackDashboard } from '@/components/super-admin/FeedbackDashboard';
 import { TelemetryDashboard } from '@/components/super-admin/TelemetryDashboard';
+import { StorageMigrationCard } from '@/components/super-admin/StorageMigrationCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
@@ -101,6 +102,12 @@ const SuperAdminDashboard = () => {
         <h2 className="text-xl font-bold text-foreground mb-4">Telemetria da Plataforma</h2>
         <TelemetryDashboard />
       </div>
+
+      {/* Separator */}
+      <Separator className="my-8" />
+
+      {/* Storage Migration (one-shot) */}
+      <StorageMigrationCard />
 
       {/* Separator */}
       <Separator className="my-8" />
