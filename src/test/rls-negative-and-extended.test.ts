@@ -78,9 +78,15 @@ const describeIfKeys =
 // ---- Helpers ---------------------------------------------------------------
 
 function b64url(input: string) {
-  // Node/Deno-safe base64url (browser btoa OK here since vitest runs in node with polyfill).
-  const b = Buffer.from(input, "utf8").toString("base64");
-  return b.replace(/=+$/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  // Base64url without depending on Node's Buffer types.
+  const bytes = new TextEncoder().encode(input);
+  let bin = "";
+  for (const b of bytes) bin += String.fromCharCode(b);
+  const b64 = (globalThis as any).btoa
+    ? (globalThis as any).btoa(bin)
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (require("buffer").Buffer.from(bin, "binary").toString("base64") as string);
+  return b64.replace(/=+$/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
 /** Forge a JWT with valid shape but a bogus signature. Will fail verification. */
