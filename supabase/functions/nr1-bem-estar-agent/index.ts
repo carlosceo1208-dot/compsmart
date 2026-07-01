@@ -176,11 +176,19 @@ serve(async (req) => {
     }
 
     const { messages } = await req.json();
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return new Response(JSON.stringify({ error: "messages inválido" }), {
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
+      return new Response(JSON.stringify({ error: "messages inválido (1-50 mensagens)" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+    for (const m of messages) {
+      if (!m || typeof m.content !== "string" || m.content.length > 4000) {
+        return new Response(
+          JSON.stringify({ error: "Cada mensagem deve ter conteúdo texto de até 4000 chars" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     const ctx = await buildCompanyContext(supabase, userData.user.id);
