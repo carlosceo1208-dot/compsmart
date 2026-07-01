@@ -45,8 +45,9 @@ serve(async (req) => {
     });
 
     if (!allowed) {
-      return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
-        status: 429,
+      // Return fallback content with 200 so the UI keeps working; signal via `fallback`.
+      return new Response(JSON.stringify({ ...FALLBACK_TRENDS, fallback: true, reason: "rate_limited" }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
