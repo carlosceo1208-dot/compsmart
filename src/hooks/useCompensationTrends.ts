@@ -216,6 +216,12 @@ export const useCompensationTrends = (params?: Record<string, unknown>) => {
     isFallback: Boolean(query.data?.isFallback),
     fallbackReason: query.data?.fallbackReason,
     fetchedAt: query.data?.fetchedAt,
+    expiresAt: query.data?.fetchedAt ? getCompensationTrendsCacheExpiry(query.data.fetchedAt) : undefined,
+    isNearExpiry: query.data?.fetchedAt
+      ? isCompensationTrendsCacheNearExpiry(query.data.fetchedAt)
+      : false,
+    ttlHours: TTL_HOURS,
+    nearExpiryHours: NEAR_EXPIRY_HOURS,
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
