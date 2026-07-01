@@ -193,6 +193,16 @@ export function AvatarUpload({
         <p className="text-xs text-muted-foreground">
           JPG, PNG, GIF ou WebP. Máximo 5MB.
         </p>
+
+        {brokenUrl && currentAvatarUrl && (
+          <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-2 text-xs text-destructive">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <span>
+              Sua foto antiga não pode mais ser exibida (link público expirou após reforço de segurança).
+              Envie novamente para restaurá-la.
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
