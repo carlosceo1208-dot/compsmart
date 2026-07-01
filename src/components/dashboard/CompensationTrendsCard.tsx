@@ -85,7 +85,10 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 );
 
 export const CompensationTrendsCard = () => {
-  const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason } = useCompensationTrends();
+  const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason, fetchedAt } = useCompensationTrends();
+  const cachedAtLabel = fetchedAt
+    ? new Date(fetchedAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
+    : null;
   const [selectedTrend, setSelectedTrend] = useState<CompensationTrend | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -119,11 +122,16 @@ export const CompensationTrendsCard = () => {
           {isFallback && trends.length > 0 && (
             <div className="mb-3 flex items-start gap-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-400">
               <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-              <span>
-                {fallbackReason === "rate_limit"
-                  ? "Limite de requisições atingido — exibindo tendências em cache. Os dados podem estar desatualizados."
-                  : "Exibindo tendências em cache. Os dados podem estar desatualizados."}
-              </span>
+              <div className="space-y-0.5">
+                <div>
+                  {fallbackReason === "rate_limit"
+                    ? "Limite de requisições atingido — exibindo tendências em cache. Os dados podem estar desatualizados."
+                    : "Exibindo tendências em cache. Os dados podem estar desatualizados."}
+                </div>
+                {cachedAtLabel && (
+                  <div className="opacity-80">Dados em cache obtidos em {cachedAtLabel}.</div>
+                )}
+              </div>
             </div>
           )}
           {isLoading ? (
