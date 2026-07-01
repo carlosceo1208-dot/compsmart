@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCompensationTrends, CompensationTrend } from "@/hooks/useCompensationTrends";
+import { formatDateTimePtBR } from "@/lib/formatDateTime";
 import { TrendDetailDialog } from "./TrendDetailDialog";
 import { 
   TrendingUp, 
@@ -86,9 +87,7 @@ const ErrorState = ({ onRetry }: { onRetry: () => void }) => (
 
 export const CompensationTrendsCard = () => {
   const { trends, isLoading, isError, refetch, isFetching, isFallback, fallbackReason, fetchedAt } = useCompensationTrends();
-  const cachedAtLabel = fetchedAt
-    ? new Date(fetchedAt).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" })
-    : null;
+  const cachedAtLabel = fetchedAt ? formatDateTimePtBR(fetchedAt) : null;
   const [selectedTrend, setSelectedTrend] = useState<CompensationTrend | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -129,7 +128,7 @@ export const CompensationTrendsCard = () => {
                     : "Exibindo tendências em cache. Os dados podem estar desatualizados."}
                 </div>
                 {cachedAtLabel && (
-                  <div className="opacity-80">Dados em cache obtidos em {cachedAtLabel}.</div>
+                  <div className="opacity-80">Dados em cache obtidos em {cachedAtLabel} (horário de Brasília).</div>
                 )}
               </div>
             </div>
