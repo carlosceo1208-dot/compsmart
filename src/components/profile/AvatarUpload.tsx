@@ -24,6 +24,8 @@ export function AvatarUpload({
 }: AvatarUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { url: displayUrl, error: brokenUrl, markBroken } = useResolvedStorageUrl('avatars', currentAvatarUrl);
+
 
   const uploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
