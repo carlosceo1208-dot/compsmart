@@ -674,9 +674,9 @@ ${document_text ? buildUntrustedDocumentBlock(document_name, document_text) : ''
     }
 
     // Adicionar pergunta atual
-    messages.push({ 
-      role: 'user', 
-      content: question + (document_text ? `\n\n---DOCUMENTO ANEXADO---\n${document_text}` : '') 
+    messages.push({
+      role: 'user',
+      content: question,
     });
 
     const startTime = Date.now();
