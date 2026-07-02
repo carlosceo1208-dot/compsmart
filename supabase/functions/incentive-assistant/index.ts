@@ -725,16 +725,7 @@ Lista numerada com:
 5. **Seja colaborativo**: Incentive iterações ("Vamos ajustar juntos?")
 6. **Seja ético**: Nunca invente dados, pergunte se faltar informação
 
-${document_text ? `
-═══════════════════════════════════════════════════════════════════
-                     📎 DOCUMENTO ANEXADO
-═══════════════════════════════════════════════════════════════════
-
-**Nome do Arquivo:** ${document_name}
-
-**Conteúdo para Análise:**
-${document_text.substring(0, 15000)}
-` : ''}
+${document_text ? buildUntrustedDocumentBlock(document_name, document_text) : ''}
 `;
 
     // Call Lovable AI with Pro model for complex reasoning
