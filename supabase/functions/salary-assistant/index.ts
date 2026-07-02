@@ -634,12 +634,7 @@ ${operationMode === 'distorcoes' ? `
 5. Priorizar ações corretivas
 ` : ''}
 
-${document_text ? `
-═══════════════════════════════════════════════════════════════════════════════
-                          📄 DOCUMENTO ANEXADO: ${document_name}
-═══════════════════════════════════════════════════════════════════════════════
-Analise o documento em conjunto com os dados da empresa para gerar insights.
-` : ''}
+${document_text ? buildUntrustedDocumentBlock(document_name, document_text) : ''}
 
 **ENCERRAMENTO OBRIGATÓRIO DE CADA ANÁLISE:**
 
