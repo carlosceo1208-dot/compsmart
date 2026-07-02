@@ -275,9 +275,9 @@ serve(async (req) => {
       );
     }
     if (document_text !== undefined && document_text !== null) {
-      if (typeof document_text !== 'string' || document_text.length > 50000) {
+      if (typeof document_text !== 'string' || document_text.length > MAX_DOCUMENT_CHARS) {
         return new Response(
-          JSON.stringify({ error: 'Document too large (max 50000 chars)' }),
+          JSON.stringify({ error: `Document too large (max ${MAX_DOCUMENT_CHARS} chars)` }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
