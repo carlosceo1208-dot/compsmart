@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { buildUntrustedDocumentBlock, MAX_DOCUMENT_CHARS } from "../_shared/sanitize-document.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -187,9 +188,9 @@ serve(async (req) => {
       );
     }
     if (document_text !== undefined && document_text !== null) {
-      if (typeof document_text !== 'string' || document_text.length > 50000) {
+      if (typeof document_text !== 'string' || document_text.length > MAX_DOCUMENT_CHARS) {
         return new Response(
-          JSON.stringify({ error: 'Document too large (max 50000 chars)' }),
+          JSON.stringify({ error: `Document too large (max ${MAX_DOCUMENT_CHARS} chars)` }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -633,12 +634,7 @@ ${operationMode === 'distorcoes' ? `
 5. Priorizar ações corretivas
 ` : ''}
 
-${document_text ? `
-═══════════════════════════════════════════════════════════════════════════════
-                          📄 DOCUMENTO ANEXADO: ${document_name}
-═══════════════════════════════════════════════════════════════════════════════
-Analise o documento em conjunto com os dados da empresa para gerar insights.
-` : ''}
+${document_text ? buildUntrustedDocumentBlock(document_name, document_text) : ''}
 
 **ENCERRAMENTO OBRIGATÓRIO DE CADA ANÁLISE:**
 
@@ -678,9 +674,9 @@ Analise o documento em conjunto com os dados da empresa para gerar insights.
     }
 
     // Adicionar pergunta atual
-    messages.push({ 
-      role: 'user', 
-      content: question + (document_text ? `\n\n---DOCUMENTO ANEXADO---\n${document_text}` : '') 
+    messages.push({
+      role: 'user',
+      content: question,
     });
 
     const startTime = Date.now();
