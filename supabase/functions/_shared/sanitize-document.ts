@@ -3,7 +3,7 @@
 // patterns, caps size, and returns a delimited block ready to embed in
 // a system prompt.
 
-export const MAX_DOCUMENT_CHARS = 10_000;
+export const MAX_DOCUMENT_CHARS = 50_000;
 
 // Strips or neutralizes common prompt-injection prefixes.
 export function sanitizeDocumentText(input: string): string {
