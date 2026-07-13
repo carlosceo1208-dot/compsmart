@@ -1,0 +1,1 @@
+GRANT SELECT (subscription_status, trial_ends_at, nr1_addon_enabled, clima_addon_enabled, fib_addon_enabled, psicossociais_addon_enabled, checkup_addon_enabled) ON public.organizational_structure TO authenticated;
