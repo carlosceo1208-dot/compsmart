@@ -38,9 +38,13 @@ jobs:
       - name: Install dependencies (retry)
         run: |
           for attempt in 1 2; do
-            bun install --frozen-lockfile && break
+            if bun install --frozen-lockfile; then
+              exit 0
+            fi
             echo "::warning::bun install failed (attempt $attempt)"
-            [ "$attempt" = "2" ] && exit 1
+            if [ "$attempt" = "2" ]; then
+              exit 1
+            fi
             sleep 10
           done
 
