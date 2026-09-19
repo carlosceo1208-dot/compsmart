@@ -1,10 +1,13 @@
 name: RLS Tenant Isolation
 
 on:
-  # Manual-only — nightly cron and PR triggers disabled to avoid noisy
-  # failure emails caused by transient infra issues (e.g. Bun download 504).
-  # Re-enable schedule/pull_request here when needed.
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+  # Semanal (não noturno) para reduzir janelas de falha transitória
+  # e o volume de e-mails; resultado é revisado na segunda-feira.
+  schedule:
+    - cron: "0 3 * * 1" # toda segunda-feira às 03:00 UTC (00:00 em São Paulo)
 
 concurrency:
   group: rls-tenant-isolation-${{ github.ref }}
