@@ -692,7 +692,7 @@ const Users = () => {
             </Button>
           )}
           
-          {hasCoreModule ? (
+          {hasCoreModule && (!isConsultorUser || hasConsultorCoreAccess) ? (
             <Button 
               variant="outline" 
               className="gap-2"
@@ -700,6 +700,16 @@ const Users = () => {
             >
               <Upload className="w-4 h-4" />
               Atualizar Colaboradores
+            </Button>
+          ) : isConsultorUser && hasCoreModule ? (
+            <Button
+              variant="outline"
+              className="gap-2"
+              disabled
+              title="Acesso restrito: é necessário um projeto de RH Service em andamento nesta empresa."
+            >
+              <Lock className="w-4 h-4" />
+              Acesso restrito
             </Button>
           ) : (
             <Button
@@ -711,6 +721,7 @@ const Users = () => {
               Ativar módulo Core
             </Button>
           )}
+
           {(currentUserRoles.includes('manager') || currentUserRoles.includes('hr_manager') || currentUserRoles.includes('admin')) && (
             <Button 
               variant="outline"
