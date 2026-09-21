@@ -18,6 +18,7 @@ A implementação seguirá sem alterações no backend, pagamentos, landing page
 2. **Atualizar o bloqueio visual dos cards**
    - Card com módulo contratado: ativo e navegável.
    - Card sem módulo contratado: continua visível, com cadeado e CTA “Ativar módulo”.
+   - O CTA exibirá o nome legível do módulo vindo do catálogo, por exemplo: “Ativar módulo Clima”, “Ativar módulo Core” ou “Ativar módulo Avaliação de Potencial e Sucessão”.
    - Substituir textos como “Fazer upgrade do plano” por “Ativar módulo”.
    - Preservar o visual atual: cores, cards, sombras, tipografia, botões e hierarquia.
 
@@ -51,13 +52,16 @@ A implementação seguirá sem alterações no backend, pagamentos, landing page
    - Controle de acesso, permissões e administração permanecem disponíveis para administradores.
    - Segurança e tentativas de login ficam fora do dashboard executivo.
 
-7. **Listar cards transversais ao final**
-   - Manter visíveis nesta etapa os cards sem dono comercial claro, como Jurídico Smart, R&B Smart e People Analytics.
+7. **Cards transversais com controle**
+   - Jurídico Smart, R&B Smart e People Analytics continuam visíveis no dashboard, mas não ficam liberados por padrão.
+   - Esses cards ficam ativos apenas quando o tenant já possuía o serviço ativo antes da migração ou quando tiver o módulo Core contratado.
+   - Caso contrário, ficam bloqueados com cadeado e CTA “Conhecer o módulo Core”.
    - Ao concluir, entregar uma lista dos cards que ficaram como transversais para validação.
 
 ## Detalhes técnicos
 
 - Criar um hook reutilizável para consultar os módulos contratados e expor helpers como `hasModule('core')` e combinações `any/all`.
+- Ler também o catálogo de módulos para usar `modules.nome` nos CTAs de bloqueio, evitando nomes fixos no código.
 - Adaptar `PlanGate` ou criar um wrapper equivalente para módulo, mantendo compatibilidade com telas que ainda dependem da regra antiga fora desta etapa.
 - Atualizar o dashboard principal e os cards de NR-1 para usar slugs de módulo, não nomes de plano.
 - Não tocar em migrações, funções de pagamento, funções de IA, regras de dados, landing page pública ou checkout.
