@@ -39,11 +39,16 @@ export const useNr1Intelligence = (filters: Nr1IntelligenceFilters, access: Nr1I
     queryKey: ['nr1-intel', activeCompanyId, filters, includePotential, includePerformance, includeCompensation],
     enabled: !!activeCompanyId,
     queryFn: async () => {
+      const companyId = activeCompanyId;
+      if (!companyId) {
+        throw new Error('Empresa ativa não selecionada');
+      }
+
       // 1) Diagnósticos NR-1 do período
       let dq = supabase
         .from('nr1_diagnosticos')
         .select('*')
-        .eq('company_id', activeCompanyId!)
+        .eq('company_id', companyId)
         .eq('status', 'concluido')
         .order('created_at', { ascending: false });
       if (filters.startDate) dq = dq.gte('periodo_fim', filters.startDate);
@@ -89,7 +94,8 @@ export const useNr1Intelligence = (filters: Nr1IntelligenceFilters, access: Nr1I
       talent.forEach((row) => {
         const k = row.unit_id ?? null;
         if (!byUnit.has(k)) byUnit.set(k, []);
-        byUnit.get(k)!.push(row);
+        const rows = byUnit.get(k);
+        if (rows) rows.push(row);
       });
 
       const riscoEmpresa = ultimo?.score_geral != null ? Number(ultimo.score_geral) : null;
