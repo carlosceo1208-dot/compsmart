@@ -41,7 +41,7 @@ Para cada prática com score abaixo de 60, o sistema sugere automaticamente o m�
 
 - Novo valor `consultor` em `public.app_role` (`ALTER TYPE ... ADD VALUE IF NOT EXISTS`), em migração separada da que o usa, para evitar erro de enum não comitado.
 - Tabelas novas em `public`, todas com `tenant_id UUID NOT NULL REFERENCES organizational_structure(id) ON DELETE CASCADE`, `created_at`/`updated_at` e trigger `public.update_updated_at_column()`:
-  `consultores`, `rh_service_projetos`, `rh_service_horas`, `rh_service_maturidade_versoes`, `rh_service_maturidade_questoes`, `rh_service_diagnosticos`, `rh_service_diagnostico_scores`, `rh_service_recomendacoes`.
+  `consultores`, `rh_service_projetos`, `rh_service_horas`, `rh_service_maturidade_versoes`, `rh_service_maturidade_questoes`, `rh_service_diagnosticos`, `rh_service_diagnostico_respostas`, `rh_service_diagnostico_scores`, `rh_service_recomendacoes`.
   `rh_service_maturidade_versoes`/`_questoes` são globais (sem `tenant_id`).
 - Cada `CREATE TABLE` seguido de `GRANT SELECT, INSERT, UPDATE, DELETE ... TO authenticated` e `GRANT ALL ... TO service_role`; nada para `anon`. Depois `ENABLE ROW LEVEL SECURITY` e as policies.
 - Policies por tabela do RH Service:
