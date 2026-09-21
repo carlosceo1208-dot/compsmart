@@ -1062,6 +1062,69 @@ export type Database = {
           },
         ]
       }
+      bundle_modules: {
+        Row: {
+          bundle_id: string
+          created_at: string
+          module_id: string
+        }
+        Insert: {
+          bundle_id: string
+          created_at?: string
+          module_id: string
+        }
+        Update: {
+          bundle_id?: string
+          created_at?: string
+          module_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_modules_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_modules_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bundles: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          is_active: boolean
+          nome: string
+          percentual_desconto: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          is_active?: boolean
+          nome: string
+          percentual_desconto?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          is_active?: boolean
+          nome?: string
+          percentual_desconto?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cbo_codes: {
         Row: {
           code: string
@@ -3775,6 +3838,54 @@ export type Database = {
           },
         ]
       }
+      leads: {
+        Row: {
+          cargo: string | null
+          consentimento_lgpd: boolean
+          created_at: string
+          email: string
+          empresa: string | null
+          id: string
+          lead_magnet: string | null
+          modulo_interesse: string | null
+          nome: string
+          origem: string | null
+          porte: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cargo?: string | null
+          consentimento_lgpd?: boolean
+          created_at?: string
+          email: string
+          empresa?: string | null
+          id?: string
+          lead_magnet?: string | null
+          modulo_interesse?: string | null
+          nome: string
+          origem?: string | null
+          porte?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cargo?: string | null
+          consentimento_lgpd?: boolean
+          created_at?: string
+          email?: string
+          empresa?: string | null
+          id?: string
+          lead_magnet?: string | null
+          modulo_interesse?: string | null
+          nome?: string
+          origem?: string | null
+          porte?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       legal_assistant_conversations: {
         Row: {
           answer: string
@@ -4098,6 +4209,92 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      module_pricing: {
+        Row: {
+          created_at: string
+          faixa_max_colaboradores: number | null
+          faixa_min_colaboradores: number
+          id: string
+          module_id: string
+          preco_mensal: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          faixa_max_colaboradores?: number | null
+          faixa_min_colaboradores: number
+          id?: string
+          module_id: string
+          preco_mensal?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          faixa_max_colaboradores?: number | null
+          faixa_min_colaboradores?: number
+          id?: string
+          module_id?: string
+          preco_mensal?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_pricing_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      modules: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          icone: string | null
+          id: string
+          is_active: boolean
+          is_legal_product: boolean
+          is_negotiable: boolean
+          nome: string
+          nome_agente: string | null
+          ordem: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          is_active?: boolean
+          is_legal_product?: boolean
+          is_negotiable?: boolean
+          nome: string
+          nome_agente?: string | null
+          ordem?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          icone?: string | null
+          id?: string
+          is_active?: boolean
+          is_legal_product?: boolean
+          is_negotiable?: boolean
+          nome?: string
+          nome_agente?: string | null
+          ordem?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       nr1_access_log: {
         Row: {
@@ -8701,6 +8898,71 @@ export type Database = {
           },
         ]
       }
+      tenant_subscriptions: {
+        Row: {
+          bundle_id: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          module_id: string | null
+          started_at: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          bundle_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          module_id?: string | null
+          started_at?: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          bundle_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          module_id?: string | null
+          started_at?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_subscriptions_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_subscriptions_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_subscriptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       unit_merit_budgets: {
         Row: {
           approved_amount_annual: number
@@ -10381,6 +10643,12 @@ export type Database = {
           total_payroll: number
         }[]
       }
+      get_tenant_modules: {
+        Args: never
+        Returns: {
+          slug: string
+        }[]
+      }
       get_top_compensation_mismatches: {
         Args: { p_limit?: number }
         Returns: {
@@ -10422,6 +10690,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_module: { Args: { _slug: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
