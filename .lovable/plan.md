@@ -27,7 +27,7 @@ Nome, e-mail, empresa, cargo, porte (pequena/média/grande), módulo de interess
 
 ## Privacidade e isolamento
 
-- Catálogo (módulos, faixas de preço, combos) é leitura pública para quem está logado; alteração apenas por super admin.
+- Catálogo (módulos, faixas de preço, combos) é de leitura pública, inclusive para visitantes sem login, para a página de vendas exibir preços; alteração apenas por super admin.
 - Contratações: cada empresa vê somente as suas; alteração apenas por super admin/sistema de pagamento.
 - Leads: gravação liberada para o formulário público (com consentimento obrigatório), leitura restrita a super admin — dado pessoal não fica exposto.
 
