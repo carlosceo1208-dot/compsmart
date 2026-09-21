@@ -2,9 +2,21 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, ArrowRight, Target, ClipboardCheck, LayoutGrid, Award } from "lucide-react";
+import { TrendingUp, ArrowRight, Target, ClipboardCheck, LayoutGrid, Award, Lock } from "lucide-react";
+import { useModuleAccess } from "@/hooks/useModuleAccess";
+import { toast } from "sonner";
 
 export function PerformanceModuleCard() {
+  const moduleAccess = useModuleAccess();
+  const hasCore = moduleAccess.hasModule('core');
+  const coreName = moduleAccess.getModuleName('core');
+
+  const handleLockedClick = () => {
+    toast.info(`Ativar módulo ${coreName}`, {
+      description: `Avaliação de Desempenho está disponível para empresas com ${coreName} contratado.`,
+    });
+  };
+
   return (
     <Card className="performance-module-card overflow-hidden border-2 border-indigo-200/50 dark:border-indigo-800/30 bg-gradient-to-br from-indigo-50 via-white to-indigo-50 dark:from-indigo-950/30 dark:via-background dark:to-indigo-950/30 shadow-lg hover:shadow-xl transition-shadow">
       <CardContent className="p-6">
@@ -22,9 +34,13 @@ export function PerformanceModuleCard() {
               </p>
             </div>
           </div>
-          <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">
-            Novo
-          </Badge>
+          {hasCore ? (
+            <Badge className="bg-indigo-100 text-indigo-700 border-indigo-200">Novo</Badge>
+          ) : (
+            <Badge variant="outline" className="bg-muted/50 text-muted-foreground">
+              <Lock className="h-3 w-3 mr-1" /> Bloqueado
+            </Badge>
+          )}
         </div>
 
         <div className="grid grid-cols-4 gap-2 mb-4">
@@ -46,12 +62,19 @@ export function PerformanceModuleCard() {
           </div>
         </div>
 
-        <Link to="/performance">
-          <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700">
-            Acessar Módulo
-            <ArrowRight className="h-4 w-4" />
+        {hasCore ? (
+          <Link to="/performance">
+            <Button className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700">
+              Acessar Módulo
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        ) : (
+          <Button type="button" variant="outline" className="w-full gap-2" onClick={handleLockedClick}>
+            <Lock className="h-4 w-4" />
+            Ativar módulo {coreName}
           </Button>
-        </Link>
+        )}
       </CardContent>
     </Card>
   );

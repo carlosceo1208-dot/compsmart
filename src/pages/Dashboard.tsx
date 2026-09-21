@@ -17,13 +17,11 @@ import { TalentIntelligenceCard } from "@/components/dashboard/TalentIntelligenc
 import { PayEquityCard } from "@/components/dashboard/PayEquityCard";
 import { ExecutiveCompCard } from "@/components/dashboard/ExecutiveCompCard";
 import { EconomicIndicatorsCard } from "@/components/dashboard/EconomicIndicatorsCard";
-import { SecurityQuickAccessCard } from "@/components/dashboard/SecurityQuickAccessCard";
 import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
 import { BemEstarModuleCard } from "@/components/dashboard/BemEstarModuleCard";
-import { PlanGate } from "@/components/PlanGate";
+import { ModuleGate } from "@/components/ModuleGate";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useFounderStatus } from "@/hooks/useFounderStatus";
-import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { FounderBadge } from "@/components/launch/FounderBadge";
 import { AiBadge } from "@/components/ui/ai-badge";
 
@@ -46,9 +44,6 @@ const Dashboard = () => {
   const { currency, setCurrency } = useCurrencyConverter();
   const [showWithCharges, setShowWithCharges] = useState(false);
   const { data: isFounder } = useFounderStatus();
-  const { data: userRole } = useCurrentUserRole();
-
-  const isSuperAdmin = userRole?.isSuperAdmin || false;
 
   return (
     <div className="h-[calc(100vh-8rem)] overflow-auto">
@@ -81,14 +76,13 @@ const Dashboard = () => {
           
           <PendingAdjustmentAlert />
           <SalaryTableSetupAlert />
-          {isSuperAdmin && <Item i={0}><SecurityQuickAccessCard /></Item>}
           
           <div className="grid gap-4 grid-cols-1">
             <Item i={1}><PerformanceModuleCard /></Item>
             <Item i={2}>
-              <PlanGate mode="card" feature="nr1_essencial" featureName="Saúde Mental e Bem-Estar (NR-1)" requiredPlanLabel="NR-1 Essencial">
+              <ModuleGate mode="card" moduleSlug="nr1" featureName="Saúde Mental e Bem-Estar (NR-1)">
                 <BemEstarModuleCard />
-              </PlanGate>
+              </ModuleGate>
             </Item>
           </div>
           
@@ -110,24 +104,24 @@ const Dashboard = () => {
           </Item>
           <Item i={1}><CompensationTrendsCard /></Item>
           <Item i={2}>
-            <PlanGate mode="card" feature="merit_governance" featureName="Coerência de Mérito" requiredPlanLabel="Pro">
+            <ModuleGate mode="card" moduleSlug="core" featureName="Coerência de Mérito">
               <MeritCoherenceCard />
-            </PlanGate>
+            </ModuleGate>
           </Item>
           <Item i={3}>
-            <PlanGate mode="card" feature="advanced_analytics" featureName="Inteligência de Talentos" requiredPlanLabel="Medium">
+            <ModuleGate mode="card" moduleSlug="potencial-sucessao" featureName="Inteligência de Talentos">
               <TalentIntelligenceCard />
-            </PlanGate>
+            </ModuleGate>
           </Item>
           <Item i={4}>
-            <PlanGate mode="card" feature="salary_analysis_report" featureName="Pay Equity" requiredPlanLabel="Pro">
+            <ModuleGate mode="card" moduleSlug="core" featureName="Pay Equity">
               <PayEquityCard />
-            </PlanGate>
+            </ModuleGate>
           </Item>
           <Item i={5}>
-            <PlanGate mode="card" feature="incentive_programs" featureName="Remuneração de Executivos (ILP)" requiredPlanLabel="Pro">
+            <ModuleGate mode="card" moduleSlug="core" featureName="Remuneração de Executivos (ILP)">
               <ExecutiveCompCard />
-            </PlanGate>
+            </ModuleGate>
           </Item>
           <Item i={6}><EconomicIndicatorsCard /></Item>
           <Item i={7}><AlphabeticalNav /></Item>
