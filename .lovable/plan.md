@@ -18,10 +18,13 @@ Título, descrição, escopo, consultor responsável, situação (proposta / em 
 Horas lançadas pelo consultor por projeto, com descrição e data. Serve para o cliente acompanhar o consumo do pacote contratado.
 
 **Questionário de maturidade de RH (versionado no banco)**
-Um conjunto de perguntas por prática de RH, agrupado em versões, para poder ajustar perguntas depois sem mexer no aplicativo. Práticas cobertas: estrutura de cargos, remuneração, desempenho, clima, NR-1, seleção, T&D e sucessão. Cada prática já vem associada ao módulo correspondente da plataforma.
+Um conjunto de perguntas por prática de RH, agrupado em versões, para poder ajustar perguntas depois sem mexer no aplicativo. Práticas cobertas: estrutura de cargos, remuneração, desempenho, clima, NR-1, seleção, T&D, sucessão e — decisão confirmada neste plano — descrição de cargos e job matching (9 práticas).
 
 **Diagnósticos de maturidade**
-Um diagnóstico por empresa/projeto, com as respostas, o score de cada prática (0–100) e o nível resultante: inicial (0–29), em desenvolvimento (30–59), estruturado (60–84), avançado (85–100). O diagnóstico guarda também o resumo geral e a situação (rascunho / concluído).
+Um diagnóstico por empresa, com o score de cada prática (0–100) e o nível resultante: inicial (0–29), em desenvolvimento (30–59), estruturado (60–84), avançado (85–100). Guarda o resumo geral, a situação (rascunho / concluído) e, para rastreabilidade, a versão do questionário respondida, o projeto de consultoria e o consultor que o aplicou — vínculos que o cliente também vê.
+
+**Respostas pergunta a pergunta**
+Cada resposta fica gravada individualmente, ligada ao diagnóstico, à pergunta e à versão do questionário. O score de cada prática é calculado somente com as perguntas da versão registrada no diagnóstico — nunca misturando versões diferentes.
 
 **Módulos recomendados**
 Para cada prática com score abaixo de 60, o sistema sugere automaticamente o módulo correspondente. O consultor revisa: pode remover, acrescentar módulos ou reescrever a justificativa. Cada recomendação guarda sua origem — automática, editada ou manual — para auditoria e calibragem futura do limiar.
