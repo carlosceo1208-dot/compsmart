@@ -12,6 +12,7 @@ import { SalaryTableSetupAlert } from "@/components/dashboard/SalaryTableSetupAl
 import { DashboardTour } from "@/components/dashboard/DashboardTour";
 import { CompanyMapCard } from "@/components/dashboard/CompanyMapCard";
 import { CompensationTrendsCard } from "@/components/dashboard/CompensationTrendsCard";
+import { MarketInsightsCard } from "@/components/dashboard/MarketInsightsCard";
 import { MeritCoherenceCard } from "@/components/dashboard/MeritCoherenceCard";
 import { TalentIntelligenceCard } from "@/components/dashboard/TalentIntelligenceCard";
 import { PayEquityCard } from "@/components/dashboard/PayEquityCard";
@@ -103,6 +104,7 @@ const Dashboard = () => {
             />
           </Item>
           <Item i={1}><CompensationTrendsCard /></Item>
+          <Item i={1}><MarketInsightsCard /></Item>
           <Item i={2}>
             <ModuleGate mode="card" moduleSlug="core" featureName="Coerência de Mérito">
               <MeritCoherenceCard />
