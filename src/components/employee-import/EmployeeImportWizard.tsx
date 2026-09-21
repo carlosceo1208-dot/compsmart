@@ -144,6 +144,7 @@ export function EmployeeImportWizard({ onImported, onClose, onViewHistory }: Pro
     try {
       const sheet = parsePastedText(pastedText);
       setParsed(sheet);
+      setSourceFile(null);
       setFileName('Dados colados');
       await applySuggestion(sheet);
       setStep('mapping');
@@ -650,6 +651,7 @@ export function EmployeeImportWizard({ onImported, onClose, onViewHistory }: Pro
             variant="outline"
             onClick={() => {
               setParsed(null);
+              setSourceFile(null);
               setResult(null);
               setPastedText('');
               setStep('file');
