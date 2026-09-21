@@ -689,14 +689,25 @@ const Users = () => {
             </Button>
           )}
           
-          <Button 
-            variant="outline" 
-            className="gap-2"
-            onClick={() => setBulkImportOpen(true)}
-          >
-            <Upload className="w-4 h-4" />
-            Atualizar Colaboradores
-          </Button>
+          {hasCoreModule ? (
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => setBulkImportOpen(true)}
+            >
+              <Upload className="w-4 h-4" />
+              Atualizar Colaboradores
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate('/settings/plans')}
+            >
+              <Lock className="w-4 h-4" />
+              Ativar módulo Core
+            </Button>
+          )}
           {(currentUserRoles.includes('manager') || currentUserRoles.includes('hr_manager') || currentUserRoles.includes('admin')) && (
             <Button 
               variant="outline"

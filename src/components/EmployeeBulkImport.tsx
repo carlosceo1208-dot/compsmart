@@ -14,7 +14,7 @@ interface EmployeeBulkImportProps {
 }
 
 export function EmployeeBulkImport({ open, onOpenChange, onSuccess }: EmployeeBulkImportProps) {
-  const { canImport, isLoading } = useEmployeeImportAccess();
+  const { canImport, loading: isLoading } = useEmployeeImportAccess();
   const [tab, setTab] = useState("importar");
 
   useEffect(() => {
