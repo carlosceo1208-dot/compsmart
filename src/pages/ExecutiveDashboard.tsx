@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 import { EconomicIndicatorsCard } from '@/components/dashboard/EconomicIndicatorsCard';
+import { MarketInsightsCard } from '@/components/dashboard/MarketInsightsCard';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import { Crown, Search, ArrowRight, ShieldAlert } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -116,6 +117,9 @@ export default function ExecutiveDashboard() {
 
       {/* Indicadores macro em destaque no topo */}
       <EconomicIndicatorsCard />
+
+      {/* Tendências e notícias do mercado de RH */}
+      <MarketInsightsCard />
 
       {/* Busca e navegação alfabética */}
       <Card>

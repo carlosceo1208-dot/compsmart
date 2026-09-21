@@ -4270,6 +4270,78 @@ export type Database = {
           },
         ]
       }
+      market_insights_cache: {
+        Row: {
+          cache_key: string
+          created_at: string
+          expires_at: string
+          fetched_at: string
+          id: string
+          question: string
+          result: Json
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string
+          expires_at?: string
+          fetched_at?: string
+          id?: string
+          question: string
+          result?: Json
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string
+          expires_at?: string
+          fetched_at?: string
+          id?: string
+          question?: string
+          result?: Json
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      market_insights_usage: {
+        Row: {
+          created_at: string
+          from_cache: boolean
+          id: string
+          question: string
+          rejected: boolean
+          rejection_reason: string | null
+          root_company_id: string | null
+          topic: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          from_cache?: boolean
+          id?: string
+          question: string
+          rejected?: boolean
+          rejection_reason?: string | null
+          root_company_id?: string | null
+          topic?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          from_cache?: boolean
+          id?: string
+          question?: string
+          rejected?: boolean
+          rejection_reason?: string | null
+          root_company_id?: string | null
+          topic?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       merit_approval_history: {
         Row: {
           action: string
