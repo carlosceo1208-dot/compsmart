@@ -12,6 +12,8 @@ import { Link } from 'react-router-dom';
 import { AlertTriangle, TrendingDown, Users, DollarSign, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useNr1Intelligence } from '@/hooks/useNr1Intelligence';
 import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, calcRisco, type Dimensao } from '@/lib/nr1';
+import { ModuleGate } from '@/components/ModuleGate';
+import { useModuleAccess } from '@/hooks/useModuleAccess';
 import {
   ResponsiveContainer,
   RadarChart,
@@ -40,7 +42,17 @@ export default function Nr1Inteligencia() {
   const [endDate, setEndDate] = useState(today.toISOString().slice(0, 10));
   const [unitId, setUnitId] = useState<string>('all');
 
-  const { data, isLoading } = useNr1Intelligence({ startDate, endDate, unitId });
+  const moduleAccess = useModuleAccess();
+  const hasCore = moduleAccess.hasModule('core');
+  const hasInsight = moduleAccess.hasModule('insight');
+  const hasPotential = moduleAccess.hasModule('potencial-sucessao');
+  const hasCompensation = hasCore || hasInsight;
+  const hasPerformance = hasCore;
+
+  const { data, isLoading } = useNr1Intelligence(
+    { startDate, endDate, unitId },
+    { includePotential: hasPotential, includePerformance: hasPerformance, includeCompensation: hasCompensation },
+  );
 
   const radarData = useMemo(() => {
     if (!data?.dimensoes) return [];
@@ -131,20 +143,38 @@ export default function Nr1Inteligencia() {
             <KpiCard
               icon={Users}
               label="Talentos analisados"
-              value={`${data.kpis.totalColab}`}
-              hint={`${data.kpis.totalEstrelas} estrelas · ${data.kpis.totalCriticos} críticos`}
+              value={
+                <ModuleGate mode="inline" moduleSlug="potencial-sucessao" featureName="Avaliação de Potencial e Sucessão">
+                  {`${data.kpis.totalColab}`}
+                </ModuleGate>
+              }
+              hint={hasPotential ? `${data.kpis.totalEstrelas} estrelas · ${data.kpis.totalCriticos} críticos` : undefined}
             />
             <KpiCard
               icon={DollarSign}
               label="Salário médio"
-              value={fmtBRL(data.kpis.avgSalGeral || 0)}
+              value={
+                <ModuleGate mode="inline" moduleSlugs={["core", "insight"]} featureName="Remuneração & Equidade">
+                  {fmtBRL(data.kpis.avgSalGeral || 0)}
+                </ModuleGate>
+              }
             />
             <KpiCard
               icon={TrendingDown}
               label="Custo turnover estimado"
-              value={fmtBRL(data.kpis.custoTurnoverEstimado)}
-              hint="Estrelas em ambiente de risco"
-              danger={data.kpis.custoTurnoverEstimado > 0}
+              value={
+                <ModuleGate
+                  mode="inline"
+                  moduleSlugs={["potencial-sucessao", "core", "insight"]}
+                  allowIf={hasPotential && hasCompensation}
+                  featureName="Risco × Potencial × Remuneração"
+                  ctaLabel="Ativar módulos necessários"
+                >
+                  {fmtBRL(data.kpis.custoTurnoverEstimado)}
+                </ModuleGate>
+              }
+              hint={hasPotential && hasCompensation ? 'Estrelas em ambiente de risco' : undefined}
+              danger={hasPotential && hasCompensation && data.kpis.custoTurnoverEstimado > 0}
             />
           </div>
 
@@ -201,31 +231,33 @@ export default function Nr1Inteligencia() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribuição 9Box por Unidade</CardTitle>
-                <CardDescription>Talentos críticos vs estrelas</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[320px]">
-                {boxBarData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={boxBarData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="unit" tick={{ fontSize: 11 }} />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="Críticos" fill="hsl(var(--destructive))" />
-                      <Bar dataKey="Estrelas" fill="hsl(var(--nr1-primary))" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <p className="text-sm text-muted-foreground text-center pt-12">
-                    Sem dados de 9Box. Realize avaliações em <Link to="/performance/9box" className="underline">Performance · 9Box</Link>.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            <ModuleGate mode="section" moduleSlug="potencial-sucessao" featureName="Distribuição 9Box por Unidade">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Distribuição 9Box por Unidade</CardTitle>
+                  <CardDescription>Talentos críticos vs estrelas</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[320px]">
+                  {boxBarData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={boxBarData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="unit" tick={{ fontSize: 11 }} />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="Críticos" fill="hsl(var(--destructive))" />
+                        <Bar dataKey="Estrelas" fill="hsl(var(--nr1-primary))" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center pt-12">
+                      Sem dados de 9Box. Realize avaliações em <Link to="/performance/9box" className="underline">Performance · 9Box</Link>.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            </ModuleGate>
           </div>
 
           {/* Tabela cruzada */}
@@ -237,7 +269,7 @@ export default function Nr1Inteligencia() {
             <CardContent className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                    <TableRow>
                     <TableHead>Unidade</TableHead>
                     <TableHead className="text-right">Colab.</TableHead>
                     <TableHead className="text-right">Críticos 9Box</TableHead>
@@ -260,16 +292,16 @@ export default function Nr1Inteligencia() {
                         <TableCell className="font-medium">{u.unitName}</TableCell>
                         <TableCell className="text-right tabular-nums">{u.totalColab}</TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {u.criticos9Box > 0 ? (
+                          {!hasPotential ? 'Bloqueado' : u.criticos9Box > 0 ? (
                             <Badge variant="destructive">{u.criticos9Box}</Badge>
                           ) : u.criticos9Box}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums">{u.estrelas9Box}</TableCell>
+                        <TableCell className="text-right tabular-nums">{hasPotential ? u.estrelas9Box : 'Bloqueado'}</TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {u.avgPerformance != null ? u.avgPerformance.toFixed(2) : '—'}
+                          {hasPerformance && u.avgPerformance != null ? u.avgPerformance.toFixed(2) : hasPerformance ? '—' : 'Bloqueado'}
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {u.avgSalary != null ? fmtBRL(u.avgSalary) : '—'}
+                          {hasCompensation && u.avgSalary != null ? fmtBRL(u.avgSalary) : hasCompensation ? '—' : 'Bloqueado'}
                         </TableCell>
                         <TableCell>
                           {riscoNivel ? (

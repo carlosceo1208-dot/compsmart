@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { ModuleGate } from '@/components/ModuleGate';
+import { useModuleAccess } from '@/hooks/useModuleAccess';
 
 import { useClimaCopsoqCorrelacao } from '@/hooks/useClimaCopsoqCorrelacao';
 import { DIMENSAO_LABEL as CLIMA_LABEL, type ClimaDimensao } from '@/lib/climaQuestoes';
@@ -20,7 +22,9 @@ import { DIMENSAO_LABEL as CLIMA_LABEL, type ClimaDimensao } from '@/lib/climaQu
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
   const { data: diagnosticos, isLoading: diagLoading } = useNr1Diagnosticos();
-  const { data: correlacoes = [] } = useClimaCopsoqCorrelacao();
+  const moduleAccess = useModuleAccess();
+  const hasClima = moduleAccess.hasModule('clima');
+  const { data: correlacoes = [] } = useClimaCopsoqCorrelacao(hasClima);
 
   const ciclosConcluidos = useMemo(
     () => (diagnosticos ?? []).filter((d) => d.status === 'concluido'),
@@ -87,7 +91,14 @@ export default function Nr1Dashboard() {
       <GrauRiscoInssCard />
 
       {/* Correlações de Risco Clima × COPSOQ */}
-      {topCorrelacoes.length > 0 && (
+      {!hasClima ? (
+        <ModuleGate
+          mode="card"
+          moduleSlug="clima"
+          featureName="Correlações de Risco — Clima × COPSOQ"
+          description="A análise cruzada de clima com riscos psicossociais exige o módulo Clima Organizacional."
+        />
+      ) : topCorrelacoes.length > 0 && (
         <Card className="border-[hsl(var(--nr1-primary)/0.3)]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between flex-wrap gap-2">

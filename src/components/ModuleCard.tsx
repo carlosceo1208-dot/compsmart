@@ -151,7 +151,16 @@ export const ModuleCard = ({
                 {lockDescription && (
                   <p className="text-xs text-muted-foreground">{lockDescription}</p>
                 )}
-                <Button type="button" size="sm" variant="outline" className="h-8 w-full text-xs" onClick={handleClick}>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 w-full text-xs"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleClick();
+                  }}
+                >
                   <Lock className="h-3.5 w-3.5" />
                   {lockCta}
                 </Button>
