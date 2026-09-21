@@ -211,17 +211,17 @@ const App = () => {
                         <Route path="/admin/convidar-socios" element={<ConvidarSocios />} />
                         <Route path="/admin/permissions-matrix" element={<PermissionsMatrix />} />
                         <Route path="/my-profile" element={<MyProfile />} />
-                        <Route path="/salary-ranges" element={<SalaryRanges />} />
-                        <Route path="/survey-data" element={<SurveyData />} />
-                        <Route path="/salary-comparison" element={<SalaryComparison />} />
-                        <Route path="/job-titles" element={<JobTitles />} />
-                        <Route path="/people-analytics" element={<PeopleAnalytics />} />
-                        <Route path="/legal-assistant" element={<LegalAssistant />} />
-                        <Route path="/salary-assistant" element={<SalaryAssistant />} />
-                        <Route path="/incentive-assistant" element={<IncentiveAssistant />} />
-                        <Route path="/incentive-programs" element={<IncentivePrograms />} />
+                        <Route path="/salary-ranges" element={<ModuleGate mode="page" moduleSlug="core" featureName="Tabela Salarial"><SalaryRanges /></ModuleGate>} />
+                        <Route path="/survey-data" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Pesquisa Salarial"><SurveyData /></ModuleGate>} />
+                        <Route path="/salary-comparison" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Comparação Salarial"><SalaryComparison /></ModuleGate>} />
+                        <Route path="/job-titles" element={<ModuleGate mode="page" moduleSlug="core" featureName="Plano de Cargos e Avaliação"><JobTitles /></ModuleGate>} />
+                        <Route path="/people-analytics" element={<ModuleGate mode="page" moduleSlug="core" featureName="People Analytics" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><PeopleAnalytics /></ModuleGate>} />
+                        <Route path="/legal-assistant" element={<ModuleGate mode="page" moduleSlug="core" featureName="Jurídico Smart" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><LegalAssistant /></ModuleGate>} />
+                        <Route path="/salary-assistant" element={<ModuleGate mode="page" moduleSlug="core" featureName="Salary Smart"><SalaryAssistant /></ModuleGate>} />
+                        <Route path="/incentive-assistant" element={<ModuleGate mode="page" moduleSlug="core" featureName="R&B Smart" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><IncentiveAssistant /></ModuleGate>} />
+                        <Route path="/incentive-programs" element={<ModuleGate mode="page" moduleSlug="core" featureName="Programas de Incentivos"><IncentivePrograms /></ModuleGate>} />
                         <Route path="/pricing" element={<Pricing />} />
-                        <Route path="/salary-analysis-report" element={<SalaryAnalysisReport />} />
+                        <Route path="/salary-analysis-report" element={<ModuleGate mode="page" moduleSlug="core" featureName="Análise Salarial"><SalaryAnalysisReport /></ModuleGate>} />
                         <Route path="/budget" element={<Budget />} />
                         <Route path="/budget-planning" element={<BudgetPlanning />} />
                         <Route path="/budget-approvals" element={<BudgetApprovals />} />
@@ -237,15 +237,15 @@ const App = () => {
                         <Route path="/settings/my-plan" element={<MyPlan />} />
                         <Route path="/super-admin" element={<SuperAdminDashboard />} />
                         <Route path="/security-dashboard" element={<SecurityDashboard />} />
-                        <Route path="/total-rewards" element={<TotalRewards />} />
+                        <Route path="/total-rewards" element={<ModuleGate mode="page" moduleSlug="core" featureName="Total Rewards"><TotalRewards /></ModuleGate>} />
                         <Route path="/equity" element={<Equity />} />
-                        <Route path="/market-benchmark" element={<MarketBenchmark />} />
-                        <Route path="/job-matching" element={<JobMatching />} />
-                        <Route path="/talent-intelligence" element={<TalentIntelligence />} />
-                        <Route path="/pay-equity" element={<PayEquity />} />
-                        <Route path="/executive-compensation" element={<ExecutiveCompensation />} />
+                        <Route path="/market-benchmark" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Benchmark de Mercado"><MarketBenchmark /></ModuleGate>} />
+                        <Route path="/job-matching" element={<ModuleGate mode="page" moduleSlug="match" featureName="Job Matching"><JobMatching /></ModuleGate>} />
+                        <Route path="/talent-intelligence" element={<ModuleGate mode="page" moduleSlug="potencial-sucessao" featureName="Inteligência de Talentos"><TalentIntelligence /></ModuleGate>} />
+                        <Route path="/pay-equity" element={<ModuleGate mode="page" moduleSlug="core" featureName="Pay Equity"><PayEquity /></ModuleGate>} />
+                        <Route path="/executive-compensation" element={<ModuleGate mode="page" moduleSlug="core" featureName="Remuneração de Executivos"><ExecutiveCompensation /></ModuleGate>} />
                         <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
-                        <Route path="/merit-governance" element={<MeritGovernance />} />
+                        <Route path="/merit-governance" element={<ModuleGate mode="page" moduleSlug="core" featureName="Governança de Mérito"><MeritGovernance /></ModuleGate>} />
                         <Route path="/budget-burndown" element={<BudgetBurndown />} />
                         <Route path="/approval-inbox" element={<ApprovalInbox />} />
                         <Route path="/decision-scenarios" element={<DecisionScenarios />} />
@@ -253,18 +253,18 @@ const App = () => {
 
                       {/* Performance Module */}
                       <Route element={<PerformanceLayout />}>
-                        <Route path="/performance" element={<PerformanceDashboard />} />
-                        <Route path="/performance/employees" element={<PerformanceEmployees />} />
-                        <Route path="/performance/cycles" element={<PerformanceCycles />} />
-                        <Route path="/performance/goals" element={<PerformanceGoals />} />
-                        <Route path="/performance/evaluations" element={<PerformanceEvaluations />} />
-                        <Route path="/performance/templates" element={<PerformanceTemplates />} />
-                        <Route path="/performance/9box" element={<Performance9Box />} />
-                        <Route path="/performance/one-on-ones" element={<PerformanceOneOnOnes />} />
-                        <Route path="/performance/kudos" element={<PerformanceKudos />} />
-                        <Route path="/performance/pdi" element={<PerformancePDI />} />
-                        <Route path="/performance/succession" element={<PerformanceSuccession />} />
-                        <Route path="/performance/feedback-360" element={<ExternalFeedback360 />} />
+                        <Route path="/performance" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceDashboard /></ModuleGate>} />
+                        <Route path="/performance/employees" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceEmployees /></ModuleGate>} />
+                        <Route path="/performance/cycles" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceCycles /></ModuleGate>} />
+                        <Route path="/performance/goals" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceGoals /></ModuleGate>} />
+                        <Route path="/performance/evaluations" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceEvaluations /></ModuleGate>} />
+                        <Route path="/performance/templates" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceTemplates /></ModuleGate>} />
+                        <Route path="/performance/9box" element={<ModuleGate mode="page" moduleSlug="potencial-sucessao" featureName="Avaliação de Potencial e Sucessão"><Performance9Box /></ModuleGate>} />
+                        <Route path="/performance/one-on-ones" element={<ModuleGate mode="page" moduleSlug="core" featureName="Avaliação de Desempenho"><PerformanceOneOnOnes /></ModuleGate>} />
+                        <Route path="/performance/kudos" element={<ModuleGate mode="page" moduleSlug="core" featureName="Reconhecimento"><PerformanceKudos /></ModuleGate>} />
+                        <Route path="/performance/pdi" element={<ModuleGate mode="page" moduleSlug="evolve" featureName="Treinamento & PDI"><PerformancePDI /></ModuleGate>} />
+                        <Route path="/performance/succession" element={<ModuleGate mode="page" moduleSlug="potencial-sucessao" featureName="Avaliação de Potencial e Sucessão"><PerformanceSuccession /></ModuleGate>} />
+                        <Route path="/performance/feedback-360" element={<ModuleGate mode="page" moduleSlug="core" featureName="Feedback 360"><ExternalFeedback360 /></ModuleGate>} />
                         <Route path="/performance/glossary" element={<PerformanceGlossary />} />
                         <Route path="/performance/assistant" element={<PerformanceAssistant />} />
                       </Route>

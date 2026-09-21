@@ -56,11 +56,20 @@ export const ModuleGate = ({
   };
 
   if (access.loading) {
-    return <Skeleton className={cn(mode === 'page' ? 'h-64 w-full' : 'h-36 w-full', className)} />;
+    return <Skeleton className={cn(mode === 'inline' ? 'h-5 w-24' : mode === 'page' ? 'h-64 w-full' : 'h-36 w-full', className)} />;
   }
 
   if (isAllowed) {
     return <>{children}</>;
+  }
+
+  if (mode === 'inline') {
+    return (
+      <Button type="button" variant="outline" size="sm" onClick={handleActivate} className={cn('h-7 gap-1 text-xs', className)}>
+        <Lock className="h-3.5 w-3.5" />
+        Bloqueado
+      </Button>
+    );
   }
 
   return (
