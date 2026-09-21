@@ -1867,6 +1867,57 @@ export type Database = {
           },
         ]
       }
+      consultores: {
+        Row: {
+          ativo: boolean
+          bio: string | null
+          created_at: string
+          email: string
+          especialidade: string | null
+          id: string
+          nome: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          bio?: string | null
+          created_at?: string
+          email: string
+          especialidade?: string | null
+          id?: string
+          nome: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          bio?: string | null
+          created_at?: string
+          email?: string
+          especialidade?: string | null
+          id?: string
+          nome?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultores_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultores_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversation_sessions: {
         Row: {
           agent_type: string
@@ -7824,6 +7875,518 @@ export type Database = {
         }
         Relationships: []
       }
+      rh_service_diagnostico_respostas: {
+        Row: {
+          created_at: string
+          diagnostico_id: string
+          id: string
+          questao_id: string
+          resposta_numerica: number | null
+          resposta_texto: string | null
+          tenant_id: string
+          updated_at: string
+          versao_id: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostico_id: string
+          id?: string
+          questao_id: string
+          resposta_numerica?: number | null
+          resposta_texto?: string | null
+          tenant_id: string
+          updated_at?: string
+          versao_id: string
+        }
+        Update: {
+          created_at?: string
+          diagnostico_id?: string
+          id?: string
+          questao_id?: string
+          resposta_numerica?: number | null
+          resposta_texto?: string | null
+          tenant_id?: string
+          updated_at?: string
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_diagnostico_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_respostas_questao_id_fkey"
+            columns: ["questao_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_maturidade_questoes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_respostas_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_respostas_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_respostas_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_maturidade_versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_service_diagnostico_scores: {
+        Row: {
+          created_at: string
+          diagnostico_id: string
+          id: string
+          module_slug: string | null
+          nivel: string | null
+          pratica: string
+          score: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostico_id: string
+          id?: string
+          module_slug?: string | null
+          nivel?: string | null
+          pratica: string
+          score: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diagnostico_id?: string
+          id?: string
+          module_slug?: string | null
+          nivel?: string | null
+          pratica?: string
+          score?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_diagnostico_scores_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_scores_module_slug_fkey"
+            columns: ["module_slug"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_scores_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnostico_scores_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_service_diagnosticos: {
+        Row: {
+          consultor_id: string | null
+          created_at: string
+          diagnostico: Json
+          id: string
+          maturidade: number | null
+          modulo_avaliado: string | null
+          nivel: string | null
+          projeto_id: string | null
+          recomendacoes: Json
+          status: string
+          tenant_id: string
+          updated_at: string
+          versao_id: string
+        }
+        Insert: {
+          consultor_id?: string | null
+          created_at?: string
+          diagnostico?: Json
+          id?: string
+          maturidade?: number | null
+          modulo_avaliado?: string | null
+          nivel?: string | null
+          projeto_id?: string | null
+          recomendacoes?: Json
+          status?: string
+          tenant_id: string
+          updated_at?: string
+          versao_id: string
+        }
+        Update: {
+          consultor_id?: string | null
+          created_at?: string
+          diagnostico?: Json
+          id?: string
+          maturidade?: number | null
+          modulo_avaliado?: string | null
+          nivel?: string | null
+          projeto_id?: string | null
+          recomendacoes?: Json
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_diagnosticos_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnosticos_modulo_avaliado_fkey"
+            columns: ["modulo_avaliado"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnosticos_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_projetos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnosticos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnosticos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_diagnosticos_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_maturidade_versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_service_horas: {
+        Row: {
+          consultor_id: string | null
+          created_at: string
+          data: string
+          descricao: string | null
+          horas: number
+          id: string
+          projeto_id: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          consultor_id?: string | null
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          horas: number
+          id?: string
+          projeto_id: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          consultor_id?: string | null
+          created_at?: string
+          data?: string
+          descricao?: string | null
+          horas?: number
+          id?: string
+          projeto_id?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_horas_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_horas_projeto_id_fkey"
+            columns: ["projeto_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_projetos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_horas_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_horas_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_service_maturidade_questoes: {
+        Row: {
+          created_at: string
+          enunciado: string
+          escala_max: number
+          id: string
+          module_slug: string | null
+          ordem: number
+          peso: number
+          pratica: string
+          updated_at: string
+          versao_id: string
+        }
+        Insert: {
+          created_at?: string
+          enunciado: string
+          escala_max?: number
+          id?: string
+          module_slug?: string | null
+          ordem?: number
+          peso?: number
+          pratica: string
+          updated_at?: string
+          versao_id: string
+        }
+        Update: {
+          created_at?: string
+          enunciado?: string
+          escala_max?: number
+          id?: string
+          module_slug?: string | null
+          ordem?: number
+          peso?: number
+          pratica?: string
+          updated_at?: string
+          versao_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_maturidade_questoes_module_slug_fkey"
+            columns: ["module_slug"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "rh_service_maturidade_questoes_versao_id_fkey"
+            columns: ["versao_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_maturidade_versoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_service_maturidade_versoes: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          is_active: boolean
+          nome: string
+          updated_at: string
+          versao: number
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          is_active?: boolean
+          nome: string
+          updated_at?: string
+          versao: number
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          is_active?: boolean
+          nome?: string
+          updated_at?: string
+          versao?: number
+        }
+        Relationships: []
+      }
+      rh_service_projetos: {
+        Row: {
+          consultor_id: string | null
+          created_at: string
+          data_fim: string | null
+          data_inicio: string | null
+          descricao: string | null
+          escopo: string | null
+          horas_estimadas: number | null
+          id: string
+          status: string
+          tenant_id: string
+          titulo: string
+          updated_at: string
+          valor_negociado: number | null
+        }
+        Insert: {
+          consultor_id?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          escopo?: string | null
+          horas_estimadas?: number | null
+          id?: string
+          status?: string
+          tenant_id: string
+          titulo: string
+          updated_at?: string
+          valor_negociado?: number | null
+        }
+        Update: {
+          consultor_id?: string | null
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          descricao?: string | null
+          escopo?: string | null
+          horas_estimadas?: number | null
+          id?: string
+          status?: string
+          tenant_id?: string
+          titulo?: string
+          updated_at?: string
+          valor_negociado?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_projetos_consultor_id_fkey"
+            columns: ["consultor_id"]
+            isOneToOne: false
+            referencedRelation: "consultores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_projetos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_projetos_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rh_service_recomendacoes: {
+        Row: {
+          created_at: string
+          diagnostico_id: string
+          id: string
+          justificativa: string | null
+          module_slug: string
+          origem: string
+          pratica: string | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          diagnostico_id: string
+          id?: string
+          justificativa?: string | null
+          module_slug: string
+          origem?: string
+          pratica?: string | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          diagnostico_id?: string
+          id?: string
+          justificativa?: string | null
+          module_slug?: string
+          origem?: string
+          pratica?: string | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rh_service_recomendacoes_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "rh_service_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_recomendacoes_module_slug_fkey"
+            columns: ["module_slug"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "rh_service_recomendacoes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rh_service_recomendacoes_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           created_at: string
@@ -10797,6 +11360,17 @@ export type Database = {
         Args: { p_reason?: string; p_source_id: string; p_source_type: string }
         Returns: string
       }
+      rh_service_calcular_nivel: { Args: { _score: number }; Returns: string }
+      rh_service_calcular_scores: {
+        Args: { _diagnostico_id: string }
+        Returns: undefined
+      }
+      rh_service_can_read: { Args: { _tenant_id: string }; Returns: boolean }
+      rh_service_can_write: { Args: { _tenant_id: string }; Returns: boolean }
+      rh_service_gerar_recomendacoes: {
+        Args: { _diagnostico_id: string; _limiar?: number }
+        Returns: number
+      }
       simulate_9box_budget: {
         Args: {
           p_ceiling_pct?: number
@@ -10911,6 +11485,7 @@ export type Database = {
         | "employee"
         | "super_admin"
         | "occupational_health"
+        | "consultor"
       calculation_mode: "manual" | "automatic"
       clima_modalidade:
         | "isolada"
@@ -11155,6 +11730,7 @@ export const Constants = {
         "employee",
         "super_admin",
         "occupational_health",
+        "consultor",
       ],
       calculation_mode: ["manual", "automatic"],
       clima_modalidade: [
