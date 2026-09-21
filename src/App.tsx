@@ -82,6 +82,7 @@ const PayEquity = lazy(() => import("./pages/PayEquity"));
 const ExecutiveCompensation = lazy(() => import("./pages/ExecutiveCompensation"));
 const ExecutiveDashboard = lazy(() => import("./pages/ExecutiveDashboard"));
 const MeritGovernance = lazy(() => import("./pages/MeritGovernance"));
+const RhService = lazy(() => import("./pages/RhService"));
 const BudgetBurndown = lazy(() => import("./pages/BudgetBurndown"));
 const ApprovalInbox = lazy(() => import("./pages/ApprovalInbox"));
 const DecisionScenarios = lazy(() => import("./pages/DecisionScenarios"));
