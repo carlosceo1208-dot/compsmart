@@ -36,6 +36,13 @@ Assim que o projeto sai de "em andamento" (concluído ou cancelado), a liberaç�
 
 Cada importação e cada abertura do Core feita por consultor gera um registro de auditoria com usuário, empresa, data e ação, visível na tela de Logs de Auditoria já existente.
 
+Tentativas sem direito também ficam registradas: quando o consultor tenta abrir o Core ou importar sem projeto ativo, é gravado um registro com resultado "negado". Um registro por ação tentada, sem repetição a cada clique.
+
+### 5. Isolamento por empresa
+
+A liberação nunca é usada isolada: em toda regra nova, a condição de consultor é sempre combinada com a empresa da própria linha. O consultor vê exclusivamente dados da empresa verificada — em colaboradores, apenas os perfis dessa empresa e o seu próprio perfil, nunca perfis de outras empresas.
+
+
 ## Detalhes técnicos
 
 - Migração:
