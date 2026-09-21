@@ -41,7 +41,8 @@ As marcações atuais de serviços adicionais por empresa (NR-1, Clima, FIB, cru
 - `tenant_subscriptions`: FK para `organizational_structure(id)` como tenant, `module_id` ou `bundle_id`, `UNIQUE (tenant_id, module_id)`, índice por tenant.
 - `has_module(text)` e `get_tenant_modules()`: `SECURITY DEFINER`, `search_path = public`, reutilizando `get_user_company_id()`; `EXECUTE` concedido a `authenticated` (não a `anon`).
 - `leads`: `INSERT` para `anon` com `consentimento_lgpd = true` obrigatório e reaproveitamento do padrão de throttle já aplicado em `nr1_leads`; `SELECT` só via `is_super_admin(auth.uid())`.
-- Seed idempotente (`ON CONFLICT (slug) DO UPDATE`) dos 9 módulos e das faixas de preço.
+- `GRANT SELECT` também para `anon` em `modules`, `module_pricing`, `bundles` e `bundle_modules`, com policy de leitura para `anon, authenticated`; escrita segue só por `is_super_admin`. `tenant_subscriptions` e `leads` não recebem nada para `anon` além do INSERT de leads já previsto.
+- Seed idempotente (`ON CONFLICT (slug) DO UPDATE`) dos 9 módulos e das faixas de preço, incluindo `nr1` = 225,00 na faixa 0-50.
 - Backfill das flags `*_addon_enabled` de `organizational_structure` para `tenant_subscriptions` (status `active`).
 - Nada de alteração em `company_subscriptions`, `subscription_plans`, edge functions de pagamento ou RBAC.
 
