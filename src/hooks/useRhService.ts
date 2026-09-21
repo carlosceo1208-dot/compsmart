@@ -78,6 +78,62 @@ const useTenantId = () => {
   return activeCompanyId ?? null;
 };
 
+/**
+ * Acesso condicional do consultor ao módulo Core (escopo LOCAL: RH Service / Core).
+ * Espelha has_consultor_modulo_access no banco: consultor + assinatura ativa do
+ * RH Service + projeto em andamento no tenant. Não altera papéis globais.
+ */
+const loggedCoreAccess = new Set<string>();
+
+export const logConsultorCoreAccess = async (
+  action: string,
+  tenantId: string | null,
+  granted: boolean,
+  details: Record<string, unknown> = {},
+) => {
+  if (!tenantId) return;
+  const key = `${action}:${tenantId}:${granted ? 'ok' : 'denied'}`;
+  if (loggedCoreAccess.has(key)) return;
+  loggedCoreAccess.add(key);
+  await (supabase as any).rpc('log_consultor_core_access', {
+    _action: action,
+    _tenant_id: tenantId,
+    _details: details,
+    _granted: granted,
+  });
+};
+
+export const useConsultorCoreAccess = () => {
+  const { isConsultor, loading: accessLoading } = useRhServiceAccess();
+  const tenantId = useTenantId();
+
+  const query = useQuery({
+    queryKey: ['consultor-core-access', tenantId],
+    enabled: isConsultor && !!tenantId,
+    staleTime: 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await (supabase as any).rpc('has_consultor_modulo_access', {
+        _tenant_id: tenantId,
+        _module_slug: 'core',
+      });
+      if (error) throw error;
+      return data === true;
+    },
+  });
+
+  const hasCoreAccess = isConsultor ? query.data === true : false;
+  const loading = accessLoading || (isConsultor && !!tenantId && query.isLoading);
+
+  useEffect(() => {
+    if (!isConsultor || loading || !tenantId) return;
+    void logConsultorCoreAccess('core_access', tenantId, hasCoreAccess);
+  }, [isConsultor, loading, tenantId, hasCoreAccess]);
+
+  return { isConsultor, hasCoreAccess, loading };
+};
+
+
+
 export const useRhConsultores = (enabled: boolean) => {
   const tenantId = useTenantId();
   return useQuery({
