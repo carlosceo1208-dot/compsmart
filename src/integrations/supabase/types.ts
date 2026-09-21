@@ -10911,6 +10911,7 @@ export type Database = {
         | "employee"
         | "super_admin"
         | "occupational_health"
+        | "consultor"
       calculation_mode: "manual" | "automatic"
       clima_modalidade:
         | "isolada"
@@ -11155,6 +11156,7 @@ export const Constants = {
         "employee",
         "super_admin",
         "occupational_health",
+        "consultor",
       ],
       calculation_mode: ["manual", "automatic"],
       clima_modalidade: [
