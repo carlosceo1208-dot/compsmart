@@ -47,15 +47,17 @@ Para cada prática com score abaixo de 60, o sistema sugere automaticamente o m�
 - Policies por tabela do RH Service:
   - leitura: `public.is_super_admin(auth.uid()) OR (tenant_id = public.get_user_company_id() AND (public.has_role(auth.uid(),'consultor') OR public.has_role(auth.uid(),'admin') OR public.has_role(auth.uid(),'hr_manager')))`;
   - escrita (insert/update/delete): apenas `is_super_admin(...)` ou `has_role(auth.uid(),'consultor')` com `tenant_id = get_user_company_id()`.
-- `rh_service_diagnosticos`: `modulo_avaliado` slug opcional, `diagnostico JSONB`, `recomendacoes JSONB` mantidos para compatibilidade com o pedido; os scores por prática ficam normalizados em `rh_service_diagnostico_scores` (`pratica`, `module_slug`, `score NUMERIC CHECK 0..100`, `nivel TEXT`).
+- `rh_service_diagnosticos`: `versao_id UUID NOT NULL REFERENCES rh_service_maturidade_versoes(id)`, `projeto_id UUID NULL REFERENCES rh_service_projetos(id) ON DELETE SET NULL`, `consultor_id UUID NULL REFERENCES consultores(id) ON DELETE SET NULL`, `modulo_avaliado` slug opcional, `diagnostico JSONB`, `recomendacoes JSONB` mantidos para compatibilidade com o pedido; os scores por prática ficam normalizados em `rh_service_diagnostico_scores` (`pratica`, `module_slug`, `score NUMERIC CHECK 0..100`, `nivel TEXT`).
+- `rh_service_diagnostico_respostas`: `diagnostico_id REFERENCES rh_service_diagnosticos(id) ON DELETE CASCADE`, `questao_id REFERENCES rh_service_maturidade_questoes(id)`, `versao_id REFERENCES rh_service_maturidade_versoes(id)`, `resposta_numerica NUMERIC NULL`, `resposta_texto TEXT NULL`, `tenant_id` para RLS, `UNIQUE (diagnostico_id, questao_id)`, grants e policies idênticas às demais tabelas do RH Service. Trigger valida que `versao_id` da resposta é igual ao `versao_id` do diagnóstico e que a questão pertence a essa versão.
 - `rh_service_recomendacoes`: `diagnostico_id`, `module_slug REFERENCES modules(slug)`, `justificativa`, `origem TEXT CHECK (origem IN ('auto','editada','manual'))`, `UNIQUE (diagnostico_id, module_slug)`.
 - Funções `SECURITY DEFINER` com `search_path = public`, `REVOKE EXECUTE ... FROM PUBLIC` e `GRANT EXECUTE ... TO authenticated` (nunca `anon`), no mesmo padrão de `has_module`:
   - `rh_service_calcular_nivel(numeric)` → texto do nível;
+  - `rh_service_calcular_scores(_diagnostico_id uuid)` → recalcula `rh_service_diagnostico_scores` a partir de `rh_service_diagnostico_respostas`, filtrando estritamente pelas questões da `versao_id` gravada no diagnóstico (média ponderada pelo peso da questão, normalizada para 0–100);
   - `rh_service_gerar_recomendacoes(_diagnostico_id uuid, _limiar numeric DEFAULT 60)` → insere recomendações `origem='auto'` para práticas abaixo do limiar, com `ON CONFLICT DO NOTHING` para não sobrescrever edição do consultor.
 - Trigger em `rh_service_diagnostico_scores` preenchendo `nivel` a partir do score; trigger em `rh_service_recomendacoes` marcando `origem='editada'` quando uma linha `auto` é alterada.
 - Validações dependentes de data (ex.: `data_fim >= data_inicio`) via trigger, não `CHECK`.
-- Índices por `tenant_id`, por `projeto_id` e por `diagnostico_id`.
-- Seed idempotente da versão 1 do questionário e das 8 práticas com seus slugs de módulo (`core`, `core`, `core`, `clima`, `nr1`, `talent`, `evolve`, `potencial-sucessao`), usando `ON CONFLICT DO NOTHING`.
+- Índices por `tenant_id`, por `projeto_id`, por `diagnostico_id` e por `questao_id`.
+- Seed idempotente da versão 1 do questionário e das 9 práticas com seus slugs de módulo (`core`, `core`, `core`, `clima`, `nr1`, `talent`, `evolve`, `potencial-sucessao`, `match`), usando `ON CONFLICT DO NOTHING`. A inclusão de `match` (descrição de cargos e job matching) fica registrada em comentário no próprio seed.
 - Gating segue o padrão existente: `has_module('rh-service')` e `get_tenant_modules()` — nenhuma alteração nessas funções.
 
 ## Fora do escopo
