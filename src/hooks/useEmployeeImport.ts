@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { useConsultorCoreAccess } from '@/hooks/useRhService';
 import type { ColumnMapping } from '@/lib/employeeImport/fieldCatalog';
 import type { ImportLookups, ValidatedRow } from '@/lib/employeeImport/validateRows';
 
