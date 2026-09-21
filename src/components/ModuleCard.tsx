@@ -3,6 +3,7 @@ import { LucideIcon, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useFeatureAccess, PlanType } from "@/hooks/useFeatureAccess";
 import { UpgradePlanModal } from "@/components/UpgradePlanModal";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,10 @@ interface ModuleCardProps {
   requiredPlan?: PlanType;
   isSmartAgent?: boolean;
   index?: number;
+  locked?: boolean;
+  lockCta?: string;
+  lockDescription?: string;
+  onLockedClick?: () => void;
 }
 
 const categoryStyles = {
@@ -56,15 +61,25 @@ export const ModuleCard = ({
   requiredPlan,
   isSmartAgent = false,
   index = 0,
+  locked = false,
+  lockCta = "Ativar módulo",
+  lockDescription,
+  onLockedClick,
 }: ModuleCardProps) => {
   const { hasAccess } = useFeatureAccess();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
-  const hasFeatureAccess = !requiredPlan || hasAccess(`${title.toLowerCase().replace(/\s+/g, '_')}`);
+  const hasFeatureAccess = !locked && (!requiredPlan || hasAccess(`${title.toLowerCase().replace(/\s+/g, '_')}`));
   const isClickable = status === "active" && onClick && hasFeatureAccess;
-  const isLocked = requiredPlan && !hasFeatureAccess;
+  const isLocked = locked || (!!requiredPlan && !hasFeatureAccess);
 
   const handleClick = () => {
+    if (locked) {
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+      onLockedClick?.();
+      return;
+    }
     if (!hasFeatureAccess && requiredPlan) {
       setIsShaking(true);
       setTimeout(() => {
@@ -96,7 +111,7 @@ export const ModuleCard = ({
             !isSmartAgent && categoryGlow[category],
             isClickable || isLocked ? "cursor-pointer" : "opacity-60 cursor-not-allowed"
           )}
-          onClick={hasFeatureAccess ? (isClickable ? onClick : undefined) : handleClick}
+          onClick={isLocked ? handleClick : isClickable ? onClick : undefined}
         >
           {isSmartAgent && (
             <div className="absolute top-2 right-2 z-10">
@@ -121,7 +136,7 @@ export const ModuleCard = ({
               )}>
                 <Icon className={cn("w-6 h-6", isSmartAgent && "text-primary-foreground")} />
               </div>
-              {statusBadges[status]}
+              {isLocked ? <Badge variant="outline" className="bg-muted/50 text-muted-foreground">Bloqueado</Badge> : statusBadges[status]}
             </div>
             <CardTitle className="text-sm sm:text-base leading-tight font-bold line-clamp-2 group-hover:text-primary transition-colors">
               {title}
@@ -131,6 +146,17 @@ export const ModuleCard = ({
             <CardDescription className="text-xs leading-relaxed">
               {description}
             </CardDescription>
+            {isLocked && (
+              <div className="mt-3 space-y-2">
+                {lockDescription && (
+                  <p className="text-xs text-muted-foreground">{lockDescription}</p>
+                )}
+                <Button type="button" size="sm" variant="outline" className="h-8 w-full text-xs" onClick={handleClick}>
+                  <Lock className="h-3.5 w-3.5" />
+                  {lockCta}
+                </Button>
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
