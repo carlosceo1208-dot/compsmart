@@ -48,9 +48,13 @@ A liberação nunca é usada isolada: em toda regra nova, a condição de consul
 - Migração:
   - `has_consultor_modulo_access(_tenant_id uuid, _module_slug text)` — SQL STABLE SECURITY DEFINER, `search_path = public`, `GRANT EXECUTE` só para `authenticated`. Condições: `has_role(auth.uid(),'consultor')`, `EXISTS` em `tenant_subscriptions` join `modules` com `slug='rh-service'` e `status='active'` (e `expires_at` nulo ou futuro), `EXISTS` em `rh_service_projetos` com `tenant_id=_tenant_id`, `status='em_andamento'` e `consultor_id IS NOT NULL`, e `_module_slug = ANY(ARRAY['core'])`.
   - `employee_import_can_manage(_tenant_id)`: troca `has_role(...,'consultor')` por `has_consultor_modulo_access(_tenant_id,'core')`, preservando super_admin/admin/hr_manager.
-  - Políticas de leitura com `OR has_consultor_modulo_access(<tenant>, 'core')`: `profiles` (nova policy SELECT usando `root_company_id`), `job_titles` (SELECT), `salary_ranges` (SELECT via `salary_tables.root_company_id`), `performance_evaluations` (SELECT). Nenhuma policy de INSERT/UPDATE/DELETE é ampliada.
-  - `log_consultor_core_access(_action text, _tenant_id uuid, _details jsonb)` — SECURITY DEFINER, insere em `audit_logs` (`user_id=auth.uid()`, `action`, `table_name='core_access'`, `new_data`, `root_company_id=_tenant_id`) apenas quando `has_consultor_modulo_access` é verdadeiro; `GRANT EXECUTE` para `authenticated`. Contorna o bloqueio de inserção direta sem afrouxar a policy.
-  - `import_employees_batch` passa a chamar esse log quando o autor é consultor.
+  - Políticas de SELECT ganham a condição sempre amarrada ao tenant da própria linha, no formato `OR (<tenant_coluna> = public.get_user_company_id() AND public.has_consultor_modulo_access(<tenant_coluna>, 'core'))` — a função nunca é usada sozinha:
+    - `profiles`: nova policy SELECT com `root_company_id IS NOT NULL AND root_company_id = get_user_company_id() AND has_consultor_modulo_access(root_company_id,'core')`; o acesso ao próprio perfil continua pela policy existente `Users view own profile`. Nenhum perfil de outro tenant fica visível.
+    - `job_titles`: `root_company_id`; `salary_ranges`: via `salary_tables.root_company_id` no subselect já existente; `performance_evaluations`: `root_company_id`.
+    - Nenhuma policy de INSERT/UPDATE/DELETE é ampliada.
+  - `log_consultor_core_access(_action text, _tenant_id uuid, _details jsonb, _granted boolean)` — SECURITY DEFINER, insere em `audit_logs` (`user_id=auth.uid()`, `action`, `table_name='core_access'`, `new_data` com `{action, granted, details}`, `root_company_id=_tenant_id`). Grava tanto acesso liberado (`granted=true`) quanto negado (`granted=false`), exigindo apenas `has_role(auth.uid(),'consultor')`; `GRANT EXECUTE` para `authenticated`. Contorna o bloqueio de inserção direta sem afrouxar a policy.
+  - `import_employees_batch` chama o log quando o autor é consultor: `granted=true` no sucesso e `granted=false` quando a verificação de acesso reprova, antes de abortar.
+
 - Frontend:
   - `src/hooks/useRhService.ts`: novo hook local `useConsultorCoreAccess()` que consulta a nova função por RPC para a empresa ativa; permanece restrito ao escopo RH Service/Core, sem alterar `useCurrentUserRole` nem `useFeatureAccess`.
   - `src/hooks/useEmployeeImport.ts`: `useEmployeeImportAccess` deixa de liberar consultor direto e passa a exigir esse hook.
