@@ -18,7 +18,8 @@ Criar a experiência do RH Service em `/rh-service`, conectada à estrutura já 
 - Criar hooks com cache e chaves por empresa ativa para consultar consultores, projetos, horas, diagnósticos, scores e recomendações.
 - Filtrar todas as consultas por `activeCompanyId`, além da proteção já aplicada pelo banco.
 - Buscar os vínculos necessários para exibir nomes de consultores/projetos e nomes legíveis dos módulos recomendados.
-- Estender a leitura de papel atual para reconhecer `consultor`, sem mudar permissões no banco.
+- Reconhecer o papel `consultor` apenas dentro do RH Service, por meio de um verificador local do módulo (`isRhServiceEditor`, verdadeiro para `super_admin` ou `consultor`), usado somente na página `/rh-service` e em seus hooks.
+- Não alterar o reconhecimento global de papéis: o consultor continua sem acesso a salários, desempenho, NR-1, clima e demais módulos.
 - Disponibilizar mutações apenas para `super_admin`/`consultor`:
   - cadastrar e editar consultores, inclusive situação ativo/inativo;
   - cadastrar e editar projetos e seu status;
@@ -30,7 +31,8 @@ Criar a experiência do RH Service em `/rh-service`, conectada à estrutura já 
 - **Consultores:** nome, especialidade, e-mail, bio e situação; ações de cadastro/edição somente para a equipe CompSmart.
 - **Projetos:** título, consultor responsável, status, horas estimadas, valor negociado e datas; cliente somente visualiza.
 - **Horas:** projeto, consultor, quantidade, descrição e data; equipe CompSmart pode registrar/editar.
-- **Diagnósticos:** projeto/consultor vinculados, status e práticas com score de 0–100, nível e módulo relacionado; recomendações com nome do módulo e origem `automática`, `editada` ou `manual`.
+- **Diagnósticos:** lista com projeto/consultor vinculados, status e maturidade geral.
+- **Detalhe do diagnóstico:** abrir cada diagnóstico em painel lateral ou janela, mostrando as práticas com score de 0–100 e nível, e os módulos recomendados com nome legível, origem (`automática`, `editada`, `manual`) e justificativa. Admin e RH do cliente também podem abrir o detalhe, em modo de consulta.
 - Usar tabelas em telas amplas e apresentação compacta em telas menores, sem alterar o design global.
 
 ### 4. Formatação e estados
