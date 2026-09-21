@@ -2448,6 +2448,220 @@ export type Database = {
           },
         ]
       }
+      employee_import_changes: {
+        Row: {
+          created_at: string
+          field: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          profile_id: string | null
+          row_number: number | null
+          run_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          field: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          profile_id?: string | null
+          row_number?: number | null
+          run_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          field?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          profile_id?: string | null
+          row_number?: number | null
+          run_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_import_changes_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "employee_import_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_import_mappings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          mapping: Json
+          name: string
+          source_system: string | null
+          tenant_id: string
+          updated_at: string
+          usage_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mapping?: Json
+          name: string
+          source_system?: string | null
+          tenant_id: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          mapping?: Json
+          name?: string
+          source_system?: string | null
+          tenant_id?: string
+          updated_at?: string
+          usage_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_import_mappings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_import_mappings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_import_row_errors: {
+        Row: {
+          created_at: string
+          error_type: string
+          field: string | null
+          id: string
+          message: string
+          resolved: boolean
+          row_data: Json
+          row_number: number
+          run_id: string
+          tenant_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_type: string
+          field?: string | null
+          id?: string
+          message: string
+          resolved?: boolean
+          row_data?: Json
+          row_number: number
+          run_id: string
+          tenant_id: string
+        }
+        Update: {
+          created_at?: string
+          error_type?: string
+          field?: string | null
+          id?: string
+          message?: string
+          resolved?: boolean
+          row_data?: Json
+          row_number?: number
+          run_id?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_import_row_errors_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "employee_import_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_import_runs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          duplicate_strategy: string
+          error_count: number
+          file_name: string
+          id: string
+          ignored_count: number
+          imported_count: number
+          mapping: Json
+          sheet_name: string | null
+          source_system: string | null
+          status: string
+          tenant_id: string
+          total_rows: number
+          updated_at: string
+          updated_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          duplicate_strategy?: string
+          error_count?: number
+          file_name: string
+          id?: string
+          ignored_count?: number
+          imported_count?: number
+          mapping?: Json
+          sheet_name?: string | null
+          source_system?: string | null
+          status?: string
+          tenant_id: string
+          total_rows?: number
+          updated_at?: string
+          updated_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          duplicate_strategy?: string
+          error_count?: number
+          file_name?: string
+          id?: string
+          ignored_count?: number
+          imported_count?: number
+          mapping?: Json
+          sheet_name?: string | null
+          source_system?: string | null
+          status?: string
+          tenant_id?: string
+          total_rows?: number
+          updated_at?: string
+          updated_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_import_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "employee_import_runs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "organizational_structure_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employee_incentive_assignments: {
         Row: {
           actual_value: number | null
@@ -10896,6 +11110,10 @@ export type Database = {
         }[]
       }
       email_queue_dispatch: { Args: never; Returns: undefined }
+      employee_import_can_manage: {
+        Args: { _tenant_id: string }
+        Returns: boolean
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -11260,6 +11478,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      import_employees_batch: {
+        Args: { p_rows: Json; p_run: Json }
+        Returns: Json
       }
       is_super_admin: { Args: { _user_id?: string }; Returns: boolean }
       manage_user_roles: {

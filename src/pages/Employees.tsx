@@ -32,7 +32,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Search, UserPlus, Calendar, MoreVertical, Edit, UserX, Upload, UserCheck, Loader2,
-  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, Mail, Send, AlertCircle
+  Users as UsersIcon, UserCheck2, UserMinus, LayoutGrid, LayoutList, Mail, Send, AlertCircle, Lock
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -41,6 +41,7 @@ import { UserDialog } from "@/components/UserDialog";
 import { EmployeeBulkImport } from "@/components/EmployeeBulkImport";
 import { formatCurrency } from "@/lib/formatters";
 import { useCompanyContext } from "@/contexts/CompanyContext";
+import { useModuleAccess } from "@/hooks/useModuleAccess";
 import {
   Select,
   SelectContent,
@@ -98,6 +99,8 @@ const normalizeLabel = (value?: string | null): string => {
 const Users = () => {
   const navigate = useNavigate();
   const { activeCompanyId, isLoading: companyContextLoading } = useCompanyContext();
+  const { hasModule } = useModuleAccess();
+  const hasCoreModule = hasModule('core');
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -689,14 +692,25 @@ const Users = () => {
             </Button>
           )}
           
-          <Button 
-            variant="outline" 
-            className="gap-2"
-            onClick={() => setBulkImportOpen(true)}
-          >
-            <Upload className="w-4 h-4" />
-            Atualizar Colaboradores
-          </Button>
+          {hasCoreModule ? (
+            <Button 
+              variant="outline" 
+              className="gap-2"
+              onClick={() => setBulkImportOpen(true)}
+            >
+              <Upload className="w-4 h-4" />
+              Atualizar Colaboradores
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => navigate('/settings/plans')}
+            >
+              <Lock className="w-4 h-4" />
+              Ativar módulo Core
+            </Button>
+          )}
           {(currentUserRoles.includes('manager') || currentUserRoles.includes('hr_manager') || currentUserRoles.includes('admin')) && (
             <Button 
               variant="outline"
