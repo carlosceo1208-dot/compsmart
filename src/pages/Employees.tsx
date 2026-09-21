@@ -42,6 +42,7 @@ import { EmployeeBulkImport } from "@/components/EmployeeBulkImport";
 import { formatCurrency } from "@/lib/formatters";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
+import { useConsultorCoreAccess } from "@/hooks/useRhService";
 import {
   Select,
   SelectContent,
