@@ -18,7 +18,8 @@ Criar a experiência do RH Service em `/rh-service`, conectada à estrutura já 
 - Criar hooks com cache e chaves por empresa ativa para consultar consultores, projetos, horas, diagnósticos, scores e recomendações.
 - Filtrar todas as consultas por `activeCompanyId`, além da proteção já aplicada pelo banco.
 - Buscar os vínculos necessários para exibir nomes de consultores/projetos e nomes legíveis dos módulos recomendados.
-- Estender a leitura de papel atual para reconhecer `consultor`, sem mudar permissões no banco.
+- Reconhecer o papel `consultor` apenas dentro do RH Service, por meio de um verificador local do módulo (`isRhServiceEditor`, verdadeiro para `super_admin` ou `consultor`), usado somente na página `/rh-service` e em seus hooks.
+- Não alterar o reconhecimento global de papéis: o consultor continua sem acesso a salários, desempenho, NR-1, clima e demais módulos.
 - Disponibilizar mutações apenas para `super_admin`/`consultor`:
   - cadastrar e editar consultores, inclusive situação ativo/inativo;
   - cadastrar e editar projetos e seu status;
