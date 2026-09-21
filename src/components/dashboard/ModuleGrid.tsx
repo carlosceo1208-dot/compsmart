@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { ModuleCard } from '@/components/ModuleCard';
 import { Badge } from '@/components/ui/badge';
 import { useModuleAccess, type ModuleSlug } from '@/hooks/useModuleAccess';
+import { useFeatureAccess } from '@/hooks/useFeatureAccess';
 import { toast } from 'sonner';
 import {
   Users,
@@ -45,11 +46,13 @@ interface ModuleDefinition {
   customCta?: string;
   customLockedDescription?: string;
   isTransversal?: boolean;
+  legacyFeature?: string;
 }
 
 export const ModuleGrid = () => {
   const navigate = useNavigate();
   const moduleAccess = useModuleAccess();
+  const legacyAccess = useFeatureAccess();
 
   const moduleCta = (slugs: ModuleSlug[], requireAll = false) => {
     const names = slugs.map((slug) => moduleAccess.getModuleName(slug));
@@ -215,6 +218,7 @@ export const ModuleGrid = () => {
       moduleSlugs: ['core'],
       customCta: `Conhecer o módulo ${moduleAccess.getModuleName('core')}`,
       isTransversal: true,
+      legacyFeature: 'people_analytics',
     },
     {
       title: 'Pesquisa Salarial',
@@ -316,6 +320,7 @@ export const ModuleGrid = () => {
       moduleSlugs: ['core'],
       customCta: `Conhecer o módulo ${moduleAccess.getModuleName('core')}`,
       isTransversal: true,
+      legacyFeature: 'legal_assistant',
     },
     {
       title: 'Salary Smart',
@@ -336,6 +341,7 @@ export const ModuleGrid = () => {
       moduleSlugs: ['core'],
       customCta: `Conhecer o módulo ${moduleAccess.getModuleName('core')}`,
       isTransversal: true,
+      legacyFeature: 'incentive_assistant',
     },
     {
       title: 'Total Rewards',
@@ -371,8 +377,10 @@ export const ModuleGrid = () => {
 
   const renderModule = (module: ModuleDefinition, index = 0, isSmartAgent = false) => {
     const slugs = module.moduleSlugs ?? [];
-    const hasAccess = slugs.length === 0 || (module.requireAll ? moduleAccess.hasAllModules(slugs) : moduleAccess.hasAnyModule(slugs));
-    const locked = !moduleAccess.loading && !hasAccess;
+    const hasLegacyAccess = module.legacyFeature ? legacyAccess.hasAccess(module.legacyFeature) : false;
+    const hasModuleAccess = slugs.length === 0 || (module.requireAll ? moduleAccess.hasAllModules(slugs) : moduleAccess.hasAnyModule(slugs));
+    const hasAccess = hasModuleAccess || hasLegacyAccess;
+    const locked = !(moduleAccess.loading || (!!module.legacyFeature && legacyAccess.loading)) && !hasAccess;
     const lockCta = module.customCta ?? moduleCta(slugs, module.requireAll);
 
     return (

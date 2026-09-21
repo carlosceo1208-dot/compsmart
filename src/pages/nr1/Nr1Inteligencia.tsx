@@ -165,8 +165,8 @@ export default function Nr1Inteligencia() {
               value={
                 <ModuleGate
                   mode="inline"
-                  moduleSlugs={["potencial-sucessao", "core", "insight"]}
-                  allowIf={hasPotential && hasCompensation}
+                  moduleSlugs={hasCore ? ["potencial-sucessao", "core"] : ["potencial-sucessao", "insight"]}
+                  requireAll
                   featureName="Risco × Potencial × Remuneração"
                   ctaLabel="Ativar módulos necessários"
                 >

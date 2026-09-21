@@ -13,6 +13,7 @@ import { Skeleton } from "./components/ui/skeleton";
 import { TelemetryTracker } from "./components/TelemetryTracker";
 import { ViewAsClientToggle } from "./components/ViewAsClientToggle";
 import { ModuleGate } from "./components/ModuleGate";
+import { useFeatureAccess } from "./hooks/useFeatureAccess";
 
 // Eager — critical entry points
 import Index from "./pages/Index";
@@ -161,6 +162,19 @@ const RouteFallback = () => (
   </div>
 );
 
+const LegacyFeatureModuleGate = ({
+  feature,
+  children,
+  ...props
+}: React.ComponentProps<typeof ModuleGate> & { feature: string }) => {
+  const legacyAccess = useFeatureAccess();
+  return (
+    <ModuleGate {...props} allowIf={!legacyAccess.loading && legacyAccess.hasAccess(feature)}>
+      {children}
+    </ModuleGate>
+  );
+};
+
 const App = () => {
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
@@ -215,10 +229,10 @@ const App = () => {
                         <Route path="/survey-data" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Pesquisa Salarial"><SurveyData /></ModuleGate>} />
                         <Route path="/salary-comparison" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Comparação Salarial"><SalaryComparison /></ModuleGate>} />
                         <Route path="/job-titles" element={<ModuleGate mode="page" moduleSlug="core" featureName="Plano de Cargos e Avaliação"><JobTitles /></ModuleGate>} />
-                        <Route path="/people-analytics" element={<ModuleGate mode="page" moduleSlug="core" featureName="People Analytics" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><PeopleAnalytics /></ModuleGate>} />
-                        <Route path="/legal-assistant" element={<ModuleGate mode="page" moduleSlug="core" featureName="Jurídico Smart" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><LegalAssistant /></ModuleGate>} />
+                        <Route path="/people-analytics" element={<LegacyFeatureModuleGate feature="people_analytics" mode="page" moduleSlug="core" featureName="People Analytics" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><PeopleAnalytics /></LegacyFeatureModuleGate>} />
+                        <Route path="/legal-assistant" element={<LegacyFeatureModuleGate feature="legal_assistant" mode="page" moduleSlug="core" featureName="Jurídico Smart" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><LegalAssistant /></LegacyFeatureModuleGate>} />
                         <Route path="/salary-assistant" element={<ModuleGate mode="page" moduleSlug="core" featureName="Salary Smart"><SalaryAssistant /></ModuleGate>} />
-                        <Route path="/incentive-assistant" element={<ModuleGate mode="page" moduleSlug="core" featureName="R&B Smart" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><IncentiveAssistant /></ModuleGate>} />
+                        <Route path="/incentive-assistant" element={<LegacyFeatureModuleGate feature="incentive_assistant" mode="page" moduleSlug="core" featureName="R&B Smart" ctaLabel="Conhecer o módulo Gestão Estratégica de Remuneração e Desempenho"><IncentiveAssistant /></LegacyFeatureModuleGate>} />
                         <Route path="/incentive-programs" element={<ModuleGate mode="page" moduleSlug="core" featureName="Programas de Incentivos"><IncentivePrograms /></ModuleGate>} />
                         <Route path="/pricing" element={<Pricing />} />
                         <Route path="/salary-analysis-report" element={<ModuleGate mode="page" moduleSlug="core" featureName="Análise Salarial"><SalaryAnalysisReport /></ModuleGate>} />
