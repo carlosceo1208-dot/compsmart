@@ -8,7 +8,7 @@ Objetivo: criar no banco a estrutura que permite vender a CompSmart por módulo,
 core (Remu), insight (Insight), match (Match), nr1 (Psi — produto legal), clima (Clima), talent (Talent), evolve (Evolve), potencial-sucessao (Potencial — "Avaliação de Potencial e Sucessão", independente do NR-1), rh-service (Consultores Seniores — preço negociado).
 
 **Preços por faixa de colaboradores**
-Faixas 0-50, 51-200, 201-500, 501-1000, 1001+ para cada módulo, com preço em branco para você definir depois. Exceção: o módulo core já entra com os valores atuais como base (R$ 299 até 50, R$ 899 até 200, R$ 1.900 até 500). O rh-service fica marcado como negociável, sem preço fixo.
+Faixas 0-50, 51-200, 201-500, 501-1000, 1001+ para cada módulo, com preço em branco para você definir depois. Exceções já semeadas: o módulo core entra com os valores atuais como base (R$ 299 até 50, R$ 899 até 200, R$ 1.900 até 500) e o módulo nr1 entra com R$ 225 na faixa até 50 colaboradores (faixa Essencial travada), com as demais faixas em branco. O rh-service fica marcado como negociável, sem preço fixo.
 
 **Combos (bundles)**
 Lista de combos com percentual de desconto e quais módulos cada combo inclui.
