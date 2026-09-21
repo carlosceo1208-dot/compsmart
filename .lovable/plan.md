@@ -59,5 +59,5 @@ A liberação nunca é usada isolada: em toda regra nova, a condição de consul
   - `src/hooks/useRhService.ts`: novo hook local `useConsultorCoreAccess()` que consulta a nova função por RPC para a empresa ativa; permanece restrito ao escopo RH Service/Core, sem alterar `useCurrentUserRole` nem `useFeatureAccess`.
   - `src/hooks/useEmployeeImport.ts`: `useEmployeeImportAccess` deixa de liberar consultor direto e passa a exigir esse hook.
   - `src/pages/Employees.tsx`: botão "Atualizar Colaboradores" e navegação do Core respeitam a mesma condição; sem acesso, mantém cadeado/CTA atual.
-  - Ao abrir o Core como consultor liberado, dispara `log_consultor_core_access` uma vez por sessão de acesso.
+  - Ao abrir o Core como consultor, dispara `log_consultor_core_access` uma única vez por sessão de acesso — com `granted=true` quando liberado e `granted=false` quando bloqueado, sem repetir a cada clique.
 - Sem mudanças em landing, checkout, pagamentos, folha, nem nas Etapas 3, 3.5 e 4.
