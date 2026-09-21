@@ -53,32 +53,17 @@ export type DuplicateStrategy = 'update' | 'ignore' | 'only_new';
 /** Quem pode importar: admin, RH, consultor CompSmart e super admin */
 export const useEmployeeImportAccess = () => {
   const { data: roleData, isLoading } = useCurrentUserRole();
-
-  const consultorQuery = useQuery({
-    queryKey: ['employee-import-consultor-role'],
-    staleTime: 5 * 60 * 1000,
-    queryFn: async () => {
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return false;
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userData.user.id)
-        .eq('role', 'consultor')
-        .maybeSingle();
-      if (error) return false;
-      return !!data;
-    },
-  });
+  const { isConsultor, hasCoreAccess, loading: consultorLoading } = useConsultorCoreAccess();
 
   const canImport =
     !!roleData?.isSuperAdmin ||
     !!roleData?.isAdmin ||
     !!roleData?.isHR ||
-    !!consultorQuery.data;
+    (isConsultor && hasCoreAccess);
 
-  return { canImport, loading: isLoading || consultorQuery.isLoading };
+  return { canImport, loading: isLoading || consultorLoading };
 };
+
 
 export const useImportLookups = (enabled: boolean) => {
   const { activeCompanyId } = useCompanyContext();
