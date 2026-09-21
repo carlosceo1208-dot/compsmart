@@ -82,6 +82,7 @@ const PayEquity = lazy(() => import("./pages/PayEquity"));
 const ExecutiveCompensation = lazy(() => import("./pages/ExecutiveCompensation"));
 const ExecutiveDashboard = lazy(() => import("./pages/ExecutiveDashboard"));
 const MeritGovernance = lazy(() => import("./pages/MeritGovernance"));
+const RhService = lazy(() => import("./pages/RhService"));
 const BudgetBurndown = lazy(() => import("./pages/BudgetBurndown"));
 const ApprovalInbox = lazy(() => import("./pages/ApprovalInbox"));
 const DecisionScenarios = lazy(() => import("./pages/DecisionScenarios"));
@@ -260,6 +261,7 @@ const App = () => {
                         <Route path="/executive-compensation" element={<ModuleGate mode="page" moduleSlug="core" featureName="Remuneração de Executivos"><ExecutiveCompensation /></ModuleGate>} />
                         <Route path="/executive-dashboard" element={<ExecutiveDashboard />} />
                         <Route path="/merit-governance" element={<ModuleGate mode="page" moduleSlug="core" featureName="Governança de Mérito"><MeritGovernance /></ModuleGate>} />
+                        <Route path="/rh-service" element={<ModuleGate mode="page" moduleSlug="rh-service" featureName="RH Service"><RhService /></ModuleGate>} />
                         <Route path="/budget-burndown" element={<BudgetBurndown />} />
                         <Route path="/approval-inbox" element={<ApprovalInbox />} />
                         <Route path="/decision-scenarios" element={<DecisionScenarios />} />

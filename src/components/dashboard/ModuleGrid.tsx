@@ -305,7 +305,7 @@ export const ModuleGrid = () => {
       title: 'RH Service',
       description: 'Consultoria com consultores seniores por demanda',
       icon: Handshake,
-      path: '/dashboard',
+      path: '/rh-service',
       status: 'active',
       category: 'consultation',
       moduleSlugs: ['rh-service'],
