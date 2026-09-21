@@ -31,7 +31,8 @@ Criar a experiência do RH Service em `/rh-service`, conectada à estrutura já 
 - **Consultores:** nome, especialidade, e-mail, bio e situação; ações de cadastro/edição somente para a equipe CompSmart.
 - **Projetos:** título, consultor responsável, status, horas estimadas, valor negociado e datas; cliente somente visualiza.
 - **Horas:** projeto, consultor, quantidade, descrição e data; equipe CompSmart pode registrar/editar.
-- **Diagnósticos:** projeto/consultor vinculados, status e práticas com score de 0–100, nível e módulo relacionado; recomendações com nome do módulo e origem `automática`, `editada` ou `manual`.
+- **Diagnósticos:** lista com projeto/consultor vinculados, status e maturidade geral.
+- **Detalhe do diagnóstico:** abrir cada diagnóstico em painel lateral ou janela, mostrando as práticas com score de 0–100 e nível, e os módulos recomendados com nome legível, origem (`automática`, `editada`, `manual`) e justificativa. Admin e RH do cliente também podem abrir o detalhe, em modo de consulta.
 - Usar tabelas em telas amplas e apresentação compacta em telas menores, sem alterar o design global.
 
 ### 4. Formatação e estados
