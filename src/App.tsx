@@ -12,7 +12,7 @@ import { LabelsProvider } from "./contexts/LabelsContext";
 import { Skeleton } from "./components/ui/skeleton";
 import { TelemetryTracker } from "./components/TelemetryTracker";
 import { ViewAsClientToggle } from "./components/ViewAsClientToggle";
-import { PlanGate } from "./components/PlanGate";
+import { ModuleGate } from "./components/ModuleGate";
 
 // Eager — critical entry points
 import Index from "./pages/Index";
@@ -286,31 +286,31 @@ const App = () => {
                         <Route path="/nr1/diagnostico/novo" element={<Nr1NovoDiagnostico />} />
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
-                       <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
-                       <Route path="/nr1/fib" element={<PlanGate feature="nr1_fib" featureName="FIB — Felicidade Interna Bruta"><Nr1FIB /></PlanGate>} />
-                       <Route path="/nr1/fib-bem-estar" element={<PlanGate feature="nr1_fib" featureName="FIB — Felicidade Interna Bruta"><Nr1FibCard /></PlanGate>} />
+                        <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
+                        <Route path="/nr1/fib" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="FIB — Felicidade Interna Bruta"><Nr1FIB /></ModuleGate>} />
+                        <Route path="/nr1/fib-bem-estar" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="FIB — Felicidade Interna Bruta"><Nr1FibCard /></ModuleGate>} />
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
                        <Route path="/nr1/universo" element={<Nr1Universo />} />
                         <Route path="/nr1/agente" element={<Nr1BemEstarAgente />} />
                         <Route path="/nr1/jornada" element={<Nr1JornadaBemEstar />} />
-                        <Route path="/nr1/acompanhamento" element={<PlanGate feature="nr1_acompanhamento" featureName="Check-up de Colaborador"><Nr1Acompanhamento /></PlanGate>} />
+                         <Route path="/nr1/acompanhamento" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="Check-up de Colaborador"><Nr1Acompanhamento /></ModuleGate>} />
                         <Route path="/nr1/contratar" element={<Nr1Contratar />} />
                         <Route path="/nr1/consentimento" element={<Nr1Consentimento />} />
                        <Route path="/nr1/planos-acao" element={<Nr1PlanosAcao />} />
                        <Route path="/nr1/vitalidade" element={<Nr1Vitalidade />} />
                        <Route path="/nr1/biblioteca" element={<Nr1Biblioteca />} />
                        <Route path="/nr1/auditoria" element={<Nr1Auditoria />} />
-                       <Route path="/nr1/clima" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1Clima /></PlanGate>} />
+                        <Route path="/nr1/clima" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1Clima /></ModuleGate>} />
                       <Route path="/nr1/clima/:id/responder" element={<Nr1ClimaResponder />} />
-                      <Route path="/nr1/clima/dashboard" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaDashboard /></PlanGate>} />
-                      <Route path="/nr1/clima/dashboard/:id" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaDashboard /></PlanGate>} />
-                      <Route path="/nr1/clima/correlacao" element={<PlanGate feature="nr1_clima_correlacao" featureName="Correlação Clima x Riscos" requiredPlanLabel="Pro"><Nr1ClimaCorrelacao /></PlanGate>} />
-                      <Route path="/nr1/clima/externo" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></PlanGate>} />
-                     <Route path="/nr1/clima/externo/:id" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></PlanGate>} />
-                     <Route path="/nr1/clima/relatorios" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaRelatorios /></PlanGate>} />
-                     <Route path="/nr1/clima/governanca" element={<PlanGate feature="clima_organizacional" featureName="Clima Organizacional"><Nr1ClimaGovernanca /></PlanGate>} />
+                       <Route path="/nr1/clima/dashboard" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaDashboard /></ModuleGate>} />
+                       <Route path="/nr1/clima/dashboard/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaDashboard /></ModuleGate>} />
+                       <Route path="/nr1/clima/correlacao" element={<ModuleGate mode="page" moduleSlugs={["nr1", "clima"]} requireAll featureName="Correlação Clima x Riscos"><Nr1ClimaCorrelacao /></ModuleGate>} />
+                       <Route path="/nr1/clima/externo" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
+                      <Route path="/nr1/clima/externo/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
+                      <Route path="/nr1/clima/relatorios" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaRelatorios /></ModuleGate>} />
+                      <Route path="/nr1/clima/governanca" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaGovernanca /></ModuleGate>} />
                       </Route>
 
                       {/* Public */}

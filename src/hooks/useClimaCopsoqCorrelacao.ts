@@ -37,11 +37,11 @@ const RECOMENDACAO: Record<string, string> = {
   proposito_alinhamento: 'Reforçar missão/visão/valores e conexão impacto-trabalho.',
 };
 
-export const useClimaCopsoqCorrelacao = () => {
+export const useClimaCopsoqCorrelacao = (enabled = true) => {
   const { activeCompanyId } = useCompanyContext();
   return useQuery({
     queryKey: ['nr1-clima-copsoq-correlacao', activeCompanyId],
-    enabled: !!activeCompanyId,
+    enabled: enabled && !!activeCompanyId,
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from('vw_nr1_clima_copsoq_correlacao')

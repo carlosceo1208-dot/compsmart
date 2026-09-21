@@ -10,6 +10,12 @@ export interface Nr1IntelligenceFilters {
   unitId?: string | 'all';
 }
 
+export interface Nr1IntelligenceAccess {
+  includePotential?: boolean;
+  includePerformance?: boolean;
+  includeCompensation?: boolean;
+}
+
 export interface UnitCrossInsight {
   unitId: string | null;
   unitName: string;
@@ -23,11 +29,14 @@ export interface UnitCrossInsight {
   alertas: string[];
 }
 
-export const useNr1Intelligence = (filters: Nr1IntelligenceFilters) => {
+export const useNr1Intelligence = (filters: Nr1IntelligenceFilters, access: Nr1IntelligenceAccess = {}) => {
   const { activeCompanyId } = useCompanyContext();
+  const includePotential = access.includePotential ?? true;
+  const includePerformance = access.includePerformance ?? true;
+  const includeCompensation = access.includeCompensation ?? true;
 
   return useQuery({
-    queryKey: ['nr1-intel', activeCompanyId, filters],
+    queryKey: ['nr1-intel', activeCompanyId, filters, includePotential, includePerformance, includeCompensation],
     enabled: !!activeCompanyId,
     queryFn: async () => {
       // 1) Diagnósticos NR-1 do período
@@ -44,13 +53,26 @@ export const useNr1Intelligence = (filters: Nr1IntelligenceFilters) => {
       const diagnosticos = (diagsData ?? []) as Diagnostico[];
       const ultimo = diagnosticos[0] ?? null;
 
-      // 2) Talent intelligence (já filtra por root_company via RLS)
-      const { data: talentData, error: tErr } = await supabase
-        .from('v_talent_intelligence_dashboard' as any)
-        .select('*')
-        .limit(1000);
-      if (tErr) throw tErr;
-      let talent = (talentData ?? []) as unknown as TalentIntelRow[];
+      // 2) Talent intelligence (consulta apenas os campos dos módulos liberados)
+      const talentColumns = [
+        'employee_id',
+        'unit_id',
+        'root_company_id',
+        includePotential ? 'box_position' : null,
+        includePotential ? 'potential_score' : null,
+        includePerformance ? 'performance_score' : null,
+        includeCompensation ? 'current_salary' : null,
+      ].filter((column): column is string => Boolean(column));
+
+      let talent: TalentIntelRow[] = [];
+      if (includePotential || includePerformance || includeCompensation) {
+        const { data: talentData, error: tErr } = await supabase
+          .from('v_talent_intelligence_dashboard' as any)
+          .select(talentColumns.join(','))
+          .limit(1000);
+        if (tErr) throw tErr;
+        talent = (talentData ?? []) as unknown as TalentIntelRow[];
+      }
       if (filters.unitId && filters.unitId !== 'all') {
         talent = talent.filter((t) => t.unit_id === filters.unitId);
       }
@@ -74,22 +96,22 @@ export const useNr1Intelligence = (filters: Nr1IntelligenceFilters) => {
 
       const unitInsights: UnitCrossInsight[] = Array.from(byUnit.entries()).map(([uid, rows]) => {
         const totalColab = rows.length;
-        const criticos = rows.filter((r) => r.box_position && r.box_position <= 3).length;
-        const estrelas = rows.filter((r) => r.box_position && r.box_position >= 7).length;
-        const perfs = rows.map((r) => r.performance_score).filter((v): v is number => v != null);
+        const criticos = includePotential ? rows.filter((r) => r.box_position && r.box_position <= 3).length : 0;
+        const estrelas = includePotential ? rows.filter((r) => r.box_position && r.box_position >= 7).length : 0;
+        const perfs = includePerformance ? rows.map((r) => r.performance_score).filter((v): v is number => v != null) : [];
         const pots = rows.map((r) => r.potential_score).filter((v): v is number => v != null);
-        const sals = rows.map((r) => r.current_salary).filter((v): v is number => v != null);
+        const sals = includeCompensation ? rows.map((r) => r.current_salary).filter((v): v is number => v != null) : [];
         const avg = (a: number[]) => (a.length ? a.reduce((s, n) => s + n, 0) / a.length : null);
 
         const alertas: string[] = [];
-        if (riscoEmpresa != null && riscoEmpresa >= 50 && criticos / Math.max(totalColab, 1) > 0.2) {
+        if (includePotential && riscoEmpresa != null && riscoEmpresa >= 50 && criticos / Math.max(totalColab, 1) > 0.2) {
           alertas.push('Risco psicossocial alto + concentração de talentos críticos: priorizar plano de ação.');
         }
-        if (riscoEmpresa != null && riscoEmpresa >= 50 && estrelas > 0) {
+        if (includePotential && riscoEmpresa != null && riscoEmpresa >= 50 && estrelas > 0) {
           alertas.push(`${estrelas} talento(s) estratégico(s) em ambiente de risco — risco de turnover.`);
         }
         const avgPerf = avg(perfs);
-        if (avgPerf != null && avgPerf < 3 && riscoEmpresa != null && riscoEmpresa >= 50) {
+        if (includePerformance && avgPerf != null && avgPerf < 3 && riscoEmpresa != null && riscoEmpresa >= 50) {
           alertas.push('Performance média baixa correlacionada a risco psicossocial elevado.');
         }
 
@@ -109,15 +131,17 @@ export const useNr1Intelligence = (filters: Nr1IntelligenceFilters) => {
 
       // 5) KPIs gerais
       const totalColab = talent.length;
-      const totalCriticos = talent.filter((r) => r.box_position && r.box_position <= 3).length;
-      const totalEstrelas = talent.filter((r) => r.box_position && r.box_position >= 7).length;
+      const totalCriticos = includePotential ? talent.filter((r) => r.box_position && r.box_position <= 3).length : 0;
+      const totalEstrelas = includePotential ? talent.filter((r) => r.box_position && r.box_position >= 7).length : 0;
       const avgSalGeral =
-        talent.filter((r) => r.current_salary).reduce((s, r) => s + (r.current_salary ?? 0), 0) /
-        Math.max(talent.filter((r) => r.current_salary).length, 1);
+        includeCompensation
+          ? talent.filter((r) => r.current_salary).reduce((s, r) => s + (r.current_salary ?? 0), 0) /
+            Math.max(talent.filter((r) => r.current_salary).length, 1)
+          : 0;
 
       // Estimativa de custo de turnover: 30% folha anual dos talentos em risco
       const estrelasEmRisco =
-        riscoEmpresa != null && riscoEmpresa >= 50
+        includePotential && includeCompensation && riscoEmpresa != null && riscoEmpresa >= 50
           ? talent.filter((r) => r.box_position && r.box_position >= 7 && r.current_salary)
           : [];
       const custoTurnoverEstimado = estrelasEmRisco.reduce(

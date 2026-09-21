@@ -10,11 +10,11 @@ import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
 import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
 import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useFeatureAccess } from '@/hooks/useFeatureAccess';
+import { useModuleAccess, type ModuleSlug } from '@/hooks/useModuleAccess';
 import { toast } from 'sonner';
 
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string }; resource?: { url: string; icon: any; label: string }; feature?: string };
+type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string }; resource?: { url: string; icon: any; label: string }; moduleSlugs?: ModuleSlug[]; requireAll?: boolean };
 type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
@@ -41,32 +41,32 @@ const GROUPS: NavGroup[] = [
     title: 'Clima Organizacional',
     tone: 'clima',
     items: [
-      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, feature: 'clima_organizacional', desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, moduleSlugs: ['clima'], desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
     ],
   },
   {
     title: 'Cruzamento Riscos Psicossociais',
     tone: 'cruzamento',
     items: [
-      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, feature: 'nr1_clima_correlacao', desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
-      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, feature: 'nr1_clima_correlacao', desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
-      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, feature: 'nr1_clima_correlacao', desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
-      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, feature: 'nr1_clima_correlacao', desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
+      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, moduleSlugs: ['core'], desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
+      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, moduleSlugs: ['potencial-sucessao'], desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
+      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, moduleSlugs: ['clima'], desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
+      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, moduleSlugs: ['core', 'insight'], desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
     ],
   },
   {
     title: 'Índice de Felicidade',
     tone: 'fib',
     items: [
-      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, feature: 'nr1_fib', desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
+      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, moduleSlugs: ['nr1'], desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
     ],
   },
   {
     title: 'Acompanhamento Colaborador',
     tone: 'jornada',
     items: [
-      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, feature: 'nr1_acompanhamento', desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
-      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, feature: 'nr1_acompanhamento', desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, moduleSlugs: ['nr1'], desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, moduleSlugs: ['nr1'], desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
     ],
   },
   {
@@ -109,7 +109,7 @@ export const Nr1Layout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { data: isSuper } = useIsSuperAdmin();
-  const { hasAccess } = useFeatureAccess();
+  const moduleAccess = useModuleAccess();
   const navRef = useRef<HTMLDivElement | null>(null);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
   const [importMatrizOpen, setImportMatrizOpen] = useState(false);
@@ -184,7 +184,8 @@ export const Nr1Layout = () => {
                   <div className={cn('grid gap-2', innerCols)}>
                     {group.items.map((item) => {
                       const Icon = item.icon;
-                      const locked = !!item.feature && !hasAccess(item.feature);
+                      const requiredModules = item.moduleSlugs ?? [];
+                      const locked = requiredModules.length > 0 && !(item.requireAll ? moduleAccess.hasAllModules(requiredModules) : moduleAccess.hasAnyModule(requiredModules));
                       const active = !locked && item.to
                         ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
                         : false;
@@ -219,8 +220,10 @@ export const Nr1Layout = () => {
                       const handleLockedClick = (e: React.MouseEvent) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        toast.info('Serviço não contratado', {
-                          description: 'Este módulo opcional não está liberado para sua empresa. Entre em contato com a CompSmart para contratar.',
+                        const moduleNames = requiredModules.map((slug) => moduleAccess.getModuleName(slug));
+                        const cta = moduleNames.length === 1 ? `Ativar módulo ${moduleNames[0]}` : `Ativar ${moduleNames.join(item.requireAll ? ' e ' : ' ou ')}`;
+                        toast.info(cta, {
+                          description: 'Este módulo não está liberado para sua empresa. Entre em contato com a CompSmart para contratar.',
                         });
                       };
                       const node = locked ? (
