@@ -101,6 +101,7 @@ const Users = () => {
   const { activeCompanyId, isLoading: companyContextLoading } = useCompanyContext();
   const { hasModule } = useModuleAccess();
   const hasCoreModule = hasModule('core');
+  const { isConsultor: isConsultorUser, hasCoreAccess: hasConsultorCoreAccess } = useConsultorCoreAccess();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
