@@ -52,9 +52,9 @@ export const useRhServiceAccess = () => {
         .select('role')
         .eq('user_id', user.id)
         .eq('role', 'consultor')
-        .maybeSingle();
+        .limit(1);
       if (error) throw error;
-      return !!data;
+      return (data ?? []).length > 0;
     },
   });
 
