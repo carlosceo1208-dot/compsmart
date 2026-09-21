@@ -11471,6 +11471,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_consultor_modulo_access: {
+        Args: { _module_slug: string; _tenant_id: string }
+        Returns: boolean
+      }
       has_module: { Args: { _slug: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -11484,6 +11488,15 @@ export type Database = {
         Returns: Json
       }
       is_super_admin: { Args: { _user_id?: string }; Returns: boolean }
+      log_consultor_core_access: {
+        Args: {
+          _action: string
+          _details?: Json
+          _granted?: boolean
+          _tenant_id: string
+        }
+        Returns: undefined
+      }
       manage_user_roles: {
         Args: {
           p_roles: Database["public"]["Enums"]["app_role"][]
