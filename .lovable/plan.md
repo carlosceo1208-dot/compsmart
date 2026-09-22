@@ -34,17 +34,24 @@ Novo cartão na página Insight — Market Benchmark, abaixo dos indicadores:
 
 ## 3. Referência de mercado citada nas análises
 
-Nos alertas de defasagem e no posicionamento competitivo, uma única linha de
-referência externa é exibida no topo de cada aba, rotulada como
-"Referência externa de mercado (conteúdo público)", com o texto do resumo, a
-fonte com link e a data.
+Uma única linha de referência externa, rotulada como "Referência externa de
+mercado (conteúdo público)", com resumo, fonte com link e data.
 
-- A referência vem do mesmo conteúdo público em cache; nenhum dado da empresa é
-  enviado para obtê-la.
+- Aparece somente nas duas abas com contexto real: Alertas de defasagem (tema
+  movimentações salariais e dissídios) e Posicionamento competitivo (tema
+  práticas de mercado por cargo e região). Nenhuma outra aba recebe a linha.
+- A referência vem do mesmo conteúdo público já buscado; nenhum dado da empresa
+  é enviado para obtê-la.
 - O rótulo deixa explícito que é conteúdo público externo, separado dos números
   internos exibidos na tabela.
-- Sem referência confiável em cache, a linha simplesmente não aparece — nada é
-  inventado.
+- Sem referência confiável disponível para aquele tema, a linha simplesmente não
+  aparece — nada é inventado.
+
+## 4. Conteúdo compartilhado entre widget e abas
+
+O widget e as referências das abas leem exatamente o mesmo conteúdo por tema:
+uma vez buscado um tema, as duas telas mostram a mesma informação, sem buscas
+duplicadas e sem a referência aparecer numa tela e faltar na outra.
 
 ## 4. Fora deste escopo
 
