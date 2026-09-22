@@ -86,8 +86,9 @@ fluxo. Cards reservados para "NR-1 e Riscos Psicossociais" e "Clima e 9-Box".
 
 ## 6. Leads
 
-Todos os formulários públicos (demo, e-book, parceiro, contato) gravam em leads
-com origem, porte e data, com tela de agradecimento após o envio.
+Todos os formulários públicos gravam em leads com origem, porte e data, com
+tela de agradecimento após o envio. Nomenclatura fixa de origem: `demo`,
+`ebook:remuneracao`, `ebook:nr1`, `ebook:clima-9box`, `parceiro`, `contato`.
 
 ## Detalhes técnicos
 
