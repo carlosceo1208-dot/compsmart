@@ -22,6 +22,14 @@ export interface MarketInsightsResult {
   stale?: boolean;
 }
 
+/** Temas usados pelo módulo Insight (mesma função Edge e mesmo cache do painel). */
+export const INSIGHT_TOPICS = [
+  { value: "dissidios_setor", label: "Movimentações salariais e dissídios por setor" },
+  { value: "inflacao_remuneracao", label: "Inflação e impacto em remuneração" },
+  { value: "beneficios_total", label: "Benefícios e remuneração total" },
+  { value: "praticas_cargo_regiao", label: "Práticas de mercado por cargo e região" },
+] as const;
+
 async function callFunction(topic: string, refresh: boolean): Promise<MarketInsightsResult> {
   const { data, error } = await supabase.functions.invoke("market-insights", {
     body: { topic, refresh },

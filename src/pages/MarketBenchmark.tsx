@@ -11,6 +11,8 @@ import {
 } from "@/hooks/useMarketBenchmark";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { Navigate } from "react-router-dom";
+import { MarketTrendsCard } from "@/components/insight/MarketTrendsCard";
+import { MarketReferenceNote } from "@/components/insight/MarketReferenceNote";
 
 const POSITION_LABELS: Record<string, { label: string; variant: "default" | "destructive" | "secondary" | "outline" }> = {
   below_market: { label: "Abaixo do Mercado", variant: "destructive" },
@@ -75,6 +77,8 @@ export default function MarketBenchmark() {
         />
       </div>
 
+      <MarketTrendsCard />
+
       <Tabs defaultValue="alerts">
         <TabsList>
           <TabsTrigger value="alerts">
@@ -96,6 +100,7 @@ export default function MarketBenchmark() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <MarketReferenceNote topic="dissidios_setor" />
               {loadingAlerts ? (
                 <Skeleton className="h-64 w-full" />
               ) : !alerts || alerts.length === 0 ? (
@@ -153,6 +158,7 @@ export default function MarketBenchmark() {
               <CardDescription>Todos os cargos com correspondência na pesquisa de mercado</CardDescription>
             </CardHeader>
             <CardContent>
+              <MarketReferenceNote topic="praticas_cargo_regiao" />
               {loadingComp ? (
                 <Skeleton className="h-64 w-full" />
               ) : !comp || comp.length === 0 ? (
