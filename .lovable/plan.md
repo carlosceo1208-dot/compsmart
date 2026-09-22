@@ -86,8 +86,9 @@ fluxo. Cards reservados para "NR-1 e Riscos Psicossociais" e "Clima e 9-Box".
 
 ## 6. Leads
 
-Todos os formulários públicos (demo, e-book, parceiro, contato) gravam em leads
-com origem, porte e data, com tela de agradecimento após o envio.
+Todos os formulários públicos gravam em leads com origem, porte e data, com
+tela de agradecimento após o envio. Nomenclatura fixa de origem: `demo`,
+`ebook:remuneracao`, `ebook:nr1`, `ebook:clima-9box`, `parceiro`, `contato`.
 
 ## Detalhes técnicos
 
@@ -101,8 +102,10 @@ com origem, porte e data, com tela de agradecimento após o envio.
   - nova tabela de configuração global de preço público (base per capita,
     desconto de módulo adicional, descontos por ciclo), com leitura anônima.
   - `get_public_pricing()` SECURITY DEFINER, `search_path = public`, EXECUTE
-    para anon e authenticated, retornando somente valores públicos. A landing e
-    o simulador leem apenas essa função.
+    para anon e authenticated, SEM parâmetros de entrada: devolve apenas a
+    estrutura fixa de valores públicos (base per capita, desconto de módulo
+    adicional, descontos por ciclo, faixas por porte). Não aceita tenant_id nem
+    qualquer dado de cliente. A landing e o simulador leem apenas essa função.
   - Seed dos valores atuais: base 5,00 · adicional 50% · semestral 5% ·
     anual 10%.
 - Frontend: novas páginas em `src/pages/public/` e componentes em
