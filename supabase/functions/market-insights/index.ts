@@ -29,6 +29,26 @@ const TOPICS: Record<string, { label: string; query: string }> = {
     label: "Tendências",
     query: "tendências de gestão de pessoas, futuro do trabalho e cultura organizacional no Brasil",
   },
+  dissidios_setor: {
+    label: "Movimentações salariais e dissídios por setor",
+    query:
+      "dissídios, convenções coletivas, pisos salariais e reajustes salariais recentes por setor no Brasil",
+  },
+  inflacao_remuneracao: {
+    label: "Inflação e impacto em remuneração",
+    query:
+      "inflação IPCA e INPC no Brasil e seu impacto em reajustes salariais e política de remuneração",
+  },
+  beneficios_total: {
+    label: "Tendências de benefícios e remuneração total",
+    query:
+      "tendências de benefícios corporativos e remuneração total (total rewards) no mercado brasileiro",
+  },
+  praticas_cargo_regiao: {
+    label: "Práticas de mercado por cargo e região",
+    query:
+      "práticas de mercado de remuneração por cargo e por região no Brasil, pesquisas salariais recentes",
+  },
 };
 
 // LGPD: qualquer indício de dado interno do cliente bloqueia a pergunta.
@@ -44,7 +64,7 @@ const FORBIDDEN_PATTERNS: { re: RegExp; reason: string }[] = [
   { re: /\b(profiles|job_titles|salary_ranges|performance_evaluations|tenant_id|root_company_id)\b/i, reason: "referência a dados internos" },
 ];
 
-const ALLOWED_TERMS = /\b(rh|recursos humanos|remunera|sal[áa]ri|benef[íi]ci|legisla|trabalhis|nr-?1|nr\s?1|psicossoc|tend[êe]nci|mercado|gest[ãa]o de pessoas|talento|clt|sindic|reajust|conven[çc][ãa]o coletiva|turnover|engajamento)/i;
+const ALLOWED_TERMS = /\b(rh|recursos humanos|remunera|sal[áa]ri|benef[íi]ci|legisla|trabalhis|nr-?1|nr\s?1|psicossoc|tend[êe]nci|mercado|gest[ãa]o de pessoas|talento|clt|sindic|reajust|conven[çc][ãa]o coletiva|turnover|engajamento|diss[íi]di|piso salarial|ipca|inpc|infla[çc][ãa]o|total rewards|remunera[çc][ãa]o total|pr[áa]tica de mercado|pr[áa]ticas de mercado|pesquisa salarial|regi[ãa]o|setor)/i;
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
