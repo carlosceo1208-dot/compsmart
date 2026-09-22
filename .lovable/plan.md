@@ -34,19 +34,26 @@ Novo cartão na página Insight — Market Benchmark, abaixo dos indicadores:
 
 ## 3. Referência de mercado citada nas análises
 
-Nos alertas de defasagem e no posicionamento competitivo, uma única linha de
-referência externa é exibida no topo de cada aba, rotulada como
-"Referência externa de mercado (conteúdo público)", com o texto do resumo, a
-fonte com link e a data.
+Uma única linha de referência externa, rotulada como "Referência externa de
+mercado (conteúdo público)", com resumo, fonte com link e data.
 
-- A referência vem do mesmo conteúdo público em cache; nenhum dado da empresa é
-  enviado para obtê-la.
+- Aparece somente nas duas abas com contexto real: Alertas de defasagem (tema
+  movimentações salariais e dissídios) e Posicionamento competitivo (tema
+  práticas de mercado por cargo e região). Nenhuma outra aba recebe a linha.
+- A referência vem do mesmo conteúdo público já buscado; nenhum dado da empresa
+  é enviado para obtê-la.
 - O rótulo deixa explícito que é conteúdo público externo, separado dos números
   internos exibidos na tabela.
-- Sem referência confiável em cache, a linha simplesmente não aparece — nada é
-  inventado.
+- Sem referência confiável disponível para aquele tema, a linha simplesmente não
+  aparece — nada é inventado.
 
-## 4. Fora deste escopo
+## 4. Conteúdo compartilhado entre widget e abas
+
+O widget e as referências das abas leem exatamente o mesmo conteúdo por tema:
+uma vez buscado um tema, as duas telas mostram a mesma informação, sem buscas
+duplicadas e sem a referência aparecer numa tela e faltar na outra.
+
+## 5. Fora deste escopo
 
 A base de benchmark comprada/importada do Insight não é substituída nem
 complementada pela busca. O widget do painel e as demais funções de backend
@@ -57,14 +64,19 @@ ficam inalterados. Nenhum dado de cliente sai da plataforma.
 - `supabase/functions/market-insights/index.ts`: acrescentar ao mapa `TOPICS` as
   chaves `dissidios_setor`, `inflacao_remuneracao`, `beneficios_total`,
   `praticas_cargo_regiao` e ampliar o regex `ALLOWED_TERMS`. Redeploy da função.
-  `FORBIDDEN_PATTERNS`, cache, `check_rate_limit` e `market_insights_usage` sem
-  alteração.
-- `src/hooks/useMarketInsights.ts`: já aceita `topic`; adicionar apenas a lista
-  de temas do Insight exportada como constante (rótulos legíveis).
+  `FORBIDDEN_PATTERNS`, cache (`cache_key = topic::question`), `check_rate_limit`
+  e `market_insights_usage` sem alteração.
+- `src/hooks/useMarketInsights.ts`: já aceita `topic` e usa `queryKey`
+  `["market-insights", topic]` — widget e nota usam o mesmo hook/tema, então o
+  React Query compartilha a mesma entrada e não dispara chamadas duplicadas;
+  adicionar apenas a constante com os temas do Insight e rótulos legíveis.
 - Novos componentes: `src/components/insight/MarketTrendsCard.tsx` (widget com
   seletor de tema, reutilizando a estrutura visual de `MarketInsightsCard`) e
-  `src/components/insight/MarketReferenceNote.tsx` (uma referência citada,
-  recebe `topic`, renderiza nada quando não há item).
-- `src/pages/MarketBenchmark.tsx`: inserir o widget após os cartões de resumo e
-  a nota de referência no topo de cada `TabsContent`.
+  `src/components/insight/MarketReferenceNote.tsx` (recebe `topic`, usa
+  `useMarketInsights(topic)` sem botão de atualizar e retorna `null` quando não
+  há item).
+- `src/pages/MarketBenchmark.tsx`: widget após os cartões de resumo; nota com
+  `topic="dissidios_setor"` na aba Alertas e `topic="praticas_cargo_regiao"` na
+  aba Competitividade — nas demais, nada.
 - Sem migração de banco e sem alteração de RLS.
+
