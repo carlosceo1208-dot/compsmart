@@ -53,7 +53,7 @@ O widget e as referências das abas leem exatamente o mesmo conteúdo por tema:
 uma vez buscado um tema, as duas telas mostram a mesma informação, sem buscas
 duplicadas e sem a referência aparecer numa tela e faltar na outra.
 
-## 4. Fora deste escopo
+## 5. Fora deste escopo
 
 A base de benchmark comprada/importada do Insight não é substituída nem
 complementada pela busca. O widget do painel e as demais funções de backend
@@ -64,14 +64,19 @@ ficam inalterados. Nenhum dado de cliente sai da plataforma.
 - `supabase/functions/market-insights/index.ts`: acrescentar ao mapa `TOPICS` as
   chaves `dissidios_setor`, `inflacao_remuneracao`, `beneficios_total`,
   `praticas_cargo_regiao` e ampliar o regex `ALLOWED_TERMS`. Redeploy da função.
-  `FORBIDDEN_PATTERNS`, cache, `check_rate_limit` e `market_insights_usage` sem
-  alteração.
-- `src/hooks/useMarketInsights.ts`: já aceita `topic`; adicionar apenas a lista
-  de temas do Insight exportada como constante (rótulos legíveis).
+  `FORBIDDEN_PATTERNS`, cache (`cache_key = topic::question`), `check_rate_limit`
+  e `market_insights_usage` sem alteração.
+- `src/hooks/useMarketInsights.ts`: já aceita `topic` e usa `queryKey`
+  `["market-insights", topic]` — widget e nota usam o mesmo hook/tema, então o
+  React Query compartilha a mesma entrada e não dispara chamadas duplicadas;
+  adicionar apenas a constante com os temas do Insight e rótulos legíveis.
 - Novos componentes: `src/components/insight/MarketTrendsCard.tsx` (widget com
   seletor de tema, reutilizando a estrutura visual de `MarketInsightsCard`) e
-  `src/components/insight/MarketReferenceNote.tsx` (uma referência citada,
-  recebe `topic`, renderiza nada quando não há item).
-- `src/pages/MarketBenchmark.tsx`: inserir o widget após os cartões de resumo e
-  a nota de referência no topo de cada `TabsContent`.
+  `src/components/insight/MarketReferenceNote.tsx` (recebe `topic`, usa
+  `useMarketInsights(topic)` sem botão de atualizar e retorna `null` quando não
+  há item).
+- `src/pages/MarketBenchmark.tsx`: widget após os cartões de resumo; nota com
+  `topic="dissidios_setor"` na aba Alertas e `topic="praticas_cargo_regiao"` na
+  aba Competitividade — nas demais, nada.
 - Sem migração de banco e sem alteração de RLS.
+
