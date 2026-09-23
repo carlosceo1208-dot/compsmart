@@ -112,6 +112,11 @@ const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
 const LandingNr1Ads = lazy(() => import("./pages/public/LandingNr1Ads"));
 const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
 const LandingCargosSalarios = lazy(() => import("./pages/public/LandingCargosSalarios"));
+const Precos = lazy(() => import("./pages/public/Precos"));
+const Parceiros = lazy(() => import("./pages/public/Parceiros"));
+const Materiais = lazy(() => import("./pages/public/Materiais"));
+const Contato = lazy(() => import("./pages/public/Contato"));
+const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
 
 // Lazy — NR-1 Module
