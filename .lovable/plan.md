@@ -29,6 +29,12 @@ Escopo: `src/components/landing/public/PublicHeader.tsx` (menu desktop) e `src/c
 - Pílula verde do NR-1 como destaque discreto, sem competir com os botões.
 - Demais links (Home, Módulos, Preços, Parceiros, Materiais, Contato) inalterados, com hover.
 
+## 5. Contornos dos cards de módulos — mais destaque (print da home)
+- Em `ModulesGridSection.tsx`, a borda atual dos cards é quase invisível (`border-border` puro).
+- Repouso: borda visível com tom azul suave `border-primary/25`.
+- Hover: reforço progressivo `hover:border-primary/60`, mantendo o `hover:shadow-lg` existente e a transição suave.
+- Não altera conteúdo, badges (incluindo "LEGAL OBRIGATÓRIO" vermelho), nem a estrutura dos cards.
+
 ## Verificação
 - Build OK (log em /tmp/observability/build-errors.log).
 - Playwright no header em desktop: confirmar visualmente os três estados (CTA sólido, Entrar outline, pílula verde) e que o dropdown Módulos e o dialog de demo continuam funcionando.
