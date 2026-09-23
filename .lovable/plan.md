@@ -1,6 +1,6 @@
-# Ajuste — Botões do Header Público
+# Ajustes — Header Público + Contornos dos Cards de Módulos
 
-Escopo: apenas `src/components/landing/public/PublicHeader.tsx` (menu desktop). Nada muda no app autenticado, no menu mobile (exceto nada — permanece como está), nem em outras páginas.
+Escopo: `src/components/landing/public/PublicHeader.tsx` (menu desktop) e `src/components/landing/pivot/ModulesGridSection.tsx` (grade "Nove módulos, nove agentes de IA" da home). Nada muda no app autenticado, no menu mobile, nem em outras páginas.
 
 ## 1. CTA "Agendar demonstração" — sólido, sem degradê
 - No `DemoDialog` do header (desktop), passar `className` que remove o degradê do botão padrão:
@@ -29,6 +29,12 @@ Escopo: apenas `src/components/landing/public/PublicHeader.tsx` (menu desktop). 
 - Pílula verde do NR-1 como destaque discreto, sem competir com os botões.
 - Demais links (Home, Módulos, Preços, Parceiros, Materiais, Contato) inalterados, com hover.
 
+## 5. Contornos dos cards de módulos — mais destaque (print da home)
+- Em `ModulesGridSection.tsx`, a borda atual dos cards é quase invisível (`border-border` puro).
+- Repouso: borda visível com tom azul suave `border-primary/25`.
+- Hover: reforço progressivo `hover:border-primary/60`, mantendo o `hover:shadow-lg` existente e a transição suave.
+- Não altera conteúdo, badges (incluindo "LEGAL OBRIGATÓRIO" vermelho), nem a estrutura dos cards.
+
 ## Verificação
 - Build OK (log em /tmp/observability/build-errors.log).
-- Playwright no header em desktop: confirmar visualmente os três estados (CTA sólido, Entrar outline, pílula verde) e que o dropdown Módulos e o dialog de demo continuam funcionando.
+- Playwright em desktop: confirmar visualmente o header (CTA sólido, Entrar outline, pílula verde, dropdown Módulos e dialog de demo funcionando) e a grade de módulos com contornos reforçados em repouso e no hover.
