@@ -266,7 +266,7 @@ export default function LandingNr1() {
                 <span>Pergunta {currentIdx + 1} de {total}</span>
                 <span>Diagnóstico Express NR-1</span>
               </div>
-              <Progress value={progress} className="h-2" />
+              <Progress value={progress} className="h-2 bg-primary/10" />
               <CardTitle className="text-lg mt-4 leading-snug">{questao.enunciado}</CardTitle>
             </CardHeader>
             <CardContent>

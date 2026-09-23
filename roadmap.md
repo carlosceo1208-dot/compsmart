@@ -1,7 +1,8 @@
 # Roadmap
 
-- [ ] Ajustes finais aprovados da landing pública: cores, marca/favicon, vídeo, contato, NR-1, preços e Termos (publicação depende da revisão da prévia e conferência documental).
-- [ ] Verificar e tratar os três alertas de segurança das regras de leitura pública.
+- [x] Ajustes finais aprovados da landing pública: cores, marca/favicon, vídeo, contato, NR-1, preços e Termos.
+- [ ] Publicação da landing: aguarda revisão da prévia e conferência da razão social no cartão CNPJ pelo cliente.
+- [x] Verificar e tratar os três alertas de segurança das regras de leitura pública.
 - [x] Etapa 2: aplicar gating por módulo no dashboard centralizado, preservando visual e sem alterar backend.
 - [x] Ajuste aprovado: cards Jurídico Smart, R&B Smart e People Analytics visíveis, bloqueados salvo Core ou serviço já ativo.
 - [x] Ajuste aprovado: CTAs bloqueados usando o nome legível vindo do catálogo de módulos.
