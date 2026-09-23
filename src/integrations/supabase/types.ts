@@ -4110,11 +4110,14 @@ export type Database = {
           created_at: string
           email: string
           empresa: string | null
+          especialidade: string | null
           id: string
           lead_magnet: string | null
+          linkedin: string | null
           modulo_interesse: string | null
           nome: string
           origem: string | null
+          parceria_tipo: string | null
           porte: string | null
           status: string
           updated_at: string
@@ -4125,11 +4128,14 @@ export type Database = {
           created_at?: string
           email: string
           empresa?: string | null
+          especialidade?: string | null
           id?: string
           lead_magnet?: string | null
+          linkedin?: string | null
           modulo_interesse?: string | null
           nome: string
           origem?: string | null
+          parceria_tipo?: string | null
           porte?: string | null
           status?: string
           updated_at?: string
@@ -4140,11 +4146,14 @@ export type Database = {
           created_at?: string
           email?: string
           empresa?: string | null
+          especialidade?: string | null
           id?: string
           lead_magnet?: string | null
+          linkedin?: string | null
           modulo_interesse?: string | null
           nome?: string
           origem?: string | null
+          parceria_tipo?: string | null
           porte?: string | null
           status?: string
           updated_at?: string
@@ -4550,29 +4559,35 @@ export type Database = {
       module_pricing: {
         Row: {
           created_at: string
+          desconto_modulo_adicional_pct: number | null
           faixa_max_colaboradores: number | null
           faixa_min_colaboradores: number
           id: string
           module_id: string
           preco_mensal: number | null
+          preco_por_colaborador: number | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          desconto_modulo_adicional_pct?: number | null
           faixa_max_colaboradores?: number | null
           faixa_min_colaboradores: number
           id?: string
           module_id: string
           preco_mensal?: number | null
+          preco_por_colaborador?: number | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          desconto_modulo_adicional_pct?: number | null
           faixa_max_colaboradores?: number | null
           faixa_min_colaboradores?: number
           id?: string
           module_id?: string
           preco_mensal?: number | null
+          preco_por_colaborador?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -8140,6 +8155,45 @@ export type Database = {
         }
         Relationships: []
       }
+      public_pricing_config: {
+        Row: {
+          created_at: string
+          desconto_anual_pct: number
+          desconto_modulo_adicional_pct: number
+          desconto_semestral_pct: number
+          faixas: Json
+          id: string
+          is_active: boolean
+          moeda: string
+          preco_base_colaborador: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          desconto_anual_pct?: number
+          desconto_modulo_adicional_pct?: number
+          desconto_semestral_pct?: number
+          faixas?: Json
+          id?: string
+          is_active?: boolean
+          moeda?: string
+          preco_base_colaborador?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          desconto_anual_pct?: number
+          desconto_modulo_adicional_pct?: number
+          desconto_semestral_pct?: number
+          faixas?: Json
+          id?: string
+          is_active?: boolean
+          moeda?: string
+          preco_base_colaborador?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rate_limit_log: {
         Row: {
           created_at: string
@@ -11487,6 +11541,7 @@ export type Database = {
           std_deviation: number
         }[]
       }
+      get_public_pricing: { Args: never; Returns: Json }
       get_salary_gini_index: {
         Args: never
         Returns: {
