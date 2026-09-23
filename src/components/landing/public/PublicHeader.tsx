@@ -92,7 +92,7 @@ export const PublicHeader = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {LINKS.slice(1).map((l) => (
+            {LINKS.slice(2).map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -108,11 +108,20 @@ export const PublicHeader = () => {
                 Dashboard
               </Button>
             ) : (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border border-border bg-transparent text-foreground hover:bg-primary/5 hover:border-primary/40"
+                onClick={() => navigate("/auth")}
+              >
                 Entrar
               </Button>
             )}
-            <DemoDialog triggerLabel="Agendar demonstração" size="sm" />
+            <DemoDialog
+              triggerLabel="Agendar demonstração"
+              size="sm"
+              className="bg-none bg-primary hover:bg-primary/90 hover:-translate-y-0 shadow-primary/25 hover:shadow-md"
+            />
           </nav>
 
           <button
