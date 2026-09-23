@@ -60,6 +60,14 @@ export const PublicHeader = () => {
               Home
             </Link>
 
+            <Link
+              to="/nr1"
+              className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+            >
+              NR-1
+            </Link>
+
+
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 Módulos
@@ -84,7 +92,7 @@ export const PublicHeader = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {LINKS.slice(1).map((l) => (
+            {LINKS.slice(2).map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -100,11 +108,20 @@ export const PublicHeader = () => {
                 Dashboard
               </Button>
             ) : (
-              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border border-border bg-transparent text-foreground hover:bg-primary/5 hover:border-primary/40"
+                onClick={() => navigate("/auth")}
+              >
                 Entrar
               </Button>
             )}
-            <DemoDialog triggerLabel="Agendar demonstração" size="sm" />
+            <DemoDialog
+              triggerLabel="Agendar demonstração"
+              size="sm"
+              className="bg-none bg-primary hover:bg-primary/90 hover:-translate-y-0 shadow-primary/25 hover:shadow-md"
+            />
           </nav>
 
           <button
