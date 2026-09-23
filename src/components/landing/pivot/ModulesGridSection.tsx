@@ -20,7 +20,7 @@ export const ModulesGridSection = () => (
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
         {LANDING_MODULES.map((m) => (
           <Link key={m.slug} to={m.route} className="group">
-            <Card className="h-full rounded-2xl transition-all hover:shadow-lg hover:border-primary/40">
+            <Card className="h-full rounded-2xl border-primary/25 transition-all hover:shadow-lg hover:border-primary/60">
               <CardContent className="p-6 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="p-2.5 rounded-xl bg-primary/10">

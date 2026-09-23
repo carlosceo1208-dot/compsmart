@@ -60,6 +60,14 @@ export const PublicHeader = () => {
               Home
             </Link>
 
+            <Link
+              to="/nr1"
+              className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+            >
+              NR-1
+            </Link>
+
+
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
                 Módulos
