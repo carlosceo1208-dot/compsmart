@@ -8,9 +8,9 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, ArrowRight, Clock, Lock, FileCheck, Award } from 'lucide-react';
+import { ShieldCheck, ArrowRight, Lock, FileCheck, Award } from 'lucide-react';
 import Nr1HeroBento from '@/components/landing/nr1/Nr1HeroBento';
-import { Footer } from '@/components/landing/Footer';
+import { PublicFooter } from '@/components/landing/public/PublicFooter';
 import { SecuritySection } from '@/components/landing/SecuritySection';
 import Nr1PerguntasChro from '@/components/landing/nr1/Nr1PerguntasChro';
 import Nr1TabelaCategoria from '@/components/landing/nr1/Nr1TabelaCategoria';
@@ -19,14 +19,15 @@ import Nr1ProvaCorrelacao from '@/components/landing/nr1/Nr1ProvaCorrelacao';
 import Nr1Faq, { NR1_FAQ_JSONLD } from '@/components/landing/nr1/Nr1Faq';
 import Nr1GestaoTerceiros from '@/components/landing/nr1/Nr1GestaoTerceiros';
 import Nr1Header from '@/components/landing/nr1/Nr1Header';
-import Nr1PricingCards from '@/components/landing/nr1/Nr1PricingCards';
-import Nr1DiscountSimulator from '@/components/landing/nr1/Nr1DiscountSimulator';
+import { PricingSimulator } from '@/components/landing/pivot/PricingSimulator';
+import { usePublicPricing, additionalModulePrice, formatBRL as formatPublicBRL } from '@/hooks/usePublicPricing';
+import { WhatsAppFloat } from '@/components/landing/public/WhatsAppFloat';
 import Nr1Novidades from '@/components/landing/nr1/Nr1Novidades';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Questoes } from '@/hooks/useNr1';
 
-import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES, estimarMultaAnual } from '@/lib/nr1';
+import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES } from '@/lib/nr1';
 import { toast } from '@/hooks/use-toast';
 
 const leadSchema = z.object({
@@ -43,10 +44,10 @@ type Step = 'landing' | 'questionario' | 'lead' | 'resultado';
 const formatBRL = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
 export default function LandingNr1() {
+  const { data: pricing, isLoading: pricingLoading } = usePublicPricing();
   const [step, setStep] = useState<Step>('landing');
   const [respostas, setRespostas] = useState<Record<string, number>>({});
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [numColab, setNumColab] = useState(50);
   const [form, setForm] = useState({ nome: '', email: '', empresa: '', telefone: '', cargo: '', tamanho_empresa: '' });
   const [scoreFree, setScoreFree] = useState<number | null>(null);
   const navigate = useNavigate();
@@ -57,21 +58,20 @@ export default function LandingNr1() {
   const questao = questoes?.[currentIdx];
   const progress = total > 0 ? ((currentIdx + 1) / total) * 100 : 0;
 
-  const multa = estimarMultaAnual(numColab);
 
   const responder = (valor: number) => {
-    if (!questao) return;
+    if (!questao || !questoes?.length) return;
     setRespostas((r) => ({ ...r, [questao.id]: valor }));
     if (currentIdx + 1 < total) {
       setCurrentIdx(currentIdx + 1);
     } else {
       // calcula score (média * 25, considerando reverso)
       let soma = 0;
-      questoes!.forEach((q) => {
+      questoes.forEach((q) => {
         const v = q.id === questao.id ? valor : respostas[q.id] ?? 0;
         soma += (q.reverso ? 4 - v : v);
       });
-      const media = soma / questoes!.length;
+      const media = soma / questoes.length;
       setScoreFree(Math.round(media * 25 * 10) / 10);
       setStep('lead');
     }
@@ -110,7 +110,7 @@ export default function LandingNr1() {
       if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
       el.setAttribute('content', content);
     };
-    const desc = 'A 1ª plataforma do Brasil a cruzar NR-1 com 9Box e remuneração. Conformidade legal + inteligência de talentos em um só lugar. Diagnóstico grátis em 2 min.';
+    const desc = 'NR-1 como módulo autônomo de gestão de riscos psicossociais. Combine Clima, 9-Box e Remuneração conforme a necessidade do seu RH.';
     setMeta('description', desc);
     setMeta('og:title', 'NR-1 Inteligente | CompSmart', 'property');
     setMeta('og:description', desc, 'property');
@@ -141,23 +141,32 @@ export default function LandingNr1() {
             onDiagnostico={() => setStep('questionario')}
           />
 
-          {/* PLANOS — pricing por faixa de colaboradores (logo após o bento de features) */}
-          <Nr1PricingCards onContratar={() => scrollToId('fale-conosco')} />
-
-          {/* Simulador de desconto (mesmos descontos do módulo Remuneração) */}
-          <section className="container mx-auto px-4 pb-14">
-            <Nr1DiscountSimulator onCTA={() => scrollToId('fale-conosco')} />
-          </section>
+           {/* Preços públicos — mesma configuração por colaborador e módulo de /precos. */}
+           <section id="planos" className="container mx-auto px-4 py-14 space-y-8">
+             <div className="max-w-3xl mx-auto text-center space-y-3">
+               <h2 className="text-3xl md:text-4xl font-bold">NR-1: escolha o que sua empresa precisa</h2>
+               <p className="text-muted-foreground">O núcleo legal NR-1 é autônomo. Clima, 9-Box e Remuneração são módulos complementares ativados à parte.</p>
+               {pricing ? (
+                 <p className="font-semibold nr1-text-primary">
+                   A partir de {formatPublicBRL(pricing.preco_base_colaborador)} por colaborador/mês no 1º módulo · adicionais a {formatPublicBRL(additionalModulePrice(pricing))} por colaborador/mês ({pricing.desconto_modulo_adicional_pct}% off) · semestral {pricing.desconto_semestral_pct}% · anual {pricing.desconto_anual_pct}% de desconto
+                 </p>
+               ) : (
+                 <p className="text-sm text-muted-foreground">{pricingLoading ? 'Carregando preços…' : 'Preços temporariamente indisponíveis.'}</p>
+               )}
+             </div>
+             <div className="max-w-4xl mx-auto"><PricingSimulator /></div>
+             <div className="text-center space-y-3">
+               {pricing && <p className="text-sm text-muted-foreground">{pricing.faixas.map((f) => `${f.nome}${f.sob_consulta ? ' · sob consulta' : ` · ${f.min}–${f.max} colaboradores`}`).join('  ·  ')}</p>}
+               <Button variant="outline" onClick={() => navigate('/precos')}>Ver todas as faixas e preços <ArrowRight className="h-4 w-4 ml-2" /></Button>
+             </div>
+           </section>
 
           {/* Faixa de urgência inteligente */}
-          <section className="bg-foreground text-background">
+           <section className="bg-primary/5 border-y border-primary/10 text-foreground">
             <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-center gap-3 text-center md:text-left">
-              <Clock className="h-5 w-5 nr1-text-accent flex-shrink-0" />
+               <ShieldCheck className="h-5 w-5 nr1-text-primary flex-shrink-0" />
               <p className="text-sm md:text-base">
-                <strong>Fiscalização: maio/2026.</strong>{' '}
-                <span className="opacity-80">
-                  Mas os dados que você perde se não integrar agora — não voltam.
-                </span>
+                 <strong>Riscos psicossociais:</strong> a obrigação de identificar e gerenciar permanece. Prepare sua empresa para a fiscalização.
               </p>
             </div>
           </section>
@@ -182,14 +191,14 @@ export default function LandingNr1() {
           <section className="container mx-auto px-4 py-10">
             <div className="max-w-4xl mx-auto">
               <p className="text-center text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">
-                Conformidade técnica garantida
+                Recursos para gestão de riscos
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   { icon: FileCheck, label: 'COPSOQ-III', sub: '6 dimensões · 40 questões' },
                   { icon: ShieldCheck, label: 'Portaria MTE', sub: '1.419/2024 · Anexo III' },
-                  { icon: Award, label: 'PGR integrado', sub: 'Plano de ação compliant' },
-                  { icon: Lock, label: 'LGPD', sub: 'Respostas 100% anônimas' },
+                  { icon: Award, label: 'PGR integrado', sub: 'Acompanhamento do plano de ação' },
+                  { icon: Lock, label: 'LGPD', sub: 'Resultados agregados por grupo' },
                 ].map((c, i) => (
                   <div key={i} className="border rounded-lg p-4 text-center bg-card">
                     <c.icon className="h-5 w-5 mx-auto nr1-text-primary mb-2" />
@@ -205,7 +214,7 @@ export default function LandingNr1() {
           <Nr1GestaoTerceiros />
 
           {/* Segurança Enterprise — confiança/objeções */}
-          <SecuritySection />
+           <SecuritySection />
 
 
 
@@ -216,10 +225,10 @@ export default function LandingNr1() {
                 <h2 className="text-3xl md:text-4xl font-bold mb-2">Solicite uma proposta personalizada</h2>
                 <p className="text-muted-foreground">
                   Cada empresa tem um contexto. Conte para a gente o seu — e montamos um pacote
-                  sob medida (NR-1 + 9Box + remuneração) com o melhor custo-benefício para o seu porte.
+                   sob medida. NR-1 é autônomo; Clima, 9-Box e Remuneração podem ser contratados como módulos complementares.
                 </p>
               </div>
-              <Card className="border-2 border-[hsl(var(--nr1-primary)/0.3)]">
+               <Card className="border-2 border-primary/30">
                 <CardContent className="pt-6">
                   <ProposalForm />
                 </CardContent>
@@ -239,9 +248,9 @@ export default function LandingNr1() {
                 Comece pelo diagnóstico. Decida com dados.
               </h2>
               <p className="text-muted-foreground">
-                Resultado em 2 minutos · 100% LGPD-compliant · Proposta sob medida.
+                Diagnóstico inicial · Dados tratados conforme a LGPD · Proposta sob medida.
               </p>
-              <Button size="lg" className="nr1-btn-primary text-white" onClick={() => setStep('questionario')}>
+               <Button size="lg" onClick={() => setStep('questionario')}>
                 Diagnóstico grátis NR-1 <ArrowRight className="h-4 w-4 ml-1.5" />
               </Button>
             </div>
@@ -257,7 +266,7 @@ export default function LandingNr1() {
                 <span>Pergunta {currentIdx + 1} de {total}</span>
                 <span>Diagnóstico Express NR-1</span>
               </div>
-              <Progress value={progress} className="h-2" />
+              <Progress value={progress} className="h-2 bg-primary/10" />
               <CardTitle className="text-lg mt-4 leading-snug">{questao.enunciado}</CardTitle>
             </CardHeader>
             <CardContent>
@@ -299,7 +308,7 @@ export default function LandingNr1() {
                   <Input id={k} value={(form as any)[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} maxLength={k === 'email' ? 255 : 200} />
                 </div>
               ))}
-              <Button onClick={enviarLead} className="w-full nr1-bg-primary mt-2">Ver meu resultado</Button>
+              <Button onClick={enviarLead} className="w-full mt-2">Ver meu resultado</Button>
               <p className="text-xs text-muted-foreground text-center">
                 Seus dados são tratados conforme LGPD e usados apenas para enviar o diagnóstico.
               </p>
@@ -319,15 +328,15 @@ export default function LandingNr1() {
               <div>
                 <p className="text-sm text-muted-foreground">Score psicossocial estimado</p>
                 <p className="text-5xl font-bold">{scoreFree.toFixed(1)}<span className="text-lg text-muted-foreground">/100</span></p>
-                <Badge className={`${RISCO_CLASS[calcRisco(scoreFree)!]} mt-2 text-base`}>
-                  Risco {RISCO_LABEL[calcRisco(scoreFree)!]}
+                <Badge className={`${RISCO_CLASS[calcRisco(scoreFree) ?? 'moderado']} mt-2 text-base`}>
+                  Risco {RISCO_LABEL[calcRisco(scoreFree) ?? 'moderado']}
                 </Badge>
               </div>
               <div className="text-left text-sm bg-accent rounded-lg p-4">
                 <strong>⚠ Aviso:</strong> esta é uma amostra com 10 perguntas. O diagnóstico oficial NR-1
                 requer 40 questões em 6 dimensões e aplicação a todos os colaboradores.
               </div>
-              <Button onClick={() => navigate('/nr1/obrigado')} className="w-full nr1-bg-primary">
+              <Button onClick={() => navigate('/nr1/obrigado')} className="w-full">
                 Quero o diagnóstico completo da minha empresa
               </Button>
             </CardContent>
@@ -335,20 +344,8 @@ export default function LandingNr1() {
         </section>
       )}
 
-      <footer className="border-t mt-10 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} CompSmart · NR-1 conforme NR-01 atualizada (Portaria MTE 1.419/2024)
-      </footer>
-      <Footer />
-    </div>
-  );
-}
-
-function Stat({ label, value, tone }: { label: string; value: string; tone: 'ok' | 'warn' | 'bad' }) {
-  const cls = tone === 'ok' ? 'nr1-risk-baixo' : tone === 'warn' ? 'nr1-risk-moderado' : 'nr1-risk-critico';
-  return (
-    <div className={`rounded-lg p-3 text-center ${cls}`}>
-      <p className="text-xs opacity-80">{label}</p>
-      <p className="font-bold">{value}</p>
+       <PublicFooter />
+       <WhatsAppFloat />
     </div>
   );
 }
@@ -363,7 +360,7 @@ const GRAU_RISCO_OPTIONS = [
 
 function ProposalForm() {
   const [data, setData] = useState({
-    nome: '', email: '', empresa: '', cargo: '', telefone: '', whatsapp: '', tamanho_empresa: '', grau_risco: '', mensagem: '',
+    nome: '', email: '', empresa: '', cargo: '', telefone: '', tamanho_empresa: '', grau_risco: '', mensagem: '',
   });
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -374,7 +371,6 @@ function ProposalForm() {
     empresa: z.string().trim().min(2, 'Informe a empresa').max(200),
     cargo: z.string().trim().max(120).optional().or(z.literal('')),
     telefone: z.string().trim().max(40).optional().or(z.literal('')),
-    whatsapp: z.string().trim().max(40).optional().or(z.literal('')),
     tamanho_empresa: z.string().trim().max(40).optional().or(z.literal('')),
     grau_risco: z.string().trim().max(20).optional().or(z.literal('')),
     mensagem: z.string().trim().max(1000).optional().or(z.literal('')),
@@ -389,7 +385,6 @@ function ProposalForm() {
     setLoading(true);
     const extras: Record<string, string> = {};
     if (parsed.data.mensagem) extras.mensagem = parsed.data.mensagem;
-    if (parsed.data.whatsapp) extras.whatsapp = parsed.data.whatsapp;
     if (parsed.data.grau_risco) extras.grau_risco_inss = parsed.data.grau_risco;
     const { error } = await supabase.from('nr1_leads').insert({
       nome: parsed.data.nome,
@@ -446,10 +441,6 @@ function ProposalForm() {
         <Input id="pf-tel" value={data.telefone} onChange={(e) => setData({ ...data, telefone: e.target.value })} maxLength={40} />
       </div>
       <div>
-        <Label htmlFor="pf-wpp">WhatsApp</Label>
-        <Input id="pf-wpp" placeholder="(11) 99999-9999" value={data.whatsapp} onChange={(e) => setData({ ...data, whatsapp: e.target.value })} maxLength={40} />
-      </div>
-      <div>
         <Label htmlFor="pf-tam">Nº de colaboradores</Label>
         <Input id="pf-tam" placeholder="ex: 250" value={data.tamanho_empresa} onChange={(e) => setData({ ...data, tamanho_empresa: e.target.value })} maxLength={40} />
       </div>
@@ -466,15 +457,15 @@ function ProposalForm() {
       </div>
       <div className="md:col-span-2">
         <Label htmlFor="pf-msg">Conte rapidamente seu contexto (opcional)</Label>
-        <Input id="pf-msg" placeholder="Ex: precisamos implementar NR-1 antes de maio/2026 e já temos 9Box rodando" value={data.mensagem} onChange={(e) => setData({ ...data, mensagem: e.target.value })} maxLength={1000} />
+        <Input id="pf-msg" placeholder="Ex.: queremos estruturar a gestão de riscos psicossociais e avaliar módulos complementares" value={data.mensagem} onChange={(e) => setData({ ...data, mensagem: e.target.value })} maxLength={1000} />
       </div>
       <div className="md:col-span-2 pt-2">
-        <Button onClick={submit} disabled={loading} className="w-full nr1-bg-primary text-white" size="lg">
+        <Button onClick={submit} disabled={loading} className="w-full" size="lg">
           {loading ? 'Enviando...' : 'Quero falar com um especialista'}
           <ArrowRight className="h-4 w-4 ml-1.5" />
         </Button>
         <p className="text-xs text-muted-foreground text-center mt-3">
-          Resposta em até 24h úteis · Seus dados são tratados conforme LGPD.
+              Seus dados são tratados conforme a LGPD.
         </p>
       </div>
     </div>

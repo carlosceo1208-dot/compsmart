@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Linkedin, Instagram, Mail } from "lucide-react";
-import compsmartLogo from "@/assets/compsmart-logo.png";
 import { LANDING_MODULES, CONTACT_EMAIL } from "@/config/landingModules";
 
 export const PublicFooter = () => {
@@ -12,9 +11,9 @@ export const PublicFooter = () => {
         <div className="py-12 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <img
-              src={compsmartLogo}
+              src="/compsmart-logo-horizontal.png"
               alt="CompSmart"
-              className="h-16 w-auto object-contain mb-4"
+              className="h-16 w-auto max-w-full object-contain mb-4"
             />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Plataforma de Gestão Estratégica de Pessoas: 9 módulos com agentes

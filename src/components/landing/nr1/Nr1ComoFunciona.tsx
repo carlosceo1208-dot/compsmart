@@ -5,43 +5,43 @@ const STEPS = [
     n: '01',
     icon: ClipboardCheck,
     titulo: 'Diagnóstico NR-1',
-    sub: 'Inventário psicossocial COPSOQ-III (40 questões, 6 dimensões) com respostas 100% anônimas — LGPD-compliant.',
+    sub: 'Inventário psicossocial COPSOQ-III (40 questões, 6 dimensões) com relatórios agregados e proteção de respostas individuais.',
   },
   {
     n: '02',
     icon: HeartPulse,
     titulo: 'Pesquisa de Clima',
-    sub: 'Cruzamos percepção do colaborador (eNPS, engajamento, liderança) com os fatores psicossociais para identificar causas-raiz.',
+    sub: 'Com o módulo de Clima contratado, compare indicadores agregados de eNPS, engajamento e liderança com os fatores psicossociais.',
   },
   {
     n: '03',
     icon: LineChart,
     titulo: 'Avaliação de Desempenho',
-    sub: 'Integramos ciclos de avaliação (90°, 180°, 360°), metas e competências para conectar entrega × risco psicossocial.',
+    sub: 'Com o módulo Core contratado, acompanhe ciclos de avaliação, metas e competências em conjunto com indicadores agregados de risco.',
   },
   {
     n: '04',
     icon: Grid3x3,
     titulo: 'Matriz 9Box',
-    sub: 'Cruzamos desempenho × potencial. Se você ainda não tem 9Box, a CompSmart constrói automaticamente a partir dos seus ciclos.',
+    sub: 'Com Potencial & Sucessão contratado, avalie desempenho × potencial sem vincular respostas individuais da NR-1 a pessoas.',
   },
   {
     n: '05',
     icon: Wallet,
     titulo: 'Remuneração & Equidade',
-    sub: 'Mapeamos faixas salariais, defasagem de mercado, compa-ratio e posicionamento individual em cada cargo.',
+    sub: 'Com Remuneração contratada, analise faixas salariais e indicadores autorizados em conjunto com resultados agregados.',
   },
   {
     n: '06',
     icon: BrainCircuit,
     titulo: 'Dashboard de Inteligência',
-    sub: 'Clusters automáticos de risco × clima × desempenho × 9Box × salário. Alertas priorizados por impacto financeiro de retenção.',
+    sub: 'Visualize tendências de risco × clima × desempenho × 9-Box × remuneração conforme os módulos contratados e as permissões aplicáveis.',
   },
   {
     n: '07',
     icon: Target,
     titulo: 'Plano de ação por ROI',
-    sub: 'Não é apenas compliance: cada ação tem custo, ganho de retenção estimado e responsável. Pronto para o board.',
+    sub: 'Registre responsáveis, prazos e acompanhamento de cada ação para apoiar as decisões do RH e da liderança.',
   },
 ];
 
@@ -56,7 +56,7 @@ export default function Nr1ComoFunciona({ idAnchor }: { idAnchor?: string }) {
           </span>
         </h2>
         <p className="text-muted-foreground">
-          7 passos. Do dado bruto à decisão estratégica de retenção, com coerência entre pessoas, performance e folha.
+          7 etapas para apoiar decisões do RH. NR-1 funciona de forma autônoma; as demais etapas dependem dos módulos contratados.
         </p>
       </div>
 

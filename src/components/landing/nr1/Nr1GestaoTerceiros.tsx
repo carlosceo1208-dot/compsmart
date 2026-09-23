@@ -71,7 +71,7 @@ export default function Nr1GestaoTerceiros() {
           <strong className="nr1-text-primary">Por que importa:</strong> em auditorias do MTE e em
           ações trabalhistas, a falta de PGR atualizado de um terceiro pode ser imputada ao
           contratante. A Gestão de Terceiros do CompSmart elimina esse risco com evidência
-          documental versionada — incluso nos planos <strong>NR-1 Essencial, Pro e Enterprise</strong>.
+          documental versionada dentro do módulo NR-1.
         </p>
       </div>
     </section>

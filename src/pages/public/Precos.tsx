@@ -19,7 +19,7 @@ const Precos = () => {
   return (
     <PublicLayout
       title="Preços | CompSmart"
-      description="Preço por colaborador e por módulo: a partir de R$ 5 por colaborador/mês, com 50% de desconto nos módulos adicionais e descontos para pagamento semestral e anual."
+      description="Confira os preços públicos por colaborador e por módulo, as faixas de porte e simule seu investimento na CompSmart."
       path="/precos"
     >
       <section className="py-16 md:py-20 bg-gradient-to-br from-background via-primary/5 to-muted/40">

@@ -1,15 +1,13 @@
-import { MessageCircle } from "lucide-react";
-import { WHATSAPP_NUMBER, WHATSAPP_MESSAGE } from "@/config/landingModules";
+import { Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const WhatsAppFloat = () => (
-  <a
-    href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Falar pelo WhatsApp"
-    className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-[#16A34A] px-4 py-3 text-white shadow-lg hover:brightness-110 transition"
+  <Link
+    to="/contato"
+    aria-label="Contato"
+    className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-primary px-4 py-3 text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
   >
-    <MessageCircle className="h-5 w-5" />
-    <span className="hidden sm:inline text-sm font-semibold">WhatsApp</span>
-  </a>
+    <Mail className="h-5 w-5" />
+    <span className="text-sm font-semibold">CONTATO</span>
+  </Link>
 );

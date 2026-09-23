@@ -42,14 +42,14 @@ export default function LandingNr1Ads() {
         <title>NR-1 Inteligente: diagnóstico grátis em 5 minutos | CompSmart</title>
         <meta
           name="description"
-          content="Cumpra a NR-1 e proteja sua empresa de multas até R$ 4.025/colaborador. Diagnóstico gratuito, PGR pronto e plano de ação em minutos. Teste agora."
+          content="Prepare a gestão dos riscos psicossociais com a CompSmart. Diagnóstico inicial, PGR e plano de ação acompanhados pelo seu RH."
         />
         <meta name="robots" content="noindex, follow" />
         <link rel="canonical" href="https://www.compsmart.ia.br/nr1" />
         <meta property="og:title" content="NR-1 Inteligente — Diagnóstico Grátis | CompSmart" />
         <meta
           property="og:description"
-          content="Diagnóstico NR-1 gratuito em 5 minutos. PGR, plano de ação por ROI e proteção contra multas. Comece agora."
+          content="NR-1 autônomo para identificar e gerenciar riscos psicossociais. Combine outros módulos conforme as necessidades do RH."
         />
         <meta property="og:url" content="https://www.compsmart.ia.br/landing-nr1" />
         <meta property="og:type" content="website" />

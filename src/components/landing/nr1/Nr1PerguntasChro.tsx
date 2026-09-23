@@ -4,18 +4,18 @@ import { HelpCircle, Users, DollarSign, LogOut } from 'lucide-react';
 const PERGUNTAS = [
   {
     icon: Users,
-    titulo: 'Quem no seu Top Talent está em risco psicossocial elevado agora?',
-    sub: 'Cruzamos NR-1 com 9Box e mostramos os colaboradores de alto potencial em zona de burnout — antes do pedido de demissão.',
+    titulo: 'Que áreas precisam de atenção prioritária?',
+    sub: 'Combine indicadores agregados de risco psicossocial com 9-Box para orientar o RH sem expor respostas individuais. O 9-Box é um módulo complementar.',
   },
   {
     icon: DollarSign,
-    titulo: 'Onde sua estrutura de remuneração está criando estresse silencioso?',
-    sub: 'Identificamos clusters de colaboradores com salário defasado E score psicossocial elevado — a combinação que mais gera turnover.',
+    titulo: 'Onde remuneração e ambiente de trabalho merecem análise conjunta?',
+    sub: 'Com o módulo de Remuneração, avalie indicadores agregados de área e dados salariais autorizados para orientar ações responsáveis.',
   },
   {
     icon: LogOut,
-    titulo: 'Qual área tem maior correlação entre risco e intenção de saída?',
-    sub: 'Dashboard mostra por departamento, gestor e cargo onde a NR-1 está sinalizando rotatividade futura — com 90 dias de antecedência.',
+    titulo: 'Quais tendências do clima pedem acompanhamento?',
+    sub: 'Ao contratar Clima, acompanhe indicadores de grupos elegíveis e planeje intervenções com RH e SST, sem previsões individuais.',
   },
 ];
 

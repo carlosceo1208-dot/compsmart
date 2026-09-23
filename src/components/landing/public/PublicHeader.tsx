@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import compsmartLogo from "@/assets/compsmart-logo.png";
 import { LANDING_MODULES } from "@/config/landingModules";
 import { supabase } from "@/integrations/supabase/client";
 import { DemoDialog } from "./DemoDialog";
@@ -47,9 +46,9 @@ export const PublicHeader = () => {
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center">
             <img
-              src={compsmartLogo}
+              src="/compsmart-logo-horizontal.png"
               alt="CompSmart — Gestão Estratégica de Pessoas"
-              className="h-12 md:h-16 w-auto object-contain"
+              className="h-12 w-auto max-w-[144px] md:h-16 md:max-w-[190px] object-contain"
             />
           </Link>
 

@@ -1,7 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import compsmartLogo from "@/assets/compsmart-logo.png";
 import { Footer } from "@/components/landing/Footer";
 
 const TermsOfUse = () => {
@@ -23,7 +22,7 @@ const TermsOfUse = () => {
               <ArrowLeft className="h-4 w-4" />
               Voltar
             </Link>
-            <img src={compsmartLogo} alt="CompSmart" className="h-8 w-auto object-contain" />
+            <img src="/compsmart-logo-horizontal.png" alt="CompSmart" className="h-12 w-auto max-w-[144px] object-contain" />
           </div>
         </div>
       </header>
@@ -35,7 +34,7 @@ const TermsOfUse = () => {
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold">Termos de Uso</h1>
             <p className="text-muted-foreground">
-              Última atualização: 26 de novembro de 2025
+              Última atualização: 23 de setembro de 2026
             </p>
           </div>
 
@@ -50,15 +49,15 @@ const TermsOfUse = () => {
               </p>
               <p className="text-muted-foreground leading-relaxed mt-2">
                 Estes Termos constituem um acordo legal vinculativo entre você e a CompSmart, 
-                operada por [Nome da Empresa], inscrita no CNPJ sob nº [CNPJ], com sede em [Endereço].
+                operada por COMPSMART TECHNOLOGIA E SERVIÇOS EM RH  LTDA., inscrita no CNPJ sob nº 58.939.923/0001-93, com sede na Vila Mariana, São Paulo — SP.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold mb-4">2. Definições</h2>
               <ul className="space-y-2 text-muted-foreground">
-                <li><strong>Plataforma:</strong> Sistema SaaS CompSmart para gestão estratégica de remuneração e benefícios.</li>
-                <li><strong>Serviços:</strong> Funcionalidades oferecidas pela Plataforma, incluindo análise salarial, gestão de benefícios, assistentes inteligentes e relatórios.</li>
+                <li><strong>Plataforma:</strong> Sistema SaaS CompSmart para gestão estratégica de pessoas.</li>
+                <li><strong>Serviços:</strong> Módulos contratados pelo Cliente para análise, gestão e apoio ao RH, incluindo agentes de IA e relatórios quando disponíveis.</li>
                 <li><strong>Conta:</strong> Registro de acesso do Cliente à Plataforma.</li>
                 <li><strong>Dados Pessoais:</strong> Informações sobre colaboradores processadas através da Plataforma.</li>
                 <li><strong>Conteúdo do Cliente:</strong> Todos os dados, informações e arquivos inseridos pelo Cliente na Plataforma.</li>
@@ -68,15 +67,15 @@ const TermsOfUse = () => {
             <section>
               <h2 className="text-2xl font-semibold mb-4">3. Descrição do Serviço</h2>
               <p className="text-muted-foreground leading-relaxed">
-                A CompSmart oferece uma plataforma completa de gestão de remuneração estratégica, incluindo:
+                 A CompSmart oferece módulos independentes de gestão estratégica de pessoas, conforme a contratação do Cliente, incluindo:
               </p>
               <ul className="space-y-2 text-muted-foreground mt-2">
-                <li>• Módulos de gestão salarial, benefícios e incentivos (ICP/ILP)</li>
-                <li>• Assistentes inteligentes com inteligência artificial (IA)</li>
-                <li>• Análise de equidade interna e benchmark de mercado</li>
-                <li>• Gestão de estruturas organizacionais e cargos</li>
-                <li>• Relatórios e dashboards analíticos</li>
-                <li>• Conformidade com legislação trabalhista brasileira e LGPD</li>
+                 <li>• Cargos, faixas salariais, remuneração e avaliação de desempenho</li>
+                 <li>• Pesquisa de mercado e descrição de cargos, em módulos próprios</li>
+                 <li>• Gestão de riscos psicossociais NR-1 como produto autônomo</li>
+                 <li>• Clima, seleção, desenvolvimento e sucessão, em módulos próprios</li>
+                 <li>• Agentes de IA para apoio às equipes de RH, conforme os módulos contratados</li>
+                 <li>• Importação de bases de colaboradores; a Plataforma não processa folha de pagamento</li>
               </ul>
             </section>
 
@@ -195,9 +194,8 @@ const TermsOfUse = () => {
                 Para dúvidas, solicitações ou comunicações relacionadas a estes Termos de Uso, entre em contato:
               </p>
               <ul className="space-y-1 text-muted-foreground mt-2">
-                <li>📧 E-mail: contato@compsmart.com.br</li>
-                <li>📞 Telefone: +55 (11) 9999-9999</li>
-                <li>📍 Endereço: São Paulo, Brasil</li>
+                <li>📧 E-mail: contato@compsmart.ia.br</li>
+                <li>📍 Endereço: Vila Mariana, São Paulo — SP</li>
               </ul>
             </section>
           </div>

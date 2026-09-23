@@ -2,7 +2,8 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useAuthCTA } from "@/hooks/useAuthCTA";
+import { PublicLayout } from "@/components/landing/public/PublicLayout";
+import { DemoDialog } from "@/components/landing/public/DemoDialog";
 import {
   BarChart3,
   Globe2,
@@ -14,8 +15,6 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const CANONICAL = "https://www.compsmart.ia.br/plano-de-cargos-e-salarios";
-
 const faqs = [
   {
     q: "O que é um plano de cargos e salários?",
@@ -23,11 +22,11 @@ const faqs = [
   },
   {
     q: "Quanto custa implantar um plano de cargos e salários?",
-    a: "Com consultoria tradicional, projetos custam de R$ 30 mil a R$ 150 mil. Com o CompSmart, você implanta em semanas a partir de R$ 199/mês — sem consultor externo.",
+    a: "O valor depende da quantidade de colaboradores e dos módulos escolhidos. Consulte as faixas e simule sua configuração na página de preços.",
   },
   {
     q: "Como funciona a pesquisa salarial integrada?",
-    a: "Comparamos os salários da sua empresa com bases de mercado por cargo, região e setor, gerando alertas de defasagem e oportunidades de ajuste — Total Cash e Total Compensation incluídos nos planos Pro e Enterprise.",
+    a: "Com o módulo Insight contratado, a empresa pode comparar faixas por cargo, região e setor. Recursos adicionais dependem dos módulos e serviços contratados.",
   },
   {
     q: "O CompSmart faz folha de pagamento?",
@@ -48,7 +47,7 @@ const features = [
   {
     icon: Globe2,
     title: "Pesquisa salarial e benchmark",
-    body: "Compare seus salários com o mercado por cargo, região e setor. Total Cash e Total Compensation inclusos nos planos Pro e Enterprise.",
+    body: "Com o módulo Insight contratado, compare faixas salariais por cargo, região e setor.",
   },
   {
     icon: Scale,
@@ -58,7 +57,7 @@ const features = [
   {
     icon: Target,
     title: "Gestão de desempenho integrada",
-    body: "Avaliação 90°/180°/360°, 9Box, PDI e PerformAI — o agente de IA que conecta desempenho à remuneração estratégica.",
+    body: "Acompanhe avaliações de desempenho no Core. 9-Box e PDI estão disponíveis em módulos complementares.",
   },
   {
     icon: Wallet,
@@ -67,13 +66,12 @@ const features = [
   },
   {
     icon: Bot,
-    title: "4 Agentes de IA",
-    body: "Jurídico, Salary Smart, Rem&Benef e PerformAI trabalham por você — sem precisar de API key.",
+    title: "Agente Remu",
+    body: "Conte com apoio de IA no módulo Core para organizar decisões de remuneração junto com seu RH.",
   },
 ];
 
 export default function LandingCargosSalarios() {
-  const { ctaTo, isLoggedIn } = useAuthCTA();
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -85,21 +83,8 @@ export default function LandingCargosSalarios() {
   };
 
   return (
-    <>
+    <PublicLayout title="Plano de Cargos e Salários com IA | CompSmart" description="Estruture cargos, faixas salariais e equidade com o Core. Combine outros módulos conforme a necessidade da sua empresa." path="/plano-de-cargos-e-salarios">
       <Helmet>
-        <title>Plano de Cargos e Salários com IA | CompSmart</title>
-        <meta
-          name="description"
-          content="Monte seu plano de cargos e salários com tabela salarial, pesquisa de mercado e equidade — tudo em uma plataforma. Teste grátis por 14 dias."
-        />
-        <link rel="canonical" href={CANONICAL} />
-        <meta property="og:title" content="Plano de Cargos e Salários com IA | CompSmart" />
-        <meta
-          property="og:description"
-          content="Tabela salarial, pesquisa salarial, equidade e gestão de desempenho em uma só plataforma."
-        />
-        <meta property="og:url" content={CANONICAL} />
-        <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
       </Helmet>
 
@@ -119,17 +104,12 @@ export default function LandingCargosSalarios() {
               decisão de remuneração seja justa, competitiva e defensável.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to={ctaTo}>
-                <Button size="lg" className="gap-2">
-                  {isLoggedIn ? 'Ir para o app' : 'Começar teste grátis de 14 dias'}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/pricing">
-                <Button size="lg" variant="outline">
+              <DemoDialog size="lg" />
+              <Button asChild size="lg" variant="outline">
+                <Link to="/precos">
                   Ver planos e preços
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -191,9 +171,9 @@ export default function LandingCargosSalarios() {
           </h2>
           <ol className="space-y-4">
             {[
-              "Importe seus dados — colaboradores, cargos e salários atuais em minutos.",
-              "Estruture cargos e faixas — biblioteca viva de descrições e job matching com IA.",
-              "Compare com o mercado — pesquisa salarial integrada, atualizada por setor.",
+              "Importe seus dados — colaboradores, cargos e salários atuais.",
+              "Estruture cargos e faixas no Core; use o Match para descrições e job matching quando contratado.",
+              "Compare com o mercado usando o Insight, se contratado.",
               "Decida com dados — dashboards de equidade, competitividade e orçamento.",
             ].map((step, i) => (
               <li key={i} className="flex gap-4 items-start">
@@ -224,7 +204,7 @@ export default function LandingCargosSalarios() {
             <ul className="space-y-3">
               {[
                 "Multi-empresa nativo (várias empresas em um login)",
-                "LGPD por desenho, com RLS em todas as tabelas",
+                "Acesso aos dados organizado por empresa e permissões",
                 "Indicadores econômicos ao vivo (INPC, dólar)",
                 "Conversão de moeda para simulações internacionais",
               ].map((b) => (
@@ -261,28 +241,17 @@ export default function LandingCargosSalarios() {
               Pare de decidir aumento no escuro
             </h2>
             <p className="text-lg opacity-90 mb-8">
-              Teste grátis por 14 dias. Sem cartão. Sem implantação.
+              Conheça os módulos e escolha a combinação para sua empresa.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link to={ctaTo}>
-                <Button size="lg" variant="secondary" className="gap-2">
-                  {isLoggedIn ? 'Ir para o app' : 'Começar agora'}
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </Link>
-              <Link to="/pricing">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
-                >
-                  Falar com especialista
-                </Button>
-              </Link>
+              <DemoDialog size="lg" variant="secondary" />
+              <Button asChild size="lg" variant="outline" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10">
+                <Link to="/precos">Ver preços <ArrowRight className="h-4 w-4 ml-2" /></Link>
+              </Button>
             </div>
           </div>
         </section>
       </main>
-    </>
+    </PublicLayout>
   );
 }
