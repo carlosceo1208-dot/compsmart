@@ -37,4 +37,4 @@ Escopo: `src/components/landing/public/PublicHeader.tsx` (menu desktop) e `src/c
 
 ## Verificação
 - Build OK (log em /tmp/observability/build-errors.log).
-- Playwright no header em desktop: confirmar visualmente os três estados (CTA sólido, Entrar outline, pílula verde) e que o dropdown Módulos e o dialog de demo continuam funcionando.
+- Playwright em desktop: confirmar visualmente o header (CTA sólido, Entrar outline, pílula verde, dropdown Módulos e dialog de demo funcionando) e a grade de módulos com contornos reforçados em repouso e no hover.
