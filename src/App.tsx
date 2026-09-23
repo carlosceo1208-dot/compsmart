@@ -288,6 +288,14 @@ const App = () => {
                       {/* Public SEO landing pages */}
                       <Route path="/plano-de-cargos-e-salarios" element={<LandingCargosSalarios />} />
 
+                      {/* Landing pública — Gestão Estratégica de Pessoas */}
+                      <Route path="/precos" element={<Precos />} />
+                      <Route path="/parceiros" element={<Parceiros />} />
+                      <Route path="/materiais" element={<Materiais />} />
+                      <Route path="/contato" element={<Contato />} />
+                      <Route path="/modulos/nr1" element={<Navigate to="/nr1" replace />} />
+                      <Route path="/modulos/:slug" element={<ModuloPage />} />
+
                       {/* Public NR-1 landing (lead capture) — nova URL oficial */}
                       <Route path="/nr1" element={<LandingNr1 />} />
                       {/* Redirect 301-style da URL antiga para preservar SEO e campanhas */}
