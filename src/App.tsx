@@ -112,6 +112,11 @@ const LandingNr1 = lazy(() => import("./pages/public/LandingNr1"));
 const LandingNr1Ads = lazy(() => import("./pages/public/LandingNr1Ads"));
 const Nr1Obrigado = lazy(() => import("./pages/public/Nr1Obrigado"));
 const LandingCargosSalarios = lazy(() => import("./pages/public/LandingCargosSalarios"));
+const Precos = lazy(() => import("./pages/public/Precos"));
+const Parceiros = lazy(() => import("./pages/public/Parceiros"));
+const Materiais = lazy(() => import("./pages/public/Materiais"));
+const Contato = lazy(() => import("./pages/public/Contato"));
+const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
 
 // Lazy — NR-1 Module
@@ -287,6 +292,14 @@ const App = () => {
 
                       {/* Public SEO landing pages */}
                       <Route path="/plano-de-cargos-e-salarios" element={<LandingCargosSalarios />} />
+
+                      {/* Landing pública — Gestão Estratégica de Pessoas */}
+                      <Route path="/precos" element={<Precos />} />
+                      <Route path="/parceiros" element={<Parceiros />} />
+                      <Route path="/materiais" element={<Materiais />} />
+                      <Route path="/contato" element={<Contato />} />
+                      <Route path="/modulos/nr1" element={<Navigate to="/nr1" replace />} />
+                      <Route path="/modulos/:slug" element={<ModuloPage />} />
 
                       {/* Public NR-1 landing (lead capture) — nova URL oficial */}
                       <Route path="/nr1" element={<LandingNr1 />} />
