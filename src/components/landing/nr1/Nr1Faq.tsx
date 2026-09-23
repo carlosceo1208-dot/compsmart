@@ -3,11 +3,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 const FAQ = [
   {
     q: 'Quando a NR-1 atualizada começa a valer?',
-    a: 'A Portaria MTE 1.419/2024 atualizou a NR-1 com a obrigatoriedade de gerenciamento de riscos psicossociais. A fiscalização efetiva começa em maio de 2026 — mas o programa precisa estar implementado antes disso para gerar evidências válidas.',
+    a: 'A obrigação de identificar e gerenciar riscos psicossociais permanece. Prepare a documentação e o plano de ação da sua empresa para a fiscalização, considerando as orientações oficiais mais recentes.',
   },
   {
-    q: 'Qual é o valor real das multas?',
-    a: 'As multas por infração à NR-1 vão de R$ 670,89 (mínimo) a R$ 6.708,90 por colaborador, podendo ser aplicadas em dobro em caso de reincidência. Empresas com 100 colaboradores podem ser autuadas em mais de R$ 100 mil em um único auto de infração.',
+    q: 'Como minha empresa pode se preparar?',
+    a: 'Comece pela identificação dos riscos, documente o diagnóstico e estabeleça um plano de ação acompanhado pelo RH e pela equipe responsável por SST. Acompanhe as orientações oficiais sobre fiscalização.',
   },
   {
     q: 'Vale para empresas com menos de 20 colaboradores?',
@@ -23,7 +23,7 @@ const FAQ = [
   },
   {
     q: 'Como o cruzamento com 9Box funciona se eu ainda não uso 9Box?',
-    a: 'A CompSmart já vem com o módulo de avaliação de desempenho e matriz 9Box nativos. Se você já usa outra ferramenta, importamos. Se ainda não usa, montamos para você — sem custo adicional nos planos Pro e Enterprise.',
+    a: 'O módulo NR-1 funciona sozinho. Para cruzamentos com 9-Box, contrate separadamente o módulo de Potencial & Sucessão; também é possível combinar Clima e Remuneração conforme sua necessidade.',
   },
 ];
 

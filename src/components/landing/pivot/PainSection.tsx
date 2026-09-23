@@ -12,7 +12,7 @@ const DORES = [
   {
     icon: ShieldAlert,
     title: "NR-1 sem ferramenta para cumprir",
-    body: "A gestão dos riscos psicossociais passou a ser exigida, com prazo e fiscalização, e o RH não tem instrumento nem documentação pronta.",
+    body: "A obrigação de identificar e gerenciar riscos psicossociais permanece. O RH precisa se preparar com instrumentos, registros e plano de ação.",
     color: "text-[#F59E0B]",
     bar: "bg-[#F59E0B]",
   },

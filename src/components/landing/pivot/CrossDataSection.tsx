@@ -10,7 +10,7 @@ const EXEMPLOS = [
   {
     icon: ShieldAlert,
     title: "Risco psicossocial × Sucessão",
-    body: "Uma pessoa-chave do 9-Box está em uma liderança com risco alto de relações e clima em queda: o plano de sucessão ganha prioridade antes da saída acontecer.",
+    body: "Uma área com clima em queda e riscos psicossociais elevados merece atenção: os planos de sucessão podem ser revisados sem identificar respostas individuais.",
   },
 ];
 

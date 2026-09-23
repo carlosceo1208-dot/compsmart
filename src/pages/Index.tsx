@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { PivotHero } from "@/components/landing/pivot/PivotHero";
+import { UrgencyBanner } from "@/components/landing/pivot/UrgencyBanner";
+import { SecurityAssuranceStrip } from "@/components/landing/pivot/SecurityAssuranceStrip";
 import { PainSection } from "@/components/landing/pivot/PainSection";
 import { ModulesGridSection } from "@/components/landing/pivot/ModulesGridSection";
 import { CrossDataSection } from "@/components/landing/pivot/CrossDataSection";
@@ -57,6 +59,8 @@ const Index = () => {
       </Helmet>
 
       <PivotHero />
+      <UrgencyBanner />
+      <SecurityAssuranceStrip />
       <PainSection />
       <ModulesGridSection />
       <CrossDataSection />

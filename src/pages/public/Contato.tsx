@@ -1,13 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mail, MessageCircle, Clock } from "lucide-react";
+import { Mail, Clock } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { LeadForm } from "@/components/landing/public/LeadForm";
-import {
-  CONTACT_EMAIL,
-  WHATSAPP_NUMBER,
-  WHATSAPP_MESSAGE,
-} from "@/config/landingModules";
+import { CONTACT_EMAIL } from "@/config/landingModules";
 
 const Contato = () => (
   <PublicLayout
@@ -41,20 +37,6 @@ const Contato = () => (
                   className="text-sm text-primary hover:underline"
                 >
                   {CONTACT_EMAIL}
-                </a>
-              </CardContent>
-            </Card>
-            <Card className="rounded-2xl">
-              <CardContent className="p-6 space-y-3">
-                <MessageCircle className="h-5 w-5 text-[#16A34A]" />
-                <h2 className="font-semibold">WhatsApp</h2>
-                <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Iniciar conversa
                 </a>
               </CardContent>
             </Card>

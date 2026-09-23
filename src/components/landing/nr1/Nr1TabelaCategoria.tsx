@@ -3,12 +3,12 @@ import { Check, X } from 'lucide-react';
 const LINHAS: Array<[string, string | boolean, string | boolean]> = [
   ['Mapeia risco psicossocial (Anexo III NR-1)', true, true],
   ['Gera PGR e relatório técnico para fiscalização', true, true],
-  ['Conecta com avaliação 9Box', false, true],
-  ['Cruza risco com faixa salarial', false, true],
-  ['Identifica top talent em burnout antes do pedido de demissão', false, true],
-  ['Plano de ação priorizado por ROI (não só compliance)', false, true],
+  ['Conecta com avaliação 9-Box (módulo complementar)', false, true],
+  ['Cruza indicadores agregados com remuneração (módulo complementar)', false, true],
+  ['Apoia a definição de prioridades sem expor respostas individuais', false, true],
+  ['Plano de ação com responsáveis e acompanhamento', false, true],
   ['Linguagem para o board (não só para o analista SST)', false, true],
-  ['Cruza risco com pesquisa de clima', false, true],
+  ['Cruza indicadores agregados com clima (módulo complementar)', false, true],
   ['Gestão do projeto NR-1 ponta a ponta', false, true],
   ['Entrega final', 'Laudo para arquivar', 'Decisão estratégica de pessoas'],
 ];
@@ -21,7 +21,7 @@ export default function Nr1TabelaCategoria() {
           NR-1 Tradicional vs. <span className="nr1-text-primary">NR-1 Inteligente</span>
         </h2>
         <p className="text-muted-foreground">
-          A diferença entre cumprir uma norma e usar o dado para reter quem importa.
+          NR-1 autônoma, com cruzamentos opcionais quando os módulos complementares forem contratados.
         </p>
       </div>
 
