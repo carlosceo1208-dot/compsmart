@@ -198,6 +198,18 @@ const TermsOfUse = () => {
                 <li>📍 Endereço: Vila Mariana, São Paulo — SP</li>
               </ul>
             </section>
+
+            <section>
+              <h2 className="text-2xl font-semibold mb-4">12. Dados da Empresa</h2>
+              <div className="rounded-2xl border border-border bg-muted/40 p-6 space-y-2">
+                <p className="font-semibold text-foreground">
+                  COMPSMART TECHNOLOGIA E SERVIÇOS EM RH&nbsp;&nbsp;LTDA.
+                </p>
+                <p className="text-sm text-muted-foreground">CNPJ: 58.939.923/0001-93</p>
+                <p className="text-sm text-muted-foreground">Endereço: Vila Mariana — São Paulo, Capital — SP</p>
+                <p className="text-sm text-muted-foreground">E-mail: contato@compsmart.ia.br</p>
+              </div>
+            </section>
           </div>
 
           {/* Bottom Notice */}

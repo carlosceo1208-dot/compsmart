@@ -115,7 +115,10 @@ export const PublicFooter = () => {
             apenas por grupo, nunca por pessoa. A plataforma importa dados de
             folha, mas não processa folha de pagamento.
           </p>
-          <p>© {year} CompSmart. Todos os direitos reservados.</p>
+          <p>
+            © {year} COMPSMART TECHNOLOGIA E SERVIÇOS EM RH&nbsp;&nbsp;LTDA. · CNPJ 58.939.923/0001-93 ·
+            Vila Mariana, São Paulo — SP. Todos os direitos reservados.
+          </p>
         </div>
       </div>
     </footer>
