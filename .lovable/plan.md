@@ -1,6 +1,6 @@
-# Ajuste — Botões do Header Público
+# Ajustes — Header Público + Contornos dos Cards de Módulos
 
-Escopo: apenas `src/components/landing/public/PublicHeader.tsx` (menu desktop). Nada muda no app autenticado, no menu mobile (exceto nada — permanece como está), nem em outras páginas.
+Escopo: `src/components/landing/public/PublicHeader.tsx` (menu desktop) e `src/components/landing/pivot/ModulesGridSection.tsx` (grade "Nove módulos, nove agentes de IA" da home). Nada muda no app autenticado, no menu mobile, nem em outras páginas.
 
 ## 1. CTA "Agendar demonstração" — sólido, sem degradê
 - No `DemoDialog` do header (desktop), passar `className` que remove o degradê do botão padrão:
