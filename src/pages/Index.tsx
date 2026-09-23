@@ -1,51 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { supabase } from "@/integrations/supabase/client";
-import { Header } from "@/components/landing/Header";
-import { HeroSection } from "@/components/landing/HeroSection";
-import { LogoSlider } from "@/components/landing/LogoSlider";
-import { BeforeAfterSection } from "@/components/landing/BeforeAfterSection";
-import { SolutionSection } from "@/components/landing/SolutionSection";
-import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
-import { SmartAgentsSection } from "@/components/landing/SmartAgentsSection";
-import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
-import { SocialProofSection } from "@/components/landing/SocialProofSection";
-import { SecuritySection } from "@/components/landing/SecuritySection";
-import { PricingSection } from "@/components/landing/PricingSection";
-import { FAQSection, FAQ_ITEMS } from "@/components/landing/FAQSection";
-import { CTASection } from "@/components/landing/CTASection";
-import { Footer } from "@/components/landing/Footer";
-import { LaunchPromoBanner } from "@/components/landing/LaunchPromoBanner";
+import { PublicLayout } from "@/components/landing/public/PublicLayout";
+import { PivotHero } from "@/components/landing/pivot/PivotHero";
+import { PainSection } from "@/components/landing/pivot/PainSection";
+import { ModulesGridSection } from "@/components/landing/pivot/ModulesGridSection";
+import { CrossDataSection } from "@/components/landing/pivot/CrossDataSection";
+import { PivotHowItWorks } from "@/components/landing/pivot/PivotHowItWorks";
+import { PayrollIntegrationsSection } from "@/components/landing/pivot/PayrollIntegrationsSection";
+import { PricingSummarySection } from "@/components/landing/pivot/PricingSummarySection";
+import { SocialProofPlaceholder } from "@/components/landing/pivot/SocialProofPlaceholder";
+import {
+  PivotFAQSection,
+  PIVOT_FAQ_ITEMS,
+} from "@/components/landing/pivot/PivotFAQSection";
+import { PreFooterCTA } from "@/components/landing/pivot/PreFooterCTA";
 import { VideoSection } from "@/components/landing/VideoSection";
 
-
 /**
- * Landing page — fluxo enxuto AIDA + StoryBrand:
- * 1. Hero (atenção + proposta de valor + CTA)
- * 2. LogoSlider (prova social leve, imediata)
- * 3. BeforeAfter (problema concreto)
- * 4. Solution (solução em alto nível)
- * 5. InteractiveDemo (produto na prática)
- * 6. SmartAgents (diferencial IA)
- * 7. HowItWorks (3 passos para começar)
- * 8. Pricing (decisão)
- * 9. SocialProof (depoimentos profundos)
- * 10. Security (confiança/objeções)
- * 11. FAQ + CTA final
- *
+ * Home pública — posicionamento de Gestão Estratégica de Pessoas:
+ * hero → dor → 9 módulos → diferencial do cruzamento → vídeo (secundário) →
+ * como funciona → integração com a folha → preços → prova social (reservada) →
+ * FAQ → pré-footer.
  */
 const Index = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
-    };
-    checkSession();
-  }, []);
 
   useEffect(() => {
     const hash = location.hash;
@@ -58,64 +37,37 @@ const Index = () => {
   }, [location.hash]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <PublicLayout
+      title="CompSmart — Gestão Estratégica de Pessoas com IA"
+      description="Plataforma modular de gestão estratégica de pessoas: remuneração, NR-1, clima, seleção, desenvolvimento e sucessão, com um agente de IA em cada módulo."
+      path="/"
+    >
       <Helmet>
-        <link rel="canonical" href="https://www.compsmart.ia.br/" />
-        <meta property="og:url" content="https://www.compsmart.ia.br/" />
         <script type="application/ld+json">
           {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: FAQ_ITEMS.map((f) => ({
-              '@type': 'Question',
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: PIVOT_FAQ_ITEMS.map((f) => ({
+              "@type": "Question",
               name: f.question,
-              acceptedAnswer: { '@type': 'Answer', text: f.answer },
+              acceptedAnswer: { "@type": "Answer", text: f.answer },
             })),
           })}
         </script>
       </Helmet>
-      <Header isLoggedIn={isLoggedIn} />
 
-      {/* 1. Hero / Headlines + destaque NR-1 */}
-      <HeroSection />
-
-      {/* 1.1 Vídeo institucional compacto */}
+      <PivotHero />
+      <PainSection />
+      <ModulesGridSection />
+      <CrossDataSection />
       <VideoSection />
-
-      {/* 2. Prova social imediata */}
-      <LogoSlider />
-
-      {/* 3. Problema */}
-      <BeforeAfterSection />
-
-      {/* 4. Solução */}
-      <SolutionSection />
-
-      {/* 5. Produto na prática */}
-      <InteractiveDemoSection />
-
-      {/* 6. Diferencial IA */}
-      <SmartAgentsSection />
-
-      {/* 7. Como começar */}
-      <HowItWorksSection />
-
-      {/* 8. Decisão */}
-      <PricingSection />
-
-      {/* 9. Prova social profunda */}
-      <SocialProofSection />
-
-      {/* 10. Confiança */}
-      <SecuritySection />
-
-      {/* 11. Objeções + CTA final */}
-      <FAQSection />
-      <CTASection />
-
-      <Footer />
-      <LaunchPromoBanner />
-    </div>
+      <PivotHowItWorks />
+      <PayrollIntegrationsSection />
+      <PricingSummarySection />
+      <SocialProofPlaceholder />
+      <PivotFAQSection />
+      <PreFooterCTA />
+    </PublicLayout>
   );
 };
 
