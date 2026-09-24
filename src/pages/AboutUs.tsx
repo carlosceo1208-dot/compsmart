@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
-import { Linkedin, Mail, ArrowRight } from "lucide-react";
+import { Linkedin, Mail, ArrowRight, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { ImageSlot } from "@/components/landing/public/ImageSlot";
+import fotoJosue from "@/assets/socio-josue.png.asset.json";
+import fotoCarlos from "@/assets/socio-carlos.png.asset.json";
+import fotoFernando from "@/assets/socio-fernando.png.asset.json";
 
 interface Socio {
   nome: string;
@@ -21,6 +24,7 @@ const SOCIOS: Socio[] = [
     cargo: "CEO & Fundador",
     bio: "Administrador de Empresas com MBA pela USP, expert e estrategista em gestão de pessoas, coach, mentor e orientador de carreira. Mais de 30 anos de experiência executiva em RH e Operações; pioneiro em benefícios flexíveis e práticas de remuneração — lidera a CompSmart como CEO & Fundador.",
     linkedin: "https://www.linkedin.com/in/ceocarloseduardooliveira/",
+    foto: fotoCarlos.url,
   },
   {
     nome: "Fernando Curral",
@@ -28,12 +32,14 @@ const SOCIOS: Socio[] = [
     cargo: "Sócio — Psicologia Organizacional & Bem-Estar",
     bio: "Psicólogo com mestrado em RH pela FMU e especializações em Psicologia da Saúde, Gestão do Stress e Burnout (UnG) e Ciências Endocrinológicas (UNIFESP). Há mais de 25 anos une a prática clínica à atuação organizacional, avaliando e planejando pessoas em empresas nacionais e multinacionais.",
     linkedin: "https://www.linkedin.com/in/fernando-curral-7a89045/",
+    foto: fotoFernando.url,
   },
   {
     nome: "Josué Cruz",
     iniciais: "JC",
     cargo: "Sócio — Estratégia de Pessoas & Performance",
-    bio: "Executivo com carreira sólida em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: equilíbrio entre resultados robustos e preservação da energia humana.",
+    foto: fotoJosue.url,
+    bio: "Psicólogo, Executivo com sólida carreira em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: o equilíbrio entre resultados robustos e a preservação da energia humana.",
     linkedin: "https://www.linkedin.com/in/josuecruz-rh/",
   },
 ];
@@ -59,10 +65,15 @@ const AboutUs = () => (
 
     <section className="py-14 bg-background">
       <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center max-w-6xl">
-        <div className="space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold">Nossa História</h2>
+        <div className="space-y-4 rounded-[20px] border border-primary/15 border-l-4 border-l-primary bg-card text-card-foreground p-6 md:p-8 shadow-[0_4px_20px_hsl(var(--foreground)/0.06)]">
+          <div className="flex items-center gap-3">
+            <Quote className="h-8 w-8 text-primary shrink-0" aria-hidden="true" />
+            <h2 className="text-2xl md:text-3xl font-extrabold">Nossa História</h2>
+          </div>
           <p className="text-muted-foreground leading-relaxed">
-            Josué Cruz, Fernando Curral e Carlos Eduardo se conhecem de longa data. Cada um
+            <strong className="text-foreground">Josué Cruz</strong>,{" "}
+            <strong className="text-foreground">Fernando Curral</strong> e{" "}
+            <strong className="text-foreground">Carlos Eduardo</strong> se conhecem de longa data. Cada um
             construiu uma carreira sólida no mundo corporativo — em empresas nacionais e
             multinacionais, de diferentes segmentos e portes — e também do outro lado da mesa,
             atuando como consultores. Fusões, reestruturações, gestão de pessoas, operações e
@@ -98,7 +109,7 @@ const AboutUs = () => (
               <CardContent className="p-6 flex flex-col items-center text-center gap-3 h-full">
                 <div className="h-28 w-28 aspect-square rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center">
                   {s.foto ? (
-                    <img src={s.foto} alt={s.nome} className="h-full w-full object-cover" />
+                    <img src={s.foto} alt={`Foto de ${s.nome}`} loading="lazy" className="h-full w-full object-cover object-center" />
                   ) : (
                     <span className="text-2xl font-semibold text-muted-foreground">{s.iniciais}</span>
                   )}
