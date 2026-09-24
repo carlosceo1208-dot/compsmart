@@ -4,7 +4,7 @@ import { Handshake, Percent, BriefcaseBusiness, Check } from "lucide-react";
 import { ImageSlot } from "@/components/landing/public/ImageSlot";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { LeadForm } from "@/components/landing/public/LeadForm";
-import imagemConsultores from "@/assets/imagem-d-consultores.png.asset.json";
+import imagemParceria from "@/assets/parceria-profissional.png.asset.json";
 
 const MODALIDADES = [
   {
@@ -111,7 +111,7 @@ const Parceiros = () => (
     </section>
   <section className="py-14 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
-          <ImageSlot src={imagemConsultores.url} label="Imagem D" alt="Consultores seniores em mentoria" className="rounded-2xl shadow-md" />
+          <ImageSlot src={imagemParceria.url} label="Imagem D" alt="Profissionais celebrando uma nova parceria" className="rounded-2xl shadow-md" />
         </div>
       </section>
     </PublicLayout>
