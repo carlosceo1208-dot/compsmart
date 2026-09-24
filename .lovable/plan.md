@@ -4,7 +4,8 @@
 Usar o layout público (mesmo header, rodapé e SEO das outras páginas).
 - **Abertura:** "QUEM SOMOS", título "Três amigos — J F C. Décadas de estrada. Um propósito em comum." e subtítulo, com o texto exato do documento.
 - **Nossa História:** os 3 parágrafos do documento, sem alterações.
-- **Os Sócios:** 3 cards (1 coluna no celular, 3 no desktop). Cada card tem um círculo neutro com as iniciais (CE, FC, JC) no lugar da foto, nome, cargo, bio e o botão "Conectar no LinkedIn" (contorno, abre em nova aba). Ordem: Carlos Eduardo, Fernando Curral, Josué Cruz.
+- **Os Sócios:** 3 cards (1 coluna no celular, 3 no desktop). Cada card tem um círculo neutro com as iniciais (CE, FC, JC) no lugar da foto, nome, cargo, bio e o botão "Conectar no LinkedIn" (contorno). Ordem: Carlos Eduardo, Fernando Curral, Josué Cruz.
+- O nome de cada sócio também leva ao LinkedIn, o que ajuda no celular. O botão e o nome abrem o LinkedIn em uma nova aba, e o site continua aberto (target="_blank" rel="noopener noreferrer").
 - **Missão:** texto de fechamento com a linha final em destaque.
 - **Chamada final:** "Agende um diagnóstico gratuito" leva a /contato; o link "Fale com a CompSmart" abre um e-mail para contato@compsmart.ia.br.
 - Espaço reservado para a Imagem A (proporção 16:9).
