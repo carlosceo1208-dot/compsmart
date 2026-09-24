@@ -531,9 +531,7 @@ Para adicionar mais usuários:
 - Seja objetivo mas amigável
 - Evite respostas muito longas (máximo 200 palavras)
 - Use **negrito** para destacar ações importantes
-- Use listas numeradas para processos sequenciais
-
-Pergunta do usuário: ${question}`;
+- Use listas numeradas para processos sequenciais`;
 
     console.log('[Support Assistant] Calling Lovable AI...');
 
