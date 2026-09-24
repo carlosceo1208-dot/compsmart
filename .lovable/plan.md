@@ -6,6 +6,11 @@ Usar o layout público (mesmo header, rodapé e SEO das outras páginas).
 - **Nossa História:** os 3 parágrafos do documento, sem alterações.
 - **Os Sócios:** 3 cards (1 coluna no celular, 3 no desktop). Cada card tem um círculo neutro com as iniciais (CE, FC, JC) no lugar da foto, nome, cargo, bio e o botão "Conectar no LinkedIn" (contorno). Ordem: Carlos Eduardo, Fernando Curral, Josué Cruz.
 - O nome de cada sócio também leva ao LinkedIn, o que ajuda no celular. O botão e o nome abrem o LinkedIn em uma nova aba, e o site continua aberto (target="_blank" rel="noopener noreferrer").
+- Textos validados, usados exatamente como estão abaixo:
+  - **Carlos Eduardo** — CEO & Fundador — "Administrador de Empresas com MBA pela USP, expert e estrategista em gestão de pessoas, coach, mentor e orientador de carreira. Mais de 30 anos de experiência executiva em RH e Operações; pioneiro em benefícios flexíveis e práticas de remuneração — lidera a CompSmart como CEO & Fundador." — linkedin.com/in/ceocarloseduardooliveira/
+  - **Fernando Curral** — Sócio — Psicologia Organizacional & Bem-Estar — "Psicólogo com mestrado em RH pela FMU e especializações em Psicologia da Saúde, Gestão do Stress e Burnout (UnG) e Ciências Endocrinológicas (UNIFESP). Há mais de 25 anos une a prática clínica à atuação organizacional, avaliando e planejando pessoas em empresas nacionais e multinacionais." — linkedin.com/in/fernando-curral-7a89045/
+  - **Josué Cruz** — Sócio — Estratégia de Pessoas & Performance — "Executivo com carreira sólida em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: equilíbrio entre resultados robustos e preservação da energia humana." — linkedin.com/in/josuecruz-rh/
+- A grafia usada é "Endocrinológicas", a forma correta em português; "Endócrinológicas" não tem acento no "o" do meio.
 - **Missão:** texto de fechamento com a linha final em destaque.
 - **Chamada final:** "Agende um diagnóstico gratuito" leva a /contato; o link "Fale com a CompSmart" abre um e-mail para contato@compsmart.ia.br.
 - Espaço reservado para a Imagem A (proporção 16:9).
