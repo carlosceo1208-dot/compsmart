@@ -360,6 +360,25 @@ serve(async (req) => {
 
     const userCompanyId = userProfile?.root_company_id;
 
+    // SECURITY: server-side paid entitlement check (module "core")
+    {
+      const { data: sa } = await supabase.from('user_roles').select('role')
+        .eq('user_id', user.id).eq('role', 'super_admin').maybeSingle();
+      if (!sa) {
+        const { data: subs } = await supabase
+          .from('tenant_subscriptions')
+          .select('status, expires_at, modules!inner(slug)')
+          .eq('tenant_id', userCompanyId)
+          .eq('modules.slug', 'core')
+          .in('status', ['active', 'trial']);
+        const entitled = (subs ?? []).some((s: any) => !s.expires_at || new Date(s.expires_at) > new Date());
+        if (!userCompanyId || !entitled) {
+          return new Response(JSON.stringify({ error: 'Módulo não contratado' }),
+            { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+      }
+    }
+
     // Buscar dados da empresa incluindo industry_sector
     let companyData: { name: string; industry_sector: string | null } | null = null;
     if (userCompanyId) {

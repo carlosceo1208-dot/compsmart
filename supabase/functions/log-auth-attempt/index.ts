@@ -74,18 +74,29 @@ serve(async (req) => {
     const failureReason = (payload.failure_reason ?? null);
     if (failureReason && (typeof failureReason !== "string" || failureReason.length > 500)) return silentOk();
 
+    // SECURITY: successful attempts must be proven by a valid session for the same email.
+    // Unauthenticated callers may only record failures, flagged as unverified.
+    let verifiedUserId: string | null = null;
+    if (payload.success) {
+      const token = (req.headers.get("Authorization") || "").replace("Bearer ", "");
+      const { data: u } = token ? await supabase.auth.getUser(token) : { data: { user: null } } as any;
+      if (!u?.user || (u.user.email || "").toLowerCase() !== cleanEmail) return silentOk();
+      verifiedUserId = u.user.id;
+    }
+
     const user_agent = (req.headers.get("user-agent") || "unknown").slice(0, 500);
 
     const { error } = await supabase.from("auth_attempt_logs").insert({
       email: cleanEmail,
-      // SECURITY: never trust caller-supplied user_id on this unauthenticated endpoint
-      user_id: null,
+      // SECURITY: user_id only from a verified session, never from the payload
+      user_id: verifiedUserId,
       attempt_type: payload.attempt_type,
       success: payload.success,
       failure_reason: failureReason,
       ip_address,
       user_agent,
-      metadata: payload.metadata && typeof payload.metadata === "object" ? payload.metadata : {},
+      // SECURITY: caller-supplied metadata is discarded; only mark verification state
+      metadata: { verified: !!verifiedUserId },
     });
     if (error) console.error("auth log insert error", error.message);
 
