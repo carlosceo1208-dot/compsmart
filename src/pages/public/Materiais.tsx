@@ -13,6 +13,7 @@ import { BookOpen, Download, Lock } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { LeadForm } from "@/components/landing/public/LeadForm";
 import type { LeadOrigem } from "@/hooks/usePublicLead";
+import simboloCrescimento from "@/assets/simbolo-crescimento.png.asset.json";
 
 interface Material {
   slug: string;
@@ -81,7 +82,15 @@ const Materiais = () => {
             {MATERIAIS.map((m) => (
               <Card key={m.slug} className="rounded-2xl h-full flex flex-col">
                 <div className="aspect-[4/3] rounded-t-2xl bg-gradient-to-br from-primary/15 via-primary/5 to-muted flex items-center justify-center">
-                  <BookOpen className="h-10 w-10 text-primary/70" />
+                  {m.slug === "remuneracao" ? (
+                    <img
+                      src={simboloCrescimento.url}
+                      alt="Símbolo de crescimento estratégico"
+                      className="size-24 rounded-2xl object-cover shadow-sm"
+                    />
+                  ) : (
+                    <BookOpen className="h-10 w-10 text-primary/70" />
+                  )}
                 </div>
                 <CardContent className="p-6 space-y-3 flex-1 flex flex-col">
                   {!m.disponivel && (
