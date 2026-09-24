@@ -7,7 +7,7 @@ import { ImageSlot } from "@/components/landing/public/ImageSlot";
 import fotoJosue from "@/assets/socio-josue.png.asset.json";
 import fotoCarlos from "@/assets/socio-carlos.png.asset.json";
 import fotoFernando from "@/assets/socio-fernando.png.asset.json";
-import imagemReuniao from "@/assets/imagem-a-reuniao.png.asset.json";
+import imagemHistoria from "@/assets/historia-consultoria-executiva.png.asset.json";
 
 interface Socio {
   nome: string;
@@ -98,9 +98,9 @@ const AboutUs = () => (
           </p>
         </div>
         <ImageSlot
-          src={imagemReuniao.url}
+          src={imagemHistoria.url}
           label="Imagem A"
-          alt="Reunião consultiva da equipe CompSmart"
+          alt="Mesa de consultoria executiva com planilhas, documentos e indicadores"
           className="rounded-[20px] shadow-md"
         />
       </div>
