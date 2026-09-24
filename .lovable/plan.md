@@ -10,11 +10,12 @@
   - `image-34.png` → `imagem-e-equipe.png`
   - `image-35.png` → `nr1-mapa.png`
   - `image-36.png` → `nr1-bem-estar.png`
-- Reutilizar os retratos reais já vinculados como Carlos, Fernando e Josué, sem trocar a identidade de nenhum sócio.
+- Usar somente as fotos originais 1:1 enviadas por upload para Carlos, Fernando e Josué; não usar nem criar versões circulares dos arquivos e não trocar a identidade de nenhum sócio.
 
 ## 2. Página “Quem Somos”
-- No card 1, manter a foto real de Carlos e corrigir o círculo: mesmo diâmetro dos demais, proporção 1:1, `object-fit: cover`, raio de 50%, sem borda visível e sem fundo branco no contêiner.
-- Aplicar exatamente o mesmo contêiner circular às fotos de Fernando e Josué.
+- No card 1, usar a foto original 1:1 de Carlos enviada pelo WhatsApp, sem editar ou recortar o arquivo.
+- Aplicar o círculo exclusivamente via CSS no contêiner dos três retratos: largura e altura idênticas de 128px, proporção 1:1, `border-radius: 50%`, `overflow: hidden`, sem borda e sem cor de fundo.
+- Aplicar `object-fit: cover` e centralização à imagem interna de Carlos, Fernando e Josué para enquadrar os rostos, preservando os arquivos originais.
 - Preservar a ordem dos cards: Carlos, Fernando e Josué.
 - Substituir a moldura vazia de “Nossa História” pela `imagem-a-reuniao.png`, em 16:9, corte `cover`, cantos de 20px e sombra suave; ao lado do texto no desktop e abaixo no celular.
 
@@ -35,7 +36,7 @@
 
 ## 5. Padrão visual e comportamento
 - Imagens editoriais em 16:9, `object-fit: cover`, cantos entre 16px e 20px e sombra suave.
-- Retratos dos sócios em 1:1 circular, com dimensões idênticas, sem fundo ou borda do contêiner.
+- Retratos originais dos sócios em 1:1; o corte circular será somente visual, feito pelo contêiner CSS de 128px, sem editar as imagens, sem fundo e sem borda.
 - Não adicionar textos sobre as fotos além das legendas e da faixa NR-1 especificadas.
 - Preservar textos, preços, formulários, questionário e seletor de tema existentes.
 
