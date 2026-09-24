@@ -3,10 +3,8 @@ import {
   ArrowRight,
   Sparkles,
   BarChart3,
-  ShieldCheck,
   FileSpreadsheet,
   ClipboardCheck,
-  Activity,
   Users,
 } from 'lucide-react';
 import imagemReuniao from '@/assets/imagem-a-reuniao.png.asset.json';
