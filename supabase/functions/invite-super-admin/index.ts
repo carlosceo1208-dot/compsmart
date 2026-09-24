@@ -126,9 +126,15 @@ serve(async (req) => {
         // and handle the "already registered" error path from Supabase Auth.
         const { data: existingProfile } = await admin
           .from("profiles")
-          .select("id")
+          .select("id, root_company_id")
           .eq("email", email)
           .maybeSingle();
+
+        // SECURITY: never re-home or promote a user that belongs to another company.
+        if (existingProfile?.root_company_id && existingProfile.root_company_id !== companyId) {
+          results.push({ email, ok: false, error: "E-mail pertence a outra empresa" });
+          continue;
+        }
 
         if (existingProfile?.id) {
           userId = existingProfile.id;

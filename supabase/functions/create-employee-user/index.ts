@@ -79,11 +79,34 @@ serve(async (req) => {
     }
 
     // SECURITY: Sanitize requested roles. Block super_admin from being assigned via API.
-    const sanitizedRoles = requestedRoles.filter((r) => ALLOWED_ROLES.has(r));
+    // Only admins may grant 'admin'; HR managers are limited to lower roles.
+    const sanitizedRoles = requestedRoles.filter((r) =>
+      ALLOWED_ROLES.has(r) && (r !== 'admin' || isAdmin)
+    );
     if (sanitizedRoles.length === 0) sanitizedRoles.push('employee');
 
     // SECURITY: Force the new profile to caller's company - never trust client value.
     const root_company_id = callerCompanyId;
+
+    // SECURITY: unit_id and manager_id must belong to the caller's company.
+    if (unit_id) {
+      const { data: unitRow } = await supabase
+        .from('organizational_structure').select('id')
+        .eq('id', unit_id).eq('root_company_id', callerCompanyId).maybeSingle();
+      if (!unitRow) {
+        return new Response(JSON.stringify({ success: false, error: 'Unidade inválida' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
+    if (manager_id) {
+      const { data: mgrRow } = await supabase
+        .from('profiles').select('id')
+        .eq('id', manager_id).eq('root_company_id', callerCompanyId).maybeSingle();
+      if (!mgrRow) {
+        return new Response(JSON.stringify({ success: false, error: 'Gestor inválido' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
 
     console.log('[create-employee-user] caller', callerId, 'creating', employee_number);
 
