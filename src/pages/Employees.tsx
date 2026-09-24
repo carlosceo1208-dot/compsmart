@@ -694,7 +694,7 @@ const Users = () => {
             </Button>
           )}
           
-          {hasCoreModule && (!isConsultorUser || hasConsultorCoreAccess) ? (
+          {(isConsultorUser ? hasConsultorCoreAccess : hasCoreModule) ? (
             <Button 
               variant="outline" 
               className="gap-2"
@@ -703,7 +703,7 @@ const Users = () => {
               <Upload className="w-4 h-4" />
               Atualizar Colaboradores
             </Button>
-          ) : isConsultorUser && hasCoreModule ? (
+          ) : isConsultorUser ? (
             <Button
               variant="outline"
               className="gap-2"

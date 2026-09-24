@@ -13,6 +13,7 @@ export const useCurrentUserRole = () => {
           isHR: false, 
           isAdmin: false,
           isSuperAdmin: false,
+          isConsultor: false,
           unitId: null,
           userId: null
         };
@@ -38,6 +39,7 @@ export const useCurrentUserRole = () => {
         isHR: userRoles.includes('hr_manager'),
         isAdmin: userRoles.includes('admin'),
         isSuperAdmin: userRoles.includes('super_admin'),
+        isConsultor: userRoles.includes('consultor'),
         unitId: profile?.unit_id || null,
         userId: user.id
       };

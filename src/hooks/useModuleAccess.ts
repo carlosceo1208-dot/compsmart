@@ -93,6 +93,9 @@ export const useModuleAccess = () => {
 
   const hasModule = (slug: ModuleSlug) => {
     if (adminBypass) return true;
+    // Consultores CompSmart operam o RH Service para clientes; o acesso aos
+    // dados de cada cliente é validado por projeto ativo no backend.
+    if (slug === 'rh-service' && (roleData as { isConsultor?: boolean } | undefined)?.isConsultor) return true;
     return contractedModules.has(slug);
   };
 

@@ -65,7 +65,7 @@ const TotalRewards = () => {
           target_value,
           actual_value,
           program_id,
-          incentive_programs (name, program_type, incentive_type)
+          incentive_programs (name, program_type, subtype)
         `)
         .eq("employee_id", selectedEmployee)
         .eq("is_active", true);
@@ -108,8 +108,8 @@ const TotalRewards = () => {
   })) || [];
 
   // Incentives breakdown
-  const icpIncentives = employeeIncentives?.filter((ei) => (ei.incentive_programs as any)?.incentive_type === "ICP") || [];
-  const ilpIncentives = employeeIncentives?.filter((ei) => (ei.incentive_programs as any)?.incentive_type === "ILP") || [];
+  const icpIncentives = employeeIncentives?.filter((ei) => (ei.incentive_programs as any)?.program_type === "short_term") || [];
+  const ilpIncentives = employeeIncentives?.filter((ei) => (ei.incentive_programs as any)?.program_type === "long_term") || [];
 
   return (
     <div className="space-y-6">
