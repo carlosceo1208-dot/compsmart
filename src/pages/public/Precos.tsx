@@ -13,6 +13,7 @@ import {
   formatBRL,
 } from "@/hooks/usePublicPricing";
 import { CONTACT_EMAIL } from "@/config/landingModules";
+import imagemEquipe from "@/assets/imagem-e-equipe.png.asset.json";
 
 const Precos = () => {
   const { data: pricing, isLoading } = usePublicPricing();
@@ -155,7 +156,7 @@ const Precos = () => {
       <PivotFAQSection />
     <section className="py-14 bg-background">
         <div className="container mx-auto px-4 max-w-4xl">
-          <ImageSlot label="Imagem E" alt="Equipe de RH trabalhando com tecnologia" />
+          <ImageSlot src={imagemEquipe.url} label="Imagem E" alt="Equipe de RH trabalhando com tecnologia" className="rounded-2xl shadow-md" />
         </div>
       </section>
     </PublicLayout>

@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
 import { ImageSlot } from "@/components/landing/public/ImageSlot";
+import imagemEquipe from "@/assets/imagem-e-equipe.png.asset.json";
 
 export const PreFooterCTA = () => (
   <>
   <section className="pt-14 pb-10 bg-background">
     <div className="container mx-auto px-4 max-w-4xl">
-      <ImageSlot label="Imagem E" alt="Equipe de RH trabalhando com tecnologia" />
+      <ImageSlot src={imagemEquipe.url} label="Imagem E" alt="Equipe de RH trabalhando com tecnologia" className="rounded-2xl shadow-md" />
     </div>
   </section>
   <section className="py-16 md:py-20 bg-primary">

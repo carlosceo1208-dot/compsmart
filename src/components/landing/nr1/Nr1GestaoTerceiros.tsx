@@ -1,4 +1,5 @@
 import { Building2, ShieldAlert, FileCheck2, BellRing, Users2, Download, Sparkles } from 'lucide-react';
+import imagemConsultores from '@/assets/imagem-d-consultores.png.asset.json';
 
 const RECURSOS = [
   {
@@ -36,19 +37,22 @@ const RECURSOS = [
 export default function Nr1GestaoTerceiros() {
   return (
     <section className="container mx-auto px-4 py-14">
-      <div className="text-center max-w-3xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full nr1-bg-soft border border-[hsl(var(--nr1-primary)/0.3)] text-xs font-semibold nr1-text-primary mb-4">
-          <Sparkles className="h-3.5 w-3.5" />
-          Novo · Diferencial CompSmart NR-1
+      <div className="grid items-center gap-8 lg:grid-cols-[1.4fr_1fr] max-w-6xl mx-auto mb-10">
+        <div className="text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full nr1-bg-soft border border-[hsl(var(--nr1-primary)/0.3)] text-xs font-semibold nr1-text-primary mb-4">
+            <Sparkles className="h-3.5 w-3.5" />
+            Novo · Diferencial CompSmart NR-1
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            Gestão de <span className="nr1-text-primary">Terceiros & PGR</span> em um único lugar
+          </h2>
+          <p className="text-muted-foreground">
+            A NR-1 responsabiliza o contratante pela cadeia de prestadores. Cadastre cada empresa
+            terceira, registre o grau de risco, anexe o PGR e mantenha o contato de emergência
+            sempre acessível — sem planilhas, sem retrabalho.
+          </p>
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-3">
-          Gestão de <span className="nr1-text-primary">Terceiros & PGR</span> em um único lugar
-        </h2>
-        <p className="text-muted-foreground">
-          A NR-1 responsabiliza o contratante pela cadeia de prestadores. Cadastre cada empresa
-          terceira, registre o grau de risco, anexe o PGR e mantenha o contato de emergência
-          sempre acessível — sem planilhas, sem retrabalho.
-        </p>
+        <img src={imagemConsultores.url} alt="Consultores seniores em reunião" className="aspect-video w-full rounded-2xl object-cover shadow-md" />
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">

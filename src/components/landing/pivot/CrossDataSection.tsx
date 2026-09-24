@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame, ShieldAlert } from "lucide-react";
 import { ImageSlot } from "@/components/landing/public/ImageSlot";
+import imagemReuniao from "@/assets/imagem-a-reuniao.png.asset.json";
 
 const EXEMPLOS = [
   {
@@ -44,7 +45,7 @@ export const CrossDataSection = () => (
         ))}
       </div>
       <div className="max-w-4xl mx-auto mt-8">
-        <ImageSlot label="Imagem A" alt="Reunião consultiva de RH com equipe diversa" />
+        <ImageSlot src={imagemReuniao.url} label="Imagem A" alt="Reunião consultiva de RH com equipe diversa" className="rounded-2xl shadow-md" />
       </div>
     </div>
   </section>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PricingSimulator } from "@/components/landing/pivot/PricingSimulator";
 import { CONTACT_EMAIL } from "@/config/landingModules";
 import { formatBRL, usePublicPricing } from "@/hooks/usePublicPricing";
+import imagemReuniao from "@/assets/imagem-a-reuniao.png.asset.json";
 
 const NR1_FEATURES = [
   "Visão Geral",
@@ -59,6 +60,13 @@ export function Nr1PublicPricing() {
         </Card>
 
         <div className="space-y-6">
+          <figure className="relative mx-auto max-w-6xl overflow-hidden rounded-2xl shadow-md">
+            <img src={imagemReuniao.url} alt="Reunião consultiva da CompSmart" className="h-[280px] w-full object-cover" />
+            <div className="absolute inset-0 bg-primary/30" aria-hidden="true" />
+            <figcaption className="absolute inset-x-0 bottom-0 bg-foreground/70 p-4 text-center font-semibold text-background">
+              Conformidade com gente — consultores e plataforma juntos no seu processo.
+            </figcaption>
+          </figure>
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="text-2xl md:text-3xl font-bold">Faixas por porte</h3>
             <p className="mt-2 text-sm text-muted-foreground">

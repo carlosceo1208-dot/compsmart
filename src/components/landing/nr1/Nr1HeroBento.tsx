@@ -3,12 +3,13 @@ import {
   ArrowRight,
   Sparkles,
   BarChart3,
-  ShieldCheck,
   FileSpreadsheet,
   ClipboardCheck,
-  Activity,
   Users,
 } from 'lucide-react';
+import imagemReuniao from '@/assets/imagem-a-reuniao.png.asset.json';
+import imagemMapa from '@/assets/nr1-mapa.png.asset.json';
+import imagemBemEstar from '@/assets/nr1-bem-estar.png.asset.json';
 
 interface Props {
   onDiagnostico: () => void;
@@ -25,27 +26,34 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
     <section className="bg-primary/5 text-foreground">
       <div className="container mx-auto px-4 pt-6 pb-10 sm:pt-8 sm:pb-12 md:pt-12 md:pb-16">
         {/* Hero compacto */}
-        <header className="max-w-4xl mx-auto text-center mb-8 md:mb-10 lg:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary text-primary-foreground rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-5">
-            <Sparkles className="h-3 w-3" />
-            <span>NR-1 Inteligente · CompSmart</span>
+        <header className="grid items-center gap-7 lg:grid-cols-[1.2fr_1fr] max-w-6xl mx-auto mb-8 md:mb-10 lg:mb-12">
+          <div className="text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary text-primary-foreground rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 md:mb-5">
+              <Sparkles className="h-3 w-3" />
+              <span>NR-1 Inteligente · CompSmart</span>
+            </div>
+            <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl leading-[1.15] md:leading-tight mb-3 md:mb-4">
+              Gestão de riscos psicossociais.{' '}
+              <span className="text-primary">Só a CompSmart te diz o que fazer.</span>
+            </h1>
+            <p className="text-base md:text-lg text-muted-foreground mb-5 md:mb-6 max-w-xl sm:max-w-2xl mx-auto lg:mx-0">
+              Organize o diagnóstico, acompanhe riscos por grupo e planeje ações com sua equipe de RH e SST.
+            </p>
+            <div className="flex justify-center px-4 sm:px-0 lg:justify-start">
+              <Button
+                size="lg"
+                onClick={onDiagnostico}
+                className="w-full sm:w-auto rounded-lg font-bold h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base"
+              >
+                Diagnóstico grátis em 2 min <ArrowRight className="h-4 w-4 ml-1.5 shrink-0" />
+              </Button>
+            </div>
           </div>
-          <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl leading-[1.15] md:leading-tight mb-3 md:mb-4">
-            Gestão de riscos psicossociais.{' '}
-            <span className="text-primary">Só a CompSmart te diz o que fazer.</span>
-          </h1>
-          <p className="text-base md:text-lg text-muted-foreground mb-5 md:mb-6 max-w-xl sm:max-w-2xl mx-auto">
-            Organize o diagnóstico, acompanhe riscos por grupo e planeje ações com sua equipe de RH e SST.
-          </p>
-          <div className="flex justify-center px-4 sm:px-0">
-            <Button
-              size="lg"
-              onClick={onDiagnostico}
-              className="w-full sm:w-auto rounded-lg font-bold h-12 sm:h-14 px-6 sm:px-8 text-sm sm:text-base"
-            >
-              Diagnóstico grátis em 2 min <ArrowRight className="h-4 w-4 ml-1.5 shrink-0" />
-            </Button>
-          </div>
+          <img
+            src={imagemReuniao.url}
+            alt="Reunião consultiva sobre gestão de riscos psicossociais"
+            className="aspect-video w-full rounded-2xl object-cover shadow-md"
+          />
         </header>
 
         {/* Bento das features NR-1 */}
@@ -65,17 +73,12 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
                   de 13 fatores críticos mapeados — apoiando a documentação e o plano de ação da empresa.
                 </p>
               </div>
-              <div className="bg-primary/5 rounded-2xl p-4">
-                <div className="flex gap-1 mb-2">
-                  <div className="h-2 flex-1 bg-primary rounded-full" />
-                  <div className="h-2 flex-1 bg-primary rounded-full" />
-                  <div className="h-2 flex-1 bg-warning rounded-full" />
-                  <div className="h-2 flex-1 bg-muted rounded-full" />
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                  Visão ilustrativa do mapa de risco
-                </span>
-              </div>
+              <figure className="overflow-hidden rounded-2xl bg-primary/5 shadow-sm">
+                <img src={imagemMapa.url} alt="Profissionais analisando um mapa de risco em um tablet" className="aspect-video w-full object-cover" />
+                <figcaption className="p-3 text-[10px] font-bold uppercase text-muted-foreground">
+                  Visualização ilustrativa do mapa de risco — matriz COPSOQ-III por área.
+                </figcaption>
+              </figure>
             </div>
 
             {/* 2. Plano de ação — faixa larga */}
@@ -111,9 +114,7 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
 
             {/* 4. Anonimato LGPD */}
             <div className="bg-primary p-6 rounded-[2rem] text-primary-foreground">
-              <div className="w-10 h-10 bg-primary-foreground/20 rounded-xl flex items-center justify-center mb-3">
-                <ShieldCheck className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src={imagemBemEstar.url} alt="Roda de conversa sobre bem-estar" className="mb-4 h-40 w-full rounded-2xl object-cover shadow-sm" />
               <h4 className="font-bold text-sm md:text-base mb-1">Anonimato LGPD</h4>
               <p className="text-[12px] text-primary-foreground/85 leading-relaxed">
                 Respostas com <strong>k-anonymity</strong>. O colaborador responde sem medo —
@@ -124,23 +125,12 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
             {/* 5. Painel executivo / Vitalidade */}
             <div className="bg-card p-6 rounded-[2rem] border border-border shadow-sm flex flex-col justify-between hover:border-primary/30 transition-colors">
               <div>
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
-                  <Activity className="w-5 h-5 text-foreground" />
-                </div>
+                <img src={imagemBemEstar.url} alt="Roda de conversa sobre vitalidade" className="mb-4 h-40 w-full rounded-2xl object-cover shadow-sm" />
                 <h4 className="font-bold text-sm md:text-base mb-1">Painel de Vitalidade</h4>
                 <p className="text-[12px] text-muted-foreground leading-relaxed">
                   Indicador único de saúde organizacional para a diretoria. Tendência mensal e
                   alertas por área.
                 </p>
-              </div>
-              <div className="flex items-end gap-1 mt-3">
-                {[40, 55, 48, 62, 70, 78].map((h, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 bg-primary/70 rounded-sm"
-                    style={{ height: `${h * 0.35}px` }}
-                  />
-                ))}
               </div>
             </div>
 
