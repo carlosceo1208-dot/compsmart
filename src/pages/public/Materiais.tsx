@@ -12,6 +12,7 @@ import {
 import { BookOpen, Download, Lock } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { LeadForm } from "@/components/landing/public/LeadForm";
+import { EbookDownloadDialog } from "@/components/landing/public/EbookDownloadDialog";
 import type { LeadOrigem } from "@/hooks/usePublicLead";
 import simboloCrescimento from "@/assets/simbolo-crescimento.png.asset.json";
 
@@ -122,7 +123,15 @@ const Materiais = () => {
         </div>
       </section>
 
-      <Dialog open={!!ativo} onOpenChange={(o) => !o && setAtivo(null)}>
+      <EbookDownloadDialog
+        open={ativo?.slug === "remuneracao"}
+        onOpenChange={(o) => !o && setAtivo(null)}
+      />
+
+      <Dialog
+        open={!!ativo && ativo.slug !== "remuneracao"}
+        onOpenChange={(o) => !o && setAtivo(null)}
+      >
         <DialogContent className="max-w-lg bg-background">
           <DialogHeader>
             <DialogTitle>Receber o material</DialogTitle>
