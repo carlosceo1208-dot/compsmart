@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
             last_attempt: emailAttempts[0].created_at
           }
         });
-        console.log(`ALERT: Brute force detected for email ${email} - ${emailAttempts.length} failures`);
+        console.log(`ALERT: Brute force detected for an account - ${emailAttempts.length} failures`);
       }
     }
     

@@ -394,14 +394,14 @@ serve(async (req) => {
         }
 
         results.sent.push(employee.full_name);
-        console.log(`Invitation sent to ${employee.email}`);
+        console.log(`Invitation sent for employee ${employee.id}`);
 
       } catch (err: any) {
         results.errors.push({ name: employee.full_name, error: 'Erro ao processar colaborador' });
       }
     }
 
-    console.log('Invitation results:', results);
+    console.log(`Invitation results: ${results.length} processed`);
 
     return new Response(JSON.stringify({
       success: true,
