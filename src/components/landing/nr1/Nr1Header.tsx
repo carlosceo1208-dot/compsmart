@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { LayoutDashboard, LogOut, ShieldCheck } from 'lucide-react';
 import { useAuthCTA } from '@/hooks/useAuthCTA';
 import { supabase } from '@/integrations/supabase/client';
+import { PublicThemeToggle } from '@/components/landing/public/PublicThemeToggle';
 
 interface Nr1HeaderProps {
   onAnchor: (id: string) => void;
@@ -53,6 +54,7 @@ export default function Nr1Header({ onAnchor }: Nr1HeaderProps) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <PublicThemeToggle />
           <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex">
             <Link to={ctaTo}>
               <LayoutDashboard className="h-4 w-4 mr-1.5" />

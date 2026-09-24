@@ -38,6 +38,8 @@ export const PricingSimulator = () => {
 
   const maxModules = Math.max(1, pricing.modulos.length || 9);
   const sim = simulateMonthlyTotal(pricing, modules, employees, cycle);
+  const periodMonths = cycle === "anual" ? 12 : cycle === "semestral" ? 6 : 1;
+  const periodLabel = cycle === "anual" ? "Total anual" : cycle === "semestral" ? "Total semestral" : null;
 
   return (
     <Card className="rounded-2xl border-primary/20">
@@ -105,12 +107,20 @@ export const PricingSimulator = () => {
               {formatBRL(sim.total)}
             </p>
             {sim.discountPct > 0 && (
-              <p className="text-xs text-[#16A34A] font-medium">
+              <p className="text-xs text-success font-medium">
                 {sim.discountPct}% de desconto já aplicado ({formatBRL(sim.gross)}{" "}
                 sem desconto)
               </p>
             )}
           </div>
+          {periodLabel && (
+            <div className="border-t border-border pt-3">
+              <p className="text-sm text-muted-foreground">{periodLabel}</p>
+              <p className="text-xl font-bold text-foreground">
+                {formatBRL(sim.total * periodMonths)}
+              </p>
+            </div>
+          )}
           <p className="text-xs text-muted-foreground">
             1º módulo {formatBRL(pricing.preco_base_colaborador)} por
             colaborador/mês · do 2º em diante,{" "}

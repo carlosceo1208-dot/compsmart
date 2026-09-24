@@ -19,8 +19,7 @@ import Nr1ProvaCorrelacao from '@/components/landing/nr1/Nr1ProvaCorrelacao';
 import Nr1Faq, { NR1_FAQ_JSONLD } from '@/components/landing/nr1/Nr1Faq';
 import Nr1GestaoTerceiros from '@/components/landing/nr1/Nr1GestaoTerceiros';
 import Nr1Header from '@/components/landing/nr1/Nr1Header';
-import { PricingSimulator } from '@/components/landing/pivot/PricingSimulator';
-import { usePublicPricing, additionalModulePrice, formatBRL as formatPublicBRL } from '@/hooks/usePublicPricing';
+import { Nr1PublicPricing } from '@/components/landing/nr1/Nr1PublicPricing';
 import { WhatsAppFloat } from '@/components/landing/public/WhatsAppFloat';
 import Nr1Novidades from '@/components/landing/nr1/Nr1Novidades';
 import { z } from 'zod';
@@ -44,7 +43,6 @@ type Step = 'landing' | 'questionario' | 'lead' | 'resultado';
 const formatBRL = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 
 export default function LandingNr1() {
-  const { data: pricing, isLoading: pricingLoading } = usePublicPricing();
   const [step, setStep] = useState<Step>('landing');
   const [respostas, setRespostas] = useState<Record<string, number>>({});
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -141,25 +139,7 @@ export default function LandingNr1() {
             onDiagnostico={() => setStep('questionario')}
           />
 
-           {/* Preços públicos — mesma configuração por colaborador e módulo de /precos. */}
-           <section id="planos" className="container mx-auto px-4 py-14 space-y-8">
-             <div className="max-w-3xl mx-auto text-center space-y-3">
-               <h2 className="text-3xl md:text-4xl font-bold">NR-1: escolha o que sua empresa precisa</h2>
-               <p className="text-muted-foreground">O núcleo legal NR-1 é autônomo. Clima, 9-Box e Remuneração são módulos complementares ativados à parte.</p>
-               {pricing ? (
-                 <p className="font-semibold nr1-text-primary">
-                   A partir de {formatPublicBRL(pricing.preco_base_colaborador)} por colaborador/mês no 1º módulo · adicionais a {formatPublicBRL(additionalModulePrice(pricing))} por colaborador/mês ({pricing.desconto_modulo_adicional_pct}% off) · semestral {pricing.desconto_semestral_pct}% · anual {pricing.desconto_anual_pct}% de desconto
-                 </p>
-               ) : (
-                 <p className="text-sm text-muted-foreground">{pricingLoading ? 'Carregando preços…' : 'Preços temporariamente indisponíveis.'}</p>
-               )}
-             </div>
-             <div className="max-w-4xl mx-auto"><PricingSimulator /></div>
-             <div className="text-center space-y-3">
-               {pricing && <p className="text-sm text-muted-foreground">{pricing.faixas.map((f) => `${f.nome}${f.sob_consulta ? ' · sob consulta' : ` · ${f.min}–${f.max} colaboradores`}`).join('  ·  ')}</p>}
-               <Button variant="outline" onClick={() => navigate('/precos')}>Ver todas as faixas e preços <ArrowRight className="h-4 w-4 ml-2" /></Button>
-             </div>
-           </section>
+           <Nr1PublicPricing />
 
           {/* Faixa de urgência inteligente */}
            <section className="bg-primary/5 border-y border-primary/10 text-foreground">
