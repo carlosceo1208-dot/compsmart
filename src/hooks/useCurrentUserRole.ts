@@ -13,6 +13,7 @@ export const useCurrentUserRole = () => {
           isHR: false, 
           isAdmin: false,
           isSuperAdmin: false,
+          isConsultor: false,
           unitId: null,
           userId: null
         };
