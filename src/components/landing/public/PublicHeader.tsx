@@ -53,7 +53,7 @@ export const PublicHeader = () => {
             />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-5">
             <Link
               to="/"
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
