@@ -57,7 +57,10 @@ serve(async (req) => {
       );
     }
 
-    const { question, pageContext } = await req.json();
+    const { question, pageContext: rawPageContext } = await req.json();
+    const pageContext = typeof rawPageContext === 'string'
+      ? rawPageContext.replace(/[^\p{L}\p{N}\s\/\-_.]/gu, '').slice(0, 80)
+      : '';
 
     if (!question) {
       return new Response(
@@ -528,9 +531,7 @@ Para adicionar mais usuários:
 - Seja objetivo mas amigável
 - Evite respostas muito longas (máximo 200 palavras)
 - Use **negrito** para destacar ações importantes
-- Use listas numeradas para processos sequenciais
-
-Pergunta do usuário: ${question}`;
+- Use listas numeradas para processos sequenciais`;
 
     console.log('[Support Assistant] Calling Lovable AI...');
 

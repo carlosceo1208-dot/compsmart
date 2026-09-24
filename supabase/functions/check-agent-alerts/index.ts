@@ -405,9 +405,9 @@ async function sendAlertEmail(
         subject: `${severityLabels[severity]}: ${title}`,
         html: htmlBody,
       });
-      console.log(`✅ Email sent to ${recipient}`);
+      console.log(`✅ Alert email sent`);
     } catch (error) {
-      console.error(`❌ Failed to send email to ${recipient}:`, error);
+      console.error(`❌ Failed to send alert email:`, error);
     }
   }
 }

@@ -346,7 +346,7 @@ serve(async (req) => {
           html,
         });
 
-        console.log(`Trial reminder sent to ${recipientEmail} (${daysLeft} days left)`);
+        console.log(`Trial reminder sent for company ${company.id} (${daysLeft} days left)`);
         emailsSent++;
         results.push({
           companyId: company.id,
@@ -356,7 +356,7 @@ serve(async (req) => {
           status: 'sent'
         });
       } catch (emailError: any) {
-        console.error(`Failed to send trial email to ${recipientEmail}:`, emailError);
+        console.error(`Failed to send trial email for company ${company.id}:`, emailError);
         results.push({
           companyId: company.id,
           email: recipientEmail,
@@ -426,7 +426,7 @@ serve(async (req) => {
           html,
         });
 
-        console.log(`Grace period reminder sent to ${recipientEmail} (${daysLeft} days until deletion)`);
+        console.log(`Grace period reminder sent for company ${company.id} (${daysLeft} days until deletion)`);
         emailsSent++;
         results.push({
           companyId: company.id,
@@ -436,7 +436,7 @@ serve(async (req) => {
           status: 'sent'
         });
       } catch (emailError: any) {
-        console.error(`Failed to send grace period email to ${recipientEmail}:`, emailError);
+        console.error(`Failed to send grace period email for company ${company.id}:`, emailError);
         results.push({
           companyId: company.id,
           email: recipientEmail,

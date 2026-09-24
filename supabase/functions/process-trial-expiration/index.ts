@@ -226,7 +226,7 @@ serve(async (req) => {
           html,
         });
 
-        console.log(`Expiration email sent to ${recipientEmail}`);
+        console.log(`Expiration email sent for company ${company.id}`);
         emailsSent++;
         results.push({
           companyId: company.id,
@@ -235,7 +235,7 @@ serve(async (req) => {
           emailSent: true
         });
       } catch (emailError: any) {
-        console.error(`Failed to send email to ${recipientEmail}:`, emailError);
+        console.error(`Failed to send expiration email for company ${company.id}:`, emailError);
         results.push({
           companyId: company.id,
           email: recipientEmail,

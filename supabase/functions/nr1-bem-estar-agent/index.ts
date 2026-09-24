@@ -175,6 +175,18 @@ serve(async (req) => {
       });
     }
 
+    // SECURITY: server-side paid entitlement check (module "nr1")
+    {
+      const { data: isSa } = await supabase.rpc("has_role", { _user_id: userData.user.id, _role: "super_admin" });
+      const { data: hasNr1 } = await supabase.rpc("has_module", { _slug: "nr1" });
+      if (!isSa && !hasNr1) {
+        return new Response(JSON.stringify({ error: "Módulo NR-1 não contratado" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const { messages } = await req.json();
     if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
       return new Response(JSON.stringify({ error: "messages inválido (1-50 mensagens)" }), {
@@ -205,8 +217,11 @@ serve(async (req) => {
         messages: [
           { role: "system", content: systemPrompt },
           ...messages.slice(-20).map((m: any) => ({
-            role: ["user", "assistant"].includes(m?.role) ? m.role : "user",
-            content: typeof m?.content === "string" ? m.content.slice(0, 4000) : "",
+            // SECURITY: client-supplied history is never trusted as assistant output.
+            role: "user",
+            content:
+              (m?.role === "assistant" ? "[Mensagem anterior exibida pelo assistente, informada pelo cliente]: " : "") +
+              (typeof m?.content === "string" ? m.content.slice(0, 4000) : ""),
           })),
         ],
         stream: true,

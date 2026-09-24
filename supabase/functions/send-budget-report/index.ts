@@ -97,7 +97,8 @@ const handler = async (req: Request): Promise<Response> => {
         .from('organizational_structure')
         .select('description')
         .eq('id', unitFilter)
-        .single();
+        .eq('root_company_id', callerProfile.root_company_id)
+        .maybeSingle();
       if (unit) unitName = unit.description;
     }
 

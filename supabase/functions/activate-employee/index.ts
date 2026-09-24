@@ -232,8 +232,9 @@ serve(async (req) => {
     // If the profile already has a registered email, the activation email MUST match it.
     // Prevents an attacker who knows employee_number/CPF from claiming the account
     // with an arbitrary email of their choice.
-    if (profile.email && profile.email.toLowerCase().trim() !== email) {
-      console.warn('Activation email mismatch - blocking takeover attempt');
+    // SECURITY: activation requires an email pre-registered by HR/admin, and it must match.
+    if (!profile.email || profile.email.toLowerCase().trim() !== email) {
+      console.warn('Activation blocked: missing or mismatched pre-registered email');
       return new Response(JSON.stringify({
         success: false,
         error: GENERIC_ERROR
@@ -356,13 +357,16 @@ serve(async (req) => {
           .select('role')
           .eq('user_id', profile.id);
 
-        if (oldRoles && oldRoles.length > 0) {
-          for (const roleData of oldRoles) {
-            await supabase.from('user_roles').insert({
-              user_id: authData.user.id,
-              role: roleData.role
-            });
-          }
+        // SECURITY: self-activation never carries privileged roles; only
+        // non-privileged roles are copied. Elevated roles must be granted by an admin.
+        const SELF_ACTIVATION_ROLES = new Set(['employee', 'manager']);
+        const safeRoles = (oldRoles ?? []).filter((r: any) => SELF_ACTIVATION_ROLES.has(r.role));
+        if (safeRoles.length === 0) safeRoles.push({ role: 'employee' } as any);
+        for (const roleData of safeRoles) {
+          await supabase.from('user_roles').insert({
+            user_id: authData.user.id,
+            role: roleData.role
+          });
         }
 
         // Delete old profile (without Auth)
