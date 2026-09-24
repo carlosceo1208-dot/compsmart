@@ -28,6 +28,7 @@ import { useNr1Questoes } from '@/hooks/useNr1';
 
 import { calcRisco, RISCO_CLASS, RISCO_LABEL, RESPOSTA_OPCOES } from '@/lib/nr1';
 import { toast } from '@/hooks/use-toast';
+import imagemEquipe from '@/assets/imagem-e-equipe.png.asset.json';
 
 const leadSchema = z.object({
   nome: z.string().trim().min(2).max(120),
@@ -213,6 +214,21 @@ export default function LandingNr1() {
                   <ProposalForm />
                 </CardContent>
               </Card>
+            </div>
+          </section>
+
+          <section className="container mx-auto px-4 pb-4">
+            <div className="relative mx-auto aspect-video max-h-[430px] max-w-6xl overflow-hidden rounded-2xl shadow-md">
+              <img src={imagemEquipe.url} alt="Equipe de RH trabalhando com tecnologia" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-y-0 left-0 w-full bg-foreground/70 md:w-3/5" aria-hidden="true" />
+              <div className="relative z-10 flex h-full max-w-2xl flex-col items-start justify-center gap-5 p-6 text-background sm:p-10 md:p-14">
+                <h2 className="text-2xl font-bold md:text-4xl">
+                  Você não precisa fazer isso sozinho. Diagnóstico, plano de ação e acompanhamento com a CompSmart.
+                </h2>
+                <Button size="lg" variant="secondary" onClick={() => setStep('questionario')}>
+                  Diagnóstico grátis NR-1 <ArrowRight className="ml-1.5 h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </section>
 

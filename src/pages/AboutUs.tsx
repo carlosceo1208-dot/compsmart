@@ -7,6 +7,7 @@ import { ImageSlot } from "@/components/landing/public/ImageSlot";
 import fotoJosue from "@/assets/socio-josue.png.asset.json";
 import fotoCarlos from "@/assets/socio-carlos.png.asset.json";
 import fotoFernando from "@/assets/socio-fernando.png.asset.json";
+import imagemReuniao from "@/assets/imagem-a-reuniao.png.asset.json";
 
 interface Socio {
   nome: string;
@@ -96,7 +97,12 @@ const AboutUs = () => (
             apoiada por dashboards e agentes de IA dedicados a cada processo.
           </p>
         </div>
-        <ImageSlot label="Imagem A" alt="Reunião consultiva da equipe CompSmart" />
+        <ImageSlot
+          src={imagemReuniao.url}
+          label="Imagem A"
+          alt="Reunião consultiva da equipe CompSmart"
+          className="rounded-[20px] shadow-md"
+        />
       </div>
     </section>
 
@@ -107,7 +113,7 @@ const AboutUs = () => (
           {SOCIOS.map((s) => (
             <Card key={s.nome} className="rounded-2xl border-primary/20">
               <CardContent className="p-6 flex flex-col items-center text-center gap-3 h-full">
-                <div className="h-28 w-28 aspect-square rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center">
+                <div className="h-32 w-32 shrink-0 overflow-hidden rounded-full">
                   {s.foto ? (
                     <img src={s.foto} alt={`Foto de ${s.nome}`} loading="lazy" className="h-full w-full object-cover object-center" />
                   ) : (

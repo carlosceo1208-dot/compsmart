@@ -13,3 +13,4 @@
 - [x] Exibir o seletor de tema compacto, somente com ícones, nos cabeçalhos principal e NR-1.
 
 - [x] Quem Somos: card Nossa História, bio Josué, fotos reais dos sócios
+- [x] Aplicar as sete imagens reais nas páginas públicas e padronizar os retratos dos sócios

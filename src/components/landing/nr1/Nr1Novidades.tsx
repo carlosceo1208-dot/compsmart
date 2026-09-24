@@ -1,4 +1,5 @@
 import { Sparkles, MessageSquareHeart, Smile, Network, Stethoscope } from 'lucide-react';
+import imagemBemEstar from '@/assets/nr1-bem-estar.png.asset.json';
 
 const NOVIDADES = [
   {
@@ -74,6 +75,13 @@ export default function Nr1Novidades() {
                     key={nv.n}
                     className="group rounded-lg border border-border p-6 hover:border-primary/40 hover:shadow-md transition-all bg-background"
                   >
+                    {nv.title === 'Check-Up do Colaborador' && (
+                      <img
+                        src={imagemBemEstar.url}
+                        alt="Roda de conversa sobre o bem-estar dos colaboradores"
+                        className="mb-5 aspect-video w-full rounded-2xl object-cover shadow-sm"
+                      />
+                    )}
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-11 h-11 bg-primary/10 rounded-lg flex items-center justify-center">
                         <Icon className="w-5 h-5 text-primary" />

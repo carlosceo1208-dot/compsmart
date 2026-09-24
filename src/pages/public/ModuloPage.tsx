@@ -7,11 +7,14 @@ import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
 import { LANDING_MODULES } from "@/config/landingModules";
 import { ImageSlot } from "@/components/landing/public/ImageSlot";
+import imagemDashboard from "@/assets/imagem-b-dashboard.png.asset.json";
+import imagemClima from "@/assets/imagem-c-clima.png.asset.json";
+import imagemConsultores from "@/assets/imagem-d-consultores.png.asset.json";
 
 const MODULE_IMAGES: Record<string, { label: string; alt: string; src?: string }> = {
-  "/modulos/core": { label: "Imagem B", alt: "Profissional analisando dashboard de remuneração" },
-  "/modulos/clima": { label: "Imagem C", alt: "Sessão de clima e feedback com equipe" },
-  "/modulos/rh-service": { label: "Imagem D", alt: "Consultores seniores em mentoria" },
+  "/modulos/core": { label: "Imagem B", alt: "Profissional analisando dashboard de remuneração", src: imagemDashboard.url },
+  "/modulos/clima": { label: "Imagem C", alt: "Sessão de clima e feedback com equipe", src: imagemClima.url },
+  "/modulos/rh-service": { label: "Imagem D", alt: "Consultores seniores em mentoria", src: imagemConsultores.url },
 };
 
 const ModuloPage = () => {
@@ -70,7 +73,7 @@ const ModuloPage = () => {
       {MODULE_IMAGES[modulo.route] && (
         <section className="pt-14 bg-background">
           <div className="container mx-auto px-4 max-w-4xl">
-            <ImageSlot {...MODULE_IMAGES[modulo.route]} />
+            <ImageSlot {...MODULE_IMAGES[modulo.route]} className="rounded-2xl shadow-md" />
           </div>
         </section>
       )}
