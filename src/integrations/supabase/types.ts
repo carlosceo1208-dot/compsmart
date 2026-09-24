@@ -11098,6 +11098,10 @@ export type Database = {
           total_cost: number
         }[]
       }
+      capture_ebook_lead: {
+        Args: { _email: string; _nome: string; _origem: string }
+        Returns: boolean
+      }
       check_budget_capacity: {
         Args: {
           p_amount_annual: number
