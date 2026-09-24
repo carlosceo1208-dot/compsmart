@@ -16,3 +16,4 @@
 - [x] Aplicar as sete imagens reais nas páginas públicas e padronizar os retratos dos sócios
 - [x] Reposicionar imagens da Home e NR-1 e substituir as fotos de Nossa História e Parceiros
 - [x] Aplicar o símbolo temático na Home, em Materiais e no favicon
+- [x] Funil de download do e-book Remuneração Estratégica em /materiais (com ajustes de validação)
