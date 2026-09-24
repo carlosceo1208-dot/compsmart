@@ -6,7 +6,7 @@ import imagemEquipe from "@/assets/imagem-e-equipe.png.asset.json";
 
 export const PreFooterCTA = () => (
   <section className="bg-background px-4 py-14">
-    <div className="relative mx-auto aspect-video max-h-[520px] max-w-6xl overflow-hidden rounded-2xl shadow-md">
+    <div className="relative mx-auto min-h-[430px] max-w-6xl overflow-hidden rounded-2xl shadow-md sm:min-h-[380px] md:aspect-video md:min-h-0 md:max-h-[520px]">
       <img
         src={imagemEquipe.url}
         alt="Equipe de RH trabalhando com tecnologia"
