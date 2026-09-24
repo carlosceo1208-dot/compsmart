@@ -7,7 +7,7 @@ import { ImageSlot } from "@/components/landing/public/ImageSlot";
 import fotoJosue from "@/assets/socio-josue.png.asset.json";
 import fotoCarlos from "@/assets/socio-carlos.png.asset.json";
 import fotoFernando from "@/assets/socio-fernando.png.asset.json";
-import imagemHistoria from "@/assets/historia-consultoria-executiva.png.asset.json";
+import imagemHistoria from "@/assets/historia-executivos.png.asset.json";
 
 interface Socio {
   nome: string;
@@ -65,7 +65,7 @@ const AboutUs = () => (
     </section>
 
     <section className="py-14 bg-background">
-      <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center max-w-6xl">
+      <div className="container mx-auto px-4 grid lg:grid-cols-[45%_1fr] gap-10 items-center max-w-6xl">
         <div className="space-y-4 rounded-[20px] border border-primary/15 border-l-4 border-l-primary bg-card text-card-foreground p-6 md:p-8 shadow-[0_4px_20px_hsl(var(--foreground)/0.06)]">
           <div className="flex items-center gap-3">
             <Quote className="h-8 w-8 text-primary shrink-0" aria-hidden="true" />
@@ -100,7 +100,7 @@ const AboutUs = () => (
         <ImageSlot
           src={imagemHistoria.url}
           label="Imagem A"
-          alt="Mesa de consultoria executiva com planilhas, documentos e indicadores"
+          alt="Três executivos de costas observando o horizonte pela vidraça de uma sala de reunião ao entardecer"
           className="rounded-[20px] shadow-md"
         />
       </div>
