@@ -11,3 +11,5 @@
 - [x] Ajuste aprovado: detalhe do diagnóstico com práticas, níveis, módulos recomendados e justificativa.
 - [x] Alinhar o pricing público de /nr1 à regra per capita de /precos e validar o seletor Normal/Dark nos headers públicos.
 - [x] Exibir o seletor de tema compacto, somente com ícones, nos cabeçalhos principal e NR-1.
+
+- [x] Quem Somos: card Nossa História, bio Josué, fotos reais dos sócios
