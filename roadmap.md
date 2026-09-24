@@ -10,3 +10,4 @@
 - [x] Ajuste aprovado: papel consultor reconhecido apenas no RH Service (helper local isRhServiceEditor).
 - [x] Ajuste aprovado: detalhe do diagnóstico com práticas, níveis, módulos recomendados e justificativa.
 - [x] Alinhar o pricing público de /nr1 à regra per capita de /precos e validar o seletor Normal/Dark nos headers públicos.
+- [x] Exibir o seletor de tema compacto, somente com ícones, nos cabeçalhos principal e NR-1.

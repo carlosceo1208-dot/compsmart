@@ -139,7 +139,7 @@ export const PublicHeader = () => {
                 Entrar
               </Button>
             )}
-            <PublicThemeToggle className="hidden xl:inline-flex" />
+            <PublicThemeToggle className="shrink-0" />
             <DemoDialog
               triggerLabel="Agendar demonstração"
               size="sm"

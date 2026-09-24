@@ -23,30 +23,32 @@ export function PublicThemeToggle({ className }: PublicThemeToggleProps) {
       <Button
         type="button"
         variant="ghost"
-        size="sm"
+        size="icon"
         className={cn(
-          "h-8 gap-1.5 px-2.5 shadow-none hover:translate-y-0 hover:shadow-none",
+          "h-8 w-8 shadow-none hover:translate-y-0 hover:shadow-none",
           !isDark ? "bg-primary/10 text-primary" : "text-muted-foreground",
         )}
         onClick={() => setTheme("light")}
         aria-pressed={!isDark}
+        aria-label="Usar fundo normal"
+        title="Fundo normal"
       >
         <Sun className="h-3.5 w-3.5" />
-        Normal
       </Button>
       <Button
         type="button"
         variant="ghost"
-        size="sm"
+        size="icon"
         className={cn(
-          "h-8 gap-1.5 px-2.5 shadow-none hover:translate-y-0 hover:shadow-none",
+          "h-8 w-8 shadow-none hover:translate-y-0 hover:shadow-none",
           isDark ? "bg-primary/10 text-primary" : "text-muted-foreground",
         )}
         onClick={() => setTheme("dark")}
         aria-pressed={isDark}
+        aria-label="Usar fundo escuro"
+        title="Fundo escuro"
       >
         <Moon className="h-3.5 w-3.5" />
-        Dark
       </Button>
     </div>
   );
