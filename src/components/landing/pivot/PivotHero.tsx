@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Sparkles, Download, ShieldCheck, HeartHandshake, Grid3X3, Wallet } from "lucide-react";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
+import simboloCrescimento from "@/assets/simbolo-crescimento.png.asset.json";
 
 const CRUZAMENTO = [
   { label: "NR-1", icon: ShieldCheck },
@@ -20,10 +21,17 @@ export const PivotHero = () => (
           Gestão Estratégica de Pessoas
         </Badge>
 
-        <h1 className="text-3xl md:text-5xl font-bold leading-tight">
-          Decisões de pessoas com{" "}
-          <span className="text-primary">dados e inteligência artificial</span>
-        </h1>
+        <div className="flex flex-col items-center justify-center gap-5 md:flex-row md:gap-7">
+          <img
+            src={simboloCrescimento.url}
+            alt="Símbolo de crescimento estratégico"
+            className="size-36 shrink-0 rounded-2xl object-cover shadow-sm md:size-40"
+          />
+          <h1 className="max-w-xl text-center text-3xl font-bold leading-tight md:text-left md:text-5xl">
+            Decisões de pessoas com{" "}
+            <span className="text-primary">dados e inteligência artificial</span>
+          </h1>
+        </div>
 
         <p className="text-base md:text-lg text-muted-foreground">
           Nove módulos independentes, cada um com um agente de IA dedicado, que
