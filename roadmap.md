@@ -9,3 +9,4 @@
 - [x] Etapa 3.5: página /rh-service com abas Consultores, Projetos, Horas e Diagnósticos, ligada ao card do dashboard.
 - [x] Ajuste aprovado: papel consultor reconhecido apenas no RH Service (helper local isRhServiceEditor).
 - [x] Ajuste aprovado: detalhe do diagnóstico com práticas, níveis, módulos recomendados e justificativa.
+- [x] Alinhar o pricing público de /nr1 à regra per capita de /precos e validar o seletor Normal/Dark nos headers públicos.

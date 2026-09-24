@@ -11,6 +11,7 @@ import {
 import { LANDING_MODULES } from "@/config/landingModules";
 import { supabase } from "@/integrations/supabase/client";
 import { DemoDialog } from "./DemoDialog";
+import { PublicThemeToggle } from "./PublicThemeToggle";
 
 const LINKS = [
   { label: "Home", to: "/" },
@@ -138,6 +139,7 @@ export const PublicHeader = () => {
                 Entrar
               </Button>
             )}
+            <PublicThemeToggle className="hidden xl:inline-flex" />
             <DemoDialog
               triggerLabel="Agendar demonstração"
               size="sm"
@@ -197,6 +199,7 @@ export const PublicHeader = () => {
               </Link>
             </div>
             <div className="pt-3">
+              <PublicThemeToggle className="mb-3" />
               <DemoDialog triggerLabel="Agendar demonstração" className="w-full" />
             </div>
           </nav>
