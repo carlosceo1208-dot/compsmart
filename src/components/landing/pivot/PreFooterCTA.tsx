@@ -2,8 +2,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
 
 export const PreFooterCTA = () => (
+  <>
+  <section className="pt-14 pb-10 bg-background">
+    <div className="container mx-auto px-4 max-w-4xl">
+      <ImageSlot label="Imagem E" alt="Equipe de RH trabalhando com tecnologia" />
+    </div>
+  </section>
   <section className="py-16 md:py-20 bg-primary">
     <div className="container mx-auto px-4">
       <div className="max-w-3xl mx-auto text-center space-y-5 text-primary-foreground">
@@ -31,4 +38,5 @@ export const PreFooterCTA = () => (
       </div>
     </div>
   </section>
+  </>
 );

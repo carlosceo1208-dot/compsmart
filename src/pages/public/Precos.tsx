@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Check, Mail, Loader2 } from "lucide-react";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { PricingSimulator } from "@/components/landing/pivot/PricingSimulator";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
@@ -152,6 +153,11 @@ const Precos = () => {
       </section>
 
       <PivotFAQSection />
+    <section className="py-14 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <ImageSlot label="Imagem E" alt="Equipe de RH trabalhando com tecnologia" />
+        </div>
+      </section>
     </PublicLayout>
   );
 };

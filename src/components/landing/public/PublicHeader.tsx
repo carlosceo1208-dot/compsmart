@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronDown, LayoutDashboard } from "lucide-react";
+import { Menu, X, ChevronDown, LayoutDashboard, ShieldCheck, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,7 +16,8 @@ const LINKS = [
   { label: "Home", to: "/" },
   { label: "NR-1", to: "/nr1" },
   { label: "Preços", to: "/precos" },
-  { label: "Parceiros", to: "/parceiros" },
+  { label: "Quem Somos", to: "/sobre-nos" },
+  { label: "Seja Parceiro", to: "/parceiros" },
   { label: "Materiais", to: "/materiais" },
   { label: "Contato", to: "/contato" },
 ];
@@ -52,7 +53,7 @@ export const PublicHeader = () => {
             />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-3 xl:gap-5">
             <Link
               to="/"
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -62,8 +63,9 @@ export const PublicHeader = () => {
 
             <Link
               to="/nr1"
-              className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+              className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 gap-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
             >
+              <ShieldCheck className="h-4 w-4" />
               NR-1
             </Link>
 
@@ -92,7 +94,26 @@ export const PublicHeader = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {LINKS.slice(2).map((l) => (
+            <Link
+              to="/precos"
+              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              Preços
+            </Link>
+            <Link
+              to="/sobre-nos"
+              className="text-sm font-semibold text-foreground hover:text-primary hover:underline underline-offset-4 transition-colors"
+            >
+              Quem Somos
+            </Link>
+            <Link
+              to="/parceiros"
+              className="inline-flex items-center gap-1.5 rounded-md border-2 border-emerald-600 px-3 py-1 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
+            >
+              <Handshake className="h-4 w-4" />
+              Seja Parceiro
+            </Link>
+            {LINKS.slice(5).map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -111,7 +132,7 @@ export const PublicHeader = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="border border-border bg-transparent text-foreground hover:bg-primary/5 hover:border-primary/40"
+                className="border-2 border-foreground bg-transparent text-foreground hover:bg-muted"
                 onClick={() => navigate("/auth")}
               >
                 Entrar
@@ -136,7 +157,7 @@ export const PublicHeader = () => {
 
         {open && (
           <nav className="lg:hidden pb-5 pt-2 flex flex-col gap-1 border-t border-border/60">
-            {LINKS.map((l) => (
+            {LINKS.slice(0, 2).map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
@@ -160,6 +181,21 @@ export const PublicHeader = () => {
                 {m.nomeCurto}
               </Link>
             ))}
+            <div className="border-t border-border/60 mt-2 pt-2 flex flex-col">
+              {LINKS.slice(2).map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  onClick={() => setOpen(false)}
+                  className="py-2.5 text-sm font-medium text-muted-foreground hover:text-primary"
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <Link to="/auth" onClick={() => setOpen(false)} className="py-2.5 text-sm font-medium text-foreground">
+                Entrar
+              </Link>
+            </div>
             <div className="pt-3">
               <DemoDialog triggerLabel="Agendar demonstração" className="w-full" />
             </div>

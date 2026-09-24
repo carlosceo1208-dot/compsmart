@@ -6,6 +6,13 @@ import { Bot, Check, ArrowRight, Link2, Download } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
 import { LANDING_MODULES } from "@/config/landingModules";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
+
+const MODULE_IMAGES: Record<string, { label: string; alt: string; src?: string }> = {
+  "/modulos/core": { label: "Imagem B", alt: "Profissional analisando dashboard de remuneração" },
+  "/modulos/clima": { label: "Imagem C", alt: "Sessão de clima e feedback com equipe" },
+  "/modulos/rh-service": { label: "Imagem D", alt: "Consultores seniores em mentoria" },
+};
 
 const ModuloPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -59,6 +66,14 @@ const ModuloPage = () => {
           </div>
         </div>
       </section>
+
+      {MODULE_IMAGES[modulo.route] && (
+        <section className="pt-14 bg-background">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <ImageSlot {...MODULE_IMAGES[modulo.route]} />
+          </div>
+        </section>
+      )}
 
       <section className="py-14 bg-background">
         <div className="container mx-auto px-4">
