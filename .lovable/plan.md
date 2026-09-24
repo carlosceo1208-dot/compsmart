@@ -12,8 +12,16 @@ Substituir pelo texto enviado, exatamente:
 "Psicólogo, Executivo com sólida carreira em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: o equilíbrio entre resultados robustos e a preservação da energia humana."
 Nome, cargo e botão do LinkedIn sem alteração.
 
-## 3. Conferência
+## 3. Fotos reais dos sócios
+Trocar as iniciais pelas fotos enviadas, em círculo 1:1 com corte centralizado no rosto:
+- 1ª foto: Josué Cruz
+- 2ª foto: Carlos Eduardo
+- 3ª foto: Fernando Curral
+A ordem dos cards continua a mesma: Carlos, Fernando, Josué.
+
+## 4. Conferência
 Capturas de tela em desktop e celular, nos temas claro e escuro, checando contraste do card.
 
 ## Detalhes técnicos
 - Arquivo: src/pages/AboutUs.tsx. Cores via tokens (bg-card, border-primary/15, border-l-primary), ícone Quote do lucide.
+- Fotos enviadas pelo CDN (lovable-assets): image-27 = Josué, image-28 = Carlos, image-29 = Fernando; preenchem o campo `foto` de cada sócio. Adicionar a tarefa em roadmap.md.
