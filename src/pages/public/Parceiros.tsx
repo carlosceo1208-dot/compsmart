@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Handshake, Percent, BriefcaseBusiness, Check } from "lucide-react";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { LeadForm } from "@/components/landing/public/LeadForm";
 
@@ -107,7 +108,12 @@ const Parceiros = () => (
         </Card>
       </div>
     </section>
-  </PublicLayout>
+  <section className="py-14 bg-background">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <ImageSlot label="Imagem D" alt="Consultores seniores em mentoria" />
+        </div>
+      </section>
+    </PublicLayout>
 );
 
 export default Parceiros;

@@ -1,114 +1,158 @@
-import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Linkedin, Mail, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import compsmartLogo from "@/assets/compsmart-logo.png";
-import { useAuthCTA } from "@/hooks/useAuthCTA";
+import { Card, CardContent } from "@/components/ui/card";
+import { PublicLayout } from "@/components/landing/public/PublicLayout";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
 
-const AboutUs = () => {
-  const { ctaTo, ctaLabel } = useAuthCTA();
-  return (
-    <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Sobre Nós — CompSmart | Remuneração + NR-1</title>
-        <meta name="description" content="Conheça a CompSmart: plataforma criada por executivos de RH para gestão estratégica de remuneração, desempenho e NR-1 orientada por dados." />
-        <link rel="canonical" href="https://www.compsmart.ia.br/sobre-nos" />
-        <meta property="og:title" content="Sobre Nós — CompSmart" />
-        <meta property="og:description" content="Quem somos, nossa experiência executiva em RH e a visão por trás da plataforma CompSmart." />
-        <meta property="og:url" content="https://www.compsmart.ia.br/sobre-nos" />
-        <meta name="twitter:title" content="Sobre Nós — CompSmart" />
-        <meta name="twitter:description" content="A história e a equipe por trás da plataforma CompSmart de remuneração estratégica." />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'AboutPage',
-            name: 'Sobre a CompSmart',
-            url: 'https://www.compsmart.ia.br/sobre-nos',
-            about: { '@type': 'Organization', name: 'CompSmart', url: 'https://www.compsmart.ia.br' },
-          })}
-        </script>
-      </Helmet>
-      {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <img src={compsmartLogo} alt="CompSmart" className="h-10 w-auto" />
-            </Link>
-            <Button variant="ghost" asChild>
-              <Link to="/" className="flex items-center gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Voltar
-              </Link>
-            </Button>
-          </div>
+interface Socio {
+  nome: string;
+  iniciais: string;
+  cargo: string;
+  bio: string;
+  linkedin: string;
+  foto?: string;
+}
+
+const SOCIOS: Socio[] = [
+  {
+    nome: "Carlos Eduardo",
+    iniciais: "CE",
+    cargo: "CEO & Fundador",
+    bio: "Administrador de Empresas com MBA pela USP, expert e estrategista em gestão de pessoas, coach, mentor e orientador de carreira. Mais de 30 anos de experiência executiva em RH e Operações; pioneiro em benefícios flexíveis e práticas de remuneração — lidera a CompSmart como CEO & Fundador.",
+    linkedin: "https://www.linkedin.com/in/ceocarloseduardooliveira/",
+  },
+  {
+    nome: "Fernando Curral",
+    iniciais: "FC",
+    cargo: "Sócio — Psicologia Organizacional & Bem-Estar",
+    bio: "Psicólogo com mestrado em RH pela FMU e especializações em Psicologia da Saúde, Gestão do Stress e Burnout (UnG) e Ciências Endocrinológicas (UNIFESP). Há mais de 25 anos une a prática clínica à atuação organizacional, avaliando e planejando pessoas em empresas nacionais e multinacionais.",
+    linkedin: "https://www.linkedin.com/in/fernando-curral-7a89045/",
+  },
+  {
+    nome: "Josué Cruz",
+    iniciais: "JC",
+    cargo: "Sócio — Estratégia de Pessoas & Performance",
+    bio: "Executivo com carreira sólida em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: equilíbrio entre resultados robustos e preservação da energia humana.",
+    linkedin: "https://www.linkedin.com/in/josuecruz-rh/",
+  },
+];
+
+const AboutUs = () => (
+  <PublicLayout
+    title="Quem Somos — CompSmart | Gestão Estratégica de Pessoas"
+    description="Josué Cruz, Fernando Curral e Carlos Eduardo: décadas de experiência em RH unidas na CompSmart, parceira tecnológica de gestão estratégica de pessoas."
+    path="/sobre-nos"
+  >
+    <section className="py-16 md:py-20 bg-gradient-to-br from-background via-primary/5 to-muted/40">
+      <div className="container mx-auto px-4 max-w-3xl text-center space-y-5">
+        <p className="text-xs font-semibold tracking-[0.2em] text-primary">QUEM SOMOS</p>
+        <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+          Três amigos — J F C. Décadas de estrada. Um propósito em comum.
+        </h1>
+        <p className="text-base md:text-lg text-muted-foreground">
+          Josué Cruz, Fernando Curral e Carlos Eduardo construíram a CompSmart para ser o
+          parceiro tecnológico que sempre sentiram falta no RH.
+        </p>
+      </div>
+    </section>
+
+    <section className="py-14 bg-background">
+      <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-10 items-center max-w-6xl">
+        <div className="space-y-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Nossa História</h2>
+          <p className="text-muted-foreground leading-relaxed">
+            Josué Cruz, Fernando Curral e Carlos Eduardo se conhecem de longa data. Cada um
+            construiu uma carreira sólida no mundo corporativo — em empresas nacionais e
+            multinacionais, de diferentes segmentos e portes — e também do outro lado da mesa,
+            atuando como consultores. Fusões, reestruturações, gestão de pessoas, operações e
+            diversos negócios: experiências complementares, acumuladas por décadas, que não se
+            aprendem em sala de aula.
+          </p>
+          <p className="text-muted-foreground leading-relaxed">
+            Foi desse reencontro que nasceu a CompSmart Tecnologia e Serviços de RH. Nós não
+            queríamos criar mais um software burocrático que o RH "precisa usar". Queríamos
+            construir o parceiro tecnológico que sempre sentimos falta: uma plataforma que
+            automatiza o operacional, cruza dados e devolve inteligência — para que o RH saia da
+            função de apagar incêndio e ocupe o papel de estrategista do negócio.
+          </p>
+          <p className="text-muted-foreground leading-relaxed">
+            Por isso, a CompSmart nasce com um ecossistema completo de gestão estratégica de
+            pessoas: remuneração e estrutura de cargos, inteligência de mercado, descrição e match
+            de cargos, pesquisa salarial, controle orçamentário, avaliação de desempenho, clima
+            organizacional, riscos psicossociais (NR-1), seleção e aquisição de talentos, trilhas
+            de desenvolvimento e matriz de potencial — tudo conectado em uma única plataforma,
+            apoiada por dashboards e agentes de IA dedicados a cada processo.
+          </p>
         </div>
-      </header>
+        <ImageSlot label="Imagem A" alt="Reunião consultiva da equipe CompSmart" />
+      </div>
+    </section>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-8 text-foreground">Sobre Nós</h1>
-        
-        <div className="prose prose-lg dark:prose-invert max-w-none space-y-6">
-          <section className="bg-card border border-border rounded-xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Nossa Plataforma</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              A CompSmart é uma plataforma desenvolvida para apoiar empresas na gestão estratégica de remuneração, 
-              elevando o nível de governança, eficiência e consistência dos processos. Nosso objetivo é transformar 
-              rotinas tradicionalmente manuais — como revisão salarial, estrutura de cargos, faixas salariais, 
-              planejamento orçamentário de salários e headcount — em uma operação padronizada, rastreável, auditável 
-              e orientada por dados.
-            </p>
-          </section>
-
-          <section className="bg-card border border-border rounded-xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Nossa Experiência</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              A solução foi criada por profissionais com ampla experiência executiva em RH e Operações, com atuação 
-              em organizações multinacionais e nacionais e vivência prática em transformação organizacional, programas 
-              de eficiência, modelos de Remuneração, Benefícios e Governança de indicadores. Essa experiência foi 
-              construída ao longo do tempo "no campo", acompanhando de perto a pressão real de ciclos de orçamento 
-              e decisões críticas sobre profissionais, talentos, carreira — e por isso a CompSmart foi desenhada para 
-              ser simples de operar, rápida na análise e confiável na tomada de decisão.
-            </p>
-          </section>
-
-          <section className="bg-card border border-border rounded-xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Inteligência Artificial</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              A CompSmart incorpora Inteligência Artificial para apoiar o time na organização e interpretação das 
-              informações, reduzindo o esforço operacional e liberando energia para o que realmente importa: decisões 
-              estratégicas, equidade interna, competitividade de mercado e sustentabilidade orçamentária.
-            </p>
-          </section>
-
-          <section className="bg-card border border-border rounded-xl p-8 shadow-sm">
-            <h2 className="text-2xl font-semibold mb-4 text-foreground">Benefícios e Segurança</h2>
-            <p className="text-muted-foreground leading-relaxed">
-              Com a CompSmart, sua empresa ganha padronização, análises inteligentes e uma visão clara do impacto 
-              financeiro das decisões de remuneração, com dados que fazem sentido para Executivos de RH, CEOs, 
-              Finanças. Tudo isso com atenção rigorosa à segurança e à confidencialidade de informações sensíveis, 
-              reforçando credibilidade e confiança no processo do início ao fim.
-            </p>
-          </section>
+    <section className="py-14 bg-muted/30">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">Os Sócios</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {SOCIOS.map((s) => (
+            <Card key={s.nome} className="rounded-2xl border-primary/20">
+              <CardContent className="p-6 flex flex-col items-center text-center gap-3 h-full">
+                <div className="h-28 w-28 aspect-square rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center">
+                  {s.foto ? (
+                    <img src={s.foto} alt={s.nome} className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-2xl font-semibold text-muted-foreground">{s.iniciais}</span>
+                  )}
+                </div>
+                <a
+                  href={s.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-lg font-semibold hover:text-primary hover:underline"
+                >
+                  {s.nome}
+                </a>
+                <p className="text-sm font-medium text-primary">{s.cargo}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed flex-1">{s.bio}</p>
+                <Button asChild variant="outline" size="sm">
+                  <a href={s.linkedin} target="_blank" rel="noopener noreferrer">
+                    <Linkedin className="h-4 w-4 mr-2" />
+                    Conectar no LinkedIn
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+      </div>
+    </section>
 
-        {/* CTA */}
-        <div className="mt-12 text-center">
+    <section className="py-14 bg-background">
+      <div className="container mx-auto px-4 max-w-3xl text-center space-y-5">
+        <p className="text-lg md:text-xl leading-relaxed">
+          Unimos a solidez de quem viveu o RH na prática por décadas à agilidade de quem acredita
+          em tecnologia. Nossa missão é simples e ousada: tornar a gestão de pessoas mais justa,
+          competitiva e inteligente para empresas de todos os portes.
+        </p>
+        <p className="text-xl md:text-2xl font-semibold text-primary">
+          Essa é a nossa história. E ela só faz sentido se continuar sendo escrita ao seu lado.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
           <Button asChild size="lg">
-            <Link to={ctaTo}>{ctaLabel}</Link>
+            <Link to="/contato">
+              Agende um diagnóstico gratuito
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="link">
+            <a href="mailto:contato@compsmart.ia.br">
+              <Mail className="h-4 w-4 mr-2" />
+              Fale com a CompSmart
+            </a>
           </Button>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border py-8 mt-12">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} CompSmart. Todos os direitos reservados.
-        </div>
-      </footer>
-    </div>
-  );
-};
+      </div>
+    </section>
+  </PublicLayout>
+);
 
 export default AboutUs;

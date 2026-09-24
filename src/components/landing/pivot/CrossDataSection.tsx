@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Flame, ShieldAlert } from "lucide-react";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
 
 const EXEMPLOS = [
   {
@@ -41,6 +42,9 @@ export const CrossDataSection = () => (
             </CardContent>
           </Card>
         ))}
+      </div>
+      <div className="max-w-4xl mx-auto mt-8">
+        <ImageSlot label="Imagem A" alt="Reunião consultiva de RH com equipe diversa" />
       </div>
     </div>
   </section>
