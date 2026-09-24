@@ -109,7 +109,7 @@ const AboutUs = () => (
               <CardContent className="p-6 flex flex-col items-center text-center gap-3 h-full">
                 <div className="h-28 w-28 aspect-square rounded-full overflow-hidden bg-muted border border-border flex items-center justify-center">
                   {s.foto ? (
-                    <img src={s.foto} alt={`Foto de ${s.nome}`} loading="lazy" className="h-full w-full object-cover object-top" />
+                    <img src={s.foto} alt={`Foto de ${s.nome}`} loading="lazy" className="h-full w-full object-cover object-center" />
                   ) : (
                     <span className="text-2xl font-semibold text-muted-foreground">{s.iniciais}</span>
                   )}
