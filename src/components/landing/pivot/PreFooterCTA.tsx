@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
+import { ImageSlot } from "@/components/landing/public/ImageSlot";
 
 export const PreFooterCTA = () => (
   <>
