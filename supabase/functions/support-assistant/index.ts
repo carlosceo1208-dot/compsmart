@@ -57,7 +57,10 @@ serve(async (req) => {
       );
     }
 
-    const { question, pageContext } = await req.json();
+    const { question, pageContext: rawPageContext } = await req.json();
+    const pageContext = typeof rawPageContext === 'string'
+      ? rawPageContext.replace(/[^\p{L}\p{N}\s\/\-_.]/gu, '').slice(0, 80)
+      : '';
 
     if (!question) {
       return new Response(

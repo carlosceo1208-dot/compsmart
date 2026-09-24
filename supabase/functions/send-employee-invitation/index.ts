@@ -401,7 +401,7 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Invitation results: ${results.length} processed`);
+    console.log(`Invitation results: sent=${results.sent.length} no_email=${results.skipped_no_email.length} no_access=${results.skipped_no_access.length} errors=${results.errors.length}`);
 
     return new Response(JSON.stringify({
       success: true,
