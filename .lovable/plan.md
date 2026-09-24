@@ -9,7 +9,7 @@
 
 ## 2. Bio do Josué
 Substituir pelo texto enviado, exatamente:
-"Executivo com sólida carreira em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: o equilíbrio entre resultados robustos e a preservação da energia humana."
+"Psicólogo, Executivo com sólida carreira em Telecomunicações, Indústria, Varejo/Franquias e Serviços Jurídicos. Transita com naturalidade entre a visão estratégica de conselho e a implementação tática, protegendo e impulsionando a performance sustentável por meio das pessoas — pela Vitalidade: o equilíbrio entre resultados robustos e a preservação da energia humana."
 Nome, cargo e botão do LinkedIn sem alteração.
 
 ## 3. Conferência
