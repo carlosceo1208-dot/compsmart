@@ -29,19 +29,25 @@ export const useNewLeadsCount = () => {
 
   useEffect(() => {
     if (!isSuperAdmin) return;
-    const channel = supabase
-      .channel("new-leads-count")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "leads" },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ["new-leads-count"] });
-          queryClient.invalidateQueries({ queryKey: ["admin-leads"] });
-        }
-      )
-      .subscribe();
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    try {
+      const name = `new-leads-count-${Math.random().toString(36).slice(2)}`;
+      channel = supabase
+        .channel(name)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "leads" },
+          () => {
+            queryClient.invalidateQueries({ queryKey: ["new-leads-count"] });
+            queryClient.invalidateQueries({ queryKey: ["admin-leads"] });
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn("Realtime de leads indisponível; usando polling.", e);
+    }
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [isSuperAdmin, queryClient]);
 
