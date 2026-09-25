@@ -80,3 +80,27 @@ export const RESPOSTA_OPCOES = [
 export type Questao = Database['public']['Tables']['nr1_questoes']['Row'];
 export type Diagnostico = Database['public']['Tables']['nr1_diagnosticos']['Row'];
 export type Subscription = Database['public']['Tables']['nr1_subscriptions']['Row'];
+
+/**
+ * Pontuação idêntica à da plataforma (nr1_recompute_scores):
+ * média por dimensão (itens reversos = 4 - v) × 25, depois média das dimensões.
+ */
+export function calcScoreNr1(
+  questoes: Pick<Questao, 'id' | 'dimensao' | 'reverso'>[],
+  respostas: Record<string, number>,
+): { geral: number; dimensoes: Record<string, number> } {
+  const acc: Record<string, { soma: number; n: number }> = {};
+  for (const q of questoes) {
+    const v = respostas[q.id];
+    if (v == null) continue;
+    const d = String(q.dimensao);
+    acc[d] ??= { soma: 0, n: 0 };
+    acc[d].soma += q.reverso ? 4 - v : v;
+    acc[d].n += 1;
+  }
+  const dimensoes: Record<string, number> = {};
+  for (const [d, { soma, n }] of Object.entries(acc)) dimensoes[d] = Math.round((soma / n) * 25 * 100) / 100;
+  const vals = Object.values(dimensoes);
+  const geral = vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) / 100 : 0;
+  return { geral, dimensoes };
+}

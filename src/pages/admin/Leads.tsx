@@ -231,6 +231,8 @@ export default function Leads() {
                 <Field label="Tipo de parceria" value={selected.parceria_tipo} />
                 <Field label="Mensagem / especialidade" value={selected.especialidade} />
                 <Field label="LinkedIn" value={selected.linkedin} />
+                <Field label="Indicador NR-1 (pontuação)" value={(selected as { score_free?: number | null }).score_free?.toString()} />
+                <Field label="Nível de risco" value={(selected as { nivel_risco_free?: string | null }).nivel_risco_free} />
                 <Field label="Consentimento LGPD" value={selected.consentimento_lgpd ? "Sim" : "Não"} />
                 <div className="space-y-1.5">
                   <p className="text-xs text-muted-foreground">Status</p>
