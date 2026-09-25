@@ -11,4 +11,9 @@
 
 ## Validação
 - No preview: abrir /nr1 e conferir o `document.title` depois do carregamento. Também conferir description, og:title e canonical (Playwright).
-- Publicar e depois conferir uma vez: HTML bruto com HTTP 200 e title, description, canonical, og e twitter corretos. Também conferir o título já renderizado no navegador em https://www.compsmart.ia.br/nr1.
+- Publicar e depois seguir estes passos:
+  1. Conferir o HTML bruto especificamente em https://www.compsmart.ia.br/nr1 (`curl -s ... | grep -o "<title>[^<]*</title>"`). O resultado esperado é `<title>NR-1 e Riscos Psicossociais: Diagnóstico COPSOQ | CompSmart</title>`, com HTTP 200.
+  2. Se o title continuar antigo, olhar `dist/nr1/index.html` no build local:
+     - Se o arquivo estiver correto, é cache ou inconsistência entre domínios. Nesse caso, republicar e conferir cada domínio.
+     - Se o arquivo estiver antigo, o gerador não está escrevendo o title da /nr1. Nesse caso, comparar `seoRoutes.ts` com a geração, corrigir e republicar.
+  3. Só então validar no navegador (Playwright), em https://www.compsmart.ia.br/nr1 depois do carregamento: `document.title`, description, og:title e canonical.
