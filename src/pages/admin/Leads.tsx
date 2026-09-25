@@ -221,7 +221,9 @@ export default function Leads() {
                 <Field label="E-mail" value={selected.email} />
                 <Field label="Recebido em" value={formatDateTimePtBR(selected.created_at)} />
                 <Field label="Último interesse" value={formatDateTimePtBR(selected.updated_at)} />
-...
+                <Field label="Origem" value={origemLabel(selected.origem)} />
+                <Field label="Empresa" value={selected.empresa} />
+                <Field label="Cargo" value={selected.cargo} />
                 <Field label="Porte" value={selected.porte} />
                 <Field label="Colaboradores" value={(selected as { colaboradores?: string | null }).colaboradores} />
                 <Field label="Módulo de interesse" value={selected.modulo_interesse} />
