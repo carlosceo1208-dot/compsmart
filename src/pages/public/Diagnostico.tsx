@@ -80,17 +80,11 @@ const Diagnostico = () => {
       toast({ title: "Não foi possível enviar", description: "Tente novamente em instantes.", variant: "destructive" });
       return;
     }
-    await supabase.functions.invoke("send-transactional-email", {
+    await supabase.functions.invoke("send-diagnostico-email", {
       body: {
-        templateName: "diagnostico-resultado",
-        recipientEmail: p.data.email.toLowerCase(),
-        idempotencyKey: `diagnostico-${leadId}-${Date.now()}`,
-        templateData: {
-          nome: p.data.nome.split(" ")[0],
-          score: geral,
-          nivel: RISCO_LABEL[nivel],
-          dimensoes: Object.entries(dimensoes).map(([d, s]) => ({ label: DIMENSAO_LABEL[d as Dimensao] ?? d, score: s })),
-        },
+        leadId,
+        nivel: RISCO_LABEL[nivel],
+        dimensoes: Object.entries(dimensoes).map(([d, s]) => ({ label: DIMENSAO_LABEL[d as Dimensao] ?? d, score: s })),
       },
     }).catch(() => undefined);
     setSending(false);
