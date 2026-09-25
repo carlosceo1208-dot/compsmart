@@ -17,7 +17,10 @@ Nome*, E-mail corporativo*, Porte (Pequena/Média/Grande)*, Colaboradores (até 
 
 ## Envio e e-mail repetido
 - Grava na lista de contatos com origem `diagnostico`, LGPD = sim, status `novo` → aparece em /admin/leads como "Demonstração/Diagnóstico" e "Novo", e acende o aviso do sino.
-- E-mail já existente com origem diagnóstico: não cria outro registro; atualiza porte, colaboradores e módulo, volta o status para `novo` e mostra a mesma confirmação.
+- Os três dados de qualificação ficam salvos: porte e módulo de interesse já têm campo próprio na lista; colaboradores ganha um campo novo. Os três aparecem no detalhe em /admin/leads.
+- E-mail já existente com origem diagnóstico: não cria outro registro; atualiza porte, colaboradores e módulo e mostra a mesma confirmação.
+- Status no reenvio: se o lead está `convertido`, continua `convertido`; em qualquer outro caso (inclusive `descartado`), volta para `novo`.
+- Ordem no painel: o reenvio grava a data de "último interesse". A lista em /admin/leads passa a ordenar pelo último interesse (mais recente primeiro). O detalhe mostra "Recebido em" e "Último interesse".
 
 ## Achado importante (seu lembrete)
 Os dois formulários da /nr1 ("Diagnóstico" origem `landing_nr1` e "Solicite uma proposta personalizada" origem `landing_nr1_proposta`) gravam numa lista SEPARADA de contatos da NR-1, e por isso NÃO aparecem em /admin/leads nem no contador. Proposta: incluir essa lista também no painel de leads (somente leitura dessa lista, marcada como origem "NR-1 Landing" / "NR-1 Proposta"). Posso fazer junto ou deixar para depois — me diga ao aprovar.
@@ -32,6 +35,6 @@ Os dois formulários da /nr1 ("Diagnóstico" origem `landing_nr1` e "Solicite um
 - Lead de teste criado na validação será removido; o lead da Marli não é tocado.
 
 ## Detalhes técnicos
-- Migração: adicionar coluna `colaboradores text` em `leads`; função `SECURITY DEFINER` `submit_diagnostico_lead(...)` com validação de tamanho/e-mail, LGPD obrigatório, upsert por `lower(email)` + origem `diagnostico` (visitante anônimo não consegue ler a tabela, por isso a checagem fica no servidor); `GRANT EXECUTE` para anon/authenticated. Respeita throttle existente.
-- Front: `src/pages/public/Diagnostico.tsx` (zod + react-hook-form, componentes shadcn existentes), rota em `App.tsx` dentro do `PublicLayout`, `useAdminLeads` passa a exibir `colaboradores` no detalhe.
+- Migração: adicionar coluna `colaboradores text` em `leads` (`porte` e `modulo_interesse` já existem); função `SECURITY DEFINER` `submit_diagnostico_lead(...)` com validação de tamanho/e-mail, LGPD obrigatório, upsert por `lower(email)` + origem `diagnostico` (visitante anônimo não consegue ler a tabela, por isso a checagem fica no servidor); no reenvio: `status = CASE WHEN status='convertido' THEN status ELSE 'novo' END`, `updated_at = now()`; `GRANT EXECUTE` para anon/authenticated. Respeita throttle existente.
+- Front: `src/pages/public/Diagnostico.tsx` (zod + react-hook-form, componentes shadcn existentes), rota em `App.tsx` dentro do `PublicLayout`; `useAdminLeads` ordena por `updated_at desc` e o detalhe exibe porte, colaboradores, módulo e "Último interesse". Registrar a nova regra de ordenação em AGENTS.md.
 - Não mexe em app/dashboard, pagamentos, checkout nem outras páginas além da troca de links.
