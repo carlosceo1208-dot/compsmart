@@ -553,6 +553,7 @@ export const DashboardLayout = () => {
             {/* Company Switcher and Notifications - visible on md+ screens */}
             <div className="hidden md:flex items-center gap-1">
               <CompanySwitcher />
+              <HeaderLeadsButton />
               <HeaderNotifications />
             </div>
             
