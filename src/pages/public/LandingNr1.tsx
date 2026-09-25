@@ -103,17 +103,8 @@ export default function LandingNr1() {
   };
 
   useEffect(() => {
-    document.title = 'NR-1 Inteligente — Cruze risco psicossocial com 9Box e remuneração | CompSmart';
-    const setMeta = (name: string, content: string, attr: 'name' | 'property' = 'name') => {
-      let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
-      if (!el) { el = document.createElement('meta'); el.setAttribute(attr, name); document.head.appendChild(el); }
-      el.setAttribute('content', content);
-    };
-    const desc = 'NR-1 como módulo autônomo de gestão de riscos psicossociais. Combine Clima, 9-Box e Remuneração conforme a necessidade do seu RH.';
-    setMeta('description', desc);
-    setMeta('og:title', 'NR-1 Inteligente | CompSmart', 'property');
-    setMeta('og:description', desc, 'property');
-    setMeta('og:type', 'website', 'property');
+    // SEO (title/description/og) comes only from src/config/seoRoutes.ts via SeoHead.
+
 
     // JSON-LD FAQ
     const ldId = 'nr1-faq-jsonld';
