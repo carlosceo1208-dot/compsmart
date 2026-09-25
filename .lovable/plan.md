@@ -26,3 +26,11 @@ Nova página **Leads** em `/admin/leads`, visível somente para super admin (mes
 - Rota adicionada em `App.tsx` junto de `/admin/convidar-socios`; link em `SuperAdminWelcome.tsx`.
 - Resposta via `mailto:`; exportação com o `csvExport.ts` existente.
 - Validação com Playwright como super admin.
+
+## Refinamentos incluídos
+- Antes de criar a restrição, a migração converte qualquer status vazio ou fora da lista para `novo`. É uma proteção para dados antigos.
+- A restrição no banco, o hook e o painel usam exatamente os mesmos valores (`novo`, `em_contato`, `convertido`, `descartado`). Na tela aparecem como Novo, Em contato, Convertido e Descartado.
+- A exportação CSV usa o `csvExport.ts`, que já grava em UTF-8 com BOM (conferido). Assim, acentos como "E-book" e "Em contato" abrem certos no Excel.
+- O botão "Responder" marca o lead como "Em contato" logo no clique. Essa é uma escolha intencional: o link de e-mail não tem como confirmar o envio. Outra opção, registrada em `AGENTS.md`, é mudar o status só à mão.
+- Lead de teste: existe 1 contato com origem E-book Remuneração. Antes de apagar, vou mostrar o nome e o e-mail para você confirmar que é teste.
+- Os novos itens entram no `roadmap.md` quando a implementação começar.
