@@ -74,6 +74,27 @@ export const HeaderNotifications = () => {
           </div>
         ) : (
           <>
+            {/* Leads do site - somente super admin */}
+            {showLeads && (
+              <DropdownMenuItem
+                className="flex items-center gap-3 cursor-pointer p-3"
+                onClick={() => navigate('/admin/leads')}
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                  <Inbox className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Novo lead do site</p>
+                  <p className="text-xs text-muted-foreground">
+                    {newLeads} {newLeads === 1 ? 'contato aguardando retorno' : 'contatos aguardando retorno'}
+                  </p>
+                </div>
+                <Badge className="bg-destructive text-destructive-foreground border-0">
+                  {newLeads}
+                </Badge>
+              </DropdownMenuItem>
+            )}
+
             {/* Kudos - visible to everyone */}
             {unreadKudos > 0 && (
               <DropdownMenuItem 
