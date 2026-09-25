@@ -11188,10 +11188,6 @@ export type Database = {
         }
         Returns: number
       }
-      delete_email: {
-        Args: { message_id: number; queue_name: string }
-        Returns: boolean
-      }
       detect_after_hours_usage: {
         Args: { p_company_id: string; p_threshold: number }
         Returns: {
@@ -11251,14 +11247,9 @@ export type Database = {
           total_count: number
         }[]
       }
-      email_queue_dispatch: { Args: never; Returns: undefined }
       employee_import_can_manage: {
         Args: { _tenant_id: string }
         Returns: boolean
-      }
-      enqueue_email: {
-        Args: { payload: Json; queue_name: string }
-        Returns: number
       }
       escalate_overdue_approvals: {
         Args: never
@@ -11647,15 +11638,6 @@ export type Database = {
         }
         Returns: undefined
       }
-      move_to_dlq: {
-        Args: {
-          dlq_name: string
-          message_id: number
-          payload: Json
-          source_queue: string
-        }
-        Returns: number
-      }
       nr1_calc_risco: {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
@@ -11708,14 +11690,6 @@ export type Database = {
       nr1_template_marcar_uso: {
         Args: { _template_id: string }
         Returns: undefined
-      }
-      read_email_batch: {
-        Args: { batch_size: number; queue_name: string; vt: number }
-        Returns: {
-          message: Json
-          msg_id: number
-          read_ct: number
-        }[]
       }
       recalculate_salary_range_percentages: {
         Args: never
