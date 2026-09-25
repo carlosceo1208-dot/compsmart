@@ -24,7 +24,9 @@ const seoPlugin = () => ({
     const basePath = path.join(dist, "index.html");
     if (!fs.existsSync(basePath)) return;
     const base = fs.readFileSync(basePath, "utf8");
-    for (const r of SEO_ROUTES) {
+    const nr1 = SEO_ROUTES.find((x) => x.path === "/nr1")!;
+    const aliases = ["/modulos/nr1", "/nr1-publico"].map((a) => ({ ...nr1, out: a }));
+    for (const r of [...SEO_ROUTES.map((x) => ({ ...x, out: x.path })), ...aliases]) {
       const url = `${SEO_BASE_URL}${r.path}`;
       const t = esc(r.title), d = esc(r.description);
       const html = base
@@ -36,7 +38,7 @@ const seoPlugin = () => ({
         .replace(/<meta property="og:image" [^>]*>/, `<meta property="og:image" content="${SEO_IMAGE}" />`)
         .replace(/<meta name="twitter:title"[^>]*>/, `<meta name="twitter:title" content="${t}" />`)
         .replace(/<meta name="twitter:description"[^>]*>/, `<meta name="twitter:description" content="${d}" />`);
-      const out = r.path === "/" ? basePath : path.join(dist, r.path.slice(1), "index.html");
+      const out = r.out === "/" ? basePath : path.join(dist, r.out.slice(1), "index.html");
       fs.mkdirSync(path.dirname(out), { recursive: true });
       fs.writeFileSync(out, html);
     }
