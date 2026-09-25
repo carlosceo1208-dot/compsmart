@@ -1,0 +1,2 @@
+UPDATE public.leads SET status = 'novo' WHERE status IS NULL OR status NOT IN ('novo','em_contato','convertido','descartado');
+ALTER TABLE public.leads ADD CONSTRAINT leads_status_check CHECK (status IN ('novo','em_contato','convertido','descartado'));
