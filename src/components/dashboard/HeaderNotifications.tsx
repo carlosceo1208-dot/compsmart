@@ -1,4 +1,5 @@
-import { Bell, FileCheck, AlertTriangle, DollarSign, Award } from 'lucide-react';
+import { Bell, FileCheck, AlertTriangle, DollarSign, Award, Inbox } from 'lucide-react';
+import { useNewLeadsCount } from '@/hooks/useNewLeadsCount';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,18 +19,21 @@ export const HeaderNotifications = () => {
   const navigate = useNavigate();
   const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
   const { pendingApprovals, activeAlerts, pendingAdjustments, unreadKudos, total, isLoading } = useHeaderNotifications();
+  const { isSuperAdmin, newLeads } = useNewLeadsCount();
 
   // Show for everyone if they have unread kudos, otherwise only Admin/HR
   const hasPersonalNotifications = unreadKudos > 0;
   const hasAdminNotifications = pendingApprovals > 0 || activeAlerts > 0 || pendingAdjustments > 0;
   const showAdminNotifications = !roleLoading && (roleData?.isAdmin || roleData?.isHR);
+  const showLeads = isSuperAdmin && newLeads > 0;
 
   // If no notifications at all, don't show the bell for non-admins
-  if (!hasPersonalNotifications && !showAdminNotifications) {
+  if (!hasPersonalNotifications && !showAdminNotifications && !showLeads) {
     return null;
   }
 
-  const hasNotifications = total > 0;
+  const hasNotifications = total + (showLeads ? newLeads : 0) > 0;
+  const badgeTotal = total + (showLeads ? newLeads : 0);
 
   return (
     <DropdownMenu>
@@ -47,7 +51,7 @@ export const HeaderNotifications = () => {
             <Badge 
               className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center p-0 text-xs bg-destructive text-destructive-foreground border-0"
             >
-              {total > 9 ? '9+' : total}
+              {badgeTotal > 9 ? '9+' : badgeTotal}
             </Badge>
           )}
           <span className="sr-only">Notificações</span>
@@ -70,6 +74,27 @@ export const HeaderNotifications = () => {
           </div>
         ) : (
           <>
+            {/* Leads do site - somente super admin */}
+            {showLeads && (
+              <DropdownMenuItem
+                className="flex items-center gap-3 cursor-pointer p-3"
+                onClick={() => navigate('/admin/leads')}
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                  <Inbox className="h-4 w-4 text-red-600 dark:text-red-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Novo lead do site</p>
+                  <p className="text-xs text-muted-foreground">
+                    {newLeads} {newLeads === 1 ? 'contato aguardando retorno' : 'contatos aguardando retorno'}
+                  </p>
+                </div>
+                <Badge className="bg-destructive text-destructive-foreground border-0">
+                  {newLeads}
+                </Badge>
+              </DropdownMenuItem>
+            )}
+
             {/* Kudos - visible to everyone */}
             {unreadKudos > 0 && (
               <DropdownMenuItem 
