@@ -44,6 +44,7 @@ const Field = ({ label, value }: { label: string; value: React.ReactNode }) => (
 
 export default function Leads() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: role, isLoading: roleLoading } = useCurrentUserRole();
   const { hasMFA, isLoading: mfaLoading } = useMFAStatus();
   const { data: leads = [], isLoading } = useAdminLeads();
