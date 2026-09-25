@@ -10,6 +10,7 @@ import { TenureMetricsCard } from '@/components/super-admin/TenureMetricsCard';
 import { FeedbackDashboard } from '@/components/super-admin/FeedbackDashboard';
 import { TelemetryDashboard } from '@/components/super-admin/TelemetryDashboard';
 import { StorageMigrationCard } from '@/components/super-admin/StorageMigrationCard';
+import { LeadsShortcutCard } from '@/components/admin/LeadsShortcutCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
