@@ -57,6 +57,13 @@ export default function Leads() {
     else if (!mfaLoading && !hasMFA) navigate("/auth/mfa-required");
   }, [role, roleLoading, hasMFA, mfaLoading, navigate]);
 
+  // Ao abrir a tela, marca os leads como vistos e zera os avisos vermelhos.
+  useEffect(() => {
+    if (!role?.isSuperAdmin) return;
+    markLeadsAsSeen();
+    queryClient.invalidateQueries({ queryKey: ["new-leads-count"] });
+  }, [role?.isSuperAdmin, queryClient]);
+
   const origens = useMemo(
     () => Array.from(new Set(leads.map((l) => l.origem).filter(Boolean))) as string[],
     [leads],

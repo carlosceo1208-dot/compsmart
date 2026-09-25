@@ -3,8 +3,28 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
+const LAST_SEEN_KEY = "leads_last_seen_at";
+
+const getLastSeen = (): string | null => {
+  try {
+    return localStorage.getItem(LAST_SEEN_KEY);
+  } catch {
+    return null;
+  }
+};
+
+/** Marca os leads como vistos: zera os contadores vermelhos em toda a UI. */
+export const markLeadsAsSeen = () => {
+  try {
+    localStorage.setItem(LAST_SEEN_KEY, new Date().toISOString());
+  } catch {
+    /* storage indisponível */
+  }
+};
+
 /**
- * Quantidade de leads do site com status "novo".
+ * Quantidade de leads do site com status "novo" recebidos desde a última
+ * vez que o Super Admin abriu a tela de Leads.
  * Somente super admin consegue ler a tabela leads (RLS), por isso o hook
  * fica desabilitado para os demais papéis.
  */
@@ -16,10 +36,13 @@ export const useNewLeadsCount = () => {
   const query = useQuery({
     queryKey: ["new-leads-count"],
     queryFn: async () => {
-      const { count, error } = await supabase
+      let q = supabase
         .from("leads")
         .select("*", { count: "exact", head: true })
         .eq("status", "novo");
+      const lastSeen = getLastSeen();
+      if (lastSeen) q = q.gt("created_at", lastSeen);
+      const { count, error } = await q;
       if (error) throw error;
       return count ?? 0;
     },
