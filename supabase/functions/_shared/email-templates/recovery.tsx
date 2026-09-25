@@ -8,10 +8,8 @@ import {
   Container,
   Head,
   Heading,
-  Hr,
   Html,
   Preview,
-  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -20,28 +18,28 @@ interface RecoveryEmailProps {
   confirmationUrl: string
 }
 
-export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps) => (
-  <Html lang="pt-BR" dir="ltr">
-    <Head />
-    <Preview>Redefina sua senha no CompSmart</Preview>
+export const RecoveryEmail = ({
+  siteName,
+  confirmationUrl,
+}: RecoveryEmailProps) => (
+  <Html lang="en" dir="ltr">
+    <Head>
+      <style>{darkModeCss}</style>
+    </Head>
+    <Preview>Reset your password for {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Section style={brandBar}>
-          <Text style={brandText}>CompSmart</Text>
-        </Section>
-        <Heading style={h1}>Redefinição de senha</Heading>
+        <Heading style={h1}>Reset your password</Heading>
         <Text style={text}>
-          Recebemos uma solicitação para redefinir a senha da sua conta em <strong>{siteName}</strong>.
-          Clique no botão abaixo para escolher uma nova senha.
+          We received a request to reset your password for {siteName}. Click
+          the button below to choose a new password.
         </Text>
-        <Button style={button} href={confirmationUrl}>
-          Redefinir senha
+        <Button className="dm-btn" style={button} href={confirmationUrl}>
+          Reset Password
         </Button>
-        <Hr style={hr} />
         <Text style={footer}>
-          Se você não solicitou esta alteração, ignore este e-mail — sua senha permanecerá inalterada.
-          <br />
-          © {new Date().getFullYear()} CompSmart — Remuneração Estratégica com IA.
+          If you didn't request a password reset, you can safely ignore this
+          email. Your password will not be changed.
         </Text>
       </Container>
     </Body>
@@ -50,26 +48,35 @@ export const RecoveryEmail = ({ siteName, confirmationUrl }: RecoveryEmailProps)
 
 export default RecoveryEmail
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Inter, Arial, sans-serif' }
-const container = { padding: '24px 28px', maxWidth: '560px', margin: '0 auto' }
-const brandBar = {
-  background: 'linear-gradient(135deg, #1E2761 0%, #22C55E 100%)',
-  borderRadius: '8px',
-  padding: '14px 18px',
-  marginBottom: '24px',
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
+const h1 = {
+  fontSize: '22px',
+  fontWeight: 'bold' as const,
+  color: '#000000',
+  margin: '0 0 20px',
 }
-const brandText = { color: '#ffffff', fontSize: '18px', fontWeight: 'bold' as const, margin: 0 }
-const h1 = { fontSize: '22px', fontWeight: 'bold' as const, color: '#1E2761', margin: '0 0 16px' }
-const text = { fontSize: '14px', color: '#334155', lineHeight: '1.6', margin: '0 0 18px' }
+const text = {
+  fontSize: '14px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
+}
 const button = {
-  backgroundColor: '#1E2761',
+  backgroundColor: '#000000',
   color: '#ffffff',
   fontSize: '14px',
-  fontWeight: 'bold' as const,
+  border: '1px solid #000000',
   borderRadius: '8px',
-  padding: '12px 24px',
+  padding: '12px 20px',
   textDecoration: 'none',
-  display: 'inline-block',
 }
-const hr = { borderColor: '#e2e8f0', margin: '28px 0 16px' }
-const footer = { fontSize: '12px', color: '#94a3b8', margin: 0, lineHeight: '1.5' }
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
+// Rendered as a text child, which React may HTML-escape: keep this CSS free of >, &, and quotes.
+const darkModeCss = `
+  @media (prefers-color-scheme: dark) {
+    .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  }
+  [data-ogsc] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+  [data-ogsb] .dm-btn { background-color: #ffffff !important; color: #000000 !important; }
+`
