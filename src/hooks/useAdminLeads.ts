@@ -17,7 +17,7 @@ const ORIGEM_LABEL: Record<string, string> = {
   "ebook:nr1": "E-book NR-1",
   "ebook:clima-9box": "E-book Clima & 9-Box",
   demo: "Demonstração",
-  diagnostico: "Demonstração",
+  diagnostico: "Diagnóstico",
   contato: "Contato",
   parceiro: "Parceiro",
 };
