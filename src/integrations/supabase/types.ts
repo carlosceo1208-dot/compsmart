@@ -4116,10 +4116,13 @@ export type Database = {
           lead_magnet: string | null
           linkedin: string | null
           modulo_interesse: string | null
+          nivel_risco_free: string | null
           nome: string
           origem: string | null
           parceria_tipo: string | null
           porte: string | null
+          respostas_free: Json | null
+          score_free: number | null
           status: string
           updated_at: string
         }
@@ -4135,10 +4138,13 @@ export type Database = {
           lead_magnet?: string | null
           linkedin?: string | null
           modulo_interesse?: string | null
+          nivel_risco_free?: string | null
           nome: string
           origem?: string | null
           parceria_tipo?: string | null
           porte?: string | null
+          respostas_free?: Json | null
+          score_free?: number | null
           status?: string
           updated_at?: string
         }
@@ -4154,10 +4160,13 @@ export type Database = {
           lead_magnet?: string | null
           linkedin?: string | null
           modulo_interesse?: string | null
+          nivel_risco_free?: string | null
           nome?: string
           origem?: string | null
           parceria_tipo?: string | null
           porte?: string | null
+          respostas_free?: Json | null
+          score_free?: number | null
           status?: string
           updated_at?: string
         }
@@ -11821,10 +11830,13 @@ export type Database = {
           _email: string
           _lgpd: boolean
           _modulo: string
+          _nivel: string
           _nome: string
           _porte: string
+          _respostas: Json
+          _score: number
         }
-        Returns: undefined
+        Returns: string
       }
       submit_external_feedback: {
         Args: {
