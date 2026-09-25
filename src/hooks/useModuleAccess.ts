@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
-import type { Database } from '@/integrations/supabase/types';
 
 export type ModuleSlug =
   | 'core'
@@ -16,8 +15,6 @@ export type ModuleSlug =
   | 'potencial-sucessao'
   | 'rh-service'
   | (string & {});
-
-export type CatalogModule = Database['public']['Tables']['modules']['Row'];
 
 const VIEW_AS_CLIENT_KEY = 'viewAsClient';
 

@@ -22,11 +22,6 @@ const readWorkbook = async (file: File): Promise<XLSX.WorkBook> => {
   return XLSX.read(buffer, { type: 'array', cellDates: true, raw: false });
 };
 
-export const listSheets = async (file: File): Promise<string[]> => {
-  const wb = await readWorkbook(file);
-  return wb.SheetNames;
-};
-
 /** Lê um arquivo .xlsx/.xls/.csv e devolve cabeçalhos + linhas como texto */
 export const parseSpreadsheet = async (file: File, sheetName?: string): Promise<ParsedSheet> => {
   const wb = await readWorkbook(file);

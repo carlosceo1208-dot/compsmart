@@ -158,9 +158,6 @@ export const IMPORT_FIELDS: ImportField[] = [
 
 export const IMPORT_FIELD_MAP = new Map(IMPORT_FIELDS.map((f) => [f.key, f]));
 
-/** Campos que identificam o colaborador — pelo menos um é obrigatório */
-export const IDENTIFIER_FIELDS = ['employee_number', 'cpf'] as const;
-
 export type ColumnMapping = Record<string, string | null>;
 
 export const normalizeHeader = (header: string): string =>

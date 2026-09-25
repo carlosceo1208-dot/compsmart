@@ -105,21 +105,6 @@ export const useSalvarMapeamentoTemplate = () => {
   });
 };
 
-export const useExcluirMapeamentoTemplate = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from('nr1_mapeamentos_templates').delete().eq('id', id);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['nr1-map-templates'] });
-      toast.success('Template removido');
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-};
-
 export const marcarUsoTemplate = async (templateId: string) => {
   await supabase.rpc('nr1_template_marcar_uso' as any, { _template_id: templateId });
 };

@@ -96,36 +96,6 @@ const featureMap: Record<string, PlanType[]> = {
   nr1_acompanhamento: ['nr1_essencial', 'pro', 'enterprise'],
 };
 
-// Map route paths to feature keys
-const pathToFeatureMap: Record<string, string> = {
-  '/employees': 'employees',
-  '/job-titles': 'job_titles',
-  '/salary-ranges': 'salary_ranges',
-  '/organization': 'organization',
-  '/people-analytics': 'people_analytics',
-  '/survey-data': 'survey_data',
-  '/my-profile': 'my_profile',
-  '/roles': 'roles',
-  '/access-control': 'access_control',
-  '/settings': 'settings',
-  '/benefits': 'benefits_basic',
-  '/salary-comparison': 'salary_comparison',
-  '/alert-settings': 'alerts',
-  '/audit-logs': 'audit_logs',
-  '/knowledge-base': 'knowledge_base',
-  '/budget-planning': 'budget_planning',
-  '/budget-approvals': 'budget_approvals',
-  '/legal-assistant': 'legal_assistant',
-  '/salary-assistant': 'salary_assistant',
-  '/incentive-assistant': 'incentive_assistant',
-  '/incentive-programs': 'incentive_programs',
-  '/salary-analysis-report': 'salary_analysis_report',
-  '/organogram': 'organogram',
-  '/budget-burndown': 'merit_governance',
-  '/approval-inbox': 'merit_governance',
-  '/decision-scenarios': 'merit_governance',
-};
-
 // Get required plan for a feature
 export const getRequiredPlanForFeature = (feature: string): PlanType | undefined => {
   const allowedPlans = featureMap[feature];
@@ -139,13 +109,6 @@ export const getRequiredPlanForFeature = (feature: string): PlanType | undefined
     }
   }
   return undefined;
-};
-
-// Get required plan for a path
-export const getRequiredPlanForPath = (path: string): PlanType | undefined => {
-  const feature = pathToFeatureMap[path];
-  if (!feature) return undefined;
-  return getRequiredPlanForFeature(feature);
 };
 
 export const useFeatureAccess = (): FeatureAccessResult => {

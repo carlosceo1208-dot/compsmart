@@ -59,7 +59,3 @@ export async function resolveSignedUrl(
   cache.set(cacheKey, { url: data.signedUrl, expiresAt: now + 30 * 60 * 1000 });
   return data.signedUrl;
 }
-
-export function clearSignedUrlCache() {
-  cache.clear();
-}

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface InstrumentScenario {
@@ -10,20 +10,6 @@ export interface InstrumentScenario {
   tax_treatment: 'mercantil' | 'remuneratorio';
   cash_impact: number;
 }
-
-export const useLtipComparisons = () => {
-  return useQuery({
-    queryKey: ['ltip-scenario-comparisons'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ltip_scenario_comparisons')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-  });
-};
 
 export const calculateInstrumentScenarios = (params: {
   grant_value: number;

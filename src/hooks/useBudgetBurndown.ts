@@ -29,19 +29,6 @@ export const useUnitBudgetStatus = (rootCompanyId: string | null, fiscalYear: nu
     },
   });
 
-export const useCheckBudgetCapacity = () =>
-  useMutation({
-    mutationFn: async (params: { unit_id: string; fiscal_year: number; amount_annual: number }) => {
-      const { data, error } = await supabase.rpc('check_budget_capacity', {
-        p_unit_id: params.unit_id,
-        p_fiscal_year: params.fiscal_year,
-        p_amount_annual: params.amount_annual,
-      });
-      if (error) throw error;
-      return data as any;
-    },
-  });
-
 export const useUpsertUnitBudget = () => {
   const qc = useQueryClient();
   return useMutation({
@@ -65,18 +52,3 @@ export const useUpsertUnitBudget = () => {
     onError: (e: Error) => toast.error(e.message),
   });
 };
-
-export const useBudgetLedger = (budgetId: string | null) =>
-  useQuery({
-    queryKey: ['budget-ledger', budgetId],
-    enabled: !!budgetId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('merit_budget_ledger' as never)
-        .select('*')
-        .eq('budget_id', budgetId!)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });

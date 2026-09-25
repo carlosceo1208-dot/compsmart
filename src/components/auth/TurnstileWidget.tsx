@@ -134,11 +134,3 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silent
     </div>
   );
 }
-
-export function useTurnstileReset() {
-  return useCallback((widgetId?: string) => {
-    if (widgetId && window.turnstile) {
-      window.turnstile.reset(widgetId);
-    }
-  }, []);
-}

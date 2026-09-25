@@ -15,10 +15,3 @@ export const getBrazilDate = (): Date => {
 export const getBrazilDateString = (): string => {
   return format(getBrazilDate(), 'yyyy-MM-dd');
 };
-
-/**
- * Converts a date string to a Date object considering São Paulo timezone (UTC-3)
- */
-export const getBrazilDateTime = (dateString: string): Date => {
-  return new Date(`${dateString}T00:00:00-03:00`);
-};

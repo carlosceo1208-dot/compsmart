@@ -41,25 +41,6 @@ export function calcRisco(score: number | null | undefined): NivelRisco | null {
   return 'critico';
 }
 
-/**
- * Estimativa de exposição anual a multas NR-1.
- * Baseado em valores referenciais do MTE (R$ 670 a R$ 6.708 por infração,
- * multiplicado por nº de empregados afetados, com teto de 1000).
- */
-export function estimarMultaAnual(numColaboradores: number): {
-  min: number;
-  max: number;
-  cenarioProvavel: number;
-} {
-  const n = Math.max(1, Math.min(numColaboradores, 1000));
-  // Empresa pequena -> faixa baixa; grande -> faixa alta
-  const fatorPorte = n <= 50 ? 0.3 : n <= 200 ? 0.6 : 1.0;
-  const min = Math.round(670 * n * fatorPorte);
-  const max = Math.round(6708 * n * fatorPorte);
-  const cenarioProvavel = Math.round((min + max) / 2);
-  return { min, max, cenarioProvavel };
-}
-
 /** Hash anônimo do respondente (LGPD) */
 export async function respondentHash(userId: string, diagnosticoId: string): Promise<string> {
   const data = new TextEncoder().encode(`${diagnosticoId}::${userId}`);
@@ -79,7 +60,6 @@ export const RESPOSTA_OPCOES = [
 
 export type Questao = Database['public']['Tables']['nr1_questoes']['Row'];
 export type Diagnostico = Database['public']['Tables']['nr1_diagnosticos']['Row'];
-export type Subscription = Database['public']['Tables']['nr1_subscriptions']['Row'];
 
 /**
  * Pontuação idêntica à da plataforma (nr1_recompute_scores):

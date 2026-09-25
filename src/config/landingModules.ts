@@ -265,10 +265,4 @@ export const LANDING_MODULES: LandingModule[] = [
   },
 ];
 
-export const getLandingModule = (slug: string) =>
-  LANDING_MODULES.find((m) => m.slug === slug);
-
 export const CONTACT_EMAIL = "contato@compsmart.ia.br";
-export const WHATSAPP_NUMBER = "5511999999999";
-export const WHATSAPP_MESSAGE =
-  "Olá! Gostaria de conhecer a plataforma CompSmart.";

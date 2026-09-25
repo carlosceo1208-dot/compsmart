@@ -101,4 +101,3 @@ export const ViewAsClientToggle = () => {
   );
 };
 
-export default ViewAsClientToggle;

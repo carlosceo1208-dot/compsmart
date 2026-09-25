@@ -33,23 +33,6 @@ export interface TopMismatch {
 }
 
 /**
- * Sugestão de mérito para um funcionário (matriz Performance × Faixa)
- */
-export function useMeritSuggestion(employeeId: string | null) {
-  return useQuery({
-    queryKey: ['merit-suggestion', employeeId],
-    enabled: !!employeeId,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_merit_suggestion', {
-        p_employee_id: employeeId!,
-      });
-      if (error) throw error;
-      return (data?.[0] ?? null) as MeritSuggestion | null;
-    },
-  });
-}
-
-/**
  * KPI agregado de incoerências performance × remuneração
  */
 export function useCompensationMismatchKPI() {
