@@ -93,7 +93,7 @@ export const PasswordStrengthIndicator = ({ password }: PasswordStrengthIndicato
   );
 };
 
-export const passwordSchema = {
+const passwordSchema = {
   minLength: 10,
   requireUppercase: true,
   requireLowercase: true,

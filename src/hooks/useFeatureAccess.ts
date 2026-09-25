@@ -142,7 +142,7 @@ export const getRequiredPlanForFeature = (feature: string): PlanType | undefined
 };
 
 // Get required plan for a path
-export const getRequiredPlanForPath = (path: string): PlanType | undefined => {
+const getRequiredPlanForPath = (path: string): PlanType | undefined => {
   const feature = pathToFeatureMap[path];
   if (!feature) return undefined;
   return getRequiredPlanForFeature(feature);

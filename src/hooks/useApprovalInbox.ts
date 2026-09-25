@@ -39,7 +39,7 @@ export interface SlaConfig {
   notify_email: boolean;
 }
 
-export const useSlaConfig = (rootCompanyId: string | null) =>
+const useSlaConfig = (rootCompanyId: string | null) =>
   useQuery({
     queryKey: ['sla-config', rootCompanyId],
     enabled: !!rootCompanyId,
@@ -53,7 +53,7 @@ export const useSlaConfig = (rootCompanyId: string | null) =>
     },
   });
 
-export const useUpsertSlaConfig = () => {
+const useUpsertSlaConfig = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: SlaConfig) => {

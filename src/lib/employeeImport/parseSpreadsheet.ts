@@ -22,7 +22,7 @@ const readWorkbook = async (file: File): Promise<XLSX.WorkBook> => {
   return XLSX.read(buffer, { type: 'array', cellDates: true, raw: false });
 };
 
-export const listSheets = async (file: File): Promise<string[]> => {
+const listSheets = async (file: File): Promise<string[]> => {
   const wb = await readWorkbook(file);
   return wb.SheetNames;
 };

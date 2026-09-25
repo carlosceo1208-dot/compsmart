@@ -172,7 +172,7 @@ export function gerarPgrPdf(input: PgrInput): jsPDF {
   return doc;
 }
 
-export function baixarPgr(input: PgrInput) {
+function baixarPgr(input: PgrInput) {
   const doc = gerarPgrPdf(input);
   const slug = (input.empresa.fantasia || input.empresa.nome)
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');

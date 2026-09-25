@@ -17,7 +17,7 @@
 /**
  * Tipos de formatação monetária suportados
  */
-export type CurrencyFormat = 'full' | 'compact' | 'no-decimals' | 'custom';
+type CurrencyFormat = 'full' | 'compact' | 'no-decimals' | 'custom';
 
 /**
  * Opções de formatação customizada
@@ -90,7 +90,7 @@ export const formatCurrencyNoDecimals = (value: number | null | undefined): stri
  * @param value - Valor a ser formatado
  * @returns String formatada (ex: "1.234")
  */
-export const formatInteger = (value: number | null | undefined): string => {
+const formatInteger = (value: number | null | undefined): string => {
   if (value === null || value === undefined || !isFinite(value)) return '0';
   return Math.round(value).toLocaleString('pt-BR');
 };
@@ -184,7 +184,7 @@ export const toFixedSafe = (
   return value.toFixed(safeDecimals);
 };
 
-export const convertCurrency = (
+const convertCurrency = (
   value: number, 
   from: 'BRL' | 'USD', 
   to: 'BRL' | 'USD', 
@@ -220,7 +220,7 @@ export const formatCurrencyCustom = (
  * @param options - Opções de formatação
  * @returns String formatada
  */
-export const formatCurrencyWithOptions = (
+const formatCurrencyWithOptions = (
   value: number | null | undefined,
   options: FormatCurrencyOptions = {}
 ): string => {

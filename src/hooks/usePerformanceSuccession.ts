@@ -176,7 +176,7 @@ export const readinessColors: Record<Readiness, string> = {
   development: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
 };
 
-export const readinessOrder: Readiness[] = ["ready_now", "ready_1_year", "ready_2_years", "development"];
+const readinessOrder: Readiness[] = ["ready_now", "ready_1_year", "ready_2_years", "development"];
 
 // Ranking labels and icons
 export const rankLabels: Record<number, string> = {

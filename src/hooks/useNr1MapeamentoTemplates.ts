@@ -105,7 +105,7 @@ export const useSalvarMapeamentoTemplate = () => {
   });
 };
 
-export const useExcluirMapeamentoTemplate = () => {
+const useExcluirMapeamentoTemplate = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {

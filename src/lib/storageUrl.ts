@@ -60,6 +60,6 @@ export async function resolveSignedUrl(
   return data.signedUrl;
 }
 
-export function clearSignedUrlCache() {
+function clearSignedUrlCache() {
   cache.clear();
 }

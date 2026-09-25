@@ -81,7 +81,7 @@ export function useExternalFeedbackResponses(requestId?: string) {
   });
 }
 
-export function useExternalFeedbackResponsesByEmployee(employeeId?: string) {
+function useExternalFeedbackResponsesByEmployee(employeeId?: string) {
   return useQuery({
     queryKey: ["external-feedback-responses-by-employee", employeeId],
     queryFn: async () => {

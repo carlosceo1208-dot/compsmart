@@ -4,7 +4,7 @@ import { useCompanyContext } from "@/contexts/CompanyContext";
 import { toast } from "sonner";
 import type { Tables, TablesInsert, TablesUpdate, Enums } from "@/integrations/supabase/types";
 
-export type PerformanceEvaluation = Tables<"performance_evaluations">;
+type PerformanceEvaluation = Tables<"performance_evaluations">;
 export type PerformanceEvaluationInsert = TablesInsert<"performance_evaluations">;
 export type PerformanceEvaluationUpdate = TablesUpdate<"performance_evaluations">;
 export type EvaluationStatus = Enums<"performance_evaluation_status">;
@@ -275,7 +275,7 @@ export const evaluationStatusColors: Record<EvaluationStatus, string> = {
   returned: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
 };
 
-export const evaluatorTypeLabels: Record<EvaluatorType, string> = {
+const evaluatorTypeLabels: Record<EvaluatorType, string> = {
   self: "Autoavaliação",
   manager: "Gestor",
   superior: "Superior",

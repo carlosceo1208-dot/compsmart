@@ -14,7 +14,7 @@ export interface CurveComparison {
   fasterCurve: 'internal' | 'market' | 'equal';
 }
 
-export interface DataPoint {
+interface DataPoint {
   x: number;
   y: number;
 }

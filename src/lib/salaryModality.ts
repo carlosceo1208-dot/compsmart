@@ -50,11 +50,11 @@ export const getModalityConfig = (modality: SalaryModality): ModalityConfig => {
   return MODALITY_CONFIG[modality] || MODALITY_CONFIG.fixed_salary;
 };
 
-export const getModalityLabel = (modality: SalaryModality): string => {
+const getModalityLabel = (modality: SalaryModality): string => {
   return getModalityConfig(modality).label;
 };
 
-export const getModalityBadgeClasses = (modality: SalaryModality): string => {
+const getModalityBadgeClasses = (modality: SalaryModality): string => {
   const config = getModalityConfig(modality);
   return `${config.bgColor} ${config.color} ${config.borderColor}`;
 };

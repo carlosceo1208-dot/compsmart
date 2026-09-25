@@ -73,7 +73,7 @@ export interface EvaluateGovernanceInput {
   budget_remaining_annual?: number | null;
 }
 
-export const useEvaluateGovernance = () =>
+const useEvaluateGovernance = () =>
   useMutation({
     mutationFn: async (input: EvaluateGovernanceInput): Promise<GovernanceEvaluation> => {
       const { data, error } = await supabase.rpc('evaluate_merit_governance', {
@@ -134,7 +134,7 @@ export type CreateMeritRequestInput = Omit<
   | 'updated_at'
 >;
 
-export const useCreateMeritRequest = () => {
+const useCreateMeritRequest = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: CreateMeritRequestInput) => {

@@ -11,7 +11,7 @@ export interface InstrumentScenario {
   cash_impact: number;
 }
 
-export const useLtipComparisons = () => {
+const useLtipComparisons = () => {
   return useQuery({
     queryKey: ['ltip-scenario-comparisons'],
     queryFn: async () => {

@@ -17,7 +17,7 @@ export const isValidCPF = (value: string): boolean => {
   return check === parseInt(cpf[10], 10);
 };
 
-export const formatCPF = (value: string): string => {
+const formatCPF = (value: string): string => {
   const cpf = onlyDigits(value);
   if (cpf.length !== 11) return value;
   return `${cpf.slice(0, 3)}.${cpf.slice(3, 6)}.${cpf.slice(6, 9)}-${cpf.slice(9)}`;

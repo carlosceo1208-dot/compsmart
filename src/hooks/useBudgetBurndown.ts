@@ -29,7 +29,7 @@ export const useUnitBudgetStatus = (rootCompanyId: string | null, fiscalYear: nu
     },
   });
 
-export const useCheckBudgetCapacity = () =>
+const useCheckBudgetCapacity = () =>
   useMutation({
     mutationFn: async (params: { unit_id: string; fiscal_year: number; amount_annual: number }) => {
       const { data, error } = await supabase.rpc('check_budget_capacity', {
@@ -66,7 +66,7 @@ export const useUpsertUnitBudget = () => {
   });
 };
 
-export const useBudgetLedger = (budgetId: string | null) =>
+const useBudgetLedger = (budgetId: string | null) =>
   useQuery({
     queryKey: ['budget-ledger', budgetId],
     enabled: !!budgetId,

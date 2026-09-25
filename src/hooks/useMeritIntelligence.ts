@@ -35,7 +35,7 @@ export interface TopMismatch {
 /**
  * Sugestão de mérito para um funcionário (matriz Performance × Faixa)
  */
-export function useMeritSuggestion(employeeId: string | null) {
+function useMeritSuggestion(employeeId: string | null) {
   return useQuery({
     queryKey: ['merit-suggestion', employeeId],
     enabled: !!employeeId,

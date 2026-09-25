@@ -11,7 +11,7 @@ interface SiteContent {
   updated_at: string;
 }
 
-export const useSiteContentSection = (sectionKey: string) => {
+const useSiteContentSection = (sectionKey: string) => {
   return useQuery({
     queryKey: ['site-content', sectionKey],
     queryFn: async () => {

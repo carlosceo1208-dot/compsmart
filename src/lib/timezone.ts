@@ -19,6 +19,6 @@ export const getBrazilDateString = (): string => {
 /**
  * Converts a date string to a Date object considering São Paulo timezone (UTC-3)
  */
-export const getBrazilDateTime = (dateString: string): Date => {
+const getBrazilDateTime = (dateString: string): Date => {
   return new Date(`${dateString}T00:00:00-03:00`);
 };

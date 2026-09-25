@@ -46,7 +46,7 @@ export function calcRisco(score: number | null | undefined): NivelRisco | null {
  * Baseado em valores referenciais do MTE (R$ 670 a R$ 6.708 por infração,
  * multiplicado por nº de empregados afetados, com teto de 1000).
  */
-export function estimarMultaAnual(numColaboradores: number): {
+function estimarMultaAnual(numColaboradores: number): {
   min: number;
   max: number;
   cenarioProvavel: number;
@@ -79,7 +79,7 @@ export const RESPOSTA_OPCOES = [
 
 export type Questao = Database['public']['Tables']['nr1_questoes']['Row'];
 export type Diagnostico = Database['public']['Tables']['nr1_diagnosticos']['Row'];
-export type Subscription = Database['public']['Tables']['nr1_subscriptions']['Row'];
+type Subscription = Database['public']['Tables']['nr1_subscriptions']['Row'];
 
 /**
  * Pontuação idêntica à da plataforma (nr1_recompute_scores):
