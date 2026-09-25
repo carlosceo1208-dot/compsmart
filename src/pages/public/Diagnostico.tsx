@@ -1,0 +1,144 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { z } from "zod";
+import { CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
+import { PublicLayout } from "@/components/landing/public/PublicLayout";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { getSeoRoute } from "@/config/seoRoutes";
+
+const PORTES = ["Pequena", "Média", "Grande"] as const;
+const COLABS = ["até 99", "100–499", "500+"] as const;
+const MODULOS = [
+  "NR-1/Riscos Psicossociais",
+  "Clima Organizacional",
+  "Cargos e Salários",
+  "Remuneração",
+  "9-Box/Sucessão",
+] as const;
+
+const schema = z.object({
+  nome: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(255),
+  porte: z.enum(PORTES),
+  colaboradores: z.enum(COLABS),
+  modulo: z.enum(MODULOS),
+  lgpd: z.literal(true),
+});
+
+const seo = getSeoRoute("/diagnostico");
+
+const Diagnostico = () => {
+  const [f, setF] = useState({ nome: "", email: "", porte: "", colaboradores: "", modulo: "", lgpd: false });
+  const [sending, setSending] = useState(false);
+  const [done, setDone] = useState(false);
+  const valid = schema.safeParse(f).success;
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const p = schema.safeParse(f);
+    if (!p.success) return;
+    setSending(true);
+    const { error } = await supabase.rpc("submit_diagnostico_lead" as never, {
+      _nome: p.data.nome,
+      _email: p.data.email,
+      _porte: p.data.porte,
+      _colaboradores: p.data.colaboradores,
+      _modulo: p.data.modulo,
+      _lgpd: true,
+    } as never);
+    setSending(false);
+    if (error) {
+      toast({ title: "Não foi possível enviar", description: "Tente novamente em instantes.", variant: "destructive" });
+      return;
+    }
+    setDone(true);
+  };
+
+  return (
+    <PublicLayout title={seo?.title ?? ""} description={seo?.description ?? ""} path="/diagnostico">
+      <section className="py-14 md:py-20 bg-gradient-to-br from-background via-primary/5 to-muted/40">
+        <div className="container mx-auto px-4 max-w-xl">
+          <div className="text-center space-y-3 mb-8">
+            <Badge className="bg-primary/10 text-primary border-primary/20 rounded-full px-4 py-1.5">
+              Diagnóstico grátis em 2 min
+            </Badge>
+            <h1 className="text-3xl md:text-4xl font-bold">Diagnóstico NR-1 gratuito</h1>
+            <p className="text-muted-foreground">
+              Riscos psicossociais pelo método COPSOQ-III, com tratamento de dados conforme a LGPD.
+            </p>
+          </div>
+
+          <Card className="rounded-2xl">
+            <CardContent className="p-6 md:p-8">
+              {done ? (
+                <div className="text-center space-y-4 py-4">
+                  <CheckCircle2 className="h-12 w-12 text-primary mx-auto" />
+                  <p className="text-lg font-semibold">
+                    Recebemos seu pedido! Em instantes você recebe seu diagnóstico por e-mail.
+                  </p>
+                  <Button asChild variant="outline">
+                    <Link to="/contato">Agendar demonstração <ArrowRight className="h-4 w-4 ml-1.5" /></Link>
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={submit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="nome">Nome*</Label>
+                    <Input id="nome" maxLength={100} value={f.nome} onChange={(e) => setF({ ...f, nome: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email">E-mail corporativo*</Label>
+                    <Input id="email" type="email" maxLength={255} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <Label>Porte da empresa*</Label>
+                      <Select value={f.porte} onValueChange={(v) => setF({ ...f, porte: v })}>
+                        <SelectTrigger aria-label="Porte da empresa"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{PORTES.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Colaboradores*</Label>
+                      <Select value={f.colaboradores} onValueChange={(v) => setF({ ...f, colaboradores: v })}>
+                        <SelectTrigger aria-label="Quantidade de colaboradores"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{COLABS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Módulo de maior interesse*</Label>
+                    <Select value={f.modulo} onValueChange={(v) => setF({ ...f, modulo: v })}>
+                      <SelectTrigger aria-label="Módulo de maior interesse"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                      <SelectContent>{MODULOS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+                    <Checkbox checked={f.lgpd} onCheckedChange={(c) => setF({ ...f, lgpd: c === true })} className="mt-0.5" aria-label="Consentimento LGPD" />
+                    <span>Concordo em receber conteúdos e contato comercial da CompSmart, conforme a LGPD.</span>
+                  </label>
+                  <Button type="submit" size="lg" className="w-full" disabled={!valid || sending}>
+                    {sending ? "Enviando..." : "Receber meu diagnóstico"}
+                  </Button>
+                  <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Seus dados são tratados conforme a LGPD.
+                  </p>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </PublicLayout>
+  );
+};
+
+export default Diagnostico;

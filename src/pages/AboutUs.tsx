@@ -155,7 +155,7 @@ const AboutUs = () => (
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
           <Button asChild size="lg">
-            <Link to="/contato">
+            <Link to="/diagnostico">
               Agende um diagnóstico gratuito
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>

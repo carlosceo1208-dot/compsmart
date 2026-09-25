@@ -128,7 +128,7 @@ export default function LandingNr1() {
         <>
           {/* HERO compacto + Bento das features NR-1 */}
           <Nr1HeroBento
-            onDiagnostico={() => setStep('questionario')}
+            onDiagnostico={() => navigate('/diagnostico')}
           />
 
            <Nr1PublicPricing />
@@ -216,7 +216,7 @@ export default function LandingNr1() {
                 <h2 className="text-2xl font-bold md:text-4xl">
                   Você não precisa fazer isso sozinho. Diagnóstico, plano de ação e acompanhamento com a CompSmart.
                 </h2>
-                <Button size="lg" variant="secondary" onClick={() => setStep('questionario')}>
+                <Button size="lg" variant="secondary" onClick={() => navigate('/diagnostico')}>
                   Diagnóstico grátis NR-1 <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Button>
               </div>
@@ -237,7 +237,7 @@ export default function LandingNr1() {
               <p className="text-muted-foreground">
                 Diagnóstico inicial · Dados tratados conforme a LGPD · Proposta sob medida.
               </p>
-               <Button size="lg" onClick={() => setStep('questionario')}>
+               <Button size="lg" onClick={() => navigate('/diagnostico')}>
                 Diagnóstico grátis NR-1 <ArrowRight className="h-4 w-4 ml-1.5" />
               </Button>
             </div>

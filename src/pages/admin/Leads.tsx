@@ -220,10 +220,12 @@ export default function Leads() {
               <div className="mt-6 space-y-4">
                 <Field label="E-mail" value={selected.email} />
                 <Field label="Recebido em" value={formatDateTimePtBR(selected.created_at)} />
+                <Field label="Último interesse" value={formatDateTimePtBR(selected.updated_at)} />
                 <Field label="Origem" value={origemLabel(selected.origem)} />
                 <Field label="Empresa" value={selected.empresa} />
                 <Field label="Cargo" value={selected.cargo} />
                 <Field label="Porte" value={selected.porte} />
+                <Field label="Colaboradores" value={(selected as { colaboradores?: string | null }).colaboradores} />
                 <Field label="Módulo de interesse" value={selected.modulo_interesse} />
                 <Field label="E-book / material" value={selected.lead_magnet} />
                 <Field label="Tipo de parceria" value={selected.parceria_tipo} />

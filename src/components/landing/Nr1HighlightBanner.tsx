@@ -56,7 +56,7 @@ export const Nr1HighlightBanner = () => {
           </div>
 
           <Link
-            to="/nr1"
+            to="/diagnostico"
             className="group relative flex-shrink-0 inline-flex items-center gap-2 px-7 py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-[hsl(217,91%,15%)] font-bold text-base transition-all shadow-2xl shadow-emerald-500/50 hover:shadow-emerald-400/60 hover:scale-105 animate-pulse"
           >
             {/* Glow pulsante ao redor do botão */}
