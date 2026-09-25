@@ -120,6 +120,7 @@ export const DashboardLayout = () => {
 
   // Check if user is super admin
   const { data: roleData } = useCurrentUserRole();
+  const { newLeads } = useNewLeadsCount();
   
   // Kudos notification system
   const { showConfetti, showPopup, currentKudos, dismissNotification } = useKudosNotifications();
