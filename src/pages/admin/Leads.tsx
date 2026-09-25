@@ -16,7 +16,7 @@ import {
   type LeadStatus,
 } from "@/hooks/useAdminLeads";
 import { exportToCSV } from "@/lib/csvExport";
-import { formatDateTimePtBR } from "@/lib/formatDateTime";
+import { APP_LOCALE, APP_TIMEZONE, formatDateTimePtBR } from "@/lib/formatDateTime";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,14 @@ const Field = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <p className="text-sm break-words">{value || "—"}</p>
   </div>
 );
+
+const formatDatePtBR = (value: string) =>
+  new Intl.DateTimeFormat(APP_LOCALE, {
+    timeZone: APP_TIMEZONE,
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(value));
 
 export default function Leads() {
   const navigate = useNavigate();
@@ -109,7 +117,7 @@ export default function Leads() {
     exportToCSV(
       `leads-${new Date().toISOString().slice(0, 10)}`,
       [
-        { header: "Data", accessor: (l: Lead) => formatDateTimePtBR(l.created_at) },
+        { header: "Data", accessor: (l: Lead) => formatDatePtBR(l.created_at) },
         { header: "Nome", accessor: (l) => l.nome },
         { header: "E-mail", accessor: (l) => l.email },
         { header: "Empresa", accessor: (l) => l.empresa },
@@ -175,16 +183,17 @@ export default function Leads() {
       </div>
 
       <Card className="rounded-2xl overflow-hidden">
-        <Table>
+        <div className="overflow-x-auto">
+        <Table className="min-w-[1120px]">
           <TableHeader>
             <TableRow>
               <TableHead>Data</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead>E-mail</TableHead>
-              <TableHead className="hidden md:table-cell">Empresa</TableHead>
-              <TableHead className="hidden lg:table-cell">Cargo</TableHead>
-              <TableHead className="hidden lg:table-cell">Porte</TableHead>
-              <TableHead className="hidden xl:table-cell">Segmento</TableHead>
+              <TableHead>Empresa</TableHead>
+              <TableHead>Cargo</TableHead>
+              <TableHead>Porte</TableHead>
+              <TableHead>Segmento</TableHead>
               <TableHead>Origem</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
@@ -199,18 +208,13 @@ export default function Leads() {
                 const s = normalizeStatus(l.status);
                 return (
                   <TableRow key={`${l.source}-${l.id}`} className="cursor-pointer" onClick={() => setSelected(l)}>
-                    <TableCell className="whitespace-nowrap">{formatDateTimePtBR(l.created_at)}</TableCell>
-                    <TableCell className="font-medium">
-                      <span className="block">{l.nome}</span>
-                      <span className="block xl:hidden text-xs font-normal text-muted-foreground">
-                        Segmento: {l.segmento || "—"}
-                      </span>
-                    </TableCell>
+                    <TableCell className="whitespace-nowrap">{formatDatePtBR(l.created_at)}</TableCell>
+                    <TableCell className="font-medium">{l.nome}</TableCell>
                     <TableCell>{l.email}</TableCell>
-                    <TableCell className="hidden md:table-cell">{l.empresa || "—"}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{l.cargo || "—"}</TableCell>
-                    <TableCell className="hidden lg:table-cell">{l.porte || "—"}</TableCell>
-                    <TableCell className="hidden xl:table-cell">{l.segmento || "—"}</TableCell>
+                    <TableCell>{l.empresa || "—"}</TableCell>
+                    <TableCell>{l.cargo || "—"}</TableCell>
+                    <TableCell>{l.porte || "—"}</TableCell>
+                    <TableCell>{l.segmento || "—"}</TableCell>
                     <TableCell>{origemLabel(l.origem)}</TableCell>
                     <TableCell><Badge variant={statusVariant[s]} className="rounded-full">{LEAD_STATUS_LABEL[s]}</Badge></TableCell>
                   </TableRow>
@@ -219,6 +223,7 @@ export default function Leads() {
             )}
           </TableBody>
         </Table>
+        </div>
       </Card>
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
