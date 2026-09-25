@@ -78,6 +78,9 @@ const SuperAdminDashboard = () => {
         </div>
       </div>
 
+      {/* Atalho de Leads */}
+      <LeadsShortcutCard />
+
       {/* KPI Cards */}
       <SuperAdminKPICards metrics={metrics} isLoading={metricsLoading} />
 
