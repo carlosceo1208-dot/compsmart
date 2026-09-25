@@ -51,7 +51,7 @@ export const HeaderNotifications = () => {
             <Badge 
               className="absolute -top-1 -right-1 h-5 min-w-5 flex items-center justify-center p-0 text-xs bg-destructive text-destructive-foreground border-0"
             >
-              {total > 9 ? '9+' : total}
+              {badgeTotal > 9 ? '9+' : badgeTotal}
             </Badge>
           )}
           <span className="sr-only">Notificações</span>
