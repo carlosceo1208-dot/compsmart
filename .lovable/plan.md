@@ -11,9 +11,12 @@
 
 ## O que será feito
 
-1. **Apagar os 21 arquivos órfãos** (todos confirmados sem importadores).
-2. **Remover exports órfãos**: para cada um dos 24 exports e 6 tipos, confirmar com busca que não há uso e remover o export (e o código morto associado quando não tiver efeito colateral). Caso algum item revele uso real ou bug (algo que deveria ser importado), corrigir o uso em vez de remover.
-3. **Export duplicado**: manter apenas o export usado pelos importadores de `ViewAsClientToggle`.
+1. **Apagar os 21 arquivos órfãos**, mas só depois de uma verificação extra em cada um:
+   - buscar pelo nome do arquivo (não só pelos imports diretos), incluindo `lazy()`/`import()` dinâmico, arquivos `index.ts` que reexportam e as definições de rotas em `App.tsx`;
+   - confirmar que é um componente/módulo puro (sem importar CSS, sem registro global, sem efeito colateral ao ser importado).
+   Se algum arquivo aparecer em rota, import dinâmico ou reexportação, ou tiver efeito colateral, ele **não** é apagado.
+2. **Remover exports órfãos**: para cada um dos 24 exports e 6 tipos, confirmar com busca que não há uso e remover o export (e o código morto associado quando não tiver efeito colateral). Esses exports ficam em arquivos que continuam em uso, então **o arquivo nunca é apagado** — só o export sai. Caso algum item revele uso real ou bug (algo que deveria ser importado), corrigir o uso em vez de remover.
+3. **Export duplicado**: antes de remover, listar todos os importadores de `ViewAsClientToggle` e confirmar se usam a forma nomeada (`import { ViewAsClientToggle }`) ou a padrão (`import ViewAsClientToggle`). Remove-se apenas a forma que ninguém usa; se as duas estiverem em uso, os importadores passam para uma só forma antes da remoção.
 4. **Atenção especial a `src/lib/nr1.ts`**: `estimarMultaAnual` e o tipo `Subscription` ficaram órfãos após a saga do diagnóstico — remover só esses; `calcScoreNr1`, `calcRisco`, `respondentHash` etc. continuam em uso e não serão tocados.
 5. **Sem mudança de comportamento**: nada de textos, layout ou funcionalidades — apenas remoção de código morto.
 
