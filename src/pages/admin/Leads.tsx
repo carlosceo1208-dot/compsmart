@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { Download, Mail, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 import { useMFAStatus } from "@/hooks/useMFAStatus";
+import { markLeadsAsSeen } from "@/hooks/useNewLeadsCount";
 import {
   LEAD_STATUSES,
   LEAD_STATUS_LABEL,
