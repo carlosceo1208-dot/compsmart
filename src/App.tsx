@@ -118,6 +118,7 @@ const Precos = lazy(() => import("./pages/public/Precos"));
 const Parceiros = lazy(() => import("./pages/public/Parceiros"));
 const Materiais = lazy(() => import("./pages/public/Materiais"));
 const Contato = lazy(() => import("./pages/public/Contato"));
+const Diagnostico = lazy(() => import("./pages/public/Diagnostico"));
 const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
 
@@ -301,6 +302,7 @@ const App = () => {
                       <Route path="/parceiros" element={<Parceiros />} />
                       <Route path="/materiais" element={<Materiais />} />
                       <Route path="/contato" element={<Contato />} />
+                      <Route path="/diagnostico" element={<Diagnostico />} />
                       <Route path="/modulos/nr1" element={<Navigate to="/nr1" replace />} />
                       <Route path="/modulos/:slug" element={<ModuloPage />} />
 

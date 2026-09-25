@@ -39,7 +39,7 @@ export const useAdminLeads = () =>
       const { data, error } = await supabase
         .from("leads")
         .select("*")
-        .order("created_at", { ascending: false })
+        .order("updated_at", { ascending: false })
         .limit(1000);
       if (error) throw error;
       return data ?? [];
