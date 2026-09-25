@@ -39,37 +39,6 @@ export interface SlaConfig {
   notify_email: boolean;
 }
 
-const useSlaConfig = (rootCompanyId: string | null) =>
-  useQuery({
-    queryKey: ['sla-config', rootCompanyId],
-    enabled: !!rootCompanyId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('approval_sla_config' as never)
-        .select('*')
-        .eq('root_company_id', rootCompanyId!);
-      if (error) throw error;
-      return (data ?? []) as unknown as SlaConfig[];
-    },
-  });
-
-const useUpsertSlaConfig = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (input: SlaConfig) => {
-      const { error } = await supabase
-        .from('approval_sla_config' as never)
-        .upsert(input as never, { onConflict: 'root_company_id,approval_type' });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success('Configuração de SLA salva');
-      qc.invalidateQueries({ queryKey: ['sla-config'] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-};
-
 export const useEscalateOverdue = () => {
   const qc = useQueryClient();
   return useMutation({

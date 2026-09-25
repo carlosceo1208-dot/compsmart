@@ -73,24 +73,6 @@ export interface EvaluateGovernanceInput {
   budget_remaining_annual?: number | null;
 }
 
-const useEvaluateGovernance = () =>
-  useMutation({
-    mutationFn: async (input: EvaluateGovernanceInput): Promise<GovernanceEvaluation> => {
-      const { data, error } = await supabase.rpc('evaluate_merit_governance', {
-        p_employee_id: input.employee_id,
-        p_requested_pct: input.requested_pct,
-        p_suggested_pct: input.suggested_pct,
-        p_compa_ratio: input.compa_ratio ?? null,
-        p_months_since_last_raise: input.months_since_last_raise ?? null,
-        p_budget_available_pct: input.budget_available_pct ?? null,
-        p_annual_impact: input.annual_impact,
-        p_budget_remaining_annual: input.budget_remaining_annual ?? null,
-      });
-      if (error) throw error;
-      return data as unknown as GovernanceEvaluation;
-    },
-  });
-
 export const useMeritApprovalRequests = (status?: MeritApprovalRequest['status']) =>
   useQuery({
     queryKey: ['merit-approval-requests', status ?? 'all'],
@@ -133,26 +115,6 @@ export type CreateMeritRequestInput = Omit<
   | 'created_at'
   | 'updated_at'
 >;
-
-const useCreateMeritRequest = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (input: CreateMeritRequestInput) => {
-      const { data, error } = await supabase
-        .from('merit_approval_requests')
-        .insert(input as never)
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['merit-approval-requests'] });
-      toast.success('Solicitação de mérito enviada para aprovação');
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-};
 
 export const useReviewMeritRequest = () => {
   const qc = useQueryClient();

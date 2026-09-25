@@ -11,20 +11,6 @@ export interface InstrumentScenario {
   cash_impact: number;
 }
 
-const useLtipComparisons = () => {
-  return useQuery({
-    queryKey: ['ltip-scenario-comparisons'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('ltip_scenario_comparisons')
-        .select('*')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      return data || [];
-    },
-  });
-};
-
 export const calculateInstrumentScenarios = (params: {
   grant_value: number;
   vesting_years: number;

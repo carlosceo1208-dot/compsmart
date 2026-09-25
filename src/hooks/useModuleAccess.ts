@@ -17,8 +17,6 @@ export type ModuleSlug =
   | 'rh-service'
   | (string & {});
 
-type CatalogModule = Database['public']['Tables']['modules']['Row'];
-
 const VIEW_AS_CLIENT_KEY = 'viewAsClient';
 
 const fallbackModuleNames: Record<string, string> = {

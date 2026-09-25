@@ -93,14 +93,6 @@ export const PasswordStrengthIndicator = ({ password }: PasswordStrengthIndicato
   );
 };
 
-const passwordSchema = {
-  minLength: 10,
-  requireUppercase: true,
-  requireLowercase: true,
-  requireNumber: true,
-  requireSpecial: true,
-};
-
 export const validatePassword = (password: string): { isValid: boolean; errors: string[] } => {
   const errors: string[] = [];
   

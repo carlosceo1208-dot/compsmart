@@ -3,8 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { toast } from "sonner";
 import type { Tables, TablesInsert, TablesUpdate, Enums } from "@/integrations/supabase/types";
-
-type PerformanceEvaluation = Tables<"performance_evaluations">;
 export type PerformanceEvaluationInsert = TablesInsert<"performance_evaluations">;
 export type PerformanceEvaluationUpdate = TablesUpdate<"performance_evaluations">;
 export type EvaluationStatus = Enums<"performance_evaluation_status">;
@@ -273,12 +271,4 @@ export const evaluationStatusColors: Record<EvaluationStatus, string> = {
   reviewed: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   approved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   returned: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-};
-
-const evaluatorTypeLabels: Record<EvaluatorType, string> = {
-  self: "Autoavaliação",
-  manager: "Gestor",
-  superior: "Superior",
-  peer: "Par",
-  hr: "RH",
 };

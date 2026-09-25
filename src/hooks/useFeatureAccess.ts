@@ -141,13 +141,6 @@ export const getRequiredPlanForFeature = (feature: string): PlanType | undefined
   return undefined;
 };
 
-// Get required plan for a path
-const getRequiredPlanForPath = (path: string): PlanType | undefined => {
-  const feature = pathToFeatureMap[path];
-  if (!feature) return undefined;
-  return getRequiredPlanForFeature(feature);
-};
-
 export const useFeatureAccess = (): FeatureAccessResult => {
   const [plan, setPlan] = useState<PlanType>('starter');
   const [status, setStatus] = useState<SubscriptionStatus>('trial');

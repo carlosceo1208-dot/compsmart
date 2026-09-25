@@ -11,23 +11,6 @@ interface SiteContent {
   updated_at: string;
 }
 
-const useSiteContentSection = (sectionKey: string) => {
-  return useQuery({
-    queryKey: ['site-content', sectionKey],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_content')
-        .select('content')
-        .eq('section_key', sectionKey)
-        .eq('is_active', true)
-        .single();
-      
-      if (error && error.code !== 'PGRST116') throw error;
-      return data?.content as Record<string, any> | null;
-    },
-  });
-};
-
 export const useAllSiteContent = () => {
   return useQuery({
     queryKey: ['site-content-all'],

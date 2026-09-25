@@ -14,11 +14,6 @@ export interface CurveComparison {
   fasterCurve: 'internal' | 'market' | 'equal';
 }
 
-interface DataPoint {
-  x: number;
-  y: number;
-}
-
 /**
  * Calcula regressão linear usando o método dos mínimos quadrados
  * @param xValues - Valores do eixo X (grades convertidas para números)

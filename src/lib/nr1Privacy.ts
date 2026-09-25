@@ -19,8 +19,6 @@ export function extrairN(rotulo: string): number | null {
   return m ? Number(m[1]) : null;
 }
 
-type LinhaComN<T> = T & { rotulo: string };
-
 /**
  * Aplica k-anonimato a uma lista de linhas com `rotulo` que contém o n
  * embutido (ex.: "Não-binário (1)"). Retorna apenas as linhas com n ≥ k.

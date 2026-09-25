@@ -1,23 +1,4 @@
-/**
- * @module formatters
- * @description Funções centralizadas para formatação de valores monetários e numéricos
- * 
- * ⚠️ IMPORTANTE: Sempre use estas funções ao invés de toLocaleString, toFixed ou Intl.NumberFormat direto
- * 
- * @example
- * // ✅ Correto
- * import { formatCurrency } from '@/lib/formatters';
- * const display = formatCurrency(1234.56); // "R$ 1.234,56"
- * 
- * @example
- * // ❌ EVITE
- * const display = value.toLocaleString('pt-BR'); // Pode causar RangeError
- */
 
-/**
- * Tipos de formatação monetária suportados
- */
-type CurrencyFormat = 'full' | 'compact' | 'no-decimals' | 'custom';
 
 /**
  * Opções de formatação customizada
@@ -83,16 +64,6 @@ export const formatCurrencyNoDecimals = (value: number | null | undefined): stri
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
-};
-
-/**
- * Formata número inteiro sem decimais
- * @param value - Valor a ser formatado
- * @returns String formatada (ex: "1.234")
- */
-const formatInteger = (value: number | null | undefined): string => {
-  if (value === null || value === undefined || !isFinite(value)) return '0';
-  return Math.round(value).toLocaleString('pt-BR');
 };
 
 /**
@@ -184,16 +155,6 @@ export const toFixedSafe = (
   return value.toFixed(safeDecimals);
 };
 
-const convertCurrency = (
-  value: number, 
-  from: 'BRL' | 'USD', 
-  to: 'BRL' | 'USD', 
-  rate: number
-): number => {
-  if (from === to) return value;
-  return from === 'BRL' ? value / rate : value * rate;
-};
-
 /**
  * Formata moeda customizada (BRL ou USD)
  * @param value - Valor a ser formatado
@@ -211,50 +172,6 @@ export const formatCurrencyCustom = (
     currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  }).format(value);
-};
-
-/**
- * Formatador universal com opções customizadas
- * @param value - Valor a ser formatado
- * @param options - Opções de formatação
- * @returns String formatada
- */
-const formatCurrencyWithOptions = (
-  value: number | null | undefined,
-  options: FormatCurrencyOptions = {}
-): string => {
-  if (value === null || value === undefined || !isFinite(value)) {
-    return options.includeSymbol !== false 
-      ? (options.currency === 'USD' ? '$ 0.00' : 'R$ 0,00')
-      : '0';
-  }
-  
-  const {
-    currency = 'BRL',
-    decimals = 2,
-    compact = false,
-    includeSymbol = true,
-  } = options;
-  
-  if (compact) {
-    return formatCompactCurrency(value);
-  }
-  
-  const safeDecimals = Math.max(0, Math.min(20, Math.floor(decimals)));
-  
-  if (!includeSymbol) {
-    return value.toLocaleString(currency === 'BRL' ? 'pt-BR' : 'en-US', {
-      minimumFractionDigits: safeDecimals,
-      maximumFractionDigits: safeDecimals,
-    });
-  }
-  
-  return new Intl.NumberFormat(currency === 'BRL' ? 'pt-BR' : 'en-US', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: safeDecimals,
-    maximumFractionDigits: safeDecimals,
   }).format(value);
 };
 
