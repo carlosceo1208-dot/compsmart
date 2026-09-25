@@ -84,7 +84,7 @@ export default function Leads() {
       if (origem !== "all" && l.origem !== origem) return false;
       if (status !== "all" && normalizeStatus(l.status) !== status) return false;
       if (!term) return true;
-      return [l.nome, l.email, l.empresa].some((v) => v?.toLowerCase().includes(term));
+      return [l.nome, l.email, l.empresa, l.segmento].some((v) => v?.toLowerCase().includes(term));
     });
   }, [leads, q, origem, status]);
 
@@ -156,7 +156,7 @@ export default function Leads() {
       <div className="flex flex-col md:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Buscar por nome, e-mail ou empresa" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input className="pl-9" placeholder="Buscar por nome, e-mail, empresa ou segmento" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select value={origem} onValueChange={setOrigem}>
           <SelectTrigger className="md:w-56"><SelectValue placeholder="Origem" /></SelectTrigger>
@@ -184,26 +184,33 @@ export default function Leads() {
               <TableHead className="hidden md:table-cell">Empresa</TableHead>
               <TableHead className="hidden lg:table-cell">Cargo</TableHead>
               <TableHead className="hidden lg:table-cell">Porte</TableHead>
+              <TableHead className="hidden xl:table-cell">Segmento</TableHead>
               <TableHead>Origem</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={8}><Skeleton className="h-6 w-full" /></TableCell></TableRow>
+              <TableRow><TableCell colSpan={9}><Skeleton className="h-6 w-full" /></TableCell></TableRow>
             ) : filtered.length === 0 ? (
-              <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Nenhum lead encontrado.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhum lead encontrado.</TableCell></TableRow>
             ) : (
               filtered.map((l) => {
                 const s = normalizeStatus(l.status);
                 return (
                   <TableRow key={`${l.source}-${l.id}`} className="cursor-pointer" onClick={() => setSelected(l)}>
                     <TableCell className="whitespace-nowrap">{formatDateTimePtBR(l.created_at)}</TableCell>
-                    <TableCell className="font-medium">{l.nome}</TableCell>
+                    <TableCell className="font-medium">
+                      <span className="block">{l.nome}</span>
+                      <span className="block xl:hidden text-xs font-normal text-muted-foreground">
+                        Segmento: {l.segmento || "—"}
+                      </span>
+                    </TableCell>
                     <TableCell>{l.email}</TableCell>
                     <TableCell className="hidden md:table-cell">{l.empresa || "—"}</TableCell>
                     <TableCell className="hidden lg:table-cell">{l.cargo || "—"}</TableCell>
                     <TableCell className="hidden lg:table-cell">{l.porte || "—"}</TableCell>
+                    <TableCell className="hidden xl:table-cell">{l.segmento || "—"}</TableCell>
                     <TableCell>{origemLabel(l.origem)}</TableCell>
                     <TableCell><Badge variant={statusVariant[s]} className="rounded-full">{LEAD_STATUS_LABEL[s]}</Badge></TableCell>
                   </TableRow>
