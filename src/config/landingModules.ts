@@ -112,7 +112,7 @@ export const LANDING_MODULES: LandingModule[] = [
   },
   {
     slug: "nr1",
-    route: "/modulos/nr1",
+    route: "/nr1",
     nome: "Saúde Mental & Bem-Estar (NR-1)",
     nomeCurto: "NR-1",
     agente: "Psi",
