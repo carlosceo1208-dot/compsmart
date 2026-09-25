@@ -117,7 +117,7 @@ export default function Leads() {
     exportToCSV(
       `leads-${new Date().toISOString().slice(0, 10)}`,
       [
-        { header: "Data", accessor: (l: Lead) => formatDatePtBR(l.created_at) },
+        { header: "Data", accessor: (l: Lead) => formatDatePtBR(l.submitted_at) },
         { header: "Nome", accessor: (l) => l.nome },
         { header: "E-mail", accessor: (l) => l.email },
         { header: "Empresa", accessor: (l) => l.empresa },
@@ -208,7 +208,7 @@ export default function Leads() {
                 const s = normalizeStatus(l.status);
                 return (
                   <TableRow key={`${l.source}-${l.id}`} className="cursor-pointer" onClick={() => setSelected(l)}>
-                    <TableCell className="whitespace-nowrap">{formatDatePtBR(l.created_at)}</TableCell>
+                     <TableCell className="whitespace-nowrap">{formatDatePtBR(l.submitted_at)}</TableCell>
                     <TableCell className="font-medium">{l.nome}</TableCell>
                     <TableCell>{l.email}</TableCell>
                     <TableCell>{l.empresa || "—"}</TableCell>
@@ -236,8 +236,7 @@ export default function Leads() {
                   <p className="text-xs rounded-md bg-muted p-2 text-muted-foreground">Somente leitura — contato da página NR-1.</p>
                 )}
                 <Field label="E-mail" value={selected.email} />
-                <Field label="Recebido em" value={formatDateTimePtBR(selected.created_at)} />
-                <Field label="Último interesse" value={formatDateTimePtBR(selected.updated_at)} />
+                 <Field label="Formulário enviado em" value={formatDateTimePtBR(selected.submitted_at)} />
                 <Field label="Origem" value={origemLabel(selected.origem)} />
                 <Field label="Empresa" value={selected.empresa} />
                 <Field label="Cargo" value={selected.cargo} />
