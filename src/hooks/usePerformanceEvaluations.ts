@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { toast } from "sonner";
-import type { Tables, TablesInsert, TablesUpdate, Enums } from "@/integrations/supabase/types";
+import type { TablesInsert, TablesUpdate, Enums } from "@/integrations/supabase/types";
 export type PerformanceEvaluationInsert = TablesInsert<"performance_evaluations">;
 export type PerformanceEvaluationUpdate = TablesUpdate<"performance_evaluations">;
 export type EvaluationStatus = Enums<"performance_evaluation_status">;
