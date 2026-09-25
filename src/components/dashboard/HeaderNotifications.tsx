@@ -19,18 +19,21 @@ export const HeaderNotifications = () => {
   const navigate = useNavigate();
   const { data: roleData, isLoading: roleLoading } = useCurrentUserRole();
   const { pendingApprovals, activeAlerts, pendingAdjustments, unreadKudos, total, isLoading } = useHeaderNotifications();
+  const { isSuperAdmin, newLeads } = useNewLeadsCount();
 
   // Show for everyone if they have unread kudos, otherwise only Admin/HR
   const hasPersonalNotifications = unreadKudos > 0;
   const hasAdminNotifications = pendingApprovals > 0 || activeAlerts > 0 || pendingAdjustments > 0;
   const showAdminNotifications = !roleLoading && (roleData?.isAdmin || roleData?.isHR);
+  const showLeads = isSuperAdmin && newLeads > 0;
 
   // If no notifications at all, don't show the bell for non-admins
-  if (!hasPersonalNotifications && !showAdminNotifications) {
+  if (!hasPersonalNotifications && !showAdminNotifications && !showLeads) {
     return null;
   }
 
-  const hasNotifications = total > 0;
+  const hasNotifications = total + (showLeads ? newLeads : 0) > 0;
+  const badgeTotal = total + (showLeads ? newLeads : 0);
 
   return (
     <DropdownMenu>
