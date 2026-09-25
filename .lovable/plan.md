@@ -16,7 +16,12 @@ Nova página **Leads** em `/admin/leads`, visível somente para super admin (mes
 - Nenhuma mudança nos formulários públicos, textos ou preços.
 
 ## Detalhes técnicos
-- Tabela `leads` já existe, com `status` e políticas de leitura/edição/exclusão só para `is_super_admin`. Sem migração, a menos que os valores atuais de `status` precisem de ajuste (conferir os valores existentes antes de fixar a lista).
+- Schema conferido: `leads.status` já existe, obrigatório, com padrão `'novo'`, sem restrição de valores. Hoje há 1 contato (origem `materiais-ebook-remuneracao`, status `novo`), então não é preciso preencher nada.
+- Migração pequena: fixar os status permitidos em `novo`, `em_contato`, `convertido`, `descartado` (restrição de valores). Por segurança, o painel também trata status vazio ou desconhecido como "Novo" nos contadores.
+- Políticas atuais: leitura/edição/exclusão só para `is_super_admin`; inserção pública com consentimento. Não mudam.
+- Lista ordenada por `created_at` do mais novo para o mais antigo; busca por nome/e-mail/empresa sem diferenciar maiúsculas (`ilike`).
+- Rótulos de origem (filtro e detalhe): `materiais-ebook-remuneracao` = E-book Remuneração; `demo`/`diagnostico` = Demonstração; `contato` = Contato; `parceiro` = Parceiro; `ebook:nr1` = E-book NR-1; `ebook:clima-9box` = E-book Clima & 9-Box; `ebook:remuneracao` = E-book Remuneração; outros = primeira letra maiúscula.
+- O detalhe mostra todos os campos enviados, a origem legível e o consentimento LGPD.
 - Novo `src/pages/admin/Leads.tsx` + hook `useAdminLeads` (React Query: listar, atualizar status). Guarda de rota igual ao `SuperAdminDashboard` (redireciona quem não é super admin; exige MFA).
 - Rota adicionada em `App.tsx` junto de `/admin/convidar-socios`; link em `SuperAdminWelcome.tsx`.
 - Resposta via `mailto:`; exportação com o `csvExport.ts` existente.
