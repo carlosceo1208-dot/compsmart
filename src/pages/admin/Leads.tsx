@@ -102,7 +102,7 @@ export default function Leads() {
     const body = encodeURIComponent(`Olá, ${lead.nome},\n\n`);
     window.location.href = `mailto:${encodeURIComponent(lead.email)}?subject=${subject}&body=${body}`;
     // Otimista: mailto não confirma envio.
-    if (normalizeStatus(lead.status) === "novo") setLeadStatus(lead, "em_contato");
+    if (lead.source !== "nr1" && normalizeStatus(lead.status) === "novo") setLeadStatus(lead, "em_contato");
   };
 
   const exportCsv = () =>
@@ -114,12 +114,14 @@ export default function Leads() {
         { header: "E-mail", accessor: (l) => l.email },
         { header: "Empresa", accessor: (l) => l.empresa },
         { header: "Cargo", accessor: (l) => l.cargo },
+        { header: "Telefone", accessor: (l) => l.telefone },
         { header: "Porte", accessor: (l) => l.porte },
+        { header: "Segmento", accessor: (l) => l.segmento },
         { header: "Origem", accessor: (l) => origemLabel(l.origem) },
         { header: "Status", accessor: (l) => LEAD_STATUS_LABEL[normalizeStatus(l.status)] },
         { header: "Mensagem/Especialidade", accessor: (l) => l.especialidade },
         { header: "LinkedIn", accessor: (l) => l.linkedin },
-        { header: "Consentimento LGPD", accessor: (l) => (l.consentimento_lgpd ? "Sim" : "Não") },
+        { header: "Consentimento LGPD", accessor: (l) => (l.consentimento_lgpd == null ? "" : l.consentimento_lgpd ? "Sim" : "Não") },
       ],
       filtered,
     );
@@ -195,7 +197,7 @@ export default function Leads() {
               filtered.map((l) => {
                 const s = normalizeStatus(l.status);
                 return (
-                  <TableRow key={l.id} className="cursor-pointer" onClick={() => setSelected(l)}>
+                  <TableRow key={`${l.source}-${l.id}`} className="cursor-pointer" onClick={() => setSelected(l)}>
                     <TableCell className="whitespace-nowrap">{formatDateTimePtBR(l.created_at)}</TableCell>
                     <TableCell className="font-medium">{l.nome}</TableCell>
                     <TableCell>{l.email}</TableCell>
@@ -218,25 +220,31 @@ export default function Leads() {
             <>
               <SheetHeader><SheetTitle>{selected.nome}</SheetTitle></SheetHeader>
               <div className="mt-6 space-y-4">
+                {selected.source === "nr1" && (
+                  <p className="text-xs rounded-md bg-muted p-2 text-muted-foreground">Somente leitura — contato da página NR-1.</p>
+                )}
                 <Field label="E-mail" value={selected.email} />
                 <Field label="Recebido em" value={formatDateTimePtBR(selected.created_at)} />
                 <Field label="Último interesse" value={formatDateTimePtBR(selected.updated_at)} />
                 <Field label="Origem" value={origemLabel(selected.origem)} />
                 <Field label="Empresa" value={selected.empresa} />
                 <Field label="Cargo" value={selected.cargo} />
+                <Field label="Telefone" value={selected.telefone} />
                 <Field label="Porte" value={selected.porte} />
-                <Field label="Colaboradores" value={(selected as { colaboradores?: string | null }).colaboradores} />
+                <Field label="Segmento" value={selected.segmento} />
+                <Field label="Colaboradores" value={selected.colaboradores} />
                 <Field label="Módulo de interesse" value={selected.modulo_interesse} />
                 <Field label="E-book / material" value={selected.lead_magnet} />
                 <Field label="Tipo de parceria" value={selected.parceria_tipo} />
                 <Field label="Mensagem / especialidade" value={selected.especialidade} />
                 <Field label="LinkedIn" value={selected.linkedin} />
-                <Field label="Indicador NR-1 (pontuação)" value={(selected as { score_free?: number | null }).score_free?.toString()} />
-                <Field label="Nível de risco" value={(selected as { nivel_risco_free?: string | null }).nivel_risco_free} />
-                <Field label="Consentimento LGPD" value={selected.consentimento_lgpd ? "Sim" : "Não"} />
+                <Field label="Indicador NR-1 (pontuação)" value={selected.score_free?.toString()} />
+                <Field label="Nível de risco" value={selected.nivel_risco_free} />
+                <Field label="UTM (origem / mídia / campanha)" value={[selected.utm_source, selected.utm_medium, selected.utm_campaign].filter(Boolean).join(" / ")} />
+                <Field label="Consentimento LGPD" value={selected.consentimento_lgpd == null ? "—" : selected.consentimento_lgpd ? "Sim" : "Não"} />
                 <div className="space-y-1.5">
                   <p className="text-xs text-muted-foreground">Status</p>
-                  <Select value={normalizeStatus(selected.status)} onValueChange={(v) => setLeadStatus(selected, v as LeadStatus)}>
+                  <Select disabled={selected.source === "nr1"} value={normalizeStatus(selected.status)} onValueChange={(v) => setLeadStatus(selected, v as LeadStatus)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {LEAD_STATUSES.map((s) => <SelectItem key={s} value={s}>{LEAD_STATUS_LABEL[s]}</SelectItem>)}
