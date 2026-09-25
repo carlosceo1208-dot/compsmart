@@ -19,3 +19,6 @@
 - [x] Funil de download do e-book Remuneração Estratégica em /materiais (com ajustes de validação)
 - [x] Painel de Leads em /admin/leads (lista, filtros, detalhe, responder, status, CSV)
 - [x] Diagnosticar o HTML pré-renderizado de /nr1, republicar e validar as tags SEO no domínio oficial.
+
+- [x] Contatos NR-1 no painel de leads (somente leitura)
+- [x] Campo "Segmento da empresa" no /diagnostico

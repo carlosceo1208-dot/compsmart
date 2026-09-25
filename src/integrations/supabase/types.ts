@@ -4123,6 +4123,7 @@ export type Database = {
           porte: string | null
           respostas_free: Json | null
           score_free: number | null
+          segmento: string | null
           status: string
           updated_at: string
         }
@@ -4145,6 +4146,7 @@ export type Database = {
           porte?: string | null
           respostas_free?: Json | null
           score_free?: number | null
+          segmento?: string | null
           status?: string
           updated_at?: string
         }
@@ -4167,6 +4169,7 @@ export type Database = {
           porte?: string | null
           respostas_free?: Json | null
           score_free?: number | null
+          segmento?: string | null
           status?: string
           updated_at?: string
         }
@@ -11809,6 +11812,7 @@ export type Database = {
           _porte: string
           _respostas: Json
           _score: number
+          _segmento: string
         }
         Returns: string
       }

@@ -40,11 +40,15 @@ export const useNewLeadsCount = () => {
         .from("leads")
         .select("*", { count: "exact", head: true })
         .eq("status", "novo");
+      let q2 = supabase.from("nr1_leads").select("*", { count: "exact", head: true });
       const lastSeen = getLastSeen();
-      if (lastSeen) q = q.gt("created_at", lastSeen);
-      const { count, error } = await q;
-      if (error) throw error;
-      return count ?? 0;
+      if (lastSeen) {
+        q = q.gt("created_at", lastSeen);
+        q2 = q2.gt("created_at", lastSeen);
+      }
+      const [r1, r2] = await Promise.all([q, q2]);
+      if (r1.error) throw r1.error;
+      return (r1.count ?? 0) + (r2.error ? 0 : r2.count ?? 0);
     },
     enabled: isSuperAdmin && !roleLoading,
     refetchInterval: 60000,
@@ -57,14 +61,14 @@ export const useNewLeadsCount = () => {
       const name = `new-leads-count-${Math.random().toString(36).slice(2)}`;
       channel = supabase
         .channel(name)
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "leads" },
-          () => {
-            queryClient.invalidateQueries({ queryKey: ["new-leads-count"] });
-            queryClient.invalidateQueries({ queryKey: ["admin-leads"] });
-          }
-        )
+        .on("postgres_changes", { event: "*", schema: "public", table: "leads" }, () => {
+          queryClient.invalidateQueries({ queryKey: ["new-leads-count"] });
+          queryClient.invalidateQueries({ queryKey: ["admin-leads"] });
+        })
+        .on("postgres_changes", { event: "*", schema: "public", table: "nr1_leads" }, () => {
+          queryClient.invalidateQueries({ queryKey: ["new-leads-count"] });
+          queryClient.invalidateQueries({ queryKey: ["admin-leads"] });
+        })
         .subscribe();
     } catch (e) {
       console.warn("Realtime de leads indisponível; usando polling.", e);

@@ -23,6 +23,10 @@ import {
 
 const PORTES = ["Pequena", "Média", "Grande"] as const;
 const COLABS = ["até 99", "100–499", "500+"] as const;
+const SEGMENTOS = [
+  "Indústria", "Comércio", "Serviços", "Tecnologia", "Saúde",
+  "Educação", "Construção Civil", "Agronegócio", "Financeiro", "Outro",
+] as const;
 const MODULOS = [
   "NR-1/Riscos Psicossociais",
   "Clima Organizacional",
@@ -35,6 +39,7 @@ const schema = z.object({
   nome: z.string().trim().min(2).max(100),
   email: z.string().trim().email().max(255),
   porte: z.enum(PORTES),
+  segmento: z.enum(SEGMENTOS),
   colaboradores: z.enum(COLABS),
   modulo: z.enum(MODULOS),
   lgpd: z.literal(true),
@@ -48,7 +53,7 @@ const Diagnostico = () => {
   const [step, setStep] = useState<Step>("questionario");
   const [idx, setIdx] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, number>>({});
-  const [f, setF] = useState({ nome: "", email: "", porte: "", colaboradores: "", modulo: "", lgpd: false });
+  const [f, setF] = useState({ nome: "", email: "", porte: "", segmento: "", colaboradores: "", modulo: "", lgpd: false });
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<{ geral: number; nivel: NivelRisco; dimensoes: Record<string, number> } | null>(null);
 
@@ -73,7 +78,7 @@ const Diagnostico = () => {
     const { data: leadId, error } = await supabase.rpc("submit_diagnostico_lead" as never, {
       _nome: p.data.nome, _email: p.data.email, _porte: p.data.porte,
       _colaboradores: p.data.colaboradores, _modulo: p.data.modulo, _lgpd: true,
-      _score: geral, _nivel: nivel, _respostas: respostas,
+      _score: geral, _nivel: nivel, _respostas: respostas, _segmento: p.data.segmento,
     } as never);
     if (error) {
       setSending(false);
@@ -160,6 +165,13 @@ const Diagnostico = () => {
                       </Select>
                     </div>
                     <div className="space-y-1.5">
+                      <Label>Segmento da empresa*</Label>
+                      <Select value={f.segmento} onValueChange={(v) => setF({ ...f, segmento: v })}>
+                        <SelectTrigger aria-label="Segmento da empresa"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{SEGMENTOS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5 sm:col-span-2">
                       <Label>Colaboradores*</Label>
                       <Select value={f.colaboradores} onValueChange={(v) => setF({ ...f, colaboradores: v })}>
                         <SelectTrigger aria-label="Quantidade de colaboradores"><SelectValue placeholder="Selecione" /></SelectTrigger>
