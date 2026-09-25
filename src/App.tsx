@@ -35,6 +35,7 @@ const Organization = lazy(() => import("./pages/Organization"));
 const Roles = lazy(() => import("./pages/Roles"));
 const AccessControl = lazy(() => import("./pages/AccessControl"));
 const ConvidarSocios = lazy(() => import("./pages/admin/ConvidarSocios"));
+const AdminLeads = lazy(() => import("./pages/admin/Leads"));
 const PermissionsMatrix = lazy(() => import("./pages/admin/PermissionsMatrix"));
 const MyProfile = lazy(() => import("./pages/MyProfile"));
 const SalaryRanges = lazy(() => import("./pages/SalaryRanges"));
@@ -229,6 +230,7 @@ const App = () => {
                         <Route path="/roles" element={<Roles />} />
                         <Route path="/access-control" element={<AccessControl />} />
                         <Route path="/admin/convidar-socios" element={<ConvidarSocios />} />
+                        <Route path="/admin/leads" element={<AdminLeads />} />
                         <Route path="/admin/permissions-matrix" element={<PermissionsMatrix />} />
                         <Route path="/my-profile" element={<MyProfile />} />
                         <Route path="/salary-ranges" element={<ModuleGate mode="page" moduleSlug="core" featureName="Tabela Salarial"><SalaryRanges /></ModuleGate>} />

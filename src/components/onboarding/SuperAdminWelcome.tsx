@@ -45,6 +45,7 @@ const STEPS = [
       { to: "/salary-ranges", label: "Revisar tabelas e faixas salariais" },
       { to: "/nr1", label: "Explorar o módulo Saúde & Bem-Estar (NR-1)" },
       { to: "/admin/convidar-socios", label: "Convidar outros sócios / admins" },
+      { to: "/admin/leads", label: "Ver e responder leads do site" },
     ],
   },
 ];
