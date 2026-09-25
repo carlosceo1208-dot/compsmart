@@ -25,6 +25,8 @@ import { FeedbackWidget } from "@/components/feedback/FeedbackWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { CompanySwitcher } from "@/components/dashboard/CompanySwitcher";
 import { HeaderNotifications } from "@/components/dashboard/HeaderNotifications";
+import { HeaderLeadsButton } from "@/components/dashboard/HeaderLeadsButton";
+import { useNewLeadsCount } from "@/hooks/useNewLeadsCount";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
