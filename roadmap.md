@@ -18,4 +18,4 @@
 - [x] Aplicar o símbolo temático na Home, em Materiais e no favicon
 - [x] Funil de download do e-book Remuneração Estratégica em /materiais (com ajustes de validação)
 - [x] Painel de Leads em /admin/leads (lista, filtros, detalhe, responder, status, CSV)
-- [ ] Diagnosticar o HTML pré-renderizado de /nr1, republicar e validar as tags SEO no domínio oficial.
+- [x] Diagnosticar o HTML pré-renderizado de /nr1, republicar e validar as tags SEO no domínio oficial.
