@@ -30,6 +30,5 @@
 7. Informar o endereço publicado e o resultado observado. Se a implantação ainda estiver processando, deixar isso explícito sem declarar conclusão prematuramente.
 
 ## Detalhes técnicos
-- A geração de `dist/nr1/index.html` já lê `src/config/seoRoutes.ts`; não é necessária correção no gerador.
 - A leitura atual indica que o gerador importa `SEO_ROUTES` e escreve `dist/nr1/index.html`, mas o build local confirmará o resultado real antes de concluir se há defeito ou cache.
 - A checagem pós-publicação será feita no HTML bruto retornado pelo servidor, não apenas no título exibido pelo navegador.
