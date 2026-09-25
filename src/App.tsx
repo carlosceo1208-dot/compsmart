@@ -1,3 +1,4 @@
+import { SeoHead } from "@/components/seo/SeoHead";
 import { useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -217,7 +218,7 @@ const App = () => {
                       <Route path="/termos-de-uso" element={<TermsOfUse />} />
                       <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
                       <Route path="/sobre-nos" element={<AboutUs />} />
-                      <Route path="/glossario" element={<Glossary />} />
+                      <Route path="/glossario" element={<><SeoHead path="/glossario" /><Glossary /></>} />
                       <Route path="/changelog" element={<Changelog />} />
                       <Route path="/checkout" element={<Checkout />} />
                       <Route path="/checkout/success" element={<CheckoutSuccess />} />
