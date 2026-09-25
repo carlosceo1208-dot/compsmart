@@ -4106,6 +4106,7 @@ export type Database = {
       leads: {
         Row: {
           cargo: string | null
+          colaboradores: string | null
           consentimento_lgpd: boolean
           created_at: string
           email: string
@@ -4124,6 +4125,7 @@ export type Database = {
         }
         Insert: {
           cargo?: string | null
+          colaboradores?: string | null
           consentimento_lgpd?: boolean
           created_at?: string
           email: string
@@ -4142,6 +4144,7 @@ export type Database = {
         }
         Update: {
           cargo?: string | null
+          colaboradores?: string | null
           consentimento_lgpd?: boolean
           created_at?: string
           email?: string
@@ -11811,6 +11814,17 @@ export type Database = {
           _token: string
         }
         Returns: string
+      }
+      submit_diagnostico_lead: {
+        Args: {
+          _colaboradores: string
+          _email: string
+          _lgpd: boolean
+          _modulo: string
+          _nome: string
+          _porte: string
+        }
+        Returns: undefined
       }
       submit_external_feedback: {
         Args: {
