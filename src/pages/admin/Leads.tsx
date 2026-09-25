@@ -200,7 +200,12 @@ export default function Leads() {
                 return (
                   <TableRow key={`${l.source}-${l.id}`} className="cursor-pointer" onClick={() => setSelected(l)}>
                     <TableCell className="whitespace-nowrap">{formatDateTimePtBR(l.created_at)}</TableCell>
-                    <TableCell className="font-medium">{l.nome}</TableCell>
+                    <TableCell className="font-medium">
+                      <span className="block">{l.nome}</span>
+                      <span className="block xl:hidden text-xs font-normal text-muted-foreground">
+                        Segmento: {l.segmento || "—"}
+                      </span>
+                    </TableCell>
                     <TableCell>{l.email}</TableCell>
                     <TableCell className="hidden md:table-cell">{l.empresa || "—"}</TableCell>
                     <TableCell className="hidden lg:table-cell">{l.cargo || "—"}</TableCell>
