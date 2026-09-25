@@ -60,6 +60,7 @@ export type AdminLead = {
   status: string | null;
   created_at: string;
   updated_at: string;
+  submitted_at: string;
 };
 
 type Row = Record<string, unknown>;
@@ -70,7 +71,7 @@ export const useAdminLeads = () =>
     queryKey: ["admin-leads"],
     queryFn: async (): Promise<AdminLead[]> => {
       const [a, b] = await Promise.all([
-        supabase.from("leads").select("*").order("updated_at", { ascending: false }).limit(1000),
+        supabase.from("leads").select("*").order("submitted_at", { ascending: false }).limit(1000),
         supabase.from("nr1_leads").select("*").order("created_at", { ascending: false }).limit(1000),
       ]);
       if (a.error) throw a.error;
@@ -83,6 +84,7 @@ export const useAdminLeads = () =>
         utm_source: s(l.utm_source),
         utm_medium: s(l.utm_medium),
         utm_campaign: s(l.utm_campaign),
+        submitted_at: String(l.submitted_at ?? l.created_at),
       }));
       // Lista NR-1: somente leitura, sem status próprio.
       const nr1 = b.error ? [] : ((b.data ?? []) as Row[]).map((l): AdminLead => ({
@@ -111,8 +113,9 @@ export const useAdminLeads = () =>
         status: "novo",
         created_at: String(l.created_at),
         updated_at: String(l.created_at),
+        submitted_at: String(l.created_at),
       }));
-      return [...main, ...nr1].sort((x, y) => (y.updated_at > x.updated_at ? 1 : -1));
+      return [...main, ...nr1].sort((x, y) => (y.submitted_at > x.submitted_at ? 1 : -1));
     },
   });
 
