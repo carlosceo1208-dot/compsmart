@@ -1,4 +1,5 @@
-import { Bell, FileCheck, AlertTriangle, DollarSign, Award } from 'lucide-react';
+import { Bell, FileCheck, AlertTriangle, DollarSign, Award, Inbox } from 'lucide-react';
+import { useNewLeadsCount } from '@/hooks/useNewLeadsCount';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
