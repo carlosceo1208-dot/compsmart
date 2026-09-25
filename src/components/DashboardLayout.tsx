@@ -611,6 +611,15 @@ export const DashboardLayout = () => {
                       <Shield className="mr-2 h-4 w-4 text-purple-600" />
                       <span className="text-purple-600 dark:text-purple-400 font-medium">Painel Plataforma</span>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/admin/leads")} className="hover:bg-purple-50 dark:hover:bg-purple-900/50">
+                      <Inbox className="mr-2 h-4 w-4 text-purple-600" />
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">Leads do Site</span>
+                      {newLeads > 0 && (
+                        <Badge className="ml-auto h-5 min-w-5 flex items-center justify-center p-0 text-xs bg-destructive text-destructive-foreground border-0">
+                          {newLeads > 9 ? "9+" : newLeads}
+                        </Badge>
+                      )}
+                    </DropdownMenuItem>
                   </>
                 )}
                 <DropdownMenuSeparator />
