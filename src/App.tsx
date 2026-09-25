@@ -304,7 +304,7 @@ const App = () => {
                       <Route path="/modulos/:slug" element={<ModuloPage />} />
 
                       {/* Public NR-1 landing (lead capture) — nova URL oficial */}
-                      <Route path="/nr1" element={<LandingNr1 />} />
+                      <Route path="/nr1" element={<><SeoHead path="/nr1" /><LandingNr1 /></>} />
                       {/* Redirect 301-style da URL antiga para preservar SEO e campanhas */}
                       <Route path="/nr1-publico" element={<Navigate to="/nr1" replace />} />
                       {/* URL comercial dedicada para anúncios pagos (Google Ads / Meta / LinkedIn) */}

@@ -40,7 +40,7 @@ export const SEO_ROUTES: SeoRoute[] = [
     title: "Plano de Cargos e Salários com IA para Empresas | CompSmart",
     description: "Estruture cargos, níveis, faixas salariais e equidade interna com o módulo Core da CompSmart, e combine outros módulos conforme a necessidade da empresa." },
   { path: "/modulos/core", priority: "0.8", changefreq: "monthly",
-    title: "Remuneração Estratégica e Avaliação de Desempenho | CompSmart",
+    title: "Remuneração Estratégica e Gestão de Desempenho | CompSmart",
     description: "Módulo Core: cargos, níveis, faixas e curvas salariais integrados à avaliação de desempenho, com agente de IA que apoia o RH nas decisões de remuneração." },
   { path: "/modulos/insight", priority: "0.8", changefreq: "monthly",
     title: "Benchmark Salarial e Pesquisa de Mercado com IA | CompSmart",

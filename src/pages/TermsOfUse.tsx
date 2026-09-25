@@ -1,19 +1,12 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { SeoHead } from "@/components/seo/SeoHead";
 import { Footer } from "@/components/landing/Footer";
 
 const TermsOfUse = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Termos de Uso — CompSmart</title>
-        <meta name="description" content="Termos e condições de uso da plataforma CompSmart: direitos, deveres, planos, cancelamento e responsabilidades das partes." />
-        <link rel="canonical" href="https://www.compsmart.ia.br/termos-de-uso" />
-        <meta property="og:title" content="Termos de Uso — CompSmart" />
-        <meta property="og:description" content="Termos e condições de uso da plataforma CompSmart." />
-        <meta property="og:url" content="https://www.compsmart.ia.br/termos-de-uso" />
-      </Helmet>
+      <SeoHead path="/termos-de-uso" />
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
