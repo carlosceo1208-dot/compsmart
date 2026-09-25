@@ -1,3 +1,4 @@
+import { SeoHead } from "@/components/seo/SeoHead";
 import { useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
