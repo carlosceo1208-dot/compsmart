@@ -28,7 +28,7 @@ import {
  * É só sugestão: o RH sempre pode sobrescrever o valor no formulário.
  */
 const SENIORIDADE_GRADE_PADRAO: Record<Senioridade, string> = {
-  junior: "I", pleno: "II", senior: "III", especialista: "IV",
+  junior: "I", pleno: "II", senior: "III", especialista: "IV", profissional: "V", consultor: "VI",
 };
 
 const norm = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
@@ -47,8 +47,10 @@ const empty: VagaInput = {
   titulo: "", area: "", senioridade: "pleno", cbo: "", descricao_cargo_id: null,
   responsabilidades: "", requisitos_obrigatorios: "", requisitos_desejaveis: "", competencias: [],
   faixa_salarial_min: null, faixa_salarial_max: null, modelo_trabalho: "presencial",
-  localizacao: "", uf: "", cidade: "", tipo_contratacao: "clt", qtd_vagas: 1, status: "rascunho",
+  localizacao: "", uf: "", cidade: "", tipo_contratacao: "clt", qtd_vagas: 1, observacao: "", status: "rascunho",
 };
+
+const OBS_MAX = 2000;
 
 const bullets = (a: string[]) => a.map((s) => `• ${s}`).join("\n");
 
@@ -274,6 +276,14 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
             <Area label="Requisitos obrigatórios" value={f.requisitos_obrigatorios ?? ""} onChange={(v) => set("requisitos_obrigatorios", v)} disabled={busy} />
             <Area label="Requisitos desejáveis" value={f.requisitos_desejaveis ?? ""} onChange={(v) => set("requisitos_desejaveis", v)} disabled={busy} />
             <Area label="Competências (separadas por vírgula)" value={competenciasTxt} onChange={setCompetenciasTxt} disabled={busy} rows={2} />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Observação</Label>
+            <Textarea value={f.observacao ?? ""} rows={3} maxLength={OBS_MAX} disabled={busy}
+              placeholder="Anotações internas sobre o processo seletivo (visível só para o RH)"
+              onChange={(e) => set("observacao", e.target.value)} className="rounded-xl" />
+            <p className="text-xs text-muted-foreground text-right">{(f.observacao ?? "").length}/{OBS_MAX}</p>
           </div>
 
           {fromCbo && (
