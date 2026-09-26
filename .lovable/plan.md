@@ -29,6 +29,11 @@
 2. **Currículo no reenvio**: caminho fixo por candidato (`{empresa}/{candidato}.pdf`); um novo PDF **sobrescreve** o anterior e todas as candidaturas passam a apontar para o mais recente. Sem novo PDF, o atual é mantido. Registrado no `AGENTS.md`.
 3. **Erros amigáveis na candidatura**: limite de tentativas (429) ou falha da verificação anti-robô mostram "Muitas tentativas — tente novamente em instantes" com botão **Reenviar**; nenhum detalhe técnico aparece. Os dados digitados permanecem no formulário.
 4. **Link público copiável**: no card e no diálogo da vaga publicada, botão **Copiar link** (1 clique, aviso "Link copiado"). Em rascunho/pausada/fechada o botão fica oculto.
+5. **Endereço das vagas já existentes**: a migração gera o endereço de todas as vagas atuais (título sem acentos, até 60 caracteres). O endereço é único no site inteiro: em colisão, mesmo entre empresas, ganha sufixo numérico (`analista-de-rh-2`, `-3`...), com nova tentativa automática. Vagas novas seguem a mesma regra via gatilho.
+6. **Empresa sempre pela vaga**: a candidatura pública recebe só o endereço da vaga; a empresa é lida da vaga no banco, nunca do que o navegador envia.
+7. **Planilha com e-mail repetido**: a segunda ocorrência (e seguintes) do mesmo e-mail na mesma colagem aparece no log como "duplicado na planilha (linha X)" e não é importada.
+8. **PDF verificado de verdade**: além do tipo e dos 5 MB, o servidor confere se o arquivo começa com `%PDF`; caso contrário, recusa com "Envie um arquivo PDF válido".
+9. **Trilha LGPD**: junto com data e versão do aceite, grava IP e navegador do candidato (visíveis só ao RH da empresa, para auditoria).
 
 ## Visibilidade da vaga (2 eixos, independentes do status)
 Segue a versão mais completa do requisito (a com "2 eixos").
