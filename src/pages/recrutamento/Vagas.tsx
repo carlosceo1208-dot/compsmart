@@ -58,7 +58,11 @@ const Vagas = () => {
           </div>
           <p className="text-muted-foreground mt-1">Recrutamento & Seleção (Aquisição de Talentos)</p>
         </div>
-        <Button className="rounded-xl" onClick={() => abrir(null)}><Plus className="h-4 w-4 mr-2" />Nova vaga</Button>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="rounded-xl"><Link to="/recrutamento/candidatos"><Users className="h-4 w-4 mr-2" />Candidatos</Link></Button>
+          <Button asChild variant="outline" className="rounded-xl"><a href="/vagas" target="_blank" rel="noreferrer"><ExternalLink className="h-4 w-4 mr-2" />Portal de vagas</a></Button>
+          <Button className="rounded-xl" onClick={() => abrir(null)}><Plus className="h-4 w-4 mr-2" />Nova vaga</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
