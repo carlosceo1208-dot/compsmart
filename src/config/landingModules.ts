@@ -171,10 +171,10 @@ export const LANDING_MODULES: LandingModule[] = [
     slug: "talent",
     chamada: "Feche a vaga certa na primeira vez, com match por perfil — dados, não intuição.",
     route: "/modulos/selecao-rs",
-    nome: "Seleção & Recrutamento",
-    nomeCurto: "Seleção & R&S",
+    nome: "Recrutamento & Seleção (Aquisição de Talentos)",
+    nomeCurto: "Recrutamento & Seleção",
     agente: "Talent",
-    selo: "SELEÇÃO & RECRUTAMENTO",
+    selo: "AQUISIÇÃO DE TALENTOS",
     icon: UserSearch,
     resumo: "Vagas, candidatos, triagem e match de perfil com o cargo real.",
     problema:

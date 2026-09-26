@@ -40,7 +40,7 @@ const Vagas = () => {
             </h1>
             <Badge className="rounded-full">Agente Talent</Badge>
           </div>
-          <p className="text-muted-foreground mt-1">Recrutamento & Seleção (Aquisição de talentos)</p>
+          <p className="text-muted-foreground mt-1">Recrutamento & Seleção (Aquisição de Talentos)</p>
         </div>
         <Button className="rounded-xl" onClick={() => abrir(null)}><Plus className="h-4 w-4 mr-2" />Nova vaga</Button>
       </div>

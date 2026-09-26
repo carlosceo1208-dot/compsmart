@@ -113,7 +113,7 @@ const ClimaCard = () => {
 const RsCard = () => {
   const max = RS_DATA.funil[0].qtd;
   return (
-    <Frame title="Seleção & R&S — Funil de contratação">
+    <Frame title="Recrutamento & Seleção — Funil de contratação">
       <div className="grid h-full grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
         <div className="flex flex-col justify-center gap-1">
           {RS_DATA.funil.map((f, i) => (
