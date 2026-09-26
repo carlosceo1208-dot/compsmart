@@ -14,6 +14,7 @@
 ### Correção
 - Buscar nas pesquisas ativas da empresa **e** nas pesquisas globais ativas, dando preferência às da empresa.
 - Comparar pelo nome do cargo sem acento e sem diferenciar maiúsculas, primeiro com nome exato e depois com nome parecido (um contém o outro). Onde houver CBO, ele continua tendo prioridade.
+- Proteção contra falso positivo: o nome parecido só é usado se encontrar **um único cargo**. Se "Analista" casar com "Analista de RH" e "Analista Financeiro", nada é sugerido e os campos ficam vazios. A nota também mostra qual cargo serviu de base (ex.: "Sugestão baseada em pesquisa (Advogado Pleno) — ajuste se necessário."), para o RH perceber se a referência não serve.
 - Se o cargo veio do CBO e não da biblioteca, procurar na biblioteca da empresa um cargo com o mesmo CBO ou o mesmo nome e usar a faixa da tabela salarial dele.
 - O nível/grade escolhido passa a sempre refinar a sugestão.
 - A nota muda conforme a origem: "Sugestão baseada em pesquisa — ajuste se necessário." ou "Sugestão baseada na tabela salarial do cargo — ajuste se necessário." Sem dado, os campos ficam vazios. O valor digitado pelo RH continua nunca sendo sobrescrito.
@@ -24,6 +25,7 @@
   - escolher um cargo que existe na pesquisa e confirmar que mínimo e máximo aparecem com a nota;
   - editar os valores à mão e confirmar que ficam como o RH digitou;
   - escolher um cargo sem dado e confirmar que os campos ficam vazios;
+  - digitar um nome ambíguo (ex.: "Analista") e confirmar que nada é sugerido;
   - criar uma vaga de rascunho de teste, editar, excluir com confirmação e confirmar que sumiu da lista;
   - confirmar que vaga publicada não mostra o botão Excluir.
 
