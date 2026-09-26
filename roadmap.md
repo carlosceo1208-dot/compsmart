@@ -26,3 +26,4 @@
 - [x] Home: ajustes finos da prova visual, botão Contato e cabeçalho responsivo
 
 - [x] Recrutamento & Seleção — Fase 1: vagas, busca na biblioteca/CBO, perfil com IA (Talent), cadastro de cargo sem duplicidade
+- [x] Nome do módulo na landing: "Recrutamento & Seleção (Aquisição de Talentos)" + selo "AQUISIÇÃO DE TALENTOS", grafia padronizada no app e na base
