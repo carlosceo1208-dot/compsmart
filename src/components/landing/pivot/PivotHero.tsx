@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Sparkles, Download, ShieldCheck, HeartHandshake, Grid3X3, Wallet } from "lucide-react";
+import { Sparkles, ClipboardCheck, ShieldCheck, HeartHandshake, Grid3X3, Wallet } from "lucide-react";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
 import simboloCrescimento from "@/assets/simbolo-crescimento.png.asset.json";
 
@@ -28,15 +28,15 @@ export const PivotHero = () => (
             className="size-36 shrink-0 rounded-2xl object-cover shadow-sm md:size-40"
           />
           <h1 className="max-w-xl text-center text-3xl font-bold leading-tight md:text-left md:text-5xl">
-            Decisões de pessoas com{" "}
-            <span className="text-primary">dados e inteligência artificial</span>
+            De dados de RH a{" "}
+            <span className="text-primary">resultados de negócio.</span>
           </h1>
         </div>
 
         <p className="text-base md:text-lg text-muted-foreground">
-          Nove módulos independentes, cada um com um agente de IA dedicado, que
-          trabalham junto com o seu RH — de cargos e salários a risco
-          psicossocial, clima, seleção, desenvolvimento e sucessão.
+          A CompSmart cruza o que nenhuma outra ferramenta cruza — remuneração,
+          risco psicossocial, clima e potencial. Você recebe diagnóstico, plano
+          de ação e métricas que o conselho entende.
         </p>
 
         <div className="rounded-2xl border border-primary/20 bg-card p-5 md:p-6 shadow-sm">
@@ -59,13 +59,13 @@ export const PivotHero = () => (
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <DemoDialog size="lg" />
-          <Button asChild variant="outline" size="lg">
-            <Link to="/materiais">
-              <Download className="h-4 w-4 mr-2" />
-              Baixar e-book Remuneração Estratégica
+          <Button asChild size="lg">
+            <Link to="/diagnostico">
+              <ClipboardCheck className="h-4 w-4 mr-2" />
+              Fazer o diagnóstico gratuito em 2 minutos
             </Link>
           </Button>
+          <DemoDialog size="lg" variant="outline" triggerLabel="Ver demonstração ao vivo" />
         </div>
       </div>
     </div>
