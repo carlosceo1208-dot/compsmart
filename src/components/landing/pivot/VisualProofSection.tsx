@@ -5,13 +5,13 @@ import { CLIMA_DATA, NR1_DATA, REMU_DATA, RS_DATA, type StatusMercado } from "@/
 
 const Frame = ({ title, children }: { title: string; children: ReactNode }) => (
   <div className="flex flex-col rounded-[18px] border border-border bg-card p-4 shadow-sm">
-    <div className="mb-3 flex items-center justify-between gap-2">
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
       <h3 className="text-sm font-semibold">{title}</h3>
       <Badge variant="outline" className="rounded-full border-warning/40 bg-warning/10 text-[10px] text-foreground">
         Exemplo ilustrativo
       </Badge>
     </div>
-    <div className="aspect-video min-h-[220px] w-full">{children}</div>
+    <div className="w-full sm:aspect-video">{children}</div>
   </div>
 );
 
@@ -29,7 +29,7 @@ const RISK = ["bg-success/70", "bg-primary/60", "bg-warning/80", "bg-destructive
 
 const Nr1Card = () => (
   <Frame title="NR-1 — Mapa de risco psicossocial">
-    <div className="grid h-full grid-cols-[1fr_140px] gap-3">
+    <div className="grid h-full grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
       <div className="flex flex-col">
         <div className="grid grid-cols-[64px_repeat(6,1fr)] gap-0.5 text-[8px] text-muted-foreground">
           <span />
@@ -62,7 +62,7 @@ const ClimaCard = () => {
   const x = 60 + 45 * Math.cos(angle), y = 55 - 45 * Math.sin(angle);
   return (
     <Frame title="Clima — eNPS e engajamento">
-      <div className="grid h-full grid-cols-[150px_1fr] gap-3">
+      <div className="grid h-full grid-cols-1 sm:grid-cols-[150px_1fr] gap-3">
         <div className="flex flex-col items-center gap-2">
           <svg viewBox="0 0 120 64" className="w-full">
             <path d="M15 55 A45 45 0 0 1 105 55" fill="none" className="stroke-muted" strokeWidth="10" strokeLinecap="round" />
@@ -107,7 +107,7 @@ const RsCard = () => {
   const max = RS_DATA.funil[0].qtd;
   return (
     <Frame title="Seleção & R&S — Funil de contratação">
-      <div className="grid h-full grid-cols-[1fr_140px] gap-3">
+      <div className="grid h-full grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
         <div className="flex flex-col justify-center gap-1">
           {RS_DATA.funil.map((f, i) => (
             <div key={f.etapa} className="flex items-center gap-2 text-[10px]">
@@ -153,16 +153,16 @@ const RemuCard = () => {
   const pt = (v: number, i: number) => ({ x: (i / 5) * W, y: H - ((v - min) / (max - min)) * H });
   return (
     <Frame title="Remuneração — Compa-Ratio e competitividade">
-      <div className="grid h-full grid-cols-[1fr_130px] gap-3">
+      <div className="grid h-full grid-cols-1 sm:grid-cols-[1fr_130px] gap-3">
         <div className="flex flex-col gap-1.5">
-          <div className="flex gap-1.5">
+          <div className="flex flex-wrap gap-1.5">
             <Kpi label="Compa-Ratio" value={REMU_DATA.compaRatio} />
             <Kpi label="Abaixo do mercado" value={REMU_DATA.abaixoMercado} tone="text-warning" />
             <div className="flex items-center gap-1 rounded-xl bg-destructive/10 px-2 text-[10px] font-semibold text-destructive">
               <AlertTriangle className="h-3 w-3" />Revisar faixa
             </div>
           </div>
-          <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} className="w-full flex-1" preserveAspectRatio="none">
+          <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} className="h-32 w-full flex-1 sm:h-auto" preserveAspectRatio="none">
             {([["p25", "stroke-muted-foreground/40"], ["p50", "stroke-primary"], ["p75", "stroke-muted-foreground/40"]] as const).map(([k, c]) => (
               <polyline key={k} points={line(REMU_DATA[k], W, H, min, max)} fill="none" className={c} strokeWidth={k === "p50" ? 2.5 : 1.5} strokeDasharray={k === "p50" ? undefined : "4 3"} />
             ))}
@@ -172,7 +172,7 @@ const RemuCard = () => {
               return <circle key={i} cx={p.x} cy={p.y} r="4" className={low ? "fill-warning" : "fill-foreground"} />;
             })}
           </svg>
-          <div className="flex gap-3 text-[9px] text-muted-foreground">
+          <div className="flex flex-wrap gap-x-3 text-[9px] text-muted-foreground">
             <span>- - P25 / P75</span><span className="text-primary">— P50 mercado</span><span>● Empresa</span><span className="text-warning">● Defasagem</span>
           </div>
         </div>
