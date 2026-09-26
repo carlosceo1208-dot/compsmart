@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Briefcase, Plus, Users, Clock, MapPin } from "lucide-react";
 import { VagaDialog } from "@/components/recrutamento/VagaDialog";
 import { MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL, useVagas, type Vaga } from "@/hooks/useVagas";
+import { UFS, formatLocal } from "@/lib/brasil";
 
 const STATUS_VARIANT: Record<Vaga["status"], "default" | "secondary" | "outline" | "destructive"> = {
   publicada: "default", rascunho: "secondary", pausada: "outline", fechada: "destructive",
@@ -19,14 +20,20 @@ const Vagas = () => {
   const [status, setStatus] = useState("todos");
   const [area, setArea] = useState("todas");
   const [senioridade, setSenioridade] = useState("todas");
+  const [uf, setUf] = useState("todas");
+  const [cidade, setCidade] = useState("todas");
   const [editing, setEditing] = useState<Vaga | null>(null);
   const [open, setOpen] = useState(false);
 
   const areas = useMemo(() => Array.from(new Set(vagas.map((v) => v.area).filter(Boolean))) as string[], [vagas]);
+  const ufsUsadas = useMemo(() => Object.fromEntries(Object.entries(UFS).filter(([k]) => vagas.some((v) => v.uf === k)).map(([k, n]) => [k, `${k} — ${n}`])), [vagas]);
+  const cidades = useMemo(() => Array.from(new Set(vagas.filter((v) => v.uf === uf).map((v) => v.cidade).filter(Boolean))).sort() as string[], [vagas, uf]);
   const lista = vagas.filter((v) =>
     (status === "todos" || v.status === status) &&
     (area === "todas" || v.area === area) &&
-    (senioridade === "todas" || v.senioridade === senioridade));
+    (senioridade === "todas" || v.senioridade === senioridade) &&
+    (uf === "todas" || v.uf === uf) &&
+    (uf === "todas" || cidade === "todas" || v.cidade === cidade));
 
   const abrir = (v: Vaga | null) => { setEditing(v); setOpen(true); };
 
@@ -45,10 +52,12 @@ const Vagas = () => {
         <Button className="rounded-xl" onClick={() => abrir(null)}><Plus className="h-4 w-4 mr-2" />Nova vaga</Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         <Filtro value={status} onChange={setStatus} placeholder="Status" all="Todos os status" allValue="todos" options={STATUS_LABEL} />
         <Filtro value={area} onChange={setArea} placeholder="Área" all="Todas as áreas" allValue="todas" options={Object.fromEntries(areas.map((a) => [a, a]))} />
         <Filtro value={senioridade} onChange={setSenioridade} placeholder="Senioridade" all="Todas as senioridades" allValue="todas" options={SENIORIDADE_LABEL} />
+        <Filtro value={uf} onChange={(v) => { setUf(v); setCidade("todas"); }} placeholder="Estado" all="Todos os estados" allValue="todas" options={ufsUsadas} />
+        <Filtro value={cidade} onChange={setCidade} placeholder="Cidade" all={uf === "todas" ? "Escolha o estado" : "Todas as cidades"} allValue="todas" options={Object.fromEntries(cidades.map((c) => [c, c]))} disabled={uf === "todas"} />
       </div>
 
       {error && <p className="text-destructive text-sm">Não foi possível carregar as vagas.</p>}
@@ -80,6 +89,7 @@ const Vagas = () => {
                   <Badge variant="outline" className="rounded-full">{MODELO_LABEL[v.modelo_trabalho]}</Badge>
                   {v.qtd_vagas > 1 && <Badge variant="outline" className="rounded-full">{v.qtd_vagas} posições</Badge>}
                 </div>
+                <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{formatLocal(v.cidade, v.uf)}</p>
                 <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground pt-1 border-t">
                   <span className="flex items-center gap-1 pt-2"><Users className="h-3.5 w-3.5" />0 candidatos</span>
                   <span className="flex items-center gap-1 pt-2"><MapPin className="h-3.5 w-3.5" />{v.status === "publicada" ? "Triagem" : "Abertura"}</span>
@@ -96,10 +106,10 @@ const Vagas = () => {
   );
 };
 
-const Filtro = ({ value, onChange, placeholder, all, allValue, options }: {
-  value: string; onChange: (v: string) => void; placeholder: string; all: string; allValue: string; options: Record<string, string>;
+const Filtro = ({ value, onChange, placeholder, all, allValue, options, disabled }: {
+  value: string; onChange: (v: string) => void; placeholder: string; all: string; allValue: string; options: Record<string, string>; disabled?: boolean;
 }) => (
-  <Select value={value} onValueChange={onChange}>
+  <Select value={value} onValueChange={onChange} disabled={disabled}>
     <SelectTrigger className="rounded-xl" aria-label={placeholder}><SelectValue placeholder={placeholder} /></SelectTrigger>
     <SelectContent>
       <SelectItem value={allValue}>{all}</SelectItem>

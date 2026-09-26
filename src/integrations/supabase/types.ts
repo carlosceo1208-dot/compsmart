@@ -10112,6 +10112,7 @@ export type Database = {
         Row: {
           area: string | null
           cbo: string | null
+          cidade: string | null
           competencias: string[]
           created_at: string
           created_by: string | null
@@ -10130,11 +10131,13 @@ export type Database = {
           status: string
           tipo_contratacao: string
           titulo: string
+          uf: string | null
           updated_at: string
         }
         Insert: {
           area?: string | null
           cbo?: string | null
+          cidade?: string | null
           competencias?: string[]
           created_at?: string
           created_by?: string | null
@@ -10153,11 +10156,13 @@ export type Database = {
           status?: string
           tipo_contratacao?: string
           titulo: string
+          uf?: string | null
           updated_at?: string
         }
         Update: {
           area?: string | null
           cbo?: string | null
+          cidade?: string | null
           competencias?: string[]
           created_at?: string
           created_by?: string | null
@@ -10176,6 +10181,7 @@ export type Database = {
           status?: string
           tipo_contratacao?: string
           titulo?: string
+          uf?: string | null
           updated_at?: string
         }
         Relationships: [

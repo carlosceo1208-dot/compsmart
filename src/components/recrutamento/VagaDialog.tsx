@@ -13,6 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Wand2, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { CargoLibrarySearch, type CargoSelecionado } from "./CargoLibrarySearch";
+import { CidadeInput } from "./CidadeInput";
+import { UFS } from "@/lib/brasil";
+import { useSugestaoFaixa } from "@/hooks/useSugestaoFaixa";
 import {
   CONTRATACAO_LABEL, MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL,
   TalentError, gerarPerfilVaga, salvarCargoNaBiblioteca, useSaveVaga,
@@ -44,7 +47,7 @@ const empty: VagaInput = {
   titulo: "", area: "", senioridade: "pleno", cbo: "", descricao_cargo_id: null,
   responsabilidades: "", requisitos_obrigatorios: "", requisitos_desejaveis: "", competencias: [],
   faixa_salarial_min: null, faixa_salarial_max: null, modelo_trabalho: "presencial",
-  localizacao: "", tipo_contratacao: "clt", qtd_vagas: 1, status: "rascunho",
+  localizacao: "", uf: "", cidade: "", tipo_contratacao: "clt", qtd_vagas: 1, status: "rascunho",
 };
 
 const bullets = (a: string[]) => a.map((s) => `• ${s}`).join("\n");
@@ -70,16 +73,29 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
     },
   });
   const [gerando, setGerando] = useState(false);
+  const [faixaEditada, setFaixaEditada] = useState(false);
+  const [faixaSugerida, setFaixaSugerida] = useState(false);
   const [erroIa, setErroIa] = useState<{ msg: string; retry: boolean } | null>(null);
   const save = useSaveVaga();
 
   useEffect(() => {
     if (!open) return;
-    const base = vaga ? { ...empty, ...vaga } : empty;
+    const base = vaga ? { ...empty, ...vaga, uf: vaga.uf ?? "", cidade: vaga.cidade ?? "" } : empty;
     setF(base);
     setCompetenciasTxt((base.competencias ?? []).join(", "));
-    setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(""); setFamiliaEditada(false); setNivelEditado(false); setErroIa(null);
+    setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(SENIORIDADE_GRADE_PADRAO[base.senioridade]); setFamiliaEditada(false); setNivelEditado(false); setErroIa(null);
+    // Vaga existente com faixa já salva: não sobrescrever.
+    setFaixaEditada(!!vaga && (vaga.faixa_salarial_min != null || vaga.faixa_salarial_max != null)); setFaixaSugerida(false);
   }, [open, vaga]);
+
+  const { data: sugestao } = useSugestaoFaixa({
+    titulo: f.titulo, cbo: f.cbo ?? "", grade: salvarBiblioteca ? nivel : "", cargoId: f.descricao_cargo_id,
+  });
+  useEffect(() => {
+    if (!open || faixaEditada) return;
+    setF((p) => ({ ...p, faixa_salarial_min: sugestao?.min ?? null, faixa_salarial_max: sugestao?.max ?? null }));
+    setFaixaSugerida(!!sugestao);
+  }, [sugestao, faixaEditada, open]);
 
   // Sugestões automáticas (não sobrescrevem o que o RH editou)
   useEffect(() => {
@@ -151,6 +167,7 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
 
   const onSave = async () => {
     if (f.titulo.trim().length < 2) { toast.error("Informe o título da vaga."); return; }
+    if (!f.uf) { toast.error("Informe o estado (UF) da vaga."); return; }
     if (f.faixa_salarial_min != null && f.faixa_salarial_max != null && f.faixa_salarial_min > f.faixa_salarial_max) {
       toast.error("A faixa salarial mínima não pode ser maior que a máxima."); return;
     }
@@ -201,13 +218,21 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
               <Input value={f.cbo ?? ""} disabled={busy} onChange={(e) => set("cbo", e.target.value)} maxLength={20} /></div>
             <Sel label="Senioridade" value={f.senioridade} onChange={(v) => set("senioridade", v as VagaInput["senioridade"])} options={SENIORIDADE_LABEL} disabled={busy} />
             <Sel label="Modelo de trabalho" value={f.modelo_trabalho} onChange={(v) => set("modelo_trabalho", v as VagaInput["modelo_trabalho"])} options={MODELO_LABEL} disabled={busy} />
-            <div className="space-y-1.5"><Label>Localização</Label>
-              <Input value={f.localizacao ?? ""} disabled={busy} onChange={(e) => set("localizacao", e.target.value)} maxLength={120} /></div>
+            <div className="space-y-1.5"><Label>Estado (UF) *</Label>
+              <Select value={f.uf ?? ""} onValueChange={(v) => setF((p) => ({ ...p, uf: v, cidade: p.uf === v ? p.cidade : "" }))} disabled={busy}>
+                <SelectTrigger className="rounded-xl" aria-label="Estado (UF)"><SelectValue placeholder="Selecione o estado" /></SelectTrigger>
+                <SelectContent>{Object.entries(UFS).map(([k, v]) => <SelectItem key={k} value={k}>{k} — {v}</SelectItem>)}</SelectContent>
+              </Select></div>
+            <div className="space-y-1.5"><Label>Cidade</Label>
+              <CidadeInput uf={f.uf ?? ""} value={f.cidade ?? ""} onChange={(v) => set("cidade", v)} disabled={busy} /></div>
             <Sel label="Tipo de contratação" value={f.tipo_contratacao} onChange={(v) => set("tipo_contratacao", v as VagaInput["tipo_contratacao"])} options={CONTRATACAO_LABEL} disabled={busy} />
             <div className="space-y-1.5"><Label>Faixa salarial mínima (R$)</Label>
-              <Input type="number" min={0} value={f.faixa_salarial_min ?? ""} disabled={busy} onChange={(e) => set("faixa_salarial_min", numOrNull(e.target.value))} /></div>
+              <Input type="number" min={0} value={f.faixa_salarial_min ?? ""} disabled={busy} onChange={(e) => { setFaixaEditada(true); set("faixa_salarial_min", numOrNull(e.target.value)); }} /></div>
             <div className="space-y-1.5"><Label>Faixa salarial máxima (R$)</Label>
-              <Input type="number" min={0} value={f.faixa_salarial_max ?? ""} disabled={busy} onChange={(e) => set("faixa_salarial_max", numOrNull(e.target.value))} /></div>
+              <Input type="number" min={0} value={f.faixa_salarial_max ?? ""} disabled={busy} onChange={(e) => { setFaixaEditada(true); set("faixa_salarial_max", numOrNull(e.target.value)); }} /></div>
+            {faixaSugerida && !faixaEditada && (
+              <p className="sm:col-span-2 -mt-2 text-xs text-muted-foreground">Sugestão baseada em pesquisa — ajuste se necessário.</p>
+            )}
             <div className="space-y-1.5"><Label>Quantidade de vagas</Label>
               <Input type="number" min={1} value={f.qtd_vagas} disabled={busy} onChange={(e) => set("qtd_vagas", Math.max(1, Number(e.target.value) || 1))} /></div>
             <Sel label="Status" value={f.status} onChange={(v) => set("status", v as VagaInput["status"])} options={STATUS_LABEL} disabled={busy} />
