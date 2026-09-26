@@ -10122,6 +10122,7 @@ export type Database = {
           id: string
           localizacao: string | null
           modelo_trabalho: string
+          observacao: string | null
           qtd_vagas: number
           requisitos_desejaveis: string | null
           requisitos_obrigatorios: string | null
@@ -10147,6 +10148,7 @@ export type Database = {
           id?: string
           localizacao?: string | null
           modelo_trabalho?: string
+          observacao?: string | null
           qtd_vagas?: number
           requisitos_desejaveis?: string | null
           requisitos_obrigatorios?: string | null
@@ -10172,6 +10174,7 @@ export type Database = {
           id?: string
           localizacao?: string | null
           modelo_trabalho?: string
+          observacao?: string | null
           qtd_vagas?: number
           requisitos_desejaveis?: string | null
           requisitos_obrigatorios?: string | null
