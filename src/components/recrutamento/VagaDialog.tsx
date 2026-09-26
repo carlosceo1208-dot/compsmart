@@ -112,11 +112,22 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
   const garantirFamilia = async (nome: string) => {
     const existente = familias.find((x) => norm(x.name) === norm(nome));
     if (existente) return existente.name;
-    const { data: atual } = await supabase.from("job_families").select("name")
-      .eq("root_company_id", activeCompanyId!).ilike("name", nome.trim());
-    if (atual && atual.length) return atual[0].name;
+    const buscar = async () => {
+      const { data } = await supabase.from("job_families").select("name")
+        .eq("root_company_id", activeCompanyId!).ilike("name", nome.trim());
+      return data?.[0]?.name ?? null;
+    };
+    const atual = await buscar();
+    if (atual) return atual;
     const { error } = await supabase.from("job_families").insert({ name: nome.trim(), root_company_id: activeCompanyId!, is_active: true });
-    if (error) throw error;
+    if (error) {
+      // Conflito de unicidade (ex.: criação simultânea): reutiliza a família existente em vez de abortar o salvamento da vaga.
+      if (error.code === "23505") {
+        const reuse = await buscar();
+        if (reuse) return reuse;
+      }
+      throw error;
+    }
     return nome.trim();
   };
 
