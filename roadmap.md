@@ -27,3 +27,5 @@
 
 - [x] Recrutamento & Seleção — Fase 1: vagas, busca na biblioteca/CBO, perfil com IA (Talent), cadastro de cargo sem duplicidade
 - [x] Nome do módulo na landing: "Recrutamento & Seleção (Aquisição de Talentos)" + selo "AQUISIÇÃO DE TALENTOS", grafia padronizada no app e na base
+
+- [ ] Fase 3: excluir candidato/candidatura (LGPD), só RH/admin da empresa, apagando o currículo
