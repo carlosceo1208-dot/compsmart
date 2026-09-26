@@ -27,10 +27,10 @@ Título + corpo "Veja como a CompSmart traduz dados em decisão, módulo a módu
 4) As 4 imagens enviadas (mockups) são só referência visual de layout, estrutura e estilo; cada tela é recriada na própria página, nas cores da CompSmart. As imagens em si não entram no site.
 
 Conteúdo de cada tela:
-- NR-1 — Mapa de risco psicossocial: mapa de calor das 6 dimensões COPSOQ-III (Exigências, Controle, Apoio Social, Relacionamentos, Recompensas, Segurança) × grupos; "Risco global: Baixo", "Dimensão crítica: 1"; tendência "Evolução do risco ao longo dos meses" em queda.
+- NR-1 — Mapa de risco psicossocial: mapa de calor das 6 dimensões COPSOQ-III (Exigências, Controle, Apoio Social, Relacionamentos, Recompensas, Segurança) × grupos; selo "Risco Alto → Baixo"; "Risco global: Baixo", "Dimensão crítica: 1"; tendência "Evolução do risco ao longo dos meses" em queda.
 - Clima — eNPS e engajamento: medidor com eNPS 62 e "+18 pts"; Participação 91%, Engajamento 78%; barras por área (Vendas, Operações, TI, Financeiro, RH); tendência por trimestre subindo.
 - Seleção — Funil de contratação: Triagem → Entrevista RH → Entrevista Gestor → Proposta → Contratado com contagens e %; "Tempo médio de fecho: 21 dias" (-40%), "Vagas ativas: 12", "Taxa de conversão: 18%"; mini linha em queda e lista de vagas.
-- Remuneração — Compa-Ratio e competitividade: curva com P25/P50/P75 e pontos por cargo; "Compa-Ratio: 94%", "Funções abaixo do mercado: 3", "Alerta: Revisar faixa"; ranking de cargos com Acima / Alinhado / Abaixo.
+- Remuneração — Compa-Ratio e competitividade: curva com P25/P50/P75 e pontos por cargo; "Compa-Ratio: 94%", "Funções abaixo do mercado: 3", alertas âmbar de "Defasagem" e "Alerta: Revisar faixa"; ranking de cargos com Acima / Alinhado / Abaixo.
 
 ## 6. Como funciona
 Título "Diagnóstico → Plano → Acompanhamento." + corpo enviado; 3 passos alinhados a esse fluxo.
