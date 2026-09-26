@@ -1,7 +1,8 @@
-# Campo "Observação" no cadastro de vaga
+# Campo "Observação" + novas senioridades no cadastro de vaga
 
 ## Objetivo
-Dar ao recrutador um campo de escrita livre para registrar informações importantes do processo seletivo (ex.: particularidades da vaga, combinações com o gestor, prazos internos).
+1. Dar ao recrutador um campo de escrita livre para registrar informações importantes do processo seletivo (ex.: particularidades da vaga, combinações com o gestor, prazos internos).
+2. Ampliar as opções de senioridade da vaga: hoje Júnior, Pleno, Sênior, Especialista — passam a incluir **Profissional** e **Consultor**, nesta ordem, após Especialista.
 
 ## O que muda
 
