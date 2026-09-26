@@ -24,7 +24,7 @@ import {
  * Ponto único para, no futuro, aceitar um mapa próprio por empresa.
  * É só sugestão: o RH sempre pode sobrescrever o valor no formulário.
  */
-export const SENIORIDADE_GRADE_PADRAO: Record<Senioridade, string> = {
+const SENIORIDADE_GRADE_PADRAO: Record<Senioridade, string> = {
   junior: "I", pleno: "II", senior: "III", especialista: "IV",
 };
 
@@ -33,8 +33,8 @@ const norm = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").t
 const AREA_FAMILIA: [RegExp, string][] = [
   [/advog|jurid|direito|legal/, "Jurídico"],
   [/financ|contab|fiscal/, "Financeiro"],
-  [/rh|recursos humanos|pessoas/, "Recursos Humanos"],
-  [/ti|tecnolog|sistemas|desenvolv/, "Tecnologia"],
+  [/\brh\b|recursos humanos|pessoas/, "Recursos Humanos"],
+  [/\bti\b|tecnolog|sistemas|desenvolv/, "Tecnologia"],
   [/venda|comercial/, "Comercial"],
   [/marketing/, "Marketing"],
   [/operac|produc|logist/, "Operações"],
