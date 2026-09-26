@@ -79,6 +79,21 @@ export const useSaveVaga = () => {
   });
 };
 
+export const useDeleteVaga = () => {
+  const qc = useQueryClient();
+  const { activeCompanyId } = useCompanyContext();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      if (!activeCompanyId) throw new Error("Empresa não selecionada");
+      const { data, error } = await vagasTable().delete()
+        .eq("id", id).eq("root_company_id", activeCompanyId).eq("status", "rascunho").select("id");
+      if (error) throw error;
+      if (!data?.length) throw new Error("Somente vagas em rascunho podem ser excluídas.");
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["vagas"] }),
+  });
+};
+
 export interface PerfilGerado {
   responsabilidades: string[];
   requisitos_obrigatorios: string[];
