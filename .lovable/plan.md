@@ -11,9 +11,9 @@
    - A regra que limita os valores de senioridade no banco é ampliada para aceitar também `profissional` e `consultor`. Vagas existentes não mudam.
 
 2. **Cadastro/edição da vaga (VagaDialog)**
-   - Novo campo "Observação" (caixa de texto de várias linhas), opcional, com contador de caracteres.
-   - Posicionado ao final do formulário, depois dos requisitos.
-   - Texto livre: sem validação de conteúdo, só o limite de tamanho.
+   - Novo campo "Observação" (caixa de texto de várias linhas), opcional, com contador de caracteres, ao final do formulário, depois dos requisitos. Texto livre: sem validação de conteúdo, só o limite de tamanho.
+   - Seletor de Senioridade passa a listar: Júnior, Pleno, Sênior, Especialista, Profissional, Consultor.
+   - Sugestão automática de nível/grade estendida: Profissional sugere grade V, Consultor sugere grade VI (sempre editável, como hoje).
 
 3. **Lista de vagas**
    - A observação aparece no card da vaga (resumida, com "ver mais" quando longa) apenas quando preenchida.
