@@ -30,11 +30,12 @@ export const PainSection = () => (
     <div className="container mx-auto px-4">
       <div className="max-w-2xl mx-auto text-center mb-10">
         <h2 className="text-2xl md:text-4xl font-bold">
-          O que trava a gestão de pessoas hoje
+          Quanto custa decidir RH no achismo?
         </h2>
         <p className="mt-3 text-muted-foreground">
-          Três situações que aparecem em praticamente toda empresa que conversa
-          com a gente.
+          Vaga parada, salário fora da faixa, talento que sai sem aviso, risco
+          psicossocial crescendo em silêncio. Cada decisão sem dado custa caro — e
+          ninguém percebe até o dano aparecer.
         </p>
       </div>
 

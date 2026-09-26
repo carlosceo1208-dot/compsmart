@@ -17,6 +17,7 @@ import {
   PIVOT_FAQ_ITEMS,
 } from "@/components/landing/pivot/PivotFAQSection";
 import { PreFooterCTA } from "@/components/landing/pivot/PreFooterCTA";
+import { VisualProofSection } from "@/components/landing/pivot/VisualProofSection";
 import { VideoSection } from "@/components/landing/VideoSection";
 
 /**
@@ -64,6 +65,7 @@ const Index = () => {
       <PainSection />
       <ModulesGridSection />
       <CrossDataSection />
+      <VisualProofSection />
       <VideoSection />
       <PivotHowItWorks />
       <PayrollIntegrationsSection />

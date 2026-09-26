@@ -1,20 +1,20 @@
-import { Upload, Brain, Compass } from "lucide-react";
+import { ClipboardCheck, ListChecks, LineChart } from "lucide-react";
 
 const PASSOS = [
   {
-    icon: Upload,
-    title: "Importe a base",
-    body: "Envie a planilha Excel ou CSV da sua folha. O mapeamento inteligente reconhece as colunas, valida os dados e mostra um preview antes de gravar.",
+    icon: ClipboardCheck,
+    title: "Diagnóstico",
+    body: "Você começa com o diagnóstico gratuito em 2 minutos e importa a base da folha (Excel ou CSV) quando quiser aprofundar.",
   },
   {
-    icon: Brain,
-    title: "A IA analisa",
-    body: "Benchmark de mercado, risco psicossocial, clima, desempenho e gaps de competência são processados pelos agentes de cada módulo.",
+    icon: ListChecks,
+    title: "Plano",
+    body: "Os agentes de IA cruzam os dados e entregam um plano de ação priorizado, com o porquê de cada recomendação.",
   },
   {
-    icon: Compass,
-    title: "Decida com inteligência",
-    body: "Relatórios, planos de ação e alertas prontos para levar à diretoria — com o porquê de cada recomendação.",
+    icon: LineChart,
+    title: "Acompanhamento",
+    body: "Acompanhe a evolução nos dashboards e leve à diretoria métricas que o conselho entende.",
   },
 ];
 
@@ -22,9 +22,9 @@ export const PivotHowItWorks = () => (
   <section className="py-16 md:py-20 bg-background">
     <div className="container mx-auto px-4">
       <div className="max-w-2xl mx-auto text-center mb-10">
-        <h2 className="text-2xl md:text-4xl font-bold">Como funciona</h2>
+        <h2 className="text-2xl md:text-4xl font-bold">Diagnóstico → Plano → Acompanhamento.</h2>
         <p className="mt-3 text-muted-foreground">
-          Do arquivo da folha à decisão, em três passos.
+          Você começa com o diagnóstico gratuito, recebe o plano priorizado e acompanha a evolução nos dashboards.
         </p>
       </div>
 

@@ -22,3 +22,4 @@
 
 - [x] Contatos NR-1 no painel de leads (somente leitura)
 - [x] Campo "Segmento da empresa" no /diagnostico
+- [ ] Home: novos textos + seção de prova visual (4 telas ilustrativas)

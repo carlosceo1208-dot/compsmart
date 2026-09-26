@@ -32,6 +32,21 @@ export const PIVOT_FAQ_ITEMS = [
     answer:
       "O time de RH e remuneração conduz; gestores participam de avaliações, metas e planos de ação; a diretoria acompanha os painéis executivos; e os colaboradores respondem diagnósticos e pesquisas de forma anônima. Cada perfil vê apenas o que lhe cabe.",
   },
+  {
+    question: "Como fica a LGPD?",
+    answer:
+      "Os diagnósticos de colaboradores são anônimos, com relatório sempre por grupo (k-anonymity) — nunca por pessoa.",
+  },
+  {
+    question: "Serve para o porte da minha empresa?",
+    answer:
+      "Sim. A plataforma ajusta estrutura, faixas e benchmarks ao tamanho da sua empresa.",
+  },
+  {
+    question: "Como é a implementação?",
+    answer:
+      "Começa pelo diagnóstico gratuito em 2 minutos, sem consultoria obrigatória.",
+  },
 ];
 
 export const PivotFAQSection = () => (
