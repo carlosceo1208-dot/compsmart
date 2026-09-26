@@ -12,6 +12,7 @@
   - Créditos de IA esgotados ou excesso de pedidos: mensagem clara explicando o motivo.
   - Falha do modelo: mensagem de erro com botão **"Tentar novamente"**.
 - **Reaproveitar o cargo (opcional)**: quando a vaga veio do catálogo CBO (cargo fora do plano da empresa), ao salvar aparece a opção "Cadastrar também este cargo na biblioteca da empresa". Se marcada, o sistema pede só o que falta ao Plano de Cargos (família e nível) e salva o cargo com o perfil gerado, deixando-o pronto para as próximas vagas. Desmarcada, só a vaga é salva.
+  - **Sem duplicidade**: antes de cadastrar, o sistema confere se a empresa já tem um cargo com o mesmo CBO ou o mesmo nome (sem diferenciar maiúsculas/acentos). Se tiver, não cria outro: avisa "Este cargo já existe na biblioteca" e liga a vaga ao cargo existente. A mesma checagem é feita no servidor, para valer mesmo com dois cliques rápidos.
 - Portal público, candidatos e ranking ficam para as próximas fases.
 
 ## Detalhes técnicos
