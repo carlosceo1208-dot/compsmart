@@ -7,8 +7,8 @@
 ## O que muda
 
 1. **Banco de dados**
-   - Nova coluna `observacao` (texto livre, opcional, sem limite rígido além de um teto de 2.000 caracteres validado no banco) na tabela de vagas.
-   - Vagas existentes ficam com o campo vazio — nada muda nelas.
+   - Nova coluna `observacao` (texto livre, opcional, teto de 2.000 caracteres validado no banco) na tabela de vagas. Vagas existentes ficam com o campo vazio.
+   - A regra que limita os valores de senioridade no banco é ampliada para aceitar também `profissional` e `consultor`. Vagas existentes não mudam.
 
 2. **Cadastro/edição da vaga (VagaDialog)**
    - Novo campo "Observação" (caixa de texto de várias linhas), opcional, com contador de caracteres.
