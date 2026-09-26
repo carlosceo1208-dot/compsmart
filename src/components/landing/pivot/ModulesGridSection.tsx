@@ -39,7 +39,7 @@ export const ModulesGridSection = () => (
                 </div>
                 <h3 className="font-semibold">{m.nomeCurto}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {m.resumo}
+                  {m.chamada ?? m.resumo}
                 </p>
                 <div className="flex items-center justify-between pt-1">
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-primary">

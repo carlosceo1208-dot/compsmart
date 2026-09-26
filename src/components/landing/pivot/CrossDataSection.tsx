@@ -21,11 +21,12 @@ export const CrossDataSection = () => (
     <div className="container mx-auto px-4">
       <div className="max-w-2xl mx-auto text-center mb-10">
         <h2 className="text-2xl md:text-4xl font-bold">
-          Só a CompSmart cruza esses dados
+          Só a CompSmart cruza remuneração × risco × clima × potencial.
         </h2>
         <p className="mt-3 text-muted-foreground">
-          NR-1, clima, potencial e remuneração no mesmo lugar — e a IA mostra o
-          que a combinação revela.
+          Cada módulo funciona sozinho, mas o valor real aparece no cruzamento:
+          quem é key person, onde está o risco, quem merece investimento e o que
+          o mercado paga — na mesma tela.
         </p>
       </div>
 

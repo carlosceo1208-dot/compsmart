@@ -20,6 +20,8 @@ export interface LandingModule {
   selo: string;
   icon: LucideIcon;
   resumo: string;
+  /** Chamada de resultado usada nos cards da Home. */
+  chamada?: string;
   /** Hero da subpágina */
   problema: string;
   solucao: string;
@@ -33,6 +35,7 @@ export interface LandingModule {
 export const LANDING_MODULES: LandingModule[] = [
   {
     slug: "core",
+    chamada: "Faixas no percentil competitivo para atrair e reter sem estourar a folha.",
     route: "/modulos/core",
     nome: "Gestão Estratégica de Remuneração e Desempenho",
     nomeCurto: "Core",
@@ -112,6 +115,7 @@ export const LANDING_MODULES: LandingModule[] = [
   },
   {
     slug: "nr1",
+    chamada: "Adequação à Portaria MTE 1.419 com mapa de risco pronto em dias — não meses.",
     route: "/nr1",
     nome: "Saúde Mental & Bem-Estar (NR-1)",
     nomeCurto: "NR-1",
@@ -139,6 +143,7 @@ export const LANDING_MODULES: LandingModule[] = [
   },
   {
     slug: "clima",
+    chamada: "eNPS medido, analisado e com plano de ação em andamento antes de perder talento.",
     route: "/modulos/clima",
     nome: "Clima Organizacional",
     nomeCurto: "Clima",
@@ -164,6 +169,7 @@ export const LANDING_MODULES: LandingModule[] = [
   },
   {
     slug: "talent",
+    chamada: "Feche a vaga certa na primeira vez, com match por perfil — dados, não intuição.",
     route: "/modulos/selecao-rs",
     nome: "Seleção & Recrutamento",
     nomeCurto: "Seleção & R&S",
@@ -214,6 +220,7 @@ export const LANDING_MODULES: LandingModule[] = [
   },
   {
     slug: "potencial-sucessao",
+    chamada: "Saiba quem são seus key people antes do mercado levar.",
     route: "/modulos/potencial-9box",
     nome: "Avaliação de Potencial e Sucessão",
     nomeCurto: "Potencial & 9-Box",
