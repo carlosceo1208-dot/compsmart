@@ -11,6 +11,11 @@
 - A mensagem de erro passa a dizer qual campo está faltando.
 
 ## Detalhes técnicos
-- `VagaDialog.tsx`: carregar `job_families` da empresa ativa (`activeCompanyId`) e usar um combobox que aceita texto livre; sugerir a família pela área (ou pela família mais parecida). O mapa senioridade → grade fica numa constante; um sinalizador "editado" impede que a sugestão sobrescreva o que o RH escreveu.
-- Continua usando a RPC `talent_link_or_create_job_title`. Nenhuma mudança no banco, a menos que família nova precise ser criada em `job_families`. Nesse caso, o insert segue as regras de acesso que já existem.
-- Rodar lint, typecheck, test, dead-code e build; testar o fluxo "Advogado" no navegador.
+- `VagaDialog.tsx`: carregar `job_families` da empresa ativa (`activeCompanyId`) e usar um combobox que aceita texto livre; sugerir a família pela área (ou pela família mais parecida). Um sinalizador "editado" impede que a sugestão sobrescreva o que o RH escreveu.
+- **Família nova sem duplicar**: antes de inserir em `job_families`, conferir se a empresa já tem uma família com o mesmo nome, sem diferenciar maiúsculas de minúsculas. Se já existir, usar essa família em vez de criar outra.
+- **Mapa senioridade → grade**: fica numa única constante documentada (`SENIORIDADE_GRADE_PADRAO`), pensada para receber no futuro um mapa próprio por empresa. O RH sempre pode sobrescrever o valor.
+- Continua usando a RPC `talent_link_or_create_job_title`. Nenhuma mudança na estrutura do banco. Família nova entra em `job_families` pelas regras de acesso que já existem.
+- Rodar lint, typecheck, test, dead-code e build. Testar o fluxo "Advogado" no navegador em 3 cenários:
+  - (a) família existente + nível sugerido;
+  - (b) família nova + nível editado (conferindo que digitar "juridico" em outra grafia não duplica a família);
+  - (c) trocar a senioridade depois de preencher: o nível editado não pode ser sobrescrito.
