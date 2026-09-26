@@ -44,7 +44,8 @@ Deno.serve(async (req) => {
     if (authErr || !userData.user) return json({ error: "Usuário não autenticado" }, 401);
 
     const { data: hasMod } = await userClient.rpc("has_module", { _slug: "talent" } as never);
-    if (hasMod === false) return json({ error: "Módulo Recrutamento & Seleção não contratado." }, 403);
+    const { data: isSuper } = await userClient.rpc("has_role", { _user_id: userData.user.id, _role: "super_admin" } as never);
+    if (hasMod !== true && isSuper !== true) return json({ error: "Módulo Recrutamento & Seleção não contratado." }, 403);
 
     const parsed = Body.safeParse(await req.json().catch(() => ({})));
     if (!parsed.success) return json({ error: "Dados inválidos", details: parsed.error.flatten().fieldErrors }, 400);
