@@ -36,7 +36,7 @@ const Nr1Card = () => (
           {NR1_DATA.dimensoes.map((d) => (
             <span
               key={d}
-              className="flex min-h-8 items-end justify-center break-all px-0.5 pb-1 text-center text-[6px] leading-tight sm:break-normal sm:text-[7px] lg:text-[8px]"
+              className="flex min-h-8 items-end justify-center break-all px-0.5 pb-1 text-center text-[6px] leading-tight sm:text-[7px] lg:text-[8px]"
             >
               {d}
             </span>
@@ -198,7 +198,7 @@ const RemuCard = () => {
 };
 
 export const VisualProofSection = () => (
-  <section className="bg-muted/30 py-16 md:py-20">
+  <section id="visual-proof" className="bg-muted/30 py-16 md:py-20">
     <div className="container mx-auto px-4">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h2 className="text-2xl font-bold md:text-4xl">Resultado não se explica — se mostra.</h2>
