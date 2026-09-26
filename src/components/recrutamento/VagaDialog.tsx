@@ -16,9 +16,10 @@ import { CargoLibrarySearch, type CargoSelecionado } from "./CargoLibrarySearch"
 import { CidadeInput } from "./CidadeInput";
 import { UFS } from "@/lib/brasil";
 import { useSugestaoFaixa } from "@/hooks/useSugestaoFaixa";
+import { ConfirmarExclusaoVaga } from "./ConfirmarExclusaoVaga";
 import {
   CONTRATACAO_LABEL, MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL,
-  TalentError, gerarPerfilVaga, salvarCargoNaBiblioteca, useSaveVaga,
+  TalentError, gerarPerfilVaga, salvarCargoNaBiblioteca, useSaveVaga, useDeleteVaga,
   type Senioridade, type Vaga, type VagaInput,
 } from "@/hooks/useVagas";
 
@@ -77,6 +78,8 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
   const [gerando, setGerando] = useState(false);
   const [faixaEditada, setFaixaEditada] = useState(false);
   const [faixaSugerida, setFaixaSugerida] = useState(false);
+  const [confirmarExclusao, setConfirmarExclusao] = useState(false);
+  const del = useDeleteVaga();
   const [erroIa, setErroIa] = useState<{ msg: string; retry: boolean } | null>(null);
   const save = useSaveVaga();
 
@@ -91,7 +94,7 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
   }, [open, vaga]);
 
   const { data: sugestao } = useSugestaoFaixa({
-    titulo: f.titulo, cbo: f.cbo ?? "", grade: salvarBiblioteca ? nivel : "", cargoId: f.descricao_cargo_id,
+    titulo: f.titulo, cbo: f.cbo ?? "", grade: nivel, cargoId: f.descricao_cargo_id,
   });
   useEffect(() => {
     if (!open || faixaEditada) return;
@@ -244,7 +247,7 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
             <div className="space-y-1.5"><Label>Faixa salarial máxima (R$)</Label>
               <Input type="number" min={0} value={f.faixa_salarial_max ?? ""} disabled={busy} onChange={(e) => { setFaixaEditada(true); set("faixa_salarial_max", numOrNull(e.target.value)); }} /></div>
             {faixaSugerida && !faixaEditada && (
-              <p className="sm:col-span-2 -mt-2 text-xs text-muted-foreground">Sugestão baseada em pesquisa — ajuste se necessário.</p>
+              <p className="sm:col-span-2 -mt-2 text-xs text-muted-foreground">{sugestao?.fonte === "tabela" ? "Sugestão baseada na tabela salarial do cargo" : "Sugestão baseada em pesquisa"}{sugestao?.base ? ` (${sugestao.base})` : ""} — ajuste se necessário.</p>
             )}
             <div className="space-y-1.5"><Label>Quantidade de vagas</Label>
               <Input type="number" min={1} value={f.qtd_vagas} disabled={busy} onChange={(e) => set("qtd_vagas", Math.max(1, Number(e.target.value) || 1))} /></div>
@@ -307,11 +310,15 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
         </div>
 
         <DialogFooter className="gap-2">
+          {vaga?.status === "rascunho" && (
+            <Button variant="destructive" className="rounded-xl sm:mr-auto" onClick={() => setConfirmarExclusao(true)} disabled={busy || del.isPending}>Excluir vaga</Button>
+          )}
           <Button variant="outline" className="rounded-xl" onClick={() => onOpenChange(false)} disabled={busy}>Cancelar</Button>
           <Button className="rounded-xl" onClick={onSave} disabled={busy}>
             {save.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Salvar vaga
           </Button>
         </DialogFooter>
+        <ConfirmarExclusaoVaga open={confirmarExclusao} onOpenChange={setConfirmarExclusao} vaga={vaga} onDone={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
   );

@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Plus, Users, Clock, MapPin } from "lucide-react";
+import { Briefcase, Plus, Users, Clock, MapPin, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ConfirmarExclusaoVaga } from "@/components/recrutamento/ConfirmarExclusaoVaga";
 import { VagaDialog } from "@/components/recrutamento/VagaDialog";
 import { MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL, useVagas, type Vaga } from "@/hooks/useVagas";
 import { UFS, formatLocal } from "@/lib/brasil";
@@ -24,6 +26,7 @@ const Vagas = () => {
   const [cidade, setCidade] = useState("todas");
   const [editing, setEditing] = useState<Vaga | null>(null);
   const [open, setOpen] = useState(false);
+  const [excluindo, setExcluindo] = useState<Vaga | null>(null);
 
   const areas = useMemo(() => Array.from(new Set(vagas.map((v) => v.area).filter(Boolean))) as string[], [vagas]);
   const ufsUsadas = useMemo(() => Object.fromEntries(Object.entries(UFS).filter(([k]) => vagas.some((v) => v.uf === k)).map(([k, n]) => [k, `${k} — ${n}`])), [vagas]);
@@ -82,7 +85,20 @@ const Vagas = () => {
                     <p className="font-semibold leading-tight">{v.titulo}</p>
                     <p className="text-sm text-muted-foreground">{v.area || "Sem área"}{v.cbo ? ` · CBO ${v.cbo}` : ""}</p>
                   </div>
-                  <Badge variant={STATUS_VARIANT[v.status]} className="rounded-full shrink-0">{STATUS_LABEL[v.status]}</Badge>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Badge variant={STATUS_VARIANT[v.status]} className="rounded-full">{STATUS_LABEL[v.status]}</Badge>
+                    {v.status === "rascunho" && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Ações da vaga"><MoreVertical className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                          <DropdownMenuItem onSelect={() => abrir(v)}><Pencil className="h-4 w-4 mr-2" />Editar</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onSelect={() => setExcluindo(v)}><Trash2 className="h-4 w-4 mr-2" />Excluir</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   <Badge variant="secondary" className="rounded-full">{SENIORIDADE_LABEL[v.senioridade]}</Badge>
@@ -105,6 +121,7 @@ const Vagas = () => {
       )}
 
       <VagaDialog open={open} onOpenChange={setOpen} vaga={editing} />
+      <ConfirmarExclusaoVaga open={!!excluindo} onOpenChange={(o) => !o && setExcluindo(null)} vaga={excluindo} />
     </div>
   );
 };
