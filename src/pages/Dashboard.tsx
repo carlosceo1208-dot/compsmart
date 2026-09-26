@@ -20,6 +20,7 @@ import { ExecutiveCompCard } from "@/components/dashboard/ExecutiveCompCard";
 import { EconomicIndicatorsCard } from "@/components/dashboard/EconomicIndicatorsCard";
 import { PerformanceModuleCard } from "@/components/dashboard/PerformanceModuleCard";
 import { BemEstarModuleCard } from "@/components/dashboard/BemEstarModuleCard";
+import { RecrutamentoModuleCard } from "@/components/dashboard/RecrutamentoModuleCard";
 import { ModuleGate } from "@/components/ModuleGate";
 import { useCurrencyConverter } from "@/hooks/useCurrencyConverter";
 import { useFounderStatus } from "@/hooks/useFounderStatus";
@@ -83,6 +84,11 @@ const Dashboard = () => {
             <Item i={2}>
               <ModuleGate mode="card" moduleSlug="nr1" featureName="Saúde Mental e Bem-Estar (NR-1)">
                 <BemEstarModuleCard />
+              </ModuleGate>
+            </Item>
+            <Item i={3}>
+              <ModuleGate mode="card" moduleSlug="talent" featureName="Recrutamento & Seleção (Aquisição de Talentos)">
+                <RecrutamentoModuleCard />
               </ModuleGate>
             </Item>
           </div>
