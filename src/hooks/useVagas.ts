@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompanyContext } from "@/contexts/CompanyContext";
 
-export type Senioridade = "junior" | "pleno" | "senior" | "especialista";
+export type Senioridade = "junior" | "pleno" | "senior" | "especialista" | "profissional" | "consultor";
 export type VagaStatus = "rascunho" | "publicada" | "pausada" | "fechada";
 
 export interface Vaga {
@@ -25,6 +25,7 @@ export interface Vaga {
   cidade: string | null;
   tipo_contratacao: "clt" | "pj" | "estagio";
   qtd_vagas: number;
+  observacao: string | null;
   status: VagaStatus;
   created_at: string;
   updated_at: string;
@@ -34,6 +35,7 @@ export type VagaInput = Omit<Vaga, "id" | "root_company_id" | "created_at" | "up
 
 export const SENIORIDADE_LABEL: Record<Senioridade, string> = {
   junior: "Júnior", pleno: "Pleno", senior: "Sênior", especialista: "Especialista",
+  profissional: "Profissional", consultor: "Consultor",
 };
 export const STATUS_LABEL: Record<VagaStatus, string> = {
   rascunho: "Rascunho", publicada: "Publicada", pausada: "Pausada", fechada: "Fechada",
