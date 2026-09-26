@@ -24,3 +24,5 @@
 - [x] Campo "Segmento da empresa" no /diagnostico
 - [x] Home: novos textos + seção de prova visual (4 telas ilustrativas)
 - [x] Home: ajustes finos da prova visual, botão Contato e cabeçalho responsivo
+
+- [x] Recrutamento & Seleção — Fase 1: vagas, busca na biblioteca/CBO, perfil com IA (Talent), cadastro de cargo sem duplicidade

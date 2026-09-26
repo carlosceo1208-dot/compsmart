@@ -24,7 +24,7 @@ const fallbackModuleNames: Record<string, string> = {
   match: 'Job Match',
   nr1: 'Saúde Mental & Bem-Estar (NR-1)',
   clima: 'Clima Organizacional',
-  talent: 'Seleção & Recrutamento',
+  talent: 'Recrutamento & Seleção (Aquisição de talentos)',
   evolve: 'Treinamento & PDI',
   'potencial-sucessao': 'Avaliação de Potencial e Sucessão',
   'rh-service': 'RH Service',
