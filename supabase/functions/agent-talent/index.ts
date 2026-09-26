@@ -8,7 +8,7 @@ const json = (body: unknown, status = 200) =>
 const Body = z.object({
   titulo: z.string().trim().min(2).max(200),
   area: z.string().trim().max(120).optional().default(""),
-  senioridade: z.enum(["junior", "pleno", "senior", "especialista"]),
+  senioridade: z.enum(["junior", "pleno", "senior", "especialista", "profissional", "consultor"]),
   cbo: z.string().trim().max(20).optional().default(""),
   descricaoParcial: z.string().max(4000).optional().default(""),
 });
