@@ -8,7 +8,10 @@ import { Briefcase, Plus, Users, Clock, MapPin, MoreVertical, Pencil, Trash2 } f
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ConfirmarExclusaoVaga } from "@/components/recrutamento/ConfirmarExclusaoVaga";
 import { VagaDialog } from "@/components/recrutamento/VagaDialog";
-import { MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL, useVagas, type Vaga } from "@/hooks/useVagas";
+import { MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL, VISIBILIDADE_LABEL, useContagemCandidaturas, useVagas, type Vaga } from "@/hooks/useVagas";
+import { CopiarLinkVaga } from "@/components/recrutamento/CopiarLinkVaga";
+import { Link } from "react-router-dom";
+import { Lock, ExternalLink } from "lucide-react";
 import { UFS, formatLocal } from "@/lib/brasil";
 
 const STATUS_VARIANT: Record<Vaga["status"], "default" | "secondary" | "outline" | "destructive"> = {
@@ -24,6 +27,8 @@ const Vagas = () => {
   const [senioridade, setSenioridade] = useState("todas");
   const [uf, setUf] = useState("todas");
   const [cidade, setCidade] = useState("todas");
+  const [visib, setVisib] = useState("todas");
+  const { data: contagem = {} } = useContagemCandidaturas();
   const [editing, setEditing] = useState<Vaga | null>(null);
   const [open, setOpen] = useState(false);
   const [excluindo, setExcluindo] = useState<Vaga | null>(null);
@@ -36,7 +41,8 @@ const Vagas = () => {
     (area === "todas" || v.area === area) &&
     (senioridade === "todas" || v.senioridade === senioridade) &&
     (uf === "todas" || v.uf === uf) &&
-    (uf === "todas" || cidade === "todas" || v.cidade === cidade));
+    (uf === "todas" || cidade === "todas" || v.cidade === cidade) &&
+    (visib === "todas" || v.visibilidade === visib));
 
   const abrir = (v: Vaga | null) => { setEditing(v); setOpen(true); };
 
@@ -55,12 +61,13 @@ const Vagas = () => {
         <Button className="rounded-xl" onClick={() => abrir(null)}><Plus className="h-4 w-4 mr-2" />Nova vaga</Button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <Filtro value={status} onChange={setStatus} placeholder="Status" all="Todos os status" allValue="todos" options={STATUS_LABEL} />
         <Filtro value={area} onChange={setArea} placeholder="Área" all="Todas as áreas" allValue="todas" options={Object.fromEntries(areas.map((a) => [a, a]))} />
         <Filtro value={senioridade} onChange={setSenioridade} placeholder="Senioridade" all="Todas as senioridades" allValue="todas" options={SENIORIDADE_LABEL} />
         <Filtro value={uf} onChange={(v) => { setUf(v); setCidade("todas"); }} placeholder="Estado" all="Todos os estados" allValue="todas" options={ufsUsadas} />
         <Filtro value={cidade} onChange={setCidade} placeholder="Cidade" all={uf === "todas" ? "Escolha o estado" : "Todas as cidades"} allValue="todas" options={Object.fromEntries(cidades.map((c) => [c, c]))} disabled={uf === "todas"} />
+        <Filtro value={visib} onChange={setVisib} placeholder="Visibilidade" all="Todas as visibilidades" allValue="todas" options={VISIBILIDADE_LABEL} />
       </div>
 
       {error && <p className="text-destructive text-sm">Não foi possível carregar as vagas.</p>}
@@ -103,6 +110,7 @@ const Vagas = () => {
                 <div className="flex flex-wrap gap-1.5">
                   <Badge variant="secondary" className="rounded-full">{SENIORIDADE_LABEL[v.senioridade]}</Badge>
                   <Badge variant="outline" className="rounded-full">{MODELO_LABEL[v.modelo_trabalho]}</Badge>
+                  {v.visibilidade === "confidencial" && <Badge variant="outline" className="rounded-full gap-1"><Lock className="h-3 w-3" />Confidencial</Badge>}
                   {v.qtd_vagas > 1 && <Badge variant="outline" className="rounded-full">{v.qtd_vagas} posições</Badge>}
                 </div>
                 <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{formatLocal(v.cidade, v.uf)}</p>
@@ -110,10 +118,11 @@ const Vagas = () => {
                   <p className="text-xs text-muted-foreground line-clamp-2 border-l-2 border-border pl-2" title={v.observacao}>{v.observacao}</p>
                 )}
                 <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground pt-1 border-t">
-                  <span className="flex items-center gap-1 pt-2"><Users className="h-3.5 w-3.5" />0 candidatos</span>
+                  <span className="flex items-center gap-1 pt-2"><Users className="h-3.5 w-3.5" />{contagem[v.id] ?? 0} {(contagem[v.id] ?? 0) === 1 ? "candidato" : "candidatos"}</span>
                   <span className="flex items-center gap-1 pt-2"><MapPin className="h-3.5 w-3.5" />{v.status === "publicada" ? "Triagem" : "Abertura"}</span>
                   <span className="flex items-center gap-1 pt-2"><Clock className="h-3.5 w-3.5" />{diasAberta(v.created_at)} dias</span>
                 </div>
+                {v.status === "publicada" && <CopiarLinkVaga slug={v.slug} compact />}
               </CardContent>
             </Card>
           ))}
