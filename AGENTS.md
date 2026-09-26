@@ -6,3 +6,4 @@
 - /admin/leads merges `leads` + `nr1_leads` client-side; NR-1 rows are read-only (no status column). Why: one panel for all funnels without migrating data.
 - Vagas (módulo talent) ficam em `vagas` com tenant root_company_id; cargo novo vindo do CBO entra em job_titles só via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
 - agent-talent envia ao modelo só dados da vaga, com filtro de e-mail/CPF/telefone. Why: LGPD.
+- Cidades de vagas vêm da API pública do IBGE (cache 24h memória + 7 dias localStorage) e a faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar valor.
