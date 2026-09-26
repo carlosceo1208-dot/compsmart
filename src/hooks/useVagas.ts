@@ -27,11 +27,36 @@ export interface Vaga {
   qtd_vagas: number;
   observacao: string | null;
   status: VagaStatus;
+  visibilidade: Visibilidade;
+  exibir_nome_empresa: boolean;
+  exibir_faixa: boolean;
+  descricao_publica_cliente: string | null;
+  slug: string;
   created_at: string;
   updated_at: string;
 }
 
-export type VagaInput = Omit<Vaga, "id" | "root_company_id" | "created_at" | "updated_at">;
+export type Visibilidade = "publica" | "confidencial";
+export const VISIBILIDADE_LABEL: Record<Visibilidade, string> = { publica: "Pública", confidencial: "Confidencial" };
+
+export type VagaInput = Omit<Vaga, "id" | "root_company_id" | "created_at" | "updated_at" | "slug">;
+
+/** Nº de candidaturas por vaga da empresa ativa. */
+export const useContagemCandidaturas = () => {
+  const { activeCompanyId } = useCompanyContext();
+  return useQuery({
+    queryKey: ["candidaturas-contagem", activeCompanyId],
+    enabled: !!activeCompanyId,
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any).from("candidaturas").select("vaga_id").eq("root_company_id", activeCompanyId);
+      if (error) throw error;
+      const m: Record<string, number> = {};
+      for (const r of (data ?? []) as { vaga_id: string }[]) m[r.vaga_id] = (m[r.vaga_id] ?? 0) + 1;
+      return m;
+    },
+  });
+};
 
 export const SENIORIDADE_LABEL: Record<Senioridade, string> = {
   junior: "Júnior", pleno: "Pleno", senior: "Sênior", especialista: "Especialista",

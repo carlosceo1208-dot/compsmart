@@ -120,6 +120,9 @@ const Parceiros = lazy(() => import("./pages/public/Parceiros"));
 const Materiais = lazy(() => import("./pages/public/Materiais"));
 const Contato = lazy(() => import("./pages/public/Contato"));
 const Diagnostico = lazy(() => import("./pages/public/Diagnostico"));
+const VagasPortal = lazy(() => import("./pages/public/VagasPortal"));
+const VagaPublica = lazy(() => import("./pages/public/VagaPublica"));
+const Candidatos = lazy(() => import("./pages/recrutamento/Candidatos"));
 const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
 
@@ -266,6 +269,7 @@ const App = () => {
                         <Route path="/equity" element={<Equity />} />
                         <Route path="/market-benchmark" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Benchmark de Mercado"><MarketBenchmark /></ModuleGate>} />
                         <Route path="/recrutamento/vagas" element={<ModuleGate mode="page" moduleSlug="talent" featureName="Recrutamento & Seleção"><Vagas /></ModuleGate>} />
+                        <Route path="/recrutamento/candidatos" element={<ModuleGate mode="page" moduleSlug="talent" featureName="Recrutamento & Seleção"><Candidatos /></ModuleGate>} />
                         <Route path="/job-matching" element={<ModuleGate mode="page" moduleSlug="match" featureName="Job Matching"><JobMatching /></ModuleGate>} />
                         <Route path="/talent-intelligence" element={<ModuleGate mode="page" moduleSlug="potencial-sucessao" featureName="Inteligência de Talentos"><TalentIntelligence /></ModuleGate>} />
                         <Route path="/pay-equity" element={<ModuleGate mode="page" moduleSlug="core" featureName="Pay Equity"><PayEquity /></ModuleGate>} />
@@ -305,6 +309,8 @@ const App = () => {
                       <Route path="/materiais" element={<Materiais />} />
                       <Route path="/contato" element={<Contato />} />
                       <Route path="/diagnostico" element={<Diagnostico />} />
+                      <Route path="/vagas" element={<VagasPortal />} />
+                      <Route path="/vagas/:slug" element={<VagaPublica />} />
                       <Route path="/modulos/nr1" element={<Navigate to="/nr1" replace />} />
                       <Route path="/modulos/:slug" element={<ModuloPage />} />
 

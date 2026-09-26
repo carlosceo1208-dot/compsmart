@@ -1125,6 +1125,120 @@ export type Database = {
         }
         Relationships: []
       }
+      candidatos: {
+        Row: {
+          cargo_pretendido: string | null
+          consentimento_data: string | null
+          consentimento_ip: string | null
+          consentimento_lgpd: boolean
+          consentimento_user_agent: string | null
+          consentimento_versao: string | null
+          created_at: string
+          created_by: string | null
+          curriculo_url: string | null
+          email: string
+          fonte: string
+          id: string
+          nome: string
+          observacoes: string | null
+          root_company_id: string
+          senioridade: string | null
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          cargo_pretendido?: string | null
+          consentimento_data?: string | null
+          consentimento_ip?: string | null
+          consentimento_lgpd?: boolean
+          consentimento_user_agent?: string | null
+          consentimento_versao?: string | null
+          created_at?: string
+          created_by?: string | null
+          curriculo_url?: string | null
+          email: string
+          fonte: string
+          id?: string
+          nome: string
+          observacoes?: string | null
+          root_company_id: string
+          senioridade?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cargo_pretendido?: string | null
+          consentimento_data?: string | null
+          consentimento_ip?: string | null
+          consentimento_lgpd?: boolean
+          consentimento_user_agent?: string | null
+          consentimento_versao?: string | null
+          created_at?: string
+          created_by?: string | null
+          curriculo_url?: string | null
+          email?: string
+          fonte?: string
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          root_company_id?: string
+          senioridade?: string | null
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      candidaturas: {
+        Row: {
+          candidato_id: string
+          created_at: string
+          etapa: string
+          id: string
+          match_score: number | null
+          root_company_id: string
+          status: string
+          updated_at: string
+          vaga_id: string
+        }
+        Insert: {
+          candidato_id: string
+          created_at?: string
+          etapa?: string
+          id?: string
+          match_score?: number | null
+          root_company_id: string
+          status?: string
+          updated_at?: string
+          vaga_id: string
+        }
+        Update: {
+          candidato_id?: string
+          created_at?: string
+          etapa?: string
+          id?: string
+          match_score?: number | null
+          root_company_id?: string
+          status?: string
+          updated_at?: string
+          vaga_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidaturas_candidato_id_fkey"
+            columns: ["candidato_id"]
+            isOneToOne: false
+            referencedRelation: "candidatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidaturas_vaga_id_fkey"
+            columns: ["vaga_id"]
+            isOneToOne: false
+            referencedRelation: "vagas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cbo_codes: {
         Row: {
           code: string
@@ -7936,6 +8050,24 @@ export type Database = {
         }
         Relationships: []
       }
+      portal_rate_limit: {
+        Row: {
+          created_at: string
+          id: number
+          ip_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          ip_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          ip_hash?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age_range: string | null
@@ -10117,6 +10249,9 @@ export type Database = {
           created_at: string
           created_by: string | null
           descricao_cargo_id: string | null
+          descricao_publica_cliente: string | null
+          exibir_faixa: boolean
+          exibir_nome_empresa: boolean
           faixa_salarial_max: number | null
           faixa_salarial_min: number | null
           id: string
@@ -10129,11 +10264,13 @@ export type Database = {
           responsabilidades: string | null
           root_company_id: string
           senioridade: string
+          slug: string
           status: string
           tipo_contratacao: string
           titulo: string
           uf: string | null
           updated_at: string
+          visibilidade: string
         }
         Insert: {
           area?: string | null
@@ -10143,6 +10280,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           descricao_cargo_id?: string | null
+          descricao_publica_cliente?: string | null
+          exibir_faixa?: boolean
+          exibir_nome_empresa?: boolean
           faixa_salarial_max?: number | null
           faixa_salarial_min?: number | null
           id?: string
@@ -10155,11 +10295,13 @@ export type Database = {
           responsabilidades?: string | null
           root_company_id: string
           senioridade?: string
+          slug: string
           status?: string
           tipo_contratacao?: string
           titulo: string
           uf?: string | null
           updated_at?: string
+          visibilidade?: string
         }
         Update: {
           area?: string | null
@@ -10169,6 +10311,9 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           descricao_cargo_id?: string | null
+          descricao_publica_cliente?: string | null
+          exibir_faixa?: boolean
+          exibir_nome_empresa?: boolean
           faixa_salarial_max?: number | null
           faixa_salarial_min?: number | null
           id?: string
@@ -10181,11 +10326,13 @@ export type Database = {
           responsabilidades?: string | null
           root_company_id?: string
           senioridade?: string
+          slug?: string
           status?: string
           tipo_contratacao?: string
           titulo?: string
           uf?: string | null
           updated_at?: string
+          visibilidade?: string
         }
         Relationships: [
           {
@@ -11786,6 +11933,45 @@ export type Database = {
         Args: { _template_id: string }
         Returns: undefined
       }
+      portal_listar_vagas: {
+        Args: never
+        Returns: {
+          area: string
+          cidade: string
+          empresa: string
+          faixa_salarial_max: number
+          faixa_salarial_min: number
+          modelo_trabalho: string
+          publicada_em: string
+          senioridade: string
+          slug: string
+          tipo_contratacao: string
+          titulo: string
+          uf: string
+        }[]
+      }
+      portal_vaga: {
+        Args: { _slug: string }
+        Returns: {
+          area: string
+          cidade: string
+          competencias: string[]
+          confidencial: boolean
+          empresa: string
+          faixa_salarial_max: number
+          faixa_salarial_min: number
+          modelo_trabalho: string
+          qtd_vagas: number
+          requisitos_desejaveis: string
+          requisitos_obrigatorios: string
+          responsabilidades: string
+          senioridade: string
+          slug: string
+          tipo_contratacao: string
+          titulo: string
+          uf: string
+        }[]
+      }
       recalculate_salary_range_percentages: {
         Args: never
         Returns: {
@@ -11920,6 +12106,14 @@ export type Database = {
         Returns: string
       }
       suggest_next_employee_number: { Args: never; Returns: string }
+      talent_company_has_module: {
+        Args: { _company: string }
+        Returns: boolean
+      }
+      talent_empresa_publica: {
+        Args: { _v: Database["public"]["Tables"]["vagas"]["Row"] }
+        Returns: string
+      }
       talent_link_or_create_job_title: {
         Args: {
           _cbo: string
@@ -11930,6 +12124,19 @@ export type Database = {
           _responsibilities: string
           _soft_skills: string
           _title: string
+        }
+        Returns: Json
+      }
+      talent_slugify: { Args: { _t: string }; Returns: string }
+      talent_upsert_candidato: {
+        Args: {
+          _cargo: string
+          _email: string
+          _nome: string
+          _observacoes: string
+          _senioridade: string
+          _telefone: string
+          _vaga_ids: string[]
         }
         Returns: Json
       }

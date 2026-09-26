@@ -17,10 +17,13 @@ import { CidadeInput } from "./CidadeInput";
 import { UFS } from "@/lib/brasil";
 import { useSugestaoFaixa } from "@/hooks/useSugestaoFaixa";
 import { ConfirmarExclusaoVaga } from "./ConfirmarExclusaoVaga";
+import { CopiarLinkVaga } from "./CopiarLinkVaga";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 import {
-  CONTRATACAO_LABEL, MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL,
+  CONTRATACAO_LABEL, MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL, VISIBILIDADE_LABEL,
   TalentError, gerarPerfilVaga, salvarCargoNaBiblioteca, useSaveVaga, useDeleteVaga,
-  type Senioridade, type Vaga, type VagaInput,
+  type Senioridade, type Vaga, type VagaInput, type Visibilidade,
 } from "@/hooks/useVagas";
 
 /**
@@ -49,6 +52,7 @@ const empty: VagaInput = {
   responsabilidades: "", requisitos_obrigatorios: "", requisitos_desejaveis: "", competencias: [],
   faixa_salarial_min: null, faixa_salarial_max: null, modelo_trabalho: "presencial",
   localizacao: "", uf: "", cidade: "", tipo_contratacao: "clt", qtd_vagas: 1, observacao: "", status: "rascunho",
+  visibilidade: "publica", exibir_nome_empresa: true, exibir_faixa: false, descricao_publica_cliente: "",
 };
 
 const OBS_MAX = 2000;
@@ -254,6 +258,47 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
             <Sel label="Status" value={f.status} onChange={(v) => set("status", v as VagaInput["status"])} options={STATUS_LABEL} disabled={busy} />
           </div>
 
+          <div className="rounded-2xl border p-4 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label className="flex items-center gap-1">Visibilidade
+                  <TooltipProvider><Tooltip><TooltipTrigger asChild><Info className="h-3.5 w-3.5 text-muted-foreground" aria-label="Sobre visibilidade" /></TooltipTrigger>
+                    <TooltipContent className="max-w-xs">Confidencial: não aparece na listagem pública; divulgada apenas por link direto.</TooltipContent></Tooltip></TooltipProvider>
+                </Label>
+                <Select value={f.visibilidade} disabled={busy} onValueChange={(v) => setF((p) => ({ ...p, visibilidade: v as Visibilidade,
+                  ...(v === "confidencial" ? { exibir_nome_empresa: false, exibir_faixa: false } : { exibir_nome_empresa: true }) }))}>
+                  <SelectTrigger className="rounded-xl" aria-label="Visibilidade"><SelectValue /></SelectTrigger>
+                  <SelectContent>{Object.entries(VISIBILIDADE_LABEL).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Descrição pública do cliente</Label>
+                <Input value={f.descricao_publica_cliente ?? ""} maxLength={160} disabled={busy || (f.visibilidade === "publica" && f.exibir_nome_empresa)}
+                  placeholder="Ex.: Indústria do setor alimentício, atuação nacional"
+                  onChange={(e) => set("descricao_publica_cliente", e.target.value)} />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              {f.visibilidade === "publica" && (
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox checked={f.exibir_nome_empresa} disabled={busy} onCheckedChange={(v) => set("exibir_nome_empresa", v === true)} />
+                  Exibir nome da empresa no portal
+                </label>
+              )}
+              {f.visibilidade === "publica" && (
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox checked={f.exibir_faixa} disabled={busy} onCheckedChange={(v) => set("exibir_faixa", v === true)} />
+                  Exibir faixa salarial no portal
+                </label>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {f.visibilidade === "confidencial"
+                  ? "O candidato verá “Empresa confidencial” (ou a descrição pública). A faixa salarial não é exibida."
+                  : f.exibir_nome_empresa ? "O nome da empresa aparece no portal." : "No lugar do nome aparece a descrição pública (ou “Empresa não identificada”)."}
+              </p>
+            </div>
+          </div>
+
           <div className="rounded-2xl border p-4 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold">Perfil da vaga</p>
@@ -312,6 +357,9 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
         <DialogFooter className="gap-2">
           {vaga?.status === "rascunho" && (
             <Button variant="destructive" className="rounded-xl sm:mr-auto" onClick={() => setConfirmarExclusao(true)} disabled={busy || del.isPending}>Excluir vaga</Button>
+          )}
+          {vaga?.status === "publicada" && (
+            <div className="sm:mr-auto"><CopiarLinkVaga slug={vaga.slug} /></div>
           )}
           <Button variant="outline" className="rounded-xl" onClick={() => onOpenChange(false)} disabled={busy}>Cancelar</Button>
           <Button className="rounded-xl" onClick={onSave} disabled={busy}>

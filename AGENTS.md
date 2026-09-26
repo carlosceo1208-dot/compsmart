@@ -7,3 +7,6 @@
 - Vagas (módulo talent) ficam em `vagas` com tenant root_company_id; cargo novo vindo do CBO entra em job_titles só via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
 - agent-talent envia ao modelo só dados da vaga, com filtro de e-mail/CPF/telefone. Why: LGPD.
 - Cidades de vagas vêm da API pública do IBGE (cache 24h memória + 7 dias localStorage) e a faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar valor.
+- Candidatura pública só via edge function portal-candidatura: empresa sempre derivada da vaga no banco, PDF checado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: o navegador anônimo nunca decide empresa nem grava direto.
+- Currículo fica em curriculos/{empresa}/{candidato}.pdf; novo envio sobrescreve e todas as candidaturas apontam para o mais recente. Why: um currículo vigente por candidato.
+- Nome da empresa no portal é mascarado no servidor (portal_listar_vagas/portal_vaga); vaga confidencial fica fora da lista e só abre por link. Why: nome real nunca chega ao navegador.
