@@ -64,7 +64,7 @@ const ClimaCard = () => {
     <Frame title="Clima — eNPS e engajamento">
       <div className="grid h-full grid-cols-1 sm:grid-cols-[150px_1fr] gap-3">
         <div className="flex flex-col items-center gap-2">
-          <svg viewBox="0 0 120 64" className="w-full">
+          <svg viewBox="0 0 120 64" className="w-full max-w-[180px]">
             <path d="M15 55 A45 45 0 0 1 105 55" fill="none" className="stroke-muted" strokeWidth="10" strokeLinecap="round" />
             <path d={`M15 55 A45 45 0 0 1 ${x} ${y}`} fill="none" className="stroke-primary" strokeWidth="10" strokeLinecap="round" />
             <text x="60" y="50" textAnchor="middle" className="fill-foreground text-[18px] font-bold">{CLIMA_DATA.enps}</text>
