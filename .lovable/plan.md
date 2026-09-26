@@ -21,6 +21,7 @@
 
 4. **Hook de dados (useVagas)**
    - Incluir `observacao` no tipo e no salvamento/carregamento.
+   - Tipo `Senioridade` e rótulos ampliados com as duas novas opções.
 
 ## O que NÃO muda
 - Nenhum outro campo, texto, cor ou layout da tela.
