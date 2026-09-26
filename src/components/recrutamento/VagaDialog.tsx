@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompanyContext } from "@/contexts/CompanyContext";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +16,29 @@ import { CargoLibrarySearch, type CargoSelecionado } from "./CargoLibrarySearch"
 import {
   CONTRATACAO_LABEL, MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL,
   TalentError, gerarPerfilVaga, salvarCargoNaBiblioteca, useSaveVaga,
-  type Vaga, type VagaInput,
+  type Senioridade, type Vaga, type VagaInput,
 } from "@/hooks/useVagas";
+
+/**
+ * Grade padrão sugerida a partir da senioridade da vaga.
+ * Ponto único para, no futuro, aceitar um mapa próprio por empresa.
+ * É só sugestão: o RH sempre pode sobrescrever o valor no formulário.
+ */
+export const SENIORIDADE_GRADE_PADRAO: Record<Senioridade, string> = {
+  junior: "I", pleno: "II", senior: "III", especialista: "IV",
+};
+
+const norm = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+
+const AREA_FAMILIA: [RegExp, string][] = [
+  [/advog|jurid|direito|legal/, "Jurídico"],
+  [/financ|contab|fiscal/, "Financeiro"],
+  [/rh|recursos humanos|pessoas/, "Recursos Humanos"],
+  [/ti|tecnolog|sistemas|desenvolv/, "Tecnologia"],
+  [/venda|comercial/, "Comercial"],
+  [/marketing/, "Marketing"],
+  [/operac|produc|logist/, "Operações"],
+];
 
 const empty: VagaInput = {
   titulo: "", area: "", senioridade: "pleno", cbo: "", descricao_cargo_id: null,
@@ -32,6 +56,19 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
   const [salvarBiblioteca, setSalvarBiblioteca] = useState(false);
   const [familia, setFamilia] = useState("");
   const [nivel, setNivel] = useState("");
+  const [familiaEditada, setFamiliaEditada] = useState(false);
+  const [nivelEditado, setNivelEditado] = useState(false);
+  const { activeCompanyId } = useCompanyContext();
+  const { data: familias = [] } = useQuery({
+    queryKey: ["job_families", activeCompanyId],
+    enabled: open && !!activeCompanyId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("job_families").select("id, name")
+        .eq("root_company_id", activeCompanyId!).order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const [gerando, setGerando] = useState(false);
   const [erroIa, setErroIa] = useState<{ msg: string; retry: boolean } | null>(null);
   const save = useSaveVaga();
@@ -41,8 +78,31 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
     const base = vaga ? { ...empty, ...vaga } : empty;
     setF(base);
     setCompetenciasTxt((base.competencias ?? []).join(", "));
-    setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(""); setErroIa(null);
+    setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(""); setFamiliaEditada(false); setNivelEditado(false); setErroIa(null);
   }, [open, vaga]);
+
+  // Sugestões automáticas (não sobrescrevem o que o RH editou)
+  useEffect(() => {
+    if (!nivelEditado) setNivel(SENIORIDADE_GRADE_PADRAO[f.senioridade]);
+  }, [f.senioridade, nivelEditado]);
+  useEffect(() => {
+    if (familiaEditada) return;
+    const alvo = norm(`${f.area ?? ""} ${f.titulo}`);
+    const existente = familias.find((x) => alvo && alvo.includes(norm(x.name)));
+    const sugerida = existente?.name ?? AREA_FAMILIA.find(([re]) => re.test(alvo))?.[1];
+    if (sugerida) setFamilia(sugerida);
+  }, [f.area, f.titulo, familias, familiaEditada]);
+
+  const garantirFamilia = async (nome: string) => {
+    const existente = familias.find((x) => norm(x.name) === norm(nome));
+    if (existente) return existente.name;
+    const { data: atual } = await supabase.from("job_families").select("name")
+      .eq("root_company_id", activeCompanyId!).ilike("name", nome.trim());
+    if (atual && atual.length) return atual[0].name;
+    const { error } = await supabase.from("job_families").insert({ name: nome.trim(), root_company_id: activeCompanyId!, is_active: true });
+    if (error) throw error;
+    return nome.trim();
+  };
 
   const set = <K extends keyof VagaInput>(k: K, v: VagaInput[K]) => setF((p) => ({ ...p, [k]: v }));
 
@@ -98,9 +158,11 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
     let input: VagaInput = { ...f, competencias };
     try {
       if (fromCbo && salvarBiblioteca) {
-        if (!familia.trim() || !nivel.trim()) { toast.error("Informe família e nível para cadastrar o cargo na biblioteca."); return; }
+        const faltam = [!familia.trim() && "família do cargo", !nivel.trim() && "nível / grade"].filter(Boolean);
+        if (faltam.length) { toast.error(`Informe ${faltam.join(" e ")} para cadastrar o cargo na biblioteca.`); return; }
+        const familiaFinal = await garantirFamilia(familia);
         const r = await salvarCargoNaBiblioteca({
-          title: f.titulo, cbo: f.cbo ?? "", jobFamily: familia, grade: nivel,
+          title: f.titulo, cbo: f.cbo ?? "", jobFamily: familiaFinal, grade: nivel,
           responsibilities: f.responsabilidades ?? "", hardSkills: f.requisitos_obrigatorios ?? "",
           softSkills: competencias.join(", "), experience: f.requisitos_desejaveis ?? "",
         });
@@ -187,9 +249,11 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
               {salvarBiblioteca && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5"><Label>Família do cargo *</Label>
-                    <Input value={familia} onChange={(e) => setFamilia(e.target.value)} maxLength={100} disabled={busy} /></div>
+                    <Input list="familias-cargo" value={familia} onChange={(e) => { setFamilia(e.target.value); setFamiliaEditada(true); }} maxLength={100} disabled={busy} placeholder="Escolha ou digite uma nova" />
+                    <datalist id="familias-cargo">{familias.map((x) => <option key={x.id} value={x.name} />)}</datalist></div>
                   <div className="space-y-1.5"><Label>Nível / grade *</Label>
-                    <Input value={nivel} onChange={(e) => setNivel(e.target.value)} maxLength={50} disabled={busy} /></div>
+                    <Input value={nivel} onChange={(e) => { setNivel(e.target.value); setNivelEditado(true); }} maxLength={50} disabled={busy} /></div>
+                  <p className="sm:col-span-2 text-xs text-muted-foreground">Sugestão automática — ajuste se necessário.</p>
                 </div>
               )}
             </div>
