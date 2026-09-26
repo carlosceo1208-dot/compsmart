@@ -24,6 +24,7 @@
 - [x] Campo "Segmento da empresa" no /diagnostico
 - [x] Home: novos textos + seção de prova visual (4 telas ilustrativas)
 - [x] Home: ajustes finos da prova visual, botão Contato e cabeçalho responsivo
+- [ ] Corrigir regressão do cabeçalho público em 1024 px e validar landing/portal de vagas em desktop e celular
 
 - [x] Recrutamento & Seleção — Fase 1: vagas, busca na biblioteca/CBO, perfil com IA (Talent), cadastro de cargo sem duplicidade
 - [x] Nome do módulo na landing: "Recrutamento & Seleção (Aquisição de Talentos)" + selo "AQUISIÇÃO DE TALENTOS", grafia padronizada no app e na base
