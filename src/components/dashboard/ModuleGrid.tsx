@@ -275,10 +275,10 @@ export const ModuleGrid = () => {
       moduleSlugs: ['clima'],
     },
     {
-      title: 'Seleção & Recrutamento',
+      title: 'Recrutamento & Seleção (Aquisição de talentos)',
       description: 'Vagas, candidatos, triagem e match de perfil',
       icon: Users,
-      path: '/dashboard',
+      path: '/recrutamento/vagas',
       status: 'active',
       category: 'consultation',
       moduleSlugs: ['talent'],

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.talent_link_or_create_job_title(text,text,text,text,text,text,text,text) FROM anon;

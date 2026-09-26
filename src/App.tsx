@@ -79,6 +79,7 @@ const TotalRewards = lazy(() => import("./pages/TotalRewards"));
 const Equity = lazy(() => import("./pages/Equity"));
 const MarketBenchmark = lazy(() => import("./pages/MarketBenchmark"));
 const JobMatching = lazy(() => import("./pages/JobMatching"));
+const Vagas = lazy(() => import("./pages/recrutamento/Vagas"));
 const TalentIntelligence = lazy(() => import("./pages/TalentIntelligence"));
 const PayEquity = lazy(() => import("./pages/PayEquity"));
 const ExecutiveCompensation = lazy(() => import("./pages/ExecutiveCompensation"));
@@ -264,6 +265,7 @@ const App = () => {
                         <Route path="/total-rewards" element={<ModuleGate mode="page" moduleSlug="core" featureName="Total Rewards"><TotalRewards /></ModuleGate>} />
                         <Route path="/equity" element={<Equity />} />
                         <Route path="/market-benchmark" element={<ModuleGate mode="page" moduleSlug="insight" featureName="Benchmark de Mercado"><MarketBenchmark /></ModuleGate>} />
+                        <Route path="/recrutamento/vagas" element={<ModuleGate mode="page" moduleSlug="talent" featureName="Recrutamento & Seleção"><Vagas /></ModuleGate>} />
                         <Route path="/job-matching" element={<ModuleGate mode="page" moduleSlug="match" featureName="Job Matching"><JobMatching /></ModuleGate>} />
                         <Route path="/talent-intelligence" element={<ModuleGate mode="page" moduleSlug="potencial-sucessao" featureName="Inteligência de Talentos"><TalentIntelligence /></ModuleGate>} />
                         <Route path="/pay-equity" element={<ModuleGate mode="page" moduleSlug="core" featureName="Pay Equity"><PayEquity /></ModuleGate>} />

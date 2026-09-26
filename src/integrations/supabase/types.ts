@@ -10108,6 +10108,86 @@ export type Database = {
         }
         Relationships: []
       }
+      vagas: {
+        Row: {
+          area: string | null
+          cbo: string | null
+          competencias: string[]
+          created_at: string
+          created_by: string | null
+          descricao_cargo_id: string | null
+          faixa_salarial_max: number | null
+          faixa_salarial_min: number | null
+          id: string
+          localizacao: string | null
+          modelo_trabalho: string
+          qtd_vagas: number
+          requisitos_desejaveis: string | null
+          requisitos_obrigatorios: string | null
+          responsabilidades: string | null
+          root_company_id: string
+          senioridade: string
+          status: string
+          tipo_contratacao: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          area?: string | null
+          cbo?: string | null
+          competencias?: string[]
+          created_at?: string
+          created_by?: string | null
+          descricao_cargo_id?: string | null
+          faixa_salarial_max?: number | null
+          faixa_salarial_min?: number | null
+          id?: string
+          localizacao?: string | null
+          modelo_trabalho?: string
+          qtd_vagas?: number
+          requisitos_desejaveis?: string | null
+          requisitos_obrigatorios?: string | null
+          responsabilidades?: string | null
+          root_company_id: string
+          senioridade?: string
+          status?: string
+          tipo_contratacao?: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string | null
+          cbo?: string | null
+          competencias?: string[]
+          created_at?: string
+          created_by?: string | null
+          descricao_cargo_id?: string | null
+          faixa_salarial_max?: number | null
+          faixa_salarial_min?: number | null
+          id?: string
+          localizacao?: string | null
+          modelo_trabalho?: string
+          qtd_vagas?: number
+          requisitos_desejaveis?: string | null
+          requisitos_obrigatorios?: string | null
+          responsabilidades?: string | null
+          root_company_id?: string
+          senioridade?: string
+          status?: string
+          tipo_contratacao?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vagas_descricao_cargo_id_fkey"
+            columns: ["descricao_cargo_id"]
+            isOneToOne: false
+            referencedRelation: "job_titles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       invoices_redacted_for_hr: {
@@ -11831,6 +11911,19 @@ export type Database = {
         Returns: string
       }
       suggest_next_employee_number: { Args: never; Returns: string }
+      talent_link_or_create_job_title: {
+        Args: {
+          _cbo: string
+          _experience: string
+          _grade: string
+          _hard_skills: string
+          _job_family: string
+          _responsibilities: string
+          _soft_skills: string
+          _title: string
+        }
+        Returns: Json
+      }
       test_audit_rollback_on_insert_failure: {
         Args: never
         Returns: {
@@ -11839,6 +11932,7 @@ export type Database = {
           status: string
         }[]
       }
+      unaccent_safe: { Args: { t: string }; Returns: string }
       validate_coupon_code: {
         Args: { p_billing_cycle?: string; p_code: string; p_plan_id?: string }
         Returns: {
