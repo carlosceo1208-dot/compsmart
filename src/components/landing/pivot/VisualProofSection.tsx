@@ -4,14 +4,14 @@ import { AlertTriangle, ArrowDown, ArrowUp, Briefcase } from "lucide-react";
 import { CLIMA_DATA, NR1_DATA, REMU_DATA, RS_DATA, type StatusMercado } from "@/config/visualProofData";
 
 const Frame = ({ title, children }: { title: string; children: ReactNode }) => (
-  <div className="flex flex-col rounded-[18px] border border-border bg-card p-4 shadow-sm">
+  <div className="flex h-full flex-col rounded-[18px] border border-border bg-card p-4 shadow-sm">
     <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
       <h3 className="text-sm font-semibold">{title}</h3>
       <Badge variant="outline" className="rounded-full border-warning/40 bg-warning/10 text-[10px] text-foreground">
         Exemplo ilustrativo
       </Badge>
     </div>
-    <div className="w-full sm:aspect-video">{children}</div>
+    <div className="w-full flex-1 sm:aspect-video">{children}</div>
   </div>
 );
 
@@ -31,9 +31,16 @@ const Nr1Card = () => (
   <Frame title="NR-1 — Mapa de risco psicossocial">
     <div className="grid h-full grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
       <div className="flex flex-col">
-        <div className="grid grid-cols-[64px_repeat(6,1fr)] gap-0.5 text-[8px] text-muted-foreground">
-          <span />
-          {NR1_DATA.dimensoes.map((d) => <span key={d} className="truncate text-center">{d}</span>)}
+        <div className="grid grid-cols-[58px_repeat(6,minmax(0,1fr))] gap-0.5 text-muted-foreground sm:grid-cols-[64px_repeat(6,minmax(0,1fr))]">
+          <span className="min-h-8" />
+          {NR1_DATA.dimensoes.map((d) => (
+            <span
+              key={d}
+              className="flex min-h-8 items-end justify-center break-all px-0.5 pb-1 text-center text-[6px] leading-tight sm:text-[7px] lg:text-[8px]"
+            >
+              {d}
+            </span>
+          ))}
           {NR1_DATA.grupos.map((g, gi) => (
             <div key={g} className="contents">
               <span className="truncate pr-1 text-[9px]">{g}</span>
@@ -163,8 +170,8 @@ const RemuCard = () => {
             </div>
           </div>
           <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} className="h-32 w-full flex-1 sm:h-auto" preserveAspectRatio="none">
-            {([["p25", "stroke-muted-foreground/40"], ["p50", "stroke-primary"], ["p75", "stroke-muted-foreground/40"]] as const).map(([k, c]) => (
-              <polyline key={k} points={line(REMU_DATA[k], W, H, min, max)} fill="none" className={c} strokeWidth={k === "p50" ? 2.5 : 1.5} strokeDasharray={k === "p50" ? undefined : "4 3"} />
+            {([["p25", "stroke-muted-foreground/70"], ["p50", "stroke-primary"], ["p75", "stroke-muted-foreground/70"]] as const).map(([k, c]) => (
+              <polyline key={k} points={line(REMU_DATA[k], W, H, min, max)} fill="none" className={c} strokeWidth={k === "p50" ? 2.5 : 2} strokeDasharray={k === "p50" ? undefined : "5 3"} />
             ))}
             {REMU_DATA.empresa.map((v, i) => {
               const p = pt(v, i);
@@ -191,7 +198,7 @@ const RemuCard = () => {
 };
 
 export const VisualProofSection = () => (
-  <section className="bg-muted/30 py-16 md:py-20">
+  <section id="visual-proof" className="bg-muted/30 py-16 md:py-20">
     <div className="container mx-auto px-4">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h2 className="text-2xl font-bold md:text-4xl">Resultado não se explica — se mostra.</h2>
@@ -199,7 +206,7 @@ export const VisualProofSection = () => (
           Veja como a CompSmart traduz dados em decisão, módulo a módulo.
         </p>
       </div>
-      <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2">
+      <div className="mx-auto grid max-w-6xl items-stretch gap-5 md:auto-rows-fr md:grid-cols-2">
         <Nr1Card />
         <ClimaCard />
         <RsCard />
