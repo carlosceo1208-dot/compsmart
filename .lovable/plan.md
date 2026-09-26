@@ -11,6 +11,7 @@
   - Durante a geração: botão em carregamento e campos bloqueados.
   - Créditos de IA esgotados ou excesso de pedidos: mensagem clara explicando o motivo.
   - Falha do modelo: mensagem de erro com botão **"Tentar novamente"**.
+- **Reaproveitar o cargo (opcional)**: quando a vaga veio do catálogo CBO (cargo fora do plano da empresa), ao salvar aparece a opção "Cadastrar também este cargo na biblioteca da empresa". Se marcada, o sistema pede só o que falta ao Plano de Cargos (família e nível) e salva o cargo com o perfil gerado, deixando-o pronto para as próximas vagas. Desmarcada, só a vaga é salva.
 - Portal público, candidatos e ranking ficam para as próximas fases.
 
 ## Detalhes técnicos
