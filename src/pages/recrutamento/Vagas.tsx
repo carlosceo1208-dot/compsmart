@@ -90,6 +90,9 @@ const Vagas = () => {
                   {v.qtd_vagas > 1 && <Badge variant="outline" className="rounded-full">{v.qtd_vagas} posições</Badge>}
                 </div>
                 <p className="text-sm text-muted-foreground flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{formatLocal(v.cidade, v.uf)}</p>
+                {v.observacao && (
+                  <p className="text-xs text-muted-foreground line-clamp-2 border-l-2 border-border pl-2" title={v.observacao}>{v.observacao}</p>
+                )}
                 <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground pt-1 border-t">
                   <span className="flex items-center gap-1 pt-2"><Users className="h-3.5 w-3.5" />0 candidatos</span>
                   <span className="flex items-center gap-1 pt-2"><MapPin className="h-3.5 w-3.5" />{v.status === "publicada" ? "Triagem" : "Abertura"}</span>
