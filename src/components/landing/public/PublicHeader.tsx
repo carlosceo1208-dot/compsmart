@@ -20,6 +20,7 @@ const LINKS = [
   { label: "Quem Somos", to: "/sobre-nos" },
   { label: "Seja Parceiro", to: "/parceiros" },
   { label: "Materiais", to: "/materiais" },
+  { label: "Vagas", to: "/vagas" },
   { label: "Contato", to: "/contato" },
 ];
 
