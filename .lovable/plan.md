@@ -34,6 +34,10 @@
 7. **Planilha com e-mail repetido**: a segunda ocorrência (e seguintes) do mesmo e-mail na mesma colagem aparece no log como "duplicado na planilha (linha X)" e não é importada.
 8. **PDF verificado de verdade**: além do tipo e dos 5 MB, o servidor confere se o arquivo começa com `%PDF`; caso contrário, recusa com "Envie um arquivo PDF válido".
 9. **Trilha LGPD**: junto com data e versão do aceite, grava IP e navegador do candidato (visíveis só ao RH da empresa, para auditoria).
+10. **Importação vinculada a vaga**: campo opcional "Vincular a uma vaga" no diálogo de colar planilha. Preenchido, cada candidato válido ganha candidatura em "Triagem" nessa vaga (sem duplicar se já estiver nela); vazio, importa só os candidatos. Log de erros e regra de duplicado na planilha continuam iguais.
+
+## Fica para a Fase 3
+- **Excluir candidato/candidatura** (direito de eliminação da LGPD): botão com confirmação, só para RH/admin da própria empresa, validado no servidor, apagando também o currículo. Registrado no `roadmap.md`; não entra nesta fase.
 
 ## Visibilidade da vaga (2 eixos, independentes do status)
 Segue a versão mais completa do requisito (a com "2 eixos").
