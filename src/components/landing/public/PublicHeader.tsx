@@ -46,110 +46,113 @@ export const PublicHeader = () => {
       } border-b border-border/60`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex flex-wrap items-center justify-between min-h-16 py-2 md:min-h-20 lg:gap-y-1 xl:flex-nowrap xl:py-0">
           <Link to="/" className="flex items-center">
             <img
               src="/compsmart-logo-horizontal.png"
               alt="CompSmart — Gestão Estratégica de Pessoas"
-              className="h-12 w-auto max-w-[144px] md:h-16 md:max-w-[190px] object-contain"
+              className="h-12 w-auto max-w-[144px] md:h-16 md:max-w-[190px] lg:max-w-[160px] xl:max-w-[190px] object-contain"
             />
           </Link>
 
-          <nav className="hidden xl:flex items-center gap-3 2xl:gap-5">
-            <Link
-              to="/"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Home
-            </Link>
-
-            <Link
-              to="/nr1"
-              className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 gap-1.5 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              NR-1
-            </Link>
-
-
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-                Módulos
-                <ChevronDown className="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80 bg-popover">
-                {LANDING_MODULES.map((m) => (
-                  <DropdownMenuItem key={m.slug} asChild>
-                    <Link to={m.route} className="flex items-start gap-3 py-2">
-                      <m.icon className="h-4 w-4 mt-0.5 text-primary shrink-0" />
-                      <span>
-                        <span className="block text-sm font-medium">
-                          {m.nomeCurto}
-                        </span>
-                        <span className="block text-xs text-muted-foreground">
-                          {m.resumo}
-                        </span>
-                      </span>
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            <Link
-              to="/precos"
-              className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-            >
-              Preços
-            </Link>
-            <Link
-              to="/sobre-nos"
-              className="text-sm font-semibold text-foreground hover:text-primary hover:underline underline-offset-4 transition-colors"
-            >
-              Quem Somos
-            </Link>
-            <Link
-              to="/parceiros"
-              className="inline-flex items-center gap-1.5 rounded-md border-2 border-emerald-600 px-3 py-1 text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
-            >
-              <Handshake className="h-4 w-4" />
-              Seja Parceiro
-            </Link>
-            {LINKS.slice(5).map((l) => (
+          <nav className="hidden lg:contents">
+            <div className="order-3 flex w-full items-center justify-between border-t border-border/60 pt-1 xl:order-none xl:w-auto xl:flex-1 xl:justify-end xl:border-0 xl:pt-0 xl:gap-3 2xl:gap-5">
               <Link
-                key={l.to}
-                to={l.to}
-                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                to="/"
+                className="text-xs 2xl:text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
               >
-                {l.label}
+                Home
               </Link>
-            ))}
 
-            {isLoggedIn ? (
-              <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")}>
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-2 border-foreground bg-transparent text-foreground hover:bg-muted"
-                onClick={() => navigate("/auth")}
+              <Link
+                to="/nr1"
+                className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 2xl:px-3.5 py-1 gap-1 text-xs 2xl:text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
               >
-                Entrar
-              </Button>
-            )}
-            <PublicThemeToggle className="shrink-0" />
-            <DemoDialog
-              triggerLabel="Agendar demonstração"
-              size="sm"
-              className="bg-none bg-primary hover:bg-primary/90 hover:-translate-y-0 shadow-primary/25 hover:shadow-md"
-            />
+                <ShieldCheck className="h-4 w-4" />
+                NR-1
+              </Link>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-xs 2xl:text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                  Módulos
+                  <ChevronDown className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-80 bg-popover">
+                  {LANDING_MODULES.map((m) => (
+                    <DropdownMenuItem key={m.slug} asChild>
+                      <Link to={m.route} className="flex items-start gap-3 py-2">
+                        <m.icon className="h-4 w-4 mt-0.5 text-primary shrink-0" />
+                        <span>
+                          <span className="block text-sm font-medium">
+                            {m.nomeCurto}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {m.resumo}
+                          </span>
+                        </span>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Link
+                to="/precos"
+                className="text-xs 2xl:text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+              >
+                Preços
+              </Link>
+              <Link
+                to="/sobre-nos"
+                className="text-xs 2xl:text-sm font-semibold text-foreground hover:text-primary hover:underline underline-offset-4 transition-colors"
+              >
+                Quem Somos
+              </Link>
+              <Link
+                to="/parceiros"
+                className="inline-flex items-center gap-1 rounded-md border-2 border-emerald-600 px-2 2xl:px-3 py-1 text-xs 2xl:text-sm font-semibold text-emerald-700 hover:bg-emerald-50 transition-colors"
+              >
+                <Handshake className="h-4 w-4" />
+                Seja Parceiro
+              </Link>
+              {LINKS.slice(5).map((l) => (
+                <Link
+                  key={l.to}
+                  to={l.to}
+                  className="text-xs 2xl:text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+
+            <div className="order-2 ml-auto flex shrink-0 items-center gap-2 xl:order-none xl:ml-3 2xl:ml-5">
+              {isLoggedIn ? (
+                <Button variant="outline" size="sm" onClick={() => navigate("/dashboard")}>
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-2 border-foreground bg-transparent text-foreground hover:bg-muted"
+                  onClick={() => navigate("/auth")}
+                >
+                  Entrar
+                </Button>
+              )}
+              <PublicThemeToggle className="shrink-0" />
+              <DemoDialog
+                triggerLabel="Agendar demonstração"
+                size="sm"
+                className="bg-none bg-primary hover:bg-primary/90 hover:-translate-y-0 shadow-primary/25 hover:shadow-md"
+              />
+            </div>
           </nav>
 
           <button
-            className="xl:hidden p-2 text-muted-foreground"
+            className="lg:hidden p-2 text-muted-foreground"
             onClick={() => setOpen(!open)}
             aria-label={open ? "Fechar menu" : "Abrir menu"}
             aria-expanded={open}
@@ -159,7 +162,7 @@ export const PublicHeader = () => {
         </div>
 
         {open && (
-          <nav className="xl:hidden pb-5 pt-2 flex flex-col gap-1 border-t border-border/60">
+          <nav className="lg:hidden pb-5 pt-2 flex flex-col gap-1 border-t border-border/60">
             {LINKS.slice(0, 2).map((l) => (
               <Link
                 key={l.to}
