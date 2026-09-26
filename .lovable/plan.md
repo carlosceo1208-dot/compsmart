@@ -1,18 +1,19 @@
-# Campo "Observação" no cadastro de vaga
+# Campo "Observação" + novas senioridades no cadastro de vaga
 
 ## Objetivo
-Dar ao recrutador um campo de escrita livre para registrar informações importantes do processo seletivo (ex.: particularidades da vaga, combinações com o gestor, prazos internos).
+1. Dar ao recrutador um campo de escrita livre para registrar informações importantes do processo seletivo (ex.: particularidades da vaga, combinações com o gestor, prazos internos).
+2. Ampliar as opções de senioridade da vaga: hoje Júnior, Pleno, Sênior, Especialista — passam a incluir **Profissional** e **Consultor**, nesta ordem, após Especialista.
 
 ## O que muda
 
 1. **Banco de dados**
-   - Nova coluna `observacao` (texto livre, opcional, sem limite rígido além de um teto de 2.000 caracteres validado no banco) na tabela de vagas.
-   - Vagas existentes ficam com o campo vazio — nada muda nelas.
+   - Nova coluna `observacao` (texto livre, opcional, teto de 2.000 caracteres validado no banco) na tabela de vagas. Vagas existentes ficam com o campo vazio.
+   - A regra que limita os valores de senioridade no banco é ampliada para aceitar também `profissional` e `consultor`. Vagas existentes não mudam.
 
 2. **Cadastro/edição da vaga (VagaDialog)**
-   - Novo campo "Observação" (caixa de texto de várias linhas), opcional, com contador de caracteres.
-   - Posicionado ao final do formulário, depois dos requisitos.
-   - Texto livre: sem validação de conteúdo, só o limite de tamanho.
+   - Novo campo "Observação" (caixa de texto de várias linhas), opcional, com contador de caracteres, ao final do formulário, depois dos requisitos. Texto livre: sem validação de conteúdo, só o limite de tamanho.
+   - Seletor de Senioridade passa a listar: Júnior, Pleno, Sênior, Especialista, Profissional, Consultor.
+   - Sugestão automática de nível/grade estendida: Profissional sugere grade V, Consultor sugere grade VI (sempre editável, como hoje).
 
 3. **Lista de vagas**
    - A observação aparece no card da vaga (resumida, com "ver mais" quando longa) apenas quando preenchida.
@@ -20,6 +21,7 @@ Dar ao recrutador um campo de escrita livre para registrar informações importa
 
 4. **Hook de dados (useVagas)**
    - Incluir `observacao` no tipo e no salvamento/carregamento.
+   - Tipo `Senioridade` e rótulos ampliados com as duas novas opções.
 
 ## O que NÃO muda
 - Nenhum outro campo, texto, cor ou layout da tela.
@@ -28,5 +30,5 @@ Dar ao recrutador um campo de escrita livre para registrar informações importa
 
 ## Verificação
 - lint, typecheck, test, dead-code e build até todos passarem.
-- Teste no navegador (desktop e celular): criar vaga com observação, editar, salvar vazio, confirmar exibição no card.
+- Teste no navegador (desktop e celular): criar vaga com observação, editar, salvar vazio, confirmar exibição no card; selecionar as novas senioridades e conferir a grade sugerida.
 - Depois de validado, publicar o app.
