@@ -21,6 +21,8 @@ export interface Vaga {
   faixa_salarial_max: number | null;
   modelo_trabalho: "remoto" | "hibrido" | "presencial";
   localizacao: string | null;
+  uf: string | null;
+  cidade: string | null;
   tipo_contratacao: "clt" | "pj" | "estagio";
   qtd_vagas: number;
   status: VagaStatus;
