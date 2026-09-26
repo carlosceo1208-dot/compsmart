@@ -83,7 +83,7 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
     const base = vaga ? { ...empty, ...vaga, uf: vaga.uf ?? "", cidade: vaga.cidade ?? "" } : empty;
     setF(base);
     setCompetenciasTxt((base.competencias ?? []).join(", "));
-    setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(""); setFamiliaEditada(false); setNivelEditado(false); setErroIa(null);
+    setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(SENIORIDADE_GRADE_PADRAO[base.senioridade]); setFamiliaEditada(false); setNivelEditado(false); setErroIa(null);
     // Vaga existente com faixa já salva: não sobrescrever.
     setFaixaEditada(!!vaga && (vaga.faixa_salarial_min != null || vaga.faixa_salarial_max != null)); setFaixaSugerida(false);
   }, [open, vaga]);
