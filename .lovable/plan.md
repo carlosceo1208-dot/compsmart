@@ -24,5 +24,11 @@
 - Front: `src/pages/public/VagasPortal.tsx`, `VagaPublica.tsx` (dentro do layout público, SEO de `/vagas` em `seoRoutes.ts`; detalhe fica `noindex` por ser dinâmico), `src/pages/recrutamento/Candidatos.tsx`, `CandidatoDialog.tsx`, `ImportarCandidatosDialog.tsx`, hook `useCandidatos.ts`; nova opção "Exibir faixa no portal" e link público no card/diálogo da vaga; item do menu do módulo.
 - Registrar em `roadmap.md` e `AGENTS.md`.
 
+## Refinamentos
+1. **Proteção anti-robô (Turnstile)**: o projeto já tem a chave pública (usada no `TurnstileWidget`) e a chave secreta no servidor (usada por `verify-turnstile`/`activate-employee`); o portal reaproveita as duas, sem criar chaves novas. No preview/localhost a função aceita as chaves de teste oficiais da Cloudflare (sempre aprovam), para não travar testes; no site publicado vale a verificação real.
+2. **Currículo no reenvio**: caminho fixo por candidato (`{empresa}/{candidato}.pdf`); um novo PDF **sobrescreve** o anterior e todas as candidaturas passam a apontar para o mais recente. Sem novo PDF, o atual é mantido. Registrado no `AGENTS.md`.
+3. **Erros amigáveis na candidatura**: limite de tentativas (429) ou falha da verificação anti-robô mostram "Muitas tentativas — tente novamente em instantes" com botão **Reenviar**; nenhum detalhe técnico aparece. Os dados digitados permanecem no formulário.
+4. **Link público copiável**: no card e no diálogo da vaga publicada, botão **Copiar link** (1 clique, aviso "Link copiado"). Em rascunho/pausada/fechada o botão fica oculto.
+
 ## Verificação
 Lint, typecheck, test, dead-code e build passando. Navegador (desktop e celular): (a) candidatura anônima com PDF e aceite obrigatório + confirmação; (b) rascunho/pausada/fechada não aparecem; (c) cadastro pelo RH + planilha com prévia e erros; (d) mesmo e-mail não duplica; (e) RH vê o currículo, outra empresa não (teste de acesso no banco); (f) candidatura em "Triagem" na vaga certa. Candidatos de teste são apagados ao final; contatos e vagas reais não são tocados.
