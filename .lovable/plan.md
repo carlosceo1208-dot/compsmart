@@ -30,5 +30,5 @@
 
 ## Verificação
 - lint, typecheck, test, dead-code e build até todos passarem.
-- Teste no navegador (desktop e celular): criar vaga com observação, editar, salvar vazio, confirmar exibição no card.
+- Teste no navegador (desktop e celular): criar vaga com observação, editar, salvar vazio, confirmar exibição no card; selecionar as novas senioridades e conferir a grade sugerida.
 - Depois de validado, publicar o app.
