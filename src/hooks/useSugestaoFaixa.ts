@@ -59,10 +59,10 @@ export const useSugestaoFaixa = (p: { titulo: string; cbo: string; grade: string
       }
 
       if (!rangeId) {
-        const { data: jts } = await supabase.from("job_titles").select("title, cbo_code, grade, salary_range_id")
+        const { data: jts } = await supabase.from("job_titles").select("title, cbo, grade, salary_range_id")
           .eq("root_company_id", activeCompanyId!).not("salary_range_id", "is", null).limit(1000);
         const lista = jts ?? [];
-        const porCbo = cbo ? lista.filter((j) => digits(j.cbo_code) === cbo) : [];
+        const porCbo = cbo ? lista.filter((j) => digits(j.cbo) === cbo) : [];
         const cand = porCbo.length ? porCbo : casarPorNome(lista, (j) => j.title, titulo);
         const mesmaGrade = grade ? cand.filter((j) => norm(j.grade) === norm(grade)) : [];
         const j = (mesmaGrade.length ? mesmaGrade : cand)[0];
