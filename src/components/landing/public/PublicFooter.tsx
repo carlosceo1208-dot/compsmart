@@ -76,6 +76,11 @@ export const PublicFooter = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/vagas" className="hover:text-primary">
+                  Trabalhe conosco
+                </Link>
+              </li>
+              <li>
                 <Link to="/contato" className="hover:text-primary">
                   Contato
                 </Link>
