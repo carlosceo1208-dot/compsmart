@@ -54,7 +54,7 @@ export const PublicHeader = () => {
             />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-3 xl:gap-5">
+          <nav className="hidden xl:flex items-center gap-3 2xl:gap-5">
             <Link
               to="/"
               className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
@@ -148,7 +148,7 @@ export const PublicHeader = () => {
           </nav>
 
           <button
-            className="lg:hidden p-2 text-muted-foreground"
+            className="xl:hidden p-2 text-muted-foreground"
             onClick={() => setOpen(!open)}
             aria-label={open ? "Fechar menu" : "Abrir menu"}
             aria-expanded={open}
@@ -158,7 +158,7 @@ export const PublicHeader = () => {
         </div>
 
         {open && (
-          <nav className="lg:hidden pb-5 pt-2 flex flex-col gap-1 border-t border-border/60">
+          <nav className="xl:hidden pb-5 pt-2 flex flex-col gap-1 border-t border-border/60">
             {LINKS.slice(0, 2).map((l) => (
               <Link
                 key={l.to}

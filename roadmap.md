@@ -23,3 +23,4 @@
 - [x] Contatos NR-1 no painel de leads (somente leitura)
 - [x] Campo "Segmento da empresa" no /diagnostico
 - [x] Home: novos textos + seção de prova visual (4 telas ilustrativas)
+- [x] Home: ajustes finos da prova visual, botão Contato e cabeçalho responsivo
