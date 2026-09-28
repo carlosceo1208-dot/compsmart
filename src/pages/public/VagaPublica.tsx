@@ -100,12 +100,20 @@ const Bloco = ({ titulo, texto }: { titulo: string; texto: string | null }) => t
 ) : null;
 
 const vazio = { nome: "", email: "", telefone: "", cargo: "", senioridade: "" };
+const ORIGEM_DEV = typeof window !== "undefined" && (() => {
+  const h = window.location.hostname;
+  return h === "localhost" || h.endsWith(".lovableproject.com") || h.startsWith("id-preview--");
+})();
 
 const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
   const [f, setF] = useState(vazio);
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [aceite, setAceite] = useState(false);
   const [token, setToken] = useState("");
+  // Token anti-robô é de uso único: após cada envio, remonta o widget para gerar outro.
+  const [widgetKey, setWidgetKey] = useState(0);
+  const novoToken = () => { setToken(""); setWidgetKey((k) => k + 1); };
+  const semToken = !token && !ORIGEM_DEV;
   const [erros, setErros] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);
@@ -143,12 +151,14 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
         const ctx = (error as any).context as Response | undefined;
         const body = ctx ? await ctx.json().catch(() => null) : null;
         if (body?.fields) setErros(Object.fromEntries(Object.entries(body.fields).map(([k, v]) => [k, (v as string[])[0]])));
-        setFalha(ctx?.status === 429 ? "Muitas tentativas — tente novamente em instantes." : body?.error ?? "Não foi possível enviar agora. Tente novamente.");
+        setFalha(body?.error ?? (ctx?.status === 429 ? "Muitas tentativas — tente novamente em instantes." : "Não foi possível enviar agora. Tente novamente."));
+        novoToken();
         return;
       }
       setOk({ jaInscrito: !!data?.jaInscrito });
     } catch {
       setFalha("Não foi possível enviar agora. Verifique sua conexão e tente novamente.");
+      novoToken();
     } finally { setEnviando(false); }
   };
 
@@ -186,17 +196,17 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
           </label>
           {erros.aceite && <p className="text-xs text-destructive">{erros.aceite}</p>}
         </div>
-        <TurnstileWidget onVerify={setToken} onExpire={() => setToken("")} />
+        <TurnstileWidget key={widgetKey} onVerify={setToken} onExpire={() => setToken("")} />
         {falha && (
           <Alert variant="destructive" className="rounded-xl">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
               <span>{falha}</span>
-              <Button size="sm" variant="outline" onClick={enviar} disabled={enviando}><RotateCcw className="h-3.5 w-3.5 mr-1" />Reenviar</Button>
+              <Button size="sm" variant="outline" onClick={enviar} disabled={enviando || semToken}><RotateCcw className="h-3.5 w-3.5 mr-1" />{semToken ? "Verificando…" : "Reenviar"}</Button>
             </AlertDescription>
           </Alert>
         )}
-        <Button className="w-full rounded-xl" onClick={enviar} disabled={enviando}>
-          {enviando && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}Enviar candidatura
+        <Button className="w-full rounded-xl" onClick={enviar} disabled={enviando || semToken}>
+          {(enviando || semToken) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{semToken ? "Verificando…" : "Enviar candidatura"}
         </Button>
       </CardContent>
     </Card>
