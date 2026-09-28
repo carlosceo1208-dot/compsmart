@@ -155,7 +155,7 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
   if (ok) return (
     <Card className="rounded-2xl"><CardContent className="py-10 text-center space-y-3">
       <CheckCircle2 className="h-10 w-10 text-primary mx-auto" />
-      <p className="text-lg font-semibold">{ok.jaInscrito ? "Você já estava inscrito nesta vaga." : "Candidatura enviada!"}</p>
+      <p className="text-lg font-semibold">{ok.jaInscrito ? "Você já se candidatou a esta vaga." : "Candidatura enviada!"}</p>
       <p className="text-sm text-muted-foreground">{ok.jaInscrito ? "Seus dados foram atualizados." : "A empresa responsável vai analisar seu perfil e entrar em contato pelo e-mail informado."}</p>
       <Button asChild variant="outline" className="rounded-xl"><Link to="/vagas">Ver outras vagas</Link></Button>
     </CardContent></Card>

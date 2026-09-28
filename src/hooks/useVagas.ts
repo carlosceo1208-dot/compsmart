@@ -94,9 +94,10 @@ export const useSaveVaga = () => {
   return useMutation({
     mutationFn: async ({ id, input }: { id?: string; input: VagaInput }) => {
       if (!activeCompanyId) throw new Error("Empresa não selecionada");
+      const dados = typeof input.titulo === "string" ? { ...input, titulo: input.titulo.trim() } : input;
       const q = id
-        ? vagasTable().update(input).eq("id", id).eq("root_company_id", activeCompanyId)
-        : vagasTable().insert({ ...input, root_company_id: activeCompanyId });
+        ? vagasTable().update(dados).eq("id", id).eq("root_company_id", activeCompanyId)
+        : vagasTable().insert({ ...dados, root_company_id: activeCompanyId });
       const { error } = await q;
       if (error) throw error;
     },
