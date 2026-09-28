@@ -122,10 +122,12 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
     titulo: f.titulo, cbo: f.cbo ?? "", grade: nivel, cargoId: f.descricao_cargo_id,
   });
   useEffect(() => {
-    if (!open || faixaEditada) return;
+    // Vaga já salva com faixa: nunca sobrescrever (evita corrida com o reset ao abrir).
+    const temFaixaSalva = !!vaga && (vaga.faixa_salarial_min != null || vaga.faixa_salarial_max != null);
+    if (!open || faixaEditada || temFaixaSalva) return;
     setF((p) => ({ ...p, faixa_salarial_min: sugestao?.min ?? null, faixa_salarial_max: sugestao?.max ?? null }));
     setFaixaSugerida(!!sugestao);
-  }, [sugestao, faixaEditada, open]);
+  }, [sugestao, faixaEditada, open, vaga]);
 
   // Sugestões automáticas (não sobrescrevem o que o RH editou)
   useEffect(() => {
@@ -235,7 +237,7 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
       const tirarLogo = logoRemovido || !publica;
       if (activeCompanyId && ((publica && logoFile) || (tirarLogo && anterior))) {
         try {
-          await salvarLogoVaga({ companyId: activeCompanyId, vagaId: id, file: publica ? logoFile : null, anterior });
+          await salvarLogoVaga({ companyId: activeCompanyId, vagaId: vaga?.id ?? id, file: publica ? logoFile : null, anterior });
         } catch (err) {
           toast.error(`Vaga salva, mas o logo não foi atualizado: ${err instanceof Error ? err.message : "erro"}`);
         }

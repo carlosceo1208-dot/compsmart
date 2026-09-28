@@ -17,7 +17,7 @@ import { EmpresaLogo } from "@/components/recrutamento/EmpresaLogo";
 export interface VagaPortal {
   slug: string; titulo: string; area: string | null; senioridade: string; modelo_trabalho: string;
   tipo_contratacao: string; cidade: string | null; uf: string | null;
-  faixa_salarial_min: number | null; faixa_salarial_max: number | null; empresa: string; publicada_em: string; logo_path: string | null;
+  faixa_salarial_min: number | null; faixa_salarial_max: number | null; empresa: string; publicada_em: string; logo_path: string | null; empresa_identificada: boolean;
 }
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
@@ -84,7 +84,7 @@ const VagasPortal = () => {
                   <Card className="rounded-2xl h-full shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-5 space-y-2">
                       <div className="flex items-center gap-3">
-                        {v.logo_path && <EmpresaLogo path={v.logo_path} nome={v.empresa} className="h-10 w-10" />}
+                        {v.empresa_identificada && <EmpresaLogo path={v.logo_path} nome={v.empresa} className="h-10 w-10" />}
                         <div className="min-w-0">
                           <p className="text-sm text-muted-foreground">{v.empresa}</p>
                           <h2 className="text-lg font-semibold">{v.titulo}</h2>

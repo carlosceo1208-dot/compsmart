@@ -10,4 +10,5 @@
 - Candidatura pública só via edge function portal-candidatura: empresa derivada da vaga no banco, PDF checado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo nunca decide empresa nem grava direto.
 - Currículo em curriculos/{empresa}/{candidato}.pdf; novo envio sobrescreve e candidaturas apontam para o mais recente. Why: um currículo vigente por candidato.
 - Nome da empresa mascarado no servidor (portal_listar_vagas/portal_vaga); confidencial só abre por link. Why: nome real nunca chega ao navegador.
-- Fase 2 do R&S (portal /vagas) concluída e publicada; pendente Fase 3 (exclusão LGPD). Why: validada com testes E2E e scan sem críticos.
+- Fase 2 R&S publicada; falta Fase 3 (exclusão LGPD). Why: E2E e scan ok.
+- Logo/"Sobre a empresa" da vaga só saem via portal_* se pública e exibir_nome_empresa; logos em logos-vagas privado. Why: imagem não revela empresa oculta.

@@ -11945,6 +11945,7 @@ export type Database = {
           area: string
           cidade: string
           empresa: string
+          empresa_identificada: boolean
           faixa_salarial_max: number
           faixa_salarial_min: number
           logo_path: string

@@ -32,3 +32,5 @@
 - [ ] Fase 3: excluir candidato/candidatura (LGPD), só RH/admin da empresa, apagando o currículo
 - [x] Testes finais Fase 2: candidatura anônima, LGPD/PDF inválido, isolamento, sem currículo, reaplicação, trim do título, publicar
 - [x] Fechamento Fase 2: nova verificação de segurança (sem alertas críticos), confirmação visual de /vagas no site publicado (desktop + celular), Fase 2 concluída e publicada
+- [x] Marca empregadora na vaga: logo, "Sobre a empresa", faixa salarial destacada (opt-in), limpeza de logos, testes no preview
+- [ ] Candidatura no site publicado: aguarda autorização dos domínios na chave anti-robô (Cloudflare)
