@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  ArrowRight, BadgeDollarSign, BarChart3, CheckCircle2, ChevronRight, Clock, EyeOff, FileText, Filter, Lock, MapPin,
+  BadgeDollarSign, BarChart3, CheckCircle2, ChevronRight, Clock, EyeOff, FileText, Filter, Lock, MapPin,
   MessageCircle, Search, ShieldCheck, Sparkles, Target, UserRound, UserSearch, Users,
 } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
