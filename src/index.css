@@ -44,6 +44,12 @@ All colors MUST be HSL.
     --success-hover: 150 55% 40%;
     --success-light: 150 55% 93%;
     --success-foreground: 0 0% 100%;
+    /* Progressão do funil de contratação (landing R&S): azul → teal → verde */
+    --funil-1: #2563EB;
+    --funil-2: #197CBA;
+    --funil-3: #0D9488;
+    --funil-4: #129C69;
+    --funil-5: #16A34A;
     
     /* Warning - Laranja energético */
     --warning: 32 95% 58%;
