@@ -38,6 +38,8 @@ All colors MUST be HSL.
     --muted-foreground: 220 10% 42%;
     
     /* Success - Verde (mantém consistência funcional) */
+    --navy: 201 75% 36%;
+    --navy-foreground: 0 0% 100%;
     --success: 150 55% 48%;
     --success-hover: 150 55% 40%;
     --success-light: 150 55% 93%;
@@ -133,6 +135,8 @@ All colors MUST be HSL.
     --muted-foreground: 215 18% 70%;
     
     /* Success - Verde */
+    --navy: 201 60% 28%;
+    --navy-foreground: 0 0% 100%;
     --success: 150 55% 55%;
     --success-hover: 150 55% 65%;
     --success-light: 150 55% 25%;

@@ -36,7 +36,7 @@ export const DemoDialog = ({
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg bg-background">
+      <DialogContent className="max-w-lg bg-background max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Agendar demonstração</DialogTitle>
           <DialogDescription>

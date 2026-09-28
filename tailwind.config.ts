@@ -33,6 +33,10 @@ export default {
           light: "hsl(var(--secondary-light))",
           dark: "hsl(var(--secondary-dark))",
         },
+        navy: {
+          DEFAULT: "hsl(var(--navy))",
+          foreground: "hsl(var(--navy-foreground))",
+        },
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",
