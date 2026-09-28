@@ -23,6 +23,7 @@ import { Info } from "lucide-react";
 import {
   CONTRATACAO_LABEL, MODELO_LABEL, SENIORIDADE_LABEL, STATUS_LABEL, VISIBILIDADE_LABEL,
   TalentError, gerarPerfilVaga, salvarCargoNaBiblioteca, useSaveVaga, useDeleteVaga,
+  SOBRE_EMPRESA_MAX, validarLogo, salvarLogoVaga, useLogoUrl,
   type Senioridade, type Vaga, type VagaInput, type Visibilidade,
 } from "@/hooks/useVagas";
 
@@ -52,7 +53,7 @@ const empty: VagaInput = {
   responsabilidades: "", requisitos_obrigatorios: "", requisitos_desejaveis: "", competencias: [],
   faixa_salarial_min: null, faixa_salarial_max: null, modelo_trabalho: "presencial",
   localizacao: "", uf: "", cidade: "", tipo_contratacao: "clt", qtd_vagas: 1, observacao: "", status: "rascunho",
-  visibilidade: "publica", exibir_nome_empresa: true, exibir_faixa: false, descricao_publica_cliente: "",
+  visibilidade: "publica", exibir_nome_empresa: true, exibir_faixa: false, descricao_publica_cliente: "", sobre_empresa: "",
 };
 
 const OBS_MAX = 2000;
@@ -86,10 +87,30 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
   const del = useDeleteVaga();
   const [erroIa, setErroIa] = useState<{ msg: string; retry: boolean } | null>(null);
   const save = useSaveVaga();
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoRemovido, setLogoRemovido] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [logoErro, setLogoErro] = useState<string | null>(null);
+  const { data: logoAtualUrl } = useLogoUrl(open ? vaga?.logo_path : null);
+  useEffect(() => {
+    if (!logoFile) { setLogoPreview(null); return; }
+    const u = URL.createObjectURL(logoFile); setLogoPreview(u);
+    return () => URL.revokeObjectURL(u);
+  }, [logoFile]);
+  const escolherLogo = (file: File | null) => {
+    if (!file) return;
+    const erro = validarLogo(file);
+    setLogoErro(erro);
+    if (!erro) { setLogoFile(file); setLogoRemovido(false); }
+  };
+  const logoMostrado = logoPreview ?? (!logoRemovido ? logoAtualUrl ?? null : null);
 
   useEffect(() => {
     if (!open) return;
-    const base = vaga ? { ...empty, ...vaga, uf: vaga.uf ?? "", cidade: vaga.cidade ?? "" } : empty;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { logo_path: _lp, ...resto } = vaga ?? ({} as Vaga);
+    const base: VagaInput = vaga ? { ...empty, ...resto, uf: vaga.uf ?? "", cidade: vaga.cidade ?? "", sobre_empresa: vaga.sobre_empresa ?? "" } : empty;
+    setLogoFile(null); setLogoRemovido(false); setLogoErro(null);
     setF(base);
     setCompetenciasTxt((base.competencias ?? []).join(", "));
     setFromCbo(false); setSalvarBiblioteca(false); setFamilia(""); setNivel(SENIORIDADE_GRADE_PADRAO[base.senioridade]); setFamiliaEditada(false); setNivelEditado(false); setErroIa(null);
@@ -192,7 +213,9 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
       toast.error("A faixa salarial mínima não pode ser maior que a máxima."); return;
     }
     const competencias = competenciasTxt.split(/[,\n]/).map((s) => s.replace(/^•\s*/, "").trim()).filter(Boolean);
-    let input: VagaInput = { ...f, competencias };
+    const publica = f.visibilidade === "publica";
+    let input: VagaInput = { ...f, competencias, exibir_faixa: publica && f.exibir_faixa,
+      sobre_empresa: publica ? (f.sobre_empresa ?? "").trim() || null : null };
     try {
       if (fromCbo && salvarBiblioteca) {
         const faltam = [!familia.trim() && "família do cargo", !nivel.trim() && "nível / grade"].filter(Boolean);
@@ -207,7 +230,16 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
         if (r.existed) toast.info("Este cargo já existe na biblioteca — a vaga foi ligada ao cargo existente.");
         else toast.success("Cargo cadastrado na biblioteca da empresa.");
       }
-      await save.mutateAsync({ id: vaga?.id, input });
+      const id = await save.mutateAsync({ id: vaga?.id, input });
+      const anterior = vaga?.logo_path ?? null;
+      const tirarLogo = logoRemovido || !publica;
+      if (activeCompanyId && ((publica && logoFile) || (tirarLogo && anterior))) {
+        try {
+          await salvarLogoVaga({ companyId: activeCompanyId, vagaId: id, file: publica ? logoFile : null, anterior });
+        } catch (err) {
+          toast.error(`Vaga salva, mas o logo não foi atualizado: ${err instanceof Error ? err.message : "erro"}`);
+        }
+      }
       toast.success(vaga ? "Vaga atualizada." : "Vaga criada.");
       onOpenChange(false);
     } catch (e) {
@@ -285,18 +317,55 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
                   Exibir nome da empresa no portal
                 </label>
               )}
-              {f.visibilidade === "publica" && (
-                <label className="flex items-center gap-2 text-sm cursor-pointer">
-                  <Checkbox checked={f.exibir_faixa} disabled={busy} onCheckedChange={(v) => set("exibir_faixa", v === true)} />
-                  Exibir faixa salarial no portal
-                </label>
-              )}
               <p className="text-xs text-muted-foreground">
                 {f.visibilidade === "confidencial"
-                  ? "O candidato verá “Empresa confidencial” (ou a descrição pública). A faixa salarial não é exibida."
-                  : f.exibir_nome_empresa ? "O nome da empresa aparece no portal." : "No lugar do nome aparece a descrição pública (ou “Empresa não identificada”)."}
+                  ? "O candidato verá “Empresa confidencial” (ou a descrição pública)."
+                  : f.exibir_nome_empresa ? "O nome da empresa aparece no portal." : "No lugar do nome aparece a descrição pública (ou “Empresa não identificada”). Logo e “Sobre a empresa” não são exibidos."}
               </p>
             </div>
+          </div>
+
+          <div className="rounded-2xl border-2 border-primary/30 bg-primary/5 p-4 space-y-4">
+            <p className="font-semibold">Visibilidade no portal</p>
+            <div className="space-y-1.5">
+              <label className={`flex items-center gap-2 text-sm font-medium ${f.visibilidade === "confidencial" ? "opacity-60" : "cursor-pointer"}`}>
+                <Checkbox checked={f.visibilidade === "publica" && f.exibir_faixa} disabled={busy || f.visibilidade === "confidencial"}
+                  onCheckedChange={(v) => set("exibir_faixa", v === true)} aria-label="Exibir faixa salarial no portal" />
+                Exibir faixa salarial no portal
+              </label>
+              <p className="text-xs text-muted-foreground">
+                {f.visibilidade === "confidencial" ? "Vagas confidenciais nunca exibem faixa salarial."
+                  : "Mostrar a faixa salarial atrai candidatos sensíveis a salário; não mostrar mantém o foco em outros atrativos (benefícios, carreira, cultura). A escolha é da empresa."}
+              </p>
+            </div>
+            {f.visibilidade === "publica" && (
+              <>
+                <div className="space-y-2">
+                  <Label>Logo da empresa</Label>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {logoMostrado
+                      ? <img src={logoMostrado} alt="Prévia do logo" className="h-14 w-14 rounded-full border bg-card object-contain p-1" />
+                      : <div className="h-14 w-14 rounded-full border border-dashed bg-card" aria-hidden="true" />}
+                    <Button type="button" variant="outline" size="sm" className="rounded-xl" disabled={busy} asChild>
+                      <label className="cursor-pointer">{logoMostrado ? "Trocar" : "Enviar logo"}
+                        <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" aria-label="Logo da empresa"
+                          onChange={(e) => { escolherLogo(e.target.files?.[0] ?? null); e.target.value = ""; }} /></label>
+                    </Button>
+                    {logoMostrado && <Button type="button" variant="ghost" size="sm" className="rounded-xl" disabled={busy}
+                      onClick={() => { setLogoFile(null); setLogoRemovido(true); }}>Remover</Button>}
+                  </div>
+                  <p className="text-xs text-muted-foreground">PNG, JPG ou WebP até 2 MB. Fundo transparente recomendado.</p>
+                  {logoErro && <p className="text-xs text-destructive">{logoErro}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Conte quem é a empresa</Label>
+                  <Textarea value={f.sobre_empresa ?? ""} rows={4} maxLength={SOBRE_EMPRESA_MAX} disabled={busy} className="rounded-xl"
+                    placeholder="Explique cultura, benefícios, plano de carreira e o que torna a empresa um ótimo lugar para trabalhar. O candidato verá este texto ao abrir a vaga."
+                    onChange={(e) => set("sobre_empresa", e.target.value)} />
+                  <p className="text-xs text-muted-foreground text-right">{(f.sobre_empresa ?? "").length}/{SOBRE_EMPRESA_MAX}</p>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="rounded-2xl border p-4 space-y-4">
