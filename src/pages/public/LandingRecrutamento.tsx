@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  BadgeDollarSign, BarChart3, Clock, EyeOff, Filter, Lock, ShieldCheck, Sparkles, Target, Users,
+  ArrowRight, BadgeDollarSign, BarChart3, Clock, EyeOff, Filter, Lock, MapPin, Search, ShieldCheck, Sparkles, Target, Users,
 } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
@@ -41,6 +41,95 @@ const irPara = (id: string) => {
 };
 
 const secao = "scroll-mt-40 lg:scroll-mt-48 xl:scroll-mt-40";
+
+const FUNIL_ETAPAS = [
+  { label: "Triagem", cor: "var(--funil-1)" },
+  { label: "Entrevista RH", cor: "var(--funil-2)" },
+  { label: "Entrevista Gestor", cor: "var(--funil-3)" },
+  { label: "Proposta", cor: "var(--funil-4)" },
+  { label: "Contratado", cor: "var(--funil-5)" },
+];
+
+const FunilContratacao = () => (
+  <div className="mx-auto mt-8 max-w-[640px]">
+    <ol aria-label="Etapas do funil de contratação" className="flex flex-col items-stretch gap-1.5 sm:flex-row sm:items-center">
+      {FUNIL_ETAPAS.map(({ label, cor }, indice) => (
+        <li key={label} className="flex flex-1 flex-col items-center gap-1.5 sm:flex-row sm:gap-1.5">
+          <span
+            className="w-full rounded-xl px-2 py-2.5 text-center text-xs font-semibold text-primary-foreground sm:flex-1 sm:text-sm"
+            style={{ backgroundColor: cor }}
+          >
+            {label}
+          </span>
+          {indice < FUNIL_ETAPAS.length - 1 && (
+            <ArrowRight className="h-4 w-4 shrink-0 rotate-90 text-muted-foreground sm:rotate-0" aria-hidden="true" />
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+);
+
+type VagaExemplo = {
+  titulo: string; local: string; senioridade: string;
+  faixa?: string; badgeVerde?: string; badgeNeutro?: string;
+};
+
+const VAGAS_EXEMPLO: VagaExemplo[] = [
+  { titulo: "Analista de Remuneração", local: "São Paulo – SP", senioridade: "Pleno", faixa: "R$ 12.000 – 15.000", badgeVerde: "Faixa salarial fornecida" },
+  { titulo: "Coordenador de RH", local: "São Paulo – SP", senioridade: "Sênior", badgeNeutro: "Confidencial" },
+  { titulo: "Analista de Recrutamento", local: "Remoto", senioridade: "Júnior" },
+];
+
+const ListagemVagasExemplo = () => (
+  <div className="mx-auto mt-8 max-w-[640px]">
+    <p className="text-center text-xs text-muted-foreground">Exemplo ilustrativo de tela</p>
+    <div role="img" aria-label="Exemplo ilustrativo do portal de vagas" className="mt-2 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
+      <div className="flex items-center gap-2 rounded-full border border-input bg-background px-3.5 py-2">
+        <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <span className="text-sm text-muted-foreground">Buscar vagas...</span>
+      </div>
+      <div className="mt-2.5 flex flex-wrap gap-2">
+        {["São Paulo – SP", "Remoto", "Híbrido"].map((chip) => (
+          <span key={chip} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            {chip}
+          </span>
+        ))}
+      </div>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-success/30 bg-success/10 px-4 py-3">
+        <span className="text-sm font-semibold text-foreground">Tempo médio de fechamento: 21 dias</span>
+        <span className="rounded-full bg-success px-2.5 py-0.5 text-xs font-bold text-success-foreground">− 40%</span>
+      </div>
+      <div className="mt-3 grid gap-2">
+        {VAGAS_EXEMPLO.map(({ titulo, local, senioridade, faixa, badgeVerde, badgeNeutro }) => (
+          <div key={titulo} className="flex flex-wrap items-start justify-between gap-2 rounded-xl border border-border bg-background p-3">
+            <div className="min-w-0">
+              <p className="font-medium text-foreground">{titulo}</p>
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                {local}
+              </p>
+              {(faixa || badgeVerde || badgeNeutro) && (
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  {faixa && (
+                    <span className="rounded-full border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-foreground">{faixa}</span>
+                  )}
+                  {badgeVerde && (
+                    <span className="rounded-full bg-success/15 px-2.5 py-0.5 text-xs font-semibold text-success">{badgeVerde}</span>
+                  )}
+                  {badgeNeutro && (
+                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">{badgeNeutro}</span>
+                  )}
+                </div>
+              )}
+            </div>
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">{senioridade}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const LandingRecrutamento = () => (
   <PublicLayout
@@ -114,6 +203,7 @@ const LandingRecrutamento = () => (
             </div>
           ))}
         </div>
+        <ListagemVagasExemplo />
       </section>
 
       <section id="metricas" className={`${secao} bg-background py-14 md:py-20`}>
