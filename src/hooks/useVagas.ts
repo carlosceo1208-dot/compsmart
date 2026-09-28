@@ -41,7 +41,7 @@ export interface Vaga {
 export type Visibilidade = "publica" | "confidencial";
 export const VISIBILIDADE_LABEL: Record<Visibilidade, string> = { publica: "Pública", confidencial: "Confidencial" };
 
-export type VagaInput = Omit<Vaga, "id" | "root_company_id" | "created_at" | "updated_at" | "slug">;
+export type VagaInput = Omit<Vaga, "id" | "root_company_id" | "created_at" | "updated_at" | "slug" | "logo_path">;
 
 /** Nº de candidaturas por vaga da empresa ativa. */
 export const useContagemCandidaturas = () => {
