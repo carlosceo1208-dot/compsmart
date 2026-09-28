@@ -12,11 +12,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { getSeoRoute } from "@/config/seoRoutes";
 import { UFS, formatLocal } from "@/lib/brasil";
 import { MODELO_LABEL, SENIORIDADE_LABEL } from "@/hooks/useVagas";
+import { EmpresaLogo } from "@/components/recrutamento/EmpresaLogo";
 
 export interface VagaPortal {
   slug: string; titulo: string; area: string | null; senioridade: string; modelo_trabalho: string;
   tipo_contratacao: string; cidade: string | null; uf: string | null;
-  faixa_salarial_min: number | null; faixa_salarial_max: number | null; empresa: string; publicada_em: string;
+  faixa_salarial_min: number | null; faixa_salarial_max: number | null; empresa: string; publicada_em: string; logo_path: string | null;
 }
 
 const brl = (n: number) => n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
@@ -82,8 +83,13 @@ const VagasPortal = () => {
                 <Link key={v.slug} to={`/vagas/${v.slug}`} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl">
                   <Card className="rounded-2xl h-full shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-5 space-y-2">
-                      <p className="text-sm text-muted-foreground">{v.empresa}</p>
-                      <h2 className="text-lg font-semibold">{v.titulo}</h2>
+                      <div className="flex items-center gap-3">
+                        {v.logo_path && <EmpresaLogo path={v.logo_path} nome={v.empresa} className="h-10 w-10" />}
+                        <div className="min-w-0">
+                          <p className="text-sm text-muted-foreground">{v.empresa}</p>
+                          <h2 className="text-lg font-semibold">{v.titulo}</h2>
+                        </div>
+                      </div>
                       <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
                         <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{formatLocal(v.cidade, v.uf)}</span>
                         <span className="inline-flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" />{MODELO_LABEL[v.modelo_trabalho as keyof typeof MODELO_LABEL] ?? v.modelo_trabalho}</span>

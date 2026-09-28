@@ -10256,6 +10256,7 @@ export type Database = {
           faixa_salarial_min: number | null
           id: string
           localizacao: string | null
+          logo_path: string | null
           modelo_trabalho: string
           observacao: string | null
           qtd_vagas: number
@@ -10265,6 +10266,7 @@ export type Database = {
           root_company_id: string
           senioridade: string
           slug: string
+          sobre_empresa: string | null
           status: string
           tipo_contratacao: string
           titulo: string
@@ -10287,6 +10289,7 @@ export type Database = {
           faixa_salarial_min?: number | null
           id?: string
           localizacao?: string | null
+          logo_path?: string | null
           modelo_trabalho?: string
           observacao?: string | null
           qtd_vagas?: number
@@ -10296,6 +10299,7 @@ export type Database = {
           root_company_id: string
           senioridade?: string
           slug: string
+          sobre_empresa?: string | null
           status?: string
           tipo_contratacao?: string
           titulo: string
@@ -10318,6 +10322,7 @@ export type Database = {
           faixa_salarial_min?: number | null
           id?: string
           localizacao?: string | null
+          logo_path?: string | null
           modelo_trabalho?: string
           observacao?: string | null
           qtd_vagas?: number
@@ -10327,6 +10332,7 @@ export type Database = {
           root_company_id?: string
           senioridade?: string
           slug?: string
+          sobre_empresa?: string | null
           status?: string
           tipo_contratacao?: string
           titulo?: string
@@ -11941,6 +11947,7 @@ export type Database = {
           empresa: string
           faixa_salarial_max: number
           faixa_salarial_min: number
+          logo_path: string
           modelo_trabalho: string
           publicada_em: string
           senioridade: string
@@ -11958,8 +11965,10 @@ export type Database = {
           competencias: string[]
           confidencial: boolean
           empresa: string
+          empresa_identificada: boolean
           faixa_salarial_max: number
           faixa_salarial_min: number
+          logo_path: string
           modelo_trabalho: string
           qtd_vagas: number
           requisitos_desejaveis: string
@@ -11967,6 +11976,7 @@ export type Database = {
           responsabilidades: string
           senioridade: string
           slug: string
+          sobre_empresa: string
           tipo_contratacao: string
           titulo: string
           uf: string
@@ -12127,6 +12137,7 @@ export type Database = {
         }
         Returns: Json
       }
+      talent_logo_visivel: { Args: { _path: string }; Returns: boolean }
       talent_slugify: { Args: { _t: string }; Returns: string }
       talent_upsert_candidato: {
         Args: {

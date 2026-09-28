@@ -21,12 +21,14 @@ import {
   CONSENTIMENTO_TEXTO, CONSENTIMENTO_VERSAO, CURRICULO_MAX_BYTES, CURRICULO_MAX_MB, EMAIL_RE, mascaraTelefone, telefoneValido,
 } from "@/config/recrutamento";
 import { formatFaixa } from "./VagasPortal";
+import { EmpresaLogo } from "@/components/recrutamento/EmpresaLogo";
 
 interface VagaDetalhe {
   slug: string; titulo: string; area: string | null; senioridade: string; modelo_trabalho: string; tipo_contratacao: string;
   cidade: string | null; uf: string | null; faixa_salarial_min: number | null; faixa_salarial_max: number | null;
   empresa: string; confidencial: boolean; responsabilidades: string | null; requisitos_obrigatorios: string | null;
   requisitos_desejaveis: string | null; competencias: string[] | null; qtd_vagas: number;
+  logo_path: string | null; sobre_empresa: string | null; empresa_identificada: boolean;
 }
 
 const toBase64 = (f: File) => new Promise<string>((res, rej) => {
@@ -67,7 +69,14 @@ const VagaPublica = () => {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3 space-y-5">
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground inline-flex items-center gap-1">{vaga.confidencial && <Lock className="h-3.5 w-3.5" />}{vaga.empresa}</p>
+                {vaga.empresa_identificada ? (
+                  <div className="flex items-center gap-3 pb-1">
+                    <EmpresaLogo path={vaga.logo_path} nome={vaga.empresa} className="h-14 w-14" />
+                    <p className="font-semibold">{vaga.empresa}</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground inline-flex items-center gap-1">{vaga.confidencial && <Lock className="h-3.5 w-3.5" />}{vaga.empresa}</p>
+                )}
                 <h1 className="text-2xl sm:text-3xl font-bold">{vaga.titulo}</h1>
                 <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
                   <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{formatLocal(vaga.cidade, vaga.uf)}</span>
@@ -79,6 +88,12 @@ const VagaPublica = () => {
                   {formatFaixa(vaga.faixa_salarial_min, vaga.faixa_salarial_max) && <Badge variant="outline" className="rounded-full">{formatFaixa(vaga.faixa_salarial_min, vaga.faixa_salarial_max)}</Badge>}
                 </div>
               </div>
+              {vaga.empresa_identificada && vaga.sobre_empresa?.trim() && (
+                <div className="rounded-2xl border bg-muted/40 p-4 space-y-1.5">
+                  <h2 className="font-semibold">Sobre a empresa</h2>
+                  <p className="text-sm whitespace-pre-line text-muted-foreground">{vaga.sobre_empresa}</p>
+                </div>
+              )}
               <Bloco titulo="Responsabilidades" texto={vaga.responsabilidades} />
               <Bloco titulo="Requisitos obrigatórios" texto={vaga.requisitos_obrigatorios} />
               <Bloco titulo="Requisitos desejáveis" texto={vaga.requisitos_desejaveis} />
