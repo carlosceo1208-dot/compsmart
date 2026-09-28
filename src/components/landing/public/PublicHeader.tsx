@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnnouncementBar } from "@/components/landing/public/AnnouncementBar";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown, LayoutDashboard, ShieldCheck, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";

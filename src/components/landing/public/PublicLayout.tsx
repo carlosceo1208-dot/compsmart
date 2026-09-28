@@ -1,4 +1,5 @@
 import { SeoHead } from "@/components/seo/SeoHead";
+import { AnnouncementBar } from "@/components/landing/public/AnnouncementBar";
 import { PublicHeader } from "./PublicHeader";
 import { PublicFooter } from "./PublicFooter";
 import { WhatsAppFloat } from "./WhatsAppFloat";
