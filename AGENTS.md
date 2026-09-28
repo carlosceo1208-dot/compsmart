@@ -4,9 +4,10 @@
 - Public-route SEO (title/description/canonical/sitemap/per-route HTML) comes only from src/config/seoRoutes.ts via SeoHead + seoPlugin in vite.config. Why: crawlers see static HTML; one list keeps Helmet, sitemap and prerender in sync.
 - /admin/leads uses submitted_at for `leads` and created_at for `nr1_leads`; form re-submissions bump submitted_at, while admin edits never do. Why: Data must always mean the actual latest form submission.
 - /admin/leads merges `leads` + `nr1_leads` client-side; NR-1 rows are read-only (no status column). Why: one panel for all funnels without migrating data.
-- Vagas (módulo talent) ficam em `vagas` com tenant root_company_id; cargo novo vindo do CBO entra em job_titles só via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
+- Vagas (módulo talent) em `vagas` com tenant root_company_id; cargo novo do CBO entra em job_titles só via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
 - agent-talent envia ao modelo só dados da vaga, com filtro de e-mail/CPF/telefone. Why: LGPD.
-- Cidades de vagas vêm da API pública do IBGE (cache 24h memória + 7 dias localStorage) e a faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar valor.
-- Candidatura pública só via edge function portal-candidatura: empresa sempre derivada da vaga no banco, PDF checado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: o navegador anônimo nunca decide empresa nem grava direto.
-- Currículo fica em curriculos/{empresa}/{candidato}.pdf; novo envio sobrescreve e todas as candidaturas apontam para o mais recente. Why: um currículo vigente por candidato.
-- Nome da empresa no portal é mascarado no servidor (portal_listar_vagas/portal_vaga); vaga confidencial fica fora da lista e só abre por link. Why: nome real nunca chega ao navegador.
+- Cidades de vagas vêm da API do IBGE (cache 24h + 7 dias localStorage); faixa sugerida de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar valor.
+- Candidatura pública só via edge function portal-candidatura: empresa derivada da vaga no banco, PDF checado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo nunca decide empresa nem grava direto.
+- Currículo em curriculos/{empresa}/{candidato}.pdf; novo envio sobrescreve e candidaturas apontam para o mais recente. Why: um currículo vigente por candidato.
+- Nome da empresa mascarado no servidor (portal_listar_vagas/portal_vaga); confidencial só abre por link. Why: nome real nunca chega ao navegador.
+- Fase 2 do R&S (portal /vagas) concluída e publicada; pendente Fase 3 (exclusão LGPD). Why: validada com testes E2E e scan sem críticos.
