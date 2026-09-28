@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnnouncementBar } from "@/components/landing/public/AnnouncementBar";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, ChevronDown, LayoutDashboard, ShieldCheck, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export const PublicHeader = () => {
           : "bg-background/80 backdrop-blur-sm"
       } border-b border-border/60`}
     >
+      <AnnouncementBar />
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap items-center justify-between min-h-16 py-2 md:min-h-20 lg:gap-y-1 xl:flex-nowrap xl:py-0">
           <Link to="/" className="flex items-center">

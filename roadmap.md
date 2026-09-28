@@ -34,3 +34,5 @@
 - [x] Fechamento Fase 2: nova verificação de segurança (sem alertas críticos), confirmação visual de /vagas no site publicado (desktop + celular), Fase 2 concluída e publicada
 - [x] Marca empregadora na vaga: logo, "Sobre a empresa", faixa salarial destacada (opt-in), limpeza de logos, testes no preview
 - [ ] Candidatura no site publicado: aguarda autorização dos domínios na chave anti-robô (Cloudflare)
+- [x] Faixa "Em reconstrução" no topo (institucional + app; oculta em /vagas)
+- [ ] Teste da candidatura no site publicado após você autorizar os domínios no Cloudflare
