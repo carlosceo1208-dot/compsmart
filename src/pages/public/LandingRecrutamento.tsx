@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {
-  ArrowRight, BadgeDollarSign, BarChart3, Clock, EyeOff, Filter, Lock, MapPin, Search, ShieldCheck, Sparkles, Target, Users,
+  BadgeDollarSign, BarChart3, CheckCircle2, ChevronRight, Clock, EyeOff, FileText, Filter, Lock, MapPin,
+  MessageCircle, Search, ShieldCheck, Sparkles, Target, UserRound, UserSearch, Users,
 } from "lucide-react";
 import { PublicLayout } from "@/components/landing/public/PublicLayout";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
@@ -43,30 +44,44 @@ const irPara = (id: string) => {
 const secao = "scroll-mt-40 lg:scroll-mt-48 xl:scroll-mt-40";
 
 const FUNIL_ETAPAS = [
-  { label: "Triagem", cor: "var(--funil-1)" },
-  { label: "Entrevista RH", cor: "var(--funil-2)" },
-  { label: "Entrevista Gestor", cor: "var(--funil-3)" },
-  { label: "Proposta", cor: "var(--funil-4)" },
-  { label: "Contratado", cor: "var(--funil-5)" },
+  { label: "Triagem", cor: "var(--funil-1)", icon: UserSearch, textoEscuro: false },
+  { label: "Entrevista RH", cor: "var(--funil-2)", icon: MessageCircle, textoEscuro: false },
+  { label: "Entrevista Gestor", cor: "var(--funil-3)", icon: UserRound, textoEscuro: true },
+  { label: "Proposta", cor: "var(--funil-4)", icon: FileText, textoEscuro: true },
+  { label: "Contratado", cor: "var(--funil-5)", icon: CheckCircle2, textoEscuro: true },
 ];
 
 const FunilContratacao = () => (
-  <div className="mx-auto mt-8 max-w-[640px]">
-    <ol aria-label="Etapas do funil de contratação" className="flex flex-col items-stretch gap-1.5 sm:flex-row sm:items-center">
-      {FUNIL_ETAPAS.map(({ label, cor }, indice) => (
-        <li key={label} className="flex flex-1 flex-col items-center gap-1.5 sm:flex-row sm:gap-1.5">
-          <span
-            className="w-full rounded-xl px-2 py-2.5 text-center text-xs font-semibold text-primary-foreground sm:flex-1 sm:text-sm"
-            style={{ backgroundColor: cor }}
-          >
-            {label}
-          </span>
-          {indice < FUNIL_ETAPAS.length - 1 && (
-            <ArrowRight className="h-4 w-4 shrink-0 rotate-90 text-muted-foreground sm:rotate-0" aria-hidden="true" />
-          )}
-        </li>
-      ))}
-    </ol>
+  <div className="mx-auto mt-8 max-w-4xl">
+    <p className="text-center text-xs text-muted-foreground">Exemplo ilustrativo de tela</p>
+    <div className="mt-2 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <div>
+        <h3 className="text-lg font-semibold text-foreground">Funil de contratação</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Como os candidatos avançam pelas etapas do processo seletivo.</p>
+      </div>
+
+      <ol aria-label="Etapas do funil de contratação" className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr_auto_1fr] sm:items-stretch">
+        {FUNIL_ETAPAS.map(({ label, cor, icon: Icon, textoEscuro }, indice) => (
+          <li key={label} className="contents">
+            <div
+              className={`flex min-h-20 items-center gap-3 rounded-xl px-3 py-3 sm:min-h-28 sm:flex-col sm:justify-center sm:text-center ${textoEscuro ? "text-foreground" : "text-primary-foreground"}`}
+              style={{ backgroundColor: cor }}
+            >
+              <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+              <span className="text-sm font-semibold leading-snug">{label}</span>
+            </div>
+            {indice < FUNIL_ETAPAS.length - 1 && (
+              <ChevronRight className="mx-auto h-5 w-5 rotate-90 self-center text-muted-foreground sm:rotate-0" aria-hidden="true" />
+            )}
+          </li>
+        ))}
+      </ol>
+
+      <div className="mt-5 flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <span className="text-sm font-semibold text-foreground">Tempo médio de fecho: 21 dias</span>
+        <span className="w-fit rounded-full bg-success px-3 py-1 text-xs font-bold text-success-foreground">↓ −40%</span>
+      </div>
+    </div>
   </div>
 );
 
