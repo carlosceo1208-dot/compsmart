@@ -1,20 +1,26 @@
-# Liberar o anti-robô no site publicado e testar a candidatura
+# Faixa "Em reconstrução" + teste da candidatura no site publicado
 
-## Por que fica em "Verificando…"
-O anti-robô (Cloudflare Turnstile) recusa o site publicado porque os endereços compsmart.ia.br e www.compsmart.ia.br não estão na lista de domínios autorizados da chave (erro 110200). Enquanto isso não for ajustado, nenhuma candidatura real passa, e nada no código resolve isso sozinho.
+## Parte 1 — Anti-robô (você faz no Cloudflare)
+O botão fica em "Verificando…" porque a chave anti-robô não aceita compsmart.ia.br nem www.compsmart.ia.br (erro 110200). A propagação do DNS no Registro.br não causa esse problema. Você autoriza os endereços no painel: Cloudflare → Turnstile → widget da chave 0x4AAAAAACKfut… → Hostname Management. Adicione compsmart.ia.br, www.compsmart.ia.br, smartcomp.ia.br e www.smartcomp.ia.br e salve.
 
-A propagação do DNS no Registro.br não causa esse problema. O site já abre em www.compsmart.ia.br, e o anti-robô só confere o nome do endereço na lista da chave. Não é preciso esperar a propagação terminar para fazer o ajuste.
+Quando você me avisar, eu testo no site publicado:
+- o botão passa de "Verificando…" para "Enviar candidatura";
+- a candidatura completa com PDF chega até "Candidatura enviada!";
+- depois de uma falha, o "Reenviar" funciona com uma verificação nova;
+- o painel do RH mostra fonte Portal, etapa Triagem e o currículo abre;
+- no fim, apago o candidato, a candidatura e o currículo de teste.
 
-## O que será feito
-1. **Conectar sua conta Cloudflare** (vai aparecer um cartão no chat). O token precisa ser um **token de usuário** (Meu perfil → Tokens de API) com a permissão **Account → Turnstile → Edit**, porque o Turnstile não aceita token de conta.
-2. **Ler o widget atual** (chave 0x4AAAAAACKfut…) e mostrar a lista de domínios de hoje.
-3. **Pedir sua confirmação** e então adicionar compsmart.ia.br, www.compsmart.ia.br, smartcomp.ia.br e www.smartcomp.ia.br, sem remover os domínios que já estão lá.
-4. **Testar no site publicado**: o botão sai de "Verificando…" e vira "Enviar candidatura"; candidatura completa com PDF até "Candidatura enviada!"; forçar uma falha e usar "Reenviar" com token novo; confirmar no painel do RH (fonte Portal, etapa Triagem, currículo abrindo).
-5. **Limpar**: apagar o candidato, a candidatura e o currículo de teste (volta a 0).
+## Parte 2 — Faixa de aviso no topo
+- **Onde:** uma barra fina com a largura toda da tela, acima do cabeçalho, em todas as páginas públicas (home, NR-1, vagas etc.) e também no app para quem está logado. Ela aparece no computador e no celular.
+- **Texto (Opção A):** "🚧 Estamos reconstruindo a CompSmart para oferecer ainda mais apoio ao RH. Em breve, muitas novidades." No celular, o texto quebra em duas linhas sem cortar.
+- **Visual:** fundo azul da marca, texto branco e a tipografia atual. A barra é fina e discreta para não competir com a parte principal da home.
+- **Animação:** um ponto pulsando no início, que indica "em andamento", e uma entrada suave de cima para baixo ao carregar. O texto não fica deslizando sem parar. Para quem configurou o computador com menos movimento, a animação fica desligada.
+- **Navegação:** o cabeçalho fixo desce a altura da faixa e o conteúdo ganha o mesmo espaço extra. Assim os links, o Entrar e o Agendar demonstração continuam acessíveis e nada fica escondido.
 
-## Caminho alternativo (se você preferir não conectar o Cloudflare)
-Você mesmo faz no painel: Cloudflare → Turnstile → widget da chave 0x4AAAAAACKfut… → Settings → Hostname Management → adicionar os 4 domínios → Save. Depois me avisa e eu rodo os passos 4 e 5.
+## Validação
+Vou rodar lint, tipos, testes, dead-code e build até passarem. Depois testo em 1280 px e 390 px na home, em /vagas, em /vagas/[slug] e no app logado. Em seguida publico e confiro no site publicado.
 
 ## Detalhes técnicos
-- Leitura: `GET /accounts/{account_id}/challenges/widgets/{sitekey}`; alteração: `PUT` no mesmo caminho, mandando a lista completa de `domains` junto com `name` e `mode` atuais.
-- Sem mudanças no código, no banco ou na lógica da função da candidatura.
+- Novo `src/components/landing/public/AnnouncementBar.tsx` com cores por tokens semânticos, `animate-ping` no ponto, `animate-fade-in` na entrada e `motion-reduce:animate-none`.
+- A altura da faixa fica numa variável CSS (`--announce-h`), usada pelo `top` do header fixo e pelo padding do `PublicLayout`. O layout do app recebe o mesmo tratamento.
+- Não há mudança no banco nem na função da candidatura. O roadmap.md recebe as duas tarefas.
