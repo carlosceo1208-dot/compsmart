@@ -221,6 +221,7 @@ const LandingRecrutamento = () => (
               </div>
             ))}
           </div>
+          <FunilContratacao />
         </div>
       </section>
 
