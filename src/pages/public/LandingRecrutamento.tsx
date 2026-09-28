@@ -140,7 +140,7 @@ const LandingRecrutamento = () => (
           <p className="mt-3 opacity-90">Veja o módulo funcionando com os dados da sua empresa.</p>
           <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             <DemoDialog triggerLabel="Agende uma demonstração" size="lg" moduloInteresse={MODULO} variant="secondary" />
-            <Button asChild size="lg" variant="outline" className="border-navy-foreground bg-transparent text-navy-foreground hover:bg-navy-foreground/10 hover:text-navy-foreground">
+            <Button asChild size="lg" variant="outline" className="border-navy-foreground bg-none bg-transparent text-navy-foreground hover:bg-navy-foreground/10 hover:text-navy-foreground">
               <Link to="/vagas">Ver o portal de vagas</Link>
             </Button>
           </div>
