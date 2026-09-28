@@ -44,11 +44,11 @@ const irPara = (id: string) => {
 const secao = "scroll-mt-40 lg:scroll-mt-48 xl:scroll-mt-40";
 
 const FUNIL_ETAPAS = [
-  { label: "Triagem", cor: "var(--funil-1)", icon: UserSearch },
-  { label: "Entrevista RH", cor: "var(--funil-2)", icon: MessageCircle },
-  { label: "Entrevista Gestor", cor: "var(--funil-3)", icon: UserRound },
-  { label: "Proposta", cor: "var(--funil-4)", icon: FileText },
-  { label: "Contratado", cor: "var(--funil-5)", icon: CheckCircle2 },
+  { label: "Triagem", cor: "var(--funil-1)", icon: UserSearch, textoEscuro: false },
+  { label: "Entrevista RH", cor: "var(--funil-2)", icon: MessageCircle, textoEscuro: false },
+  { label: "Entrevista Gestor", cor: "var(--funil-3)", icon: UserRound, textoEscuro: true },
+  { label: "Proposta", cor: "var(--funil-4)", icon: FileText, textoEscuro: true },
+  { label: "Contratado", cor: "var(--funil-5)", icon: CheckCircle2, textoEscuro: true },
 ];
 
 const FunilContratacao = () => (
@@ -61,10 +61,10 @@ const FunilContratacao = () => (
       </div>
 
       <ol aria-label="Etapas do funil de contratação" className="mt-5 grid gap-2 sm:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr_auto_1fr] sm:items-stretch">
-        {FUNIL_ETAPAS.map(({ label, cor, icon: Icon }, indice) => (
+        {FUNIL_ETAPAS.map(({ label, cor, icon: Icon, textoEscuro }, indice) => (
           <li key={label} className="contents">
             <div
-              className="flex min-h-20 items-center gap-3 rounded-xl px-3 py-3 text-primary-foreground sm:min-h-28 sm:flex-col sm:justify-center sm:text-center"
+              className={`flex min-h-20 items-center gap-3 rounded-xl px-3 py-3 sm:min-h-28 sm:flex-col sm:justify-center sm:text-center ${textoEscuro ? "text-foreground" : "text-primary-foreground"}`}
               style={{ backgroundColor: cor }}
             >
               <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
