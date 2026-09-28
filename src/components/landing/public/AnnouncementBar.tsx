@@ -1,10 +1,10 @@
 import { useLocation } from "react-router-dom";
 
-export const ANNOUNCEMENT_TEXT =
+const ANNOUNCEMENT_TEXT =
   "🚧 Estamos reconstruindo a CompSmart para oferecer ainda mais apoio ao RH. Em breve, muitas novidades.";
 
 /** Portal de vagas fica sem a faixa para não confundir o candidato. */
-export const useShowAnnouncement = () => !useLocation().pathname.startsWith("/vagas");
+const useShowAnnouncement = () => !useLocation().pathname.startsWith("/vagas");
 
 /** Faixa "em reconstrução". `spacer` reserva a mesma altura, invisível, sob o header fixo. */
 export const AnnouncementBar = ({ spacer = false }: { spacer?: boolean }) => {
