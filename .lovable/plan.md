@@ -11,12 +11,15 @@ Transformar o funil atual da página `/modulos/selecao-rs` em um componente visu
 - Manter as cinco etapas, sem números ou percentuais:
   **Triagem → Entrevista RH → Entrevista Gestor → Proposta → Contratado**.
 - Apresentar cada etapa como um card com ícone e progressão visual azul → teal → verde, usando os tokens existentes.
+- Usar ícones semânticos por etapa: triagem, conversa, pessoa/gestor, documento/proposta e confirmação de contratação.
 - Substituir as setas soltas por ícones gráficos de chevron, com alinhamento e espaçamento uniformes.
 - No celular, empilhar as etapas e girar os chevrons para indicar o avanço vertical.
+- Garantir contraste legível em todos os tons, escolhendo a cor de texto semântica adequada para cada superfície.
 
 ### 2. KPI ilustrativo
 - Adicionar ao mesmo conjunto visual o rótulo discreto **“Exemplo ilustrativo de tela”**.
 - Exibir o destaque **“Tempo médio de fecho: 21 dias”** com badge verde **“↓ −40%”**.
+- Manter o KPI ao lado ou abaixo do funil como um elemento separado, nunca como uma etapa do processo.
 - Manter esse dado claramente identificado como simulação de produto, não como resultado de cliente.
 
 ### 3. Integração visual
