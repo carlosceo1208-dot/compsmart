@@ -15,6 +15,11 @@
 
 ## Regra de proteção
 Logo e "Sobre a empresa" só chegam ao navegador quando a vaga é pública **e** mostra o nome da empresa. Se o nome estiver oculto, o logo também fica oculto, para não revelar a empresa pela imagem.
+- A opção "mostrar nome da empresa" já existe em toda vaga: é um campo próprio, sempre preenchido (padrão ligado), e desligado automaticamente em vaga confidencial.
+
+## Ajustes finos
+- **Sem arquivos esquecidos**: ao trocar o logo, o antigo é apagado; ao remover o logo ou excluir a vaga, o logo também é apagado.
+- **"Sobre a empresa" seguro**: o texto é mostrado sempre como texto simples (nunca vira código na página) e mantém as quebras de linha.
 
 ## Testes (desktop e celular)
 1. Criar vaga pública: faixa desligada por padrão; logo PNG aceito; arquivo .exe recusado; texto salvo.
@@ -23,7 +28,10 @@ Logo e "Sobre a empresa" só chegam ao navegador quando a vaga é pública **e**
 4. Vaga confidencial: sem logo, sem texto, sem faixa; link direto funciona.
 5. Trocar e remover logo e texto refletem na página.
 6. Isolamento: outra empresa não grava nem altera logo/texto (simulação no banco).
-7. Candidatura de ponta a ponta continua funcionando; checagem completa (lint, tipos, testes, dead-code, build) passando. Dados de teste apagados ao final.
+7. Candidatura de ponta a ponta no preview agora; no site publicado fica pendente até os domínios serem autorizados no anti-robô. Checagem completa (lint, tipos, testes, dead-code, build) passando. Dados de teste apagados ao final.
+8. Vaga pública com nome oculto: card mostra "Empresa confidencial" sem logo; página sem logo e sem "Sobre a empresa".
+9. Trocar logo apaga o arquivo antigo; excluir vaga apaga o logo (conferido no armazenamento).
+10. Texto com marcação (ex.: `<b>oi</b>`) aparece literal, com quebras de linha preservadas.
 
 ## Detalhes técnicos
 - Migração: `vagas` ganha `logo_path text` e `sobre_empresa text` (check ≤ 600); check `NOT (visibilidade='confidencial' AND exibir_faixa)`.
