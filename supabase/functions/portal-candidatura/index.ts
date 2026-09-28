@@ -6,6 +6,7 @@ const MAX_BYTES = 5 * 1024 * 1024;
 const RATE_MAX = 5; // candidaturas por IP
 const RATE_WINDOW_MIN = 10;
 const MSG_LIMITE = "Muitas tentativas — tente novamente em instantes.";
+const MSG_CAPTCHA = "Não conseguimos confirmar que você não é um robô — aguarde a verificação e tente de novo.";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -47,25 +48,33 @@ Deno.serve(async (req) => {
     const origin = req.headers.get("origin") ?? "";
     const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-    // Limite por IP
+    // Limite por IP (só conta tentativas que passaram no anti-robô)
     const ipHash = await sha256(ip);
     const since = new Date(Date.now() - RATE_WINDOW_MIN * 60_000).toISOString();
     const { count } = await db.from("portal_rate_limit").select("id", { count: "exact", head: true })
       .eq("ip_hash", ipHash).gte("created_at", since);
     if ((count ?? 0) >= RATE_MAX) return json({ error: MSG_LIMITE, code: "rate_limit" }, 429);
-    await db.from("portal_rate_limit").insert({ ip_hash: ipHash });
 
     // Anti-robô: obrigatório no site publicado; no preview/localhost aceita falha do widget para não travar testes.
     const secret = Deno.env.get("TURNSTILE_SECRET_KEY");
+    let host = "";
+    try { host = new URL(origin).hostname; } catch { /* sem origem */ }
     if (!isDevOrigin(origin)) {
-      if (!secret || !b.turnstileToken) return json({ error: MSG_LIMITE, code: "captcha" }, 429);
+      if (!secret || !b.turnstileToken) {
+        console.warn("captcha_missing", JSON.stringify({ host, temSecret: !!secret, temToken: !!b.turnstileToken }));
+        return json({ error: MSG_CAPTCHA, code: "captcha_missing" }, 403);
+      }
       const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
         method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ secret, response: b.turnstileToken, remoteip: ip }),
       });
       const v = await r.json().catch(() => ({ success: false }));
-      if (!v.success) return json({ error: MSG_LIMITE, code: "captcha" }, 429);
+      if (!v.success) {
+        console.warn("captcha_invalid", JSON.stringify({ host, codes: v["error-codes"] ?? [], hostname: v.hostname ?? null }));
+        return json({ error: MSG_CAPTCHA, code: "captcha_invalid" }, 403);
+      }
     }
+    await db.from("portal_rate_limit").insert({ ip_hash: ipHash });
 
     // Empresa SEMPRE derivada da vaga no banco
     const { data: vaga } = await db.from("vagas").select("id, root_company_id, status").eq("slug", b.slug).maybeSingle();
