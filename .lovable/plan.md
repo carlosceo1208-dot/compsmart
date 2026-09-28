@@ -9,11 +9,13 @@ Na página `/modulos/selecao-rs`, criar dois elementos visuais de produto como *
 - Cada etapa em card com tom progressivo de azul → teal → verde (tokens do site: #2563EB → #0D9488 → #16A34A)
 - Sem números/percentuais por etapa — apenas etapas e setas (decisão de integridade mantida)
 - Card compacto, largura ~640px, centralizado, **abaixo do grid de 4 indicadores**; não full-width
-- Estrutura acessível: lista ordenada (as etapas são texto real, não imagem)
+- Estrutura acessível: lista ordenada (`<ol>`) com `aria-label="Etapas do funil de contratação"` (as etapas são texto real, não imagem)
 - No mobile as etapas empilham/setam em coluna, dentro da largura da página
 
-## 2. Listagem de vagas (seção "Como a CompSmart resolve")
+## 2. Listagem de vagas (seção id `solucao` — "Como a CompSmart resolve")
+Id real conferido no código da página: `solucao`, já coberto pela âncora "Solução" no menu do topo — as âncoras continuam funcionando sem mudança.
 Componente CSS simulando o portal /vagas, na largura da página do card compacto:
+- Subtítulo discreto acima do componente: **"Exemplo ilustrativo de tela"** — deixa claro que "21 dias / −40%" é simulação de produto, não resultado de cliente
 - Barra de busca "Buscar vagas..." e chips de filtro: **São Paulo – SP, Remoto, Híbrido**
 - 3 cards de vaga com título, local e pill de senioridade:
   - um com faixa salarial **"R$ 12.000 – 15.000"** e badge verde **"Faixa salarial fornecida"**
