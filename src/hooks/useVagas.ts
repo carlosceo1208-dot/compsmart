@@ -31,6 +31,8 @@ export interface Vaga {
   exibir_nome_empresa: boolean;
   exibir_faixa: boolean;
   descricao_publica_cliente: string | null;
+  logo_path: string | null;
+  sobre_empresa: string | null;
   slug: string;
   created_at: string;
   updated_at: string;
@@ -98,8 +100,9 @@ export const useSaveVaga = () => {
       const q = id
         ? vagasTable().update(dados).eq("id", id).eq("root_company_id", activeCompanyId)
         : vagasTable().insert({ ...dados, root_company_id: activeCompanyId });
-      const { error } = await q;
+      const { data, error } = await q.select("id").single();
       if (error) throw error;
+      return (data as { id: string }).id;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["vagas"] }),
   });
@@ -111,10 +114,12 @@ export const useDeleteVaga = () => {
   return useMutation({
     mutationFn: async (id: string) => {
       if (!activeCompanyId) throw new Error("Empresa não selecionada");
+      const { data: atual } = await vagasTable().select("logo_path").eq("id", id).eq("root_company_id", activeCompanyId).maybeSingle();
       const { data, error } = await vagasTable().delete()
         .eq("id", id).eq("root_company_id", activeCompanyId).eq("status", "rascunho").select("id");
       if (error) throw error;
       if (!data?.length) throw new Error("Somente vagas em rascunho podem ser excluídas.");
+      if (atual?.logo_path) await supabase.storage.from(LOGO_BUCKET).remove([atual.logo_path]);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["vagas"] }),
   });
@@ -162,3 +167,43 @@ export const salvarCargoNaBiblioteca = async (p: {
   if (error) throw error;
   return data as { id: string; existed: boolean };
 };
+
+export const LOGO_BUCKET = "logos-vagas";
+export const LOGO_MAX_BYTES = 2 * 1024 * 1024;
+export const LOGO_TIPOS: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
+export const SOBRE_EMPRESA_MAX = 600;
+
+/** Valida o arquivo de logo; retorna mensagem de erro ou null. */
+export const validarLogo = (f: File) =>
+  !LOGO_TIPOS[f.type] ? "Envie um logo em PNG, JPG ou WebP." : f.size > LOGO_MAX_BYTES ? "O logo deve ter até 2 MB." : null;
+
+/** Envia o novo logo, grava na vaga e apaga o arquivo anterior (sem órfãos). */
+export const salvarLogoVaga = async (p: { companyId: string; vagaId: string; file: File | null; anterior: string | null }) => {
+  let novo: string | null = null;
+  if (p.file) {
+    const erro = validarLogo(p.file);
+    if (erro) throw new Error(erro);
+    novo = `${p.companyId}/${p.vagaId}-${Date.now()}.${LOGO_TIPOS[p.file.type]}`;
+    const { error } = await supabase.storage.from(LOGO_BUCKET).upload(novo, p.file, { contentType: p.file.type });
+    if (error) throw error;
+  }
+  const { error } = await vagasTable().update({ logo_path: novo }).eq("id", p.vagaId).eq("root_company_id", p.companyId);
+  if (error) {
+    if (novo) await supabase.storage.from(LOGO_BUCKET).remove([novo]);
+    throw error;
+  }
+  if (p.anterior && p.anterior !== novo) await supabase.storage.from(LOGO_BUCKET).remove([p.anterior]);
+};
+
+/** URL temporária do logo (espaço privado; o servidor só libera logos exibíveis). */
+export const useLogoUrl = (path: string | null | undefined) =>
+  useQuery({
+    queryKey: ["logo-vaga", path],
+    enabled: !!path,
+    staleTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.storage.from(LOGO_BUCKET).createSignedUrl(path!, 3600);
+      if (error) return null;
+      return data.signedUrl;
+    },
+  });
