@@ -15,6 +15,9 @@
 4. **Título com espaço**: o dado já está correto; para não voltar a acontecer, o cadastro/edição de vaga passará a remover espaços no início e fim do título ao salvar.
 5. Rodar lint, tipos, testes, dead-code e build até tudo passar; checar segurança; publicar e conferir `/vagas` e a página da vaga no site publicado.
 6. Relatório passo a passo do que foi clicado e o resultado.
+7. **Candidatura sem currículo** (antes de publicar, não bloqueia): enviar candidatura válida sem anexo; confirmar tela de confirmação e que o candidato fica sem currículo, sem erro.
+8. **Reaplicação na mesma vaga** (antes de publicar, não bloqueia): reenviar com o mesmo e-mail na mesma vaga; a tela deve dizer "Você já se candidatou a esta vaga" (hoje o texto é "Você já estava inscrito nesta vaga" e será trocado) e o banco deve continuar com 1 candidatura só.
+Os dados dos testes 7 e 8 também são apagados ao final. As tarefas 7 e 8 entram no `roadmap.md`.
 
 ## Detalhes técnicos
 - No preview o anti-robô aceita falha do widget (origem de desenvolvimento), então o teste roda no preview; depois do publish, só conferência visual das páginas (sem nova candidatura real no site publicado).
