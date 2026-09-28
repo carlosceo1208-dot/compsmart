@@ -330,6 +330,7 @@ export const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col overflow-x-hidden">
+      <AnnouncementBar />
       {/* Kudos Celebration Components */}
       <KudosConfetti isActive={showConfetti} />
       <KudosNotificationPopup 

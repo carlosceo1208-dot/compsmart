@@ -22,7 +22,7 @@ export const PublicLayout = ({
     <div className="min-h-screen bg-background">
       <SeoHead path={path} title={title} description={description} />
       <PublicHeader />
-      <main className="pt-16 md:pt-20 lg:pt-28 xl:pt-20">{children}</main>
+      <main className="pt-16 md:pt-20 lg:pt-28 xl:pt-20"><AnnouncementBar spacer />{children}</main>
       <PublicFooter />
       <WhatsAppFloat />
     </div>
