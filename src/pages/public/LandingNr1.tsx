@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnnouncementBar } from "@/components/landing/public/AnnouncementBar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -121,6 +122,7 @@ export default function LandingNr1() {
   return (
     <div className="nr1-scope min-h-screen bg-background">
 
+      <AnnouncementBar />
       {/* Header */}
       <Nr1Header onAnchor={scrollToId} />
 
