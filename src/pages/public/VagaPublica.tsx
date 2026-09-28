@@ -114,7 +114,7 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
 
   const onArquivo = (file: File | null) => {
     const e = { ...erros }; delete e.curriculo;
-    if (file && file.type !== "application/pdf") e.curriculo = "Envie um arquivo PDF.";
+    if (file && file.type !== "application/pdf") e.curriculo = "Envie um arquivo PDF válido.";
     else if (file && file.size > CURRICULO_MAX_BYTES) e.curriculo = `O currículo deve ter até ${CURRICULO_MAX_MB} MB.`;
     setErros(e); setArquivo(e.curriculo ? null : file);
   };
