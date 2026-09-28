@@ -13,8 +13,12 @@
 2. **Mensagens corretas**: separar "Muitas tentativas" (limite real) de "Não conseguimos confirmar que você não é um robô — aguarde a verificação e tente de novo".
 3. **Token novo a cada envio**: após qualquer falha, reiniciar o widget anti-robô; o botão "Enviar"/"Reenviar" fica desabilitado até existir token válido, com aviso "Verificando…".
 4. **Contagem justa**: só contar a tentativa no limite depois que o anti-robô for aprovado (falhas de verificação não bloqueiam a pessoa).
-5. Se o diagnóstico mostrar domínio não autorizado, informar você do ajuste necessário na chave anti-robô.
-6. Rodar lint, tipos, testes, dead-code e build; publicar; testar candidatura completa com PDF no site publicado e apagar o candidato de teste.
+5. **Domínio na chave anti-robô**: confirmar que compsmart.ia.br e www.compsmart.ia.br estão autorizados (pelo código de erro do anti-robô no site publicado). Se não estiverem, avisar você do ajuste necessário — sem isso toda candidatura real falha, mesmo com a correção.
+6. Rodar lint, tipos, testes, dead-code e build; publicar.
+7. **Testes no site publicado** (não só no preview, onde as chaves de teste sempre aprovam):
+   - Botão "Enviar" desabilitado com "Verificando…" até existir token válido.
+   - Forçar uma falha, clicar "Reenviar" e confirmar que o novo envio passa com token novo (widget reiniciado). Se falhar, o reset não funcionou e será corrigido.
+   - Candidatura completa com PDF até "Candidatura enviada!"; depois apagar o candidato de teste.
 
 ## Detalhes técnicos
 - `supabase/functions/portal-candidatura/index.ts`: códigos distintos (`rate_limit` vs `captcha_missing`/`captcha_invalid` com `error-codes` do siteverify em log), mover o insert em `portal_rate_limit` para depois do siteverify.
