@@ -36,3 +36,4 @@
 - [ ] Candidatura no site publicado: aguarda autorização dos domínios na chave anti-robô (Cloudflare)
 - [x] Faixa "Em reconstrução" no topo (institucional + app; oculta em /vagas)
 - [ ] Teste da candidatura no site publicado após você autorizar os domínios no Cloudflare
+- [x] Página Recrutamento & Seleção (/modulos/selecao-rs): abertura, problema, solução, métricas, CTA navy, SEO, navegação rápida, demo no celular

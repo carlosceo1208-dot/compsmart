@@ -123,6 +123,7 @@ const Diagnostico = lazy(() => import("./pages/public/Diagnostico"));
 const VagasPortal = lazy(() => import("./pages/public/VagasPortal"));
 const VagaPublica = lazy(() => import("./pages/public/VagaPublica"));
 const Candidatos = lazy(() => import("./pages/recrutamento/Candidatos"));
+const LandingRecrutamento = lazy(() => import("./pages/public/LandingRecrutamento"));
 const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
 
@@ -312,6 +313,7 @@ const App = () => {
                       <Route path="/vagas" element={<VagasPortal />} />
                       <Route path="/vagas/:slug" element={<VagaPublica />} />
                       <Route path="/modulos/nr1" element={<Navigate to="/nr1" replace />} />
+                      <Route path="/modulos/selecao-rs" element={<LandingRecrutamento />} />
                       <Route path="/modulos/:slug" element={<ModuloPage />} />
 
                       {/* Public NR-1 landing (lead capture) — nova URL oficial */}
