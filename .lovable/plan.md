@@ -3,6 +3,8 @@
 ## Por que fica em "Verificando…"
 O anti-robô (Cloudflare Turnstile) recusa o site publicado porque os endereços compsmart.ia.br e www.compsmart.ia.br não estão na lista de domínios autorizados da chave (erro 110200). Enquanto isso não for ajustado, nenhuma candidatura real passa, e nada no código resolve isso sozinho.
 
+A propagação do DNS no Registro.br não causa esse problema. O site já abre em www.compsmart.ia.br, e o anti-robô só confere o nome do endereço na lista da chave. Não é preciso esperar a propagação terminar para fazer o ajuste.
+
 ## O que será feito
 1. **Conectar sua conta Cloudflare** (vai aparecer um cartão no chat). O token precisa ser um **token de usuário** (Meu perfil → Tokens de API) com a permissão **Account → Turnstile → Edit**, porque o Turnstile não aceita token de conta.
 2. **Ler o widget atual** (chave 0x4AAAAAACKfut…) e mostrar a lista de domínios de hoje.
