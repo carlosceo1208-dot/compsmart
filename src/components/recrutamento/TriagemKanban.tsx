@@ -187,7 +187,7 @@ export const TriagemKanban = ({ vagaInicial = null, onVagaChange }: Props) => {
                         {st.status === "erro" && (
                           <div className="space-y-1">
                             <p className="text-destructive">{st.erro}</p>
-                            {podeAnalisar && <Button size="sm" variant="outline" className="h-7 px-2 rounded-lg" disabled={fila.ocupado && !!fila.pausa} onClick={() => rodarAnalise(c.id)}><RotateCcw className="h-3 w-3 mr-1" />Tentar novamente</Button>}
+                            {podeAnalisar && <Button size="sm" variant="outline" className="h-7 px-2 rounded-lg" onClick={() => rodarAnalise(c.id)}><RotateCcw className="h-3 w-3 mr-1" />Tentar novamente</Button>}
                           </div>
                         )}
                       </div>
