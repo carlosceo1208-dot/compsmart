@@ -17,13 +17,22 @@ import { CandidatoDrawer } from "./CandidatoDrawer";
 
 const dias = (d: string) => Math.max(0, Math.floor((Date.now() - new Date(d).getTime()) / 86_400_000));
 
-export const TriagemKanban = () => {
+type Props = { vagaInicial?: string | null; onVagaChange?: (id: string) => void };
+
+export const TriagemKanban = ({ vagaInicial = null, onVagaChange }: Props) => {
   const { data: vagas = [], isLoading: carregandoVagas } = useVagas();
-  const [vagaId, setVagaId] = useState<string | null>(null);
+  const [vagaId, setVagaIdState] = useState<string | null>(null);
+  const [naoEncontrada, setNaoEncontrada] = useState(false);
   const ordenadas = useMemo(
     () => [...vagas].sort((a, b) => Number(b.status === "publicada") - Number(a.status === "publicada") || b.created_at.localeCompare(a.created_at)),
     [vagas]);
-  useEffect(() => { if (!vagaId && ordenadas.length) setVagaId(ordenadas[0].id); }, [ordenadas, vagaId]);
+  useEffect(() => {
+    if (vagaId || !ordenadas.length) return;
+    const pedida = vagaInicial && ordenadas.find((v) => v.id === vagaInicial);
+    setNaoEncontrada(!!vagaInicial && !pedida);
+    setVagaIdState(pedida ? pedida.id : ordenadas[0].id);
+  }, [ordenadas, vagaId, vagaInicial]);
+  const setVagaId = (id: string) => { setVagaIdState(id); setNaoEncontrada(false); onVagaChange?.(id); };
 
   const { data: lista = [], isLoading, error } = useTriagem(vagaId);
   const mover = useMoverCandidatura(vagaId);
@@ -89,6 +98,7 @@ export const TriagemKanban = () => {
           <SelectContent>{ordenadas.map((v) => <SelectItem key={v.id} value={v.id}>{v.titulo}{v.status !== "publicada" ? ` (${v.status})` : ""}</SelectItem>)}</SelectContent>
         </Select>
       </div>
+      {naoEncontrada && <p role="status" className="text-sm text-muted-foreground">Vaga não encontrada, exibindo a mais recente.</p>}
 
       {error && <p className="text-destructive text-sm">Não foi possível carregar o pipeline.</p>}
       {!isLoading && lista.length === 0 && <p className="text-sm text-muted-foreground">Nenhum candidato nesta vaga ainda.</p>}

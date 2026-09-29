@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +25,10 @@ const Candidatos = () => {
   const [vaga, setVaga] = useState("todas");
   const [novo, setNovo] = useState(false);
   const [importar, setImportar] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const aba = params.get("aba") === "triagem" ? "triagem" : "lista";
+  const trocarAba = (a: string) => setParams(a === "triagem" ? { aba: "triagem", ...(params.get("vaga") ? { vaga: params.get("vaga") as string } : {}) } : {}, { replace: true });
+  const trocarVaga = (id: string) => setParams({ aba: "triagem", vaga: id }, { replace: true });
 
   const lista = useMemo(() => {
     const q = busca.trim().toLowerCase();
@@ -57,9 +61,9 @@ const Candidatos = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="lista">
+      <Tabs value={aba} onValueChange={trocarAba}>
       <TabsList className="rounded-xl"><TabsTrigger value="lista">Lista</TabsTrigger><TabsTrigger value="triagem">Triagem</TabsTrigger></TabsList>
-      <TabsContent value="triagem" className="mt-4"><TriagemKanban /></TabsContent>
+      <TabsContent value="triagem" className="mt-4"><TriagemKanban vagaInicial={params.get("vaga")} onVagaChange={trocarVaga} /></TabsContent>
       <TabsContent value="lista" className="mt-4 space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="relative">

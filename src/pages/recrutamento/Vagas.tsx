@@ -88,7 +88,7 @@ const Vagas = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {lista.map((v) => (
-            <Card key={v.id} role="button" tabIndex={0} onClick={() => abrir(v)} onKeyDown={(e) => e.key === "Enter" && abrir(v)}
+            <Card key={v.id} role="button" tabIndex={0} onClick={() => abrir(v)} onKeyDown={(e) => e.target === e.currentTarget && e.key === "Enter" && abrir(v)}
               className="rounded-2xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
               <CardContent className="p-5 space-y-3">
                 <div className="flex items-start justify-between gap-2">
@@ -121,10 +121,15 @@ const Vagas = () => {
                 {v.observacao && (
                   <p className="text-xs text-muted-foreground line-clamp-2 border-l-2 border-border pl-2" title={v.observacao}>{v.observacao}</p>
                 )}
-                <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground pt-1 border-t">
-                  <span className="flex items-center gap-1 pt-2"><Users className="h-3.5 w-3.5" />{contagem[v.id] ?? 0} {(contagem[v.id] ?? 0) === 1 ? "candidato" : "candidatos"}</span>
-                  <span className="flex items-center gap-1 pt-2"><MapPin className="h-3.5 w-3.5" />{v.status === "publicada" ? "Triagem" : "Abertura"}</span>
-                  <span className="flex items-center gap-1 pt-2"><Clock className="h-3.5 w-3.5" />{diasAberta(v.created_at)} dias</span>
+                <div className="grid grid-cols-3 gap-2 items-center text-xs text-muted-foreground pt-1 border-t">
+                  <Link to={`/recrutamento/candidatos?aba=triagem&vaga=${v.id}`}
+                    aria-label={`Ver triagem da vaga ${v.titulo}`}
+                    onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}
+                    className="col-span-2 mt-1 min-h-11 inline-flex items-center gap-3 rounded-lg px-2 -mx-2 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                    <span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{contagem[v.id] ?? 0} {(contagem[v.id] ?? 0) === 1 ? "candidato" : "candidatos"}</span>
+                    <span className="flex items-center gap-1 text-primary font-medium">{v.status === "publicada" ? "Triagem" : "Abertura"}</span>
+                  </Link>
+                  <span className="flex items-center gap-1 mt-1"><Clock className="h-3.5 w-3.5" />{diasAberta(v.created_at)} dias</span>
                 </div>
                 {v.status === "publicada" && <CopiarLinkVaga slug={v.slug} compact />}
               </CardContent>
