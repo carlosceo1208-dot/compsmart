@@ -42,6 +42,8 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
   const cb = useRef({ onVerify, onError, onExpire, onLoading });
   cb.current = { onVerify, onError, onExpire, onLoading };
   const [isLoading, setIsLoading] = useState(true);
+  // Incrementa para refazer a carga do script quando o widget nunca desenhou
+  const [attempt, setAttempt] = useState(0);
 
   const setLoading = (v: boolean) => { if (!aliveRef.current) return; setIsLoading(v); cb.current.onLoading?.(v); };
 
@@ -74,13 +76,13 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
     else {
       const prev = window.onTurnstileLoad;
       window.onTurnstileLoad = () => { prev?.(); render(); };
-      if (!document.querySelector('script[src*="turnstile"]')) {
-        const s = document.createElement("script");
-        s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
-        s.async = true; s.defer = true;
-        s.onerror = () => { setLoading(false); cb.current.onError?.(); };
-        document.head.appendChild(s);
-      }
+      // Em nova tentativa, remove script antigo (pode ter falhado) e recarrega
+      document.querySelector('script[src*="turnstile"]')?.remove();
+      const s = document.createElement("script");
+      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
+      s.async = true; s.defer = true;
+      s.onerror = () => { setLoading(false); cb.current.onError?.(); };
+      document.head.appendChild(s);
     }
 
     return () => {
@@ -89,14 +91,19 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
       if (widgetIdRef.current && window.turnstile) window.turnstile.remove(widgetIdRef.current);
       widgetIdRef.current = null;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempt]);
 
-  // Pedido de token novo: reset no widget existente
+  // Pedido de token novo: reset no widget existente; se nunca desenhou, recarrega o script
   useEffect(() => {
     if (resetSignal === 0) return;
     retriesRef.current = 0;
-    setLoading(true);
-    if (widgetIdRef.current && window.turnstile) window.turnstile.reset(widgetIdRef.current);
+    if (widgetIdRef.current && window.turnstile) {
+      setLoading(true);
+      window.turnstile.reset(widgetIdRef.current);
+    } else {
+      setAttempt((a) => a + 1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetSignal]);
 
