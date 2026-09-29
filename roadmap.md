@@ -54,3 +54,4 @@
 - [x] Botão de análise oculto para colaborador
 - [x] Troca de empresa no meio do lote: sem vazamento; corrigido envio de pendente após troca (fila parada ao sair da tela)
 - [x] Fase 3 R&S fechada (testes F/G/H/I); dados temporários apagados
+- [x] "Colar da planilha" e "Novo candidato" ocultos para colaborador (servidor já recusa); publicado e conferido no site oficial
