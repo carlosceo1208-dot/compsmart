@@ -1,0 +1,2 @@
+REVOKE ALL ON public.maturidade_questionario, public.maturidade_diagnosticos, public.maturidade_gestores, public.maturidade_convidados, public.maturidade_respostas, public.maturidade_leads, public.maturidade_tentativas FROM anon;
+REVOKE ALL ON public.maturidade_respostas, public.maturidade_tentativas FROM authenticated;

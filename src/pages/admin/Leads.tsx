@@ -110,7 +110,7 @@ export default function Leads() {
     const body = encodeURIComponent(`Olá, ${lead.nome},\n\n`);
     window.location.href = `mailto:${encodeURIComponent(lead.email)}?subject=${subject}&body=${body}`;
     // Otimista: mailto não confirma envio.
-    if (lead.source !== "nr1" && normalizeStatus(lead.status) === "novo") setLeadStatus(lead, "em_contato");
+    if (lead.source === "leads" && normalizeStatus(lead.status) === "novo") setLeadStatus(lead, "em_contato");
   };
 
   const exportCsv = () =>
@@ -232,8 +232,8 @@ export default function Leads() {
             <>
               <SheetHeader><SheetTitle>{selected.nome}</SheetTitle></SheetHeader>
               <div className="mt-6 space-y-4">
-                {selected.source === "nr1" && (
-                  <p className="text-xs rounded-md bg-muted p-2 text-muted-foreground">Somente leitura — contato da página NR-1.</p>
+                {selected.source !== "leads" && (
+                  <p className="text-xs rounded-md bg-muted p-2 text-muted-foreground">Somente leitura — contato da página {selected.source === "nr1" ? "NR-1" : "Maturidade do RH"}.</p>
                 )}
                 <Field label="E-mail" value={selected.email} />
                  <Field label="Formulário enviado em" value={formatDateTimePtBR(selected.submitted_at)} />
@@ -255,7 +255,7 @@ export default function Leads() {
                 <Field label="Consentimento LGPD" value={selected.consentimento_lgpd == null ? "—" : selected.consentimento_lgpd ? "Sim" : "Não"} />
                 <div className="space-y-1.5">
                   <p className="text-xs text-muted-foreground">Status</p>
-                  <Select disabled={selected.source === "nr1"} value={normalizeStatus(selected.status)} onValueChange={(v) => setLeadStatus(selected, v as LeadStatus)}>
+                  <Select disabled={selected.source !== "leads"} value={normalizeStatus(selected.status)} onValueChange={(v) => setLeadStatus(selected, v as LeadStatus)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {LEAD_STATUSES.map((s) => <SelectItem key={s} value={s}>{LEAD_STATUS_LABEL[s]}</SelectItem>)}

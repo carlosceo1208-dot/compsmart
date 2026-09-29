@@ -120,6 +120,10 @@ const Parceiros = lazy(() => import("./pages/public/Parceiros"));
 const Materiais = lazy(() => import("./pages/public/Materiais"));
 const Contato = lazy(() => import("./pages/public/Contato"));
 const Diagnostico = lazy(() => import("./pages/public/Diagnostico"));
+const Maturidade = lazy(() => import("./pages/public/Maturidade"));
+const MaturidadeResponder = lazy(() => import("./pages/public/MaturidadeResponder"));
+const MaturidadeLista = lazy(() => import("./pages/consultoria/MaturidadeLista"));
+const MaturidadeDetalhe = lazy(() => import("./pages/consultoria/MaturidadeDetalhe"));
 const VagasPortal = lazy(() => import("./pages/public/VagasPortal"));
 const VagaPublica = lazy(() => import("./pages/public/VagaPublica"));
 const Candidatos = lazy(() => import("./pages/recrutamento/Candidatos"));
@@ -238,6 +242,8 @@ const App = () => {
                         <Route path="/access-control" element={<AccessControl />} />
                         <Route path="/admin/convidar-socios" element={<ConvidarSocios />} />
                         <Route path="/admin/leads" element={<AdminLeads />} />
+                        <Route path="/consultoria/maturidade" element={<MaturidadeLista />} />
+                        <Route path="/consultoria/maturidade/:id" element={<MaturidadeDetalhe />} />
                         <Route path="/admin/permissions-matrix" element={<PermissionsMatrix />} />
                         <Route path="/my-profile" element={<MyProfile />} />
                         <Route path="/salary-ranges" element={<ModuleGate mode="page" moduleSlug="core" featureName="Tabela Salarial"><SalaryRanges /></ModuleGate>} />
@@ -310,6 +316,8 @@ const App = () => {
                       <Route path="/materiais" element={<Materiais />} />
                       <Route path="/contato" element={<Contato />} />
                       <Route path="/diagnostico" element={<Diagnostico />} />
+                      <Route path="/maturidade" element={<Maturidade />} />
+                      <Route path="/maturidade/responder/:token" element={<MaturidadeResponder />} />
                       <Route path="/vagas" element={<VagasPortal />} />
                       <Route path="/vagas/:slug" element={<VagaPublica />} />
                       <Route path="/modulos/nr1" element={<Navigate to="/nr1" replace />} />

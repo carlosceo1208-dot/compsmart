@@ -22,6 +22,7 @@ const ORIGEM_LABEL: Record<string, string> = {
   parceiro: "Parceiro",
   landing_nr1: "NR-1 Landing",
   landing_nr1_proposta: "NR-1 Proposta",
+  maturidade: "Maturidade RH",
 };
 
 export const origemLabel = (o?: string | null) => {
@@ -36,7 +37,7 @@ export const normalizeStatus = (s?: string | null): LeadStatus =>
 
 export type AdminLead = {
   id: string;
-  source: "leads" | "nr1";
+  source: "leads" | "nr1" | "maturidade";
   nome: string;
   email: string;
   empresa: string | null;
@@ -70,9 +71,10 @@ export const useAdminLeads = () =>
   useQuery({
     queryKey: ["admin-leads"],
     queryFn: async (): Promise<AdminLead[]> => {
-      const [a, b] = await Promise.all([
+      const [a, b, c] = await Promise.all([
         supabase.from("leads").select("*").order("submitted_at", { ascending: false }).limit(1000),
         supabase.from("nr1_leads").select("*").order("created_at", { ascending: false }).limit(1000),
+        supabase.from("maturidade_leads").select("*").order("criado_em", { ascending: false }).limit(1000),
       ]);
       if (a.error) throw a.error;
       const main = ((a.data ?? []) as Row[]).map((l) => ({
@@ -115,7 +117,17 @@ export const useAdminLeads = () =>
         updated_at: String(l.created_at),
         submitted_at: String(l.created_at),
       }));
-      return [...main, ...nr1].sort((x, y) => (y.submitted_at > x.submitted_at ? 1 : -1));
+      // Lista Maturidade: somente leitura.
+      const mat = c.error ? [] : ((c.data ?? []) as Row[]).map((l): AdminLead => ({
+        id: String(l.id), source: "maturidade", nome: String(l.nome ?? ""), email: String(l.email ?? ""),
+        empresa: s(l.empresa), cargo: null, porte: s(l.porte), segmento: null, colaboradores: null,
+        modulo_interesse: l.nivel_teaser ? `Nível teaser: ${l.nivel_teaser}` : null, lead_magnet: null, parceria_tipo: null,
+        especialidade: null, linkedin: null, telefone: null, utm_source: null, utm_medium: null, utm_campaign: null,
+        score_free: l.score_teaser == null ? null : Number(l.score_teaser), nivel_risco_free: s(l.nivel_teaser),
+        consentimento_lgpd: Boolean(l.consentimento_lgpd), origem: "maturidade", status: "novo",
+        created_at: String(l.criado_em), updated_at: String(l.criado_em), submitted_at: String(l.criado_em),
+      }));
+      return [...main, ...nr1, ...mat].sort((x, y) => (y.submitted_at > x.submitted_at ? 1 : -1));
     },
   });
 

@@ -4552,6 +4552,261 @@ export type Database = {
         }
         Relationships: []
       }
+      maturidade_convidados: {
+        Row: {
+          criado_em: string
+          diagnostico_id: string
+          email: string
+          expira_em: string
+          id: string
+          respondido_em: string | null
+          status: string
+          token: string
+        }
+        Insert: {
+          criado_em?: string
+          diagnostico_id: string
+          email: string
+          expira_em?: string
+          id?: string
+          respondido_em?: string | null
+          status?: string
+          token?: string
+        }
+        Update: {
+          criado_em?: string
+          diagnostico_id?: string
+          email?: string
+          expira_em?: string
+          id?: string
+          respondido_em?: string | null
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maturidade_convidados_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "maturidade_diagnosticos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maturidade_diagnosticos: {
+        Row: {
+          concluido_em: string | null
+          criado_em: string
+          id: string
+          nome_projeto: string
+          responsavel_id: string
+          root_company_id: string
+          status: string
+        }
+        Insert: {
+          concluido_em?: string | null
+          criado_em?: string
+          id?: string
+          nome_projeto: string
+          responsavel_id?: string
+          root_company_id: string
+          status?: string
+        }
+        Update: {
+          concluido_em?: string | null
+          criado_em?: string
+          id?: string
+          nome_projeto?: string
+          responsavel_id?: string
+          root_company_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      maturidade_gestores: {
+        Row: {
+          completo: boolean
+          criado_em: string
+          diagnostico_id: string
+          id: string
+          ordem: number
+        }
+        Insert: {
+          completo?: boolean
+          criado_em?: string
+          diagnostico_id: string
+          id?: string
+          ordem: number
+        }
+        Update: {
+          completo?: boolean
+          criado_em?: string
+          diagnostico_id?: string
+          id?: string
+          ordem?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maturidade_gestores_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "maturidade_diagnosticos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maturidade_leads: {
+        Row: {
+          consentimento_em: string
+          consentimento_lgpd: boolean
+          consentimento_versao: string
+          criado_em: string
+          email: string
+          empresa: string
+          id: string
+          ip_hash: string | null
+          nivel_teaser: string
+          nome: string
+          porte: string
+          score_teaser: number | null
+        }
+        Insert: {
+          consentimento_em?: string
+          consentimento_lgpd: boolean
+          consentimento_versao: string
+          criado_em?: string
+          email: string
+          empresa: string
+          id?: string
+          ip_hash?: string | null
+          nivel_teaser: string
+          nome: string
+          porte: string
+          score_teaser?: number | null
+        }
+        Update: {
+          consentimento_em?: string
+          consentimento_lgpd?: boolean
+          consentimento_versao?: string
+          criado_em?: string
+          email?: string
+          empresa?: string
+          id?: string
+          ip_hash?: string | null
+          nivel_teaser?: string
+          nome?: string
+          porte?: string
+          score_teaser?: number | null
+        }
+        Relationships: []
+      }
+      maturidade_questionario: {
+        Row: {
+          afirmacao: string
+          dimensao: number
+          eixo: number
+          grupo_aplicavel: string
+          id: string
+          numero: number
+        }
+        Insert: {
+          afirmacao: string
+          dimensao: number
+          eixo: number
+          grupo_aplicavel: string
+          id?: string
+          numero: number
+        }
+        Update: {
+          afirmacao?: string
+          dimensao?: number
+          eixo?: number
+          grupo_aplicavel?: string
+          id?: string
+          numero?: number
+        }
+        Relationships: []
+      }
+      maturidade_respostas: {
+        Row: {
+          convidado_id: string | null
+          criado_em: string
+          diagnostico_id: string
+          gestor_id: string | null
+          id: string
+          questionario_id: string
+          respondente_tipo: string
+          resposta: number
+        }
+        Insert: {
+          convidado_id?: string | null
+          criado_em?: string
+          diagnostico_id: string
+          gestor_id?: string | null
+          id?: string
+          questionario_id: string
+          respondente_tipo: string
+          resposta: number
+        }
+        Update: {
+          convidado_id?: string | null
+          criado_em?: string
+          diagnostico_id?: string
+          gestor_id?: string | null
+          id?: string
+          questionario_id?: string
+          respondente_tipo?: string
+          resposta?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maturidade_respostas_convidado_id_fkey"
+            columns: ["convidado_id"]
+            isOneToOne: false
+            referencedRelation: "maturidade_convidados"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maturidade_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "maturidade_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maturidade_respostas_gestor_id_fkey"
+            columns: ["gestor_id"]
+            isOneToOne: false
+            referencedRelation: "maturidade_gestores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "maturidade_respostas_questionario_id_fkey"
+            columns: ["questionario_id"]
+            isOneToOne: false
+            referencedRelation: "maturidade_questionario"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maturidade_tentativas: {
+        Row: {
+          chave: string
+          criado_em: string
+          id: number
+        }
+        Insert: {
+          chave: string
+          criado_em?: string
+          id?: number
+        }
+        Update: {
+          chave?: string
+          criado_em?: string
+          id?: number
+        }
+        Relationships: []
+      }
       merit_approval_history: {
         Row: {
           action: string
@@ -11955,6 +12210,65 @@ export type Database = {
         }
         Returns: undefined
       }
+      maturidade_convite_questoes: {
+        Args: { p_token: string }
+        Returns: {
+          afirmacao: string
+          dimensao: number
+          id: string
+          numero: number
+        }[]
+      }
+      maturidade_convite_resolver: {
+        Args: { p_token: string }
+        Returns: {
+          criado_em: string
+          diagnostico_id: string
+          email: string
+          expira_em: string
+          id: string
+          respondido_em: string | null
+          status: string
+          token: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "maturidade_convidados"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      maturidade_convite_responder: {
+        Args: { p_respostas: Json; p_token: string }
+        Returns: undefined
+      }
+      maturidade_empresas: {
+        Args: never
+        Returns: {
+          id: string
+          nome: string
+        }[]
+      }
+      maturidade_excedeu: {
+        Args: { _chave: string; _janela: string; _max: number }
+        Returns: boolean
+      }
+      maturidade_ip_hash: { Args: never; Returns: string }
+      maturidade_pode_gerir: { Args: { _company: string }; Returns: boolean }
+      maturidade_questoes_gestor: {
+        Args: { p_diagnostico: string }
+        Returns: {
+          afirmacao: string
+          dimensao: number
+          id: string
+          numero: number
+        }[]
+      }
+      maturidade_registrar_gestor: {
+        Args: { p_diagnostico: string; p_respostas: Json }
+        Returns: number
+      }
+      maturidade_scorecard: { Args: { p_diagnostico: string }; Returns: Json }
       nr1_calc_risco: {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
@@ -12184,6 +12498,19 @@ export type Database = {
           p_token: string
         }
         Returns: string
+      }
+      submit_maturidade_lead: {
+        Args: {
+          p_consentimento: boolean
+          p_email: string
+          p_empresa: string
+          p_nivel: string
+          p_nome: string
+          p_porte: string
+          p_score: number
+          p_versao: string
+        }
+        Returns: undefined
       }
       suggest_next_employee_number: { Args: never; Returns: string }
       talent_company_has_module: {
