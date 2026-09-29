@@ -9,7 +9,6 @@ interface TurnstileWidgetProps {
   onError?: () => void;
   onExpire?: () => void;
   onLoading?: (isLoading: boolean) => void;
-  silentFallback?: boolean;
 }
 
 declare global {
@@ -62,7 +61,7 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
       updateLoading(false);
       onError?.();
     }
-  }, [retryCount, onError, updateLoading, silentFallback]);
+  }, [retryCount, onError, updateLoading]);
 
   const handleExpire = useCallback(() => {
     console.log("Turnstile token expired");
