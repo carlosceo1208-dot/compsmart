@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { z } from "npm:zod@3";
+import { analisarCandidatura } from "./analisar.ts";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -47,12 +48,19 @@ Deno.serve(async (req) => {
     const { data: isSuper } = await userClient.rpc("has_role", { _user_id: userData.user.id, _role: "super_admin" } as never);
     if (hasMod !== true && isSuper !== true) return json({ error: "Módulo Recrutamento & Seleção não contratado." }, 403);
 
-    const parsed = Body.safeParse(await req.json().catch(() => ({})));
-    if (!parsed.success) return json({ error: "Dados inválidos", details: parsed.error.flatten().fieldErrors }, 400);
-    const d = parsed.data;
-
+    const raw = await req.json().catch(() => ({}));
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) return json({ error: "Configuração de IA ausente." }, 500);
+
+    if (raw?.acao === "analisar") {
+      const a = z.object({ candidaturaId: z.string().uuid() }).safeParse(raw);
+      if (!a.success) return json({ error: "Dados inválidos" }, 400);
+      return await analisarCandidatura(a.data.candidaturaId, auth, apiKey, req.signal, json);
+    }
+
+    const parsed = Body.safeParse(raw);
+    if (!parsed.success) return json({ error: "Dados inválidos", details: parsed.error.flatten().fieldErrors }, 400);
+    const d = parsed.data;
 
     const prompt = anonimizar(
       `Crie o perfil de uma vaga para o mercado brasileiro.\nCargo: ${d.titulo}\nÁrea: ${d.area || "não informada"}\nSenioridade: ${d.senioridade}\nCBO: ${d.cbo || "não informado"}\n${d.descricaoParcial ? `Descrição parcial do RH (complete sem contradizer):\n${d.descricaoParcial}\n` : ""}\nRetorne 5 a 8 responsabilidades, 4 a 6 requisitos obrigatórios, 3 a 5 desejáveis e 5 a 8 competências (curtas). Português do Brasil, frases objetivas.`,

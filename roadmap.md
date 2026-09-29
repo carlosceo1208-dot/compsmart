@@ -41,3 +41,4 @@
 - [x] /modulos/selecao-rs: refinar o funil em card unificado com ícones, chevrons gráficos e KPI ilustrativo separado
 
 - [x] Anti-robô da candidatura: widget sem looping (reset), siteverify no servidor, chave do widget COMPSMART, envio real aprovado no site publicado
+- [x] Fase 3 R&S: kanban de triagem por vaga, histórico auditável, análise do agente Talent (currículo anonimizado, nota 0–100, recomendação aplicada só pelo RH)

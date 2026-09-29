@@ -13,6 +13,8 @@ import { useVagas } from "@/hooks/useVagas";
 import { ETAPA_LABEL, FONTE_LABEL } from "@/config/recrutamento";
 import { CandidatoDialog } from "@/components/recrutamento/CandidatoDialog";
 import { ImportarCandidatosDialog } from "@/components/recrutamento/ImportarCandidatosDialog";
+import { TriagemKanban } from "@/components/recrutamento/TriagemKanban";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Candidatos = () => {
   const { data: candidatos = [], isLoading, error } = useCandidatos();
@@ -55,6 +57,10 @@ const Candidatos = () => {
         </div>
       </div>
 
+      <Tabs defaultValue="lista">
+      <TabsList className="rounded-xl"><TabsTrigger value="lista">Lista</TabsTrigger><TabsTrigger value="triagem">Triagem</TabsTrigger></TabsList>
+      <TabsContent value="triagem" className="mt-4"><TriagemKanban /></TabsContent>
+      <TabsContent value="lista" className="mt-4 space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="relative">
           <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -99,6 +105,9 @@ const Candidatos = () => {
           ))}
         </div>
       )}
+
+      </TabsContent>
+      </Tabs>
 
       <CandidatoDialog open={novo} onOpenChange={setNovo} />
       <ImportarCandidatosDialog open={importar} onOpenChange={setImportar} />

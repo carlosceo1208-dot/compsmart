@@ -1125,6 +1125,60 @@ export type Database = {
         }
         Relationships: []
       }
+      candidato_historico: {
+        Row: {
+          candidato_id: string
+          candidatura_id: string
+          criado_em: string
+          criado_por: string | null
+          etapa_anterior: string | null
+          etapa_nova: string
+          id: string
+          motivo: string | null
+          origem: string
+          root_company_id: string
+        }
+        Insert: {
+          candidato_id: string
+          candidatura_id: string
+          criado_em?: string
+          criado_por?: string | null
+          etapa_anterior?: string | null
+          etapa_nova: string
+          id?: string
+          motivo?: string | null
+          origem: string
+          root_company_id: string
+        }
+        Update: {
+          candidato_id?: string
+          candidatura_id?: string
+          criado_em?: string
+          criado_por?: string | null
+          etapa_anterior?: string | null
+          etapa_nova?: string
+          id?: string
+          motivo?: string | null
+          origem?: string
+          root_company_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidato_historico_candidato_id_fkey"
+            columns: ["candidato_id"]
+            isOneToOne: false
+            referencedRelation: "candidatos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "candidato_historico_candidatura_id_fkey"
+            columns: ["candidatura_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidatos: {
         Row: {
           cargo_pretendido: string | null
@@ -1190,33 +1244,48 @@ export type Database = {
       }
       candidaturas: {
         Row: {
+          analise_em: string | null
+          analise_talent: Json | null
           candidato_id: string
           created_at: string
+          entrevista_em: string | null
           etapa: string
+          etapa_desde: string | null
           id: string
           match_score: number | null
+          motivo_arquivamento: string | null
           root_company_id: string
           status: string
           updated_at: string
           vaga_id: string
         }
         Insert: {
+          analise_em?: string | null
+          analise_talent?: Json | null
           candidato_id: string
           created_at?: string
+          entrevista_em?: string | null
           etapa?: string
+          etapa_desde?: string | null
           id?: string
           match_score?: number | null
+          motivo_arquivamento?: string | null
           root_company_id: string
           status?: string
           updated_at?: string
           vaga_id: string
         }
         Update: {
+          analise_em?: string | null
+          analise_talent?: Json | null
           candidato_id?: string
           created_at?: string
+          entrevista_em?: string | null
           etapa?: string
+          etapa_desde?: string | null
           id?: string
           match_score?: number | null
+          motivo_arquivamento?: string | null
           root_company_id?: string
           status?: string
           updated_at?: string
@@ -12139,6 +12208,16 @@ export type Database = {
         Returns: Json
       }
       talent_logo_visivel: { Args: { _path: string }; Returns: boolean }
+      talent_mover_candidatura: {
+        Args: {
+          _entrevista_em?: string
+          _etapa: string
+          _id: string
+          _motivo?: string
+          _origem?: string
+        }
+        Returns: Json
+      }
       talent_slugify: { Args: { _t: string }; Returns: string }
       talent_upsert_candidato: {
         Args: {
