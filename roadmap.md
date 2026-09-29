@@ -45,3 +45,7 @@
 - [x] Fase 3: publicada + teste entre empresas (RH de outra empresa vê 0 e não move/grava; desfeito com rollback)
 - [x] Card da vaga: "N candidatos · Triagem" abre o funil da vaga (?aba=triagem&vaga=id)
 - [ ] Aceite final: abrir currículo e "Analisar currículo" logado como 2ª empresa real (aguarda conta de cliente real)
+
+## Agente Talent visível na Triagem (lote + card + filtro)
+- [x] Filtro com/sem análise, botão em lote, sparkle por card, reanálise no histórico, papel+empresa no servidor
+- [ ] Teste do lote com 3 candidaturas descartáveis (2 legíveis + 1 imagem) e simulação de 429 — aguarda autorização para criar dados de teste
