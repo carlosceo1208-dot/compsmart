@@ -1,14 +1,13 @@
 # AGENTS.md
-- Leads status fixos: novo, em_contato, convertido, descartado. Why: uma fonte única para contadores e filtros.
+- Leads status fixos: novo, em_contato, convertido, descartado. Why: fonte única para contadores e filtros.
 - "Responder" em /admin/leads marca em_contato ao abrir o mailto. Why: mailto não confirma envio.
-- SEO público só por src/config/seoRoutes.ts (SeoHead + seoPlugin). Why: crawler vê HTML estático; uma lista mantém Helmet, sitemap e prerender alinhados.
-- /admin/leads usa submitted_at em `leads` e created_at em `nr1_leads`; admin nunca mexe nessas datas. Why: Data = última submissão real.
+- SEO público só por src/config/seoRoutes.ts (SeoHead + seoPlugin). Why: uma lista mantém Helmet, sitemap e prerender alinhados.
+- /admin/leads usa submitted_at (`leads`) e created_at (`nr1_leads`); admin não edita essas datas. Why: Data = última submissão real.
 - /admin/leads junta `leads` + `nr1_leads` no cliente; NR-1 é somente leitura. Why: um painel para todos os funis sem migrar dados.
-- Vagas (talent) em `vagas` com root_company_id; cargo novo do CBO só entra em job_titles via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
+- Vagas (talent) em `vagas` com root_company_id; cargo novo do CBO só entra em job_titles via RPC talent_link_or_create_job_title. Why: dedupe no servidor.
 - agent-talent manda ao modelo só dados da vaga, filtrando e-mail/CPF/telefone. Why: LGPD.
-- Cidades de vagas vêm do IBGE (cache 24h + 7 dias localStorage); faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar.
-- Candidatura pública só via edge function portal-candidatura: empresa derivada da vaga no banco, PDF validado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo nunca decide empresa nem grava direto.
+- Cidades de vagas vêm do IBGE (cache 24h/7 dias localStorage); faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais.
+- Candidatura pública só via edge function portal-candidatura: empresa vem da vaga no banco, PDF validado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo não decide empresa nem grava direto.
 - Currículo em curriculos/{empresa}/{candidato}.pdf; reenvio sobrescreve. Why: um currículo vigente por candidato.
-- Nome da empresa mascarado no servidor (portal_listar_vagas/portal_vaga); confidencial só abre por link. Why: nome real nunca chega ao navegador.
-- Logo/"Sobre a empresa" só via portal_* se vaga pública e exibir_nome_empresa; logos em logos-vagas privado. Why: imagem não revela empresa oculta.
-- Anti-robô (candidatura, login, ativação): site key pública em src/components/auth/TurnstileWidget.tsx e segredo TURNSTILE_SECRET_KEY no cofre; sem token o botão não libera e a falha vira "Tentar novamente". Why: widget que não renderiza travava o envio em "Verificando…".
+- Empresa mascarada no servidor (portal_listar_vagas/portal_vaga): confidencial só abre por link; logo/"Sobre a empresa" só saem se vaga pública e exibir_nome_empresa; logos em logos-vagas privado. Why: nome e imagem nunca revelam empresa oculta.
+- Anti-robô (candidatura/login/ativação): site key pública em src/components/auth/TurnstileWidget.tsx, segredo TURNSTILE_SECRET_KEY no cofre; sem token o botão não libera e falha vira "Tentar novamente". Why: widget que não renderiza travava o envio em "Verificando…".
