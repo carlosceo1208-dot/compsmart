@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { Loader2 } from "lucide-react";
 
-const TURNSTILE_SITE_KEY = "0x4AAAAAACKfutEiGcNZieDn";
+const TURNSTILE_SITE_KEY = "0x4AAAAAAFJIAO_pENlxDUF6";
 const MAX_RETRIES = 3;
 
 interface TurnstileWidgetProps {
