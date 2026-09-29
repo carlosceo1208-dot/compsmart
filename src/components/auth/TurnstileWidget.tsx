@@ -91,14 +91,19 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
       if (widgetIdRef.current && window.turnstile) window.turnstile.remove(widgetIdRef.current);
       widgetIdRef.current = null;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempt]);
 
-  // Pedido de token novo: reset no widget existente
+  // Pedido de token novo: reset no widget existente; se nunca desenhou, recarrega o script
   useEffect(() => {
     if (resetSignal === 0) return;
     retriesRef.current = 0;
-    setLoading(true);
-    if (widgetIdRef.current && window.turnstile) window.turnstile.reset(widgetIdRef.current);
+    if (widgetIdRef.current && window.turnstile) {
+      setLoading(true);
+      window.turnstile.reset(widgetIdRef.current);
+    } else {
+      setAttempt((a) => a + 1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetSignal]);
 
