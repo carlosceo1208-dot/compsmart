@@ -76,3 +76,12 @@
 - [x] Conferência visual do "Login vinculado" (super admin vincula; consultor vê só a empresa do projeto; sem vínculo o acesso some).
 - [x] Anti-robô: "Tentar novamente" sem script duplicado, só a tentativa atual desenha, mensagem clara quando o bloqueio persiste.
 - [ ] Decisão: modo invisível do anti-robô (hoje é verificação automática, sem execute()).
+
+## Fase 5 — NR-1 (auditar, completar, reorganizar card)
+- [x] Etapa 1: auditoria entregue (aguardando OK dos sócios para construir)
+- [ ] Etapa 2: novo layout do card NR-1 em 4 blocos (Preparar/Diagnosticar/Agir/Acompanhar) + "Mais recursos"
+- [ ] Etapa 3: Clima 360° como cartão contratável; FIB fundido no Clima; cruzamentos só com has_module
+- [ ] Etapa 4: cortes 40/60/80 (front+servidor), k=5 no servidor, link anônimo tudo-ou-nada, agente Psi, laudo PDF/Excel
+- [ ] Validação completa + NÃO publicar até revisão
+- Fase 5B (não mexer): Segurança Psicológica, Sociodemográfico, Terceiros, Vitalidade, Inteligência
+- GATE: varredura de segurança completa antes do relançamento comercial
