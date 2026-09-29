@@ -129,7 +129,8 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
   // Token anti-robô é de uso único: após cada envio, faz reset no widget existente (sem redesenhar nem limpar o formulário).
   const [resetSignal, setResetSignal] = useState(0);
   const novoToken = () => { setToken(""); setCaptchaErro(false); setResetSignal((k) => k + 1); };
-  const semToken = !token && !captchaErro && !ORIGEM_DEV;
+  // Sem token não há envio: falha do anti-robô exige novo clique em "Tentar novamente".
+  const semToken = !token && !ORIGEM_DEV;
   const [erros, setErros] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);
@@ -225,12 +226,13 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
           <Alert variant="destructive" className="rounded-xl">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
               <span>{falha}</span>
-              <Button size="sm" variant="outline" onClick={enviar} disabled={enviando || semToken}><RotateCcw className="h-3.5 w-3.5 mr-1" />{semToken ? "Verificando…" : "Reenviar"}</Button>
+              <Button size="sm" variant="outline" onClick={enviar} disabled={enviando || semToken}><RotateCcw className="h-3.5 w-3.5 mr-1" />Reenviar</Button>
             </AlertDescription>
           </Alert>
         )}
         <Button className="w-full rounded-xl" onClick={enviar} disabled={enviando || semToken}>
-          {(enviando || semToken) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}{semToken ? "Verificando…" : "Enviar candidatura"}
+          {enviando && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+          {enviando ? "Enviando…" : semToken ? (captchaErro ? "Verificação pendente" : "Verificando…") : "Enviar candidatura"}
         </Button>
       </CardContent>
     </Card>
