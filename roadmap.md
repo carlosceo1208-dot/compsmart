@@ -62,9 +62,10 @@
 - [x] Ferramenta interna /consultoria/maturidade: convite RH, gestores anônimos, scorecard, radar, relatório, roadmap 90 dias
 - [x] 6 ajustes (nível único, grupo por convite, progresso por gestor, limites, média protegida, leitura do gap)
 - [x] Validação no servidor com dados fictícios (desfeita) + landing 1280/390
-- [ ] Conferir visualmente a tela interna /consultoria/maturidade logado
+- [x] Conferir visualmente a tela interna /consultoria/maturidade logado
 - [ ] GATE: varredura de segurança completa antes do relançamento comercial
 - [ ] Publicar após revisão do usuário
-- [ ] Teste final 1: fluxo interno logado (super admin) + envio tudo-ou-nada (tela e servidor)
-- [ ] Teste final 2: regra do consultor (sem/com projeto; visibilidade cruzada só relatar, publicação suspensa se ocorrer)
-- [ ] Limpeza só no banco + consulta antes/depois
+- [x] Teste final 1: fluxo interno logado (super admin) + envio tudo-ou-nada (tela e servidor)
+- [x] Teste final 2: regra do consultor (sem/com projeto; visibilidade cruzada só relatar, publicação suspensa se ocorrer)
+- [x] Limpeza só no banco + consulta antes/depois
+- [ ] BLOQUEIO publicação Fase 4: decisão dos sócios sobre visibilidade do consultor (equipe compartilhada vs dono do cliente)
