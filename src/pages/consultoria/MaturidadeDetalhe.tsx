@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Copy, Printer, AlertTriangle } from "lucide-react";
@@ -262,8 +262,8 @@ function ScoreTabela({ card }: { card: ReturnType<typeof montarScorecard> }) {
         </thead>
         <tbody>
           {card.eixos.map((e) => (
-            <>
-              <tr key={`e${e.n}`} className="bg-muted/20"><td colSpan={4} className="p-2 font-semibold text-foreground">{e.nome}</td><td className="p-2 font-semibold">{fmt(e.media)}</td><td className="p-2">{e.nivel ?? "—"}</td></tr>
+            <Fragment key={`e${e.n}`}>
+              <tr className="bg-muted/20"><td colSpan={4} className="p-2 font-semibold text-foreground">{e.nome}</td><td className="p-2 font-semibold">{fmt(e.media)}</td><td className="p-2">{e.nivel ?? "—"}</td></tr>
               {card.dims.filter((x) => x.eixo === e.n).map((x) => (
                 <tr key={x.n} className="border-t">
                   <td className="p-2 text-foreground">D{x.n}. {DIMENSOES[x.n - 1].nome}</td>
@@ -274,7 +274,7 @@ function ScoreTabela({ card }: { card: ReturnType<typeof montarScorecard> }) {
                   <td className="p-2">{x.nivel ?? "—"}</td>
                 </tr>
               ))}
-            </>
+            </Fragment>
           ))}
         </tbody>
       </table>

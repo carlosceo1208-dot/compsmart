@@ -613,6 +613,10 @@ export const DashboardLayout = () => {
                       <Shield className="mr-2 h-4 w-4 text-purple-600" />
                       <span className="text-purple-600 dark:text-purple-400 font-medium">Painel Plataforma</span>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/consultoria/maturidade")} className="hover:bg-purple-50 dark:hover:bg-purple-900/50">
+                      <Shield className="mr-2 h-4 w-4 text-purple-600" />
+                      <span className="text-purple-600 dark:text-purple-400 font-medium">Maturidade do RH</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/admin/leads")} className="hover:bg-purple-50 dark:hover:bg-purple-900/50">
                       <Inbox className="mr-2 h-4 w-4 text-purple-600" />
                       <span className="text-purple-600 dark:text-purple-400 font-medium">Leads do Site</span>
