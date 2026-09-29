@@ -65,3 +65,6 @@
 - [ ] Conferir visualmente a tela interna /consultoria/maturidade logado
 - [ ] GATE: varredura de segurança completa antes do relançamento comercial
 - [ ] Publicar após revisão do usuário
+- [ ] Teste final 1: fluxo interno logado (super admin) + envio tudo-ou-nada (tela e servidor)
+- [ ] Teste final 2: regra do consultor (sem/com projeto; visibilidade cruzada só relatar, publicação suspensa se ocorrer)
+- [ ] Limpeza só no banco + consulta antes/depois
