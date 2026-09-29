@@ -82,29 +82,24 @@ export const useMoverCandidatura = (vagaId: string | null) => {
 
 export class AnaliseErro extends Error { constructor(msg: string, public code?: string | number) { super(msg); } }
 
-export const useAnalisarCurriculo = (vagaId: string | null) => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (candidaturaId: string) => {
-      const { data: s } = await supabase.auth.getSession();
-      let res: Response;
-      try {
-        res = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/agent-talent`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            Authorization: `Bearer ${s.session?.access_token ?? ""}`,
-          },
-          body: JSON.stringify({ acao: "analisar", candidaturaId }),
-        });
-      } catch {
-        throw new AnaliseErro("Sem conexão com o agente Talent. Tente novamente.");
-      }
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new AnaliseErro(body?.error ?? "O agente Talent não conseguiu analisar agora.", body?.code);
-      return body.analise as AnaliseTalent;
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: chave(vagaId) }),
-  });
+/** Chama o agente Talent para uma candidatura. Sem timer de aborto: análise já paga não é descartada. */
+export const chamarAnalise = async (candidaturaId: string): Promise<AnaliseTalent> => {
+  const { data: s } = await supabase.auth.getSession();
+  let res: Response;
+  try {
+    res = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/agent-talent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${s.session?.access_token ?? ""}`,
+      },
+      body: JSON.stringify({ acao: "analisar", candidaturaId }),
+    });
+  } catch {
+    throw new AnaliseErro("Sem conexão com o agente Talent. Tente novamente.");
+  }
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new AnaliseErro(body?.error ?? "O agente Talent não conseguiu analisar agora.", body?.code ?? res.status);
+  return body.analise as AnaliseTalent;
 };
