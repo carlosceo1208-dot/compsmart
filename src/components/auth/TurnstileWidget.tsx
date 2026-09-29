@@ -42,6 +42,8 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
   const cb = useRef({ onVerify, onError, onExpire, onLoading });
   cb.current = { onVerify, onError, onExpire, onLoading };
   const [isLoading, setIsLoading] = useState(true);
+  // Incrementa para refazer a carga do script quando o widget nunca desenhou
+  const [attempt, setAttempt] = useState(0);
 
   const setLoading = (v: boolean) => { if (!aliveRef.current) return; setIsLoading(v); cb.current.onLoading?.(v); };
 
