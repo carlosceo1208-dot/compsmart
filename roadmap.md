@@ -39,3 +39,5 @@
 - [x] Página Recrutamento & Seleção (/modulos/selecao-rs): abertura, problema, solução, métricas, CTA navy, SEO, navegação rápida, demo no celular
 - [x] /modulos/selecao-rs: substituir cards de imagem por componentes HTML/CSS (funil 5 etapas + listagem de vagas ilustrativa), validar 1280/390
 - [x] /modulos/selecao-rs: refinar o funil em card unificado com ícones, chevrons gráficos e KPI ilustrativo separado
+
+- [ ] Anti-robô da candidatura: widget sem looping (reset), siteverify no servidor, chave secreta do widget COMPSMART, teste no site publicado

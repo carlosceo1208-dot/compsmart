@@ -62,17 +62,17 @@ Deno.serve(async (req) => {
     if (!isDevOrigin(origin)) {
       if (!secret || !b.turnstileToken) {
         console.warn("captcha_missing", JSON.stringify({ host, temSecret: !!secret, temToken: !!b.turnstileToken }));
-        return json({ error: MSG_CAPTCHA, code: "captcha_missing" }, 403);
+        return json({ error: MSG_CAPTCHA, code: "captcha_missing" }, 400);
       }
-      const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-        method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ secret, response: b.turnstileToken, remoteip: ip }),
-      });
-      const v = await r.json().catch(() => ({ success: false }));
-      if (!v.success) {
+      const v = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret, response: b.turnstileToken, remoteip: ip }),
+      }).then((r) => r.json()).catch(() => ({ success: false, "error-codes": ["siteverify-unreachable"] }));
+      if (v.success !== true) {
         console.warn("captcha_invalid", JSON.stringify({ host, codes: v["error-codes"] ?? [], hostname: v.hostname ?? null }));
-        return json({ error: MSG_CAPTCHA, code: "captcha_invalid" }, 403);
+        return json({ error: "Falha na verificação anti-robô", codes: v["error-codes"] ?? [], code: "captcha_invalid" }, 400);
       }
+      console.log("captcha_ok", JSON.stringify({ host, hostname: v.hostname ?? null }));
     }
     await db.from("portal_rate_limit").insert({ ip_hash: ipHash });
 

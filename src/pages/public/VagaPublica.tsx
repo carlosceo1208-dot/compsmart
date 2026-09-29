@@ -126,9 +126,9 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
   const [aceite, setAceite] = useState(false);
   const [token, setToken] = useState("");
   const [captchaErro, setCaptchaErro] = useState(false);
-  // Token anti-robô é de uso único: após cada envio, remonta o widget para gerar outro.
-  const [widgetKey, setWidgetKey] = useState(0);
-  const novoToken = () => { setToken(""); setCaptchaErro(false); setWidgetKey((k) => k + 1); };
+  // Token anti-robô é de uso único: após cada envio, faz reset no widget existente (sem redesenhar nem limpar o formulário).
+  const [resetSignal, setResetSignal] = useState(0);
+  const novoToken = () => { setToken(""); setCaptchaErro(false); setResetSignal((k) => k + 1); };
   const semToken = !token && !captchaErro && !ORIGEM_DEV;
   const [erros, setErros] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
@@ -212,7 +212,7 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
           </label>
           {erros.aceite && <p className="text-xs text-destructive">{erros.aceite}</p>}
         </div>
-        <TurnstileWidget key={widgetKey} onVerify={setToken} onExpire={() => setToken("")} onError={() => setCaptchaErro(true)} />
+        <TurnstileWidget resetSignal={resetSignal} onVerify={setToken} onExpire={() => setToken("")} onError={() => setCaptchaErro(true)} />
         {captchaErro && (
           <Alert variant="destructive" className="rounded-xl">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
