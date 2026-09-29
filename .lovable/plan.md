@@ -31,9 +31,18 @@ Triagem azul #2563EB, Entrevistas teal #0D9488, Proposta/Contratado verde #16A34
 - Front: `TriagemKanban.tsx`, `CandidaturaCard.tsx`, `CandidatoDrawer.tsx` e hook `useTriagem.ts` filtrando por `activeCompanyId`.
 - Atualizar `roadmap.md` e `AGENTS.md`.
 
-## Validação
-- `bun run ci` (lint, tipos, testes, código não usado, build).
-- Navegador em 1280px e 390px: kanban sem cortes, arrastar e botões, painel lateral.
-- Dois candidatos fictícios (um compatível, um não) com PDFs de texto: notas diferentes; aplicar recomendação grava histórico; PDF só-imagem mostra o aviso.
-- Logs confirmam que nada pessoal foi ao modelo; usuário de outra empresa não vê candidaturas, histórico nem currículos.
-- Apagar os fictícios; manter a sua candidatura.
+## Validação (check de aceite)
+- `bun run ci` passando (lint, tipos, testes, código não usado, build).
+- Kanban em 1280px e 390px sem cortes; arrastar, botões e painel lateral funcionando no celular.
+- Dois fictícios (um compatível, um não) com PDFs de texto: notas diferentes e coerentes com os currículos.
+- Aplicar recomendação grava histórico com origem "agente"; movimento manual com origem "manual".
+- Arquivar exige motivo; agendar grava a data da entrevista e aparece no histórico.
+- Resposta do modelo fora do formato/enum/faixa (simulada no teste): aviso + "Tentar novamente", sem mover nem quebrar o painel.
+- PDF só-imagem: aviso "Não foi possível ler o PDF" e triagem manual segue.
+- Logs da função sem nenhum dado pessoal (só tamanhos e contagem de substituições).
+- Usuário de outra empresa não vê candidaturas, histórico nem currículos.
+- Sua candidatura da Fase 2 continua legível (Portal, Triagem) após a migração.
+- Fictícios apagados; sua candidatura mantida; `roadmap.md` e `AGENTS.md` atualizados.
+
+## Detalhe técnico extra
+- Contrato de saída: schema estrito (`match_score` integer 0–100, `recomendacao` enum) + validação Zod no servidor após `JSON.parse`; falha retorna 502 com mensagem segura e não grava nada.
