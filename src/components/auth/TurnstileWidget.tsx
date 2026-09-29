@@ -71,6 +71,14 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
 
   // Load Turnstile script
   useEffect(() => {
+    // Se o script não carregar (bloqueador de anúncio, rede), avisa após 15s
+    const timeout = setTimeout(() => {
+      if (!window.turnstile) {
+        updateLoading(false);
+        onError?.();
+      }
+    }, 15000);
+
     const existingScript = document.querySelector('script[src*="turnstile"]');
     if (existingScript) {
       if (window.turnstile) {
@@ -78,7 +86,7 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
       } else {
         window.onTurnstileLoad = () => setScriptLoaded(true);
       }
-      return;
+      return () => clearTimeout(timeout);
     }
 
     window.onTurnstileLoad = () => setScriptLoaded(true);
@@ -87,6 +95,11 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
     script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
     script.async = true;
     script.defer = true;
+    script.onerror = () => {
+      clearTimeout(timeout);
+      updateLoading(false);
+      onError?.();
+    };
     document.head.appendChild(script);
 
     return () => {
