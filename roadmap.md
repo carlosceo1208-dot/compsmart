@@ -69,3 +69,7 @@
 - [x] Teste final 2: regra do consultor (sem/com projeto; visibilidade cruzada só relatar, publicação suspensa se ocorrer)
 - [x] Limpeza só no banco + consulta antes/depois
 - [ ] BLOQUEIO publicação Fase 4: decisão dos sócios sobre visibilidade do consultor (equipe compartilhada vs dono do cliente)
+
+## Fase 4 — Consultor dono do cliente
+- [x] Decisão dos sócios: cada consultor vê só os próprios projetos (Maturidade + RH Service + Core do consultor). Testado com rollback.
+- [ ] GATE: varredura de segurança completa antes do relançamento comercial.

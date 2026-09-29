@@ -246,6 +246,7 @@ type ConsultorInput = {
   especialidade: string | null;
   bio: string | null;
   ativo: boolean;
+  user_id: string | null;
 };
 
 export const useSaveConsultor = () => {
@@ -263,6 +264,7 @@ export const useSaveConsultor = () => {
             especialidade: input.especialidade,
             bio: input.bio,
             ativo: input.ativo,
+            user_id: input.user_id,
           })
           .eq('id', input.id)
           .eq('tenant_id', tenantId);
@@ -276,6 +278,7 @@ export const useSaveConsultor = () => {
         especialidade: input.especialidade,
         bio: input.bio,
         ativo: input.ativo,
+        user_id: input.user_id,
       });
       if (error) throw error;
     },
@@ -378,3 +381,21 @@ export const useSaveHora = () => {
     onError: (error: Error) => toast.error('Não foi possível salvar as horas.', { description: error.message }),
   });
 };
+
+/** Logins com papel consultor, para vincular ao cadastro (dono do projeto). */
+export const useLoginsConsultor = (enabled: boolean) =>
+  useQuery({
+    queryKey: ['rh-service-logins-consultor'],
+    enabled,
+    queryFn: async () => {
+      const { data: roles, error } = await supabase.from('user_roles').select('user_id').eq('role', 'consultor');
+      if (error) throw error;
+      const ids = (roles ?? []).map((r) => r.user_id);
+      if (!ids.length) return [] as { id: string; label: string }[];
+      const { data: perfis } = await supabase.from('profiles').select('id, full_name, email').in('id', ids);
+      return ids.map((id) => {
+        const p = (perfis ?? []).find((x) => x.id === id);
+        return { id, label: p?.full_name || p?.email || id.slice(0, 8) };
+      });
+    },
+  });

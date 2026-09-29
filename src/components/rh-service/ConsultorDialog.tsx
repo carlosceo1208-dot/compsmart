@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { useSaveConsultor, type Consultor } from '@/hooks/useRhService';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useLoginsConsultor, useSaveConsultor, type Consultor } from '@/hooks/useRhService';
 
 interface ConsultorDialogProps {
   open: boolean;
@@ -20,6 +21,8 @@ export const ConsultorDialog = ({ open, consultor, onOpenChange }: ConsultorDial
   const [especialidade, setEspecialidade] = useState('');
   const [bio, setBio] = useState('');
   const [ativo, setAtivo] = useState(true);
+  const [userId, setUserId] = useState<string>('');
+  const logins = useLoginsConsultor(open);
 
   useEffect(() => {
     if (!open) return;
@@ -28,6 +31,7 @@ export const ConsultorDialog = ({ open, consultor, onOpenChange }: ConsultorDial
     setEspecialidade(consultor?.especialidade ?? '');
     setBio(consultor?.bio ?? '');
     setAtivo(consultor?.ativo ?? true);
+    setUserId(consultor?.user_id ?? '');
   }, [open, consultor]);
 
   const handleSubmit = async () => {
@@ -39,6 +43,7 @@ export const ConsultorDialog = ({ open, consultor, onOpenChange }: ConsultorDial
       especialidade: especialidade.trim() || null,
       bio: bio.trim() || null,
       ativo,
+      user_id: userId || null,
     });
     onOpenChange(false);
   };
@@ -72,6 +77,19 @@ export const ConsultorDialog = ({ open, consultor, onOpenChange }: ConsultorDial
           <div className="space-y-2">
             <Label htmlFor="consultor-bio">Bio</Label>
             <Textarea id="consultor-bio" rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Login vinculado</Label>
+            <Select value={userId || 'none'} onValueChange={(v) => setUserId(v === 'none' ? '' : v)}>
+              <SelectTrigger><SelectValue placeholder="Sem vínculo" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem vínculo</SelectItem>
+                {(logins.data ?? []).map((l) => (
+                  <SelectItem key={l.id} value={l.id}>{l.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">Sem login vinculado, o consultor não acessa nenhuma empresa. Ele só vê as empresas dos projetos em que é o responsável.</p>
           </div>
           <div className="flex items-center justify-between rounded-xl border border-border p-3">
             <div>

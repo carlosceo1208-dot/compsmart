@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.consultor_dono_ativo(uuid) FROM authenticated;

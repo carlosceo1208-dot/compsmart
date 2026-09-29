@@ -2061,6 +2061,7 @@ export type Database = {
           nome: string
           tenant_id: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           ativo?: boolean
@@ -2072,6 +2073,7 @@ export type Database = {
           nome: string
           tenant_id: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           ativo?: boolean
@@ -2083,6 +2085,7 @@ export type Database = {
           nome?: string
           tenant_id?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -11750,6 +11753,7 @@ export type Database = {
           total_headcount: number
         }[]
       }
+      consultor_dono_ativo: { Args: { _tenant: string }; Returns: boolean }
       count_agent_audit_logs: {
         Args: {
           p_agent_type?: string
