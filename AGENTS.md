@@ -1,14 +1,14 @@
 # AGENTS.md
-- Leads status values are fixed: novo, em_contato, convertido, descartado (DB check + useAdminLeads). Why: one source of truth for counters and filters.
-- "Responder" in /admin/leads sets status em_contato optimistically on mailto click; alternative is manual-only. Why: mailto can't confirm sending.
-- Public-route SEO (title/description/canonical/sitemap/per-route HTML) comes only from src/config/seoRoutes.ts via SeoHead + seoPlugin in vite.config. Why: crawlers see static HTML; one list keeps Helmet, sitemap and prerender in sync.
-- /admin/leads uses submitted_at for `leads` and created_at for `nr1_leads`; form re-submissions bump submitted_at, while admin edits never do. Why: Data must always mean the actual latest form submission.
-- /admin/leads merges `leads` + `nr1_leads` client-side; NR-1 rows are read-only (no status column). Why: one panel for all funnels without migrating data.
-- Vagas (módulo talent) em `vagas` com tenant root_company_id; cargo novo do CBO entra em job_titles só via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
-- agent-talent envia ao modelo só dados da vaga, com filtro de e-mail/CPF/telefone. Why: LGPD.
-- Cidades de vagas vêm da API do IBGE (cache 24h + 7 dias localStorage); faixa sugerida de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar valor.
-- Candidatura pública só via edge function portal-candidatura: empresa derivada da vaga no banco, PDF checado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo nunca decide empresa nem grava direto.
-- Currículo em curriculos/{empresa}/{candidato}.pdf; novo envio sobrescreve e candidaturas apontam para o mais recente. Why: um currículo vigente por candidato.
+- Leads status fixos: novo, em_contato, convertido, descartado. Why: uma fonte única para contadores e filtros.
+- "Responder" em /admin/leads marca em_contato ao abrir o mailto. Why: mailto não confirma envio.
+- SEO público só por src/config/seoRoutes.ts (SeoHead + seoPlugin). Why: crawler vê HTML estático; uma lista mantém Helmet, sitemap e prerender alinhados.
+- /admin/leads usa submitted_at em `leads` e created_at em `nr1_leads`; admin nunca mexe nessas datas. Why: Data = última submissão real.
+- /admin/leads junta `leads` + `nr1_leads` no cliente; NR-1 é somente leitura. Why: um painel para todos os funis sem migrar dados.
+- Vagas (talent) em `vagas` com root_company_id; cargo novo do CBO só entra em job_titles via RPC talent_link_or_create_job_title. Why: dedupe por CBO/nome no servidor.
+- agent-talent manda ao modelo só dados da vaga, filtrando e-mail/CPF/telefone. Why: LGPD.
+- Cidades de vagas vêm do IBGE (cache 24h + 7 dias localStorage); faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais, nunca inventar.
+- Candidatura pública só via edge function portal-candidatura: empresa derivada da vaga no banco, PDF validado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo nunca decide empresa nem grava direto.
+- Currículo em curriculos/{empresa}/{candidato}.pdf; reenvio sobrescreve. Why: um currículo vigente por candidato.
 - Nome da empresa mascarado no servidor (portal_listar_vagas/portal_vaga); confidencial só abre por link. Why: nome real nunca chega ao navegador.
-- Fase 2 R&S publicada; falta Fase 3 (exclusão LGPD). Why: E2E e scan ok.
-- Logo/"Sobre a empresa" da vaga só saem via portal_* se pública e exibir_nome_empresa; logos em logos-vagas privado. Why: imagem não revela empresa oculta.
+- Logo/"Sobre a empresa" só via portal_* se vaga pública e exibir_nome_empresa; logos em logos-vagas privado. Why: imagem não revela empresa oculta.
+- Anti-robô (candidatura, login, ativação): site key pública em src/components/auth/TurnstileWidget.tsx e segredo TURNSTILE_SECRET_KEY no cofre; sem token o botão não libera e a falha vira "Tentar novamente". Why: widget que não renderiza travava o envio em "Verificando…".
