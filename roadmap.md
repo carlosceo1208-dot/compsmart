@@ -33,11 +33,11 @@
 - [x] Testes finais Fase 2: candidatura anônima, LGPD/PDF inválido, isolamento, sem currículo, reaplicação, trim do título, publicar
 - [x] Fechamento Fase 2: nova verificação de segurança (sem alertas críticos), confirmação visual de /vagas no site publicado (desktop + celular), Fase 2 concluída e publicada
 - [x] Marca empregadora na vaga: logo, "Sobre a empresa", faixa salarial destacada (opt-in), limpeza de logos, testes no preview
-- [ ] Candidatura no site publicado: aguarda autorização dos domínios na chave anti-robô (Cloudflare)
+- [x] Candidatura no site publicado: domínios autorizados na chave anti-robô (Cloudflare) e envio real concluído
 - [x] Faixa "Em reconstrução" no topo (institucional + app; oculta em /vagas)
-- [ ] Teste da candidatura no site publicado após você autorizar os domínios no Cloudflare
+- [x] Teste ponta a ponta no site oficial: confirmação "Candidatura enviada!", aceite LGPD com data/IP/navegador, PDF no storage, entrada em Triagem
 - [x] Página Recrutamento & Seleção (/modulos/selecao-rs): abertura, problema, solução, métricas, CTA navy, SEO, navegação rápida, demo no celular
 - [x] /modulos/selecao-rs: substituir cards de imagem por componentes HTML/CSS (funil 5 etapas + listagem de vagas ilustrativa), validar 1280/390
 - [x] /modulos/selecao-rs: refinar o funil em card unificado com ícones, chevrons gráficos e KPI ilustrativo separado
 
-- [ ] Anti-robô da candidatura: widget sem looping (reset), siteverify no servidor, chave secreta do widget COMPSMART, teste no site publicado
+- [x] Anti-robô da candidatura: widget sem looping (reset), siteverify no servidor, chave do widget COMPSMART, envio real aprovado no site publicado
