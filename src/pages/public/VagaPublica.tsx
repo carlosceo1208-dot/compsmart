@@ -125,10 +125,11 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
   const [arquivo, setArquivo] = useState<File | null>(null);
   const [aceite, setAceite] = useState(false);
   const [token, setToken] = useState("");
+  const [captchaErro, setCaptchaErro] = useState(false);
   // Token anti-robô é de uso único: após cada envio, remonta o widget para gerar outro.
   const [widgetKey, setWidgetKey] = useState(0);
-  const novoToken = () => { setToken(""); setWidgetKey((k) => k + 1); };
-  const semToken = !token && !ORIGEM_DEV;
+  const novoToken = () => { setToken(""); setCaptchaErro(false); setWidgetKey((k) => k + 1); };
+  const semToken = !token && !captchaErro && !ORIGEM_DEV;
   const [erros, setErros] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);

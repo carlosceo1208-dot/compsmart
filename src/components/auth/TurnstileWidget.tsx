@@ -58,11 +58,9 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silent
         }
       }, 1000);
     } else {
-      // Silent fallback - just stop trying without showing error
+      // Sem mais tentativas: avisa o chamador para exibir erro e opção de recarregar
       updateLoading(false);
-      if (!silentFallback) {
-        onError?.();
-      }
+      onError?.();
     }
   }, [retryCount, onError, updateLoading, silentFallback]);
 
