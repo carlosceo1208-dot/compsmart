@@ -49,5 +49,8 @@
 ## Agente Talent visível na Triagem (lote + card + filtro)
 - [x] Filtro com/sem análise, botão em lote, sparkle por card, reanálise no histórico, papel+empresa no servidor
 - [x] Teste do lote (3 fictícios), limite de 2, 429 simulado, 403 para colaborador; fictícios apagados
-- [ ] Troca de vaga no meio do lote — aguarda uma 2ª vaga publicada
-- [ ] 403 para usuário de outra empresa — aguarda autorização para mexer temporariamente num usuário
+- [x] Troca de vaga no meio do lote (vaga de teste temporária): 2 em voo concluíram, 3º não iniciou
+- [x] Outra empresa (B temporária): currículo 403, análise recusada, 0 linhas, nada gravado; revertido
+- [x] Botão de análise oculto para colaborador
+- [x] Troca de empresa no meio do lote: sem vazamento; corrigido envio de pendente após troca (fila parada ao sair da tela)
+- [x] Fase 3 R&S fechada (testes F/G/H/I); dados temporários apagados
