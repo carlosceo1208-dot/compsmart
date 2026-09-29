@@ -233,7 +233,7 @@ export default function Leads() {
               <SheetHeader><SheetTitle>{selected.nome}</SheetTitle></SheetHeader>
               <div className="mt-6 space-y-4">
                 {selected.source !== "leads" && (
-                  <p className="text-xs rounded-md bg-muted p-2 text-muted-foreground">Somente leitura — contato da página NR-1.</p>
+                  <p className="text-xs rounded-md bg-muted p-2 text-muted-foreground">Somente leitura — contato da página {selected.source === "nr1" ? "NR-1" : "Maturidade do RH"}.</p>
                 )}
                 <Field label="E-mail" value={selected.email} />
                  <Field label="Formulário enviado em" value={formatDateTimePtBR(selected.submitted_at)} />

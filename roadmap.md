@@ -55,3 +55,12 @@
 - [x] Troca de empresa no meio do lote: sem vazamento; corrigido envio de pendente após troca (fila parada ao sair da tela)
 - [x] Fase 3 R&S fechada (testes F/G/H/I); dados temporários apagados
 - [x] "Colar da planilha" e "Novo candidato" ocultos para colaborador (servidor já recusa); publicado e conferido no site oficial
+
+## Fase 4 — Diagnóstico de Maturidade do RH
+- [x] Estrutura, 48 afirmações exatas, regras de acesso e limites anti-abuso
+- [x] Página /maturidade com teaser de 10 perguntas e captura de lead (LGPD com data e versão)
+- [x] Ferramenta interna /consultoria/maturidade: convite RH, gestores anônimos, scorecard, radar, relatório, roadmap 90 dias
+- [x] 6 ajustes (nível único, grupo por convite, progresso por gestor, limites, média protegida, leitura do gap)
+- [ ] Validação ponta a ponta com dados fictícios e limpeza
+- [ ] GATE: varredura de segurança completa antes do relançamento comercial
+- [ ] Publicar após revisão do usuário
