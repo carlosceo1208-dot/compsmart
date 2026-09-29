@@ -36,6 +36,9 @@ export const useFilaAnalise = (vagaId: string | null) => {
     setItens(new Map()); setLote(LOTE_VAZIO); setPausa(null);
   }, [activeCompanyId]);
 
+  // Tela desmontada (ex.: troca de empresa recria a página): pendentes não iniciam; em voo concluem e gravam.
+  useEffect(() => () => { geracao.current++; fila.current = []; }, []);
+
   // Trocar de vaga: o que ainda não começou sai da fila; o que está em voo conclui e grava.
   useEffect(() => {
     const retirados = fila.current; fila.current = [];
