@@ -76,13 +76,13 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
     else {
       const prev = window.onTurnstileLoad;
       window.onTurnstileLoad = () => { prev?.(); render(); };
-      if (!document.querySelector('script[src*="turnstile"]')) {
-        const s = document.createElement("script");
-        s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
-        s.async = true; s.defer = true;
-        s.onerror = () => { setLoading(false); cb.current.onError?.(); };
-        document.head.appendChild(s);
-      }
+      // Em nova tentativa, remove script antigo (pode ter falhado) e recarrega
+      document.querySelector('script[src*="turnstile"]')?.remove();
+      const s = document.createElement("script");
+      s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
+      s.async = true; s.defer = true;
+      s.onerror = () => { setLoading(false); cb.current.onError?.(); };
+      document.head.appendChild(s);
     }
 
     return () => {
