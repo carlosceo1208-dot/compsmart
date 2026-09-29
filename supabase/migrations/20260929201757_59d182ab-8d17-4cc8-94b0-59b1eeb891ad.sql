@@ -1,0 +1,1 @@
+ALTER TABLE public.rh_service_projetos DROP CONSTRAINT rh_service_projetos_consultor_fk;

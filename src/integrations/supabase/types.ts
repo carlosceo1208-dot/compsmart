@@ -9117,13 +9117,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "rh_service_projetos_consultor_fk"
-            columns: ["consultor_id"]
-            isOneToOne: false
-            referencedRelation: "consultores"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "rh_service_projetos_consultor_id_fkey"
             columns: ["consultor_id"]
             isOneToOne: false
