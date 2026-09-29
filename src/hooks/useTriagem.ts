@@ -45,8 +45,8 @@ export const useHistorico = (candidaturaId: string | null) =>
       const ids = [...new Set(itens.map((i) => i.criado_por).filter(Boolean))];
       const nomes: Record<string, string> = {};
       if (ids.length) {
-        const { data: p } = await db.from("profiles_directory").select("id, full_name").in("id", ids);
-        (p ?? []).forEach((x: { id: string; full_name: string | null }) => { nomes[x.id] = x.full_name ?? ""; });
+        const { data: p } = await db.from("profiles_directory").select("user_id, full_name").in("user_id", ids);
+        (p ?? []).forEach((x: { user_id: string; full_name: string | null }) => { nomes[x.user_id] = x.full_name ?? ""; });
       }
       return itens.map((i) => ({ ...i, responsavel: i.criado_por ? nomes[i.criado_por] || "Usuário do RH" : "—" }));
     },
