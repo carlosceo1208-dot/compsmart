@@ -152,7 +152,7 @@ export const TriagemKanban = () => {
 
       <MoverDialog pedido={pedido} onClose={() => setPedido(null)} onConfirm={confirmar} enviando={mover.isPending} />
       <CandidatoDrawer c={aberto} onClose={() => setAbertoId(null)}
-        analisando={analisar.isPending && analisar.variables === aberto?.id}
+        analisando={analisar.isPending}
         erroAnalise={aberto ? erros[aberto.id] || null : null}
         onAnalisar={() => aberto && rodarAnalise(aberto.id)}
         onAplicar={(r) => aberto && aplicar(aberto, r)} />
