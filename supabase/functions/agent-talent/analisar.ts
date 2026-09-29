@@ -56,23 +56,32 @@ export async function analisarCandidatura(
   apiKey: string,
   signal: AbortSignal,
   json: Json,
+  quem: { userId: string; empresaId: string | null },
 ) {
   const url = Deno.env.get("SUPABASE_URL")!;
   const userClient = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
   // RLS garante que só o RH da mesma empresa lê a candidatura.
   const { data: c, error } = await userClient
     .from("candidaturas")
-    .select("id, root_company_id, candidatos(nome, email, telefone, curriculo_url), vagas(titulo, cbo, area, senioridade, responsabilidades, requisitos_obrigatorios, requisitos_desejaveis, competencias)")
+    .select("id, root_company_id, candidato_id, etapa, analise_talent, candidatos(nome, email, telefone, curriculo_url), vagas(titulo, cbo, area, senioridade, responsabilidades, requisitos_obrigatorios, requisitos_desejaveis, competencias)")
     .eq("id", candidaturaId)
     .maybeSingle();
   if (error || !c) return json({ error: "Candidatura não encontrada." }, 404);
+  if (quem.empresaId !== null && c.root_company_id !== quem.empresaId) {
+    return json({ error: "Sem permissão para analisar currículos.", code: "sem_permissao" }, 403);
+  }
   // deno-lint-ignore no-explicit-any
   const cand = (c as any).candidatos, vaga = (c as any).vagas;
+  // deno-lint-ignore no-explicit-any
+  const notaAnterior: number | null = (c as any).analise_talent?.match_score ?? null;
   if (!cand?.curriculo_url) return json({ error: "Este candidato não tem currículo anexado.", code: "sem_curriculo" }, 422);
 
   const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
   const { data: file, error: dlErr } = await admin.storage.from("curriculos").download(cand.curriculo_url);
   if (dlErr || !file) return json({ error: "Currículo não encontrado." }, 404);
+  if (file.size > 10 * 1024 * 1024) {
+    return json({ error: "PDF acima de 10 MB. Siga com a triagem manual.", code: "pdf_grande" }, 413);
+  }
 
   let bruto = "";
   try {
@@ -153,5 +162,14 @@ export async function analisarCandidatura(
     .update({ analise_talent: analise, analise_em: new Date().toISOString(), match_score: analise.match_score })
     .eq("id", candidaturaId);
   if (upErr) return json({ error: "Não foi possível salvar a análise." }, 500);
+  if (notaAnterior !== null) {
+    // Reanálise: evento auditável; não mexe em etapa nem etapa_desde.
+    const { error: hErr } = await admin.from("candidato_historico").insert({
+      root_company_id: c.root_company_id, candidatura_id: c.id, candidato_id: c.candidato_id,
+      etapa_anterior: c.etapa, etapa_nova: c.etapa, origem: "agente", criado_por: quem.userId,
+      motivo: `Reanálise do currículo: nota ${notaAnterior} → ${analise.match_score}`,
+    });
+    if (hErr) console.error("agent-talent reanalise historico", hErr.code);
+  }
   return json({ analise });
 }

@@ -55,7 +55,18 @@ Deno.serve(async (req) => {
     if (raw?.acao === "analisar") {
       const a = z.object({ candidaturaId: z.string().uuid() }).safeParse(raw);
       if (!a.success) return json({ error: "Dados inválidos" }, 400);
-      return await analisarCandidatura(a.data.candidaturaId, auth, apiKey, req.signal, json);
+      const uid = userData.user.id;
+      const [{ data: isAdmin }, { data: isHr }, { data: empresa }] = await Promise.all([
+        userClient.rpc("has_role", { _user_id: uid, _role: "admin" } as never),
+        userClient.rpc("has_role", { _user_id: uid, _role: "hr_manager" } as never),
+        userClient.rpc("get_user_root_company_id_strict" as never),
+      ]);
+      if (isSuper !== true && isAdmin !== true && isHr !== true) {
+        return json({ error: "Sem permissão para analisar currículos.", code: "sem_permissao" }, 403);
+      }
+      return await analisarCandidatura(a.data.candidaturaId, auth, apiKey, req.signal, json, {
+        userId: uid, empresaId: isSuper === true ? null : ((empresa as string | null) ?? "__nenhuma__"),
+      });
     }
 
     const parsed = Body.safeParse(raw);
