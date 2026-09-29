@@ -14,3 +14,4 @@
 - Currículo só abre via edge function curriculo-download (blob no app), nunca link direto do storage. Why: extensões bloqueiam o domínio do storage.
 - Etapa de R&S só muda via RPC talent_mover_candidatura (histórico + etapa_desde + entrevista_em na mesma transação; mesma etapa é recusada). Why: auditoria sem buracos nem duplicatas.
 - agent-talent `acao: analisar` extrai texto do PDF no servidor, anonimiza (nome/e-mail/telefone/CPF/CEP/endereço/links), valida saída com Zod e só grava analise_talent; logs só com tamanhos/contagens. Why: LGPD e agente nunca move etapa sozinho.
+- Análises do Talent no cliente só via useFilaAnalise (máx. 2 em voo, sem aborto por timer, 402/429 pausa sem reenvio; status em Map por empresa). Why: sem custo duplicado nem 429 auto-infligido.
