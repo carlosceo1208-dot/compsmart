@@ -30,7 +30,7 @@ declare global {
   }
 }
 
-export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silentFallback = true }: TurnstileWidgetProps) {
+export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);

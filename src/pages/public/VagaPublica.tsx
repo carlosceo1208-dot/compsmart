@@ -212,7 +212,15 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
           </label>
           {erros.aceite && <p className="text-xs text-destructive">{erros.aceite}</p>}
         </div>
-        <TurnstileWidget key={widgetKey} onVerify={setToken} onExpire={() => setToken("")} />
+        <TurnstileWidget key={widgetKey} onVerify={setToken} onExpire={() => setToken("")} onError={() => setCaptchaErro(true)} />
+        {captchaErro && (
+          <Alert variant="destructive" className="rounded-xl">
+            <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
+              <span>Não conseguimos carregar a verificação de segurança. Verifique sua conexão ou desative bloqueadores de anúncio.</span>
+              <Button size="sm" variant="outline" onClick={novoToken} disabled={enviando}><RotateCcw className="h-3.5 w-3.5 mr-1" />Tentar novamente</Button>
+            </AlertDescription>
+          </Alert>
+        )}
         {falha && (
           <Alert variant="destructive" className="rounded-xl">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
