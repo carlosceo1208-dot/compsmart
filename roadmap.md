@@ -73,3 +73,6 @@
 ## Fase 4 — Consultor dono do cliente
 - [x] Decisão dos sócios: cada consultor vê só os próprios projetos (Maturidade + RH Service + Core do consultor). Testado com rollback.
 - [ ] GATE: varredura de segurança completa antes do relançamento comercial.
+- [x] Conferência visual do "Login vinculado" (super admin vincula; consultor vê só a empresa do projeto; sem vínculo o acesso some).
+- [x] Anti-robô: "Tentar novamente" sem script duplicado, só a tentativa atual desenha, mensagem clara quando o bloqueio persiste.
+- [ ] Decisão: modo invisível do anti-robô (hoje é verificação automática, sem execute()).
