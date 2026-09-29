@@ -12,3 +12,5 @@
 - Empresa mascarada no servidor (portal_listar_vagas/portal_vaga): confidencial só abre por link; logo/"Sobre a empresa" só saem se vaga pública e exibir_nome_empresa; logos em logos-vagas privado. Why: nome e imagem nunca revelam empresa oculta.
 - Anti-robô (candidatura/login/ativação): site key pública em src/components/auth/TurnstileWidget.tsx, segredo TURNSTILE_SECRET_KEY no cofre; sem token o botão não libera e falha vira "Tentar novamente". Why: widget que não renderiza travava o envio em "Verificando…".
 - Currículo só abre via edge function curriculo-download (blob no app), nunca link direto do storage. Why: extensões bloqueiam o domínio do storage.
+- Etapa de R&S só muda via RPC talent_mover_candidatura (histórico + etapa_desde + entrevista_em na mesma transação; mesma etapa é recusada). Why: auditoria sem buracos nem duplicatas.
+- agent-talent `acao: analisar` extrai texto do PDF no servidor, anonimiza (nome/e-mail/telefone/CPF/CEP/endereço/links), valida saída com Zod e só grava analise_talent; logs só com tamanhos/contagens. Why: LGPD e agente nunca move etapa sozinho.
