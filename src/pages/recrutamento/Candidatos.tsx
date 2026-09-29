@@ -15,6 +15,7 @@ import { CandidatoDialog } from "@/components/recrutamento/CandidatoDialog";
 import { ImportarCandidatosDialog } from "@/components/recrutamento/ImportarCandidatosDialog";
 import { TriagemKanban } from "@/components/recrutamento/TriagemKanban";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCurrentUserRole } from "@/hooks/useCurrentUserRole";
 
 const Candidatos = () => {
   const { data: candidatos = [], isLoading, error } = useCandidatos();
@@ -25,6 +26,9 @@ const Candidatos = () => {
   const [vaga, setVaga] = useState("todas");
   const [novo, setNovo] = useState(false);
   const [importar, setImportar] = useState(false);
+  const { data: papel } = useCurrentUserRole();
+  // Mesma regra do servidor: só admin/RH/super admin gravam candidatos.
+  const podeGerir = !!(papel?.isAdmin || papel?.isHR || papel?.isSuperAdmin);
   const [params, setParams] = useSearchParams();
   const aba = params.get("aba") === "triagem" ? "triagem" : "lista";
   const trocarAba = (a: string) => setParams(a === "triagem" ? { aba: "triagem", ...(params.get("vaga") ? { vaga: params.get("vaga") as string } : {}) } : {}, { replace: true });
@@ -55,10 +59,12 @@ const Candidatos = () => {
           <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2 mt-1"><Users className="h-7 w-7 text-primary" /> Candidatos</h1>
           <p className="text-muted-foreground mt-1">Recrutamento & Seleção (Aquisição de Talentos)</p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" className="rounded-xl" onClick={() => setImportar(true)}><ClipboardPaste className="h-4 w-4 mr-2" />Colar da planilha</Button>
-          <Button className="rounded-xl" onClick={() => setNovo(true)}><Plus className="h-4 w-4 mr-2" />Novo candidato</Button>
-        </div>
+        {podeGerir && (
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" className="rounded-xl" onClick={() => setImportar(true)}><ClipboardPaste className="h-4 w-4 mr-2" />Colar da planilha</Button>
+            <Button className="rounded-xl" onClick={() => setNovo(true)}><Plus className="h-4 w-4 mr-2" />Novo candidato</Button>
+          </div>
+        )}
       </div>
 
       <Tabs value={aba} onValueChange={trocarAba}>
@@ -113,8 +119,8 @@ const Candidatos = () => {
       </TabsContent>
       </Tabs>
 
-      <CandidatoDialog open={novo} onOpenChange={setNovo} />
-      <ImportarCandidatosDialog open={importar} onOpenChange={setImportar} />
+      {podeGerir && <CandidatoDialog open={novo} onOpenChange={setNovo} />}
+      {podeGerir && <ImportarCandidatosDialog open={importar} onOpenChange={setImportar} />}
     </div>
   );
 };
