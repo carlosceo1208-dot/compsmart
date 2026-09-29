@@ -20,9 +20,17 @@
 
 ## Regras de cálculo
 - Nota por dimensão = média das respostas 1–5; score global = média das 12 dimensões.
-- Cortes: até 1,8 Reativo · até 2,6 Estruturado · até 3,4 Alinhado · até 4,2 Parceiro · acima Transformacional (limite inferior incluso no nível de cima; calibrar após o piloto).
+- Nível único para teaser e scorecard (mesma regra, nunca duplicada): até 1,8 Reativo · até 2,6 Estruturado · até 3,4 Alinhado · até 4,2 Parceiro · acima de 4,2 Transformacional (o valor do limite fica no nível de baixo; calibrar após o piloto).
 - Gap = média Gestores − média RH por dimensão; dimensão sem respostas de um grupo mostra "sem dados", nunca zero.
 - As 48 afirmações entram exatamente como enviadas (texto, número e grupo).
+
+## Ajustes combinados antes do build
+1. Nível calculado por uma única regra, testada com 1,8 / 2,6 / 3,4 / 4,2 / 4,21.
+2. Quem responde vê só o seu grupo: convite do RH mostra RH + Ambos; lançamento de gestores mostra Gestores + Ambos. O RH nunca vê afirmações de gestores e vice-versa.
+3. Gestores cadastrados um a um sem nome/e-mail ("Gestor 1", "Gestor 2"). Progresso "Gestores: 2/5 respondidos" (conta só gestores completos). Relatório só usa média do grupo.
+4. Proteção contra abuso: lead limitado a 5 por hora por IP, e-mail e tamanhos validados, aceite LGPD gravado com data/hora e versão do texto; sem aceite não salva. Link do RH com limite de tentativas por link e por IP contra adivinhação.
+5. As médias do scorecard só saem para quem pode gerir aquele diagnóstico; usuário logado sem projeto na empresa não recebe nada.
+6. Relatório com cabeçalho (empresa, data, score global, nível) e frase fixa explicando o gap: "compara a autoavaliação do RH com a percepção dos gestores (percepção cruzada)". Nunca mostra resposta individual de gestor.
 
 ## Fora do escopo
 - Sem IA nesta fase (recomendações e roadmap são textos modelo); não é módulo vendido; não mexe em pagamentos, checkout, dashboard do cliente nem em Carlos/Josue/Marli.
@@ -35,9 +43,10 @@
 - roadmap.md: registrar GATE de varredura de segurança completa antes do relançamento comercial.
 
 ## Detalhes técnicos
-- Tabelas (com GRANT + RLS): `maturidade_questionario` (seed 48, leitura authenticated), `maturidade_diagnosticos` (root_company_id), `maturidade_respostas` (respondente_tipo rh/gestor, `respondente_id` nulo para gestor, mais `lote_gestor` numérico só para agrupar sem identificar), `maturidade_convidados` (token aleatório, expira em 30 dias, status), `maturidade_leads`.
-- Acesso interno: função `maturidade_pode_gerir(company)` = super_admin OU consultor com projeto ativo do RH Service naquela empresa (regra já usada no RH Service).
-- Público: RPC SECURITY DEFINER `submit_maturidade_lead` (valida e-mail/tamanhos, LGPD obrigatório, throttle), `maturidade_convite_questoes(token)` e `maturidade_convite_responder(token, respostas)` — anônimo nunca lê tabelas.
-- Scorecard calculado no cliente a partir de uma RPC agregada que devolve só médias por dimensão/grupo (nunca linhas de gestores). Funções puras de cálculo em `src/lib/maturidade.ts` com testes vitest.
+- Tabelas (com GRANT + RLS): `maturidade_questionario` (seed 48, leitura authenticated), `maturidade_diagnosticos` (root_company_id), `maturidade_gestores` (diagnostico_id, rótulo "Gestor N", completo bool — sem nome/e-mail), `maturidade_respostas` (respondente_tipo rh/gestor, `gestor_id` só para agrupar, nunca exposto), `maturidade_convidados` (token aleatório, expira em 30 dias, status, tentativas), `maturidade_leads` (consentimento_em, consentimento_versao, ip_hash).
+- Acesso interno: `maturidade_pode_gerir(company)` = super_admin OU consultor com projeto ativo do RH Service naquela empresa.
+- Público: RPCs SECURITY DEFINER `submit_maturidade_lead` (5/h por IP via rate limit existente, validação, LGPD com data+versão), `maturidade_convite_questoes(token)` (filtra rh+ambos) e `maturidade_convite_responder(token, respostas)` (limite de tentativas por token/IP) — anônimo nunca lê tabelas.
+- Lançamento de gestores pelo consultor filtra gestores+ambos no servidor.
+- `maturidade_scorecard(diagnostico)` exige `maturidade_pode_gerir`, devolve só médias por dimensão/grupo e contagens. `nivelDoScore` e demais cálculos puros em `src/lib/maturidade.ts` com vitest (limites exatos).
 - Radar com recharts (já no projeto); relatório via `window.print` com CSS de impressão.
 - Rotas: `/maturidade` (público, entrada em seoRoutes.ts), `/maturidade/responder/:token` (público, noindex), `/consultoria/maturidade` e `/consultoria/maturidade/:id` (internas). Regra nova em AGENTS.md.
