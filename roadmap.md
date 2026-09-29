@@ -48,4 +48,6 @@
 
 ## Agente Talent visível na Triagem (lote + card + filtro)
 - [x] Filtro com/sem análise, botão em lote, sparkle por card, reanálise no histórico, papel+empresa no servidor
-- [ ] Teste do lote com 3 candidaturas descartáveis (2 legíveis + 1 imagem) e simulação de 429 — aguarda autorização para criar dados de teste
+- [x] Teste do lote (3 fictícios), limite de 2, 429 simulado, 403 para colaborador; fictícios apagados
+- [ ] Troca de vaga no meio do lote — aguarda uma 2ª vaga publicada
+- [ ] 403 para usuário de outra empresa — aguarda autorização para mexer temporariamente num usuário
