@@ -126,6 +126,7 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
   const [aceite, setAceite] = useState(false);
   const [token, setToken] = useState("");
   const [captchaErro, setCaptchaErro] = useState(false);
+  const [bloqueado, setBloqueado] = useState(false);
   // Token anti-robô é de uso único: após cada envio, faz reset no widget existente (sem redesenhar nem limpar o formulário).
   const [resetSignal, setResetSignal] = useState(0);
   const novoToken = () => { setToken(""); setCaptchaErro(false); setResetSignal((k) => k + 1); };
@@ -213,11 +214,11 @@ const FormCandidatura = ({ vaga }: { vaga: VagaDetalhe }) => {
           </label>
           {erros.aceite && <p className="text-xs text-destructive">{erros.aceite}</p>}
         </div>
-        <TurnstileWidget resetSignal={resetSignal} onVerify={setToken} onExpire={() => setToken("")} onError={() => setCaptchaErro(true)} />
+        <TurnstileWidget resetSignal={resetSignal} onVerify={setToken} onExpire={() => setToken("")} onError={(b) => { setBloqueado(!!b); setCaptchaErro(true); }} />
         {captchaErro && (
           <Alert variant="destructive" className="rounded-xl">
             <AlertDescription className="flex flex-wrap items-center justify-between gap-2">
-              <span>Não conseguimos carregar a verificação de segurança. Verifique sua conexão ou desative bloqueadores de anúncio.</span>
+              <span>{bloqueado ? "Verificação bloqueada pelo seu navegador. Desative o bloqueador de anúncios ou tente outro navegador." : "Não conseguimos carregar a verificação de segurança. Verifique sua conexão ou desative bloqueadores de anúncio."}</span>
               <Button size="sm" variant="outline" onClick={novoToken} disabled={enviando}><RotateCcw className="h-3.5 w-3.5 mr-1" />Tentar novamente</Button>
             </AlertDescription>
           </Alert>
