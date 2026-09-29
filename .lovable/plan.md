@@ -25,9 +25,14 @@ Triagem azul #2563EB, Entrevistas teal #0D9488, Proposta/Contratado verde #16A34
 - **Migração**:
   - `candidaturas`: adicionar etapa `arquivado` aos valores aceitos, `etapa_desde timestamptz`, `motivo_arquivamento`, `entrevista_em timestamptz`, `analise_talent jsonb`, `analise_em timestamptz`.
   - Nova `candidato_historico` (candidatura_id, candidato_id, root_company_id, etapa_anterior, etapa_nova, motivo, origem check agente/manual, criado_por, criado_em). GRANT authenticated/service_role; RLS: leitura e inserção só da própria empresa com `has_module('talent')` e papel admin/hr_manager; sem edição/exclusão.
-  - RPC `talent_mover_candidatura(_id, _etapa, _motivo, _origem, _entrevista_em)` security definer: valida tenant/papel, exige motivo ao arquivar, atualiza etapa e grava histórico na mesma transação.
+  - RPC `talent_mover_candidatura(_id, _etapa, _motivo, _origem, _entrevista_em)` security definer: valida tenant/papel, exige motivo ao arquivar, atualiza etapa e grava histórico na mesma transação. Regras:
+    - `etapa_desde = now()` em toda movimentação (dias na etapa contam da última mudança).
+    - Se `_etapa` = etapa atual (e não for só agendamento), retorna erro "Candidato já está nesta etapa" sem gravar histórico.
+    - `entrevista_em`: aceito apenas se a nova etapa for Entrevista RH/Gestor; em qualquer outra etapa vira vazio (NULL). Agendar na mesma etapa de entrevista grava evento próprio no histórico ("Entrevista agendada para …").
 - **Edge function `agent-talent`**: nova ação `analisar` (mantém a geração de perfil). Valida JWT, módulo e que a candidatura é da empresa; baixa o PDF com service role; extrai texto (`unpdf`); remove nome do candidato, e-mail, telefone, CPF, CEP/endereço e links (LinkedIn/URLs) antes de chamar o modelo; envia só texto anônimo + dados públicos da vaga; `openai/gpt-6-astra` em streaming com saída estruturada; grava apenas o JSON da análise. Logs registram só tamanhos e contagem de substituições, nunca o texto.
-- Arrastar com HTML5 nativo + `aria-label` nas colunas/cards; sem biblioteca nova.
+- Arrastar com HTML5 nativo + `aria-label` nas colunas/cards; sem biblioteca nova. Movimento otimista: o card muda na hora e volta à coluna original com aviso se o servidor recusar.
+- "Analisar currículo" fica desabilitado durante a chamada (sem pedido duplicado nem crédito gasto em dobro).
+- Primeira abertura do kanban: seleciona automaticamente a vaga publicada mais recente; sem vagas, mostra "Crie ou publique uma vaga para ver o pipeline"; com vaga sem candidatos, colunas vazias com "Nenhum candidato nesta vaga ainda".
 - Front: `TriagemKanban.tsx`, `CandidaturaCard.tsx`, `CandidatoDrawer.tsx` e hook `useTriagem.ts` filtrando por `activeCompanyId`.
 - Atualizar `roadmap.md` e `AGENTS.md`.
 
