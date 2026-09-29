@@ -62,8 +62,36 @@ export const useSalvarCandidato = () => {
   });
 };
 
-export const abrirCurriculo = async (path: string) => {
-  const { data, error } = await supabase.storage.from("curriculos").createSignedUrl(path, 300);
-  if (error || !data) throw error ?? new Error("Não foi possível abrir o currículo.");
-  window.open(data.signedUrl, "_blank", "noopener");
+/** Busca o PDF pela função do servidor e abre como blob dentro do app (sem navegar para o storage). */
+export const abrirCurriculo = async (candidatoId: string, nome: string) => {
+  const { data: s } = await supabase.auth.getSession();
+  let res: Response;
+  try {
+    res = await fetch(`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/curriculo-download`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${s.session?.access_token ?? ""}`,
+      },
+      body: JSON.stringify({ candidatoId }),
+    });
+  } catch {
+    throw new Error("Link expirado. Tente abrir novamente.");
+  }
+  if (res.status === 401 || res.status === 403) throw new Error("Você não tem permissão para ver este currículo.");
+  if (res.status === 404) throw new Error("Currículo não encontrado.");
+  if (!res.ok) throw new Error("Link expirado. Tente abrir novamente.");
+  const blob = new Blob([await res.blob()], { type: "application/pdf" });
+  const url = URL.createObjectURL(blob);
+  const aba = window.open(url, "_blank");
+  if (!aba) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Curriculo - ${nome}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 };

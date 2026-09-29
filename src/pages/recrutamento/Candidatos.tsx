@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ClipboardPaste, FileText, Plus, Search, Users } from "lucide-react";
+import { ArrowLeft, ClipboardPaste, FileText, Loader2, Plus, Search, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useCandidatos, abrirCurriculo } from "@/hooks/useCandidatos";
 import { useVagas } from "@/hooks/useVagas";
@@ -33,8 +33,12 @@ const Candidatos = () => {
       (vaga === "todas" || c.candidaturas.some((x) => x.vaga_id === vaga)));
   }, [candidatos, busca, fonte, etapa, vaga]);
 
-  const verCurriculo = async (path: string) => {
-    try { await abrirCurriculo(path); } catch { toast.error("Não foi possível abrir o currículo."); }
+  const [abrindo, setAbrindo] = useState<string | null>(null);
+  const verCurriculo = async (id: string, nome: string) => {
+    setAbrindo(id);
+    try { await abrirCurriculo(id, nome); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Link expirado. Tente abrir novamente."); }
+    finally { setAbrindo(null); }
   };
 
   return (
@@ -88,7 +92,7 @@ const Candidatos = () => {
                 </div>
                 <div className="flex items-center justify-between text-xs text-muted-foreground pt-1">
                   <span>{c.consentimento_lgpd ? `Aceite LGPD ${c.consentimento_versao ?? ""} em ${new Date(c.consentimento_data!).toLocaleDateString("pt-BR")}` : "Cadastrado pelo RH"}</span>
-                  {c.curriculo_url && <Button size="sm" variant="ghost" className="h-7" onClick={() => verCurriculo(c.curriculo_url!)}><FileText className="h-3.5 w-3.5 mr-1" />Currículo</Button>}
+                  {c.curriculo_url && <Button size="sm" variant="ghost" className="h-7" disabled={abrindo === c.id} onClick={() => verCurriculo(c.id, c.nome)}>{abrindo === c.id ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <FileText className="h-3.5 w-3.5 mr-1" />}Currículo</Button>}
                 </div>
               </CardContent>
             </Card>
