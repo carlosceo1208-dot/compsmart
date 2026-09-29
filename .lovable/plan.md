@@ -4,6 +4,7 @@
 - **Passo 0 (limpeza) não será feito**: a sua candidatura de teste fica no sistema como base para os testes, conforme sua última mensagem. Os 2 candidatos fictícios da validação serão criados e apagados ao final; a sua candidatura fica.
 - A etapa fica **por candidatura** (candidato + vaga), não no candidato: a mesma pessoa pode estar em Triagem numa vaga e em Proposta em outra. O kanban é filtrado por vaga.
 - O módulo continua bloqueado pelo código já existente do módulo (`talent`), não por um novo nome.
+- **Nada é renomeado nem apagado**: só entram campos novos (vazios nos registros antigos) e a etapa "Arquivado" como opção extra. A sua candidatura (origem Portal, etapa Triagem) continua igual, sem migrar dados. Se for preciso renomear algo, aviso antes.
 
 ## O que o RH vai ter
 1. **Aba "Triagem"** em Candidatos (ao lado da lista atual), com seletor de vaga e colunas: Triagem, Entrevista RH, Entrevista Gestor, Proposta, Contratado e Arquivado (cada uma com contador).
@@ -14,7 +15,8 @@
    - Estados: sem análise, analisando, concluída, falha com "Tentar novamente".
    - PDF escaneado/imagem: aviso "Não foi possível ler o PDF"; a triagem manual segue normal.
    - Créditos de IA esgotados / muitos pedidos: mensagem clara.
-6. **Histórico**: cada movimento, arquivamento ou recomendação aplicada registra etapa anterior, nova, motivo, origem (agente/manual), responsável e data.
+6. **Histórico**: cada movimento, arquivamento, **agendamento de entrevista** (com a data marcada) ou recomendação aplicada registra etapa anterior, nova, motivo, origem (agente/manual), responsável e data.
+7. **Resposta do agente conferida**: se o modelo devolver algo fora do formato, nota fora de 0–100 ou recomendação diferente de Avançar/Agendar/Arquivar, nada é salvo nem movido; aparece aviso amigável com "Tentar novamente".
 
 ## Cores
 Triagem azul #2563EB, Entrevistas teal #0D9488, Proposta/Contratado verde #16A34A, Arquivado cinza; nota ≥80 verde, 60–79 azul, <60 âmbar. Tokens atuais, cards arredondados, badges pílula.
