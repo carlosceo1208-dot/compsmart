@@ -9,7 +9,6 @@ interface TurnstileWidgetProps {
   onError?: () => void;
   onExpire?: () => void;
   onLoading?: (isLoading: boolean) => void;
-  silentFallback?: boolean;
 }
 
 declare global {
@@ -30,7 +29,7 @@ declare global {
   }
 }
 
-export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silentFallback = true }: TurnstileWidgetProps) {
+export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -58,13 +57,11 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silent
         }
       }, 1000);
     } else {
-      // Silent fallback - just stop trying without showing error
+      // Sem mais tentativas: avisa o chamador para exibir erro e opção de recarregar
       updateLoading(false);
-      if (!silentFallback) {
-        onError?.();
-      }
+      onError?.();
     }
-  }, [retryCount, onError, updateLoading, silentFallback]);
+  }, [retryCount, onError, updateLoading]);
 
   const handleExpire = useCallback(() => {
     console.log("Turnstile token expired");
@@ -74,6 +71,14 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silent
 
   // Load Turnstile script
   useEffect(() => {
+    // Se o script não carregar (bloqueador de anúncio, rede), avisa após 15s
+    const timeout = setTimeout(() => {
+      if (!window.turnstile) {
+        updateLoading(false);
+        onError?.();
+      }
+    }, 15000);
+
     const existingScript = document.querySelector('script[src*="turnstile"]');
     if (existingScript) {
       if (window.turnstile) {
@@ -81,7 +86,7 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silent
       } else {
         window.onTurnstileLoad = () => setScriptLoaded(true);
       }
-      return;
+      return () => clearTimeout(timeout);
     }
 
     window.onTurnstileLoad = () => setScriptLoaded(true);
@@ -90,14 +95,21 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, silent
     script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
     script.async = true;
     script.defer = true;
+    script.onerror = () => {
+      clearTimeout(timeout);
+      updateLoading(false);
+      onError?.();
+    };
     document.head.appendChild(script);
 
     return () => {
+      clearTimeout(timeout);
       // Cleanup on unmount
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.remove(widgetIdRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Render widget when script is loaded
