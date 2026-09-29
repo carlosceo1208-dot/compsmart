@@ -43,3 +43,5 @@
 - [x] Anti-robô da candidatura: widget sem looping (reset), siteverify no servidor, chave do widget COMPSMART, envio real aprovado no site publicado
 - [x] Fase 3 R&S: kanban de triagem por vaga, histórico auditável, análise do agente Talent (currículo anonimizado, nota 0–100, recomendação aplicada só pelo RH)
 - [x] Fase 3: publicada + teste entre empresas (RH de outra empresa vê 0 e não move/grava; desfeito com rollback)
+- [x] Card da vaga: "N candidatos · Triagem" abre o funil da vaga (?aba=triagem&vaga=id)
+- [ ] Aceite final: abrir currículo e "Analisar currículo" logado como 2ª empresa real (aguarda conta de cliente real)
