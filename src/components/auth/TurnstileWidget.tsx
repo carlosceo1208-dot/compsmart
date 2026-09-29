@@ -103,11 +103,13 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading }: Turn
     document.head.appendChild(script);
 
     return () => {
+      clearTimeout(timeout);
       // Cleanup on unmount
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.remove(widgetIdRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Render widget when script is loaded
