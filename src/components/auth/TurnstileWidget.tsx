@@ -6,7 +6,8 @@ const MAX_RETRIES = 3;
 
 interface TurnstileWidgetProps {
   onVerify: (token: string) => void;
-  onError?: () => void;
+  /** bloqueado=true quando a falha acontece numa nova tentativa (script segue bloqueado). */
+  onError?: (bloqueado?: boolean) => void;
   onExpire?: () => void;
   onLoading?: (isLoading: boolean) => void;
   /** Mude este número para pedir um token novo ao widget existente (reset, sem redesenhar). */
@@ -44,16 +45,21 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
   const [isLoading, setIsLoading] = useState(true);
   // Incrementa para refazer a carga do script quando o widget nunca desenhou
   const [attempt, setAttempt] = useState(0);
+  const geracaoRef = useRef(0);
 
   const setLoading = (v: boolean) => { if (!aliveRef.current) return; setIsLoading(v); cb.current.onLoading?.(v); };
 
   // Carrega o script e desenha o widget UMA vez por montagem
   useEffect(() => {
     aliveRef.current = true;
+    const g = ++geracaoRef.current;
+    const vivo = () => aliveRef.current && g === geracaoRef.current;
+    const falhou = () => { if (!vivo()) return; setLoading(false); cb.current.onError?.(attempt > 0); };
+    if (attempt > 0) setLoading(true);
     const later = (fn: () => void, ms: number) => { timersRef.current.push(window.setTimeout(fn, ms)); };
 
     const render = () => {
-      if (!aliveRef.current || !containerRef.current || !window.turnstile || widgetIdRef.current) return;
+      if (!vivo() || !containerRef.current || !window.turnstile || widgetIdRef.current) return;
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
         theme: 'auto',
@@ -64,24 +70,24 @@ export function TurnstileWidget({ onVerify, onError, onExpire, onLoading, resetS
           if (retriesRef.current < MAX_RETRIES - 1) {
             retriesRef.current += 1;
             later(() => { if (aliveRef.current && widgetIdRef.current) window.turnstile?.reset(widgetIdRef.current); }, 1000);
-          } else { setLoading(false); cb.current.onError?.(); }
+          } else { setLoading(false); cb.current.onError?.(false); }
         },
         'expired-callback': () => { if (!aliveRef.current) return; setLoading(false); cb.current.onExpire?.(); },
       });
     };
 
-    later(() => { if (!window.turnstile) { setLoading(false); cb.current.onError?.(); } }, 15000);
+    later(() => { if (!window.turnstile) falhou(); }, 15000);
 
     if (window.turnstile) render();
     else {
-      const prev = window.onTurnstileLoad;
-      window.onTurnstileLoad = () => { prev?.(); render(); };
+      // Só a tentativa atual desenha; avisos atrasados de tentativas antigas são descartados
+      window.onTurnstileLoad = () => { if (g === geracaoRef.current) render(); };
       // Em nova tentativa, remove script antigo (pode ter falhado) e recarrega
       document.querySelector('script[src*="turnstile"]')?.remove();
       const s = document.createElement("script");
       s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad";
       s.async = true; s.defer = true;
-      s.onerror = () => { setLoading(false); cb.current.onError?.(); };
+      s.onerror = falhou;
       document.head.appendChild(s);
     }
 
