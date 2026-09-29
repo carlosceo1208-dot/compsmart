@@ -61,6 +61,7 @@
 - [x] Página /maturidade com teaser de 10 perguntas e captura de lead (LGPD com data e versão)
 - [x] Ferramenta interna /consultoria/maturidade: convite RH, gestores anônimos, scorecard, radar, relatório, roadmap 90 dias
 - [x] 6 ajustes (nível único, grupo por convite, progresso por gestor, limites, média protegida, leitura do gap)
-- [ ] Validação ponta a ponta com dados fictícios e limpeza
+- [x] Validação no servidor com dados fictícios (desfeita) + landing 1280/390
+- [ ] Conferir visualmente a tela interna /consultoria/maturidade logado
 - [ ] GATE: varredura de segurança completa antes do relançamento comercial
 - [ ] Publicar após revisão do usuário
