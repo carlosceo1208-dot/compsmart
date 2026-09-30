@@ -339,8 +339,9 @@ const App = () => {
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
                         <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
-                        <Route path="/nr1/fib" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="FIB — Felicidade Interna Bruta"><Nr1FIB /></ModuleGate>} />
-                        <Route path="/nr1/fib-bem-estar" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="FIB — Felicidade Interna Bruta"><Nr1FibCard /></ModuleGate>} />
+                        <Route path="/nr1/matriz-risco" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="Matriz de Risco"><Nr1FIB /></ModuleGate>} />
+                        <Route path="/nr1/fib" element={<Navigate to="/nr1/matriz-risco" replace />} />
+                        <Route path="/nr1/fib-bem-estar" element={<Navigate to="/nr1/clima" replace />} />
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />

@@ -80,6 +80,7 @@
 ## Fase 5 — NR-1 (auditar, completar, reorganizar card)
 - [x] Etapa 1: auditoria entregue (aguardando OK dos sócios para construir)
 - [ ] Etapa 2: novo layout do card NR-1 em 4 blocos (Preparar/Diagnosticar/Agir/Acompanhar) + "Mais recursos"
+- [ ] Navegação aprovada: Etapas do Programa visível em Diagnosticar; Histórico na gaveta; Plano Essencial e Acompanhamento sempre visíveis
 - [ ] Etapa 3: Clima 360° como cartão contratável; FIB fundido no Clima; cruzamentos só com has_module
 - [ ] Etapa 4: cortes 40/60/80 (front+servidor), k=5 no servidor, link anônimo tudo-ou-nada, agente Psi, laudo PDF/Excel
 - [ ] Validação completa + NÃO publicar até revisão
