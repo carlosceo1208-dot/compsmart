@@ -125,6 +125,7 @@ export const useFeatureAccess = (): FeatureAccessResult => {
   const [dataDeletionScheduledAt, setDataDeletionScheduledAt] = useState<string | null>(null);
   // Admin override - admins/super_admins bypass plan restrictions
   const [isAdminOrSuperAdmin, setIsAdminOrSuperAdmin] = useState(false);
+  const [isSuperAdminRole, setIsSuperAdminRole] = useState(false);
   // Add-ons opcionais independentes do plano
   const [nr1AddonEnabled, setNr1AddonEnabled] = useState(false);
   const [climaAddonEnabled, setClimaAddonEnabled] = useState(false);
@@ -151,6 +152,7 @@ export const useFeatureAccess = (): FeatureAccessResult => {
         const roles = userRoles?.map(r => r.role) || [];
         const hasAdminRole = roles.includes('admin') || roles.includes('super_admin');
         setIsAdminOrSuperAdmin(hasAdminRole);
+        setIsSuperAdminRole(roles.includes('super_admin'));
 
         // Get user's profile to find their company
         const { data: profile } = await supabase
@@ -275,8 +277,8 @@ export const useFeatureAccess = (): FeatureAccessResult => {
     // "Ver como cliente" mode: super admin pode simular acesso de cliente real
     const viewAsClient = typeof window !== 'undefined' && localStorage.getItem('viewAsClient') === 'true';
 
-    // ADMIN OVERRIDE: Admins and Super Admins always have access — exceto em modo "ver como cliente"
-    if (isAdminOrSuperAdmin && !viewAsClient) {
+    // Só o super admin CompSmart passa pelas travas (exceto em "ver como cliente"); admin de cliente segue o plano contratado.
+    if (isSuperAdminRole && !viewAsClient) {
       return true;
     }
 
