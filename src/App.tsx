@@ -377,16 +377,7 @@ const App = () => {
                        <Route path="/nr1/vitalidade" element={<Nr1Vitalidade />} />
                        <Route path="/nr1/biblioteca" element={<Nr1Biblioteca />} />
                        <Route path="/nr1/auditoria" element={<Nr1Auditoria />} />
-                        <Route path="/nr1/clima" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1Clima /></ModuleGate>} />
-                      <Route path="/nr1/clima/:id/responder" element={<Nr1ClimaResponder />} />
-                       <Route path="/nr1/clima/dashboard" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaDashboard /></ModuleGate>} />
-                       <Route path="/nr1/clima/dashboard/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaDashboard /></ModuleGate>} />
-                       <Route path="/nr1/clima/correlacao" element={<ModuleGate mode="page" moduleSlugs={["nr1", "clima"]} requireAll featureName="Correlação Clima x Riscos"><Nr1ClimaCorrelacao /></ModuleGate>} />
-                       <Route path="/nr1/clima/externo" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
-                      <Route path="/nr1/clima/externo/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
-                      <Route path="/nr1/clima/relatorios" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaRelatorios /></ModuleGate>} />
-                      <Route path="/nr1/clima/governanca" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaGovernanca /></ModuleGate>} />
-                      </Route>
+                       </Route>
 
                       {/* Public */}
                       <Route path="/feedback/:token" element={<ExternalFeedbackForm />} />
