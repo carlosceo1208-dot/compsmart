@@ -5246,6 +5246,7 @@ export type Database = {
       }
       nr1_diagnostico_respostas: {
         Row: {
+          convite_id: string | null
           created_at: string
           diagnostico_id: string
           id: string
@@ -5254,6 +5255,7 @@ export type Database = {
           resposta: number
         }
         Insert: {
+          convite_id?: string | null
           created_at?: string
           diagnostico_id: string
           id?: string
@@ -5262,6 +5264,7 @@ export type Database = {
           resposta: number
         }
         Update: {
+          convite_id?: string | null
           created_at?: string
           diagnostico_id?: string
           id?: string
@@ -5270,6 +5273,13 @@ export type Database = {
           resposta?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "nr1_diagnostico_respostas_convite_id_fkey"
+            columns: ["convite_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_convites"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "nr1_diagnostico_respostas_diagnostico_id_fkey"
             columns: ["diagnostico_id"]
@@ -12386,6 +12396,16 @@ export type Database = {
       }
       nr1_resultado_agregado: {
         Args: { p_diagnostico_id: string }
+        Returns: {
+          dados_suficientes: boolean
+          nivel_risco: Database["public"]["Enums"]["nr1_nivel_risco"]
+          score_geral: number
+          scores_dimensao: Json
+          total_respondentes: number
+        }[]
+      }
+      nr1_resultado_grupo: {
+        Args: { p_diagnostico_id: string; p_grupo: string }
         Returns: {
           dados_suficientes: boolean
           nivel_risco: Database["public"]["Enums"]["nr1_nivel_risco"]

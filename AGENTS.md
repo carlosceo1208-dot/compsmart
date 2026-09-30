@@ -17,4 +17,4 @@
 - Talent no cliente só via useFilaAnalise (máx. 2 em voo; 402/429 pausa sem reenvio; status por empresa). Why: evita custo duplicado e 429.
 - Maturidade: nível via nivelDoScore; público só por RPCs limitadas; respostas sem leitura direta; médias protegidas por maturidade_pode_gerir; gestores "Gestor N". Why: LGPD.
 - Consultor dono do cliente: consultor só acessa empresa onde é dono (rh_service_projetos.consultor_id → consultores.user_id = auth.uid(), ativo, em_andamento) via consultor_dono_ativo, usado em maturidade_pode_gerir, has_consultor_modulo_access e rh_service_can_read/write. Why: decisão dos sócios, sem visibilidade cruzada.
-- Navegação NR-1: quatro etapas sempre visíveis; Etapas em Diagnosticar, secundários na gaveta, Biblioteca/Auditoria no rodapé. Why: preservar o ciclo operacional.
+- NR-1: 4 etapas visíveis; Psi só agregado k≥5; cruzamentos só em Clima com ambos módulos. Why: LGPD e autonomia.

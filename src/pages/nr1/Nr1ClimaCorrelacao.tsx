@@ -99,8 +99,8 @@ export default function Nr1ClimaCorrelacao() {
     },
   });
 
-  const climaAtual = climaPesquisas.find((p) => p.total_respondentes > 0);
-  const diagAtual = diagnosticos.find((d) => d.total_respondentes > 0);
+  const climaAtual = climaPesquisas.find((p) => p.total_respondentes >= 5);
+  const diagAtual = diagnosticos.find((d) => d.total_respondentes >= 5);
 
   const pares = useMemo(() => {
     if (!climaAtual?.scores_dimensao || !diagAtual?.scores_dimensao) return [];
