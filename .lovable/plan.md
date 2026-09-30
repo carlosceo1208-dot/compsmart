@@ -19,7 +19,7 @@ Hoje o card é uma lista de 12 itens misturados. Ele passa a seguir as etapas do
 
 ```text
 1. Preparar      Visão Geral · Plano NR-1 Essencial · Universo
-2. Diagnosticar  Novo Diagnóstico
+2. Diagnosticar  Novo Diagnóstico · Etapas do Programa
 3. Agir          Matriz de Risco · Plano de Ação
 4. Acompanhar    Minha Jornada · Check up Semanal
 ```
@@ -29,6 +29,8 @@ Hoje o card é uma lista de 12 itens misturados. Ele passa a seguir as etapas do
 - Selo "LEGAL OBRIGATÓRIO" no topo.
 - O Acompanhamento do Colaborador (Minha Jornada e Check up Semanal) permanece sempre visível no bloco "Acompanhar"; nunca vai para a gaveta.
 - O Plano NR-1 Essencial permanece sempre visível no bloco "Preparar" como hub de conformidade; nunca vai para a gaveta.
+- "Etapas do Programa" permanece visível no bloco "Diagnosticar", ao lado de "Novo Diagnóstico". Ela é o roteiro guiado do programa, não a gestão dos ciclos.
+- "Novo Diagnóstico" é a entrada para criar um novo ciclo. O "Histórico" continua sendo a lista e comparação dos ciclos já criados, sem duplicar nomenclatura.
 - A gaveta recolhida "Mais recursos" contém exatamente: Histórico, Importar Matriz, Gestão de Terceiros, Vitalidade, Inteligência, Segurança Psicológica e Sociodemográfico. São recursos secundários ou da Fase 5B; suas telas não mudam nesta etapa.
 - Glossário / Metodologias & Biblioteca e Auditoria & Segurança ficam fora da gaveta, num rodapé discreto do card.
 - A matriz de risco ganha um endereço com nome próprio, em vez de "/fib". O endereço antigo continua funcionando e leva à nova página.
@@ -64,7 +66,7 @@ Hoje o card é uma lista de 12 itens misturados. Ele passa a seguir as etapas do
 - Limites 40/41, 60/61 e 80/81 testados; os 2 diagnósticos reais continuam "Moderado"
 - Link anônimo com prazo, envio tudo-ou-nada e sem rascunho ao reabrir
 - Não veem nada: colaborador sem módulo, consultor sem projeto e visitante
-- Card conferido no computador e no celular: quatro blocos sempre visíveis, Acompanhamento em "Acompanhar" e Plano Essencial em "Preparar"
+- Card conferido no computador e no celular: quatro blocos sempre visíveis, Acompanhamento em "Acompanhar", Plano Essencial em "Preparar" e Etapas do Programa em "Diagnosticar"
 - Gaveta contém somente os sete itens definidos; Biblioteca e Auditoria aparecem no rodapé
 - Com Clima contratado aparecem Clima, FIB e cruzamentos; sem Clima, não aparecem
 - Nova rota `/nr1/matriz-risco` e redirecionamentos antigos conferidos
