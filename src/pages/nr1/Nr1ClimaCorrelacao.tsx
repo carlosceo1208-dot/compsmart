@@ -127,7 +127,7 @@ export default function Nr1ClimaCorrelacao() {
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/nr1/clima"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Link>
+          <Link to="/clima"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Link>
         </Button>
         <div>
           <h1 className="text-xl font-bold flex items-center gap-2">
@@ -145,7 +145,7 @@ export default function Nr1ClimaCorrelacao() {
               <AlertTriangle className="h-4 w-4" /> Dados insuficientes
             </p>
             <ul className="mt-2 space-y-1 text-amber-700 text-xs list-disc list-inside">
-              {!climaAtual && <li>Nenhuma pesquisa de clima com respostas. <Link to="/nr1/clima" className="underline">Criar agora</Link></li>}
+              {!climaAtual && <li>Nenhuma pesquisa de clima com respostas. <Link to="/clima" className="underline">Criar agora</Link></li>}
               {!diagAtual && <li>Nenhum diagnóstico psicossocial (COPSOQ-III) com respostas. <Link to="/nr1/diagnosticos" className="underline">Iniciar diagnóstico</Link></li>}
             </ul>
           </CardContent>

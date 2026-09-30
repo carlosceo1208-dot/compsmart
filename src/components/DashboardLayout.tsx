@@ -15,7 +15,7 @@ import {
 import { 
   LogOut, User, Settings, Home, Users as UsersIcon, Network, 
   DollarSign, ShieldCheck, Briefcase, Globe, Menu, ChevronRight, ArrowLeft, Shield,
-  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare, Building2
+  Bot, Sparkles, Scale, BadgeDollarSign, Gift, Wallet, Inbox, GitCompare, Building2, Smile
 } from "lucide-react";
 import { useLabels } from "@/contexts/LabelsContext";
 import { toast } from "sonner";
@@ -320,6 +320,7 @@ export const DashboardLayout = () => {
     { icon: Wallet, label: "Budget Burn-Down", path: "/budget-burndown" },
     { icon: Inbox, label: "Aprovações", path: "/approval-inbox" },
     { icon: GitCompare, label: "Cenários de Decisão", path: "/decision-scenarios" },
+    { icon: Smile, label: "Clima Organizacional", path: "/clima" },
   ];
 
   const userItems = [

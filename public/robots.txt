@@ -31,7 +31,7 @@ Disallow: /nr1/painel
 Disallow: /nr1/diagnostico
 Disallow: /nr1/diagnosticos
 Disallow: /nr1/inteligencia
-Disallow: /nr1/clima
+Disallow: /clima
 Disallow: /feedback/
 Disallow: /clima/publico/
 Disallow: /clima-externo/

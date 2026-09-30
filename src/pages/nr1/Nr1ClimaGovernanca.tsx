@@ -147,7 +147,7 @@ export default function Nr1ClimaGovernanca() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <Link to="/nr1/clima" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-2">
+          <Link to="/clima" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-2">
             <ArrowLeft className="h-4 w-4" /> Voltar para Clima
           </Link>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">

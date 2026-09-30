@@ -298,7 +298,7 @@ export default function Nr1ClimaDashboard() {
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/nr1/clima"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Link>
+            <Link to="/clima"><ArrowLeft className="h-4 w-4 mr-1" /> Voltar</Link>
           </Button>
           <div>
             <h1 className="text-xl font-bold">Dashboard Analítico — Clima 360°</h1>

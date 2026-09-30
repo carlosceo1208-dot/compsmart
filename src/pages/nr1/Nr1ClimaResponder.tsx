@@ -118,7 +118,7 @@ export default function Nr1ClimaResponder() {
           <CheckCircle2 className="h-14 w-14 mx-auto text-emerald-500" />
           <h2 className="text-xl font-semibold">Resposta enviada com sucesso</h2>
           <p className="text-sm text-muted-foreground">Sua percepção contribui para tornar o ambiente melhor.</p>
-          <Button asChild><Link to="/nr1/clima">Voltar à pesquisa</Link></Button>
+          <Button asChild><Link to="/clima">Voltar à pesquisa</Link></Button>
         </CardContent>
       </Card>
     );
@@ -129,7 +129,7 @@ export default function Nr1ClimaResponder() {
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <Button variant="ghost" size="sm" asChild className="self-start mb-2 w-fit">
-            <Link to="/nr1/clima"><ArrowLeft className="h-4 w-4 mr-1" />Voltar</Link>
+            <Link to="/clima"><ArrowLeft className="h-4 w-4 mr-1" />Voltar</Link>
           </Button>
           <CardTitle>{pesquisa?.nome ?? 'Pesquisa de clima'}</CardTitle>
           <CardDescription className="flex items-center gap-1 text-xs">
