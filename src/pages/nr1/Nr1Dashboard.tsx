@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, GitCompare, History, Scale, Pencil, Trash2, Plus, TrendingUp, TrendingDown, Minus, ClipboardList } from 'lucide-react';
+import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, History, Scale, Pencil, Trash2, Plus, TrendingUp, TrendingDown, Minus, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useNr1Diagnosticos, useNr1Subscription, useUpdateNr1Diagnostico, useDeleteNr1Diagnostico } from '@/hooks/useNr1';
@@ -13,17 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { useModuleAccess } from '@/hooks/useModuleAccess';
-
-import { useClimaCopsoqCorrelacao } from '@/hooks/useClimaCopsoqCorrelacao';
-import { DIMENSAO_LABEL as CLIMA_LABEL, type ClimaDimensao } from '@/lib/climaQuestoes';
 
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
   const { data: diagnosticos, isLoading: diagLoading } = useNr1Diagnosticos();
-  const moduleAccess = useModuleAccess();
-  const hasClima = moduleAccess.hasModule('clima');
-  const { data: correlacoes = [] } = useClimaCopsoqCorrelacao(hasClima);
 
   const ciclosConcluidos = useMemo(
     () => (diagnosticos ?? []).filter((d) => d.status === 'concluido'),
@@ -38,11 +31,6 @@ export default function Nr1Dashboard() {
   const deleteMut = useDeleteNr1Diagnostico();
   const [editing, setEditing] = useState<{ id: string; nome: string } | null>(null);
   const [deleting, setDeleting] = useState<{ id: string; nome: string } | null>(null);
-
-  const topCorrelacoes = [...correlacoes]
-    .filter((c) => c.prioridade === 'causa_raiz' || c.prioridade === 'atencao')
-    .sort((a, b) => (a.prioridade === 'causa_raiz' ? -1 : 1) - (b.prioridade === 'causa_raiz' ? -1 : 1))
-    .slice(0, 3);
 
   const ultimo = diagnosticos?.[0];
   const concluidos = diagnosticos?.filter((d) => d.status === 'concluido').length ?? 0;
@@ -88,55 +76,6 @@ export default function Nr1Dashboard() {
 
       {/* Grau de Risco INSS + Plano de Ação */}
       <GrauRiscoInssCard />
-
-      {/* Correlações de Risco Clima × COPSOQ */}
-      {hasClima && topCorrelacoes.length > 0 && (
-        <Card className="border-[hsl(var(--nr1-primary)/0.3)]">
-          <CardHeader className="pb-2">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <GitCompare className="h-4 w-4 nr1-text-primary" />
-                  Correlações de Risco — Clima × COPSOQ
-                </CardTitle>
-                <CardDescription className="text-xs">
-                  Top {topCorrelacoes.length} dimensões com convergência crítica entre os dois instrumentos.
-                </CardDescription>
-              </div>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/nr1/clima/correlacao">Ver análise completa <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {topCorrelacoes.map((c, i) => (
-                <li key={`${c.clima_dim}-${i}`} className="flex items-center justify-between gap-3 p-2 rounded-md border bg-card">
-                  <div className="flex items-center gap-2 min-w-0">
-                    {c.prioridade === 'causa_raiz' ? (
-                      <Badge className="bg-orange-100 text-orange-700 border-orange-300">Causa raiz</Badge>
-                    ) : (
-                      <Badge variant="outline" className="border-amber-400 text-amber-700">Atenção</Badge>
-                    )}
-                    <span className="text-sm font-medium truncate">
-                      {CLIMA_LABEL[c.clima_dim as ClimaDimensao] ?? c.clima_dim}
-                    </span>
-                    <span className="text-xs text-muted-foreground hidden sm:inline">↔ {DIMENSAO_LABEL[c.copsoq_dim as Dimensao] ?? c.copsoq_dim}</span>
-                  </div>
-                  <div className="text-xs tabular-nums text-muted-foreground whitespace-nowrap">
-                    Clima {c.clima_score?.toFixed(1) ?? '—'}/5 · COPSOQ {c.copsoq_score_raw?.toFixed(0) ?? '—'}/100
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
-
-
-
-
 
 
       <div className="grid gap-4 md:grid-cols-3">

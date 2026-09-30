@@ -72,7 +72,7 @@ Recomendação de uso: o manual deve ser lido por RH, SESMT e CIPA antes da aber
     nome: 'Copenhagen Psychosocial Questionnaire (versão III)',
     origem: 'Instituto Nacional de Saúde Ocupacional da Dinamarca (NRCWE), 2019.',
     proposito: 'Avaliar fatores psicossociais no trabalho em 6 dimensões: Demandas, Organização e Conteúdo, Relações e Liderança, Interface Trabalho-Indivíduo, Valores no Trabalho e Saúde e Bem-Estar.',
-    comoUsamos: 'Base do diagnóstico psicossocial NR-1. Cada questão é pontuada de 0 a 4 e convertida em score 0-100 por dimensão. Risco classificado em Baixo (≤25), Moderado (26-50), Alto (51-75) e Crítico (>75).',
+    comoUsamos: 'Base do diagnóstico psicossocial NR-1. Cada questão é pontuada de 0 a 4 e convertida em score 0-100 por dimensão. Risco classificado em Baixo (≤40), Moderado (41-60), Alto (61-80) e Crítico (>80).',
     baseLegal: 'NR-1, item 1.5.3.2 — identificação de perigos e avaliação de riscos psicossociais.',
     referencia: 'Burr, H. et al. (2019). The Third Version of the Copenhagen Psychosocial Questionnaire. Safety and Health at Work, 10(4).',
   },

@@ -11,7 +11,7 @@ const SYSTEM_PROMPT = `Você é o "Bem-Estar", agente de IA EXPERT em NR-1 (Port
 
 ## SEU ESCOPO (profundidade de especialista)
 1. **NR-1 e legislação correlata** (NR-17 ergonomia, NR-7 PCMSO, eSocial S-2240, LGPD, ISO 45003:2021, CID-11): explique obrigações, prazos, multas (R$ 670 a R$ 6.708 por infração), evidências e como cumprir.
-2. **Riscos psicossociais (COPSOQ-III, HSE Management Standards, JD-R, Karasek)**: ajude a interpretar resultados das **6 dimensões do COPSOQ-III** — Demandas no Trabalho, Organização e Conteúdo, Relações e Liderança, Interface Trabalho-Indivíduo, Valores no Trabalho, Saúde e Bem-Estar — e sua **correlação com os 13 fatores de risco psicossocial da NR-1** (já mapeados em /nr1/fib).
+2. **Riscos psicossociais (COPSOQ-III, HSE Management Standards, JD-R, Karasek)**: interprete apenas resultados agregados das 6 dimensões e sua correlação com os 13 fatores psicossociais da NR-1.
 3. **Saúde mental e emocional**: aborde burnout (CID-11 QD85), ansiedade, depressão, assédio moral/sexual, segurança psicológica (Edmondson), regulação emocional, estresse ocupacional, fadiga por compaixão, intervenções baseadas em evidência (TCC, mindfulness, EAP, PGE).
 4. **Planos de ação**: sugira intervenções práticas, baseadas em evidência científica, priorizadas por gravidade × esforço; proponha metas SMART, indicadores e responsáveis.
 5. **Cruzamento estratégico**: conecte dados psicossociais com performance (9Box) e remuneração para mostrar impacto financeiro (turnover, absenteísmo, presenteísmo).
@@ -19,7 +19,7 @@ const SYSTEM_PROMPT = `Você é o "Bem-Estar", agente de IA EXPERT em NR-1 (Port
 
 ## INSTRUMENTOS — USO CORRETO
 - **Quick Screening (subset DASS-21, 5–7 itens):** triagem rápida derivada do DASS-21 original (21 itens, validado por Lovibond & Lovibond, 1995). NUNCA chame o subset de "DASS-21 completo" — é apenas um *screening* para sinalizar necessidade de aprofundamento. Resultado positivo NÃO equivale a diagnóstico clínico.
-- **Diagnóstico Completo (COPSOQ-III, 6 dimensões / ~40 itens):** instrumento validado (Kristensen et al.; versão brasileira COPSOQ-III-BR). As 6 dimensões devem ser sempre apresentadas mapeadas aos **13 fatores de risco psicossocial da NR-1** para coerência regulatória — esse cruzamento já está disponível na biblioteca em /nr1/fib.
+- **Diagnóstico Completo (COPSOQ-III, 6 dimensões / ~40 itens):** instrumento validado (Kristensen et al.; versão brasileira COPSOQ-III-BR). Mapeie as dimensões aos 13 fatores da NR-1.
 - **Não confunda:** "13 fatores NR-1" ≠ "perguntas COPSOQ". Sempre explicite a relação.
 
 ## METODOLOGIA: PLANO SUSTENTÁVEL DE NR-1 (ciclo PDCA + ISO 45003)
@@ -96,13 +96,6 @@ async function buildCompanyContext(supabase: any, userId: string): Promise<strin
       .eq("id", companyId)
       .maybeSingle();
 
-    // Contexto demográfico do colaborador atual (cargo, área, modalidade, tempo de empresa)
-    const { data: me } = await supabase
-      .from("profiles")
-      .select("full_name, job_title, department, work_modality, hire_date, leadership_level")
-      .eq("id", userId)
-      .maybeSingle();
-
     const { data: diags } = await supabase
       .from("nr1_diagnosticos")
       .select("ciclo_nome, periodo_inicio, periodo_fim, score_geral, nivel_risco, total_respondentes, scores_dimensao, status")
@@ -114,28 +107,11 @@ async function buildCompanyContext(supabase: any, userId: string): Promise<strin
     let ctx = `- Empresa: ${company?.name ?? "(sem nome)"}\n`;
     if (company?.industry_sector) ctx += `- Setor: ${company.industry_sector}\n`;
 
-    if (me) {
-      const modalidadeLabel: Record<string, string> = {
-        presencial: "Presencial",
-        home_office: "Home Office",
-        hibrido: "Híbrido",
-      };
-      ctx += `- Colaborador: ${me.full_name ?? "(sem nome)"}\n`;
-      if (me.job_title) ctx += `  • Cargo: ${me.job_title}\n`;
-      if (me.department) ctx += `  • Área/Departamento: ${me.department}\n`;
-      if (me.leadership_level) ctx += `  • Nível de liderança: ${me.leadership_level}\n`;
-      if (me.work_modality) ctx += `  • Modalidade de trabalho: ${modalidadeLabel[me.work_modality] ?? me.work_modality}\n`;
-      if (me.hire_date) {
-        const anos = Math.max(0, Math.floor((Date.now() - new Date(me.hire_date).getTime()) / (1000 * 60 * 60 * 24 * 365)));
-        ctx += `  • Tempo de empresa: ~${anos} ano(s) (admissão ${me.hire_date})\n`;
-      }
-    }
-
     if (!diags || diags.length === 0) {
       ctx += "- Diagnósticos NR-1: nenhum diagnóstico concluído ainda. Sugira iniciar um diagnóstico em /nr1/diagnostico/novo.\n";
     } else {
       ctx += `- Diagnósticos concluídos (mais recentes):\n`;
-      for (const d of diags) {
+      for (const d of diags.filter((diag: any) => Number(diag.total_respondentes) >= 5)) {
         ctx += `  • ${d.ciclo_nome} (${d.periodo_inicio} a ${d.periodo_fim}) — score ${d.score_geral ?? "—"}/100, risco ${d.nivel_risco ?? "—"}, ${d.total_respondentes} respondentes\n`;
         if (d.scores_dimensao && typeof d.scores_dimensao === "object") {
           const dims = Object.entries(d.scores_dimensao as Record<string, number>)
