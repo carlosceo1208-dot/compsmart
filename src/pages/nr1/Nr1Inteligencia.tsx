@@ -46,7 +46,9 @@ export default function Nr1Inteligencia() {
   const hasCore = moduleAccess.hasModule('core');
   const hasInsight = moduleAccess.hasModule('insight');
   const hasPotential = moduleAccess.hasModule('potencial-sucessao');
-  const hasCompensation = hasCore || hasInsight;
+  // Cruzamentos exigem cada módulo de origem contratado (Core é sempre ativo).
+  const hasCompensation = hasInsight;
+  const hasCross = moduleAccess.hasAllModules(['nr1', 'potencial-sucessao', 'insight']);
   const hasPerformance = hasCore;
 
   const { data, isLoading } = useNr1Intelligence(
@@ -144,7 +146,7 @@ export default function Nr1Inteligencia() {
               icon={Users}
               label="Talentos analisados"
               value={
-                <ModuleGate mode="inline" moduleSlug="potencial-sucessao" featureName="Avaliação de Potencial e Sucessão">
+                <ModuleGate mode="inline" moduleSlugs={["nr1", "potencial-sucessao"]} requireAll featureName="Avaliação de Potencial e Sucessão">
                   {`${data.kpis.totalColab}`}
                 </ModuleGate>
               }
@@ -154,7 +156,7 @@ export default function Nr1Inteligencia() {
               icon={DollarSign}
               label="Salário médio"
               value={
-                <ModuleGate mode="inline" moduleSlugs={["core", "insight"]} featureName="Remuneração & Equidade">
+                <ModuleGate mode="inline" moduleSlugs={["nr1", "potencial-sucessao", "insight"]} requireAll featureName="Remuneração & Equidade">
                   {fmtBRL(data.kpis.avgSalGeral || 0)}
                 </ModuleGate>
               }
@@ -165,7 +167,7 @@ export default function Nr1Inteligencia() {
               value={
                 <ModuleGate
                   mode="inline"
-                  moduleSlugs={hasCore ? ["potencial-sucessao", "core"] : ["potencial-sucessao", "insight"]}
+                  moduleSlugs={["nr1", "potencial-sucessao", "insight"]}
                   requireAll
                   featureName="Risco × Potencial × Remuneração"
                   ctaLabel="Ativar módulos necessários"
@@ -173,13 +175,13 @@ export default function Nr1Inteligencia() {
                   {fmtBRL(data.kpis.custoTurnoverEstimado)}
                 </ModuleGate>
               }
-              hint={hasPotential && hasCompensation ? 'Estrelas em ambiente de risco' : undefined}
-              danger={hasPotential && hasCompensation && data.kpis.custoTurnoverEstimado > 0}
+              hint={hasCross ? 'Estrelas em ambiente de risco' : undefined}
+              danger={hasCross && data.kpis.custoTurnoverEstimado > 0}
             />
           </div>
 
           {/* Insights acionáveis */}
-          {data.unitInsights.flatMap((u) => u.alertas.map((a) => ({ unit: u.unitName, msg: a }))).length > 0 && (
+          {hasCross && data.unitInsights.flatMap((u) => u.alertas.map((a) => ({ unit: u.unitName, msg: a }))).length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -231,7 +233,7 @@ export default function Nr1Inteligencia() {
               </CardContent>
             </Card>
 
-            <ModuleGate mode="section" moduleSlug="potencial-sucessao" featureName="Distribuição 9Box por Unidade">
+            <ModuleGate mode="section" moduleSlugs={["nr1", "potencial-sucessao"]} requireAll featureName="Distribuição 9Box por Unidade">
               <Card>
                 <CardHeader>
                   <CardTitle>Distribuição 9Box por Unidade</CardTitle>
@@ -261,6 +263,7 @@ export default function Nr1Inteligencia() {
           </div>
 
           {/* Tabela cruzada */}
+          <ModuleGate mode="section" moduleSlugs={["nr1", "potencial-sucessao", "insight"]} requireAll featureName="Cruzamento NR-1 × Performance × Remuneração" ctaLabel="Ativar módulos necessários">
           <Card>
             <CardHeader>
               <CardTitle>Detalhamento por Unidade</CardTitle>
@@ -315,6 +318,7 @@ export default function Nr1Inteligencia() {
               </Table>
             </CardContent>
           </Card>
+          </ModuleGate>
 
           <div className="flex justify-end">
             <Button variant="outline" asChild>
