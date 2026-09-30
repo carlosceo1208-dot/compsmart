@@ -53,7 +53,7 @@ const METODOLOGIAS: Metodologia[] = [
 
 2) Papéis e responsabilidades — RH conduz o ciclo, SESMT valida tecnicamente, CIPA participa do plano de ação (Lei 14.457/2022), gestores executam e colaboradores respondem de forma anônima e voluntária. Super-admin nunca acessa resposta individual.
 
-3) Passo a passo do diagnóstico — (a) abertura do ciclo, (b) aceite de consentimento LGPD versionado, (c) aplicação do Quick Screening (DASS-21 subset, 5–7 itens), (d) Diagnóstico Completo COPSOQ-III (40 itens / 6 dimensões), (e) consolidação com mínimo de 5 respondentes por recorte (k-anonimato), (f) classificação de risco por dimensão (Baixo ≤25, Moderado 26–50, Alto 51–75, Crítico >75), (g) plano de ação opcionalmente vinculado ao colaborador apenas com consentimento explícito.
+3) Passo a passo do diagnóstico — (a) abertura do ciclo, (b) aceite de consentimento LGPD versionado, (c) aplicação do Quick Screening (DASS-21 subset, 5–7 itens), (d) Diagnóstico Completo COPSOQ-III (40 itens / 6 dimensões), (e) consolidação com mínimo de 5 respondentes por recorte (k-anonimato), (f) classificação de risco por dimensão (Baixo ≤40, Moderado 41–60, Alto 61–80, Crítico >80), (g) plano de ação opcionalmente vinculado ao colaborador apenas com consentimento explícito.
 
 4) Plano de ação — modelo SMART por dimensão de risco, responsável, prazo e evidência. Ações típicas: redesenho de carga, treinamento de liderança, canal de denúncia de assédio, pausas estruturadas, política de desconexão, EAP. Toda ação alimenta o PGR.
 

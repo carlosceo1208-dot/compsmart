@@ -13,7 +13,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { ModuleGate } from '@/components/ModuleGate';
 import { useModuleAccess } from '@/hooks/useModuleAccess';
 
 import { useClimaCopsoqCorrelacao } from '@/hooks/useClimaCopsoqCorrelacao';
@@ -66,7 +65,7 @@ export default function Nr1Dashboard() {
           </CardContent>
         </Card>
       ) : (
-        <Card className="nr1-bg-soft border-[hsl(var(--nr1-primary)/0.2)]">
+        <Card id="plano-essencial" className="nr1-bg-soft border-[hsl(var(--nr1-primary)/0.2)] scroll-mt-6">
           <CardContent className="pt-6 flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
               <ShieldCheck className="h-8 w-8 nr1-text-primary" />
@@ -80,7 +79,7 @@ export default function Nr1Dashboard() {
             <div className="flex items-center gap-2">
               <Badge variant="outline">Conformidade Ativa</Badge>
               <Button asChild size="sm" className="nr1-bg-primary">
-                <Link to="/nr1/fib">Abrir Matriz de Risco <ArrowRight className="h-4 w-4 ml-1" /></Link>
+                <Link to="/nr1/matriz-risco">Abrir Matriz de Risco <ArrowRight className="h-4 w-4 ml-1" /></Link>
               </Button>
             </div>
           </CardContent>
@@ -91,14 +90,7 @@ export default function Nr1Dashboard() {
       <GrauRiscoInssCard />
 
       {/* Correlações de Risco Clima × COPSOQ */}
-      {!hasClima ? (
-        <ModuleGate
-          mode="card"
-          moduleSlug="clima"
-          featureName="Correlações de Risco — Clima × COPSOQ"
-          description="A análise cruzada de clima com riscos psicossociais exige o módulo Clima Organizacional."
-        />
-      ) : topCorrelacoes.length > 0 && (
+      {hasClima && topCorrelacoes.length > 0 && (
         <Card className="border-[hsl(var(--nr1-primary)/0.3)]">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between flex-wrap gap-2">
@@ -166,7 +158,7 @@ export default function Nr1Dashboard() {
               <Badge className={`${grauInfo.bg} ${grauInfo.cor} border`}>
                 Grau {grauInfo.grau} · {grauInfo.label}
               </Badge>
-            ) : ultimo?.nivel_risco ? (
+             ) : ultimo && ultimo.total_respondentes >= 5 && ultimo.nivel_risco ? (
               <Badge className={RISCO_CLASS[ultimo.nivel_risco as keyof typeof RISCO_CLASS]}>
                 {RISCO_LABEL[ultimo.nivel_risco as keyof typeof RISCO_LABEL]}
               </Badge>
@@ -184,7 +176,7 @@ export default function Nr1Dashboard() {
             <div>
               <CardTitle>Último Diagnóstico — {ultimo.ciclo_nome}</CardTitle>
               <CardDescription>
-                Score geral: {ultimo.score_geral?.toFixed(1) ?? '—'}/100
+                 {ultimo.total_respondentes < 5 ? 'Dados insuficientes — mínimo de 5 participantes' : `Score geral: ${ultimo.score_geral?.toFixed(1) ?? '—'}/100`}
               </CardDescription>
             </div>
             <Button variant="outline" size="sm" asChild>
@@ -192,7 +184,7 @@ export default function Nr1Dashboard() {
             </Button>
           </CardHeader>
           <CardContent>
-            {ultimo.scores_dimensao && typeof ultimo.scores_dimensao === 'object' ? (
+            {ultimo.total_respondentes >= 5 && ultimo.scores_dimensao && typeof ultimo.scores_dimensao === 'object' ? (
               <div className="grid gap-3 sm:grid-cols-2">
                 {Object.entries(ultimo.scores_dimensao as Record<string, number>).map(([dim, score]) => (
                   <div key={dim} className="flex items-center justify-between p-3 rounded-md border">
@@ -204,7 +196,7 @@ export default function Nr1Dashboard() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Sem dados por dimensão.</p>
+              <p className="text-sm text-muted-foreground">{ultimo.total_respondentes < 5 ? 'Dados insuficientes para exibir resultados por dimensão.' : 'Sem dados por dimensão.'}</p>
             )}
           </CardContent>
         </Card>
@@ -245,7 +237,7 @@ export default function Nr1Dashboard() {
                     <Link to={`/nr1/diagnostico/${c.id}`} className="min-w-0 flex-1">
                       <p className="text-sm font-medium truncate">{c.ciclo_nome}</p>
                       <p className="text-xs text-muted-foreground">
-                        {c.total_respondentes ?? 0} resp · Score {c.score_geral?.toFixed(1) ?? '—'}
+                         {c.total_respondentes ?? 0} resp · {c.total_respondentes < 5 ? 'Dados insuficientes' : `Score ${c.score_geral?.toFixed(1) ?? '—'}`}
                         {vazio && <span className="ml-1 text-amber-600">· vazio</span>}
                       </p>
                     </Link>

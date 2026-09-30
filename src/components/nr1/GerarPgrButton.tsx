@@ -13,8 +13,9 @@ import { toast } from 'sonner';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { useNr1PlanosAcao } from '@/hooks/useNr1PlanosAcao';
-import { gerarPgrPdf, type PgrDiagnosticoInput, type PgrInput } from '@/lib/nr1Pgr';
+import { gerarPgrExcel, gerarPgrPdf, type PgrDiagnosticoInput, type PgrInput } from '@/lib/nr1Pgr';
 import type { GrauRiscoInss } from '@/lib/nr1Risco';
+import * as XLSX from 'xlsx';
 
 interface Props {
   diagnostico?: PgrDiagnosticoInput | null;
@@ -40,7 +41,7 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
     const diags: PgrDiagnosticoInput[] = diagnostico
       ? [diagnostico]
       : (diagnosticos ?? [])
-          .filter((d) => d.status === 'concluido')
+          .filter((d) => d.status === 'concluido' && d.total_respondentes >= 5)
           .map((d) => ({
             ciclo_nome: d.ciclo_nome,
             periodo_inicio: d.periodo_inicio,
@@ -77,14 +78,21 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
     setPreviewUrl(null);
   };
 
-  const run = async (action: 'download' | 'print' | 'preview') => {
+  const run = async (action: 'download' | 'excel' | 'print' | 'preview') => {
     setLoading(true);
     try {
       const input = buildInput();
       if (!input) return;
-      const doc = gerarPgrPdf(input);
       const name = `PGR_${(activeCompany?.fantasy_name || activeCompany?.name || 'empresa').replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`;
       setFilename(name);
+
+      if (action === 'excel') {
+        XLSX.writeFile(gerarPgrExcel(input), name.replace(/\.pdf$/i, '.xlsx'));
+        toast.success('Laudo Excel baixado com sucesso');
+        return;
+      }
+
+      const doc = gerarPgrPdf(input);
 
       if (action === 'download') {
         doc.save(name);
@@ -151,6 +159,9 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuItem onClick={() => run('download')}>
             <Download className="h-4 w-4 mr-2" /> Baixar PDF
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => run('excel')}>
+            <FileCheck2 className="h-4 w-4 mr-2" /> Baixar Excel
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => run('preview')}>
             <Eye className="h-4 w-4 mr-2" /> Visualizar

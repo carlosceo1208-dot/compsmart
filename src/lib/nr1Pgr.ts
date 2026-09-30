@@ -5,6 +5,7 @@ import autoTable from 'jspdf-autotable';
 import { DIMENSAO_LABEL, RISCO_LABEL, type Dimensao } from './nr1';
 import { GRAU_RISCO_INSS, type GrauRiscoInss } from './nr1Risco';
 import type { Nr1PlanoAcao } from '@/hooks/useNr1PlanosAcao';
+import * as XLSX from 'xlsx';
 
 export interface PgrDiagnosticoInput {
   ciclo_nome: string;
@@ -71,8 +72,8 @@ export function gerarPgrPdf(input: PgrInput): jsPDF {
     '6 dimensões: Demandas no Trabalho, Organização e Conteúdo, Relações e Liderança, Interface ' +
     'Trabalho-Indivíduo, Valores no Trabalho e Saúde & Bem-Estar. As respostas são coletadas de forma ' +
     'anônima (hash SHA-256 do respondente, em conformidade com a LGPD) e os scores são normalizados ' +
-    'em escala 0–100, classificados em quatro níveis: Baixo (0–25), Moderado (26–50), Alto (51–75) e ' +
-    'Crítico (76–100). Esta metodologia atende aos requisitos da NR-1 (itens 1.5.3 a 1.5.5) quanto à ' +
+    'em escala 0–100, classificados em quatro níveis: Baixo (0–40), Moderado (41–60), Alto (61–80) e ' +
+    'Crítico (81–100). Esta metodologia atende aos requisitos da NR-1 (itens 1.5.3 a 1.5.5) quanto à ' +
     'identificação, avaliação e controle de riscos ocupacionais de natureza psicossocial.';
   const lines = doc.splitTextToSize(metodologia, W - 28);
   doc.text(lines, 14, y); y += lines.length * 5 + 6;
@@ -94,7 +95,7 @@ export function gerarPgrPdf(input: PgrInput): jsPDF {
       head: [['Dimensão Psicossocial', 'Score (0-100)', 'Nível']],
       body: dims.map(([d, s]) => {
         const n = Number(s);
-        const nivel = n <= 25 ? 'Baixo' : n <= 50 ? 'Moderado' : n <= 75 ? 'Alto' : 'Crítico';
+        const nivel = n <= 40 ? 'Baixo' : n <= 60 ? 'Moderado' : n <= 80 ? 'Alto' : 'Crítico';
         return [DIMENSAO_LABEL[d as Dimensao] ?? d, n.toFixed(1), nivel];
       }),
       styles: { fontSize: 9 },
@@ -170,4 +171,33 @@ export function gerarPgrPdf(input: PgrInput): jsPDF {
   }
 
   return doc;
+}
+
+export function gerarPgrExcel(input: PgrInput): XLSX.WorkBook {
+  const workbook = XLSX.utils.book_new();
+  const resumo = input.diagnosticos.map((diag) => ({
+    Ciclo: diag.ciclo_nome,
+    'Período inicial': diag.periodo_inicio,
+    'Período final': diag.periodo_fim ?? '',
+    Respondentes: diag.total_respondentes,
+    'Score geral': diag.score_geral ?? '',
+    'Nível de risco': diag.nivel_risco ? RISCO_LABEL[diag.nivel_risco as keyof typeof RISCO_LABEL] : '',
+  }));
+  const dimensoes = input.diagnosticos.flatMap((diag) => Object.entries(diag.scores_dimensao ?? {}).map(([dimensao, score]) => ({
+    Ciclo: diag.ciclo_nome,
+    'Dimensão psicossocial': DIMENSAO_LABEL[dimensao as Dimensao] ?? dimensao,
+    'Score (0-100)': Number(score),
+    Nível: Number(score) <= 40 ? 'Baixo' : Number(score) <= 60 ? 'Moderado' : Number(score) <= 80 ? 'Alto' : 'Crítico',
+  })));
+  const acoes = input.planoAcao.map((acao) => ({
+    Ação: acao.titulo,
+    Dimensão: acao.dimensao ? DIMENSAO_LABEL[acao.dimensao as Dimensao] ?? acao.dimensao : '',
+    Responsável: acao.responsavel ?? '', Prazo: acao.prazo ?? '',
+    Prioridade: PRIORIDADE_LABEL[acao.prioridade] ?? acao.prioridade,
+    Status: STATUS_LABEL[acao.status] ?? acao.status, 'Progresso (%)': acao.progresso,
+  }));
+  XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(resumo), 'Resumo');
+  XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dimensoes), 'Dimensões');
+  XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(acoes), 'Plano de Ação');
+  return workbook;
 }

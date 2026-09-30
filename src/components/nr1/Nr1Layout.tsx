@@ -1,314 +1,224 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type ComponentType } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Activity, Brain, FileText, ListChecks, ArrowLeft, Sparkles, Grid3x3, Shield, Users, GitBranch, UserCheck, ShieldAlert, ClipboardCheck, HeartPulse, Library, Heart, CalendarCheck, ClipboardList, BarChart3, LayoutGrid, DollarSign, Building2, Upload, Lock, FileSearch } from 'lucide-react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import {
+  Activity, ArrowLeft, BookOpen, Brain, Building2, CalendarCheck, ChevronDown,
+  ClipboardCheck, FileSearch, FileText, GitBranch, Grid3x3, Heart, HeartPulse,
+  History, Library, Shield, ShieldAlert, Sparkles, Upload, UserCheck, Users,
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
-import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
-import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
-import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
-import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useModuleAccess, type ModuleSlug } from '@/hooks/useModuleAccess';
-import { toast } from 'sonner';
+import { Nr1BemEstarFloating } from '@/components/nr1/Nr1BemEstarFloating';
+import { Nr1ConsentGate } from '@/components/nr1/Nr1ConsentGate';
+import { Nr1ImportarMatrizDialog } from '@/components/nr1/Nr1ImportarMatrizDialog';
+import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
+import { cn } from '@/lib/utils';
 
+type NavAction = 'open-terceiros' | 'open-import-matriz';
+type NavItem = {
+  to?: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  end?: boolean;
+  action?: NavAction;
+  desc: string;
+};
+type JourneyGroup = { step: number; title: string; helper: string; items: NavItem[] };
 
-type NavItem = { to?: string; label: string; icon: any; end?: boolean; highlight?: boolean; onClick?: () => void; action?: 'open-terceiros' | 'open-import-matriz'; desc?: string; actions?: string[]; shortcut?: { to: string; icon: any; label: string }; resource?: { url: string; icon: any; label: string }; moduleSlugs?: ModuleSlug[]; requireAll?: boolean };
-type NavGroup = { title: string; tone: 'nr1' | 'clima' | 'cruzamento' | 'fib' | 'jornada' | 'glossario'; items: NavItem[] };
-
-const GROUPS: NavGroup[] = [
+const JOURNEY_GROUPS: JourneyGroup[] = [
   {
-    title: 'NR-1',
-    tone: 'nr1',
+    step: 1,
+    title: 'Preparar',
+    helper: 'Organize a base e confirme as exigências legais.',
     items: [
-      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true, desc: 'Painel executivo com KPIs, score psicossocial e status de conformidade NR-1.', actions: ['Ver KPIs e score psicossocial', 'Acompanhar conformidade NR-1', 'Atalho rápido: Plano de Ação'], shortcut: { to: '/nr1/planos-acao', icon: ClipboardCheck, label: 'Ir para Plano de Ação' } },
-      { to: '/nr1/universo', label: 'Universo', icon: UserCheck, desc: 'Defina o universo elegível para diagnóstico (colaboradores ativos por unidade, área e cargo).', actions: ['Filtrar por unidade/área/cargo', 'Validar elegíveis', 'Exportar lista'] },
-      { to: '/nr1/fib', label: 'Matriz de Risco', icon: Grid3x3, desc: 'Matriz 5x5 de probabilidade × severidade dos riscos psicossociais identificados.', actions: ['Visualizar matriz 5x5', 'Classificar riscos', 'Gerar plano a partir do risco'] },
-      { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: Shield, desc: 'Mede confiança, abertura para erros e voz ativa nas equipes.', actions: ['Ver score por equipe', 'Comparar áreas', 'Recomendações de IA'] },
-      { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users, desc: 'Recortes por gênero, faixa etária, raça/cor e PCD para análise de equidade.', actions: ['Filtrar recortes', 'Comparar grupos', 'Exportar relatório'] },
-      { to: '/nr1/etapas', label: 'Etapas', icon: GitBranch, desc: 'Roteiro guiado: PGR, diagnóstico, plano de ação e governança NR-1.', actions: ['Avançar etapas do PGR', 'Marcar conclusão', 'Anexar evidências'] },
-      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText, desc: 'Iniciar novo ciclo COPSOQ-III com convites anônimos aos colaboradores.', actions: ['Criar ciclo', 'Enviar convites anônimos', 'Configurar prazo'] },
-      { to: '/nr1/diagnosticos', label: 'Histórico', icon: ListChecks, desc: 'Histórico de ciclos concluídos, evolução de score e comparativo entre períodos.', actions: ['Ver ciclos anteriores', 'Comparar períodos', 'Exportar relatórios'] },
-      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck, desc: 'Ações corretivas e preventivas com responsáveis, prazos, evidências e aprovação.', actions: ['Criar nova ação', 'Aprovar / rejeitar / solicitar revisão', 'Acompanhar prazos e progresso'] },
-      { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros', desc: 'Cadastro e monitoramento de fornecedores quanto à conformidade NR-1.', actions: ['Cadastrar fornecedor', 'Avaliar conformidade', 'Exportar relatório'] },
-      { label: 'Importar Matriz de Risco', icon: Upload, action: 'open-import-matriz', desc: 'Importar matriz de risco existente (planilha) para a plataforma.', actions: ['Baixar template', 'Subir planilha', 'Validar importação'] },
-      { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse, desc: 'Indicadores de absenteísmo, afastamentos e saúde ocupacional.', actions: ['Ver absenteísmo', 'Afastamentos por causa', 'Tendências mensais'] },
-      { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles, desc: 'Insights e recomendações geradas por IA com base no diagnóstico e ações.', actions: ['Gerar insights por IA', 'Recomendações priorizadas', 'Aplicar ao plano'] },
+      { to: '/nr1/painel', label: 'Visão Geral', icon: Activity, end: true, desc: 'Indicadores, conformidade e andamento do programa.' },
+      { to: '/nr1/painel#plano-essencial', label: 'Plano NR-1 Essencial', icon: Shield, desc: 'Grau CNAE/INSS, exigências e situação de conformidade.' },
+      { to: '/nr1/universo', label: 'Universo', icon: UserCheck, desc: 'Defina os colaboradores elegíveis para o diagnóstico.' },
     ],
   },
   {
-    title: 'Clima Organizacional',
-    tone: 'clima',
+    step: 2,
+    title: 'Diagnosticar',
+    helper: 'Crie o ciclo e acompanhe as etapas do programa.',
     items: [
-      { to: '/nr1/clima', label: 'Pesquisa de Clima 360°', icon: ClipboardList, highlight: true, moduleSlugs: ['clima'], desc: 'Pesquisa de clima 360° com correlação automática às dimensões NR-1.', actions: ['Criar pesquisa', 'Enviar convites', 'Ver resultados e correlação NR-1'] },
+      { to: '/nr1/diagnostico/novo', label: 'Novo Diagnóstico', icon: FileText, desc: 'Crie um novo ciclo de diagnóstico COPSOQ-III.' },
+      { to: '/nr1/etapas', label: 'Etapas do Programa', icon: GitBranch, desc: 'Siga o roteiro de preparação, mensuração e transformação.' },
     ],
   },
   {
-    title: 'Cruzamento Riscos Psicossociais',
-    tone: 'cruzamento',
+    step: 3,
+    title: 'Agir',
+    helper: 'Priorize riscos e transforme achados em ações.',
     items: [
-      { to: '/performance/evaluations', label: 'Avaliação de Desempenho', icon: BarChart3, moduleSlugs: ['core'], desc: 'Cruza performance individual com fatores de risco psicossocial.', actions: ['Ver avaliações', 'Cruzar com NR-1', 'Identificar alertas'] },
-      { to: '/performance/9box', label: '9Box', icon: LayoutGrid, moduleSlugs: ['potencial-sucessao'], desc: 'Matriz 9Box (performance × potencial) correlacionada ao bem-estar.', actions: ['Posicionar talentos', 'Cruzar com bem-estar', 'Planos de sucessão'] },
-      { to: '/nr1/clima', label: 'Pesquisa de Clima', icon: ClipboardList, moduleSlugs: ['clima'], desc: 'Resultados de clima cruzados com dimensões NR-1.', actions: ['Ver clima x NR-1', 'Filtrar por área', 'Exportar análise'] },
-      { to: '/dashboard', label: 'Remuneração', icon: DollarSign, moduleSlugs: ['core', 'insight'], desc: 'Cruza equidade salarial e competitividade com fatores psicossociais.', actions: ['Ver equidade salarial', 'Comparar com mercado', 'Identificar gaps'] },
+      { to: '/nr1/matriz-risco', label: 'Matriz de Risco', icon: Grid3x3, desc: 'Avalie probabilidade e severidade dos riscos psicossociais.' },
+      { to: '/nr1/planos-acao', label: 'Plano de Ação', icon: ClipboardCheck, desc: 'Gerencie responsáveis, prazos, evidências e aprovações.' },
     ],
   },
   {
-    title: 'Índice de Felicidade',
-    tone: 'fib',
+    step: 4,
+    title: 'Acompanhar',
+    helper: 'Cuide da jornada e acompanhe os check-ups semanais.',
     items: [
-      { to: '/nr1/fib-bem-estar', label: 'FIB', icon: Heart, moduleSlugs: ['nr1'], desc: 'Felicidade Interna Bruta: medição contínua do bem-estar dos colaboradores.', actions: ['Ver FIB atual', 'Tendência histórica', 'Comparar áreas'] },
-    ],
-  },
-  {
-    title: 'Acompanhamento Colaborador',
-    tone: 'jornada',
-    items: [
-      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, moduleSlugs: ['nr1'], desc: 'Jornada pessoal de bem-estar com trilhas, conteúdos e check-ins.', actions: ['Acessar trilhas', 'Registrar check-in', 'Conteúdos recomendados'] },
-      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, moduleSlugs: ['nr1'], desc: 'Pulse semanal de humor e energia, com alertas para gestores.', actions: ['Responder pulse', 'Ver histórico', 'Alertas para gestor'] },
-    ],
-  },
-  {
-    title: 'Glossário',
-    tone: 'glossario',
-    items: [
-      { to: '/nr1/biblioteca', label: 'Metodologias & Biblioteca', icon: Library, desc: 'COPSOQ-III, NR-1, NBR ISO 45003, Manual Prático NR-1 e demais referências metodológicas.', actions: ['Consultar metodologias', 'Ler Manual Prático NR-1', 'Glossário NR-1'] },
-      { to: '/nr1/auditoria', label: 'Auditoria & Segurança', icon: FileSearch, desc: 'Logs de acesso, autenticação, atividade e alterações no Módulo NR-1 por usuário e empresa.', actions: ['Filtrar por usuário/empresa', 'Exportar CSV', 'Ver bloqueios e falhas de login'] },
+      { to: '/nr1/jornada', label: 'Minha Jornada', icon: Heart, desc: 'Acesse a jornada pessoal de bem-estar.' },
+      { to: '/nr1/acompanhamento', label: 'Check up Semanal', icon: CalendarCheck, desc: 'Registre e acompanhe os check-ups das 12 semanas.' },
     ],
   },
 ];
 
-const GROUP_STYLES: Record<NavGroup['tone'], { border: string; bg: string; title: string; dot: string }> = {
-  nr1:       { border: 'border-[hsl(var(--nr1-primary)/0.35)]', bg: 'bg-[hsl(var(--nr1-primary)/0.04)]', title: 'text-[hsl(var(--nr1-primary))]', dot: 'bg-[hsl(var(--nr1-primary))]' },
-  clima:     { border: 'border-[hsl(11_77%_60%/0.45)]',          bg: 'bg-[hsl(11_77%_60%/0.05)]',         title: 'text-[hsl(11_77%_45%)]',         dot: 'bg-[hsl(11_77%_55%)]' },
-  cruzamento:{ border: 'border-violet-300',                      bg: 'bg-violet-50/60',                   title: 'text-violet-700',                dot: 'bg-violet-500' },
-  fib:       { border: 'border-amber-300',                       bg: 'bg-amber-50/60',                    title: 'text-amber-700',                 dot: 'bg-amber-500' },
-  jornada:   { border: 'border-sky-300',                         bg: 'bg-sky-50/60',                      title: 'text-sky-700',                   dot: 'bg-sky-500' },
-  glossario: { border: 'border-slate-300',                       bg: 'bg-slate-50/70',                    title: 'text-slate-700',                 dot: 'bg-slate-500' },
-};
+const EXTRA_ITEMS: NavItem[] = [
+  { to: '/nr1/diagnosticos', label: 'Histórico', icon: History, desc: 'Consulte e compare os ciclos de diagnóstico.' },
+  { label: 'Importar Matriz', icon: Upload, action: 'open-import-matriz', desc: 'Importe uma matriz existente com validação prévia.' },
+  { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros', desc: 'Acompanhe a conformidade dos fornecedores.' },
+  { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse, desc: 'Acompanhe indicadores de saúde ocupacional.' },
+  { to: '/nr1/inteligencia', label: 'Inteligência', icon: Sparkles, desc: 'Consulte recomendações geradas a partir dos resultados.' },
+  { to: '/nr1/seguranca-psicologica', label: 'Segurança Psicológica', icon: ShieldAlert, desc: 'Analise confiança, abertura e voz ativa nas equipes.' },
+  { to: '/nr1/sociodemografico', label: 'Sociodemográfico', icon: Users, desc: 'Consulte recortes agregados para análise de equidade.' },
+];
 
-const useIsSuperAdmin = () =>
-  useQuery({
-    queryKey: ['nr1-is-super-admin'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
-      const { data } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'super_admin')
-        .maybeSingle();
-      return !!data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+const FOOTER_ITEMS: NavItem[] = [
+  { to: '/nr1/biblioteca', label: 'Glossário / Metodologias & Biblioteca', icon: Library, desc: 'Consulte referências e metodologias do programa.' },
+  { to: '/nr1/auditoria', label: 'Auditoria & Segurança', icon: FileSearch, desc: 'Consulte acessos, atividades e eventos de segurança.' },
+];
+
+const useIsSuperAdmin = () => useQuery({
+  queryKey: ['nr1-is-super-admin'],
+  queryFn: async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+    const { data } = await supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'super_admin').maybeSingle();
+    return Boolean(data);
+  },
+  staleTime: 5 * 60 * 1000,
+});
 
 export const Nr1Layout = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  const { data: isSuper } = useIsSuperAdmin();
-  const moduleAccess = useModuleAccess();
   const navRef = useRef<HTMLDivElement | null>(null);
+  const { data: isSuper } = useIsSuperAdmin();
+  const { data: subscription } = useNr1Subscription();
+  const { data: diagnostics } = useNr1Diagnosticos();
+  const [extrasOpen, setExtrasOpen] = useState(false);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
   const [importMatrizOpen, setImportMatrizOpen] = useState(false);
 
+  const suggestedPath = !subscription?.grau_risco_inss
+    ? '/nr1/painel#plano-essencial'
+    : !diagnostics?.length
+      ? '/nr1/diagnostico/novo'
+      : '/nr1/planos-acao';
 
+  const isActive = (item: NavItem) => {
+    if (!item.to) return false;
+    const [path] = item.to.split('#');
+    return item.end ? location.pathname === path : location.pathname.startsWith(path);
+  };
+
+  const handleAction = (action?: NavAction) => {
+    if (action === 'open-terceiros') setTerceirosOpen(true);
+    if (action === 'open-import-matriz') setImportMatrizOpen(true);
+  };
+
+  const renderItem = (item: NavItem, compact = false) => {
+    const Icon = item.icon;
+    const active = isActive(item);
+    const suggested = item.to === suggestedPath;
+    const content = (
+      <>
+        <Icon className={cn('shrink-0', compact ? 'h-3.5 w-3.5' : 'h-4 w-4')} />
+        <span className={cn('font-semibold', compact ? 'text-xs' : 'text-[11px] leading-tight text-center')}>{item.label}</span>
+        {suggested && !compact && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-warning" aria-label="Próximo passo sugerido" />}
+      </>
+    );
+    const classes = cn(
+      'relative transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+      compact
+        ? 'flex items-center gap-1.5 text-muted-foreground hover:text-foreground'
+        : 'flex min-h-[68px] w-full flex-col items-center justify-center gap-1 rounded-md border bg-card px-2 py-2.5 text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)] hover:text-[hsl(var(--nr1-primary))]',
+      active && !compact && 'border-[hsl(var(--nr1-primary))] bg-[hsl(var(--nr1-primary)/0.10)] text-[hsl(var(--nr1-primary))]',
+      suggested && !compact && 'ring-2 ring-warning/40',
+    );
+    const node = item.to ? (
+      <NavLink key={item.to} to={item.to} end={item.end} className={classes}>{content}</NavLink>
+    ) : (
+      <Button key={item.label} type="button" variant="ghost" onClick={() => handleAction(item.action)} className={cn(classes, 'h-auto')}>{content}</Button>
+    );
+    return (
+      <Tooltip key={item.to ?? item.label}>
+        <TooltipTrigger asChild>{node}</TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-[260px] text-xs">{item.desc}</TooltipContent>
+      </Tooltip>
+    );
+  };
 
   return (
     <TooltipProvider delayDuration={150}>
-    <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
-      {isSuper && (
-        <div className="bg-amber-100 border-b border-amber-300 text-amber-900 text-xs px-4 py-1.5 flex items-center gap-2 justify-center">
-          <ShieldAlert className="h-3.5 w-3.5" />
-          <span>
-            <strong>Modo Super Admin · CompSmart</strong> — alguns painéis podem exibir dados demonstrativos para validação interna.
-            Esses dados <strong>nunca</strong> são exibidos para clientes.
-          </span>
-        </div>
-      )}
-      <header className="border-b bg-card relative overflow-hidden">
-        <div
-          className="absolute inset-x-0 top-0 h-1"
-          style={{ background: 'linear-gradient(90deg, hsl(var(--nr1-primary)) 0%, hsl(160 70% 45%) 55%, hsl(var(--nr1-accent)) 100%)' }}
-          aria-hidden
-        />
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center nr1-bg-gradient shadow-md">
-              <Brain className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold leading-tight">Saúde Mental & Bem-Estar</h1>
-              <p className="text-xs text-muted-foreground">Conformidade NR-1 · Riscos Psicossociais</p>
-            </div>
+      <div className="nr1-scope min-h-screen bg-gradient-to-b from-[hsl(var(--nr1-soft))] via-background to-background">
+        {isSuper && (
+          <div className="flex items-center justify-center gap-2 border-b border-warning/40 bg-warning-light px-4 py-1.5 text-xs text-foreground">
+            <ShieldAlert className="h-3.5 w-3.5" />
+            <span><strong>Modo Super Admin · CompSmart</strong> — alguns painéis podem exibir dados demonstrativos para validação interna.</span>
           </div>
-          <Button variant="ghost" size="sm" asChild className="hover:bg-[hsl(var(--nr1-primary)/0.08)] hover:text-[hsl(var(--nr1-primary))]">
-            <NavLink to="/dashboard"><ArrowLeft className="h-4 w-4 mr-1" />Voltar ao CompSmart</NavLink>
-          </Button>
-        </div>
-        <div className="container mx-auto px-4 pb-4">
-          <div ref={navRef} className="grid grid-cols-12 gap-3">
-            {GROUPS.map((group, idx) => {
-              const styles = GROUP_STYLES[group.tone];
-              // Layout spans: NR-1 = 8, Clima = 4 (top row). Demais = 4 cada (linha abaixo).
-              const span =
-                group.tone === 'nr1' ? 'col-span-12 lg:col-span-8'
-                : group.tone === 'clima' ? 'col-span-12 lg:col-span-4'
-                : group.tone === 'cruzamento' ? 'col-span-12'
-                : 'col-span-12 md:col-span-6 lg:col-span-4';
-              const innerCols =
-                group.tone === 'nr1'
-                  ? 'grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6'
-                  : group.tone === 'cruzamento'
-                    ? 'grid-cols-2 md:grid-cols-4'
-                    : group.items.length > 1
-                      ? 'grid-cols-2'
-                      : 'grid-cols-1';
-              return (
-                <section
-                  key={group.title}
-                  className={cn(
-                    'rounded-xl border-2 p-3 flex flex-col gap-2 shadow-sm',
-                    styles.border, styles.bg, span,
-                  )}
-                  aria-label={group.title}
-                >
-                  <header className="flex items-center gap-2 px-1">
-                    <span className={cn('h-2 w-2 rounded-full', styles.dot)} aria-hidden />
-                    <h2 className={cn('text-xs font-bold uppercase tracking-wide', styles.title)}>
-                      {group.title}
-                    </h2>
-                  </header>
-                  <div className={cn('grid gap-2', innerCols)}>
-                    {group.items.map((item) => {
-                      const Icon = item.icon;
-                      const requiredModules = item.moduleSlugs ?? [];
-                      const locked = requiredModules.length > 0 && !(item.requireAll ? moduleAccess.hasAllModules(requiredModules) : moduleAccess.hasAnyModule(requiredModules));
-                      const active = !locked && item.to
-                        ? (item.end ? location.pathname === item.to : location.pathname.startsWith(item.to))
-                        : false;
-                      const isTerceiros = item.action === 'open-terceiros';
-                      const isImportMatriz = item.action === 'open-import-matriz';
-                      const baseClass = cn(
-                        'group flex flex-col items-center justify-center text-center gap-1 px-2 py-2.5 rounded-lg border bg-card transition-all min-h-[64px] relative',
-                        locked
-                          ? 'opacity-60 cursor-not-allowed border-dashed border-muted-foreground/40 text-muted-foreground hover:border-muted-foreground/60 bg-muted/30'
-                          : active
-                          ? 'bg-[hsl(var(--nr1-primary)/0.10)] border-[hsl(var(--nr1-primary))] text-[hsl(var(--nr1-primary))] shadow-sm font-bold'
-                          : isTerceiros
-                          ? 'bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100 hover:border-blue-400 shadow-sm'
-                          : isImportMatriz
-                          ? 'bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100 hover:border-purple-400 shadow-sm'
-                          : item.highlight
-                          ? 'bg-[hsl(11_77%_60%/0.08)] border-[hsl(11_77%_60%/0.55)] text-[hsl(11_77%_45%)] hover:bg-[hsl(11_77%_60%/0.14)] hover:border-[hsl(11_77%_60%)] shadow-sm'
-                          : 'border-border text-muted-foreground hover:border-[hsl(var(--nr1-primary))] hover:text-[hsl(var(--nr1-primary))] hover:bg-[hsl(var(--nr1-primary)/0.05)]'
-                      );
-                      const iconClass = cn('h-4 w-4 shrink-0', locked ? 'text-muted-foreground/60' : active ? 'text-[hsl(var(--nr1-primary))]' : isTerceiros ? 'text-blue-600 group-hover:text-blue-700' : isImportMatriz ? 'text-purple-600 group-hover:text-purple-700' : item.highlight ? 'text-[hsl(11_77%_55%)]' : 'text-muted-foreground group-hover:text-[hsl(var(--nr1-primary))]');
-                      const inner = (
-                        <>
-                          {locked && (
-                            <span className="absolute top-1 right-1 bg-background border border-border rounded-full p-0.5 shadow-sm">
-                              <Lock className="h-2.5 w-2.5 text-muted-foreground" />
-                            </span>
-                          )}
-                          <Icon className={iconClass} />
-                          <span className="text-[11px] leading-tight font-semibold line-clamp-2">{item.label}</span>
-                        </>
-                      );
-                      const handleLockedClick = (e: React.MouseEvent) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const moduleNames = requiredModules.map((slug) => moduleAccess.getModuleName(slug));
-                        const cta = moduleNames.length === 1 ? `Ativar módulo ${moduleNames[0]}` : `Ativar ${moduleNames.join(item.requireAll ? ' e ' : ' ou ')}`;
-                        toast.info(cta, {
-                          description: 'Este módulo não está liberado para sua empresa. Entre em contato com a CompSmart para contratar.',
-                        });
-                      };
-                      const node = locked ? (
-                        <button
-                          key={item.to ?? item.label}
-                          type="button"
-                          onClick={handleLockedClick}
-                          aria-disabled
-                          className={cn(baseClass, 'w-full')}
-                        >
-                          {inner}
-                        </button>
-                      ) : !item.to ? (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onClick={() => {
-                            if (item.action === 'open-terceiros') setTerceirosOpen(true);
-                            if (item.action === 'open-import-matriz') setImportMatrizOpen(true);
-                            item.onClick?.();
-                          }}
-                          className={cn(baseClass, 'w-full')}
-                        >
-                          {inner}
-                        </button>
-                      ) : (
-                        <NavLink
-                          key={item.to}
-                          to={item.to}
-                          end={item.end}
-                          data-nr1-active={active}
-                          className={cn(baseClass, 'w-full')}
-                        >
-                          {inner}
-                        </NavLink>
-                      );
+        )}
+        <header className="border-b bg-card">
+          <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="nr1-bg-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-lg shadow-sm"><Brain className="h-5 w-5" /></div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg font-semibold leading-tight">Saúde Mental & Bem-Estar</h1>
+                  <Badge variant="destructive" className="text-[10px]">LEGAL OBRIGATÓRIO</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">Conformidade NR-1 · Riscos Psicossociais</p>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" asChild><NavLink to="/dashboard"><ArrowLeft className="mr-1 h-4 w-4" />Voltar</NavLink></Button>
+          </div>
 
-                      if (!item.desc) return node;
-                      return (
-                        <Tooltip key={item.to ?? item.label} delayDuration={150}>
-                          <TooltipTrigger asChild>{node}</TooltipTrigger>
-                          <TooltipContent side="bottom" className="max-w-[280px] text-xs leading-snug">
-                            <p className="font-semibold mb-0.5">{item.label}</p>
-                            <p className="text-muted-foreground">{item.desc}</p>
-                            {item.actions && item.actions.length > 0 && (
-                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
-                                <p className="font-semibold text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">Principais ações</p>
-                                <ul className="list-disc list-inside space-y-0.5">
-                                  {item.actions.map((a) => (
-                                    <li key={a}>{a}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {item.shortcut && (
-                              <div className="mt-1.5 pt-1.5 border-t border-border/50">
-                                <button
-                                  type="button"
-                                  onClick={() => navigate(item.shortcut!.to)}
-                                  className="text-[10px] text-[hsl(var(--nr1-primary))] font-semibold flex items-center gap-1 hover:underline cursor-pointer"
-                                >
-                                  <item.shortcut.icon className="h-3 w-3" />
-                                  {item.shortcut.label}
-                                </button>
-                              </div>
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      );
-                    })}
+          <div ref={navRef} className="container mx-auto px-4 pb-4">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {JOURNEY_GROUPS.map((group) => (
+                <section key={group.step} className="flex min-w-0 flex-col gap-2 rounded-lg border bg-background/70 p-3" aria-label={`${group.step}. ${group.title}`}>
+                  <div className="flex items-start gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--nr1-primary))] text-xs font-bold text-primary-foreground">{group.step}</span>
+                    <div>
+                      <h2 className="text-sm font-bold">{group.title}</h2>
+                      <p className="text-[11px] leading-snug text-muted-foreground">{group.helper}</p>
+                    </div>
+                  </div>
+                  <div className={cn('grid gap-2', group.items.length === 3 ? 'grid-cols-3' : 'grid-cols-2')}>
+                    {group.items.map((item) => renderItem(item))}
                   </div>
                 </section>
-              );
-            })}
+              ))}
+            </div>
+
+            <Collapsible open={extrasOpen} onOpenChange={setExtrasOpen} className="mt-3 rounded-lg border bg-background/60">
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" className="h-10 w-full justify-between rounded-lg px-3">
+                  <span className="flex items-center gap-2 text-sm font-semibold"><BookOpen className="h-4 w-4 nr1-text-primary" />Mais recursos</span>
+                  <ChevronDown className={cn('h-4 w-4 transition-transform', extrasOpen && 'rotate-180')} />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="border-t px-3 py-3">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">{EXTRA_ITEMS.map((item) => renderItem(item))}</div>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <nav aria-label="Referências e segurança" className="mt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t pt-3">
+              {FOOTER_ITEMS.map((item) => renderItem(item, true))}
+            </nav>
           </div>
-        </div>
-      </header>
-      <main className="container mx-auto px-4 py-6">
-        <Outlet />
-      </main>
-      <Nr1ConsentGate />
-      <Nr1BemEstarFloating />
-      <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
-      <Nr1ImportarMatrizDialog open={importMatrizOpen} onOpenChange={setImportMatrizOpen} />
-    </div>
+        </header>
+        <main className="container mx-auto px-4 py-6"><Outlet /></main>
+        <Nr1ConsentGate />
+        <Nr1BemEstarFloating />
+        <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
+        <Nr1ImportarMatrizDialog open={importMatrizOpen} onOpenChange={setImportMatrizOpen} />
+      </div>
     </TooltipProvider>
   );
 };

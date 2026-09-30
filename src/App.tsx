@@ -130,6 +130,7 @@ const Candidatos = lazy(() => import("./pages/recrutamento/Candidatos"));
 const LandingRecrutamento = lazy(() => import("./pages/public/LandingRecrutamento"));
 const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
+const Nr1Responder = lazy(() => import("./pages/public/Nr1Responder"));
 
 // Lazy — NR-1 Module
 const Nr1Layout = lazy(() => import("./components/nr1/Nr1Layout").then((m) => ({ default: m.Nr1Layout })));
@@ -331,6 +332,7 @@ const App = () => {
                       {/* URL comercial dedicada para anúncios pagos (Google Ads / Meta / LinkedIn) */}
                       <Route path="/landing-nr1" element={<LandingNr1Ads />} />
                       <Route path="/nr1/obrigado" element={<Nr1Obrigado />} />
+                      <Route path="/nr1/responder/:token" element={<Nr1Responder />} />
 
                       {/* NR-1 Module (authenticated) */}
                       <Route element={<Nr1Layout />}>
@@ -339,8 +341,9 @@ const App = () => {
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
                         <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
-                        <Route path="/nr1/fib" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="FIB — Felicidade Interna Bruta"><Nr1FIB /></ModuleGate>} />
-                        <Route path="/nr1/fib-bem-estar" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="FIB — Felicidade Interna Bruta"><Nr1FibCard /></ModuleGate>} />
+                        <Route path="/nr1/matriz-risco" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="Matriz de Risco"><Nr1FIB /></ModuleGate>} />
+                        <Route path="/nr1/fib" element={<Navigate to="/nr1/matriz-risco" replace />} />
+                        <Route path="/nr1/fib-bem-estar" element={<Navigate to="/nr1/clima" replace />} />
                        <Route path="/nr1/seguranca-psicologica" element={<Nr1SegPsi />} />
                        <Route path="/nr1/sociodemografico" element={<Nr1Sociodemografico />} />
                        <Route path="/nr1/etapas" element={<Nr1Etapas />} />
