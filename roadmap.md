@@ -110,3 +110,7 @@
 ## Varredura de segurança 2026-09-30
 - [ ] Opcional: revogar acesso de visitante a has_role/is_super_admin/get_user_company_id/import_employees_batch/employee_import_can_manage (hoje retornam vazio/recusam sem login)
 - [ ] Opcional: trocar policy {public} por {authenticated} em nr1_checkins_semanais e nr1_jornada_mensagens
+
+## BLOQUEADORES encontrados 2026-09-30 (aguardando aprovação)
+- [ ] calculate_transportation_benefit, check_employee_eligibility, compare_scenarios, get_unit_budget_status, simulate_9box_budget, check_budget_capacity, apply_merit_to_budget: sem checagem de empresa/papel
+- [ ] Retomar itens 3-6 da rodada final após correção
