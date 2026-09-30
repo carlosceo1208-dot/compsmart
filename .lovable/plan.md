@@ -34,3 +34,9 @@
 - `useSugestaoFaixa.ts` passa a chamar só `supabase.rpc('talent_sugerir_faixa')`, sem ler as tabelas direto. A lógica de casamento vai do cliente para a função. A nota em `VagaDialog.tsx` fica genérica.
 - As políticas de `survey_tables`/`survey_data` e `has_module` não mudam.
 - Registrar a regra em AGENTS.md ("sugestão de faixa só via talent_sugerir_faixa, retorno mínimo") e o item em roadmap.md. O relatório de segurança ganha uma linha nova (v3), classificada como exposição controlada.
+
+## Reforços antes de liberar
+1. **Origem sempre genérica:** o campo `fonte` só aceita três valores fixos: "pesquisa de mercado", "tabela salarial" ou "dados da empresa". Nunca aparece o nome, o id ou qualquer identificador da base global da CompSmart. O servidor impõe isso com um CASE fechado.
+2. **Teste de contrato do retorno:** a resposta tem exatamente 3 chaves (`min`, `max`, `fonte`), conferido com `jsonb_object_keys` (contagem = 3 e o conjunto igual). Não pode vir mediana, contagem nem lista. `fonte` precisa ser um dos 3 valores permitidos.
+3. **Erro explícito por papel:** para colaborador, visitante e outra empresa, a função lança erro (RAISE com código próprio) em vez de devolver vazio. "Sem faixa" (`null`) só vale para quem tem acesso. A tela trata o erro como erro e não mostra faixa vazia. Cada tentativa recusada fica registrada em `audit_logs`. No teste, cada papel precisa gerar erro, e não resposta vazia.
+4. **Comportamento documentado:** o roadmap.md e o AGENTS.md vão registrar que, sem o Insight, a sugestão pontual usa também os dados globais da CompSmart, e que isso é intencional (decisão do cliente), só com mínimo, máximo e origem genérica. O relatório v3 traz o mesmo registro.
