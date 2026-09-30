@@ -190,7 +190,8 @@ serve(async (req) => {
     // CREATE
     if (email) {
       // SECURITY: Strong random password; user must set their own via the invitation flow.
-      const randomPassword = crypto.randomUUID() + crypto.randomUUID() + 'Aa1!';
+      // Auth limits passwords to 72 chars: two UUIDs (72) + suffix exceeded it and broke every creation.
+      const randomPassword = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '').slice(0, 20) + 'Aa1!';
       // email_confirm: true to bypass SMTP confirmation step (which was returning 500
       // when the project's transactional email isn't configured for the verify endpoint).
       // The user still cannot log in until they set a password via the invitation flow.
