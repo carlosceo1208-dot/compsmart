@@ -94,5 +94,7 @@
 ## Fase 5 — validação final (aberto)
 - [x] Comparação de ciclos, telas de quem responde, Clima/FIB, rotas, card 1280/390, PGR/laudo PDF+Excel
 - [x] Corrigido: resposta anterior ficava marcada e travava "Próxima" no questionário anônimo
-- [ ] BLOQUEIO: admin do cliente passa por todas as travas de módulo (cruzamentos/Clima visíveis sem contratar) — aguardando aprovação para corrigir
-- [ ] Após correção: rodar bun run ci, apagar empresas/ciclos/logins [TESTE], foto final vs "antes"
+- [x] BLOQUEIO admin do cliente — corrigido
+- [x] bun run ci limpo, dados [TESTE] apagados, foto final = "antes"
+- [x] Travas de módulo: só super admin passa; Core sempre ativo; cruzamentos por módulo de origem (tela + servidor); testado e dados [TESTE] apagados
+- [ ] Pendente: 2 logins de teste sem papel/perfil ainda existem no cadastro de acesso (não há como apagar daqui)
