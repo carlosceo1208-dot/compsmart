@@ -12487,6 +12487,7 @@ export type Database = {
         Args: { p_reason?: string; p_source_id: string; p_source_type: string }
         Returns: string
       }
+      rh_admin_da_empresa: { Args: { _company: string }; Returns: boolean }
       rh_service_calcular_nivel: { Args: { _score: number }; Returns: string }
       rh_service_calcular_scores: {
         Args: { _diagnostico_id: string }
