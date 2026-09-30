@@ -12647,6 +12647,17 @@ export type Database = {
         Returns: Json
       }
       talent_slugify: { Args: { _t: string }; Returns: string }
+      talent_sugerir_faixa: {
+        Args: {
+          _cargo_id: string
+          _cbo: string
+          _company: string
+          _grade: string
+          _pontos?: number
+          _titulo: string
+        }
+        Returns: Json
+      }
       talent_upsert_candidato: {
         Args: {
           _cargo: string
