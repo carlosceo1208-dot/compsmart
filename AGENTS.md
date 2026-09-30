@@ -1,22 +1,9 @@
 # AGENTS.md
-- Leads status fixos: novo, em_contato, convertido, descartado. Why: fonte única para contadores e filtros.
-- "Responder" em /admin/leads marca em_contato ao abrir o mailto. Why: mailto não confirma envio.
-- SEO público só por src/config/seoRoutes.ts (SeoHead + seoPlugin). Why: uma lista mantém Helmet, sitemap e prerender alinhados.
-- /admin/leads usa submitted_at (`leads`) e created_at (`nr1_leads`); admin não edita essas datas. Why: Data = última submissão real.
-- /admin/leads junta `leads` + `nr1_leads` no cliente; NR-1 é somente leitura. Why: um painel para todos os funis sem migrar dados.
-- Vagas (talent) em `vagas` com root_company_id; cargo novo do CBO só entra em job_titles via RPC talent_link_or_create_job_title. Why: dedupe no servidor.
-- agent-talent manda ao modelo só dados da vaga, filtrando e-mail/CPF/telefone. Why: LGPD.
-- Cidades de vagas vêm do IBGE (cache 24h/7 dias localStorage); faixa sugerida vem de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais.
-- Candidatura pública só via edge function portal-candidatura: empresa vem da vaga no banco, PDF validado (%PDF, 5 MB), aceite LGPD grava data/versão/IP/navegador. Why: anônimo não decide empresa nem grava direto.
-- Currículo em curriculos/{empresa}/{candidato}.pdf; reenvio sobrescreve. Why: um currículo vigente por candidato.
-- Empresa mascarada no servidor (portal_listar_vagas/portal_vaga): confidencial só abre por link; logo/"Sobre a empresa" só saem se vaga pública e exibir_nome_empresa; logos em logos-vagas privado. Why: nome e imagem nunca revelam empresa oculta.
-- Anti-robô (candidatura/login/ativação): site key pública em src/components/auth/TurnstileWidget.tsx, segredo TURNSTILE_SECRET_KEY no cofre; sem token o botão não libera e falha vira "Tentar novamente". Why: widget que não renderiza travava o envio em "Verificando…".
-- Currículo só abre via edge function curriculo-download (blob no app), nunca link direto do storage. Why: extensões bloqueiam o domínio do storage.
-- Etapa de R&S só muda via RPC talent_mover_candidatura (histórico + etapa_desde + entrevista_em na mesma transação; mesma etapa é recusada). Why: auditoria sem buracos nem duplicatas.
-- agent-talent `acao: analisar` extrai texto do PDF no servidor, anonimiza (nome/e-mail/telefone/CPF/CEP/endereço/links), valida saída com Zod e só grava analise_talent; logs só com tamanhos/contagens. Why: LGPD e agente nunca move etapa sozinho.
-- Talent no cliente só via useFilaAnalise (máx. 2 em voo; 402/429 pausa sem reenvio; status por empresa). Why: evita custo duplicado e 429.
-- Maturidade: nível via nivelDoScore; público só por RPCs limitadas; respostas sem leitura direta; médias protegidas por maturidade_pode_gerir; gestores "Gestor N". Why: LGPD.
-- Consultor dono do cliente: consultor só acessa empresa onde é dono (rh_service_projetos.consultor_id → consultores.user_id = auth.uid(), ativo, em_andamento) via consultor_dono_ativo, usado em maturidade_pode_gerir, has_consultor_modulo_access e rh_service_can_read/write. Why: decisão dos sócios, sem visibilidade cruzada.
-- NR-1: 4 etapas visíveis; Psi só agregado k≥5; cruzamentos só em Clima com ambos módulos. Why: LGPD e autonomia.
-- Travas de módulo/plano: só super admin passa (exceto 'ver como cliente'); Core sempre ativo; cruzamentos exigem cada módulo de origem; has_module no banco segue a mesma regra. Why: admin de cliente não pode ver módulo não contratado.
-- Funções do servidor que recebem id de empresa/unidade/colaborador checam dentro via rh_admin_da_empresa (super admin, ou admin/RH da mesma empresa); gatilhos (pg_trigger_depth>0) passam. Why: fechar vazamento entre empresas no servidor.
+- SEO público só por src/config/seoRoutes.ts (SeoHead + seoPlugin). Why: Helmet, sitemap e prerender alinhados.
+- Anti-robô: site key pública em TurnstileWidget.tsx, segredo TURNSTILE_SECRET_KEY; sem token o botão não libera, falha vira "Tentar novamente". Why: evitar trava em "Verificando…".
+- Maturidade: nível via nivelDoScore; público só por RPCs limitadas; sem leitura direta de respostas; médias via maturidade_pode_gerir; gestores "Gestor N". Why: LGPD.
+- Consultor só acessa empresa onde é dono de projeto ativo em andamento (consultor_dono_ativo em maturidade_pode_gerir, has_consultor_modulo_access, rh_service_can_read/write). Why: decisão dos sócios.
+- NR-1: 4 etapas; Psi só agregado k≥5; cruzamentos só com os módulos de origem. Why: LGPD.
+- Travas de módulo: só super admin passa (exceto 'ver como cliente'); Core sempre ativo; has_module no banco igual. Why: cliente não vê módulo não contratado.
+- Funções do servidor com id de empresa/unidade/colaborador checam dentro via rh_admin_da_empresa; gatilhos (pg_trigger_depth>0) passam. Why: sem vazamento entre empresas.
+- Detalhes: supabase/functions/AGENTS.md (Talent), src/pages/AGENTS.md (leads).
