@@ -12647,6 +12647,10 @@ export type Database = {
         }
         Returns: Json
       }
+      talent_pode_sugerir: {
+        Args: { _company: string; _user: string }
+        Returns: boolean
+      }
       talent_slugify: { Args: { _t: string }; Returns: string }
       talent_sugerir_faixa: {
         Args: {
@@ -12656,6 +12660,7 @@ export type Database = {
           _grade: string
           _pontos?: number
           _titulo: string
+          _user: string
         }
         Returns: Json
       }
