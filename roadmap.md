@@ -112,5 +112,6 @@
 - [ ] Opcional: trocar policy {public} por {authenticated} em nr1_checkins_semanais e nr1_jornada_mensagens
 
 ## BLOQUEADORES encontrados 2026-09-30 (aguardando aprovação)
-- [ ] calculate_transportation_benefit, check_employee_eligibility, compare_scenarios, get_unit_budget_status, simulate_9box_budget, check_budget_capacity, apply_merit_to_budget: sem checagem de empresa/papel
+- [x] 7 funções fechadas com rh_admin_da_empresa (testado por papel, rollback)
+- [ ] Abrir no navegador como RH real as telas de Vale-transporte, Benefícios, Cenários e Orçamento
 - [ ] Retomar itens 3-6 da rodada final após correção
