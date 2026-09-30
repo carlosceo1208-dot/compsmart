@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { CompanyProvider } from "./contexts/CompanyContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -193,6 +193,12 @@ const LegacyFeatureModuleGate = ({
   );
 };
 
+// Redirect de compatibilidade: /nr1/clima* → /clima* (preserva :id e query string)
+const RedirectClima = () => {
+  const { pathname, search, hash } = useLocation();
+  return <Navigate to={{ pathname: pathname.replace(/^\/nr1\/clima/, "/clima"), search, hash }} replace />;
+};
+
 const App = () => {
   useEffect(() => {
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
@@ -287,6 +293,21 @@ const App = () => {
                         <Route path="/budget-burndown" element={<BudgetBurndown />} />
                         <Route path="/approval-inbox" element={<ApprovalInbox />} />
                         <Route path="/decision-scenarios" element={<DecisionScenarios />} />
+
+                        {/* Clima Organizacional — módulo independente (fora do NR-1) */}
+                        <Route path="/clima" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1Clima /></ModuleGate>} />
+                        <Route path="/clima/:id/responder" element={<Nr1ClimaResponder />} />
+                        <Route path="/clima/dashboard" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaDashboard /></ModuleGate>} />
+                        <Route path="/clima/dashboard/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaDashboard /></ModuleGate>} />
+                        <Route path="/clima/relatorios" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaRelatorios /></ModuleGate>} />
+                        <Route path="/clima/governanca" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaGovernanca /></ModuleGate>} />
+                        <Route path="/clima/externo" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
+                        <Route path="/clima/externo/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
+                        <Route path="/clima/correlacao" element={<ModuleGate mode="page" moduleSlugs={["nr1", "clima"]} requireAll featureName="Correlação Clima x Riscos"><Nr1ClimaCorrelacao /></ModuleGate>} />
+
+                        {/* Redirects de compatibilidade das URLs antigas /nr1/clima* (preservam :id e query) */}
+                        <Route path="/nr1/clima/*" element={<RedirectClima />} />
+                        <Route path="/nr1/fib-bem-estar" element={<Navigate to="/clima" replace />} />
                       </Route>
 
                       {/* Performance Module */}
