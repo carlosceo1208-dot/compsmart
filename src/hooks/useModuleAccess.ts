@@ -86,9 +86,11 @@ export const useModuleAccess = () => {
   );
 
   const isAdminOrSuperAdmin = !!roleData?.isAdmin || !!roleData?.isSuperAdmin;
-  const adminBypass = isAdminOrSuperAdmin && !viewAsClient;
+  // Só o super admin CompSmart passa pelas travas (suporte/validação); admin de cliente nunca.
+  const adminBypass = !!roleData?.isSuperAdmin && !viewAsClient;
 
   const hasModule = (slug: ModuleSlug) => {
+    if (slug === 'core') return true; // Core é o módulo base, sempre ativo.
     if (adminBypass) return true;
     // Consultores CompSmart operam o RH Service para clientes; o acesso aos
     // dados de cada cliente é validado por projeto ativo no backend.
