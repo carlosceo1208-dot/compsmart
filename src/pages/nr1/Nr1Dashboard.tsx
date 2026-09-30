@@ -301,9 +301,9 @@ export default function Nr1Dashboard() {
                       <span className="text-center">{cicloB.ciclo_nome}</span>
                     </div>
                       {[
-                        { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => v?.toFixed(1) ?? '—' },
+                        { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => typeof v === 'number' ? v.toFixed(1) : 'Dados insuficientes' },
                         { label: 'Respondentes', a: cicloA.total_respondentes, b: cicloB.total_respondentes, fmt: (v: any) => v ?? '—' },
-                        { label: 'Nível de risco', a: cicloA.nivel_risco, b: cicloB.nivel_risco, fmt: (v: any) => v ? RISCO_LABEL[v as keyof typeof RISCO_LABEL] : '—' },
+                        { label: 'Nível de risco', a: cicloA.nivel_risco, b: cicloB.nivel_risco, fmt: (v: any) => v ? RISCO_LABEL[v as keyof typeof RISCO_LABEL] : 'Dados insuficientes' },
                       ].map((row) => {
                         const delta = typeof row.a === 'number' && typeof row.b === 'number' ? (row.b as number) - (row.a as number) : null;
                         return (

@@ -41,7 +41,7 @@ export default function Nr1Diagnosticos() {
               </CardHeader>
               <CardContent className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex gap-6 text-sm text-muted-foreground">
-                  <span>Score: <strong className="text-foreground">{d.score_geral?.toFixed(1) ?? '—'}</strong></span>
+                  <span>Score: <strong className="text-foreground">{(d.total_respondentes ?? 0) < 5 || d.score_geral == null ? 'Dados insuficientes (menos de 5 respostas)' : d.score_geral.toFixed(1)}</strong></span>
                   <span>Respondentes: <strong className="text-foreground">{d.total_respondentes}</strong></span>
                   <span className="capitalize">Status: {d.status.replace('_', ' ')}</span>
                 </div>
