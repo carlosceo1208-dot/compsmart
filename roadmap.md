@@ -86,3 +86,7 @@
 - [ ] Validação completa + NÃO publicar até revisão
 - Fase 5B (não mexer): Segurança Psicológica, Sociodemográfico, Terceiros, Vitalidade, Inteligência
 - GATE: varredura de segurança completa antes do relançamento comercial
+- [x] Correção de acesso NR-1: RH/admin da empresa vê os próprios ciclos; consultor dono vê só o projeto dele; sem projeto/colaborador/visitante = 0 (testado com rollback)
+- [x] Histórico e comparação: ciclo com menos de 5 respostas mostra "Dados insuficientes"
+- Alerta aceito com justificativa: consulta de resultado por grupo e regra de acesso NR-1 liberadas a logados — exigem permissão de gestão e aplicam k=5 no servidor
+- [ ] Pendente do relatório: capturas das mensagens de quem responde, Clima/FIB, card 1280/390, PGR/laudo PDF/Excel no navegador
