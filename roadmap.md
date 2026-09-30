@@ -90,3 +90,9 @@
 - [x] Histórico e comparação: ciclo com menos de 5 respostas mostra "Dados insuficientes"
 - Alerta aceito com justificativa: consulta de resultado por grupo e regra de acesso NR-1 liberadas a logados — exigem permissão de gestão e aplicam k=5 no servidor
 - [ ] Pendente do relatório: capturas das mensagens de quem responde, Clima/FIB, card 1280/390, PGR/laudo PDF/Excel no navegador
+
+## Fase 5 — validação final (aberto)
+- [x] Comparação de ciclos, telas de quem responde, Clima/FIB, rotas, card 1280/390, PGR/laudo PDF+Excel
+- [x] Corrigido: resposta anterior ficava marcada e travava "Próxima" no questionário anônimo
+- [ ] BLOQUEIO: admin do cliente passa por todas as travas de módulo (cruzamentos/Clima visíveis sem contratar) — aguardando aprovação para corrigir
+- [ ] Após correção: rodar bun run ci, apagar empresas/ciclos/logins [TESTE], foto final vs "antes"
