@@ -106,3 +106,7 @@
 - [ ] Decisão: admins internos CompSmart (contratar 9-Box/Insight na conta interna ou promover a super admin)
 - [ ] Apagar logins teste.nr1.admin / teste.nr1.hr_manager em Users (sem chave de serviço aqui)
 - [ ] Varredura de segurança: salários do Core no servidor sem Insight; ~100 avisos antigos
+
+## Varredura de segurança 2026-09-30
+- [ ] Opcional: revogar acesso de visitante a has_role/is_super_admin/get_user_company_id/import_employees_batch/employee_import_can_manage (hoje retornam vazio/recusam sem login)
+- [ ] Opcional: trocar policy {public} por {authenticated} em nr1_checkins_semanais e nr1_jornada_mensagens
