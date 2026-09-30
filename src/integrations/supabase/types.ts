@@ -5199,6 +5199,7 @@ export type Database = {
           created_by: string
           diagnostico_id: string
           expires_at: string
+          grupo: string
           id: string
           token: string
           updated_at: string
@@ -5209,6 +5210,7 @@ export type Database = {
           created_by?: string
           diagnostico_id: string
           expires_at: string
+          grupo: string
           id?: string
           token?: string
           updated_at?: string
@@ -5219,6 +5221,7 @@ export type Database = {
           created_by?: string
           diagnostico_id?: string
           expires_at?: string
+          grupo?: string
           id?: string
           token?: string
           updated_at?: string
@@ -12331,6 +12334,7 @@ export type Database = {
           ciclo_nome: string
           disponivel: boolean
           expires_at: string
+          grupo: string
           questoes: Json
         }[]
       }
@@ -12391,7 +12395,7 @@ export type Database = {
         }[]
       }
       nr1_submeter_respostas: {
-        Args: { p_respostas: Json; p_token: string }
+        Args: { p_respostas: Json; p_submission_id: string; p_token: string }
         Returns: string
       }
       nr1_template_marcar_uso: {
