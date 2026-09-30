@@ -11653,6 +11653,7 @@ export type Database = {
       }
     }
     Functions: {
+      _sf_norm: { Args: { t: string }; Returns: string }
       apply_merit_to_budget: {
         Args: {
           p_amount_annual: number
