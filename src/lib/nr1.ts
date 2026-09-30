@@ -35,9 +35,9 @@ export const RISCO_CLASS: Record<NivelRisco, string> = {
 
 export function calcRisco(score: number | null | undefined): NivelRisco | null {
   if (score == null) return null;
-  if (score <= 25) return 'baixo';
-  if (score <= 50) return 'moderado';
-  if (score <= 75) return 'alto';
+  if (score <= 40) return 'baixo';
+  if (score <= 60) return 'moderado';
+  if (score <= 80) return 'alto';
   return 'critico';
 }
 

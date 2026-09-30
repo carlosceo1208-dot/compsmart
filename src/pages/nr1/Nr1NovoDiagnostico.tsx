@@ -1,209 +1,91 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Progress } from '@/components/ui/progress';
-import { useNr1Questoes } from '@/hooks/useNr1';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { RESPOSTA_OPCOES, respondentHash } from '@/lib/nr1';
-import { Loader2 } from 'lucide-react';
-import { Nr1ConsentReconfirm } from '@/components/nr1/Nr1ConsentGate';
+import { Check, Copy, Link2, Loader2, ShieldCheck } from 'lucide-react';
+
+const defaultExpiry = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 21);
+  return date.toISOString().slice(0, 10);
+};
 
 export default function Nr1NovoDiagnostico() {
   const { activeCompanyId } = useCompanyContext();
-  const { data: questoes, isLoading } = useNr1Questoes(false);
-  const navigate = useNavigate();
-  const [step, setStep] = useState<'config' | 'questionario' | 'enviando'>('config');
   const [cicloNome, setCicloNome] = useState(`Ciclo ${new Date().getFullYear()}`);
-  const [diagnosticoId, setDiagnosticoId] = useState<string | null>(null);
-  const [respostas, setRespostas] = useState<Record<string, number>>({});
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [consentOk, setConsentOk] = useState(false);
-  const [ordemEmbaralhada, setOrdemEmbaralhada] = useState<string[]>([]);
+  const [grupo, setGrupo] = useState('Geral');
+  const [expiresAt, setExpiresAt] = useState(defaultExpiry);
+  const [loading, setLoading] = useState(false);
+  const [link, setLink] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  // Embaralha as questões uma única vez quando carregam (Fisher-Yates)
-  useEffect(() => {
-    if (questoes && questoes.length > 0 && ordemEmbaralhada.length === 0) {
-      const ids = questoes.map((q) => q.id);
-      for (let i = ids.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [ids[i], ids[j]] = [ids[j], ids[i]];
-      }
-      setOrdemEmbaralhada(ids);
-    }
-  }, [questoes, ordemEmbaralhada.length]);
-
-  const questao = useMemo(() => {
-    if (!questoes || ordemEmbaralhada.length === 0) return undefined;
-    const id = ordemEmbaralhada[currentIdx];
-    return questoes.find((q) => q.id === id);
-  }, [questoes, ordemEmbaralhada, currentIdx]);
-  const total = ordemEmbaralhada.length || questoes?.length || 0;
-  const progress = total > 0 ? ((currentIdx + 1) / total) * 100 : 0;
-
-
-  const iniciar = async () => {
-    if (!activeCompanyId) {
-      toast({ title: 'Empresa não selecionada', variant: 'destructive' });
+  const criar = async () => {
+    if (!activeCompanyId || cicloNome.trim().length < 3 || grupo.trim().length < 2 || !expiresAt) {
+      toast({ title: 'Preencha o nome do ciclo, o grupo e o prazo.', variant: 'destructive' });
       return;
     }
-    if (cicloNome.trim().length < 3) {
-      toast({ title: 'Nome do ciclo muito curto', variant: 'destructive' });
-      return;
-    }
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-      .from('nr1_diagnosticos')
-      .insert({
-        company_id: activeCompanyId,
-        ciclo_nome: cicloNome.trim(),
-        status: 'em_andamento',
-        created_by: user?.id,
-      })
-      .select()
-      .single();
-    if (error) {
-      toast({ title: 'Erro ao iniciar', description: error.message, variant: 'destructive' });
-      return;
-    }
-    setDiagnosticoId(data.id);
-    setStep('questionario');
-  };
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: diagnostico, error: diagError } = await supabase
+        .from('nr1_diagnosticos')
+        .insert({ company_id: activeCompanyId, ciclo_nome: cicloNome.trim(), status: 'em_andamento', created_by: user?.id })
+        .select('id')
+        .single();
+      if (diagError) throw diagError;
 
-  const responder = async (valor: number) => {
-    if (!questao || !diagnosticoId) return;
-    setRespostas((r) => ({ ...r, [questao.id]: valor }));
+      const expiry = new Date(`${expiresAt}T23:59:59.999`);
+      const { data: convite, error: inviteError } = await supabase
+        .from('nr1_convites')
+        .insert({ diagnostico_id: diagnostico.id, grupo: grupo.trim(), expires_at: expiry.toISOString() })
+        .select('token')
+        .single();
+      if (inviteError) throw inviteError;
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    const hash = await respondentHash(user.id, diagnosticoId);
-
-    await supabase.from('nr1_diagnostico_respostas').upsert(
-      { diagnostico_id: diagnosticoId, respondent_hash: hash, questao_id: questao.id, resposta: valor },
-      { onConflict: 'diagnostico_id,respondent_hash,questao_id' }
-    );
-
-    if (currentIdx + 1 < total) {
-      setCurrentIdx(currentIdx + 1);
-    } else {
-      finalizar();
+      setLink(`${window.location.origin}/nr1/responder/${convite.token}`);
+      toast({ title: 'Ciclo e link anônimo criados.' });
+    } catch (error) {
+      toast({ title: 'Não foi possível criar o ciclo.', description: error instanceof Error ? error.message : String(error), variant: 'destructive' });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const finalizar = async () => {
-    if (!diagnosticoId) return;
-    setStep('enviando');
-    // Recalcula scores
-    await supabase.rpc('nr1_recompute_scores', { p_diagnostico_id: diagnosticoId });
-    await supabase
-      .from('nr1_diagnosticos')
-      .update({ status: 'concluido', periodo_fim: new Date().toISOString().slice(0, 10) })
-      .eq('id', diagnosticoId);
-    toast({ title: 'Diagnóstico concluído!', description: 'Veja o relatório completo.' });
-    navigate(`/nr1/diagnostico/${diagnosticoId}`);
+  const copiar = async () => {
+    if (!link) return;
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin nr1-text-primary" />
-      </div>
-    );
-  }
-
-  if (step === 'config') {
-    return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle>Pesquisa Saúde Bem-Estar - NR-1</CardTitle>
-          <CardDescription>
-            Aplicação anônima de {total} perguntas baseadas em metodologia COPSOQ-III, agrupadas em 6 dimensões psicossociais.
-            Suas respostas individuais não são identificadas — apenas dados agregados aparecem no relatório.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="ciclo">Nome do ciclo</Label>
-            <Input
-              id="ciclo"
-              value={cicloNome}
-              onChange={(e) => setCicloNome(e.target.value)}
-              maxLength={120}
-              placeholder="Ex: Ciclo 2026 Q1"
-            />
-          </div>
-
-          <Nr1ConsentReconfirm
-            cycleLabel={cicloNome.trim() || 'Novo ciclo'}
-            onConfirmed={() => setConsentOk(true)}
-            confirmed={consentOk}
-          />
-
-          <Button
-            onClick={iniciar}
-            disabled={!consentOk}
-            className="nr1-bg-primary w-full sm:w-auto"
-          >
-            Começar questionário
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (step === 'enviando') {
-    return (
-      <Card className="max-w-md mx-auto">
-        <CardContent className="pt-10 pb-10 text-center space-y-3">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto nr1-text-primary" />
-          <p className="text-sm text-muted-foreground">Calculando scores e gerando relatório…</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Questionario
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="mx-auto max-w-2xl">
       <CardHeader>
-        <div className="flex justify-between text-xs text-muted-foreground mb-2">
-          <span>Pergunta {currentIdx + 1} de {total}</span>
-        </div>
-        <Progress value={progress} className="h-2" />
-        <CardTitle className="text-lg mt-4 leading-snug">{questao!.enunciado}</CardTitle>
+        <CardTitle>Novo diagnóstico</CardTitle>
+        <CardDescription>Crie o ciclo e gere um link anônimo por grupo. Nenhuma resposta parcial será armazenada.</CardDescription>
       </CardHeader>
-      <CardContent>
-        <RadioGroup
-          key={questao!.id}
-          value={respostas[questao!.id]?.toString()}
-          onValueChange={(v) => responder(Number(v))}
-          className="space-y-2"
-        >
-          {RESPOSTA_OPCOES.map((opt) => (
-            <Label
-              key={opt.value}
-              htmlFor={`opt-${opt.value}`}
-              className="flex items-center gap-3 p-3 rounded-md border cursor-pointer hover:bg-accent transition-colors"
-            >
-              <RadioGroupItem value={opt.value.toString()} id={`opt-${opt.value}`} />
-              <span className="text-sm">{opt.label}</span>
-            </Label>
-          ))}
-        </RadioGroup>
-        {currentIdx > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="mt-4"
-            onClick={() => setCurrentIdx(currentIdx - 1)}
-          >
-            ← Anterior
-          </Button>
+      <CardContent className="space-y-5">
+        {!link ? (
+          <>
+            <div className="space-y-2"><Label htmlFor="ciclo">Nome do ciclo</Label><Input id="ciclo" value={cicloNome} onChange={(e) => setCicloNome(e.target.value)} maxLength={120} placeholder="Ex.: Ciclo 2026 Q1" /></div>
+            <div className="space-y-2"><Label htmlFor="grupo">Grupo de aplicação</Label><Input id="grupo" value={grupo} onChange={(e) => setGrupo(e.target.value)} maxLength={100} placeholder="Ex.: Operações" /></div>
+            <div className="space-y-2"><Label htmlFor="prazo">Responder até</Label><Input id="prazo" type="date" min={new Date().toISOString().slice(0, 10)} value={expiresAt} onChange={(e) => setExpiresAt(e.target.value)} /></div>
+            <div className="flex gap-3 rounded-lg border bg-muted/30 p-3 text-sm text-muted-foreground"><ShieldCheck className="h-5 w-5 shrink-0 nr1-text-primary" /><p>O mesmo link pode ser compartilhado com todo o grupo. Os resultados só aparecem a partir de 5 participantes.</p></div>
+            <Button onClick={criar} disabled={loading} className="nr1-bg-primary"><>{loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Link2 className="mr-2 h-4 w-4" />}Criar ciclo e gerar link</></Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="rounded-lg border border-[hsl(var(--nr1-primary)/0.35)] bg-[hsl(var(--nr1-primary)/0.05)] p-4">
+              <div className="mb-2 flex items-center gap-2 font-semibold"><Check className="h-5 w-5 nr1-text-primary" />Link anônimo pronto</div>
+              <p className="mb-3 text-sm text-muted-foreground">Compartilhe este link somente com o grupo “{grupo.trim()}”.</p>
+              <div className="flex gap-2"><Input value={link} readOnly aria-label="Link anônimo do diagnóstico" /><Button variant="outline" onClick={copiar}>{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}<span className="sr-only">Copiar link</span></Button></div>
+            </div>
+            <Button variant="outline" onClick={() => { setLink(null); setGrupo('Geral'); }}>Criar outro ciclo</Button>
+          </div>
         )}
       </CardContent>
     </Card>

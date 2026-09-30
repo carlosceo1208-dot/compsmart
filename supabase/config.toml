@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.send-diagnostico-email]
 verify_jwt = false
+
+[functions.nr1-questionario-publico]
+verify_jwt = false

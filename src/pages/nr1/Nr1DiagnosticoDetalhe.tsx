@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/nr1';
+import { calcRisco, DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Download, Users, AlertTriangle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -21,7 +21,10 @@ export default function Nr1DiagnosticoDetalhe() {
   const scores = (data.scores_dimensao as Record<string, number> | null) ?? {};
   const dims = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
+  const baixaParticipacao = data.total_respondentes < 5;
+
   const exportar = () => {
+    if (baixaParticipacao) return;
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text(`Diagnóstico NR-1 — ${data.ciclo_nome}`, 14, 18);
@@ -40,8 +43,6 @@ export default function Nr1DiagnosticoDetalhe() {
     doc.save(`nr1-diagnostico-${data.ciclo_nome}.pdf`);
   };
 
-  const baixaParticipacao = data.total_respondentes < 5;
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -53,10 +54,10 @@ export default function Nr1DiagnosticoDetalhe() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={exportar} variant="outline">
+          <Button onClick={exportar} variant="outline" disabled={baixaParticipacao}>
             <Download className="h-4 w-4 mr-1" /> Exportar PDF
           </Button>
-          <GerarPgrButton
+          {!baixaParticipacao && <GerarPgrButton
             size="default"
             className="nr1-bg-primary"
             diagnostico={{
@@ -68,7 +69,7 @@ export default function Nr1DiagnosticoDetalhe() {
               scores_dimensao: data.scores_dimensao as Record<string, number> | null,
               total_respondentes: data.total_respondentes,
             }}
-          />
+          />}
         </div>
       </div>
 
@@ -77,13 +78,13 @@ export default function Nr1DiagnosticoDetalhe() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-xs text-muted-foreground">Score Geral</p>
-            <p className="text-3xl font-bold">{data.score_geral?.toFixed(1) ?? '—'}<span className="text-base text-muted-foreground">/100</span></p>
+            <p className="text-3xl font-bold">{baixaParticipacao ? 'Dados insuficientes' : data.score_geral?.toFixed(1) ?? '—'}{!baixaParticipacao && <span className="text-base text-muted-foreground">/100</span>}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <p className="text-xs text-muted-foreground">Nível de Risco</p>
-            {data.nivel_risco ? (
+            {!baixaParticipacao && data.nivel_risco ? (
               <Badge className={`${RISCO_CLASS[data.nivel_risco as keyof typeof RISCO_CLASS]} text-base mt-1`}>
                 {RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL]}
               </Badge>
@@ -106,8 +107,8 @@ export default function Nr1DiagnosticoDetalhe() {
           <CardContent className="pt-4 flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 text-[hsl(var(--nr1-warning))] flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <strong>Atenção (LGPD/k-anonimato):</strong> menos de 5 respondentes podem permitir reidentificação.
-              Resultados com baixa participação não devem ser publicados internamente.
+              <strong>Dados insuficientes:</strong> este ciclo ainda não atingiu o mínimo de 5 participantes.
+              Nenhum score individual ou agregado será exibido até atingir esse limite.
             </div>
           </CardContent>
         </Card>
@@ -120,12 +121,14 @@ export default function Nr1DiagnosticoDetalhe() {
           <CardDescription>Quanto maior o score, maior o risco identificado naquela dimensão.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {dims.length === 0 ? (
+          {baixaParticipacao ? (
+            <p className="text-sm text-muted-foreground">Dados insuficientes para exibir resultados por dimensão.</p>
+          ) : dims.length === 0 ? (
             <p className="text-sm text-muted-foreground">Sem respostas registradas.</p>
           ) : (
             dims.map(([dim, score]) => {
               const s = Number(score);
-              const risco = s <= 25 ? 'baixo' : s <= 50 ? 'moderado' : s <= 75 ? 'alto' : 'critico';
+              const risco = calcRisco(s)!;
               return (
                 <div key={dim} className="space-y-1">
                   <div className="flex justify-between text-sm">

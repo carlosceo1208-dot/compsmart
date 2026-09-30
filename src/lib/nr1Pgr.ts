@@ -71,8 +71,8 @@ export function gerarPgrPdf(input: PgrInput): jsPDF {
     '6 dimensões: Demandas no Trabalho, Organização e Conteúdo, Relações e Liderança, Interface ' +
     'Trabalho-Indivíduo, Valores no Trabalho e Saúde & Bem-Estar. As respostas são coletadas de forma ' +
     'anônima (hash SHA-256 do respondente, em conformidade com a LGPD) e os scores são normalizados ' +
-    'em escala 0–100, classificados em quatro níveis: Baixo (0–25), Moderado (26–50), Alto (51–75) e ' +
-    'Crítico (76–100). Esta metodologia atende aos requisitos da NR-1 (itens 1.5.3 a 1.5.5) quanto à ' +
+    'em escala 0–100, classificados em quatro níveis: Baixo (0–40), Moderado (41–60), Alto (61–80) e ' +
+    'Crítico (81–100). Esta metodologia atende aos requisitos da NR-1 (itens 1.5.3 a 1.5.5) quanto à ' +
     'identificação, avaliação e controle de riscos ocupacionais de natureza psicossocial.';
   const lines = doc.splitTextToSize(metodologia, W - 28);
   doc.text(lines, 14, y); y += lines.length * 5 + 6;
@@ -94,7 +94,7 @@ export function gerarPgrPdf(input: PgrInput): jsPDF {
       head: [['Dimensão Psicossocial', 'Score (0-100)', 'Nível']],
       body: dims.map(([d, s]) => {
         const n = Number(s);
-        const nivel = n <= 25 ? 'Baixo' : n <= 50 ? 'Moderado' : n <= 75 ? 'Alto' : 'Crítico';
+        const nivel = n <= 40 ? 'Baixo' : n <= 60 ? 'Moderado' : n <= 80 ? 'Alto' : 'Crítico';
         return [DIMENSAO_LABEL[d as Dimensao] ?? d, n.toFixed(1), nivel];
       }),
       styles: { fontSize: 9 },

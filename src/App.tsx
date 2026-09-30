@@ -130,6 +130,7 @@ const Candidatos = lazy(() => import("./pages/recrutamento/Candidatos"));
 const LandingRecrutamento = lazy(() => import("./pages/public/LandingRecrutamento"));
 const ModuloPage = lazy(() => import("./pages/public/ModuloPage"));
 const ClimaPublico = lazy(() => import("./pages/public/ClimaPublico"));
+const Nr1Responder = lazy(() => import("./pages/public/Nr1Responder"));
 
 // Lazy — NR-1 Module
 const Nr1Layout = lazy(() => import("./components/nr1/Nr1Layout").then((m) => ({ default: m.Nr1Layout })));
@@ -331,6 +332,7 @@ const App = () => {
                       {/* URL comercial dedicada para anúncios pagos (Google Ads / Meta / LinkedIn) */}
                       <Route path="/landing-nr1" element={<LandingNr1Ads />} />
                       <Route path="/nr1/obrigado" element={<Nr1Obrigado />} />
+                      <Route path="/nr1/responder/:token" element={<Nr1Responder />} />
 
                       {/* NR-1 Module (authenticated) */}
                       <Route element={<Nr1Layout />}>
