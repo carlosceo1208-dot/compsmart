@@ -115,3 +115,8 @@
 - [x] 7 funções fechadas com rh_admin_da_empresa (testado por papel, rollback)
 - [ ] Abrir no navegador como RH real as telas de Vale-transporte, Benefícios, Cenários e Orçamento
 - [ ] Retomar itens 3-6 da rodada final após correção
+
+## Sugestão de faixa na vaga (sem Insight)
+- [x] RPC talent_sugerir_faixa: retorna só min/max/fonte genérica; recusa com erro 42501
+- [x] Documentado: sem Insight, a sugestão pontual usa também a base global da CompSmart (decisão do cliente)
+- [ ] Publicação aguardando revisão final
