@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogT
 import { ClipboardList, Sparkles, Plus, ArrowRight, Users, Copy, Mail, Send, Link2, LineChart, FileText, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { DIMENSAO_LABEL, interpretarClima, CORRELACAO_COPSOQ, type ClimaDimensao } from '@/lib/climaQuestoes';
+import Nr1FibCard from './Nr1FibCard';
 
 type Pesquisa = {
   id: string;
@@ -172,6 +173,9 @@ export default function Nr1Clima() {
           </div>
         </CardHeader>
       </Card>
+
+      {/* FIB faz parte do painel de Clima; não existe mais como módulo avulso. */}
+      <Nr1FibCard />
 
       {/* CTA respondente */}
       {aberta && (

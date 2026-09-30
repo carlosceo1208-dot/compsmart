@@ -40,7 +40,7 @@ export function GerarPgrButton({ diagnostico, variant = 'default', size = 'defau
     const diags: PgrDiagnosticoInput[] = diagnostico
       ? [diagnostico]
       : (diagnosticos ?? [])
-          .filter((d) => d.status === 'concluido')
+          .filter((d) => d.status === 'concluido' && d.total_respondentes >= 5)
           .map((d) => ({
             ciclo_nome: d.ciclo_nome,
             periodo_inicio: d.periodo_inicio,
