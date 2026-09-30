@@ -118,7 +118,7 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
     setFaixaEditada(!!vaga && (vaga.faixa_salarial_min != null || vaga.faixa_salarial_max != null)); setFaixaSugerida(false);
   }, [open, vaga]);
 
-  const { data: sugestao } = useSugestaoFaixa({
+  const { data: sugestao, error: erroSugestao } = useSugestaoFaixa({
     titulo: f.titulo, cbo: f.cbo ?? "", grade: nivel, cargoId: f.descricao_cargo_id,
   });
   useEffect(() => {
@@ -285,7 +285,10 @@ export const VagaDialog = ({ open, onOpenChange, vaga }: { open: boolean; onOpen
             <div className="space-y-1.5"><Label>Faixa salarial máxima (R$)</Label>
               <Input type="number" min={0} value={f.faixa_salarial_max ?? ""} disabled={busy} onChange={(e) => { setFaixaEditada(true); set("faixa_salarial_max", numOrNull(e.target.value)); }} /></div>
             {faixaSugerida && !faixaEditada && (
-              <p className="sm:col-span-2 -mt-2 text-xs text-muted-foreground">{sugestao?.fonte === "tabela" ? "Sugestão baseada na tabela salarial do cargo" : "Sugestão baseada em pesquisa"}{sugestao?.base ? ` (${sugestao.base})` : ""} — ajuste se necessário.</p>
+              <p className="sm:col-span-2 -mt-2 text-xs text-muted-foreground">Baseado em posições similares{sugestao?.fonte ? ` (${sugestao.fonte})` : ""} — ajuste se necessário.</p>
+            )}
+            {erroSugestao && !faixaEditada && (
+              <p className="sm:col-span-2 -mt-2 text-xs text-destructive">Não foi possível sugerir a faixa (sem permissão). Preencha manualmente.</p>
             )}
             <div className="space-y-1.5"><Label>Quantidade de vagas</Label>
               <Input type="number" min={1} value={f.qtd_vagas} disabled={busy} onChange={(e) => set("qtd_vagas", Math.max(1, Number(e.target.value) || 1))} /></div>
