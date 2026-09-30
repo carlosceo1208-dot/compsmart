@@ -5193,6 +5193,54 @@ export type Database = {
           },
         ]
       }
+      nr1_convites: {
+        Row: {
+          created_at: string
+          created_by: string
+          diagnostico_id: string
+          expires_at: string
+          id: string
+          token: string
+          updated_at: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          diagnostico_id: string
+          expires_at: string
+          id?: string
+          token?: string
+          updated_at?: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          diagnostico_id?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          updated_at?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_convites_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_convites_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+        ]
+      }
       nr1_diagnostico_respostas: {
         Row: {
           created_at: string
@@ -12277,6 +12325,15 @@ export type Database = {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
       }
+      nr1_convite_resolver: {
+        Args: { p_token: string }
+        Returns: {
+          ciclo_nome: string
+          disponivel: boolean
+          expires_at: string
+          questoes: Json
+        }[]
+      }
       nr1_plano_transicao: {
         Args: {
           _novo_status: Database["public"]["Enums"]["nr1_aprovacao_status"]
@@ -12318,9 +12375,24 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      nr1_pode_gerir: { Args: { _company_id: string }; Returns: boolean }
       nr1_recompute_scores: {
         Args: { p_diagnostico_id: string }
         Returns: undefined
+      }
+      nr1_resultado_agregado: {
+        Args: { p_diagnostico_id: string }
+        Returns: {
+          dados_suficientes: boolean
+          nivel_risco: Database["public"]["Enums"]["nr1_nivel_risco"]
+          score_geral: number
+          scores_dimensao: Json
+          total_respondentes: number
+        }[]
+      }
+      nr1_submeter_respostas: {
+        Args: { p_respostas: Json; p_token: string }
+        Returns: string
       }
       nr1_template_marcar_uso: {
         Args: { _template_id: string }
