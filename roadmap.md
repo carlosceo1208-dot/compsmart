@@ -98,3 +98,11 @@
 - [x] bun run ci limpo, dados [TESTE] apagados, foto final = "antes"
 - [x] Travas de módulo: só super admin passa; Core sempre ativo; cruzamentos por módulo de origem (tela + servidor); testado e dados [TESTE] apagados
 - [ ] Pendente: 2 logins de teste sem papel/perfil ainda existem no cadastro de acesso (não há como apagar daqui)
+
+## Fase 5 — 3 testes finais (30/09)
+- [x] RH/admin de A: só ciclos, vagas e projetos de A; nada de B
+- [x] Sem Talent: vagas somem e criação recusada
+- [x] Consultor dono: só A (NR-1, Maturidade, RH Service); sem projeto: 0 e scorecard recusado
+- [ ] Decisão: admins internos CompSmart (contratar 9-Box/Insight na conta interna ou promover a super admin)
+- [ ] Apagar logins teste.nr1.admin / teste.nr1.hr_manager em Users (sem chave de serviço aqui)
+- [ ] Varredura de segurança: salários do Core no servidor sem Insight; ~100 avisos antigos
