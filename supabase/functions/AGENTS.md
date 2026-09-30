@@ -6,4 +6,4 @@
 - Etapa só muda via RPC talent_mover_candidatura (histórico + etapa_desde + entrevista_em juntos; mesma etapa recusada). Why: auditoria sem buracos.
 - agent-talent: ao modelo só dados anonimizados (nome/e-mail/telefone/CPF/CEP/endereço/links); `analisar` extrai PDF no servidor, valida com Zod, só grava analise_talent; logs só tamanhos. Why: LGPD; agente nunca move etapa.
 - Cliente usa só useFilaAnalise (máx. 2 em voo; 402/429 pausa sem reenvio). Why: custo e 429.
-- Cidades de vagas do IBGE (cache localStorage); faixa sugerida de survey_data (Q1–Q3) e depois salary_ranges. Why: dados reais.
+- Cidades de vagas do IBGE (cache localStorage). Faixa sugerida só via RPC talent_sugerir_faixa (RH/admin da empresa; retorna só {min,max,fonte} com fonte genérica; recusa = erro 42501). Sem Insight usa também a base global da CompSmart — intencional. Why: exposição controlada sem liberar a base.
