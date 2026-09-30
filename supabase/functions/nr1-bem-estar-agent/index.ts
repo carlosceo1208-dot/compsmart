@@ -84,7 +84,7 @@ Se identificar **ideação suicida, autolesão, crise aguda de pânico, sintomas
 `;
 
 
-async function buildCompanyContext(supabase: any, userId: string): Promise<string> {
+async function buildCompanyContext(supabase: any): Promise<string> {
   try {
     // Descobre company do usuário
     const { data: companyId } = await supabase.rpc("get_user_company_id");
@@ -179,7 +179,7 @@ serve(async (req) => {
       }
     }
 
-    const ctx = await buildCompanyContext(supabase, userData.user.id);
+    const ctx = await buildCompanyContext(supabase);
     const systemPrompt = SYSTEM_PROMPT.replace("{COMPANY_CONTEXT}", ctx);
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
