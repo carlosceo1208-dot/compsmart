@@ -116,21 +116,21 @@ export default function Nr1Clima() {
             {canManage && pesquisas.some((p) => p.total_respondentes > 0) && (
               <>
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/nr1/clima/dashboard"><LineChart className="h-4 w-4 mr-1" /> Dashboard analítico</Link>
+                  <Link to="/clima/dashboard"><LineChart className="h-4 w-4 mr-1" /> Dashboard analítico</Link>
                 </Button>
                 <Button asChild variant="outline" size="sm">
-                  <Link to="/nr1/clima/relatorios"><FileText className="h-4 w-4 mr-1" /> Relatórios</Link>
+                  <Link to="/clima/relatorios"><FileText className="h-4 w-4 mr-1" /> Relatórios</Link>
                 </Button>
               </>
             )}
             {canManage && (
               <Button asChild variant="outline" size="sm" className="border-emerald-300 text-emerald-700 hover:bg-emerald-50">
-                <Link to="/nr1/clima/governanca"><ShieldCheck className="h-4 w-4 mr-1" /> Governança</Link>
+                <Link to="/clima/governanca"><ShieldCheck className="h-4 w-4 mr-1" /> Governança</Link>
               </Button>
             )}
             {canManage && pesquisas.some((p) => p.modalidade === 'com_clientes_externos') && (
               <Button asChild variant="outline" size="sm">
-                <Link to="/nr1/clima/externo"><Users className="h-4 w-4 mr-1" /> Clima externo</Link>
+                <Link to="/clima/externo"><Users className="h-4 w-4 mr-1" /> Clima externo</Link>
               </Button>
             )}
             {canManage && (
@@ -186,7 +186,7 @@ export default function Nr1Clima() {
               <p className="text-sm text-muted-foreground">Sua resposta é anônima — leva cerca de 15 minutos.</p>
             </div>
             <Button asChild>
-              <Link to={`/nr1/clima/${aberta.id}/responder`}>Responder agora <ArrowRight className="h-4 w-4 ml-1" /></Link>
+              <Link to={`/clima/${aberta.id}/responder`}>Responder agora <ArrowRight className="h-4 w-4 ml-1" /></Link>
             </Button>
           </CardContent>
         </Card>
@@ -269,7 +269,7 @@ export default function Nr1Clima() {
                 <div className="flex justify-end gap-2 mt-4">
                   {p.status === 'aberta' && (
                     <Button asChild size="sm" variant="outline">
-                      <Link to={`/nr1/clima/${p.id}/responder`}>Responder (preview)</Link>
+                      <Link to={`/clima/${p.id}/responder`}>Responder (preview)</Link>
                     </Button>
                   )}
                 </div>
@@ -304,7 +304,7 @@ export default function Nr1Clima() {
               Veja causas raiz confirmadas e plano de ação unificado quando há ambos os instrumentos aplicados.
             </p>
             <Button asChild size="sm" variant="outline">
-              <Link to="/nr1/clima/correlacao"><Sparkles className="h-3.5 w-3.5 mr-1" /> Ver correlação</Link>
+              <Link to="/clima/correlacao"><Sparkles className="h-3.5 w-3.5 mr-1" /> Ver correlação</Link>
             </Button>
           </div>
         </CardContent>

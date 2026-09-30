@@ -269,7 +269,7 @@ export const ModuleGrid = () => {
       title: 'Clima Organizacional',
       description: 'Pesquisa de clima, eNPS, engajamento e cultura',
       icon: Users,
-      path: '/nr1/clima',
+      path: '/clima',
       status: 'active',
       category: 'consultation',
       moduleSlugs: ['clima'],

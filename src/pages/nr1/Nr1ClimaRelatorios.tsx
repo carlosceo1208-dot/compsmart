@@ -148,7 +148,7 @@ export default function Nr1ClimaRelatorios() {
     <div className="space-y-4 p-4 md:p-6 max-w-6xl mx-auto">
       <div className="flex items-center gap-2">
         <Button asChild variant="ghost" size="sm">
-          <Link to="/nr1/clima"><ArrowLeft className="h-4 w-4 mr-1" />Voltar</Link>
+          <Link to="/clima"><ArrowLeft className="h-4 w-4 mr-1" />Voltar</Link>
         </Button>
         <div>
           <h1 className="text-xl font-bold">Relatórios Executivos — Clima 360°</h1>

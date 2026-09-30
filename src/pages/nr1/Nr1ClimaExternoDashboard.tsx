@@ -96,7 +96,7 @@ export default function Nr1ClimaExternoDashboard() {
   return (
     <div className="space-y-4 p-4 md:p-6 max-w-7xl mx-auto">
       <div className="flex items-center gap-2">
-        <Button asChild variant="ghost" size="sm"><Link to="/nr1/clima"><ArrowLeft className="h-4 w-4 mr-1" />Voltar</Link></Button>
+        <Button asChild variant="ghost" size="sm"><Link to="/clima"><ArrowLeft className="h-4 w-4 mr-1" />Voltar</Link></Button>
         <div>
           <h1 className="text-xl font-bold">Clima Externo — Stakeholders 360°</h1>
           <p className="text-sm text-muted-foreground">Percepção de clientes, fornecedores, parceiros, candidatos e ex-colaboradores.</p>
