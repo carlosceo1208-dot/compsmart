@@ -1,0 +1,1 @@
+ALTER FUNCTION public.talent_sugerir_faixa(uuid,text,text,text,uuid,numeric) VOLATILE;
