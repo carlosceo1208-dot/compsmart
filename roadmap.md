@@ -121,4 +121,4 @@
 - [x] Documentado: sem Insight, a sugestão pontual usa também a base global da CompSmart (decisão do cliente)
 - [ ] Publicação aguardando revisão final
 - [x] Sugestão de faixa: entrada única com auditoria das recusas (_user só do login), contrato 200/200-nulo/403, 0 chamadas diretas
-- [ ] Teste na tela como RH de A (1280/390) — aguarda aprovação da sessão
+- [x] Teste na tela como RH de A (1280/390)
