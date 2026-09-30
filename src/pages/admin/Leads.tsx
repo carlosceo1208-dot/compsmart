@@ -96,6 +96,28 @@ export default function Leads() {
     });
   }, [leads, q, origem, status]);
 
+  // Agrupa envios pelo mesmo e-mail (mais recente primeiro), sem descartar nenhum registro.
+  const groups = useMemo(() => {
+    const map = new Map<string, Lead[]>();
+    filtered.forEach((l) => {
+      const k = (l.email || `${l.source}-${l.id}`).trim().toLowerCase();
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(l);
+    });
+    const t = (l: Lead) => (l.submitted_at ? new Date(l.submitted_at).getTime() : 0);
+    return Array.from(map.entries())
+      .map(([key, items]) => ({ key, items: [...items].sort((a, b) => t(b) - t(a)) }))
+      .sort((a, b) => t(b.items[0]) - t(a.items[0]));
+  }, [filtered]);
+
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const toggleGroup = (k: string) =>
+    setExpanded((cur) => {
+      const n = new Set(cur);
+      n.has(k) ? n.delete(k) : n.add(k);
+      return n;
+    });
+
   const setLeadStatus = async (lead: Lead, s: LeadStatus) => {
     try {
       await update.mutateAsync({ id: lead.id, status: s });
@@ -204,11 +226,25 @@ export default function Leads() {
             ) : filtered.length === 0 ? (
               <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Nenhum lead encontrado.</TableCell></TableRow>
             ) : (
-              filtered.map((l) => {
+              groups.flatMap(({ key, items }) => {
+                const open = expanded.has(key);
+                const shown = open ? items : items.slice(0, 1);
+                return shown.map((l, idx) => {
                 const s = normalizeStatus(l.status);
                 return (
-                  <TableRow key={`${l.source}-${l.id}`} className="cursor-pointer" onClick={() => setSelected(l)}>
-                     <TableCell className="whitespace-nowrap">{formatDatePtBR(l.submitted_at)}</TableCell>
+                  <TableRow key={`${l.source}-${l.id}`} className={`cursor-pointer ${idx > 0 ? "bg-muted/40" : ""}`} onClick={() => setSelected(l)}>
+                     <TableCell className="whitespace-nowrap">
+                       {formatDatePtBR(l.submitted_at)}
+                       {idx === 0 && items.length > 1 && (
+                         <button
+                           type="button"
+                           className="ml-2 text-xs text-primary underline"
+                           onClick={(e) => { e.stopPropagation(); toggleGroup(key); }}
+                         >
+                           {open ? "ocultar" : `${items.length} envios`}
+                         </button>
+                       )}
+                     </TableCell>
                     <TableCell className="font-medium">{l.nome}</TableCell>
                     <TableCell>{l.email}</TableCell>
                     <TableCell>{l.empresa || "—"}</TableCell>
@@ -219,6 +255,7 @@ export default function Leads() {
                     <TableCell><Badge variant={statusVariant[s]} className="rounded-full">{LEAD_STATUS_LABEL[s]}</Badge></TableCell>
                   </TableRow>
                 );
+                });
               })
             )}
           </TableBody>
