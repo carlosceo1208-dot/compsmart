@@ -5,6 +5,7 @@
 - Em cada uma das três telas: nota de rodapé e dica ao lado do selo com o texto "Nota de saúde = 100 − risco psicossocial", para o "Crítico" não parecer erro.
 - "Diagnóstico Q1 2026" (risco 49,93) passa a aparecer como nota de saúde 50,1, Crítico.
 - Na conferência: prints antes e depois das três telas.
+- Abrir as três telas logado como RH da empresa de teste (não só como super admin), e também como RH de outra empresa e de empresa sem NR-1, para confirmar que a troca de rótulo não mudou nenhuma regra de papel ou empresa.
 - Dossiê: "A9 aprovado — Diagnóstico Q1 2026 passa de Moderado para Crítico por padronização do selo único; conversão 100 − risco exibida nas telas de Diagnóstico, Matriz de Risco e Visão Geral."
 
 ## 2. Teste próprio dos assistentes (A5)
@@ -15,6 +16,7 @@
 
 ## 3. Conferir as exportações abrindo os arquivos
 - Gerar o PDF e a planilha, abrir os dois e conferir o cabeçalho: mínimo de 5 pessoas, período, fórmula da nota de saúde, fator 0,5 e salário anual = mensal × 13,33; nenhuma linha com menos de 5 pessoas e nenhum nome.
+- Com unidade ou grupo oculto na empresa de teste, conferir que o cabeçalho dos dois arquivos traz o aviso "N recorte(s) oculto(s)", igual à tela. Se faltar, acrescentar.
 
 ## 4. Conferência completa em empresa de teste (apagada no final), 1280px e 390px
 - Empresas com e sem Clima/Potencial/Insight; sem NR-1; unidade com 5 aparece, com 4 fica oculta; grupo com 5 aparece, com 4 fica oculto; outra empresa vê 0 linhas; consultor com e sem projeto ativo; ordem da lista de prioridades (A7); filtro por unidade; /clima/correlacao abre a aba certa; atalho dentro do Clima.
