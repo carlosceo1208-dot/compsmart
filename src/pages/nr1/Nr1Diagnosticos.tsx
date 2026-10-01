@@ -1,9 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos } from '@/hooks/useNr1';
-import { RISCO_CLASS, RISCO_LABEL } from '@/lib/nr1';
+import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, Plus } from 'lucide-react';
 
@@ -33,10 +32,8 @@ export default function Nr1Diagnosticos() {
             <Card key={d.id}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-base">{d.ciclo_nome}</CardTitle>
-                {d.nivel_risco && (
-                  <Badge className={RISCO_CLASS[d.nivel_risco as keyof typeof RISCO_CLASS]}>
-                    Risco {RISCO_LABEL[d.nivel_risco as keyof typeof RISCO_LABEL]}
-                  </Badge>
+                {(d.total_respondentes ?? 0) >= 5 && d.score_geral != null && (
+                  <Nr1SeloSaude risco={d.score_geral} />
                 )}
               </CardHeader>
               <CardContent className="flex items-center justify-between gap-4 flex-wrap">
@@ -51,6 +48,7 @@ export default function Nr1Diagnosticos() {
               </CardContent>
             </Card>
           ))}
+          <Nr1SeloRodape />
         </div>
       )}
     </div>

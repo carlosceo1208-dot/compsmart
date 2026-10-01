@@ -1,11 +1,12 @@
 import { useParams } from 'react-router-dom';
 import { useNr1Diagnostico } from '@/hooks/useNr1';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { calcRisco, DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/nr1';
+import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
+import { notaSaude, seloSaude } from '@/lib/nr1Selo';
 import { Download, Users, AlertTriangle } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -30,9 +31,9 @@ export default function Nr1DiagnosticoDetalhe() {
     doc.text(`Diagnóstico NR-1 — ${data.ciclo_nome}`, 14, 18);
     doc.setFontSize(10);
     doc.text(
-      `Score geral: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Risco: ${
-        data.nivel_risco ? RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL] : '—'
-      } · Respondentes: ${data.total_respondentes}`,
+      `Risco: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Nota de saúde: ${
+        notaSaude(data.score_geral)?.toFixed(1) ?? '—'
+      } (${seloSaude(notaSaude(data.score_geral))?.label ?? '—'}) · Respondentes: ${data.total_respondentes} · Nota de saúde = 100 - risco psicossocial`,
       14, 26
     );
     autoTable(doc, {
@@ -83,11 +84,12 @@ export default function Nr1DiagnosticoDetalhe() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground">Nível de Risco</p>
-            {!baixaParticipacao && data.nivel_risco ? (
-              <Badge className={`${RISCO_CLASS[data.nivel_risco as keyof typeof RISCO_CLASS]} text-base mt-1`}>
-                {RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL]}
-              </Badge>
+            <p className="text-xs text-muted-foreground">Selo (nota de saúde)</p>
+            {!baixaParticipacao && data.score_geral != null ? (
+              <div className="mt-1 space-y-1">
+                <Nr1SeloSaude risco={data.score_geral} className="text-base" />
+                <Nr1SeloRodape />
+              </div>
             ) : <p className="text-muted-foreground">—</p>}
           </CardContent>
         </Card>
@@ -128,16 +130,13 @@ export default function Nr1DiagnosticoDetalhe() {
           ) : (
             dims.map(([dim, score]) => {
               const s = Number(score);
-              const risco = calcRisco(s)!;
               return (
                 <div key={dim} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium">{DIMENSAO_LABEL[dim as Dimensao] ?? dim}</span>
                     <span className="tabular-nums">
                       {s.toFixed(1)} —{' '}
-                      <Badge variant="outline" className={RISCO_CLASS[risco as keyof typeof RISCO_CLASS]}>
-                        {RISCO_LABEL[risco as keyof typeof RISCO_LABEL]}
-                      </Badge>
+                      <Nr1SeloSaude risco={s} mostrarNota={false} />
                     </span>
                   </div>
                   <Progress value={s} className="h-2" />

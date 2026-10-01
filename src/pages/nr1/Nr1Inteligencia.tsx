@@ -79,8 +79,11 @@ export default function Nr1Inteligencia() {
   const periodo = `${startDate} a ${endDate}`;
 
   const exportarCSV = () => {
+    // Sem unidade visível, sai uma linha só com a nota de método (nenhum número de recorte oculto).
+    const linhas = units.length ? units : [{ unitName: 'Nenhuma unidade com 5 ou mais pessoas' } as UnitCrossInsight];
+    const primeira = linhas[0];
     exportToCSV<UnitCrossInsight>(`inteligencia-nr1-${endDate}`, [
-      { header: 'Prioridade', accessor: (u) => units.indexOf(u) + 1 },
+      { header: 'Prioridade', accessor: (u) => (units.length ? units.indexOf(u) + 1 : '') },
       { header: 'Unidade', accessor: (u) => u.unitName },
       { header: 'Pessoas', accessor: (u) => u.totalColab },
       { header: 'Nota de saúde', accessor: (u) => u.saude },
@@ -91,18 +94,22 @@ export default function Nr1Inteligencia() {
         { header: 'Estrelas (9Box 7-9)', accessor: (u: UnitCrossInsight) => u.estrelas9Box },
       ] : []),
       ...(data?.incluiRemuneracao ? [{ header: 'Salário médio', accessor: (u: UnitCrossInsight) => u.avgSalary }] : []),
-      ...(data?.incluiPotencial && data?.incluiRemuneracao ? [{ header: 'Custo de turnover estimado', accessor: (u: UnitCrossInsight) => Math.round(u.custoTurnover) }] : []),
-      { header: `Nota metodológica (período ${periodo})`, accessor: (u) => (units.indexOf(u) === 0 ? NOTA_METODO : '') },
-    ], units);
+      ...(data?.incluiPotencial && data?.incluiRemuneracao ? [{ header: 'Custo de turnover estimado', accessor: (u: UnitCrossInsight) => (u.custoTurnover == null ? '' : Math.round(u.custoTurnover)) }] : []),
+      { header: `Nota metodológica (período ${periodo}; ${data?.unidadesOcultas ?? 0} recorte(s) oculto(s) por ter menos de 5 pessoas; k=5)`, accessor: (u) => (u === primeira ? NOTA_METODO : '') },
+    ], linhas);
   };
 
   const exportarPDF = () => {
     const doc = new jsPDF();
+    // Fonte padrão do PDF não tem "−" nem "≥": troca por equivalentes legíveis.
+    const t = (x: string) => x.replace(/−/g, '-').replace(/≥/g, '>=').replace(/≤/g, '<=').replace(/×/g, 'x');
+    const ocultas = data?.unidadesOcultas ?? 0;
     doc.setFontSize(16); doc.text('Inteligência NR-1 — relatório agregado', 14, 18);
     doc.setFontSize(9);
-    doc.text(`Período: ${periodo} · Diagnóstico: ${data?.diagnostico?.nome ?? '—'} · Nota de saúde da empresa: ${fmtN(data?.saude)} (${seloSaude(data?.saude)?.label ?? '—'})`, 14, 26);
-    doc.text(doc.splitTextToSize(`Nota metodológica: ${NOTA_METODO}`, 182), 14, 33);
-    let y = 58;
+    doc.text(t(`Período: ${periodo} · Diagnóstico: ${data?.diagnostico?.nome ?? '—'} · Nota de saúde da empresa: ${fmtN(data?.saude)} (${seloSaude(data?.saude)?.label ?? '—'})`), 14, 26);
+    doc.text(`${ocultas} recorte(s) oculto(s) por ter menos de 5 pessoas (k=5).`, 14, 30);
+    doc.text(doc.splitTextToSize(t(`Nota metodológica: ${NOTA_METODO}`), 182), 14, 36);
+    let y = 62;
     doc.setFontSize(10); doc.text('Prioridades por unidade (agregado, k=5)', 14, y); y += 6;
     doc.setFontSize(8);
     units.forEach((u, i) => {
@@ -111,9 +118,8 @@ export default function Nr1Inteligencia() {
       if (data?.incluiPotencial) parts.push(`estrelas ${u.estrelas9Box ?? 0}`, `críticos ${u.criticos9Box ?? 0}`);
       if (data?.incluiPotencial && data?.incluiRemuneracao) parts.push(`custo turnover ${fmtBRL(u.custoTurnover)}`);
       if (y > 280) { doc.addPage(); y = 18; }
-      doc.text(parts.join(' · '), 14, y); y += 5;
+      doc.text(t(parts.join(' · ')), 14, y); y += 5;
     });
-    if (data?.unidadesOcultas) { y += 2; doc.text(`${data.unidadesOcultas} recorte(s) oculto(s) por ter menos de 5 pessoas.`, 14, y); }
     doc.save(`inteligencia-nr1-${endDate}.pdf`);
   };
 

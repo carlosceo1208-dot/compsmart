@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useNr1Diagnosticos } from '@/hooks/useNr1';
 import { Nr1EmptyState } from '@/components/nr1/Nr1EmptyState';
+import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
 
 // 13 fatores de risco psicossocial (NR-1) com correlação às 6 dimensões do COPSOQ-III
 // (mesmas dimensões usadas em scores_dimensao do diagnóstico)
@@ -104,6 +105,14 @@ export function Nr1MatrizRisco() {
             Os 13 fatores de risco psicossocial da NR-1 são posicionados na matriz com base no questionário de 40 perguntas.
             <strong> Probabilidade</strong> é derivada do score COPSOQ das dimensões correlatas; <strong>Severidade</strong> é
             atribuída pela gravidade clínica/legal do fator. Clique numa célula para ver os fatores.
+            {(ultimo.total_respondentes ?? 0) >= 5 && ultimo.score_geral != null && (
+              <span className="mt-2 flex flex-wrap items-center gap-2">
+                <span>Selo do diagnóstico {ultimo.ciclo_nome}:</span>
+                <Nr1SeloSaude risco={ultimo.score_geral} />
+              </span>
+            )}
+            <Nr1SeloRodape className="mt-1" />
+            <span className="block text-xs mt-1">A classificação S×P de cada fator abaixo segue a matriz do PGR e é separada do selo de saúde.</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
