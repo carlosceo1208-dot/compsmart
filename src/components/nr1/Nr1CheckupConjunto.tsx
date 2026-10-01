@@ -86,10 +86,10 @@ export function Nr1CheckupConjunto() {
               ) : (
                 <div className="divide-y rounded-lg border">
                   {data.areas!.map((a) => (
-                    <div key={`${a.tipo}-${a.area}`} className="flex items-center justify-between gap-3 p-3 text-sm">
+                    <div key={`${a.tipo}-${a.area}`} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 p-3 text-sm">
                       <span className="flex items-center gap-2 min-w-0">
                         <Badge variant="outline" className="shrink-0">{a.tipo === 'grupo' ? 'Grupo' : 'Área'}</Badge>
-                        <span className="font-medium truncate">{a.area}</span>
+                        <span className="font-medium break-words">{a.area}</span>
                       </span>
                       <span className="flex items-center gap-3 shrink-0">
                         <span className="text-muted-foreground">{a.pessoas} pessoas</span>
