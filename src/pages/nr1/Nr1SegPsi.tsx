@@ -28,9 +28,11 @@ type Resultado = {
 };
 type Ciclo = { id: string; ciclo_nome: string; periodo_inicio: string; status: string };
 type Historico = { ciclos?: { diagnostico_id: string; ciclo_nome: string; total: number; dados_suficientes: boolean; score_geral: number | null }[] };
+type ExportLinha = { recorte: string; respondentes: number | null; dimensao: string; score: number | null; observacao?: string };
 
 const DIMS = Object.keys(DIMENSAO_LABEL) as Dimensao[];
 const FAIXAS = ['0-20', '20-40', '40-60', '60-80', '80-100'];
+const NOTA_METODOLOGICA = 'Demandas no Trabalho e Saúde e Bem-Estar não são avaliadas pela escala de Segurança Psicológica; essas dimensões são cobertas pelo diagnóstico COPSOQ.';
 const rpc = supabase.rpc.bind(supabase) as unknown as (fn: string, args?: Record<string, unknown>) => Promise<{ data: any; error: any }>;
 
 function StatusBadge({ score }: { score: number }) {
@@ -66,11 +68,12 @@ export default function Nr1SegPsi() {
 
   if (ciclos.isLoading) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando…</div>;
   if (!ciclos.data?.length) {
+    const gestorSemGrupo = actorRole === 'manager';
     return (
       <Card><CardContent className="py-10 text-center space-y-2">
         <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
-        <p className="font-semibold">Nenhum resultado disponível para você</p>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto">Os resultados de Segurança Psicológica são vistos pelo RH, pelo admin e pelo consultor responsável. O gestor vê apenas os grupos vinculados a ele. As perguntas fazem parte do questionário anônimo do diagnóstico NR-1.</p>
+        <p className="font-semibold">{gestorSemGrupo ? 'Seu acesso será liberado quando o RH vincular sua equipe a um grupo' : 'Nenhum resultado disponível para você'}</p>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">{gestorSemGrupo ? 'Para preservar o anonimato, gestores acessam somente resultados agregados dos grupos vinculados pelo RH.' : 'Os resultados de Segurança Psicológica são vistos pelo RH, pelo admin e pelo consultor responsável. O gestor vê apenas os grupos vinculados a ele. As perguntas fazem parte do questionário anônimo do diagnóstico NR-1.'}</p>
       </CardContent></Card>
     );
   }
@@ -87,7 +90,7 @@ export default function Nr1SegPsi() {
 
   const exportarCSV = () => {
     if (activeCompanyId) registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'segpsi', kValue: SEGPSI_K_MINIMO });
-    const linhas: { recorte: string; respondentes: number; dimensao: string; score: number }[] = [];
+    const linhas: ExportLinha[] = [];
     if (emp?.dados_suficientes) {
       linhas.push({ recorte: 'Empresa', respondentes: emp.total, dimensao: 'Geral', score: Number(emp.score_geral) });
       comDado.forEach((d) => linhas.push({ recorte: 'Empresa', respondentes: emp.total, dimensao: d.label, score: d.score }));
@@ -97,12 +100,14 @@ export default function Nr1SegPsi() {
       Object.entries(g.scores_dimensao ?? {}).forEach(([d, v]) => linhas.push({ recorte: `Grupo: ${g.grupo}`, respondentes: g.total, dimensao: dimensaoLabel(d), score: v }));
     });
     (historico.data?.ciclos ?? []).filter((c) => c.dados_suficientes).forEach((c) => linhas.push({ recorte: `Histórico: ${c.ciclo_nome}`, respondentes: c.total, dimensao: 'Geral', score: Number(c.score_geral) }));
+    linhas.push({ recorte: 'Nota metodológica', respondentes: null, dimensao: 'Demandas no Trabalho e Saúde e Bem-Estar', score: null, observacao: NOTA_METODOLOGICA });
     exportToCSV('seguranca_psicologica_agregado', [
       { header: 'Recorte', accessor: (x: any) => x.recorte },
       { header: 'Respondentes', accessor: (x: any) => x.respondentes },
       { header: 'Dimensão', accessor: (x: any) => x.dimensao },
       { header: 'Score (0-100)', accessor: (x: any) => x.score },
-      { header: 'Status', accessor: (x: any) => statusSegPsi(x.score).label },
+      { header: 'Status', accessor: (x: ExportLinha) => x.score == null ? '' : statusSegPsi(x.score).label },
+      { header: 'Observação', accessor: (x: ExportLinha) => x.observacao ?? '' },
     ], linhas);
   };
   const exportarPDF = async () => {
@@ -132,6 +137,7 @@ export default function Nr1SegPsi() {
 
       {r && r.acesso !== 'negado' && (
         <div ref={ref} className="space-y-6 bg-background p-1">
+          <p className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground"><strong>Nota metodológica:</strong> {NOTA_METODOLOGICA}</p>
           {escopoEmpresa && (
             emp?.dados_suficientes ? (
               <>
@@ -142,11 +148,11 @@ export default function Nr1SegPsi() {
                   <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Dimensão mais frágil</p><p className="text-sm font-semibold mt-1">{fragil?.label ?? '—'}</p></CardContent></Card>
                 </div>
                 <Card>
-                  <CardHeader><CardTitle>Score por dimensão</CardTitle><CardDescription>0–100; quanto maior, mais segurança. Dimensões sem itens da escala aparecem como "sem itens".</CardDescription></CardHeader>
+                  <CardHeader><CardTitle>Score por dimensão</CardTitle><CardDescription>0–100; quanto maior, mais segurança. Demandas e Saúde são avaliadas no diagnóstico COPSOQ.</CardDescription></CardHeader>
                   <CardContent className="grid gap-2 md:grid-cols-2">
                     {dimsData.map((d) => (
                       <div key={d.key} className="rounded-md border p-3">
-                        <div className="flex items-center justify-between gap-2"><p className="text-sm font-medium">{d.label}</p>{d.score != null ? <StatusBadge score={d.score} /> : <span className="text-xs text-muted-foreground">sem itens</span>}</div>
+                        <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium">{d.label}</p>{d.score != null ? <StatusBadge score={d.score} /> : <span className="max-w-[220px] text-right text-xs text-muted-foreground">Não avaliada nesta escala — consulte o diagnóstico COPSOQ</span>}</div>
                         {d.score != null && <><Progress value={d.score} className="mt-2 h-2" /><p className="mt-1 text-xs text-muted-foreground tabular-nums">{d.score.toFixed(1)} / 100</p></>}
                       </div>
                     ))}
@@ -212,6 +218,7 @@ export default function Nr1SegPsi() {
 function GestoresPorGrupo({ diagnosticoId, companyId }: { diagnosticoId: string; companyId: string }) {
   const qc = useQueryClient();
   const [sel, setSel] = useState<Record<string, string>>({});
+  const [somenteSemGrupo, setSomenteSemGrupo] = useState(false);
   const grupos = useQuery({
     queryKey: ['segpsi-grupos', diagnosticoId],
     queryFn: async () => { const { data } = await supabase.from('nr1_convites').select('grupo').eq('diagnostico_id', diagnosticoId); return [...new Set((data ?? []).map((c) => c.grupo))].sort(); },
@@ -220,11 +227,22 @@ function GestoresPorGrupo({ diagnosticoId, companyId }: { diagnosticoId: string;
     queryKey: ['segpsi-vinculos', companyId],
     queryFn: async () => { const { data } = await (supabase as any).from('nr1_grupo_gestores').select('id, grupo, gestor_id').eq('company_id', companyId); return (data ?? []) as { id: string; grupo: string; gestor_id: string }[]; },
   });
-  const pessoas = useQuery({
-    queryKey: ['segpsi-pessoas', companyId],
-    queryFn: async () => { const { data } = await supabase.from('profiles').select('id, full_name').eq('root_company_id', companyId).eq('status', 'active').order('full_name').limit(500); return data ?? []; },
+  const gestores = useQuery({
+    queryKey: ['segpsi-gestores', companyId],
+    queryFn: async () => {
+      const { data: roles, error: rolesError } = await supabase.from('user_roles').select('user_id').eq('role', 'manager');
+      if (rolesError) throw rolesError;
+      const ids = [...new Set((roles ?? []).map((r) => r.user_id))];
+      if (!ids.length) return [];
+      const { data, error } = await supabase.from('profiles').select('id, full_name').eq('root_company_id', companyId).eq('status', 'active').in('id', ids).order('full_name').limit(500);
+      if (error) throw error;
+      return data ?? [];
+    },
   });
-  const nome = useMemo(() => new Map((pessoas.data ?? []).map((p) => [p.id, p.full_name])), [pessoas.data]);
+  const nome = useMemo(() => new Map((gestores.data ?? []).map((p) => [p.id, p.full_name])), [gestores.data]);
+  const idsVinculados = useMemo(() => new Set((vinculos.data ?? []).map((v) => v.gestor_id)), [vinculos.data]);
+  const gestoresSemGrupo = useMemo(() => (gestores.data ?? []).filter((p) => !idsVinculados.has(p.id)), [gestores.data, idsVinculados]);
+  const gestoresDisponiveis = somenteSemGrupo ? gestoresSemGrupo : (gestores.data ?? []);
   const refresh = () => qc.invalidateQueries({ queryKey: ['segpsi-vinculos', companyId] });
 
   const vincular = async (grupo: string) => {
@@ -237,7 +255,13 @@ function GestoresPorGrupo({ diagnosticoId, companyId }: { diagnosticoId: string;
   if (!grupos.data?.length) return null;
   return (
     <Card>
-      <CardHeader><CardTitle>Gestores por grupo</CardTitle><CardDescription>O gestor vinculado vê só o resultado agregado do próprio grupo, e só com o mínimo de {SEGPSI_K_MINIMO} respostas. A pessoa precisa ter o papel de gestor.</CardDescription></CardHeader>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <CardTitle>Gestores por grupo</CardTitle>
+          <Button type="button" size="sm" variant={somenteSemGrupo ? 'secondary' : 'outline'} onClick={() => setSomenteSemGrupo((v) => !v)}>Sem grupo ({gestoresSemGrupo.length})</Button>
+        </div>
+        <CardDescription>O gestor vinculado vê só o resultado agregado do próprio grupo, e só com o mínimo de {SEGPSI_K_MINIMO} respostas. A pessoa precisa ter o papel de gestor.</CardDescription>
+      </CardHeader>
       <CardContent className="space-y-3">
         {grupos.data.map((g) => (
           <div key={g} className="rounded-md border p-3 space-y-2">
@@ -248,7 +272,7 @@ function GestoresPorGrupo({ diagnosticoId, companyId }: { diagnosticoId: string;
             <div className="flex flex-col gap-2 sm:flex-row">
               <Select value={sel[g] ?? ''} onValueChange={(v) => setSel((s) => ({ ...s, [g]: v }))}>
                 <SelectTrigger className="sm:w-[280px]"><SelectValue placeholder="Escolher gestor" /></SelectTrigger>
-                <SelectContent>{(pessoas.data ?? []).map((p) => <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>)}</SelectContent>
+                <SelectContent>{gestoresDisponiveis.map((p) => <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>)}</SelectContent>
               </Select>
               <Button size="sm" variant="outline" disabled={!sel[g]} onClick={() => vincular(g)}>Vincular</Button>
             </div>
