@@ -137,5 +137,6 @@
 
 - [x] Fase 5B-2 Vitalidade: implementado e validado (10 itens + adendo), dados de teste removidos — aguardando aprovação para publicar
 - [x] Fase 5B-2: publicação autorizada pelo CEO (2026-10-01); dossiê com acessos=3 e 3 avisos aceitos
-- [ ] Fase 5B-2 pós-publicação: conferir convite de contratar Clima (RH sem Clima)
+- [x] Fase 5B-2 pós-publicação: convite de contratar Clima conferido na Vitalidade (1280/390)
 - [x] Fase 5B-3 Etapa 0: diagnóstico Acompanhar (Minha Jornada + Check up) entregue, sem bloqueador; achados A1–A5; aguardando decisões do CEO
+- [x] Fase 5B-3 Acompanhar: implementado e validado em empresa de teste (removida) — aguardando aprovação para publicar

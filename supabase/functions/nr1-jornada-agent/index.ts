@@ -62,46 +62,21 @@ Em todo check-in semanal, lembre em 1 frase: "Você pode pausar ou encerrar essa
 {JORNADA_CONTEXT}
 `;
 
-async function buildCompanyContext(supabase: any, userId: string): Promise<string> {
+// LGPD: ao modelo vai SÓ o setor da empresa. Nunca nome, cargo, área, liderança,
+// modalidade, tempo de empresa ou nome da empresa.
+async function buildCompanyContext(supabase: any): Promise<string> {
   try {
     const { data: companyId } = await supabase.rpc("get_user_company_id");
-    if (!companyId) return "Sem empresa identificada.";
-
+    if (!companyId) return "- Setor: não informado";
     const { data: company } = await supabase
       .from("organizational_structure")
-      .select("name, industry_sector")
+      .select("industry_sector")
       .eq("id", companyId)
       .maybeSingle();
-
-    const { data: me } = await supabase
-      .from("profiles")
-      .select("full_name, job_title, department, work_modality, hire_date, leadership_level")
-      .eq("id", userId)
-      .maybeSingle();
-
-    const modalidadeLabel: Record<string, string> = {
-      presencial: "Presencial",
-      home_office: "Home Office",
-      hibrido: "Híbrido",
-    };
-
-    let ctx = `- Empresa: ${company?.name ?? "(sem nome)"}\n`;
-    if (company?.industry_sector) ctx += `- Setor: ${company.industry_sector}\n`;
-    if (me) {
-      ctx += `- Colaborador: ${me.full_name ?? "(sem nome)"}\n`;
-      if (me.job_title) ctx += `  • Cargo: ${me.job_title}\n`;
-      if (me.department) ctx += `  • Área: ${me.department}\n`;
-      if (me.leadership_level) ctx += `  • Liderança: ${me.leadership_level}\n`;
-      if (me.work_modality) ctx += `  • Modalidade: ${modalidadeLabel[me.work_modality] ?? me.work_modality}\n`;
-      if (me.hire_date) {
-        const anos = Math.max(0, Math.floor((Date.now() - new Date(me.hire_date).getTime()) / (1000 * 60 * 60 * 24 * 365)));
-        ctx += `  • Tempo de empresa: ~${anos} ano(s)\n`;
-      }
-    }
-    return ctx;
+    return `- Setor: ${company?.industry_sector ?? "não informado"}`;
   } catch (e) {
-    console.error("buildCompanyContext error", e);
-    return "Sem contexto disponível.";
+    console.error("buildCompanyContext error", e instanceof Error ? e.message : "erro");
+    return "- Setor: não informado";
   }
 }
 
@@ -140,8 +115,25 @@ serve(async (req) => {
       });
     }
 
-    const companyCtx = await buildCompanyContext(supabase, userData.user.id);
-    const jornadaCtx = `- Jornada ID: ${jornadaId ?? "(nova)"}\n- Momento atual: ${momentoAtual} de 8\n- Semana atual: ${semanaAtual} de 12`;
+    const { data: temNr1 } = await supabase.rpc("has_module", { _slug: "nr1" });
+    if (temNr1 !== true) {
+      return new Response(JSON.stringify({ error: "Sua empresa não tem o NR-1 contratado." }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    if (jornadaId) {
+      const { data: j } = await supabase.from("nr1_jornadas").select("id").eq("id", jornadaId).eq("user_id", userData.user.id).maybeSingle();
+      if (!j) {
+        return new Response(JSON.stringify({ error: "Jornada não encontrada." }), {
+          status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const companyCtx = await buildCompanyContext(supabase);
+    const m = Number.isFinite(momentoAtual) ? Math.min(8, Math.max(1, Math.round(momentoAtual))) : 1;
+    const s = Number.isFinite(semanaAtual) ? Math.min(12, Math.max(1, Math.round(semanaAtual))) : 1;
+    const jornadaCtx = `- Momento atual: ${m} de 8\n- Semana atual: ${s} de 12`;
 
     const systemPrompt = SYSTEM_PROMPT
       .replace("{COMPANY_CONTEXT}", companyCtx)
