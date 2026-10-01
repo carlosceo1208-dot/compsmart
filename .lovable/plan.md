@@ -11,46 +11,63 @@ Uma única tela, "Inteligência", com 4 abas:
 3. **Talentos em Risco (NR-1 x 9Box)**: exige o módulo Potencial & Sucessão. Sem ele, aparece o convite.
 4. **Custo do Risco (NR-1 x Remuneração)**: exige o Insight. Sem ele, aparece o convite.
 
-Em todas as abas usamos um selo só: 70 ou mais é Saudável, de 55 a 69 é Atenção, abaixo de 55 é Crítico. Ele substitui o "Baixo/Moderado/Alto/Crítico".
+Unidades e grupos com menos de 5 pessoas: a contagem aparece, mas a nota não. O bloco fica oculto e aparece o aviso "N recorte(s) oculto(s)".
 
-Unidades com menos de 5 pessoas: a contagem aparece, mas a nota não. O bloco fica oculto e aparece o aviso "N recorte(s) oculto(s)".
+O endereço antigo /clima/correlacao passa a levar para a aba nova. O card do Clima continua separado no painel e ganha o atalho "Ver correlação com riscos psicossociais" (A6).
 
-Exportação em PDF e planilha, sempre com dados agregados e uma nota sobre o método. Vou abrir os arquivos para conferir, não só gerar.
+## Ajustes aprovados
 
-O endereço antigo /clima/correlacao passa a levar para a aba nova. O card do Clima continua separado no painel.
-
-## Ponto de atenção sobre o selo
-
-A nota do COPSOQ é de risco: quanto maior, pior. O selo 70/55 trata nota alta como boa. Por isso, na Inteligência a nota mostrada vai ser de saúde, calculada como 100 menos o risco. Exemplo: o "Diagnóstico Q1 2026", com risco 49,93, aparece com 50,1, Crítico. As telas de Diagnóstico e Matriz de Risco ficam como estão. Se preferir outra regra, me diga antes de aprovar.
+- **A1 — Selo único em todo o NR-1.** O selo é: 70 ou mais, Saudável; de 55 a 69, Atenção; abaixo de 55, Crítico. A nota mostrada é a nota de saúde, calculada como 100 menos o risco. Exemplo: risco 49,93 dá saúde 50,1, que é Crítico.
+  - O selo vale também para Diagnóstico, Matriz de Risco e Visão Geral, para a mesma nota não ganhar rótulos diferentes em telas diferentes.
+  - Na Inteligência, uma nota de rodapé com dica explica a conta: "nota de saúde = 100 − risco psicossocial".
+  - Se alguma tela antiga precisar ficar como está, isso vai para o dossiê como decisão explícita.
+- **A2 — Custo de turnover com regra fixa, sem IA.** A conta é: nº de estrelas em ambiente de risco × salário médio anual dessas estrelas × 0,5.
+  - O salário anual é o mensal × 13,33.
+  - "Estrela em ambiente de risco" é quem está nos quadrantes 7 a 9 do 9Box, numa unidade com selo Atenção ou Crítico.
+  - A fórmula aparece na tela e no cabeçalho da exportação.
+- **A3 — Grupo mínimo de 5 também no grupo autodeclarado**, além da unidade.
+- **A4 — Filtro por unidade feito na própria tela.** A função devolve todas as unidades, e o seletor que já existe continua funcionando.
+- **A5 — Trava nos agentes que já existem**: nr1-bem-estar-agent, nr1-jornada-agent e nr1-plano-acao-assistant. Eles só usam dados de cruzamento se a empresa tiver o módulo de origem. Isso ganha um teste próprio.
+- **A6 — Atalho dentro do Clima**, além do redirecionamento.
 
 ## Etapas
 
-1. Juntar as duas telas em uma, com as abas e o redirecionamento.
-2. Fazer as contas por unidade no servidor (hoje elas são feitas no navegador). A função confere papel, empresa, NR-1 e o módulo de origem de cada cruzamento. Sem permissão, a recusa fica registrada no log de acessos e a consulta devolve 0 linhas, sem dar erro. O grupo mínimo de 5 também é aplicado no servidor.
-3. Montar a Visão Executiva com a lista de prioridades. A lista segue regras fixas, sem usar IA, para não inventar números.
-4. Trocar para o selo único em todo o módulo.
-5. Travar cada cruzamento em 3 camadas: tela, banco e agente. Hoje a Inteligência não tem agente próprio. Por isso a trava do agente vale para os agentes que já leem esses dados, sem criar um agente novo.
-6. Fazer a exportação agregada com a nota sobre o método.
+1. Juntar as duas telas em uma, com as 4 abas, o redirecionamento e o atalho no Clima (A6).
+2. Fazer as contas por unidade e por grupo no servidor, com o mínimo de 5 pessoas (A3, A4).
+   - A função confere papel, empresa, NR-1 e o módulo de origem.
+   - Sem permissão, a recusa fica registrada no log de acessos e a função devolve 0 linhas, sem dar erro.
+3. Montar a Visão Executiva com a lista de prioridades, por regras fixas, e o custo de turnover (A2).
+4. Aplicar o selo único em todo o NR-1, com a explicação na tela (A1).
+5. Travar cada cruzamento em 3 camadas: tela, banco e agentes (A5).
+6. Fazer a exportação agregada com a nota de método: mínimo de 5 pessoas, período, fórmula da nota de saúde e fator de reposição.
 7. Validar numa empresa de teste, que será apagada no fim.
 
 ## Validação
 
-- Comparar o resultado esperado com o obtido, em telas de 1280px e 390px. Casos testados:
+- Comparar o esperado com o obtido em 1280px e 390px, nestes casos:
   - empresa com e sem Clima, Potencial e Insight;
   - empresa sem NR-1;
   - unidade com 5 pessoas (aparece) e com 4 (fica oculta);
+  - grupo autodeclarado com 5 (aparece) e com 4 (fica oculto);
   - outra empresa vê 0 linhas;
-  - consultor com e sem projeto ativo.
+  - consultor com e sem projeto ativo;
+  - agentes respeitando o módulo de origem;
+  - a mesma nota com o mesmo selo em todas as telas;
+  - o filtro por unidade continua funcionando.
 - Abrir o PDF e a planilha exportados para conferir.
-- Depois da limpeza, as contagens precisam bater com a linha de base: 4 acessos, 2 auditorias, respostas 440/0/0, 9 check-ups, 18 logins, 2 leads.
-- Rodar `bun run ci` sem erros. Atualizar AGENTS.md e roadmap.md.
-- Nada vai ser publicado sem a sua aprovação explícita.
+- Depois da limpeza, as contagens batem com a linha de base: 4 acessos, 2 auditorias, respostas 440/0/0, 9 check-ups, 18 logins, 2 leads.
+- `bun run ci` limpo. AGENTS.md e roadmap.md atualizados.
+- Nada é publicado sem a aprovação explícita do CEO.
 
 ## Detalhes técnicos
 
-- Nova função `nr1_inteligencia_unidades(p_inicio, p_fim)`, SECURITY DEFINER e com search_path fixo. Usa `rh_admin_da_empresa`/`get_user_root_company_id_strict`, `has_module('nr1')` e `nr1_consultor_liberado`. Só preenche as colunas de 9Box se `has_module('potencial-sucessao')` e as de salário se `has_module('insight')`. Esconde a unidade quando houver menos de 5 pessoas (`n<5`). Recusa: grava em `nr1_access_log`, emite WARNING e faz RETURN.
-- A visão `vw_nr1_clima_copsoq_correlacao` passa a ser lida por uma função com a mesma trava e com `has_module('clima')`.
-- `useNr1Intelligence` deixa de ler a `v_talent_intelligence_dashboard` direto e passa a usar a função nova.
-- `src/lib/nr1Selo.ts` (`seloSaude`) reaproveita os limites de `statusSegPsi`. `calcRisco` continua existindo para as outras telas.
-- Exportação com `csvExport`/`pdfExport` e cabeçalho metodológico (k=5, período, fórmula da nota de saúde).
-- Rotas: `/nr1/inteligencia?aba=…` e `/clima/correlacao` → redirecionamento.
+- `nr1_inteligencia_unidades(p_inicio, p_fim)`:
+  - SECURITY DEFINER, com search_path fixo.
+  - Usa `rh_admin_da_empresa`/`get_user_root_company_id_strict`, `has_module('nr1')` e `nr1_consultor_liberado`.
+  - Preenche as colunas de 9Box só com `has_module('potencial-sucessao')` e as de salário só com `has_module('insight')`.
+  - Recorte por `coalesce(department, grupo)` com n≥5. A recusa grava em `nr1_access_log` e termina com WARNING + RETURN.
+- `nr1_clima_correlacao()` passa a ler `vw_nr1_clima_copsoq_correlacao`, com a mesma trava mais `has_module('clima')`.
+- `useNr1Intelligence` passa a usar a função nova, e não mais `v_talent_intelligence_dashboard` direto.
+- `src/lib/nr1Selo.ts` (`seloSaude`, `notaSaude = 100 − risco`) reaproveita os limites de `statusSegPsi`. As telas do NR-1 que hoje usam `calcRisco` para mostrar o rótulo passam a usar `seloSaude`. Hoje existe o teste `nr1-risk-thresholds`; ele ganha um teste equivalente para o selo.
+- Agentes: conferência com `has_module` do módulo de origem antes de incluir dados de cruzamento no contexto. Sem o módulo, os dados ficam de fora e a resposta diz "módulo não contratado".
+- Rotas: `/nr1/inteligencia?aba=…` e o redirecionamento de `/clima/correlacao`.
