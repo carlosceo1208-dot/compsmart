@@ -122,3 +122,4 @@
 - [ ] Publicação aguardando revisão final
 - [x] Sugestão de faixa: entrada única com auditoria das recusas (_user só do login), contrato 200/200-nulo/403, 0 chamadas diretas
 - [x] Teste na tela como RH de A (1280/390)
+- [ ] Fase D (validação comercial): contratar só Clima (sem NR-1) e operar as 7 telas — prova de produto vendável sozinho
