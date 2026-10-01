@@ -40,3 +40,8 @@ Registro no dossiê:
 - `bun run ci` limpo.
 - Relatório atualizado (esperado × obtido, com os prints).
 - **Nada publicado** até aprovação explícita.
+
+## Registro do CEO (20:39 UTC, pós-conferência)
+- Correções de mobile durante a conferência (nome da área cortado, botões do topo da jornada passando da borda) registradas como o ciclo de validação funcionando direito — corrigidas e reconferidas.
+- Linha "Sem recorte — média da empresa" com 2 pessoas sem nota: registrado como correto. A contagem aparece; a nota só a partir de k=5.
+- Obs.: o arquivo do relatório e a pasta de prints foram removidos com a empresa de teste; o registro do resultado visual fica neste dossiê.
