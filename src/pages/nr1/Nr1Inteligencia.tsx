@@ -79,8 +79,11 @@ export default function Nr1Inteligencia() {
   const periodo = `${startDate} a ${endDate}`;
 
   const exportarCSV = () => {
+    // Sem unidade visível, sai uma linha só com a nota de método (nenhum número de recorte oculto).
+    const linhas = units.length ? units : [{ unitName: 'Nenhuma unidade com 5 ou mais pessoas' } as UnitCrossInsight];
+    const primeira = linhas[0];
     exportToCSV<UnitCrossInsight>(`inteligencia-nr1-${endDate}`, [
-      { header: 'Prioridade', accessor: (u) => units.indexOf(u) + 1 },
+      { header: 'Prioridade', accessor: (u) => (units.length ? units.indexOf(u) + 1 : '') },
       { header: 'Unidade', accessor: (u) => u.unitName },
       { header: 'Pessoas', accessor: (u) => u.totalColab },
       { header: 'Nota de saúde', accessor: (u) => u.saude },
@@ -92,8 +95,8 @@ export default function Nr1Inteligencia() {
       ] : []),
       ...(data?.incluiRemuneracao ? [{ header: 'Salário médio', accessor: (u: UnitCrossInsight) => u.avgSalary }] : []),
       ...(data?.incluiPotencial && data?.incluiRemuneracao ? [{ header: 'Custo de turnover estimado', accessor: (u: UnitCrossInsight) => Math.round(u.custoTurnover) }] : []),
-      { header: `Nota metodológica (período ${periodo}; ${data?.unidadesOcultas ?? 0} recorte(s) oculto(s) por ter menos de 5 pessoas; k=5)`, accessor: (u) => (units.indexOf(u) === 0 ? NOTA_METODO : '') },
-    ], units);
+      { header: `Nota metodológica (período ${periodo}; ${data?.unidadesOcultas ?? 0} recorte(s) oculto(s) por ter menos de 5 pessoas; k=5)`, accessor: (u) => (u === primeira ? NOTA_METODO : '') },
+    ], linhas);
   };
 
   const exportarPDF = () => {
