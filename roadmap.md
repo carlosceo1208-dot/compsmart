@@ -130,3 +130,6 @@
 - [x] Teste no navegador do questionário completo em tenant fictício + conferência real de PDF/planilha + limpeza integral
 - [x] Gestor sem grupo vinculado permanece sem acesso; usar gestor cadastrado do colaborador quebraria o anonimato
 - [x] Publicado (2026-10-01, aprovação do CEO)
+- [x] Endurecimento 5B-1: lista de perguntas da Segurança Psicológica restrita a NR-1/super admin (não publicado)
+- [x] Fase 5B-2 Etapa 0: diagnóstico do Vitalidade entregue
+- [ ] Fase 5B-2: aguardando decisões de escala e dimensões
