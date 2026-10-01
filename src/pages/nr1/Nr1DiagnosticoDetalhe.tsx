@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { calcRisco, DIMENSAO_LABEL, RISCO_CLASS, RISCO_LABEL, type Dimensao } from '@/lib/nr1';
+import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
 import { Download, Users, AlertTriangle } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -130,16 +130,13 @@ export default function Nr1DiagnosticoDetalhe() {
           ) : (
             dims.map(([dim, score]) => {
               const s = Number(score);
-              const risco = calcRisco(s)!;
               return (
                 <div key={dim} className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span className="font-medium">{DIMENSAO_LABEL[dim as Dimensao] ?? dim}</span>
                     <span className="tabular-nums">
                       {s.toFixed(1)} —{' '}
-                      <Badge variant="outline" className={RISCO_CLASS[risco as keyof typeof RISCO_CLASS]}>
-                        {RISCO_LABEL[risco as keyof typeof RISCO_LABEL]}
-                      </Badge>
+                      <Nr1SeloSaude risco={s} mostrarNota={false} />
                     </span>
                   </div>
                   <Progress value={s} className="h-2" />
