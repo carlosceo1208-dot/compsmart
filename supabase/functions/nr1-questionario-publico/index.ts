@@ -20,15 +20,19 @@ Deno.serve(async (req) => {
       if (error) throw error;
       const convite = data?.[0];
       if (!convite?.disponivel) return json({ error: 'Este link expirou ou não está mais disponível.' }, 410);
-      return json(convite);
+      const { data: segpsi, error: segErr } = await db.from('nr1_segpsi_questoes').select('id, codigo, dimensao, enunciado, ordem, reverso').eq('ativo', true).order('ordem');
+      if (segErr) throw segErr;
+      return json({ ...convite, questoes_segpsi: segpsi ?? [] });
     }
 
     if (action === 'submit') {
       const submissionId = typeof body?.submissionId === 'string' ? body.submissionId : '';
       const respostas = body?.respostas;
-      if (!uuidPattern.test(submissionId) || !respostas || typeof respostas !== 'object' || Array.isArray(respostas)) return json({ error: 'Envio inválido' }, 400);
-      if (Object.keys(respostas).length > 100) return json({ error: 'Quantidade de respostas inválida' }, 400);
-      const { error } = await db.rpc('nr1_submeter_respostas', { p_token: token, p_submission_id: submissionId, p_respostas: respostas });
+      const respostasSegPsi = body?.respostasSegPsi;
+      const isObj = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
+      if (!uuidPattern.test(submissionId) || !isObj(respostas) || !isObj(respostasSegPsi)) return json({ error: 'Envio inválido' }, 400);
+      if (Object.keys(respostas).length > 100 || Object.keys(respostasSegPsi).length > 50) return json({ error: 'Quantidade de respostas inválida' }, 400);
+      const { error } = await db.rpc('nr1_submeter_com_segpsi', { p_token: token, p_submission_id: submissionId, p_respostas: respostas, p_respostas_segpsi: respostasSegPsi });
       if (error) return json({ error: error.message.includes('já foi enviado') ? 'Este questionário já foi enviado.' : 'Não foi possível registrar as respostas.' }, 400);
       return json({ success: true });
     }

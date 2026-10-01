@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
-import { FIB_DIMENSOES, ESTAGIOS_SEG_PSI } from '@/lib/fib';
+import { FIB_DIMENSOES } from '@/lib/fib';
 
 /**
  * Hooks de dados executivos do módulo NR-1 (FIB, Segurança Psicológica e
@@ -21,8 +21,6 @@ export type FibScore = { key: string; label: string; grupo: 'pessoa' | 'organiza
 export type DataSource = 'real' | 'seed' | 'empty';
 export type FibData = { ciclo: string | null; respondentes: number; adesao: number; scores: FibScore[]; source: DataSource };
 
-export type SegPsiScore = { key: string; label: string; score: number; descricao: string };
-export type SegPsiData = { ciclo: string | null; respondentes: number; adesao: number; scores: SegPsiScore[]; source: DataSource };
 
 export type SociodemoLinha = { rotulo: string; fib: number; segPsi: number; hse: number };
 export type SociodemoRecorte = { id: string; titulo: string; linhas: SociodemoLinha[] };
@@ -59,7 +57,6 @@ const SEED_FIB_EMP: Record<string, number> = {
   bem_estar_psicologico: 78, saude: 82, uso_do_tempo: 70, vitalidade_comunitaria: 75,
   cultura: 80, educacao: 77, governanca: 84, meio_ambiente: 85, padrao_de_vida: 72,
 };
-const SEED_SEGPSI: Record<string, number> = { incluir: 71.4, aprender: 65.1, contribuir: 65.1, desafiar: 40.5 };
 const SEED_SOCIODEMO: SociodemoRecorte[] = [
   { id: 'genero', titulo: 'Por sexo', linhas: [
     { rotulo: 'Feminino', fib: 68, segPsi: 62, hse: 71 },
@@ -174,57 +171,6 @@ export const useFibData = () => {
 };
 
 // ---------- Segurança Psicológica ----------
-export const useSegPsiData = () => {
-  const { activeCompanyId } = useCompanyContext();
-  return useQuery<SegPsiData>({
-    queryKey: ['nr1-segpsi-data', activeCompanyId],
-    enabled: !!activeCompanyId,
-    queryFn: async () => {
-      const rows = await safeSelect<any>('nr1_segpsi_results', activeCompanyId!);
-      if (rows && rows.length > 0) {
-        const ultimo = rows[0];
-        const scores: SegPsiScore[] = ESTAGIOS_SEG_PSI.map((e) => ({
-          key: e.key,
-          label: e.label,
-          descricao: e.descricao,
-          score: Number(ultimo?.scores?.[e.key] ?? 0),
-        }));
-        return {
-          ciclo: ultimo?.ciclo_nome ?? null,
-          respondentes: Number(ultimo?.respondentes ?? 0),
-          adesao: Number(ultimo?.adesao_pct ?? 0),
-          scores,
-          source: 'real',
-        };
-      }
-      // Sem ciclo coletado: só o Super Admin do CompSmart vê seeds ilustrativos.
-      const isSuper = await isCurrentUserSuperAdmin();
-      const workforce = await getWorkforceCount(activeCompanyId!);
-      if (!isSuper) {
-        return {
-          ciclo: null,
-          respondentes: 0,
-          adesao: 0,
-          scores: ESTAGIOS_SEG_PSI.map((e) => ({ key: e.key, label: e.label, descricao: e.descricao, score: 0 })),
-          source: 'empty',
-        };
-      }
-      const respondentes = Math.max(0, Math.round(workforce * 0.8125));
-      return {
-        ciclo: 'Ciclo Demo · 2026.1',
-        respondentes,
-        adesao: workforce > 0 ? (respondentes / workforce) * 100 : 0,
-        scores: ESTAGIOS_SEG_PSI.map((e) => ({
-          key: e.key,
-          label: e.label,
-          descricao: e.descricao,
-          score: SEED_SEGPSI[e.key],
-        })),
-        source: 'seed',
-      };
-    },
-  });
-};
 
 // ---------- Sociodemográfico ----------
 // Para 16 colaboradores, geramos recortes coerentes com o porte real

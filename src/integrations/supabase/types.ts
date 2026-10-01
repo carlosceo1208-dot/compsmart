@@ -5354,6 +5354,33 @@ export type Database = {
         }
         Relationships: []
       }
+      nr1_grupo_gestores: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          gestor_id: string
+          grupo: string
+          id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          gestor_id: string
+          grupo: string
+          id?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          gestor_id?: string
+          grupo?: string
+          id?: string
+        }
+        Relationships: []
+      }
       nr1_importacoes_matriz: {
         Row: {
           arquivo_mime: string | null
@@ -5841,6 +5868,107 @@ export type Database = {
           reverso?: boolean
         }
         Relationships: []
+      }
+      nr1_segpsi_questoes: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          created_at: string
+          dimensao: Database["public"]["Enums"]["nr1_dimensao"]
+          enunciado: string
+          fonte: string
+          id: string
+          ordem: number
+          reverso: boolean
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          dimensao: Database["public"]["Enums"]["nr1_dimensao"]
+          enunciado: string
+          fonte?: string
+          id?: string
+          ordem: number
+          reverso?: boolean
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          dimensao?: Database["public"]["Enums"]["nr1_dimensao"]
+          enunciado?: string
+          fonte?: string
+          id?: string
+          ordem?: number
+          reverso?: boolean
+        }
+        Relationships: []
+      }
+      nr1_segpsi_respostas: {
+        Row: {
+          company_id: string
+          convite_id: string | null
+          created_at: string
+          diagnostico_id: string
+          grupo: string
+          id: string
+          questao_id: string
+          resposta: number
+          submission_hash: string
+        }
+        Insert: {
+          company_id: string
+          convite_id?: string | null
+          created_at?: string
+          diagnostico_id: string
+          grupo: string
+          id?: string
+          questao_id: string
+          resposta: number
+          submission_hash: string
+        }
+        Update: {
+          company_id?: string
+          convite_id?: string | null
+          created_at?: string
+          diagnostico_id?: string
+          grupo?: string
+          id?: string
+          questao_id?: string
+          resposta?: number
+          submission_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_segpsi_respostas_convite_id_fkey"
+            columns: ["convite_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_convites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_segpsi_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_segpsi_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+          {
+            foreignKeyName: "nr1_segpsi_respostas_questao_id_fkey"
+            columns: ["questao_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_segpsi_questoes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       nr1_subscriptions: {
         Row: {
@@ -11653,6 +11781,14 @@ export type Database = {
       }
     }
     Functions: {
+      _nr1_segpsi_agregar: {
+        Args: { p_diag: string; p_grupos: string[] }
+        Returns: Json
+      }
+      _nr1_segpsi_negar: {
+        Args: { p_company: string; p_reason: string; p_resource: string }
+        Returns: undefined
+      }
       _sf_norm: { Args: { t: string }; Returns: string }
       apply_merit_to_budget: {
         Args: {
@@ -12414,6 +12550,29 @@ export type Database = {
           scores_dimensao: Json
           total_respondentes: number
         }[]
+      }
+      nr1_segpsi_ciclos: {
+        Args: never
+        Returns: {
+          ciclo_nome: string
+          id: string
+          periodo_inicio: string
+          status: Database["public"]["Enums"]["nr1_diagnostico_status"]
+        }[]
+      }
+      nr1_segpsi_historico: { Args: { p_company_id: string }; Returns: Json }
+      nr1_segpsi_resultado: {
+        Args: { p_diagnostico_id: string }
+        Returns: Json
+      }
+      nr1_submeter_com_segpsi: {
+        Args: {
+          p_respostas: Json
+          p_respostas_segpsi: Json
+          p_submission_id: string
+          p_token: string
+        }
+        Returns: string
       }
       nr1_submeter_respostas: {
         Args: { p_respostas: Json; p_submission_id: string; p_token: string }

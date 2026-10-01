@@ -1,255 +1,260 @@
-import { useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertTriangle, Download, FileText, Link2, Loader2, Lock, Trash2 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, LineChart, Line } from 'recharts';
+import { supabase } from '@/integrations/supabase/client';
 import { exportToCSV } from '@/lib/csvExport';
 import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
-import { useSegPsiData, useNr1Workforce } from '@/hooks/useNr1Cycles';
-import { useNr1Diagnosticos } from '@/hooks/useNr1';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, Cell } from 'recharts';
-import { Nr1EmptyState, Nr1SeedAlert } from '@/components/nr1/Nr1EmptyState';
 import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { SEGPSI_K_MINIMO, dimensaoLabel, statusSegPsi } from '@/lib/nr1SegPsi';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { ModuleGate } from '@/components/ModuleGate';
+import { toast } from 'sonner';
 
-const DIMENSOES_COPSOQ: { key: string; label: string; descricao: string }[] = [
-  { key: 'demandas_trabalho', label: 'Demandas do Trabalho', descricao: 'Volume, ritmo, pressão de tempo, demandas emocionais e cognitivas.' },
-  { key: 'organizacao_conteudo', label: 'Organização e Conteúdo', descricao: 'Autonomia, clareza de papel, previsibilidade, sentido do trabalho.' },
-  { key: 'relacoes_lideranca', label: 'Relações & Liderança', descricao: 'Apoio do líder e dos pares, qualidade da liderança, feedback.' },
-  { key: 'interface_trabalho_individuo', label: 'Interface Trabalho-Indivíduo', descricao: 'Conflito trabalho-família, insegurança no emprego.' },
-  { key: 'valores_trabalho', label: 'Valores no Trabalho', descricao: 'Justiça organizacional, confiança, reconhecimento.' },
-  { key: 'saude_bem_estar', label: 'Saúde & Bem-Estar', descricao: 'Estresse, burnout, sofrimento psíquico, segurança mental.' },
-];
-
-function corDimensao(score: number) {
-  if (score >= 70) return 'hsl(var(--nr1-success))';
-  if (score >= 55) return 'hsl(var(--nr1-primary))';
-  return 'hsl(var(--nr1-danger))';
-}
-
-const cores: Record<string, string> = {
-  incluir: 'hsl(var(--nr1-success))',
-  aprender: 'hsl(var(--nr1-primary))',
-  contribuir: 'hsl(var(--nr1-primary))',
-  desafiar: 'hsl(var(--nr1-danger))',
+type Agregado = { total: number; score_geral: number | null; scores_dimensao: Record<string, number> | null };
+type Resultado = {
+  acesso: 'empresa' | 'gestor' | 'negado';
+  motivo?: string;
+  empresa?: (Agregado & { dados_suficientes: boolean; distribuicao?: Record<string, number> }) | null;
+  grupos?: (Agregado & { grupo: string })[];
 };
+type Ciclo = { id: string; ciclo_nome: string; periodo_inicio: string; status: string };
+type Historico = { ciclos?: { diagnostico_id: string; ciclo_nome: string; total: number; dados_suficientes: boolean; score_geral: number | null }[] };
 
-function tom(score: number) {
-  if (score >= 70) return { label: 'Saudável', cls: 'bg-green-100 text-green-800' };
-  if (score >= 55) return { label: 'Atenção', cls: 'bg-yellow-100 text-yellow-800' };
-  return { label: 'Crítico', cls: 'bg-orange-100 text-orange-800' };
+const DIMS = Object.keys(DIMENSAO_LABEL) as Dimensao[];
+const FAIXAS = ['0-20', '20-40', '40-60', '60-80', '80-100'];
+const rpc = supabase.rpc as unknown as (fn: string, args?: Record<string, unknown>) => Promise<{ data: any; error: any }>;
+
+function StatusBadge({ score }: { score: number }) {
+  const s = statusSegPsi(score);
+  return <Badge variant={s.variant}>{s.label}</Badge>;
 }
 
 export default function Nr1SegPsi() {
-  const dashboardRef = useRef<HTMLDivElement>(null);
-  const { data, isLoading } = useSegPsiData();
-  const { data: workforce = 0 } = useNr1Workforce();
-  const { data: diagnosticos } = useNr1Diagnosticos();
+  const ref = useRef<HTMLDivElement>(null);
   const { activeCompanyId } = useCompanyContext();
   const { data: roleInfo } = useCurrentUserRole();
-  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isManager ? 'manager' : 'employee';
+  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isConsultor ? 'consultor' : roleInfo?.isManager ? 'manager' : 'employee';
+  const [cicloId, setCicloId] = useState<string>('');
 
-  if (isLoading || !data) {
-    return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando dados…</div>;
-  }
+  const ciclos = useQuery({
+    queryKey: ['segpsi-ciclos', activeCompanyId],
+    enabled: !!activeCompanyId,
+    queryFn: async () => { const { data, error } = await rpc('nr1_segpsi_ciclos'); if (error) throw error; return (data ?? []) as Ciclo[]; },
+  });
+  useEffect(() => { if (!cicloId && ciclos.data?.length) setCicloId(ciclos.data[0].id); }, [ciclos.data, cicloId]);
 
-  if (data.source === 'empty') {
+  const resultado = useQuery({
+    queryKey: ['segpsi-resultado', cicloId],
+    enabled: !!cicloId,
+    queryFn: async () => { const { data, error } = await rpc('nr1_segpsi_resultado', { p_diagnostico_id: cicloId }); if (error) throw error; return data as Resultado; },
+  });
+  const escopoEmpresa = resultado.data?.acesso === 'empresa';
+  const historico = useQuery({
+    queryKey: ['segpsi-historico', activeCompanyId],
+    enabled: !!activeCompanyId && escopoEmpresa,
+    queryFn: async () => { const { data, error } = await rpc('nr1_segpsi_historico', { p_company_id: activeCompanyId }); if (error) throw error; return data as Historico; },
+  });
+
+  if (ciclos.isLoading) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando…</div>;
+  if (!ciclos.data?.length) {
     return (
-      <Nr1EmptyState
-        titulo="Nenhum ciclo de Segurança Psicológica coletado"
-        descricao="Quando o primeiro ciclo for aplicado e respondido pelos colaboradores, os scores dos 4 estágios aparecerão aqui automaticamente."
-      />
+      <Card><CardContent className="py-10 text-center space-y-2">
+        <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
+        <p className="font-semibold">Nenhum resultado disponível para você</p>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">Os resultados de Segurança Psicológica são vistos pelo RH, pelo admin e pelo consultor responsável. O gestor vê apenas os grupos vinculados a ele. As perguntas fazem parte do questionário anônimo do diagnóstico NR-1.</p>
+      </CardContent></Card>
     );
   }
 
-  const geral = (data.scores.reduce((a, b) => a + b.score, 0) / (data.scores.length || 1)).toFixed(2);
-  const fragil = [...data.scores].sort((a, b) => a.score - b.score)[0];
+  const r = resultado.data;
+  const emp = r?.empresa;
+  const grupos = r?.grupos ?? [];
+  const dimsData = DIMS.map((d) => ({ key: d, label: DIMENSAO_LABEL[d], score: emp?.scores_dimensao?.[d] ?? null }));
+  const comDado = dimsData.filter((d) => d.score != null) as { key: string; label: string; score: number }[];
+  const fragil = [...comDado].sort((a, b) => a.score - b.score)[0];
+  const alertas = grupos.filter((g) => g.score_geral != null && statusSegPsi(g.score_geral).key !== 'saudavel');
+  const histData = (historico.data?.ciclos ?? []).filter((c) => c.dados_suficientes).map((c) => ({ ciclo: c.ciclo_nome, score: Number(c.score_geral) }));
+  const cicloNome = ciclos.data.find((c) => c.id === cicloId)?.ciclo_nome ?? '';
 
   const exportarCSV = () => {
-    if (activeCompanyId) {
-      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'segpsi' });
+    if (activeCompanyId) registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'segpsi', kValue: SEGPSI_K_MINIMO });
+    const linhas: { recorte: string; respondentes: number; dimensao: string; score: number }[] = [];
+    if (emp?.dados_suficientes) {
+      linhas.push({ recorte: 'Empresa', respondentes: emp.total, dimensao: 'Geral', score: Number(emp.score_geral) });
+      comDado.forEach((d) => linhas.push({ recorte: 'Empresa', respondentes: emp.total, dimensao: d.label, score: d.score }));
     }
-    exportToCSV(
-      'seguranca_psicologica',
-      [
-        { header: 'Estágio', accessor: (r: any) => r.label },
-        { header: 'Score (0-100)', accessor: (r: any) => r.score },
-        { header: 'Classificação', accessor: (r: any) => tom(r.score).label },
-        { header: 'Descrição', accessor: (r: any) => r.descricao },
-      ],
-      data.scores,
-    );
+    grupos.forEach((g) => {
+      linhas.push({ recorte: `Grupo: ${g.grupo}`, respondentes: g.total, dimensao: 'Geral', score: Number(g.score_geral) });
+      Object.entries(g.scores_dimensao ?? {}).forEach(([d, v]) => linhas.push({ recorte: `Grupo: ${g.grupo}`, respondentes: g.total, dimensao: dimensaoLabel(d), score: v }));
+    });
+    (historico.data?.ciclos ?? []).filter((c) => c.dados_suficientes).forEach((c) => linhas.push({ recorte: `Histórico: ${c.ciclo_nome}`, respondentes: c.total, dimensao: 'Geral', score: Number(c.score_geral) }));
+    exportToCSV('seguranca_psicologica_agregado', [
+      { header: 'Recorte', accessor: (x: any) => x.recorte },
+      { header: 'Respondentes', accessor: (x: any) => x.respondentes },
+      { header: 'Dimensão', accessor: (x: any) => x.dimensao },
+      { header: 'Score (0-100)', accessor: (x: any) => x.score },
+      { header: 'Status', accessor: (x: any) => statusSegPsi(x.score).label },
+    ], linhas);
   };
-
   const exportarPDF = async () => {
-    if (activeCompanyId) {
-      registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'segpsi' });
-    }
-    if (dashboardRef.current) {
-      await exportDashboardToPDF(dashboardRef.current, {
-        filename: 'seguranca_psicologica',
-        title: 'Segurança Psicológica — Visão Executiva',
-        subtitle: data.ciclo ?? '4 estágios (T. Clark)',
-      });
-    }
+    if (activeCompanyId) registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'segpsi', kValue: SEGPSI_K_MINIMO });
+    if (ref.current) await exportDashboardToPDF(ref.current, { filename: 'seguranca_psicologica', title: 'Segurança Psicológica — Relatório agregado', subtitle: `${cicloNome} · mínimo de ${SEGPSI_K_MINIMO} respostas por recorte` });
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Segurança Psicológica — Visão Executiva</h2>
-          <p className="text-sm text-muted-foreground">Modelo dos 4 estágios: Incluir, Aprender, Contribuir e Desafiar.</p>
+          <h2 className="text-xl font-semibold">Segurança Psicológica</h2>
+          <p className="text-sm text-muted-foreground">Escala de Edmondson + complementos, nas 6 dimensões do diagnóstico NR-1. Somente agregados, com mínimo de {SEGPSI_K_MINIMO} respostas.</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={exportarCSV}>
-            <Download className="h-4 w-4 mr-2" /> CSV
-          </Button>
-          <Button variant="outline" size="sm" onClick={exportarPDF}>
-            <FileText className="h-4 w-4 mr-2" /> PDF
-          </Button>
+        <div className="flex flex-wrap gap-2">
+          <Select value={cicloId} onValueChange={setCicloId}>
+            <SelectTrigger className="w-full sm:w-[220px]"><SelectValue placeholder="Ciclo" /></SelectTrigger>
+            <SelectContent>{ciclos.data.map((c) => <SelectItem key={c.id} value={c.id}>{c.ciclo_nome}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={exportarCSV} disabled={r?.acesso === 'negado'}><Download className="h-4 w-4 mr-2" />Planilha</Button>
+          <Button variant="outline" size="sm" onClick={exportarPDF} disabled={r?.acesso === 'negado'}><FileText className="h-4 w-4 mr-2" />PDF</Button>
         </div>
       </div>
-      {data.source === 'seed' && <Nr1SeedAlert />}
 
-      <div ref={dashboardRef} className="space-y-6 bg-background p-1">
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card><CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground">Respondentes</p>
-            <p className="text-2xl font-semibold">
-              {data.respondentes.toLocaleString('pt-BR')}
-              <span className="text-sm text-muted-foreground font-normal"> / {workforce}</span>
-            </p>
-          </CardContent></Card>
-          <Card><CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground">Adesão</p>
-            <p className="text-2xl font-semibold">
-              {workforce > 0 ? ((data.respondentes / workforce) * 100).toFixed(1) : '0,0'}%
-            </p>
-          </CardContent></Card>
-          <Card><CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground">Score geral</p>
-            <p className="text-2xl font-semibold">{geral}</p>
-          </CardContent></Card>
-          <Card><CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground">Estágio mais frágil</p>
-            <p className="text-2xl font-semibold">{fragil?.label ?? '—'}</p>
-          </CardContent></Card>
-        </div>
+      {resultado.isLoading && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando resultado…</div>}
+      {r?.acesso === 'negado' && <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">{r.motivo ?? 'Acesso negado.'}</CardContent></Card>}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Score por estágio</CardTitle>
-            <CardDescription>Pontuação 0–100 — escala normalizada.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.scores}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip />
-                  <Bar dataKey="score">
-                    {data.scores.map((d) => <Cell key={d.key} fill={cores[d.key] ?? 'hsl(var(--nr1-primary))'} />)}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      {r && r.acesso !== 'negado' && (
+        <div ref={ref} className="space-y-6 bg-background p-1">
+          {escopoEmpresa && (
+            emp?.dados_suficientes ? (
+              <>
+                <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Respondentes</p><p className="text-2xl font-semibold">{emp.total}</p></CardContent></Card>
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Score global</p><p className="text-2xl font-semibold tabular-nums">{Number(emp.score_geral).toFixed(1)}</p></CardContent></Card>
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Status</p><div className="mt-1"><StatusBadge score={Number(emp.score_geral)} /></div></CardContent></Card>
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Dimensão mais frágil</p><p className="text-sm font-semibold mt-1">{fragil?.label ?? '—'}</p></CardContent></Card>
+                </div>
+                <Card>
+                  <CardHeader><CardTitle>Score por dimensão</CardTitle><CardDescription>0–100; quanto maior, mais segurança. Dimensões sem itens da escala aparecem como "sem itens".</CardDescription></CardHeader>
+                  <CardContent className="grid gap-2 md:grid-cols-2">
+                    {dimsData.map((d) => (
+                      <div key={d.key} className="rounded-md border p-3">
+                        <div className="flex items-center justify-between gap-2"><p className="text-sm font-medium">{d.label}</p>{d.score != null ? <StatusBadge score={d.score} /> : <span className="text-xs text-muted-foreground">sem itens</span>}</div>
+                        {d.score != null && <><Progress value={d.score} className="mt-2 h-2" /><p className="mt-1 text-xs text-muted-foreground tabular-nums">{d.score.toFixed(1)} / 100</p></>}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader><CardTitle>Distribuição das respostas</CardTitle><CardDescription>Quantidade de respondentes por faixa de score.</CardDescription></CardHeader>
+                  <CardContent><div className="h-[220px]"><ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={FAIXAS.map((f) => ({ faixa: f, n: emp.distribuicao?.[f] ?? 0 }))}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="faixa" /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="n" name="Respondentes" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} /></BarChart>
+                  </ResponsiveContainer></div></CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">Dados insuficientes neste ciclo ({emp?.total ?? 0} de no mínimo {SEGPSI_K_MINIMO} respostas). Os resultados aparecem quando o mínimo for atingido.</CardContent></Card>
+            )
+          )}
 
-        <div className="grid gap-3 md:grid-cols-2">
-          {data.scores.map((d) => {
-            const t = tom(d.score);
-            return (
-              <Card key={d.key}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold">{d.label}</p>
-                      <p className="text-xs text-muted-foreground">{d.descricao}</p>
-                    </div>
-                    <Badge className={t.cls}>{t.label}</Badge>
+          <Card>
+            <CardHeader><CardTitle>{escopoEmpresa ? 'Resultado por grupo' : 'Seus grupos'}</CardTitle><CardDescription>Só aparecem grupos com no mínimo {SEGPSI_K_MINIMO} respostas.</CardDescription></CardHeader>
+            <CardContent className="space-y-3">
+              {alertas.length > 0 && (
+                <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">
+                  <p className="flex items-center gap-2 font-semibold"><AlertTriangle className="h-4 w-4 text-destructive" />Alertas por área</p>
+                  <ul className="mt-1 space-y-0.5">{alertas.map((g) => <li key={g.grupo}>{g.grupo}: {statusSegPsi(Number(g.score_geral)).label} ({Number(g.score_geral).toFixed(1)})</li>)}</ul>
+                </div>
+              )}
+              {grupos.length === 0 ? <p className="text-sm text-muted-foreground">Nenhum grupo atingiu o mínimo de respostas.</p> : (
+                <div className="grid gap-2 md:grid-cols-2">{grupos.map((g) => (
+                  <div key={g.grupo} className="flex items-center justify-between gap-2 rounded-md border p-3">
+                    <div className="min-w-0"><p className="truncate text-sm font-medium">{g.grupo}</p><p className="text-xs text-muted-foreground">{g.total} respondentes</p></div>
+                    <div className="flex items-center gap-2"><span className="font-semibold tabular-nums">{Number(g.score_geral).toFixed(1)}</span><StatusBadge score={Number(g.score_geral)} /></div>
                   </div>
-                  <div className="mt-3">
-                    <Progress value={d.score} className="h-2" />
-                    <p className="text-xs text-muted-foreground mt-1 tabular-nums">{d.score.toFixed(1)} / 100</p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                ))}</div>
+              )}
+            </CardContent>
+          </Card>
 
-
-        {(() => {
-          const ultimo = diagnosticos?.find((d) => d.status === 'concluido');
-          const scoresDim = (ultimo?.scores_dimensao as Record<string, number> | null) ?? null;
-          const dadosDim = DIMENSOES_COPSOQ.map((d) => ({
-            ...d,
-            score: scoresDim ? Number(scoresDim[d.key] ?? 0) : 0,
-          }));
-          const temDados = scoresDim && dadosDim.some((d) => d.score > 0);
-          return (
+          {escopoEmpresa && (
             <Card>
-              <CardHeader>
-                <CardTitle>Score por dimensão COPSOQ-III</CardTitle>
-                <CardDescription>
-                  6 dimensões psicossociais (0–100) — base do diagnóstico NR-1 e da Matriz de Risco.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!temDados ? (
-                  <p className="text-sm text-muted-foreground py-8 text-center">
-                    Nenhum diagnóstico NR-1 concluído ainda. Aplique a Pesquisa Saúde Bem-Estar para visualizar.
-                  </p>
-                ) : (
-                  <>
-                    <div className="h-[300px]">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={dadosDim} margin={{ left: 0, right: 16, top: 8, bottom: 8 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="label" tick={{ fontSize: 11 }} interval={0} angle={-12} textAnchor="end" height={70} />
-                          <YAxis domain={[0, 100]} />
-                          <Tooltip
-                            formatter={(v: number) => [`${v.toFixed(1)} / 100`, 'Score']}
-                            labelFormatter={(l) => l}
-                          />
-                          <Bar dataKey="score" radius={[6, 6, 0, 0]}>
-                            {dadosDim.map((d) => (
-                              <Cell key={d.key} fill={corDimensao(d.score)} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="grid gap-2 md:grid-cols-2 mt-4">
-                      {dadosDim.map((d) => {
-                        const t = tom(d.score);
-                        return (
-                          <div key={d.key} className="flex items-center justify-between gap-3 p-2 rounded-md border border-border/50">
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium truncate">{d.label}</p>
-                              <p className="text-xs text-muted-foreground truncate">{d.descricao}</p>
-                            </div>
-                            <div className="flex items-center gap-2 shrink-0">
-                              <span className="text-sm font-semibold tabular-nums">{d.score.toFixed(1)}</span>
-                              <Badge className={t.cls}>{t.label}</Badge>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </>
-                )}
-              </CardContent>
+              <CardHeader><CardTitle>Tendência entre ciclos</CardTitle><CardDescription>Score global por ciclo (só ciclos com o mínimo de respostas).</CardDescription></CardHeader>
+              <CardContent>{histData.length < 2 ? <p className="text-sm text-muted-foreground">É preciso pelo menos 2 ciclos com o mínimo de respostas para mostrar a tendência.</p> : (
+                <div className="h-[220px]"><ResponsiveContainer width="100%" height="100%"><LineChart data={histData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="ciclo" /><YAxis domain={[0, 100]} /><Tooltip /><Line type="monotone" dataKey="score" name="Score" stroke="hsl(var(--primary))" strokeWidth={2} /></LineChart></ResponsiveContainer></div>
+              )}</CardContent>
             </Card>
-          );
-        })()}
-      </div>
+          )}
+        </div>
+      )}
+
+      {escopoEmpresa && (
+        <ModuleGate moduleSlug="clima" mode="section" featureName="Correlação com o Clima Organizacional" description="Cruze Segurança Psicológica, eNPS e as dimensões do NR-1. Disponível para empresas com o Clima Organizacional contratado.">
+          <Card><CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div><p className="font-semibold">Correlação com o Clima Organizacional</p><p className="text-sm text-muted-foreground">Compare com a dimensão "Segurança Psicológica e Respeito" e o eNPS do Clima.</p></div>
+            <Button asChild variant="outline" size="sm"><Link to="/clima/correlacao"><Link2 className="h-4 w-4 mr-2" />Abrir correlação</Link></Button>
+          </CardContent></Card>
+        </ModuleGate>
+      )}
+
+      {escopoEmpresa && cicloId && activeCompanyId && <GestoresPorGrupo diagnosticoId={cicloId} companyId={activeCompanyId} />}
     </div>
+  );
+}
+
+function GestoresPorGrupo({ diagnosticoId, companyId }: { diagnosticoId: string; companyId: string }) {
+  const qc = useQueryClient();
+  const [sel, setSel] = useState<Record<string, string>>({});
+  const grupos = useQuery({
+    queryKey: ['segpsi-grupos', diagnosticoId],
+    queryFn: async () => { const { data } = await supabase.from('nr1_convites').select('grupo').eq('diagnostico_id', diagnosticoId); return [...new Set((data ?? []).map((c) => c.grupo))].sort(); },
+  });
+  const vinculos = useQuery({
+    queryKey: ['segpsi-vinculos', companyId],
+    queryFn: async () => { const { data } = await (supabase as any).from('nr1_grupo_gestores').select('id, grupo, gestor_id').eq('company_id', companyId); return (data ?? []) as { id: string; grupo: string; gestor_id: string }[]; },
+  });
+  const pessoas = useQuery({
+    queryKey: ['segpsi-pessoas', companyId],
+    queryFn: async () => { const { data } = await supabase.from('profiles').select('id, full_name').eq('root_company_id', companyId).eq('status', 'active').order('full_name').limit(500); return data ?? []; },
+  });
+  const nome = useMemo(() => new Map((pessoas.data ?? []).map((p) => [p.id, p.full_name])), [pessoas.data]);
+  const refresh = () => qc.invalidateQueries({ queryKey: ['segpsi-vinculos', companyId] });
+
+  const vincular = async (grupo: string) => {
+    const gestor = sel[grupo]; if (!gestor) return;
+    const { error } = await (supabase as any).from('nr1_grupo_gestores').insert({ company_id: companyId, grupo, gestor_id: gestor });
+    if (error) toast.error('Não foi possível vincular'); else { toast.success('Gestor vinculado'); refresh(); }
+  };
+  const remover = async (id: string) => { await (supabase as any).from('nr1_grupo_gestores').delete().eq('id', id); refresh(); };
+
+  if (!grupos.data?.length) return null;
+  return (
+    <Card>
+      <CardHeader><CardTitle>Gestores por grupo</CardTitle><CardDescription>O gestor vinculado vê só o resultado agregado do próprio grupo, e só com o mínimo de {SEGPSI_K_MINIMO} respostas. A pessoa precisa ter o papel de gestor.</CardDescription></CardHeader>
+      <CardContent className="space-y-3">
+        {grupos.data.map((g) => (
+          <div key={g} className="rounded-md border p-3 space-y-2">
+            <p className="text-sm font-medium">{g}</p>
+            <div className="flex flex-wrap gap-1">{(vinculos.data ?? []).filter((v) => v.grupo === g).map((v) => (
+              <Badge key={v.id} variant="secondary" className="gap-1">{nome.get(v.gestor_id) ?? 'Gestor'}<button type="button" aria-label="Remover vínculo" onClick={() => remover(v.id)}><Trash2 className="h-3 w-3" /></button></Badge>
+            ))}</div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Select value={sel[g] ?? ''} onValueChange={(v) => setSel((s) => ({ ...s, [g]: v }))}>
+                <SelectTrigger className="sm:w-[280px]"><SelectValue placeholder="Escolher gestor" /></SelectTrigger>
+                <SelectContent>{(pessoas.data ?? []).map((p) => <SelectItem key={p.id} value={p.id}>{p.full_name}</SelectItem>)}</SelectContent>
+              </Select>
+              <Button size="sm" variant="outline" disabled={!sel[g]} onClick={() => vincular(g)}>Vincular</Button>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

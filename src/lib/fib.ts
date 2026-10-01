@@ -24,15 +24,6 @@ export const FIB_DIMENSOES: { key: FibDimensao; label: string; grupo: 'pessoa' |
   { key: 'padrao_de_vida', label: 'Padrão de Vida', grupo: 'organizacao' },
 ];
 
-export type EstagioSegPsi = 'incluir' | 'aprender' | 'contribuir' | 'desafiar';
-
-export const ESTAGIOS_SEG_PSI: { key: EstagioSegPsi; label: string; descricao: string }[] = [
-  { key: 'incluir', label: 'Incluir', descricao: 'Sinto-me aceito e respeitado pelo grupo.' },
-  { key: 'aprender', label: 'Aprender', descricao: 'Posso fazer perguntas e errar sem medo.' },
-  { key: 'contribuir', label: 'Contribuir', descricao: 'Posso usar minhas habilidades e gerar valor.' },
-  { key: 'desafiar', label: 'Desafiar', descricao: 'Posso questionar o status quo com segurança.' },
-];
-
 export type Instrumento = {
   key: string;
   nome: string;

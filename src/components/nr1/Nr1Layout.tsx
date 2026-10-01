@@ -17,6 +17,8 @@ import { Nr1TerceirosDialog } from '@/components/nr1/terceiros/Nr1TerceirosDialo
 import { supabase } from '@/integrations/supabase/client';
 import { useNr1Diagnosticos, useNr1Subscription } from '@/hooks/useNr1';
 import { cn } from '@/lib/utils';
+import { ModuleGate } from '@/components/ModuleGate';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 
 type NavAction = 'open-terceiros' | 'open-import-matriz';
 type NavItem = {
@@ -95,10 +97,15 @@ const useIsSuperAdmin = () => useQuery({
   staleTime: 5 * 60 * 1000,
 });
 
+// Telas que precisam abrir mesmo sem o módulo contratado (contratação e termos LGPD).
+const OPEN_PATHS = ['/nr1/contratar', '/nr1/consentimento'];
+
 export const Nr1Layout = () => {
   const location = useLocation();
   const navRef = useRef<HTMLDivElement | null>(null);
   const { data: isSuper } = useIsSuperAdmin();
+  // Consultor: o acesso aos dados de cada cliente é validado no servidor (consultor_dono_ativo).
+  const { data: roleInfo } = useCurrentUserRole();
   const { data: subscription } = useNr1Subscription();
   const { data: diagnostics } = useNr1Diagnosticos();
   const [extrasOpen, setExtrasOpen] = useState(false);
@@ -213,7 +220,13 @@ export const Nr1Layout = () => {
             </nav>
           </div>
         </header>
-        <main className="container mx-auto px-4 py-6"><Outlet /></main>
+        <main className="container mx-auto px-4 py-6">
+          {OPEN_PATHS.includes(location.pathname) ? <Outlet /> : (
+            <ModuleGate mode="page" moduleSlug="nr1" featureName="Saúde Mental & Bem-Estar (NR-1)" allowIf={!!roleInfo?.isConsultor}>
+              <Outlet />
+            </ModuleGate>
+          )}
+        </main>
         <Nr1ConsentGate />
         <Nr1BemEstarFloating />
         <Nr1TerceirosDialog open={terceirosOpen} onOpenChange={setTerceirosOpen} />
