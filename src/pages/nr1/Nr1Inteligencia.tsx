@@ -94,7 +94,7 @@ export default function Nr1Inteligencia() {
         { header: 'Estrelas (9Box 7-9)', accessor: (u: UnitCrossInsight) => u.estrelas9Box },
       ] : []),
       ...(data?.incluiRemuneracao ? [{ header: 'Salário médio', accessor: (u: UnitCrossInsight) => u.avgSalary }] : []),
-      ...(data?.incluiPotencial && data?.incluiRemuneracao ? [{ header: 'Custo de turnover estimado', accessor: (u: UnitCrossInsight) => Math.round(u.custoTurnover) }] : []),
+      ...(data?.incluiPotencial && data?.incluiRemuneracao ? [{ header: 'Custo de turnover estimado', accessor: (u: UnitCrossInsight) => (u.custoTurnover == null ? '' : Math.round(u.custoTurnover)) }] : []),
       { header: `Nota metodológica (período ${periodo}; ${data?.unidadesOcultas ?? 0} recorte(s) oculto(s) por ter menos de 5 pessoas; k=5)`, accessor: (u) => (u === primeira ? NOTA_METODO : '') },
     ], linhas);
   };

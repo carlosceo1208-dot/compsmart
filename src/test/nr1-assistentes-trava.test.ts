@@ -1,10 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
 // A5: os três assistentes do NR-1 recusam empresa sem NR-1 (403) e não leem dados de cruzamento.
 const AGENTES = ['nr1-bem-estar-agent', 'nr1-jornada-agent', 'nr1-plano-acao-assistant'];
-const ler = (n: string) => readFileSync(join(process.cwd(), 'supabase/functions', n, 'index.ts'), 'utf8');
+const FONTES = import.meta.glob('/supabase/functions/nr1-*/index.ts', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const ler = (n: string) => FONTES[`/supabase/functions/${n}/index.ts`] ?? '';
 
 describe('assistentes do NR-1 — trava por módulo (A5)', () => {
   for (const nome of AGENTES) {
