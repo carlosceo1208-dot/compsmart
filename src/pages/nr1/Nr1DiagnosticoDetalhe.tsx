@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useNr1Diagnostico } from '@/hooks/useNr1';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
