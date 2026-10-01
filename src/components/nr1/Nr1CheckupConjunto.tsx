@@ -13,9 +13,10 @@ type Agregado = {
   acesso: string;
   motivo?: string;
   empresa?: { dados_suficientes: boolean; pessoas?: number; score?: number };
-  areas?: { area: string; pessoas: number; score: number }[];
+  areas?: { area: string; tipo?: 'area' | 'grupo'; pessoas: number; score: number }[];
   areas_ocultas?: number;
   sem_area?: number | null;
+  sem_recorte?: number | null;
   tendencia?: { semana: string; score: number; pessoas: number }[];
 };
 
@@ -85,8 +86,11 @@ export function Nr1CheckupConjunto() {
               ) : (
                 <div className="divide-y rounded-lg border">
                   {data.areas!.map((a) => (
-                    <div key={a.area} className="flex items-center justify-between gap-3 p-3 text-sm">
-                      <span className="font-medium truncate">{a.area}</span>
+                    <div key={`${a.tipo}-${a.area}`} className="flex items-center justify-between gap-3 p-3 text-sm">
+                      <span className="flex items-center gap-2 min-w-0">
+                        <Badge variant="outline" className="shrink-0">{a.tipo === 'grupo' ? 'Grupo' : 'Área'}</Badge>
+                        <span className="font-medium truncate">{a.area}</span>
+                      </span>
                       <span className="flex items-center gap-3 shrink-0">
                         <span className="text-muted-foreground">{a.pessoas} pessoas</span>
                         <span className="font-semibold">{a.score}</span>
@@ -97,11 +101,17 @@ export function Nr1CheckupConjunto() {
                 </div>
               )}
               {!!data.areas_ocultas && (
-                <p className="text-xs text-muted-foreground">{data.areas_ocultas} área(s) oculta(s) por ter menos de 5 pessoas.</p>
+                <p className="text-xs text-muted-foreground">{data.areas_ocultas} recorte(s) oculto(s) por ter menos de 5 pessoas.</p>
               )}
-              {!!data.sem_area && (
+              {!!data.sem_recorte && (
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-dashed p-3 text-sm">
+                  <span className="font-medium">Sem recorte — média da empresa</span>
+                  <span className="text-muted-foreground shrink-0">{data.sem_recorte} pessoa(s)</span>
+                </div>
+              )}
+              {!!data.sem_recorte && (
                 <p className="text-xs text-muted-foreground">
-                  {data.sem_area} pessoa(s) sem área no cadastro entram só na média da empresa. Preencha a área para ter o recorte.
+                  Quem não tem área no cadastro nem grupo escolhido entra só na média da empresa. Preencha a área para ter o recorte.
                 </p>
               )}
             </div>

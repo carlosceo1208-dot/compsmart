@@ -144,3 +144,6 @@
 - [ ] Pauta de negócio: preencher área no cadastro (campanha ou importação de planilhas) — só 10/182 preenchidas
 - [ ] 5B-3 incremento 1: grupo escolhido pela pessoa como reserva da área no check-up (k=5) — aguardando aprovação para publicar
 - [ ] 5B-3: teste de reativação do NR-1 (dados da jornada voltam)
+- [x] 5B-3 publicada (2026-10-01)
+- [x] 5B-3 teste de reativação do NR-1: dados voltam iguais
+- [ ] 5B-3 incremento 1 (grupo autodeclarado): implementado e testado — aguardando revisão do CEO para publicar; conferência visual 1280/390 pendente

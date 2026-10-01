@@ -12,6 +12,7 @@ import { Heart, Send, User, Loader2, RotateCcw, PauseCircle } from 'lucide-react
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { JornadaStepper } from '@/components/nr1/JornadaStepper';
+import { Nr1GrupoSelect } from '@/components/nr1/Nr1GrupoSelect';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
 
@@ -33,9 +34,19 @@ export default function Nr1JornadaBemEstar() {
 
   const [semJornada, setSemJornada] = useState(false);
   const [iniciando, setIniciando] = useState(false);
+  const [grupo, setGrupo] = useState<string | null>(null);
+
+  const salvarGrupo = async (v: string | null) => {
+    setGrupo(v);
+    if (!jornadaId) return;
+    const { error } = await supabase.from('nr1_jornadas').update({ grupo: v } as any).eq('id', jornadaId);
+    if (error) toast.error('Não foi possível salvar o grupo.');
+    else toast.success('Grupo atualizado.');
+  };
 
   const carregarMensagens = async (j: any) => {
     setJornadaId(j.id);
+    setGrupo(j.grupo ?? null);
     setMomentoAtual(j.momento_atual ?? 1);
     setSemanaAtual(j.semana_atual ?? 1);
     const { data: msgs } = await supabase
@@ -85,7 +96,7 @@ export default function Nr1JornadaBemEstar() {
       }
       const { data: created, error } = await supabase
         .from('nr1_jornadas')
-        .insert({ user_id: userData.user.id, company_id: companyId })
+        .insert({ user_id: userData.user.id, company_id: companyId, grupo } as any)
         .select()
         .single();
       if (error || !created) throw error;
@@ -243,7 +254,8 @@ export default function Nr1JornadaBemEstar() {
             Nada é gravado até você clicar em "Iniciar minha jornada".
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <Nr1GrupoSelect value={grupo} onChange={setGrupo} disabled={iniciando} />
           <Button onClick={iniciarJornada} disabled={iniciando} className="nr1-bg-primary text-white">
             {iniciando ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Heart className="h-4 w-4 mr-2" />}
             Iniciar minha jornada
@@ -255,6 +267,11 @@ export default function Nr1JornadaBemEstar() {
 
   return (
     <div className="space-y-4">
+      <Card>
+        <CardContent className="pt-6">
+          <Nr1GrupoSelect value={grupo} onChange={salvarGrupo} />
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">

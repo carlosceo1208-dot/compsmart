@@ -5524,6 +5524,7 @@ export type Database = {
           consent_id_at: string | null
           created_at: string
           encerramento_motivo: string | null
+          grupo: string | null
           id: string
           momento_atual: number
           semana_atual: number
@@ -5539,6 +5540,7 @@ export type Database = {
           consent_id_at?: string | null
           created_at?: string
           encerramento_motivo?: string | null
+          grupo?: string | null
           id?: string
           momento_atual?: number
           semana_atual?: number
@@ -5554,6 +5556,7 @@ export type Database = {
           consent_id_at?: string | null
           created_at?: string
           encerramento_motivo?: string | null
+          grupo?: string | null
           id?: string
           momento_atual?: number
           semana_atual?: number
@@ -12607,6 +12610,12 @@ export type Database = {
           expires_at: string
           grupo: string
           questoes: Json
+        }[]
+      }
+      nr1_grupos_empresa: {
+        Args: never
+        Returns: {
+          grupo: string
         }[]
       }
       nr1_plano_transicao: {
