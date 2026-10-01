@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useNr1Diagnosticos } from '@/hooks/useNr1';
-import { RISCO_CLASS, RISCO_LABEL } from '@/lib/nr1';
+import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FileText, Plus } from 'lucide-react';
 
