@@ -10,6 +10,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Heart, Loader2, PauseCircle, XCircle, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { Nr1CheckupConjunto } from '@/components/nr1/Nr1CheckupConjunto';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
@@ -30,6 +32,8 @@ const ACOES_PADRAO = [
 
 export default function Nr1Acompanhamento() {
   const navigate = useNavigate();
+  const { data: roleInfo } = useCurrentUserRole();
+  const verConjunto = !!(roleInfo?.isHR || roleInfo?.isAdmin || roleInfo?.isSuperAdmin);
   const [loading, setLoading] = useState(true);
   const [jornada, setJornada] = useState<Jornada | null>(null);
   const [checkins, setCheckins] = useState<Checkin[]>([]);
@@ -136,6 +140,7 @@ export default function Nr1Acompanhamento() {
 
   if (!jornada) {
     return (
+      <div className="space-y-4">
       <Card>
         <CardHeader>
           <CardTitle>Acompanhamento Semanal</CardTitle>
@@ -147,6 +152,8 @@ export default function Nr1Acompanhamento() {
           </Button>
         </CardContent>
       </Card>
+      {verConjunto && <Nr1CheckupConjunto />}
+      </div>
     );
   }
 
@@ -191,7 +198,7 @@ export default function Nr1Acompanhamento() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Check-in da semana {semanaCorrente}</CardTitle>
-            <CardDescription>Leva 1 minutinho. Ninguém vê suas respostas individualmente.</CardDescription>
+            <CardDescription>Leva 1 minutinho. Só você vê suas respostas; o RH vê apenas médias de grupos com 5 pessoas ou mais.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             {jaRespondeu ? (
@@ -261,6 +268,7 @@ export default function Nr1Acompanhamento() {
           </CardContent>
         </Card>
       </div>
+      {verConjunto && <Nr1CheckupConjunto />}
     </div>
   );
 }

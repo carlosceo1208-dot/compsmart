@@ -107,6 +107,15 @@ export const Nr1Layout = () => {
   // Consultor: o acesso aos dados de cada cliente é validado no servidor (consultor_dono_ativo).
   const { data: roleInfo } = useCurrentUserRole();
   const { data: subscription } = useNr1Subscription();
+  // A tela só libera o consultor que é dono de projeto ativo nesta empresa (mesma regra do banco).
+  const { data: consultorAtivo } = useQuery({
+    queryKey: ['nr1-consultor-dono-ativo'],
+    enabled: !!roleInfo?.isConsultor,
+    queryFn: async () => {
+      const { data } = await supabase.rpc('nr1_consultor_liberado' as any);
+      return data === true;
+    },
+  });
   const { data: diagnostics } = useNr1Diagnosticos();
   const [extrasOpen, setExtrasOpen] = useState(false);
   const [terceirosOpen, setTerceirosOpen] = useState(false);
@@ -222,7 +231,7 @@ export const Nr1Layout = () => {
         </header>
         <main className="container mx-auto px-4 py-6">
           {OPEN_PATHS.includes(location.pathname) ? <Outlet /> : (
-            <ModuleGate mode="page" moduleSlug="nr1" featureName="Saúde Mental & Bem-Estar (NR-1)" allowIf={!!roleInfo?.isConsultor}>
+            <ModuleGate mode="page" moduleSlug="nr1" featureName="Saúde Mental & Bem-Estar (NR-1)" allowIf={!!roleInfo?.isConsultor && consultorAtivo === true}>
               <Outlet />
             </ModuleGate>
           )}

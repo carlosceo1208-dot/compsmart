@@ -31,7 +31,22 @@ export default function Nr1JornadaBemEstar() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  // Bootstrap: carrega jornada ativa OU cria nova
+  const [semJornada, setSemJornada] = useState(false);
+  const [iniciando, setIniciando] = useState(false);
+
+  const carregarMensagens = async (j: any) => {
+    setJornadaId(j.id);
+    setMomentoAtual(j.momento_atual ?? 1);
+    setSemanaAtual(j.semana_atual ?? 1);
+    const { data: msgs } = await supabase
+      .from('nr1_jornada_mensagens')
+      .select('role, content')
+      .eq('jornada_id', j.id)
+      .order('created_at', { ascending: true });
+    setMessages(msgs && msgs.length > 0 ? (msgs as Msg[]) : [{ role: 'assistant', content: KICKOFF }]);
+  };
+
+  // Bootstrap: apenas LÊ a jornada ativa. Abrir a tela não grava nada.
   useEffect(() => {
     (async () => {
       try {
@@ -40,13 +55,6 @@ export default function Nr1JornadaBemEstar() {
           toast.error('Faça login para iniciar a jornada.');
           return;
         }
-        const { data: companyId } = await supabase.rpc('get_user_company_id');
-        if (!companyId) {
-          toast.error('Empresa ativa não identificada.');
-          return;
-        }
-
-        // Busca jornada ativa
         const { data: existing } = await supabase
           .from('nr1_jornadas')
           .select('*')
@@ -55,40 +63,8 @@ export default function Nr1JornadaBemEstar() {
           .order('started_at', { ascending: false })
           .limit(1)
           .maybeSingle();
-
-        let j = existing;
-        if (!j) {
-          const { data: created, error: createErr } = await supabase
-            .from('nr1_jornadas')
-            .insert({ user_id: userData.user.id, company_id: companyId })
-            .select()
-            .single();
-          if (createErr) throw createErr;
-          j = created;
-        }
-
-        if (!j) return;
-        setJornadaId(j.id);
-        setMomentoAtual(j.momento_atual ?? 1);
-        setSemanaAtual(j.semana_atual ?? 1);
-
-        // Carrega mensagens anteriores
-        const { data: msgs } = await supabase
-          .from('nr1_jornada_mensagens')
-          .select('role, content')
-          .eq('jornada_id', j.id)
-          .order('created_at', { ascending: true });
-
-        if (msgs && msgs.length > 0) {
-          setMessages(msgs as Msg[]);
-        } else {
-          // Mensagem de abertura do agente
-          const opening: Msg = { role: 'assistant', content: KICKOFF };
-          setMessages([opening]);
-          await supabase.from('nr1_jornada_mensagens').insert({
-            jornada_id: j.id, role: 'assistant', content: opening.content, momento: 1,
-          });
-        }
+        if (existing) await carregarMensagens(existing);
+        else setSemJornada(true);
       } catch (e: any) {
         console.error(e);
         toast.error('Erro ao carregar jornada.');
@@ -97,6 +73,34 @@ export default function Nr1JornadaBemEstar() {
       }
     })();
   }, []);
+
+  const iniciarJornada = async () => {
+    setIniciando(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const { data: companyId } = await supabase.rpc('get_user_company_id');
+      if (!userData?.user || !companyId) {
+        toast.error('Empresa ativa não identificada.');
+        return;
+      }
+      const { data: created, error } = await supabase
+        .from('nr1_jornadas')
+        .insert({ user_id: userData.user.id, company_id: companyId })
+        .select()
+        .single();
+      if (error || !created) throw error;
+      await supabase.from('nr1_jornada_mensagens').insert({
+        jornada_id: created.id, role: 'assistant', content: KICKOFF, momento: 1,
+      });
+      setSemJornada(false);
+      await carregarMensagens(created);
+    } catch (e) {
+      console.error(e);
+      toast.error('Não foi possível iniciar a jornada.');
+    } finally {
+      setIniciando(false);
+    }
+  };
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -226,6 +230,26 @@ export default function Nr1JornadaBemEstar() {
       <div className="flex items-center justify-center h-[60vh]">
         <Loader2 className="h-6 w-6 animate-spin nr1-text-primary" />
       </div>
+    );
+  }
+
+  if (semJornada) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><Heart className="h-5 w-5 nr1-text-primary" /> Minha Jornada</CardTitle>
+          <CardDescription>
+            Uma conversa guiada de 12 semanas para cuidar do seu bem-estar no trabalho. Só você vê o que escreve aqui.
+            Nada é gravado até você clicar em "Iniciar minha jornada".
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={iniciarJornada} disabled={iniciando} className="nr1-bg-primary text-white">
+            {iniciando ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Heart className="h-4 w-4 mr-2" />}
+            Iniciar minha jornada
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
 

@@ -12594,6 +12594,11 @@ export type Database = {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
       }
+      nr1_checkup_agregado: {
+        Args: { p_company: string; p_dias?: number }
+        Returns: Json
+      }
+      nr1_consultor_liberado: { Args: never; Returns: boolean }
       nr1_convite_resolver: {
         Args: { p_token: string }
         Returns: {
