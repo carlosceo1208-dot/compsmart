@@ -135,4 +135,4 @@
 - [x] Fase 5B-2 Etapa 0: diagnóstico do Vitalidade entregue
 - [ ] Fase 5B-2: aguardando decisões de escala e dimensões
 
-- [ ] Fase 5B-2 Vitalidade: implementação + adendo (catálogo lido pelo fluxo anônimo, sem perguntas repetidas, estado "dados insuficientes", tela final com os dois blocos) — em andamento
+- [x] Fase 5B-2 Vitalidade: implementado e validado (10 itens + adendo), dados de teste removidos — aguardando aprovação para publicar
