@@ -6140,6 +6140,121 @@ export type Database = {
           },
         ]
       }
+      nr1_vitalidade_questoes: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          copsoq_questao_id: string | null
+          created_at: string
+          dimensao: string
+          enunciado: string | null
+          fonte: string
+          id: string
+          ordem: number
+          origem: string
+          reverso: boolean
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          copsoq_questao_id?: string | null
+          created_at?: string
+          dimensao: string
+          enunciado?: string | null
+          fonte: string
+          id?: string
+          ordem: number
+          origem: string
+          reverso?: boolean
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          copsoq_questao_id?: string | null
+          created_at?: string
+          dimensao?: string
+          enunciado?: string | null
+          fonte?: string
+          id?: string
+          ordem?: number
+          origem?: string
+          reverso?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_vitalidade_questoes_copsoq_questao_id_fkey"
+            columns: ["copsoq_questao_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_questoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      nr1_vitalidade_respostas: {
+        Row: {
+          company_id: string
+          convite_id: string | null
+          created_at: string
+          diagnostico_id: string
+          grupo: string
+          id: string
+          questao_id: string
+          resposta: number
+          submission_hash: string
+        }
+        Insert: {
+          company_id: string
+          convite_id?: string | null
+          created_at?: string
+          diagnostico_id: string
+          grupo: string
+          id?: string
+          questao_id: string
+          resposta: number
+          submission_hash: string
+        }
+        Update: {
+          company_id?: string
+          convite_id?: string | null
+          created_at?: string
+          diagnostico_id?: string
+          grupo?: string
+          id?: string
+          questao_id?: string
+          resposta?: number
+          submission_hash?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_vitalidade_respostas_convite_id_fkey"
+            columns: ["convite_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_convites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_vitalidade_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_vitalidade_respostas_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+          {
+            foreignKeyName: "nr1_vitalidade_respostas_questao_id_fkey"
+            columns: ["questao_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_vitalidade_questoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizational_structure: {
         Row: {
           address: string | null
@@ -11789,6 +11904,10 @@ export type Database = {
         Args: { p_company: string; p_reason: string; p_resource: string }
         Returns: undefined
       }
+      _nr1_vitalidade_agregar: {
+        Args: { p_diag: string; p_grupos: string[] }
+        Returns: Json
+      }
       _sf_norm: { Args: { t: string }; Returns: string }
       apply_merit_to_budget: {
         Args: {
@@ -12585,6 +12704,16 @@ export type Database = {
         }
         Returns: string
       }
+      nr1_submeter_completo: {
+        Args: {
+          p_respostas: Json
+          p_respostas_segpsi: Json
+          p_respostas_vitalidade: Json
+          p_submission_id: string
+          p_token: string
+        }
+        Returns: string
+      }
       nr1_submeter_respostas: {
         Args: { p_respostas: Json; p_submission_id: string; p_token: string }
         Returns: string
@@ -12592,6 +12721,25 @@ export type Database = {
       nr1_template_marcar_uso: {
         Args: { _template_id: string }
         Returns: undefined
+      }
+      nr1_vitalidade_historico: {
+        Args: { p_company_id: string }
+        Returns: Json
+      }
+      nr1_vitalidade_questoes_listar: {
+        Args: never
+        Returns: {
+          codigo: string
+          dimensao: string
+          enunciado: string
+          ordem: number
+          origem: string
+          reverso: boolean
+        }[]
+      }
+      nr1_vitalidade_resultado: {
+        Args: { p_diagnostico_id: string }
+        Returns: Json
       }
       portal_listar_vagas: {
         Args: never
