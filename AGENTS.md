@@ -8,3 +8,4 @@
 - Travas de módulo: só super admin passa (exceto 'ver como cliente'); Core sempre ativo; has_module no banco igual. Why: cliente não vê módulo não contratado.
 - Funções do servidor com id de empresa/unidade/colaborador checam dentro via rh_admin_da_empresa; gatilhos (pg_trigger_depth>0) passam. Why: sem vazamento entre empresas.
 - Detalhes: supabase/functions/AGENTS.md (Talent), src/pages/AGENTS.md (leads).
+- Segurança Psicológica: respostas em nr1_segpsi_respostas sem identidade, gravadas só via nr1_submeter_com_segpsi (junto do COPSOQ); leitura só por nr1_segpsi_resultado/historico/ciclos (k=5, recusa registrada em nr1_access_log); gestor só grupos de nr1_grupo_gestores. Área /nr1/* travada por ModuleGate nr1 (exceto contratar/consentimento). Why: LGPD e trava de módulo.
