@@ -134,3 +134,5 @@
 - [ ] Fase 5B-2 Vitalidade: escala própria 8–10 itens, 4 dimensões (Energia, Recuperação, Equilíbrio, Satisfação) — decidido, implementação na próxima rodada
 - [x] Fase 5B-2 Etapa 0: diagnóstico do Vitalidade entregue
 - [ ] Fase 5B-2: aguardando decisões de escala e dimensões
+
+- [ ] Fase 5B-2 Vitalidade: implementação + adendo (catálogo lido pelo fluxo anônimo, sem perguntas repetidas, estado "dados insuficientes", tela final com os dois blocos) — em andamento
