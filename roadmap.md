@@ -133,6 +133,6 @@
 - [x] Endurecimento 5B-1: lista de perguntas da Segurança Psicológica restrita a NR-1/super admin — gaps A1 (envio 51 perguntas 1280/390) e A2 (tentativa negada registrada) verdes; publicado (2026-10-01, aprovação do CEO)
 - [ ] Fase 5B-2 Vitalidade: escala própria 8–10 itens, 4 dimensões (Energia, Recuperação, Equilíbrio, Satisfação) — decidido, implementação na próxima rodada
 - [x] Fase 5B-2 Etapa 0: diagnóstico do Vitalidade entregue
-- [ ] Fase 5B-2: aguardando decisões de escala e dimensões
+- [x] Fase 5B-2: decisões de escala e dimensões tomadas
 
 - [x] Fase 5B-2 Vitalidade: implementado e validado (10 itens + adendo), dados de teste removidos — aguardando aprovação para publicar
