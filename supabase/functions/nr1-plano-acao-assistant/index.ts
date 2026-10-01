@@ -150,6 +150,15 @@ serve(async (req) => {
       });
     }
 
+    // Trava NR-1 (3ª camada). Este agente não lê dados de Clima, 9Box nem Remuneração.
+    const { data: temNr1 } = await supabase.rpc("has_module", { _slug: "nr1" });
+    if (!temNr1) {
+      return new Response(JSON.stringify({ error: "Módulo NR-1 não contratado" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = await req.json().catch(() => ({}));
     const instrucao: string = (body?.instrucao ?? "").toString().trim();
     if (!instrucao) {
