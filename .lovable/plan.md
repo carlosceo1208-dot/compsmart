@@ -29,6 +29,18 @@ O endereço antigo /clima/correlacao passa a levar para a aba nova. O card do Cl
 - **A4 — Filtro por unidade feito na própria tela.** A função devolve todas as unidades, e o seletor que já existe continua funcionando.
 - **A5 — Trava nos agentes que já existem**: nr1-bem-estar-agent, nr1-jornada-agent e nr1-plano-acao-assistant. Eles só usam dados de cruzamento se a empresa tiver o módulo de origem. Isso ganha um teste próprio.
 - **A6 — Atalho dentro do Clima**, além do redirecionamento.
+- **A7 — Ordem fixa da Visão Executiva.** As unidades seguem esta ordem:
+  - primeiro, as que têm causa raiz confirmada, ou seja, Crítico no Clima e no NR-1 (só quando a empresa tem Clima);
+  - depois, as com selo Crítico que têm estrelas em risco;
+  - por fim, as demais, da maior para a menor estimativa de custo de turnover.
+  - Em caso de empate, vem primeiro a unidade com mais colaboradores.
+- **A8 — Área e grupo como recortes separados.** A área vem do cadastro do colaborador. O grupo autodeclarado vem da jornada que o próprio colaborador iniciou. São fontes diferentes, então não junto as duas numa coisa só, para não perder dados sem perceber.
+  - O recorte por área traz todos os cruzamentos.
+  - O recorte por grupo traz só a contagem e a nota de saúde, nunca ligadas a uma pessoa e sempre com o mínimo de 5.
+  - O grupo não é ligado a 9Box nem a salário, para não identificar ninguém.
+- **A9 — Mudança de rótulo precisa da sua aprovação.** Com o selo único, o "Diagnóstico Q1 2026", que tem risco 49,93, deixa de aparecer como Moderado e passa a Crítico, com nota de saúde 50,1. Isso aparece nas telas que já estão publicadas: Diagnóstico, Matriz de Risco e Visão Geral.
+  - Na conferência, mostro essas telas antes e depois da mudança.
+  - A mudança fica registrada no dossiê como item que só segue com a sua aprovação.
 
 ## Etapas
 
@@ -53,7 +65,9 @@ O endereço antigo /clima/correlacao passa a levar para a aba nova. O card do Cl
   - consultor com e sem projeto ativo;
   - agentes respeitando o módulo de origem;
   - a mesma nota com o mesmo selo em todas as telas;
-  - o filtro por unidade continua funcionando.
+  - o filtro por unidade continua funcionando;
+  - o endereço /clima/correlacao abre a aba certa, e o atalho do card Clima leva ao mesmo lugar;
+  - a Visão Executiva segue a ordem fixa da A7.
 - Abrir o PDF e a planilha exportados para conferir.
 - Depois da limpeza, as contagens batem com a linha de base: 4 acessos, 2 auditorias, respostas 440/0/0, 9 check-ups, 18 logins, 2 leads.
 - `bun run ci` limpo. AGENTS.md e roadmap.md atualizados.
