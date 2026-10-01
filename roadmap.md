@@ -140,3 +140,7 @@
 - [x] Fase 5B-2 pós-publicação: convite de contratar Clima conferido na Vitalidade (1280/390)
 - [x] Fase 5B-3 Etapa 0: diagnóstico Acompanhar (Minha Jornada + Check up) entregue, sem bloqueador; achados A1–A5; aguardando decisões do CEO
 - [x] Fase 5B-3 Acompanhar: implementado e validado em empresa de teste (removida) — aguardando aprovação para publicar
+- [x] Decisão CEO: selo único em todo o NR-1 (≥70 Saudável, 55–69 Atenção, <55 Crítico)
+- [ ] Pauta de negócio: preencher área no cadastro (campanha ou importação de planilhas) — só 10/182 preenchidas
+- [ ] 5B-3 incremento 1: grupo escolhido pela pessoa como reserva da área no check-up (k=5) — aguardando aprovação para publicar
+- [ ] 5B-3: teste de reativação do NR-1 (dados da jornada voltam)
