@@ -153,6 +153,6 @@
 - [x] Funções no servidor com k=5 (unidade + grupo), trava por módulo de origem, recusa registrada
 - [x] Ordem fixa A7, custo A2, selo único na Inteligência, exportação PDF/planilha com nota de método
 - [x] Trava NR-1 no assistente do plano de ação (os agentes não leem Clima/9Box/salário)
-- [ ] Selo único nas telas antigas (Diagnóstico, Matriz, Visão Geral) — aguarda aprovação do CEO (A9)
-- [ ] Conferência em empresa de teste 1280/390 + exportações abertas — próximo passo
+- [x] A9 aprovado: selo único + "Nota de saúde = 100 − risco psicossocial" no Diagnóstico, Matriz e Visão Geral; Q1 2026 Moderado → Crítico (saúde 50,1)
+- [x] Conferência: travas por papel/empresa (banco, desfeito), prints antes/depois 1280/390, teste dos assistentes (A5), PDF/planilha abertos com aviso de recortes ocultos no topo, ci limpo, scan rodado
 - [ ] Publicar — aguarda aprovação
