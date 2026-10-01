@@ -146,4 +146,4 @@
 - [ ] 5B-3: teste de reativação do NR-1 (dados da jornada voltam)
 - [x] 5B-3 publicada (2026-10-01)
 - [x] 5B-3 teste de reativação do NR-1: dados voltam iguais
-- [ ] 5B-3 incremento 1 (grupo autodeclarado): implementado e testado — aguardando revisão do CEO para publicar; conferência visual 1280/390 pendente
+- [x] 5B-3 incremento 1 (grupo autodeclarado): implementado, testado e conferido visualmente em 1280/390 — aguardando aprovação do CEO para publicar (registro positivo do CEO 20:39 UTC: ciclo de correção mobile ok; "Sem recorte" sem nota = correto)
