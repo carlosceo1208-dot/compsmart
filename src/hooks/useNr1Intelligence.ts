@@ -1,173 +1,91 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
-import type { TalentIntelRow } from './useTalentIntelligence';
-import type { Diagnostico, Dimensao } from '@/lib/nr1';
+import { custoTurnover, seloSaude } from '@/lib/nr1Selo';
 
 export interface Nr1IntelligenceFilters {
-  startDate?: string; // ISO date
+  startDate?: string;
   endDate?: string;
   unitId?: string | 'all';
-}
-
-export interface Nr1IntelligenceAccess {
-  includePotential?: boolean;
-  includePerformance?: boolean;
-  includeCompensation?: boolean;
 }
 
 export interface UnitCrossInsight {
   unitId: string | null;
   unitName: string;
   totalColab: number;
-  criticos9Box: number; // boxes 1, 2, 3
-  estrelas9Box: number; // boxes 7, 8, 9
+  criticos9Box: number | null;
+  estrelas9Box: number | null;
   avgPerformance: number | null;
-  avgPotential: number | null;
   avgSalary: number | null;
-  riskScore: number | null; // herda do diagnóstico empresa (mesmo valor)
+  salarioMedioEstrelas: number | null;
+  saude: number | null; // herdada do diagnóstico da empresa
+  custoTurnover: number;
+  causaRaiz: boolean;
   alertas: string[];
 }
 
-export const useNr1Intelligence = (filters: Nr1IntelligenceFilters, access: Nr1IntelligenceAccess = {}) => {
-  const { activeCompanyId } = useCompanyContext();
-  const includePotential = access.includePotential ?? true;
-  const includePerformance = access.includePerformance ?? true;
-  const includeCompensation = access.includeCompensation ?? true;
+export interface GrupoInsight { grupo: string; pessoas: number; saude: number | null }
 
+type RpcResult = {
+  acesso: 'ok' | 'negado';
+  inclui_potencial?: boolean;
+  inclui_remuneracao?: boolean;
+  diagnostico: { id: string; nome: string; risco: number | null; saude: number | null; dimensoes: Record<string, number> | null; respondentes: number } | null;
+  unidades: Array<{ unit_id: string | null; unit_name: string; pessoas: number; criticos: number | null; estrelas: number | null; perf_media: number | null; salario_medio: number | null; salario_medio_estrelas: number | null }>;
+  unidades_ocultas: number;
+  grupos: GrupoInsight[];
+  grupos_ocultos: number;
+};
+
+/** A7: causa raiz confirmada → Crítico com estrelas em risco → custo de turnover desc → mais colaboradores. */
+export function ordenarPrioridades(units: UnitCrossInsight[]): UnitCrossInsight[] {
+  const rank = (u: UnitCrossInsight) =>
+    u.causaRaiz ? 0 : seloSaude(u.saude)?.key === 'critico' && (u.estrelas9Box ?? 0) > 0 ? 1 : 2;
+  return [...units].sort((a, b) => rank(a) - rank(b) || b.custoTurnover - a.custoTurnover || b.totalColab - a.totalColab);
+}
+
+export const useNr1Intelligence = (filters: Nr1IntelligenceFilters, causaRaizEmpresa = false) => {
+  const { activeCompanyId } = useCompanyContext();
   return useQuery({
-    queryKey: ['nr1-intel', activeCompanyId, filters, includePotential, includePerformance, includeCompensation],
+    queryKey: ['nr1-intel', activeCompanyId, filters.startDate, filters.endDate, causaRaizEmpresa],
     enabled: !!activeCompanyId,
     queryFn: async () => {
-      const companyId = activeCompanyId;
-      if (!companyId) {
-        throw new Error('Empresa ativa não selecionada');
-      }
-
-      // 1) Diagnósticos NR-1 do período
-      let dq = supabase
-        .from('nr1_diagnosticos')
-        .select('*')
-        .eq('company_id', companyId)
-        .eq('status', 'concluido')
-        .order('created_at', { ascending: false });
-      if (filters.startDate) dq = dq.gte('periodo_fim', filters.startDate);
-      if (filters.endDate) dq = dq.lte('periodo_fim', filters.endDate);
-      const { data: diagsData, error: dErr } = await dq;
-      if (dErr) throw dErr;
-      const diagnosticos = (diagsData ?? []) as Diagnostico[];
-      const ultimo = diagnosticos[0] ?? null;
-
-      // 2) Talent intelligence (consulta apenas os campos dos módulos liberados)
-      const talentColumns = [
-        'employee_id',
-        'unit_id',
-        'root_company_id',
-        includePotential ? 'box_position' : null,
-        includePotential ? 'potential_score' : null,
-        includePerformance ? 'performance_score' : null,
-        includeCompensation ? 'current_salary' : null,
-      ].filter((column): column is string => Boolean(column));
-
-      let talent: TalentIntelRow[] = [];
-      if (includePotential || includePerformance || includeCompensation) {
-        const { data: talentData, error: tErr } = await supabase
-          .from('v_talent_intelligence_dashboard' as any)
-          .select(talentColumns.join(','))
-          .limit(1000);
-        if (tErr) throw tErr;
-        talent = (talentData ?? []) as unknown as TalentIntelRow[];
-      }
-      if (filters.unitId && filters.unitId !== 'all') {
-        talent = talent.filter((t) => t.unit_id === filters.unitId);
-      }
-
-      // 3) Unidades (para nomes) — RLS já filtra por root_company_id
-      const { data: unitsData } = await supabase
-        .from('organizational_structure')
-        .select('id, name, type')
-        .neq('type', 'company');
-      const unitMap = new Map((unitsData ?? []).map((u) => [u.id, u.name]));
-
-      // 4) Agregação por unidade
-      const byUnit = new Map<string | null, TalentIntelRow[]>();
-      talent.forEach((row) => {
-        const k = row.unit_id ?? null;
-        if (!byUnit.has(k)) byUnit.set(k, []);
-        const rows = byUnit.get(k);
-        if (rows) rows.push(row);
+      const { data, error } = await (supabase as any).rpc('nr1_inteligencia_unidades', {
+        p_company: activeCompanyId, p_inicio: filters.startDate || null, p_fim: filters.endDate || null,
       });
-
-      const riscoEmpresa = ultimo?.score_geral != null ? Number(ultimo.score_geral) : null;
-
-      const unitInsights: UnitCrossInsight[] = Array.from(byUnit.entries()).map(([uid, rows]) => {
-        const totalColab = rows.length;
-        const criticos = includePotential ? rows.filter((r) => r.box_position && r.box_position <= 3).length : 0;
-        const estrelas = includePotential ? rows.filter((r) => r.box_position && r.box_position >= 7).length : 0;
-        const perfs = includePerformance ? rows.map((r) => r.performance_score).filter((v): v is number => v != null) : [];
-        const pots = rows.map((r) => r.potential_score).filter((v): v is number => v != null);
-        const sals = includeCompensation ? rows.map((r) => r.current_salary).filter((v): v is number => v != null) : [];
-        const avg = (a: number[]) => (a.length ? a.reduce((s, n) => s + n, 0) / a.length : null);
-
+      if (error) throw error;
+      const r = data as RpcResult;
+      if (!r || r.acesso !== 'ok') return null;
+      const saude = r.diagnostico?.saude ?? null;
+      const units: UnitCrossInsight[] = (r.unidades ?? []).map((u) => {
+        const custo = custoTurnover(u.estrelas, u.salario_medio_estrelas, saude);
+        const selo = seloSaude(saude);
         const alertas: string[] = [];
-        if (includePotential && riscoEmpresa != null && riscoEmpresa >= 50 && criticos / Math.max(totalColab, 1) > 0.2) {
-          alertas.push('Risco psicossocial alto + concentração de talentos críticos: priorizar plano de ação.');
-        }
-        if (includePotential && riscoEmpresa != null && riscoEmpresa >= 50 && estrelas > 0) {
-          alertas.push(`${estrelas} talento(s) estratégico(s) em ambiente de risco — risco de turnover.`);
-        }
-        const avgPerf = avg(perfs);
-        if (includePerformance && avgPerf != null && avgPerf < 3 && riscoEmpresa != null && riscoEmpresa >= 50) {
-          alertas.push('Performance média baixa correlacionada a risco psicossocial elevado.');
-        }
-
+        if (selo && selo.key !== 'saudavel' && (u.criticos ?? 0) / Math.max(u.pessoas, 1) > 0.2)
+          alertas.push('Risco psicossocial + concentração de talentos críticos: priorizar plano de ação.');
+        if (selo && selo.key !== 'saudavel' && (u.estrelas ?? 0) > 0)
+          alertas.push(`${u.estrelas} talento(s) estratégico(s) em ambiente de risco — risco de saída.`);
+        if (selo && selo.key !== 'saudavel' && u.perf_media != null && u.perf_media < 3)
+          alertas.push('Desempenho médio baixo junto de risco psicossocial.');
         return {
-          unitId: uid,
-          unitName: uid ? unitMap.get(uid) ?? 'Unidade sem nome' : 'Sem unidade',
-          totalColab,
-          criticos9Box: criticos,
-          estrelas9Box: estrelas,
-          avgPerformance: avgPerf,
-          avgPotential: avg(pots),
-          avgSalary: avg(sals),
-          riskScore: riscoEmpresa,
-          alertas,
+          unitId: u.unit_id, unitName: u.unit_name, totalColab: u.pessoas,
+          criticos9Box: u.criticos, estrelas9Box: u.estrelas, avgPerformance: u.perf_media,
+          avgSalary: u.salario_medio, salarioMedioEstrelas: u.salario_medio_estrelas,
+          saude, custoTurnover: custo, causaRaiz: causaRaizEmpresa && selo?.key === 'critico', alertas,
         };
       });
-
-      // 5) KPIs gerais
-      const totalColab = talent.length;
-      const totalCriticos = includePotential ? talent.filter((r) => r.box_position && r.box_position <= 3).length : 0;
-      const totalEstrelas = includePotential ? talent.filter((r) => r.box_position && r.box_position >= 7).length : 0;
-      const avgSalGeral =
-        includeCompensation
-          ? talent.filter((r) => r.current_salary).reduce((s, r) => s + (r.current_salary ?? 0), 0) /
-            Math.max(talent.filter((r) => r.current_salary).length, 1)
-          : 0;
-
-      // Estimativa de custo de turnover: 30% folha anual dos talentos em risco
-      const estrelasEmRisco =
-        includePotential && includeCompensation && riscoEmpresa != null && riscoEmpresa >= 50
-          ? talent.filter((r) => r.box_position && r.box_position >= 7 && r.current_salary)
-          : [];
-      const custoTurnoverEstimado = estrelasEmRisco.reduce(
-        (s, r) => s + (r.current_salary ?? 0) * 13.33 * 0.3,
-        0,
-      );
-
-      const dimensoes =
-        ultimo?.scores_dimensao && typeof ultimo.scores_dimensao === 'object'
-          ? (ultimo.scores_dimensao as Record<Dimensao, number>)
-          : null;
-
+      const filtered = filters.unitId && filters.unitId !== 'all' ? units.filter((u) => u.unitId === filters.unitId) : units;
       return {
-        diagnosticos,
-        ultimo,
-        riscoEmpresa,
-        dimensoes,
-        kpis: { totalColab, totalCriticos, totalEstrelas, avgSalGeral, custoTurnoverEstimado },
-        unitInsights: unitInsights.sort((a, b) => b.totalColab - a.totalColab),
-        units: Array.from(unitMap.entries()).map(([id, name]) => ({ id, name })),
+        diagnostico: r.diagnostico,
+        saude,
+        incluiPotencial: !!r.inclui_potencial,
+        incluiRemuneracao: !!r.inclui_remuneracao,
+        allUnits: units,
+        unitInsights: ordenarPrioridades(filtered),
+        unidadesOcultas: r.unidades_ocultas ?? 0,
+        grupos: r.grupos ?? [],
+        gruposOcultos: r.grupos_ocultos ?? 0,
+        custoTotal: filtered.reduce((s, u) => s + u.custoTurnover, 0),
       };
     },
   });

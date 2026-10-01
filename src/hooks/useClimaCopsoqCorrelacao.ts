@@ -43,10 +43,7 @@ export const useClimaCopsoqCorrelacao = (enabled = true) => {
     queryKey: ['nr1-clima-copsoq-correlacao', activeCompanyId],
     enabled: enabled && !!activeCompanyId,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('vw_nr1_clima_copsoq_correlacao')
-        .select('*')
-        .eq('company_id', activeCompanyId);
+      const { data, error } = await (supabase as any).rpc('nr1_clima_correlacao', { p_company: activeCompanyId });
       if (error) throw error;
       return (data ?? []) as CorrelacaoRow[];
     },

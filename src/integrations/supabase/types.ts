@@ -12601,6 +12601,32 @@ export type Database = {
         Args: { p_company: string; p_dias?: number }
         Returns: Json
       }
+      nr1_clima_correlacao: {
+        Args: { p_company: string }
+        Returns: {
+          clima_dim: string | null
+          clima_id: string | null
+          clima_nome: string | null
+          clima_respondentes: number | null
+          clima_score: number | null
+          clima_status: string | null
+          company_id: string | null
+          copsoq_dim: string | null
+          copsoq_score_eq: number | null
+          copsoq_score_raw: number | null
+          copsoq_status: string | null
+          diag_nome: string | null
+          diag_respondentes: number | null
+          diagnostico_id: string | null
+          prioridade: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "vw_nr1_clima_copsoq_correlacao"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       nr1_consultor_liberado: { Args: never; Returns: boolean }
       nr1_convite_resolver: {
         Args: { p_token: string }
@@ -12617,6 +12643,10 @@ export type Database = {
         Returns: {
           grupo: string
         }[]
+      }
+      nr1_inteligencia_unidades: {
+        Args: { p_company: string; p_fim?: string; p_inicio?: string }
+        Returns: Json
       }
       nr1_plano_transicao: {
         Args: {
