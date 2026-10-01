@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompanyContext } from '@/contexts/CompanyContext';
-import { FIB_DIMENSOES, ESTAGIOS_SEG_PSI } from '@/lib/fib';
+import { FIB_DIMENSOES } from '@/lib/fib';
 
 /**
  * Hooks de dados executivos do módulo NR-1 (FIB, Segurança Psicológica e
