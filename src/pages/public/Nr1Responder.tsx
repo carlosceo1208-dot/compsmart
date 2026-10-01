@@ -9,10 +9,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { AlertTriangle, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
 import { RESPOSTA_OPCOES } from '@/lib/nr1';
 import { calcScoreSegPsi, dimensaoLabel, statusSegPsi, type SegPsiQuestao } from '@/lib/nr1SegPsi';
+import { calcScoreVitalidade, vitDimLabel, type VitQuestao } from '@/lib/nr1Vitalidade';
 
 type Questao = { id: string; enunciado: string; ordem: number };
-type Convite = { ciclo_nome: string | null; grupo: string | null; expires_at: string | null; disponivel: boolean; questoes: Questao[]; questoes_segpsi?: SegPsiQuestao[] };
-type Item = { id: string; enunciado: string; bloco: 'copsoq' | 'segpsi' };
+type Convite = { ciclo_nome: string | null; grupo: string | null; expires_at: string | null; disponivel: boolean; questoes: Questao[]; questoes_segpsi?: SegPsiQuestao[]; questoes_vitalidade?: VitQuestao[] };
+type Item = { id: string; enunciado: string; bloco: 'copsoq' | 'segpsi' | 'vitalidade' };
 const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nr1-questionario-publico`;
 
 function getSubmissionId(token: string) {
@@ -32,6 +33,7 @@ export default function Nr1Responder() {
   const [status, setStatus] = useState<'loading' | 'ready' | 'sending' | 'done' | 'error'>('loading');
   const [error, setError] = useState('');
   const [resultado, setResultado] = useState<ReturnType<typeof calcScoreSegPsi> | null>(null);
+  const [resultadoVit, setResultadoVit] = useState<ReturnType<typeof calcScoreVitalidade> | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -43,10 +45,13 @@ export default function Nr1Responder() {
   }, [token]);
 
   const segpsi = useMemo(() => convite?.questoes_segpsi ?? [], [convite]);
+  const vitalidade = useMemo(() => convite?.questoes_vitalidade ?? [], [convite]);
   const itens = useMemo<Item[]>(() => [
     ...(convite?.questoes ?? []).map((q) => ({ id: q.id, enunciado: q.enunciado, bloco: 'copsoq' as const })),
     ...segpsi.map((q) => ({ id: q.id, enunciado: q.enunciado, bloco: 'segpsi' as const })),
-  ], [convite, segpsi]);
+    // Só itens próprios: os de referência ao COPSOQ já foram respondidos acima e não se repetem.
+    ...vitalidade.filter((q) => q.origem === 'propria').map((q) => ({ id: q.id, enunciado: q.enunciado ?? '', bloco: 'vitalidade' as const })),
+  ], [convite, segpsi, vitalidade]);
   const questao = itens[index];
   const completa = itens.length > 0 && itens.every((q) => respostas[q.id] != null);
 
@@ -55,13 +60,15 @@ export default function Nr1Responder() {
     setStatus('sending');
     const copsoq: Record<string, number> = {};
     const seg: Record<string, number> = {};
-    for (const q of itens) (q.bloco === 'segpsi' ? seg : copsoq)[q.id] = respostas[q.id];
+    const vit: Record<string, number> = {};
+    for (const q of itens) (q.bloco === 'segpsi' ? seg : q.bloco === 'vitalidade' ? vit : copsoq)[q.id] = respostas[q.id];
     try {
-      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submit', token, submissionId: getSubmissionId(token), respostas: copsoq, respostasSegPsi: seg }) });
+      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submit', token, submissionId: getSubmissionId(token), respostas: copsoq, respostasSegPsi: seg, respostasVitalidade: vit }) });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || 'Não foi possível enviar');
       // Resultado individual calculado só na memória do navegador; nada é salvo com identificação.
       setResultado(calcScoreSegPsi(segpsi, seg));
+      setResultadoVit(vitalidade.length ? calcScoreVitalidade(vitalidade, vit, copsoq) : null);
       setRespostas({});
       setStatus('done');
     } catch (e) { setError(e instanceof Error ? e.message : String(e)); setStatus('error'); }
@@ -91,9 +98,23 @@ export default function Nr1Responder() {
                     <li key={d} className="flex justify-between gap-3"><span className="text-muted-foreground">{dimensaoLabel(d)}</span><span className="tabular-nums font-medium">{v.toFixed(1)}</span></li>
                   ))}
                 </ul>
-                <p className="rounded-md bg-muted p-2 text-xs text-muted-foreground">Seu resultado é exibido uma única vez e não fica salvo com sua identificação. Ao sair desta página, ele não poderá ser recuperado.</p>
               </div>
             )}
+            {resultadoVit && (() => { const sv = statusSegPsi(resultadoVit.geral); return (
+              <div className="rounded-lg border p-4 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold">Sua Vitalidade</p>
+                  <Badge variant={sv.variant}>{sv.label}</Badge>
+                </div>
+                <p className="text-3xl font-semibold tabular-nums">{resultadoVit.geral.toFixed(1)}<span className="text-sm font-normal text-muted-foreground"> / 100</span></p>
+                <ul className="space-y-1 text-sm">
+                  {Object.entries(resultadoVit.dimensoes).map(([d, v]) => (
+                    <li key={d} className="flex justify-between gap-3"><span className="text-muted-foreground">{vitDimLabel(d)}</span><span className="tabular-nums font-medium">{v.toFixed(1)}</span></li>
+                  ))}
+                </ul>
+              </div>
+            ); })()}
+            {(resultado || resultadoVit) && <p className="rounded-md bg-muted p-2 text-xs text-muted-foreground">Seu resultado é exibido uma única vez e não fica salvo com sua identificação. Ao sair desta página, ele não poderá ser recuperado.</p>}
           </CardContent>
         </Card>
       </main>
@@ -113,6 +134,7 @@ export default function Nr1Responder() {
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
             <span>Pergunta {index + 1} de {itens.length}</span>
             {questao?.bloco === 'segpsi' && <Badge variant="outline">Segurança Psicológica</Badge>}
+            {questao?.bloco === 'vitalidade' && <Badge variant="outline">Vitalidade</Badge>}
           </div>
           <h2 className="text-lg font-semibold leading-snug">{questao?.enunciado}</h2>
           {questao && <RadioGroup key={questao.id} value={respostas[questao.id]?.toString() ?? ""} onValueChange={(v) => setRespostas((r) => ({ ...r, [questao.id]: Number(v) }))} className="space-y-2">{RESPOSTA_OPCOES.map((opt) => <Label key={opt.value} htmlFor={`nr1-${questao.id}-${opt.value}`} className="flex cursor-pointer items-center gap-3 rounded-md border p-3 hover:bg-accent"><RadioGroupItem id={`nr1-${questao.id}-${opt.value}`} value={String(opt.value)} /><span>{opt.label}</span></Label>)}</RadioGroup>}
