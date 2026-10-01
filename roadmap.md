@@ -123,3 +123,9 @@
 - [x] Sugestão de faixa: entrada única com auditoria das recusas (_user só do login), contrato 200/200-nulo/403, 0 chamadas diretas
 - [x] Teste na tela como RH de A (1280/390)
 - [ ] Fase D (validação comercial): contratar só Clima (sem NR-1) e operar as 7 telas — prova de produto vendável sozinho
+
+## Fase 5B-1 — Segurança Psicológica (implementada, não publicada)
+- [x] Trava do NR-1 na área interna; escala própria; envio tudo-ou-nada; agregados com mínimo de 5; gestor por grupo; histórico; exportação; correlação com o Clima
+- [ ] Teste no navegador do questionário completo (exige convite real; o teste no servidor passou)
+- [ ] Gestor sem grupo vinculado: a alternativa de usar o gestor cadastrado do colaborador não é possível sem identificar quem respondeu (decisão dos sócios)
+- [ ] Publicar (aguarda aprovação)
