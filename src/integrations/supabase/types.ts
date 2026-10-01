@@ -12561,6 +12561,17 @@ export type Database = {
         }[]
       }
       nr1_segpsi_historico: { Args: { p_company_id: string }; Returns: Json }
+      nr1_segpsi_questoes_listar: {
+        Args: never
+        Returns: {
+          codigo: string
+          dimensao: string
+          enunciado: string
+          id: string
+          ordem: number
+          reverso: boolean
+        }[]
+      }
       nr1_segpsi_resultado: {
         Args: { p_diagnostico_id: string }
         Returns: Json
