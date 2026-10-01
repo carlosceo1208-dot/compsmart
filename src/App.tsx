@@ -155,7 +155,6 @@ const Nr1Biblioteca = lazy(() => import("./pages/nr1/Nr1Biblioteca"));
 const Nr1Clima = lazy(() => import("./pages/nr1/Nr1Clima"));
 const Nr1ClimaResponder = lazy(() => import("./pages/nr1/Nr1ClimaResponder"));
 const Nr1ClimaDashboard = lazy(() => import("./pages/nr1/Nr1ClimaDashboard"));
-const Nr1ClimaCorrelacao = lazy(() => import("./pages/nr1/Nr1ClimaCorrelacao"));
 const Nr1ClimaExternoDashboard = lazy(() => import("./pages/nr1/Nr1ClimaExternoDashboard"));
 const Nr1ClimaRelatorios = lazy(() => import("./pages/nr1/Nr1ClimaRelatorios"));
 const Nr1ClimaGovernanca = lazy(() => import("./pages/nr1/Nr1ClimaGovernanca"));
@@ -303,7 +302,7 @@ const App = () => {
                         <Route path="/clima/governanca" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaGovernanca /></ModuleGate>} />
                         <Route path="/clima/externo" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
                         <Route path="/clima/externo/:id" element={<ModuleGate mode="page" moduleSlug="clima" featureName="Clima Organizacional"><Nr1ClimaExternoDashboard /></ModuleGate>} />
-                        <Route path="/clima/correlacao" element={<ModuleGate mode="page" moduleSlugs={["nr1", "clima"]} requireAll featureName="Correlação Clima x Riscos"><Nr1ClimaCorrelacao /></ModuleGate>} />
+                        <Route path="/clima/correlacao" element={<Navigate to="/nr1/inteligencia?aba=clima" replace />} />
 
                         {/* Redirects de compatibilidade das URLs antigas /nr1/clima* (preservam :id e query) */}
                         <Route path="/nr1/clima/*" element={<RedirectClima />} />
