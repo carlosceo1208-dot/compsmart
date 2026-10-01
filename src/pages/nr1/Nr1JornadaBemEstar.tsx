@@ -268,6 +268,11 @@ export default function Nr1JornadaBemEstar() {
   return (
     <div className="space-y-4">
       <Card>
+        <CardContent className="pt-6">
+          <Nr1GrupoSelect value={grupo} onChange={salvarGrupo} />
+        </CardContent>
+      </Card>
+      <Card>
         <CardHeader className="flex flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full nr1-bg-primary flex items-center justify-center">
