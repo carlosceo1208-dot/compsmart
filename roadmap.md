@@ -147,3 +147,12 @@
 - [x] 5B-3 publicada (2026-10-01)
 - [x] 5B-3 teste de reativação do NR-1: dados voltam iguais
 - [x] 5B-3 incremento 1 (grupo autodeclarado): implementado, testado e conferido visualmente em 1280/390 — aguardando aprovação do CEO para publicar (registro positivo do CEO 20:39 UTC: ciclo de correção mobile ok; "Sem recorte" sem nota = correto)
+
+## Fase 6 — Inteligência NR-1
+- [x] Abas unificadas, redirecionamento /clima/correlacao, atalho no Clima
+- [x] Funções no servidor com k=5 (unidade + grupo), trava por módulo de origem, recusa registrada
+- [x] Ordem fixa A7, custo A2, selo único na Inteligência, exportação PDF/planilha com nota de método
+- [x] Trava NR-1 no assistente do plano de ação (os agentes não leem Clima/9Box/salário)
+- [ ] Selo único nas telas antigas (Diagnóstico, Matriz, Visão Geral) — aguarda aprovação do CEO (A9)
+- [ ] Conferência em empresa de teste 1280/390 + exportações abertas — próximo passo
+- [ ] Publicar — aguarda aprovação
