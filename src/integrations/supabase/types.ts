@@ -12551,6 +12551,15 @@ export type Database = {
           total_respondentes: number
         }[]
       }
+      nr1_segpsi_ciclos: {
+        Args: never
+        Returns: {
+          ciclo_nome: string
+          id: string
+          periodo_inicio: string
+          status: Database["public"]["Enums"]["nr1_diagnostico_status"]
+        }[]
+      }
       nr1_segpsi_historico: { Args: { p_company_id: string }; Returns: Json }
       nr1_segpsi_resultado: {
         Args: { p_diagnostico_id: string }
