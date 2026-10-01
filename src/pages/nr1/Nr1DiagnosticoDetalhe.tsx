@@ -34,7 +34,7 @@ export default function Nr1DiagnosticoDetalhe() {
     doc.text(
       `Risco: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Nota de saúde: ${
         notaSaude(data.score_geral)?.toFixed(1) ?? '—'
-      } (${seloSaude(notaSaude(data.score_geral))?.label ?? '—'}) · Respondentes: ${data.total_respondentes} · Nota de saúde = 100 − risco psicossocial`,
+      } (${seloSaude(notaSaude(data.score_geral))?.label ?? '—'}) · Respondentes: ${data.total_respondentes} · Nota de saúde = 100 - risco psicossocial`,
       14, 26
     );
     autoTable(doc, {
