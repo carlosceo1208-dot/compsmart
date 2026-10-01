@@ -5,7 +5,7 @@ Nada é alterado, gravado ou publicado. Ao final entrego um diagnóstico no mesm
 ## O que será verificado
 1. **Tela atual** (/nr1/vitalidade, item "Vitalidade" em Mais recursos): classificar como placeholder, informativa sem dados ou com dados reais; recomendar evoluir no lugar (preferido) ou recriar, com motivo.
 2. **Origem de cada número visível**: dado real (tabela + quantidade de registros), fixo no código, ou sem dado.
-3. **Cobertura do COPSOQ, com lacunas declaradas**: listar, com o texto de cada pergunta, os itens que tratam de energia, fadiga, recuperação, satisfação com a vida, equilíbrio vida-trabalho e sono. Declarar explicitamente o que não tem cobertura (ex.: "sono: nenhum item"). Sem escolher a escala ainda.
+3. **Cobertura do COPSOQ, com lacunas declaradas**: listar, com o texto de cada pergunta, os itens que tratam de energia, fadiga, recuperação, satisfação com a vida, equilíbrio vida-trabalho e sono. Declarar explicitamente cada lacuna; onde não houver cobertura, escrever "sem item" (ex.: "sono: sem item"; "recuperação: sem item direto"). Sem escolher a escala ainda.
 4. **Mapa de reuso da 5B-1**, classificando cada peça como reaproveitável, precisa de adaptação ou precisa criar:
    - Peças técnicas: agregação k=5, consentimento LGPD, envio anônimo atômico, exportação PDF/planilha, correlação com Clima, trava do NR-1.
    - Padrões de tela: score global 0–100, selo Saudável/Atenção/Crítico, distribuição das respostas, alertas por grupo, rótulo "Não avaliada nesta escala — consulte o diagnóstico COPSOQ" e resultado individual só na tela final.
