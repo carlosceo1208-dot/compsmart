@@ -9,4 +9,4 @@
 - Funções do servidor com id de empresa/unidade/colaborador checam dentro via rh_admin_da_empresa; gatilhos (pg_trigger_depth>0) passam. Why: sem vazamento entre empresas.
 - Detalhes: supabase/functions/AGENTS.md (Talent), src/pages/AGENTS.md (leads).
 - Segurança Psicológica: respostas sem identidade, envio atômico com COPSOQ e leitura só agregada k≥5; Demandas/Saúde são avaliadas apenas no COPSOQ; gestor sem grupo não acessa; exportações só agregadas. Área /nr1/* travada por ModuleGate nr1 (exceto contratar/consentimento). Why: LGPD, método e anonimato.
-- Lista de perguntas da Segurança Psicológica: leitura só com has_module('nr1') ou super admin (consulta gerencial nr1_segpsi_questoes_listar registra negação); respondente por convite lê só pela função pública nr1-questionario-publico. Why: LGPD e produto pago.
+- Lista de perguntas da Segurança Psicológica: leitura só com has_module('nr1') ou super admin (consulta gerencial nr1_segpsi_questoes_listar registra negação e devolve 0 linhas sem erro, pois erro desfaz o registro); respondente por convite lê só pela função pública nr1-questionario-publico. Why: LGPD e produto pago.
