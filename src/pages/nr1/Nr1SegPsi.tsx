@@ -31,7 +31,7 @@ type Historico = { ciclos?: { diagnostico_id: string; ciclo_nome: string; total:
 
 const DIMS = Object.keys(DIMENSAO_LABEL) as Dimensao[];
 const FAIXAS = ['0-20', '20-40', '40-60', '60-80', '80-100'];
-const rpc = supabase.rpc as unknown as (fn: string, args?: Record<string, unknown>) => Promise<{ data: any; error: any }>;
+const rpc = supabase.rpc.bind(supabase) as unknown as (fn: string, args?: Record<string, unknown>) => Promise<{ data: any; error: any }>;
 
 function StatusBadge({ score }: { score: number }) {
   const s = statusSegPsi(score);
