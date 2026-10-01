@@ -1,314 +1,225 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ArrowRight, Calculator, Info, Sparkles, TrendingDown, Activity } from 'lucide-react';
-import { useNr1Diagnosticos } from '@/hooks/useNr1';
-import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertTriangle, Download, FileText, Link2, Loader2, Lock } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, LineChart, Line } from 'recharts';
+import { supabase } from '@/integrations/supabase/client';
+import { exportToCSV } from '@/lib/csvExport';
+import { exportDashboardToPDF } from '@/lib/pdfDashboardExport';
+import { registrarAcessoNr1 } from '@/lib/nr1Privacy';
+import { statusSegPsi } from '@/lib/nr1SegPsi';
+import { VIT_DIMENSOES, VIT_DIM_LABEL, VIT_K_MINIMO, vitDimLabel } from '@/lib/nr1Vitalidade';
+import { useCompanyContext } from '@/contexts/CompanyContext';
+import { useCurrentUserRole } from '@/hooks/useCurrentUserRole';
+import { ModuleGate } from '@/components/ModuleGate';
 
-/* ---------------------------- helpers ---------------------------- */
-
-const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
-
-type Quadrante = 'vitalidade' | 'alerta' | 'estagnacao' | 'critico';
-
-const QUADRANTE_INFO: Record<Quadrante, { label: string; descricao: string; bg: string; cor: string }> = {
-  vitalidade: {
-    label: 'Vitalidade',
-    descricao: 'Alta saúde + alta entrega. Modelo a replicar.',
-    bg: 'bg-emerald-50 border-emerald-300',
-    cor: 'text-emerald-800',
-  },
-  alerta: {
-    label: 'Alerta',
-    descricao: 'Alta entrega + alto risco. Burnout iminente.',
-    bg: 'bg-amber-50 border-amber-300',
-    cor: 'text-amber-800',
-  },
-  estagnacao: {
-    label: 'Estagnação',
-    descricao: 'Baixa entrega + baixo risco. Falta de desafio.',
-    bg: 'bg-slate-50 border-slate-300',
-    cor: 'text-slate-700',
-  },
-  critico: {
-    label: 'Crítico',
-    descricao: 'Baixa entrega + alto risco. Falência do modelo.',
-    bg: 'bg-amber-50 border-amber-300',
-    cor: 'text-amber-800',
-  },
+type Agregado = { total: number; score_geral: number | null; scores_dimensao: Record<string, number> | null };
+type Resultado = {
+  acesso: 'empresa' | 'gestor' | 'negado';
+  motivo?: string;
+  empresa?: (Agregado & { dados_suficientes: boolean; distribuicao?: Record<string, number> }) | null;
+  grupos?: (Agregado & { grupo: string })[];
 };
+type Ciclo = { id: string; ciclo_nome: string; periodo_inicio: string; status: string };
+type Historico = { ciclos?: { diagnostico_id: string; ciclo_nome: string; total: number; dados_suficientes: boolean; score_geral: number | null; scores_dimensao: Record<string, number> | null }[] };
+type ExportLinha = { recorte: string; respondentes: number | null; dimensao: string; score: number | null; observacao?: string };
 
-/* ---------------------------- Matriz MCPS ---------------------------- */
+const FAIXAS = ['0-20', '20-40', '40-60', '60-80', '80-100'];
+const NOTA_METODOLOGICA = 'Escala própria de Vitalidade (8 perguntas novas, com base em vigor/UWES e bem-estar/WHO-5, + 2 perguntas do diagnóstico COPSOQ usadas como referência, sem repetição no questionário), em 4 dimensões próprias: Energia, Recuperação, Equilíbrio e Satisfação. Não usa as 6 dimensões do COPSOQ. Resultados só agregados, com no mínimo 5 respostas por recorte.';
+const rpc = supabase.rpc.bind(supabase) as unknown as (fn: string, args?: Record<string, unknown>) => Promise<{ data: any; error: any }>;
 
-function MatrizMCPS() {
-  const { data: diagnosticos } = useNr1Diagnosticos();
-  const ultimo = diagnosticos?.[0];
-  const scores = (ultimo?.scores_dimensao ?? {}) as Record<string, number>;
-
-  const pontos = useMemo(() => {
-    return Object.entries(scores).map(([dim, score]) => {
-      // X = saúde (100 - risco), Y = entrega (proxy invertida do risco × variação)
-      // Como proxy: score baixo de risco → alta saúde; com pequena variância para visualização
-      const saude = Math.max(0, Math.min(100, 100 - score));
-      // Proxy de entrega: invertido para dimensões de demandas/organização
-      const entrega = Math.max(0, Math.min(100, 100 - score * 0.7 - (Math.sin(dim.length) * 10 + 10)));
-      const quadrante: Quadrante =
-        saude >= 50 && entrega >= 50 ? 'vitalidade' :
-        saude < 50 && entrega >= 50 ? 'alerta' :
-        saude >= 50 && entrega < 50 ? 'estagnacao' :
-        'critico';
-      return { dim: dim as Dimensao, label: DIMENSAO_LABEL[dim as Dimensao] ?? dim, x: saude, y: entrega, quadrante };
-    });
-  }, [scores]);
-
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 nr1-text-primary" />
-              Matriz MCPS — Performance × Saúde
-            </CardTitle>
-            <CardDescription>
-              Cruzamento de saúde psicossocial (eixo X) com proxy de entrega (eixo Y) por dimensão NR-1.
-            </CardDescription>
-          </div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Badge variant="outline" className="cursor-help"><Info className="h-3 w-3 mr-1" />Como ler</Badge>
-            </TooltipTrigger>
-            <TooltipContent side="left" className="max-w-xs">
-              Cada ponto é uma dimensão NR-1. Quanto mais à direita e acima, melhor. O quadrante <strong>Crítico</strong> (inferior esquerdo) sinaliza falência do modelo de gestão.
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {pontos.length === 0 ? (
-          <div className="text-center py-10 space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Realize um diagnóstico NR-1 para visualizar a matriz.
-            </p>
-            <Button asChild size="sm" className="nr1-bg-primary">
-              <Link to="/nr1/diagnostico/novo">Iniciar diagnóstico <ArrowRight className="h-4 w-4 ml-1" /></Link>
-            </Button>
-          </div>
-        ) : (
-          <div className="grid lg:grid-cols-[1fr,260px] gap-6">
-            {/* Plot */}
-            <div className="relative w-full aspect-square max-w-[520px] mx-auto border-2 rounded-lg overflow-hidden bg-gradient-to-br from-amber-50/40 via-white to-emerald-50/60">
-              {/* quadrant backgrounds */}
-              <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-                <div className="border-r border-b border-dashed border-muted-foreground/30 flex items-start justify-start p-2 text-[10px] font-semibold text-amber-700/70">ALERTA</div>
-                <div className="border-b border-dashed border-muted-foreground/30 flex items-start justify-end p-2 text-[10px] font-semibold text-emerald-700/70">VITALIDADE</div>
-                <div className="border-r border-dashed border-muted-foreground/30 flex items-end justify-start p-2 text-[10px] font-semibold text-amber-700/70">CRÍTICO</div>
-                <div className="flex items-end justify-end p-2 text-[10px] font-semibold text-slate-600/70">ESTAGNAÇÃO</div>
-              </div>
-              {/* axes labels */}
-              <div className="absolute left-1/2 -translate-x-1/2 -bottom-5 text-[10px] text-muted-foreground">Saúde Psicossocial →</div>
-              <div className="absolute -left-1 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] text-muted-foreground whitespace-nowrap">Entrega →</div>
-              {/* points */}
-              {pontos.map((p) => {
-                const info = QUADRANTE_INFO[p.quadrante];
-                return (
-                  <Tooltip key={p.dim}>
-                    <TooltipTrigger asChild>
-                      <button
-                        className={`absolute w-3 h-3 rounded-full border-2 border-white shadow-md hover:scale-150 transition-transform ${
-                          p.quadrante === 'vitalidade' ? 'bg-emerald-500' :
-                          p.quadrante === 'alerta' ? 'bg-amber-500' :
-                          p.quadrante === 'estagnacao' ? 'bg-slate-400' :
-                          'bg-amber-500'
-                        }`}
-                        style={{ left: `${p.x}%`, bottom: `${p.y}%`, transform: 'translate(-50%, 50%)' }}
-                        aria-label={p.label}
-                      />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="font-semibold text-xs">{p.label}</p>
-                      <p className={`text-[10px] ${info.cor}`}>{info.label}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              })}
-            </div>
-
-            {/* Legenda */}
-            <div className="space-y-2">
-              {(Object.keys(QUADRANTE_INFO) as Quadrante[]).map((q) => {
-                const info = QUADRANTE_INFO[q];
-                const count = pontos.filter((p) => p.quadrante === q).length;
-                return (
-                  <div key={q} className={`p-2 rounded-md border ${info.bg}`}>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs font-bold ${info.cor}`}>{info.label}</span>
-                      <Badge variant="outline" className="text-[10px]">{count}</Badge>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{info.descricao}</p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+function StatusBadge({ score }: { score: number }) {
+  const s = statusSegPsi(score);
+  return <Badge variant={s.variant}>{s.label}</Badge>;
 }
-
-/* ---------------------------- Calculadora Custo do Risco ---------------------------- */
-
-function CustoDoMedo() {
-  const [headcount, setHeadcount] = useState(100);
-  const [salarioMedio, setSalarioMedio] = useState(6000);
-  const [turnoverPct, setTurnoverPct] = useState(15);
-  const [absenteismoDias, setAbsenteismoDias] = useState(8);
-  const [reducaoEstimada, setReducaoEstimada] = useState(40);
-
-  const calc = useMemo(() => {
-    // Custo de turnover: ~6 meses de salário por colaborador substituído (recrutamento + onboarding + curva)
-    const colabsPerdidos = headcount * (turnoverPct / 100);
-    const custoTurnover = colabsPerdidos * salarioMedio * 6;
-
-    // Absenteísmo: dias × custo/dia (salário/22) × headcount
-    const custoDia = salarioMedio / 22;
-    const custoAbsenteismo = headcount * absenteismoDias * custoDia;
-
-    // Sinistralidade (saúde mental): estimativa ~3% da folha anual em casos de risco
-    const folhaAnual = headcount * salarioMedio * 13.33; // 12 + 13º + férias
-    const custoSinistralidade = folhaAnual * 0.03;
-
-    const custoTotal = custoTurnover + custoAbsenteismo + custoSinistralidade;
-    const economia = custoTotal * (reducaoEstimada / 100);
-    const roi = economia > 0 ? economia / Math.max(1, folhaAnual * 0.005) : 0; // assume investimento ~0,5% folha
-
-    return { custoTurnover, custoAbsenteismo, custoSinistralidade, custoTotal, economia, roi, folhaAnual };
-  }, [headcount, salarioMedio, turnoverPct, absenteismoDias, reducaoEstimada]);
-
-  return (
-    <Card className="border-2 border-amber-200/60 bg-gradient-to-br from-amber-50/40 via-white to-amber-50/30">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calculator className="h-5 w-5 text-amber-700" />
-          Calculadora — Custo do Risco
-        </CardTitle>
-        <CardDescription>
-          Quanto a sua organização perde por ano com cultura de medo, burnout e adoecimento mental (riscos psicossociais NR-1).
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          <Field label="Nº de colaboradores" value={headcount} onChange={setHeadcount} />
-          <Field label="Salário médio (R$)" value={salarioMedio} onChange={setSalarioMedio} step={100} />
-          <Field label="Turnover voluntário (%)" value={turnoverPct} onChange={setTurnoverPct} step={1} max={100} />
-          <Field label="Absenteísmo (dias/colab/ano)" value={absenteismoDias} onChange={setAbsenteismoDias} step={1} />
-          <Field label="Redução esperada com plano (%)" value={reducaoEstimada} onChange={setReducaoEstimada} step={5} max={100} />
-        </div>
-
-        <Separator />
-
-        <div className="grid sm:grid-cols-3 gap-3">
-          <CostCard label="Turnover" value={calc.custoTurnover} cor="text-amber-700" bg="bg-amber-50/60" />
-          <CostCard label="Absenteísmo" value={calc.custoAbsenteismo} cor="text-amber-700" bg="bg-amber-50/60" />
-          <CostCard label="Sinistralidade" value={calc.custoSinistralidade} cor="text-orange-700" bg="bg-orange-50/60" />
-        </div>
-
-        <div className="rounded-lg border-2 border-amber-300 bg-amber-50/80 p-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Custo anual estimado</p>
-              <p className="text-3xl font-bold text-amber-900">{BRL.format(calc.custoTotal)}</p>
-              <p className="text-[11px] text-amber-700/80">
-                {((calc.custoTotal / Math.max(1, calc.folhaAnual)) * 100).toFixed(1)}% da folha anual
-              </p>
-            </div>
-            <TrendingDown className="h-10 w-10 text-amber-400" />
-          </div>
-        </div>
-
-        <div className="rounded-lg border-2 border-emerald-300 bg-emerald-50/80 p-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div>
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Economia potencial com plano de ação</p>
-              <p className="text-3xl font-bold text-emerald-900">{BRL.format(calc.economia)}</p>
-              <p className="text-[11px] text-emerald-700/80">
-                ROI estimado de Saúde Mental: <strong>{calc.roi.toFixed(1)}:1</strong>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-3 w-3 inline ml-1 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    Considera investimento ~0,5% da folha anual em programa de saúde mental e bem-estar.
-                  </TooltipContent>
-                </Tooltip>
-              </p>
-            </div>
-            <Sparkles className="h-10 w-10 text-emerald-500" />
-          </div>
-          <Button asChild size="sm" className="mt-3 nr1-bg-primary">
-            <Link to="/nr1/planos-acao">Construir plano de ação <ArrowRight className="h-4 w-4 ml-1" /></Link>
-          </Button>
-        </div>
-
-        <p className="text-[10px] text-muted-foreground italic">
-          * Estimativas baseadas em referências de mercado (WorldatWork, Mercer). Turnover ≈ 6 salários por substituição;
-          sinistralidade saúde mental ≈ 3% da folha. Ajuste os parâmetros à realidade da sua empresa.
-        </p>
-      </CardContent>
-    </Card>
-  );
-}
-
-function Field({
-  label, value, onChange, step = 1, max,
-}: { label: string; value: number; onChange: (n: number) => void; step?: number; max?: number }) {
-  return (
-    <div className="space-y-1">
-      <Label className="text-xs">{label}</Label>
-      <Input
-        type="number"
-        value={value}
-        min={0}
-        max={max}
-        step={step}
-        onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
-        className="h-9"
-      />
-    </div>
-  );
-}
-
-function CostCard({ label, value, cor, bg }: { label: string; value: number; cor: string; bg: string }) {
-  return (
-    <div className={`rounded-md border p-3 ${bg}`}>
-      <p className={`text-[10px] font-semibold uppercase tracking-wide ${cor}`}>{label}</p>
-      <p className={`text-lg font-bold ${cor}`}>{BRL.format(value)}</p>
-    </div>
-  );
-}
-
-/* ---------------------------- Page ---------------------------- */
 
 export default function Nr1Vitalidade() {
-  return (
-    <TooltipProvider delayDuration={150}>
+  const ref = useRef<HTMLDivElement>(null);
+  const { activeCompanyId } = useCompanyContext();
+  const { data: roleInfo } = useCurrentUserRole();
+  const actorRole = roleInfo?.isSuperAdmin ? 'super_admin' : roleInfo?.isAdmin ? 'admin' : roleInfo?.isHR ? 'hr_manager' : roleInfo?.isConsultor ? 'consultor' : roleInfo?.isManager ? 'manager' : 'employee';
+  const [cicloId, setCicloId] = useState<string>('');
+
+  const ciclos = useQuery({
+    queryKey: ['vitalidade-ciclos', activeCompanyId],
+    enabled: !!activeCompanyId,
+    queryFn: async () => { const { data, error } = await rpc('nr1_segpsi_ciclos'); if (error) throw error; return (data ?? []) as Ciclo[]; },
+  });
+  useEffect(() => { if (!cicloId && ciclos.data?.length) setCicloId(ciclos.data[0].id); }, [ciclos.data, cicloId]);
+
+  const resultado = useQuery({
+    queryKey: ['vitalidade-resultado', cicloId],
+    enabled: !!cicloId,
+    queryFn: async () => { const { data, error } = await rpc('nr1_vitalidade_resultado', { p_diagnostico_id: cicloId }); if (error) throw error; return data as Resultado; },
+  });
+  const escopoEmpresa = resultado.data?.acesso === 'empresa';
+  const historico = useQuery({
+    queryKey: ['vitalidade-historico', activeCompanyId],
+    enabled: !!activeCompanyId && escopoEmpresa,
+    queryFn: async () => { const { data, error } = await rpc('nr1_vitalidade_historico', { p_company_id: activeCompanyId }); if (error) throw error; return data as Historico; },
+  });
+
+  const cabecalho = (
+    <div>
+      <h2 className="text-xl font-semibold">Vitalidade</h2>
+      <p className="text-sm text-muted-foreground">Energia, Recuperação, Equilíbrio e Satisfação. Somente agregados, com mínimo de {VIT_K_MINIMO} respostas.</p>
+    </div>
+  );
+
+  if (ciclos.isLoading) return <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando…</div>;
+  if (!ciclos.data?.length) {
+    const gestorSemGrupo = actorRole === 'manager';
+    return (
       <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold">Vitalidade Organizacional</h2>
-          <p className="text-sm text-muted-foreground">
-            Cruze saúde psicossocial com performance e quantifique o custo do adoecimento mental.
-          </p>
-        </div>
-        <MatrizMCPS />
-        <CustoDoMedo />
+        {cabecalho}
+        <Card><CardContent className="py-10 text-center space-y-2">
+          <Lock className="mx-auto h-8 w-8 text-muted-foreground" />
+          <p className="font-semibold">{gestorSemGrupo ? 'Seu acesso será liberado quando o RH vincular sua equipe a um grupo' : 'Dados insuficientes'}</p>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">{gestorSemGrupo ? 'Para preservar o anonimato, gestores acessam somente resultados agregados dos grupos vinculados pelo RH.' : 'Ainda não há ciclo do diagnóstico NR-1 com respostas de Vitalidade. As perguntas fazem parte do questionário anônimo do diagnóstico.'}</p>
+        </CardContent></Card>
       </div>
-    </TooltipProvider>
+    );
+  }
+
+  const r = resultado.data;
+  const emp = r?.empresa;
+  const grupos = r?.grupos ?? [];
+  const dimsData = VIT_DIMENSOES.map((d) => ({ key: d, label: VIT_DIM_LABEL[d], score: emp?.scores_dimensao?.[d] ?? null }));
+  const comDado = dimsData.filter((d) => d.score != null) as { key: string; label: string; score: number }[];
+  const fragil = [...comDado].sort((a, b) => a.score - b.score)[0];
+  const alertas = grupos.filter((g) => g.score_geral != null && statusSegPsi(g.score_geral).key !== 'saudavel');
+  const histData = (historico.data?.ciclos ?? []).filter((c) => c.dados_suficientes).map((c) => ({ ciclo: c.ciclo_nome, score: Number(c.score_geral) }));
+  const cicloNome = ciclos.data.find((c) => c.id === cicloId)?.ciclo_nome ?? '';
+  const temAgregado = !!emp?.dados_suficientes || grupos.length > 0;
+
+  const exportarCSV = () => {
+    if (activeCompanyId) registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_csv', resource: 'vitalidade', kValue: VIT_K_MINIMO });
+    const linhas: ExportLinha[] = [];
+    if (emp?.dados_suficientes) {
+      linhas.push({ recorte: 'Empresa', respondentes: emp.total, dimensao: 'Geral', score: Number(emp.score_geral) });
+      comDado.forEach((d) => linhas.push({ recorte: 'Empresa', respondentes: emp.total, dimensao: d.label, score: d.score }));
+      FAIXAS.forEach((f) => linhas.push({ recorte: 'Distribuição', respondentes: emp.distribuicao?.[f] ?? 0, dimensao: `Faixa ${f}`, score: null }));
+    }
+    grupos.forEach((g) => {
+      linhas.push({ recorte: `Grupo: ${g.grupo}`, respondentes: g.total, dimensao: 'Geral', score: Number(g.score_geral) });
+      Object.entries(g.scores_dimensao ?? {}).forEach(([d, v]) => linhas.push({ recorte: `Grupo: ${g.grupo}`, respondentes: g.total, dimensao: vitDimLabel(d), score: v }));
+    });
+    (historico.data?.ciclos ?? []).filter((c) => c.dados_suficientes).forEach((c) => linhas.push({ recorte: `Tendência: ${c.ciclo_nome}`, respondentes: c.total, dimensao: 'Geral', score: Number(c.score_geral) }));
+    if (!linhas.length) linhas.push({ recorte: 'Dados insuficientes', respondentes: emp?.total ?? 0, dimensao: '—', score: null, observacao: `Mínimo de ${VIT_K_MINIMO} respostas não atingido` });
+    linhas.push({ recorte: 'Nota metodológica', respondentes: null, dimensao: '—', score: null, observacao: NOTA_METODOLOGICA });
+    exportToCSV('vitalidade_agregado', [
+      { header: 'Recorte', accessor: (x: any) => x.recorte },
+      { header: 'Respondentes', accessor: (x: any) => x.respondentes },
+      { header: 'Dimensão', accessor: (x: any) => x.dimensao },
+      { header: 'Score (0-100)', accessor: (x: any) => x.score },
+      { header: 'Status', accessor: (x: ExportLinha) => x.score == null ? '' : statusSegPsi(x.score).label },
+      { header: 'Observação', accessor: (x: ExportLinha) => x.observacao ?? '' },
+    ], linhas);
+  };
+  const exportarPDF = async () => {
+    if (activeCompanyId) registrarAcessoNr1({ companyId: activeCompanyId, actorRole, action: 'export_pdf', resource: 'vitalidade', kValue: VIT_K_MINIMO });
+    if (ref.current) await exportDashboardToPDF(ref.current, { filename: 'vitalidade', title: 'Vitalidade — Relatório agregado', subtitle: `${cicloNome} · mínimo de ${VIT_K_MINIMO} respostas por recorte` });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        {cabecalho}
+        <div className="flex flex-wrap gap-2">
+          <Select value={cicloId} onValueChange={setCicloId}>
+            <SelectTrigger className="w-full sm:w-[220px]"><SelectValue placeholder="Ciclo" /></SelectTrigger>
+            <SelectContent>{ciclos.data.map((c) => <SelectItem key={c.id} value={c.id}>{c.ciclo_nome}</SelectItem>)}</SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={exportarCSV} disabled={r?.acesso !== 'empresa' && !temAgregado}><Download className="h-4 w-4 mr-2" />Planilha</Button>
+          <Button variant="outline" size="sm" onClick={exportarPDF} disabled={r?.acesso !== 'empresa' && !temAgregado}><FileText className="h-4 w-4 mr-2" />PDF</Button>
+        </div>
+      </div>
+
+      {resultado.isLoading && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando resultado…</div>}
+      {r?.acesso === 'negado' && <Card><CardContent className="py-8 text-center text-sm text-muted-foreground">{r.motivo ?? 'Acesso negado.'}</CardContent></Card>}
+
+      {r && r.acesso !== 'negado' && (
+        <div ref={ref} className="space-y-6 bg-background p-1">
+          <p className="rounded-md border bg-muted/30 p-3 text-xs text-muted-foreground"><strong>Nota metodológica:</strong> {NOTA_METODOLOGICA}</p>
+          {escopoEmpresa && (
+            emp?.dados_suficientes ? (
+              <>
+                <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Respondentes</p><p className="text-2xl font-semibold">{emp.total}</p></CardContent></Card>
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Score global</p><p className="text-2xl font-semibold tabular-nums">{Number(emp.score_geral).toFixed(1)}</p></CardContent></Card>
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Status</p><div className="mt-1"><StatusBadge score={Number(emp.score_geral)} /></div></CardContent></Card>
+                  <Card><CardContent className="pt-6"><p className="text-xs text-muted-foreground">Dimensão mais frágil</p><p className="text-sm font-semibold mt-1">{fragil?.label ?? '—'}</p></CardContent></Card>
+                </div>
+                <Card>
+                  <CardHeader><CardTitle>Score por dimensão</CardTitle><CardDescription>0–100; quanto maior, mais vitalidade.</CardDescription></CardHeader>
+                  <CardContent className="grid gap-2 md:grid-cols-2">
+                    {dimsData.map((d) => (
+                      <div key={d.key} className="rounded-md border p-3">
+                        <div className="flex items-start justify-between gap-2"><p className="text-sm font-medium">{d.label}</p>{d.score != null && <StatusBadge score={d.score} />}</div>
+                        {d.score != null && <><Progress value={d.score} className="mt-2 h-2" /><p className="mt-1 text-xs text-muted-foreground tabular-nums">{d.score.toFixed(1)} / 100</p></>}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader><CardTitle>Distribuição das respostas</CardTitle><CardDescription>Quantidade de respondentes por faixa de score.</CardDescription></CardHeader>
+                  <CardContent><div className="h-[220px]"><ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={FAIXAS.map((f) => ({ faixa: f, n: emp.distribuicao?.[f] ?? 0 }))}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="faixa" /><YAxis allowDecimals={false} /><Tooltip /><Bar dataKey="n" name="Respondentes" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} /></BarChart>
+                  </ResponsiveContainer></div></CardContent>
+                </Card>
+              </>
+            ) : (
+              <Card><CardContent className="py-8 text-center text-sm text-muted-foreground"><p className="font-semibold text-foreground">Dados insuficientes</p>Este ciclo tem {emp?.total ?? 0} de no mínimo {VIT_K_MINIMO} respostas. Os resultados aparecem quando o mínimo for atingido.</CardContent></Card>
+            )
+          )}
+
+          <Card>
+            <CardHeader><CardTitle>{escopoEmpresa ? 'Resultado por grupo' : 'Seus grupos'}</CardTitle><CardDescription>Só aparecem grupos com no mínimo {VIT_K_MINIMO} respostas. Os vínculos de gestor são os mesmos da Segurança Psicológica.</CardDescription></CardHeader>
+            <CardContent className="space-y-3">
+              {alertas.length > 0 && (
+                <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm">
+                  <p className="flex items-center gap-2 font-semibold"><AlertTriangle className="h-4 w-4 text-destructive" />Alertas por grupo</p>
+                  <ul className="mt-1 space-y-0.5">{alertas.map((g) => <li key={g.grupo}>{g.grupo}: {statusSegPsi(Number(g.score_geral)).label} ({Number(g.score_geral).toFixed(1)})</li>)}</ul>
+                </div>
+              )}
+              {grupos.length === 0 ? <p className="text-sm text-muted-foreground">Dados insuficientes: nenhum grupo atingiu o mínimo de respostas.</p> : (
+                <div className="grid gap-2 md:grid-cols-2">{grupos.map((g) => (
+                  <div key={g.grupo} className="rounded-md border p-3 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0"><p className="truncate text-sm font-medium">{g.grupo}</p><p className="text-xs text-muted-foreground">{g.total} respondentes</p></div>
+                      <div className="flex items-center gap-2"><span className="font-semibold tabular-nums">{Number(g.score_geral).toFixed(1)}</span><StatusBadge score={Number(g.score_geral)} /></div>
+                    </div>
+                    <ul className="grid grid-cols-2 gap-x-3 text-xs">{VIT_DIMENSOES.map((d) => <li key={d} className="flex justify-between"><span className="text-muted-foreground">{VIT_DIM_LABEL[d]}</span><span className="tabular-nums">{g.scores_dimensao?.[d]?.toFixed(1) ?? '—'}</span></li>)}</ul>
+                  </div>
+                ))}</div>
+              )}
+            </CardContent>
+          </Card>
+
+          {escopoEmpresa && (
+            <Card>
+              <CardHeader><CardTitle>Tendência entre ciclos</CardTitle><CardDescription>Score global por ciclo (só ciclos com o mínimo de respostas).</CardDescription></CardHeader>
+              <CardContent>{histData.length < 2 ? <p className="text-sm text-muted-foreground">É preciso pelo menos 2 ciclos com o mínimo de respostas para mostrar a tendência.</p> : (
+                <div className="h-[220px]"><ResponsiveContainer width="100%" height="100%"><LineChart data={histData}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="ciclo" /><YAxis domain={[0, 100]} /><Tooltip /><Line type="monotone" dataKey="score" name="Score" stroke="hsl(var(--primary))" strokeWidth={2} /></LineChart></ResponsiveContainer></div>
+              )}</CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {escopoEmpresa && (
+        <ModuleGate moduleSlug="clima" mode="section" featureName="Correlação com o Clima Organizacional" description="Cruze Vitalidade, eNPS e engajamento. Disponível para empresas com o Clima Organizacional contratado.">
+          <Card><CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div><p className="font-semibold">Correlação com o Clima Organizacional</p><p className="text-sm text-muted-foreground">Compare a Vitalidade com o eNPS e o engajamento do Clima.</p></div>
+            <Button asChild variant="outline" size="sm"><Link to="/clima/correlacao"><Link2 className="h-4 w-4 mr-2" />Abrir correlação</Link></Button>
+          </CardContent></Card>
+        </ModuleGate>
+      )}
+    </div>
   );
 }

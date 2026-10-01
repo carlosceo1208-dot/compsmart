@@ -22,17 +22,22 @@ Deno.serve(async (req) => {
       if (!convite?.disponivel) return json({ error: 'Este link expirou ou não está mais disponível.' }, 410);
       const { data: segpsi, error: segErr } = await db.from('nr1_segpsi_questoes').select('id, codigo, dimensao, enunciado, ordem, reverso').eq('ativo', true).order('ordem');
       if (segErr) throw segErr;
-      return json({ ...convite, questoes_segpsi: segpsi ?? [] });
+      // Catálogo do Vitalidade lido aqui, pelo servidor (acesso próprio), só os itens próprios.
+      // Itens de referência ao COPSOQ já aparecem no bloco do diagnóstico e não se repetem.
+      const { data: vit, error: vitErr } = await db.from('nr1_vitalidade_questoes').select('id, codigo, dimensao, origem, copsoq_questao_id, enunciado, ordem, reverso').eq('ativo', true).order('ordem');
+      if (vitErr) throw vitErr;
+      return json({ ...convite, questoes_segpsi: segpsi ?? [], questoes_vitalidade: vit ?? [] });
     }
 
     if (action === 'submit') {
       const submissionId = typeof body?.submissionId === 'string' ? body.submissionId : '';
       const respostas = body?.respostas;
       const respostasSegPsi = body?.respostasSegPsi;
+      const respostasVitalidade = body?.respostasVitalidade;
       const isObj = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
-      if (!uuidPattern.test(submissionId) || !isObj(respostas) || !isObj(respostasSegPsi)) return json({ error: 'Envio inválido' }, 400);
-      if (Object.keys(respostas).length > 100 || Object.keys(respostasSegPsi).length > 50) return json({ error: 'Quantidade de respostas inválida' }, 400);
-      const { error } = await db.rpc('nr1_submeter_com_segpsi', { p_token: token, p_submission_id: submissionId, p_respostas: respostas, p_respostas_segpsi: respostasSegPsi });
+      if (!uuidPattern.test(submissionId) || !isObj(respostas) || !isObj(respostasSegPsi) || !isObj(respostasVitalidade)) return json({ error: 'Envio inválido' }, 400);
+      if (Object.keys(respostas).length > 100 || Object.keys(respostasSegPsi).length > 50 || Object.keys(respostasVitalidade).length > 30) return json({ error: 'Quantidade de respostas inválida' }, 400);
+      const { error } = await db.rpc('nr1_submeter_completo', { p_token: token, p_submission_id: submissionId, p_respostas: respostas, p_respostas_segpsi: respostasSegPsi, p_respostas_vitalidade: respostasVitalidade });
       if (error) return json({ error: error.message.includes('já foi enviado') ? 'Este questionário já foi enviado.' : 'Não foi possível registrar as respostas.' }, 400);
       return json({ success: true });
     }
