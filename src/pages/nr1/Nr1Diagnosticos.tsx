@@ -33,10 +33,8 @@ export default function Nr1Diagnosticos() {
             <Card key={d.id}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-base">{d.ciclo_nome}</CardTitle>
-                {d.nivel_risco && (
-                  <Badge className={RISCO_CLASS[d.nivel_risco as keyof typeof RISCO_CLASS]}>
-                    Risco {RISCO_LABEL[d.nivel_risco as keyof typeof RISCO_LABEL]}
-                  </Badge>
+                {(d.total_respondentes ?? 0) >= 5 && d.score_geral != null && (
+                  <Nr1SeloSaude risco={d.score_geral} />
                 )}
               </CardHeader>
               <CardContent className="flex items-center justify-between gap-4 flex-wrap">

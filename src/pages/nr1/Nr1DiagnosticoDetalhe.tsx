@@ -83,11 +83,12 @@ export default function Nr1DiagnosticoDetalhe() {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-xs text-muted-foreground">Nível de Risco</p>
-            {!baixaParticipacao && data.nivel_risco ? (
-              <Badge className={`${RISCO_CLASS[data.nivel_risco as keyof typeof RISCO_CLASS]} text-base mt-1`}>
-                {RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL]}
-              </Badge>
+            <p className="text-xs text-muted-foreground">Selo (nota de saúde)</p>
+            {!baixaParticipacao && data.score_geral != null ? (
+              <div className="mt-1 space-y-1">
+                <Nr1SeloSaude risco={data.score_geral} className="text-base" />
+                <Nr1SeloRodape />
+              </div>
             ) : <p className="text-muted-foreground">—</p>}
           </CardContent>
         </Card>

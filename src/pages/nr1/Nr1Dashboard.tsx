@@ -5,7 +5,9 @@ import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, Hist
 import { Link } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { useNr1Diagnosticos, useNr1Subscription, useUpdateNr1Diagnostico, useDeleteNr1Diagnostico } from '@/hooks/useNr1';
-import { RISCO_CLASS, RISCO_LABEL, DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
+import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
+import { notaSaude, seloSaude } from '@/lib/nr1Selo';
 import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
@@ -97,10 +99,8 @@ export default function Nr1Dashboard() {
               <Badge className={`${grauInfo.bg} ${grauInfo.cor} border`}>
                 Grau {grauInfo.grau} · {grauInfo.label}
               </Badge>
-             ) : ultimo && ultimo.total_respondentes >= 5 && ultimo.nivel_risco ? (
-              <Badge className={RISCO_CLASS[ultimo.nivel_risco as keyof typeof RISCO_CLASS]}>
-                {RISCO_LABEL[ultimo.nivel_risco as keyof typeof RISCO_LABEL]}
-              </Badge>
+             ) : ultimo && ultimo.total_respondentes >= 5 && ultimo.score_geral != null ? (
+              <Nr1SeloSaude risco={ultimo.score_geral} />
             ) : (
               '—'
             )
@@ -181,10 +181,8 @@ export default function Nr1Dashboard() {
                       </p>
                     </Link>
                     <div className="flex items-center gap-1 shrink-0">
-                      {c.nivel_risco && !vazio && (
-                        <Badge className={`${RISCO_CLASS[c.nivel_risco as keyof typeof RISCO_CLASS]} hidden md:inline-flex`}>
-                          {RISCO_LABEL[c.nivel_risco as keyof typeof RISCO_LABEL]}
-                        </Badge>
+                      {c.score_geral != null && !vazio && (c.total_respondentes ?? 0) >= 5 && (
+                        <Nr1SeloSaude risco={c.score_geral} mostrarNota={false} className="hidden md:inline-flex" />
                       )}
                       {!vazio && (
                         <Button
@@ -303,7 +301,7 @@ export default function Nr1Dashboard() {
                       {[
                         { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => typeof v === 'number' ? v.toFixed(1) : 'Dados insuficientes' },
                         { label: 'Respondentes', a: cicloA.total_respondentes, b: cicloB.total_respondentes, fmt: (v: any) => v ?? '—' },
-                        { label: 'Nível de risco', a: cicloA.nivel_risco, b: cicloB.nivel_risco, fmt: (v: any) => v ? RISCO_LABEL[v as keyof typeof RISCO_LABEL] : 'Dados insuficientes' },
+                        { label: 'Selo (nota de saúde)', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => { const s = notaSaude(typeof v === 'number' ? v : null); const sl = seloSaude(s); return sl && s != null ? `${sl.label} · ${s.toFixed(1)}` : 'Dados insuficientes'; } },
                       ].map((row) => {
                         const delta = typeof row.a === 'number' && typeof row.b === 'number' ? (row.b as number) - (row.a as number) : null;
                         return (
