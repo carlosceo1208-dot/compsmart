@@ -273,7 +273,7 @@ export default function Nr1JornadaBemEstar() {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between gap-3">
+        <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full nr1-bg-primary flex items-center justify-center">
               <Heart className="h-5 w-5 text-white" />
