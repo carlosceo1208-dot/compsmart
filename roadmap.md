@@ -129,4 +129,4 @@
 - [x] Acabamento final: rótulo COPSOQ para Demandas/Saúde, nota nas exportações e indicador de gestores sem grupo
 - [x] Teste no navegador do questionário completo em tenant fictício + conferência real de PDF/planilha + limpeza integral
 - [x] Gestor sem grupo vinculado permanece sem acesso; usar gestor cadastrado do colaborador quebraria o anonimato
-- [ ] Publicar (aguarda aprovação)
+- [x] Publicado (2026-10-01, aprovação do CEO)
