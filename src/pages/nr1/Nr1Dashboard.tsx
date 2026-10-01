@@ -117,6 +117,7 @@ export default function Nr1Dashboard() {
               <CardDescription>
                  {ultimo.total_respondentes < 5 ? 'Dados insuficientes — mínimo de 5 participantes' : `Score geral: ${ultimo.score_geral?.toFixed(1) ?? '—'}/100`}
               </CardDescription>
+              <Nr1SeloRodape className="mt-1" />
             </div>
             <Button variant="outline" size="sm" asChild>
               <Link to={`/nr1/diagnostico/${ultimo.id}`}>Ver relatório <ArrowRight className="h-4 w-4 ml-1" /></Link>

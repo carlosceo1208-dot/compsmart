@@ -49,6 +49,7 @@ export default function Nr1Diagnosticos() {
               </CardContent>
             </Card>
           ))}
+          <Nr1SeloRodape />
         </div>
       )}
     </div>

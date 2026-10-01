@@ -31,9 +31,9 @@ export default function Nr1DiagnosticoDetalhe() {
     doc.text(`Diagnóstico NR-1 — ${data.ciclo_nome}`, 14, 18);
     doc.setFontSize(10);
     doc.text(
-      `Score geral: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Risco: ${
-        data.nivel_risco ? RISCO_LABEL[data.nivel_risco as keyof typeof RISCO_LABEL] : '—'
-      } · Respondentes: ${data.total_respondentes}`,
+      `Risco: ${data.score_geral?.toFixed(1) ?? '—'} / 100 · Nota de saúde: ${
+        notaSaude(data.score_geral)?.toFixed(1) ?? '—'
+      } (${seloSaude(notaSaude(data.score_geral))?.label ?? '—'}) · Respondentes: ${data.total_respondentes} · Nota de saúde = 100 − risco psicossocial`,
       14, 26
     );
     autoTable(doc, {
