@@ -126,7 +126,7 @@
 
 ## Fase 5B-1 — Segurança Psicológica (implementada, não publicada)
 - [x] Trava do NR-1 na área interna; escala própria; envio tudo-ou-nada; agregados com mínimo de 5; gestor por grupo; histórico; exportação; correlação com o Clima
-- [ ] Acabamento final: rótulo COPSOQ para Demandas/Saúde, nota nas exportações e indicador de gestores sem grupo
-- [ ] Teste no navegador do questionário completo em tenant fictício + conferência real de PDF/planilha + limpeza integral
+- [x] Acabamento final: rótulo COPSOQ para Demandas/Saúde, nota nas exportações e indicador de gestores sem grupo
+- [x] Teste no navegador do questionário completo em tenant fictício + conferência real de PDF/planilha + limpeza integral
 - [x] Gestor sem grupo vinculado permanece sem acesso; usar gestor cadastrado do colaborador quebraria o anonimato
 - [ ] Publicar (aguarda aprovação)
