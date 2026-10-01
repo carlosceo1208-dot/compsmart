@@ -304,7 +304,7 @@ export default function Nr1Clima() {
               Veja causas raiz confirmadas e plano de ação unificado quando há ambos os instrumentos aplicados.
             </p>
             <Button asChild size="sm" variant="outline">
-              <Link to="/clima/correlacao"><Sparkles className="h-3.5 w-3.5 mr-1" /> Ver correlação</Link>
+              <Link to="/nr1/inteligencia?aba=clima"><Sparkles className="h-3.5 w-3.5 mr-1" /> Ver correlação com riscos psicossociais</Link>
             </Button>
           </div>
         </CardContent>

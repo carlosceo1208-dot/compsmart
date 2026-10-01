@@ -139,7 +139,7 @@ export function Nr1CheckupConjunto() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border p-4">
             <p className="text-sm text-muted-foreground">Compare o check-up com o eNPS e o engajamento do Clima.</p>
-            <Button asChild variant="outline" size="sm"><Link to="/clima/correlacao"><Link2 className="h-4 w-4 mr-2" />Abrir correlação</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link to="/nr1/inteligencia?aba=clima"><Link2 className="h-4 w-4 mr-2" />Abrir correlação</Link></Button>
           </div>
         </ModuleGate>
       </CardContent>

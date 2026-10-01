@@ -216,7 +216,7 @@ export default function Nr1Vitalidade() {
         <ModuleGate moduleSlug="clima" mode="section" featureName="Correlação com o Clima Organizacional" description="Cruze Vitalidade, eNPS e engajamento. Disponível para empresas com o Clima Organizacional contratado.">
           <Card><CardContent className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div><p className="font-semibold">Correlação com o Clima Organizacional</p><p className="text-sm text-muted-foreground">Compare a Vitalidade com o eNPS e o engajamento do Clima.</p></div>
-            <Button asChild variant="outline" size="sm"><Link to="/clima/correlacao"><Link2 className="h-4 w-4 mr-2" />Abrir correlação</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link to="/nr1/inteligencia?aba=clima"><Link2 className="h-4 w-4 mr-2" />Abrir correlação</Link></Button>
           </CardContent></Card>
         </ModuleGate>
       )}
