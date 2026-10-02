@@ -12779,6 +12779,7 @@ export type Database = {
         Args: { _template_id: string }
         Returns: undefined
       }
+      nr1_terceiros_pode_gerir: { Args: { _company: string }; Returns: boolean }
       nr1_vitalidade_historico: {
         Args: { p_company_id: string }
         Returns: Json
