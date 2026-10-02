@@ -31,6 +31,9 @@ Conclusão: não dá para fechar a cadeia com dados reais sem começar a coletar
 - Consolidação no fechamento do ciclo: calcula FIB/SegPsi/HSE por grupo e grava só grupos com 5+.
 - Teste com empresa temporária (um grupo com 5+, outro com menos), 1280/390, exportações abertas, recarregar sem duplicidade; empresa apagada; linha de base 25 · 2 · 440/0/0 · 9 · 190 · 2 · Q1 2026 = 49,93.
 - Testes extras: envio sem responder o bloco e envio com "Prefiro não informar" concluem normalmente; reprocessar o mesmo ciclo duas vezes não duplica.
+- Empresa sem áreas cadastradas: a pergunta de área mostra só "Prefiro não informar" e o envio conclui normalmente.
+- Alterar/excluir áreas depois do fechamento não muda os recortes já consolidados (conferido no teste).
+- O mapa de calor e as exportações não mostram contagem por grupo; grupo exibido significa 5 ou mais (sem prometer número exato).
 
 Registro em AGENTS.md, roadmap e dossiê nas duas partes. Nada publicado sem sua autorização.
 
@@ -41,5 +44,5 @@ Registro em AGENTS.md, roadmap e dossiê nas duas partes. Nada publicado sem sua
 ## Detalhes técnicos
 - Respostas: `nr1_diagnostico_respostas` (respondent_hash, questao_id, resposta, convite_id); sem demografia. `nr1_convites.grupo` é o único recorte.
 - `nr1_sociodemo_results`, `nr1_fib_results`, `nr1_segpsi_results` ausentes; `safeSelect` em useNr1Cycles.ts engole o erro → `source:'empty'`.
-- Coleta proposta: tabela própria anônima por envio (diagnostico_id + faixas), gravada no envio atômico `nr1_submeter_completo` (confirmado: existe com esse nome, ao lado de nr1_submeter_respostas e nr1_submeter_com_segpsi); parâmetro demográfico opcional, nulo aceito. Lista de áreas de `organizational_structure` da empresa, validada no servidor. Consolidação via função SECURITY DEFINER com upsert em (company_id, diagnostico_id), HAVING count ≥ 5.
+- Coleta proposta: tabela própria anônima por envio (diagnostico_id + faixas), gravada no envio atômico `nr1_submeter_completo` (confirmado: existe com esse nome, ao lado de nr1_submeter_respostas e nr1_submeter_com_segpsi); parâmetro demográfico opcional, nulo aceito, **só nesta função** (as outras duas não mudam, para não divergirem). Lista de áreas de `organizational_structure` da empresa, validada no servidor; área gravada como rótulo no momento do envio, para a consolidação não depender do cadastro atual. Consolidação via função SECURITY DEFINER com upsert em (company_id, diagnostico_id), HAVING count ≥ 5.
 - Não altera Matriz, Importações, Terceiros, selo, parser.
