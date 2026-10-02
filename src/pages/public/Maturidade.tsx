@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { getSeoRoute } from "@/config/seoRoutes";
-import { EIXOS, NIVEIS, TEASER, LIKERT, LGPD_VERSAO, media, nivelDoScore, fraseDoNivel, type NivelKey } from "@/lib/maturidade";
+import { EIXOS, ESTILOS_GESTAO, NIVEIS, TEASER, LIKERT, LGPD_VERSAO, media, nivelDoScore, fraseDoNivel, rotuloNivelEstrutural, type NivelKey } from "@/lib/maturidade";
 
 const seo = getSeoRoute("/maturidade");
 const ICONES = [BarChart3, Cpu, HeartHandshake, Rocket];
@@ -118,11 +118,25 @@ const Maturidade = () => {
           <div className="mt-8 grid gap-3 md:grid-cols-5 md:items-end">
             {NIVEIS.map((n) => (
               <div key={n.key} className="rounded-2xl border bg-card p-5" style={{ minHeight: `${6 + n.n * 1.5}rem` }}>
-                <span className="text-xs font-semibold text-primary">Nível {n.n}</span>
-                <h3 className="mt-1 font-semibold text-foreground">{n.key}</h3>
+                <span className="text-xs font-semibold text-primary">Maturidade estrutural {n.n}</span>
+                <h3 className="mt-1 font-semibold text-foreground">{rotuloNivelEstrutural(n.key)}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{n.frase}</p>
               </div>
             ))}
+          </div>
+          <div className="mt-10 border-t pt-8">
+            <h3 className="text-xl font-semibold text-foreground">Estilo de Gestão</h3>
+            <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+              O modelo completo também observa como RH e liderança conduzem a gestão. Este eixo é aprofundado com nossos consultores e não compõe o resultado gratuito abaixo.
+            </p>
+            <ol className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {ESTILOS_GESTAO.map((estilo) => (
+                <li key={estilo.n} className="rounded-xl border bg-card p-4">
+                  <span className="text-xs font-semibold text-primary">{estilo.n}</span>
+                  <p className="mt-1 font-medium text-foreground">{estilo.nome}</p>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </section>
@@ -166,7 +180,7 @@ const Maturidade = () => {
             {resultado && (
               <div>
                 <p className="text-sm text-muted-foreground">Seu nível provisório</p>
-                <h2 className="text-3xl font-bold text-primary mt-1">{resultado.nivel}</h2>
+                <h2 className="text-3xl font-bold text-primary mt-1">{rotuloNivelEstrutural(resultado.nivel)}</h2>
                 <p className="mt-2 text-foreground">{fraseDoNivel(resultado.nivel)}</p>
                 <p className="mt-2 text-xs text-muted-foreground">Média {resultado.score.toFixed(1).replace(".", ",")} de 5 em 10 perguntas. O diagnóstico completo avalia 48 afirmações com RH e gestores.</p>
 

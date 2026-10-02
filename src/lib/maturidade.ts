@@ -9,6 +9,26 @@ export const NIVEIS = [
 ] as const;
 export type NivelKey = (typeof NIVEIS)[number]["key"];
 
+/** Rótulos públicos do modelo 5×2. Os códigos internos acima permanecem estáveis. */
+export const NIVEIS_ESTRUTURAIS = [
+  { n: 1, nome: "Reativo", codigo: "Reativo" },
+  { n: 2, nome: "Operacional", codigo: "Estruturado" },
+  { n: 3, nome: "Tático", codigo: "Alinhado" },
+  { n: 4, nome: "Estratégico", codigo: "Parceiro" },
+  { n: 5, nome: "Transformador", codigo: "Transformacional" },
+] as const satisfies ReadonlyArray<{ n: number; nome: string; codigo: NivelKey }>;
+
+export const ESTILOS_GESTAO = [
+  { n: 1, nome: "Controle" },
+  { n: 2, nome: "Informativo" },
+  { n: 3, nome: "Participativo" },
+  { n: 4, nome: "Facilitador" },
+  { n: 5, nome: "Empoderamento" },
+] as const;
+
+export const rotuloNivelEstrutural = (codigo: NivelKey) =>
+  NIVEIS_ESTRUTURAIS.find((nivel) => nivel.codigo === codigo)?.nome ?? "Reativo";
+
 /** Limite superior incluso no nível de baixo: <=1.8 Reativo, <=2.6 Estruturado, <=3.4 Alinhado, <=4.2 Parceiro, >4.2 Transformacional. */
 export function nivelDoScore(score: number): NivelKey {
   if (score <= 1.8) return "Reativo";

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { nivelDoScore, montarScorecard, TEASER, DIMENSOES } from "./maturidade";
+import { nivelDoScore, montarScorecard, rotuloNivelEstrutural, TEASER, DIMENSOES } from "./maturidade";
 
 describe("nivelDoScore", () => {
   it("limite superior fica no nível de baixo", () => {
@@ -11,6 +11,11 @@ describe("nivelDoScore", () => {
     expect(nivelDoScore(4.2)).toBe("Parceiro");
     expect(nivelDoScore(4.21)).toBe("Transformacional");
     expect(nivelDoScore(5)).toBe("Transformacional");
+  });
+  it("apresenta todas as faixas com o novo rótulo estrutural", () => {
+    expect([1, 2, 3, 4, 5].map((score) => rotuloNivelEstrutural(nivelDoScore(score)))).toEqual([
+      "Reativo", "Operacional", "Tático", "Estratégico", "Transformador",
+    ]);
   });
 });
 

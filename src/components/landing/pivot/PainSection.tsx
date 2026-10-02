@@ -4,7 +4,7 @@ import { Users, FileX, EyeOff } from "lucide-react";
 const CONTRAPONTOS = [
   {
     icon: Users,
-    title: "Consultoria cara e dependente de humanos",
+    title: "RH em modo apaga-incêndio",
     body: "Projetos longos, relatório entregue e conhecimento que vai embora junto com o consultor.",
   },
   {
@@ -14,7 +14,7 @@ const CONTRAPONTOS = [
   },
   {
     icon: EyeOff,
-    title: "Anonimato de fachada",
+    title: "Anonimato que esconde problemas",
     body: "Recortes pequenos demais permitem identificar quem respondeu — e a confiança acaba.",
   },
 ];

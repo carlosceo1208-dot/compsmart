@@ -17,15 +17,15 @@ export const PivotHero = () => (
             className="size-28 shrink-0 rounded-2xl object-cover shadow-sm md:size-36"
           />
           <h1 className="max-w-xl text-center text-3xl font-bold leading-tight md:text-left md:text-5xl">
-            O RH virou obrigação legal e alavanca estratégica.{" "}
-            <span className="text-primary">A CompSmart faz os dois.</span>
+            O RH que decide com dados não apaga incêndio.{" "}
+            <span className="text-primary">Ele constrói o futuro.</span>
           </h1>
         </div>
 
-        <p className="text-base md:text-lg text-muted-foreground">
-          Plataforma com 8 agentes de IA que cruza NR-1, clima, desempenho,
-          remuneração e sucessão — e consultoria sob demanda para levar da
-          estrutura ao resultado.
+        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
+          Da conformidade ao crescimento: NR-1, clima, remuneração e sucessão
+          em uma plataforma que transforma pessoas em vantagem competitiva —
+          com consultoria sob demanda para levar do diagnóstico ao resultado.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
