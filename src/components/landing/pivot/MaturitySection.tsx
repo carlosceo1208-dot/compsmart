@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Compass } from "lucide-react";
-
-const NIVEIS = [1, 2, 3, 4, 5];
+import { ESTILOS_GESTAO, NIVEIS_ESTRUTURAIS } from "@/lib/maturidade";
 
 /**
  * Apresenta o modelo de maturidade sem prometer funcionalidades que a página
@@ -36,22 +35,34 @@ export const MaturitySection = () => (
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm" aria-hidden="true">
-          <div className="flex justify-between text-[10px] font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            <span>Controle</span><span>Estilo de gestão</span><span>Facilitação</span>
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="grid gap-6 sm:grid-cols-2">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase text-muted-foreground">Maturidade estrutural</p>
+              <ol className="space-y-2">
+                {NIVEIS_ESTRUTURAIS.map((nivel) => (
+                  <li key={nivel.n} className="flex items-center gap-2 text-sm">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">{nivel.n}</span>
+                    <span className="font-medium">{nivel.nome}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase text-muted-foreground">Estilo de gestão</p>
+              <ol className="space-y-2">
+                {ESTILOS_GESTAO.map((estilo) => (
+                  <li key={estilo.n} className="flex items-center gap-2 text-sm">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">{estilo.n}</span>
+                    <span className="font-medium">{estilo.nome}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
-          <div className="space-y-2">
-            {[...NIVEIS].reverse().map((n, i) => (
-              <div key={n} className="flex items-center gap-3">
-                <span className="w-16 shrink-0 text-xs text-muted-foreground">Nível {n}</span>
-                <div className="h-6 flex-1 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${(5 - i) * 20}%`, opacity: 0.35 + (5 - i) * 0.13 }} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <p className="mt-3 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground text-center">
-            Maturidade estrutural
+          <p className="mt-5 border-t border-border pt-4 text-xs leading-relaxed text-muted-foreground">
+            O diagnóstico gratuito apresenta o nível de maturidade estrutural.
+            O estilo de gestão integra o modelo completo conduzido com nossos consultores.
           </p>
         </div>
       </div>
