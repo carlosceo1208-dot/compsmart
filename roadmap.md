@@ -156,3 +156,9 @@
 - [x] A9 aprovado: selo único + "Nota de saúde = 100 − risco psicossocial" no Diagnóstico, Matriz e Visão Geral; Q1 2026 Moderado → Crítico (saúde 50,1)
 - [x] Conferência: travas por papel/empresa (banco, desfeito), prints antes/depois 1280/390, teste dos assistentes (A5), PDF/planilha abertos com aviso de recortes ocultos no topo, ci limpo, scan rodado
 - [x] Publicado (2026-10-02, aprovação do CEO) + conferência pós-publicação 1280/390
+
+## Fase 7 — Histórico do NR-1
+- [x] Comparador movido para o Histórico (Visão Geral só com "Ver histórico completo"), direção corrigida para nota de saúde (D2), k=5 (D3), filtro por período, exportação PDF/planilha com método
+- [x] Refinamentos: seletores A base/B comparado com exclusão mútua, testes de borda 0,5/0,49/<5, fonte DejaVu embutida, tabela com rolagem em 390px
+- [x] Conferência em empresas de teste (apagadas), contagens na linha de base, ci limpo
+- [ ] Publicar — aguarda aprovação
