@@ -80,3 +80,28 @@ No celular (390px):
   - Busca no código sem referências quebradas.
   - Selos "IA" e nomes dos agentes inteiros no celular.
   - `bun run ci` limpo e `roadmap.md` atualizado.
+
+## Adendo final (execução fina)
+- **Simulador em /precos:** hoje o `PricingSimulator` não recebe props, e `Precos.tsx` mostra o botão "Falar com especialista" fora dele.
+  - Os botões novos entram como props opcionais. Sem as props, nada aparece, e `/precos` continua exatamente como está.
+  - A Home passa os dois botões com os mesmos handlers do topo.
+  - `usePublicPricing`, `perEmployeePrice` e `simulateMonthlyTotal` não mudam.
+- **Teste de preço:** novo arquivo `src/hooks/usePublicPricing.test.ts`, que roda pelo Vitest dentro do `bun run ci`. Casos cobertos:
+  - 100 colaboradores × 4 módulos = R$ 1.250.
+  - 100 colaboradores × 3 módulos = R$ 1.000.
+  - 100 colaboradores × 1 módulo = R$ 500.
+  - Valor do módulo adicional (`additionalModulePrice`) = R$ 2,50.
+- **Download do e-book:** hoje o arquivo vem de `src/assets/ebook-remuneracao-estrategica.pdf.asset.json`, entregue pelo `EbookDownloadDialog` com a origem atual `materiais-ebook-remuneracao`.
+  - A configuração de materiais aponta para esse mesmo arquivo e esse mesmo fluxo, sem trocar o destino.
+  - Validar o download completo pela Home e por `/materiais`.
+- **SEO da Home:** em `src/config/seoRoutes.ts`, só a rota `/` muda.
+  - Título: "CompSmart — O RH virou obrigação legal e alavanca estratégica".
+  - Descrição: "8 agentes de IA e consultoria sob demanda que cruzam NR-1, clima, remuneração, desempenho e sucessão."
+  - O endereço canônico e as demais rotas ficam intactos. A FAQ continua sendo enviada ao Google com as 7 perguntas.
+- **Selo NR-1:** o conteúdo do `UrgencyBanner` vira o selo de alerta do topo da Home, sem criar outro componente. Se o arquivo ficar sem uso, é removido. O selo não entra no `AnnouncementBar`.
+- **Validação extra:**
+  - `/precos` carrega e o simulador funciona.
+  - O teste de preço passa no CI.
+  - O download funciona a partir da configuração.
+  - O novo título e a nova descrição aparecem na Home.
+  - O selo NR-1 aparece com bom contraste em 1280px e 390px, sem duas faixas empilhadas no topo.
