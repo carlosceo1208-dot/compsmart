@@ -105,3 +105,14 @@ No celular (390px):
   - O download funciona a partir da configuração.
   - O novo título e a nova descrição aparecem na Home.
   - O selo NR-1 aparece com bom contraste em 1280px e 390px, sem duas faixas empilhadas no topo.
+
+## 4 ajustes finos
+1. **Origem do e-book:** o `EbookDownloadDialog` grava pela função `capture_ebook_lead`, com a origem `materiais-ebook-remuneracao`. Ele não usa `usePublicLead` nem o tipo `LeadOrigem`, então não há erro de tipagem. Essa origem fica exatamente como está, tanto na Home quanto em `/materiais`, para não fragmentar a base. Os cards "em breve" usam `usePublicLead` com `ebook:nr1` e `ebook:clima-9box`, que já estão no tipo.
+2. **SEO com uma única fonte:** o `SeoHead` já dá prioridade ao que está em `seoRoutes.ts`, e as props só valem quando a rota não está cadastrada lá. Mesmo assim, as props de título e descrição saem de `Index.tsx`, deixando `seoRoutes.ts` como a única fonte. Conferir o `<head>` na prévia.
+3. **Teste com dados próprios:** o teste monta um `PublicPricing` de exemplo (base 5, desconto de 50%). Os resultados de R$ 1.250, R$ 1.000, R$ 500 e R$ 2,50 saem desses dados, e não do cadastro de produção.
+4. **Textos de /materiais:** a nova configuração copia exatamente os títulos, as descrições e os botões atuais, incluindo "Remuneração Estratégica — Como atrair e reter talentos com um pacote de remuneração total competitivo", o botão "Baixar" e os cards "Em breve" de NR-1 e Clima/9-Box. Comparar com a página atual antes e depois da mudança.
+- **Validação:**
+  - `bun run ci` passa com o novo teste.
+  - O título e a descrição novos aparecem no `<head>`.
+  - O download funciona do começo ao fim (Home → janela de download → arquivo) e grava a mesma origem de hoje.
+  - `/precos` continua sem botões extras.
