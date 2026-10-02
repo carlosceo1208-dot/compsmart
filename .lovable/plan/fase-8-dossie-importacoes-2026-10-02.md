@@ -11,4 +11,4 @@ Escopo: opção A (conferência). Integração com a Matriz de Risco (opção B)
 - Tela 1280/390: página e estado vazio conferidos.
 - Rodada final: importação real temporária criada como pendente e removida ao final; PDF e planilha abertos com período, filtro, aviso de fatores sem dados pessoais e explicação do k=5; sem nomes nem URLs; link abriu imediatamente e expirou após 10 minutos (HTTP 400).
 - Logins esclarecidos: 190 é o total histórico; 18 corresponde exatamente a setembro de 2026. A nova linha de base usa 190 e ficou igual antes/depois.
-- Empresa sem NR-1: a função de gestão exige has_module('nr1'); não existe hoje RH/admin real fora da única empresa com NR-1 para um teste visual sem criar conta. A prova por perfis temporários fica bloqueada pela impossibilidade de criar auth.users neste acesso.
+- Empresa sem NR-1: a função de gestão exige has_module('nr1'); não existe hoje RH/admin real fora da única empresa com NR-1. O teste temporário ficou bloqueado porque este acesso não pode criar conta nem reassociar perfil; pendência registrada antes da publicação.
