@@ -10,6 +10,7 @@ import {
 import imagemReuniao from '@/assets/imagem-a-reuniao.png.asset.json';
 import imagemMapa from '@/assets/nr1-mapa.png.asset.json';
 import imagemBemEstar from '@/assets/nr1-bem-estar.png.asset.json';
+import { Nr1UrgencyAlert } from './Nr1UrgencyAlert';
 
 interface Props {
   onDiagnostico: () => void;
@@ -25,6 +26,10 @@ export default function Nr1HeroBento({ onDiagnostico }: Props) {
   return (
     <section className="bg-primary/5 text-foreground">
       <div className="container mx-auto px-4 pt-6 pb-10 sm:pt-8 sm:pb-12 md:pt-12 md:pb-16">
+        <div className="mb-6 text-center md:mb-8">
+          <Nr1UrgencyAlert />
+        </div>
+
         {/* Hero compacto */}
         <header className="grid items-center gap-7 lg:grid-cols-[1.2fr_1fr] max-w-6xl mx-auto mb-8 md:mb-10 lg:mb-12">
           <div className="text-center lg:text-left">

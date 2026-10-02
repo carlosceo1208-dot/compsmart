@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { PlayCircle } from "lucide-react";
-import { UrgencyBanner } from "./UrgencyBanner";
 import { DiagnosticoCTA } from "./DiagnosticoCTA";
 import simboloCrescimento from "@/assets/simbolo-crescimento.png.asset.json";
 
@@ -8,8 +7,6 @@ export const PivotHero = () => (
   <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-muted/40 py-14 md:py-24">
     <div className="container mx-auto px-4">
       <div className="max-w-3xl mx-auto text-center space-y-6">
-        <UrgencyBanner />
-
         <div className="flex flex-col items-center justify-center gap-5 md:flex-row md:gap-7">
           <img
             src={simboloCrescimento.url}
