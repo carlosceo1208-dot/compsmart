@@ -8,10 +8,14 @@
 Conclusão: não dá para fechar a cadeia com dados reais sem começar a coletar. Pela D1/D4, sinalizo e aguardo aprovação.
 
 ## Proposta mínima de coleta (precisa da sua aprovação)
-- Bloco curto e **opcional** no início do questionário anônimo: sexo, faixa etária (faixas largas), tempo de casa (faixas), área (lista da empresa). Sempre com "Prefiro não informar".
+- Bloco curto e **opcional no final** do questionário anônimo (decisão registrada: no final, para não influenciar as respostas; pode ser pulado).
+- Campos: sexo, faixa etária e tempo de casa em **faixas largas e fixas**; área em **lista controlada** vinda do cadastro de unidades da empresa (nunca texto livre). Sempre com "Prefiro não informar".
 - Guardado junto do envio anônimo, nunca ligado à pessoa nem ao convite individual.
 - Recortes separados (nunca combinados entre si, como na Fase 6), k=5 por grupo.
 - Ciclos já coletados (Q1 2026, Ciclo 2026) **não ganham** recorte — ficam no estado vazio desta tela.
+
+## Pendência transversal (só registro no dossiê, fora do escopo)
+- As telas de FIB e Segurança Psicológica também ficam vazias para cliente real (mesmas tabelas de resultado ausentes), junto com os "0" de respostas de Segurança Psicológica e Vitalidade na linha de base. Fica como pendência explícita para fase futura.
 
 ## Plano em duas partes
 
@@ -26,6 +30,7 @@ Conclusão: não dá para fechar a cadeia com dados reais sem começar a coletar
 - Bloco sociodemográfico no questionário anônimo.
 - Consolidação no fechamento do ciclo: calcula FIB/SegPsi/HSE por grupo e grava só grupos com 5+.
 - Teste com empresa temporária (um grupo com 5+, outro com menos), 1280/390, exportações abertas, recarregar sem duplicidade; empresa apagada; linha de base 25 · 2 · 440/0/0 · 9 · 190 · 2 · Q1 2026 = 49,93.
+- Testes extras: envio sem responder o bloco e envio com "Prefiro não informar" concluem normalmente; reprocessar o mesmo ciclo duas vezes não duplica.
 
 Registro em AGENTS.md, roadmap e dossiê nas duas partes. Nada publicado sem sua autorização.
 
@@ -36,5 +41,5 @@ Registro em AGENTS.md, roadmap e dossiê nas duas partes. Nada publicado sem sua
 ## Detalhes técnicos
 - Respostas: `nr1_diagnostico_respostas` (respondent_hash, questao_id, resposta, convite_id); sem demografia. `nr1_convites.grupo` é o único recorte.
 - `nr1_sociodemo_results`, `nr1_fib_results`, `nr1_segpsi_results` ausentes; `safeSelect` em useNr1Cycles.ts engole o erro → `source:'empty'`.
-- Coleta proposta: tabela própria anônima por envio (diagnostico_id + faixas), gravada no envio atômico `nr1_submeter_completo`; consolidação via função SECURITY DEFINER com upsert em (company_id, diagnostico_id), HAVING count ≥ 5.
+- Coleta proposta: tabela própria anônima por envio (diagnostico_id + faixas), gravada no envio atômico `nr1_submeter_completo` (confirmado: existe com esse nome, ao lado de nr1_submeter_respostas e nr1_submeter_com_segpsi); parâmetro demográfico opcional, nulo aceito. Lista de áreas de `organizational_structure` da empresa, validada no servidor. Consolidação via função SECURITY DEFINER com upsert em (company_id, diagnostico_id), HAVING count ≥ 5.
 - Não altera Matriz, Importações, Terceiros, selo, parser.
