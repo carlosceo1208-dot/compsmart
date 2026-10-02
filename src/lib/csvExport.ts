@@ -19,14 +19,16 @@ export function exportToCSV<T>(
   filename: string,
   columns: CSVColumn<T>[],
   rows: T[],
-  separator: ';' | ',' = ';'
+  separator: ';' | ',' = ';',
+  preamble: string[] = []
 ): void {
   const headerLine = columns.map((c) => escapeCell(c.header)).join(separator);
   const dataLines = rows.map((row) =>
     columns.map((c) => escapeCell(c.accessor(row))).join(separator)
   );
+  const preLines = preamble.length ? [...preamble.map(escapeCell), ''] : [];
 
-  const csv = [headerLine, ...dataLines].join('\r\n');
+  const csv = [...preLines, headerLine, ...dataLines].join('\r\n');
   // BOM para Excel reconhecer UTF-8 corretamente
   const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
 
