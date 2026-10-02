@@ -16,5 +16,7 @@ O comparador antigo (Visão Geral) usava o risco bruto e chamava de "Evolução 
 ## Contagens após limpeza
 Iguais às de antes do teste: acessos 25 registros na tabela (sem acréscimo), 2 auditorias, 9 check-ups, 2 diagnósticos, Q1 2026 = 49,93.
 
+Nota de linha de base (aprovada pelo CEO em 2026-10-02): a linha de base de acessos passa a ser **25**, não 4. O valor "4 acessos" do plano era um snapshot desatualizado de fase anterior; o teste não alterou a contagem (25 → 25).
+
 ## Código
 bun run ci: 0 erros, 65 testes, build ok. Nada publicado.
