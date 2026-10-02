@@ -184,11 +184,18 @@ export const PricingSimulator = ({ selectModules = false, actions }: PricingSimu
               </p>
             </div>
           )}
+          {selectModules && (
+            <p className="text-sm font-medium text-foreground">
+              {Math.max(1, qty)} {Math.max(1, qty) === 1 ? "módulo" : "módulos"} ·{" "}
+              {employees.toLocaleString("pt-BR")} colaboradores
+            </p>
+          )}
           <p className="text-xs text-muted-foreground">
             1º módulo {formatBRL(pricing.preco_base_colaborador)} por
             colaborador/mês · do 2º em diante,{" "}
             {pricing.desconto_modulo_adicional_pct}% de desconto por módulo.
           </p>
+          {actions && <div className="flex flex-col gap-2 pt-2">{actions}</div>}
         </div>
       </CardContent>
     </Card>
