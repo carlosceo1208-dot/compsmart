@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ListChecks } from 'lucide-react';
+import { ListChecks, Upload } from 'lucide-react';
 import { GerarPgrButton } from '@/components/nr1/GerarPgrButton';
 import { Nr1MatrizRisco } from '@/components/nr1/Nr1MatrizRisco';
 
@@ -24,6 +24,9 @@ export default function Nr1FIB() {
           <div className="flex items-center gap-2 flex-wrap">
             <Button asChild variant="outline" size="sm">
               <Link to="/nr1/planos-acao"><ListChecks className="h-4 w-4 mr-1" /> Plano de Ação</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/nr1/importacoes"><Upload className="h-4 w-4 mr-1" /> Importações</Link>
             </Button>
             <GerarPgrButton size="sm" variant="default" className="nr1-bg-primary" />
           </div>

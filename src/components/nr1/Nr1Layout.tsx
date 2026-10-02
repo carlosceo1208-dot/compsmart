@@ -73,6 +73,7 @@ const JOURNEY_GROUPS: JourneyGroup[] = [
 
 const EXTRA_ITEMS: NavItem[] = [
   { to: '/nr1/diagnosticos', label: 'Histórico', icon: History, desc: 'Consulte e compare os ciclos de diagnóstico.' },
+  { to: '/nr1/importacoes', label: 'Importações', icon: ClipboardCheck, desc: 'Confira e registre a conferência das matrizes importadas.' },
   { label: 'Importar Matriz', icon: Upload, action: 'open-import-matriz', desc: 'Importe uma matriz existente com validação prévia.' },
   { label: 'Gestão de Terceiros', icon: Building2, action: 'open-terceiros', desc: 'Acompanhe a conformidade dos fornecedores.' },
   { to: '/nr1/vitalidade', label: 'Vitalidade', icon: HeartPulse, desc: 'Acompanhe indicadores de saúde ocupacional.' },
@@ -220,7 +221,7 @@ export const Nr1Layout = () => {
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="border-t px-3 py-3">
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">{EXTRA_ITEMS.map((item) => renderItem(item))}</div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-8">{EXTRA_ITEMS.map((item) => renderItem(item))}</div>
               </CollapsibleContent>
             </Collapsible>
 

@@ -5388,6 +5388,8 @@ export type Database = {
           arquivo_path: string | null
           arquivo_tamanho: number | null
           company_id: string
+          conferido_em: string | null
+          conferido_por: string | null
           consultoria: string | null
           created_at: string
           created_by: string | null
@@ -5400,6 +5402,7 @@ export type Database = {
           metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
           metodologia_outra: string | null
           modo: Database["public"]["Enums"]["nr1_matriz_modo"]
+          motivo_rejeicao: string | null
           observacoes: string | null
           processado_em: string | null
           status: Database["public"]["Enums"]["nr1_matriz_status"]
@@ -5413,6 +5416,8 @@ export type Database = {
           arquivo_path?: string | null
           arquivo_tamanho?: number | null
           company_id: string
+          conferido_em?: string | null
+          conferido_por?: string | null
           consultoria?: string | null
           created_at?: string
           created_by?: string | null
@@ -5425,6 +5430,7 @@ export type Database = {
           metodologia: Database["public"]["Enums"]["nr1_matriz_metodologia"]
           metodologia_outra?: string | null
           modo?: Database["public"]["Enums"]["nr1_matriz_modo"]
+          motivo_rejeicao?: string | null
           observacoes?: string | null
           processado_em?: string | null
           status?: Database["public"]["Enums"]["nr1_matriz_status"]
@@ -5438,6 +5444,8 @@ export type Database = {
           arquivo_path?: string | null
           arquivo_tamanho?: number | null
           company_id?: string
+          conferido_em?: string | null
+          conferido_por?: string | null
           consultoria?: string | null
           created_at?: string
           created_by?: string | null
@@ -5450,6 +5458,7 @@ export type Database = {
           metodologia?: Database["public"]["Enums"]["nr1_matriz_metodologia"]
           metodologia_outra?: string | null
           modo?: Database["public"]["Enums"]["nr1_matriz_modo"]
+          motivo_rejeicao?: string | null
           observacoes?: string | null
           processado_em?: string | null
           status?: Database["public"]["Enums"]["nr1_matriz_status"]
@@ -12644,6 +12653,10 @@ export type Database = {
           grupo: string
         }[]
       }
+      nr1_importacao_pode_gerir: {
+        Args: { _company: string }
+        Returns: boolean
+      }
       nr1_inteligencia_unidades: {
         Args: { p_company: string; p_fim?: string; p_inicio?: string }
         Returns: Json
@@ -13115,6 +13128,8 @@ export type Database = {
         | "mapeado"
         | "publicado"
         | "erro"
+        | "conferido"
+        | "rejeitado"
       nr1_nivel_risco: "baixo" | "moderado" | "alto" | "critico"
       nr1_plan_tier: "essencial" | "pro"
       nr1_subscription_status:
@@ -13367,6 +13382,8 @@ export const Constants = {
         "mapeado",
         "publicado",
         "erro",
+        "conferido",
+        "rejeitado",
       ],
       nr1_nivel_risco: ["baixo", "moderado", "alto", "critico"],
       nr1_plan_tier: ["essencial", "pro"],

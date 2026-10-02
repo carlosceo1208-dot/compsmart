@@ -137,6 +137,7 @@ const Nr1Layout = lazy(() => import("./components/nr1/Nr1Layout").then((m) => ({
 const Nr1Dashboard = lazy(() => import("./pages/nr1/Nr1Dashboard"));
 const Nr1NovoDiagnostico = lazy(() => import("./pages/nr1/Nr1NovoDiagnostico"));
 const Nr1Diagnosticos = lazy(() => import("./pages/nr1/Nr1Diagnosticos"));
+const Nr1Importacoes = lazy(() => import("./pages/nr1/Nr1Importacoes"));
 const Nr1DiagnosticoDetalhe = lazy(() => import("./pages/nr1/Nr1DiagnosticoDetalhe"));
 const Nr1Contratar = lazy(() => import("./pages/nr1/Nr1Contratar"));
 const Nr1Inteligencia = lazy(() => import("./pages/nr1/Nr1Inteligencia"));
@@ -358,6 +359,7 @@ const App = () => {
                         <Route path="/nr1/painel" element={<Nr1Dashboard />} />
                         <Route path="/nr1/diagnostico/novo" element={<Nr1NovoDiagnostico />} />
                         <Route path="/nr1/diagnosticos" element={<Nr1Diagnosticos />} />
+                        <Route path="/nr1/importacoes" element={<Nr1Importacoes />} />
                         <Route path="/nr1/diagnostico/:id" element={<Nr1DiagnosticoDetalhe />} />
                         <Route path="/nr1/inteligencia" element={<Nr1Inteligencia />} />
                         <Route path="/nr1/matriz-risco" element={<ModuleGate mode="page" moduleSlug="nr1" featureName="Matriz de Risco"><Nr1FIB /></ModuleGate>} />
