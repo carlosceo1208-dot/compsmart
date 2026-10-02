@@ -26,10 +26,12 @@
 ## Decisão registrada (regras do relatório)
 "Conformidade geral" de 100% / 70% / 0% (válido / vencendo / vencido) e o rodapé "Validade: 30 dias": **mantidas por simplicidade, com revisão futura se o mercado pedir**. O link do PGR continua de 60 s.
 
+O dossiê também registra o contrato de tipagem fechado: o tipo `Terceiro` ganhou `grau_risco`, `emergencia_nome`, `emergencia_telefone`, `emergencia_email` e `contrato_inicio`, e o `as any` saiu do formulário.
+
 ## Validação (empresa de teste, apagada ao final; 1280 e 390)
 - Percurso pela navegação NR-1 → Gestão de Terceiros, com estados vazio e carregando corretos.
-- Cadastrar terceiro com grau de risco, contato de emergência e início do contrato → recarregar → os dados voltam.
-- **Editar** o mesmo terceiro (grau de risco e emergência) → salvar → recarregar → os 5 campos refletem a alteração.
+- Cadastrar terceiro com grau de risco, contato de emergência (nome, telefone e e-mail) e início do contrato → recarregar → os dados voltam.
+- **Editar** o mesmo terceiro (grau de risco e emergência, incluindo o e-mail) → salvar → recarregar → os 5 campos (`grau_risco`, `emergencia_nome`, `emergencia_telefone`, `emergencia_email`, `contrato_inicio`) refletem a alteração.
 - CNPJ duplicado bloqueado, com a mensagem atual.
 - Anexar PGR com emissão e vencimento → baixar → abrir a mesma URL depois de 60 s: precisa falhar (mesmo critério da Fase 8).
 - Gerar e abrir o Relatório (checklist completo, status correto, acentos e "≤" certos).
