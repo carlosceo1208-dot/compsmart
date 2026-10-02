@@ -26,7 +26,18 @@ Deno.serve(async (req) => {
       // Itens de referência ao COPSOQ já aparecem no bloco do diagnóstico e não se repetem.
       const { data: vit, error: vitErr } = await db.from('nr1_vitalidade_questoes').select('id, codigo, dimensao, origem, copsoq_questao_id, enunciado, ordem, reverso').eq('ativo', true).order('ordem');
       if (vitErr) throw vitErr;
-      return json({ ...convite, questoes_segpsi: segpsi ?? [], questoes_vitalidade: vit ?? [] });
+      // Lista controlada de áreas da empresa do ciclo (só nomes; vazia não trava o envio).
+      let areas: string[] = [];
+      const { data: conv } = await db.from('nr1_convites').select('diagnostico_id').eq('token', token).maybeSingle();
+      if (conv?.diagnostico_id) {
+        const { data: diag } = await db.from('nr1_diagnosticos').select('company_id').eq('id', conv.diagnostico_id).maybeSingle();
+        if (diag?.company_id) {
+          const { data: orgs } = await db.from('organizational_structure').select('id, name')
+            .or(`root_company_id.eq.${diag.company_id},parent_id.eq.${diag.company_id}`).neq('id', diag.company_id);
+          areas = [...new Set((orgs ?? []).map((o: { name: string }) => o.name).filter(Boolean))].sort();
+        }
+      }
+      return json({ ...convite, questoes_segpsi: segpsi ?? [], questoes_vitalidade: vit ?? [], areas });
     }
 
     if (action === 'submit') {
@@ -37,7 +48,8 @@ Deno.serve(async (req) => {
       const isObj = (v: unknown) => !!v && typeof v === 'object' && !Array.isArray(v);
       if (!uuidPattern.test(submissionId) || !isObj(respostas) || !isObj(respostasSegPsi) || !isObj(respostasVitalidade)) return json({ error: 'Envio inválido' }, 400);
       if (Object.keys(respostas).length > 100 || Object.keys(respostasSegPsi).length > 50 || Object.keys(respostasVitalidade).length > 30) return json({ error: 'Quantidade de respostas inválida' }, 400);
-      const { error } = await db.rpc('nr1_submeter_completo', { p_token: token, p_submission_id: submissionId, p_respostas: respostas, p_respostas_segpsi: respostasSegPsi, p_respostas_vitalidade: respostasVitalidade });
+      const demografia = isObj(body?.demografia) ? body.demografia : null;
+      const { error } = await db.rpc('nr1_submeter_completo', { p_token: token, p_submission_id: submissionId, p_respostas: respostas, p_respostas_segpsi: respostasSegPsi, p_respostas_vitalidade: respostasVitalidade, p_demografia: demografia });
       if (error) return json({ error: error.message.includes('já foi enviado') ? 'Este questionário já foi enviado.' : 'Não foi possível registrar as respostas.' }, 400);
       return json({ success: true });
     }

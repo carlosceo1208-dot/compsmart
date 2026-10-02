@@ -22,7 +22,8 @@ export type DataSource = 'real' | 'seed' | 'empty';
 export type FibData = { ciclo: string | null; respondentes: number; adesao: number; scores: FibScore[]; source: DataSource };
 
 
-export type SociodemoLinha = { rotulo: string; fib: number; segPsi: number; hse: number };
+// null = indicador não coletado no ciclo (exibido como "—").
+export type SociodemoLinha = { rotulo: string; fib: number | null; segPsi: number | null; hse: number | null };
 export type SociodemoRecorte = { id: string; titulo: string; linhas: SociodemoLinha[] };
 export type SociodemoData = { ciclo: string | null; recortes: SociodemoRecorte[]; source: DataSource };
 
