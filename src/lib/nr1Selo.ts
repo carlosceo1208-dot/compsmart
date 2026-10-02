@@ -42,7 +42,8 @@ export function compararCiclos(
   if (!ok(a) || !ok(b)) return { tendencia: 'nao_comparavel', saudeA: null, saudeB: null, delta: null };
   const saudeA = notaSaude(a.score_geral)!;
   const saudeB = notaSaude(b.score_geral)!;
-  const delta = Math.round((saudeB - saudeA) * 100) / 100;
+  // delta sobre os valores sem arredondar (saúde B − saúde A = risco A − risco B)
+  const delta = Math.round((Number(a.score_geral) - Number(b.score_geral)) * 100) / 100;
   const tendencia: Tendencia = delta >= LIMIAR_TENDENCIA ? 'evolucao' : delta <= -LIMIAR_TENDENCIA ? 'piora' : 'estavel';
   return { tendencia, saudeA, saudeB, delta };
 }
