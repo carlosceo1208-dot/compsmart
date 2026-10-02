@@ -180,6 +180,7 @@
 - [x] Parte 1: faixa crítica (<50) em vermelho; exportações já usam só grupos com 5+ e registram acesso.
 - [x] Parte 2: coleta anônima opcional no final + consolidação por ciclo; validada na prévia.
 - [x] Publicada (2026-10-02, aprovação do CEO) + pós-publicação: 1280/390 no ar, CSV e PDF abertos com grupos <5 suprimidos, scan só com o aviso informativo CBO conhecido.
-- [ ] Pendências registradas: coleta FIB/HSE (incremento futuro — telas mostram "—"); FIB e SegPsi sem tabelas de resultado para cliente real; 3 contas de teste inativas (teste.fase9.*); "Ver como cliente" passa pelas travas de módulo por decisão.
+- [x] "Ver como cliente": encerrado por decisão consciente (2026-10-02) — avaliado, o botão não burla as travas de acesso; não é dívida de segurança. Restringir a visibilidade ao Super Admin seria ajuste isolado de UI, se um dia desejado.
+- [ ] Pendências registradas: coleta FIB/HSE (incremento futuro — telas mostram "—" até existir coleta, sem número inventado); FIB e SegPsi sem tabelas de resultado para cliente real; 3 contas de teste inativas (teste.fase9.*).
 
 - [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Publicada em 2026-10-02 (aprovação do CEO).
