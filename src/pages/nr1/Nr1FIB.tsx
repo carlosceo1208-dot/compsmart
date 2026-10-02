@@ -25,6 +25,9 @@ export default function Nr1FIB() {
             <Button asChild variant="outline" size="sm">
               <Link to="/nr1/planos-acao"><ListChecks className="h-4 w-4 mr-1" /> Plano de Ação</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/nr1/importacoes"><Upload className="h-4 w-4 mr-1" /> Importações</Link>
+            </Button>
             <GerarPgrButton size="sm" variant="default" className="nr1-bg-primary" />
           </div>
         </CardContent>
