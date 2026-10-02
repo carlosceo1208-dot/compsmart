@@ -5982,6 +5982,102 @@ export type Database = {
           },
         ]
       }
+      nr1_sociodemo_envios: {
+        Row: {
+          area: string | null
+          company_id: string
+          created_at: string
+          diagnostico_id: string
+          faixa_etaria: string | null
+          id: string
+          sexo: string | null
+          submission_hash: string
+          tempo_casa: string | null
+        }
+        Insert: {
+          area?: string | null
+          company_id: string
+          created_at?: string
+          diagnostico_id: string
+          faixa_etaria?: string | null
+          id?: string
+          sexo?: string | null
+          submission_hash: string
+          tempo_casa?: string | null
+        }
+        Update: {
+          area?: string | null
+          company_id?: string
+          created_at?: string
+          diagnostico_id?: string
+          faixa_etaria?: string | null
+          id?: string
+          sexo?: string | null
+          submission_hash?: string
+          tempo_casa?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_sociodemo_envios_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_sociodemo_envios_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+        ]
+      }
+      nr1_sociodemo_results: {
+        Row: {
+          ciclo_nome: string | null
+          company_id: string
+          created_at: string
+          diagnostico_id: string
+          id: string
+          recortes: Json
+          updated_at: string
+        }
+        Insert: {
+          ciclo_nome?: string | null
+          company_id: string
+          created_at?: string
+          diagnostico_id: string
+          id?: string
+          recortes?: Json
+          updated_at?: string
+        }
+        Update: {
+          ciclo_nome?: string | null
+          company_id?: string
+          created_at?: string
+          diagnostico_id?: string
+          id?: string
+          recortes?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nr1_sociodemo_results_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "nr1_diagnosticos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nr1_sociodemo_results_diagnostico_id_fkey"
+            columns: ["diagnostico_id"]
+            isOneToOne: false
+            referencedRelation: "vw_nr1_clima_copsoq_correlacao"
+            referencedColumns: ["diagnostico_id"]
+          },
+        ]
+      }
       nr1_subscriptions: {
         Row: {
           company_id: string
@@ -12752,6 +12848,7 @@ export type Database = {
         Args: { p_diagnostico_id: string }
         Returns: Json
       }
+      nr1_sociodemo_consolidar: { Args: { _diag: string }; Returns: Json }
       nr1_submeter_com_segpsi: {
         Args: {
           p_respostas: Json
@@ -12763,6 +12860,7 @@ export type Database = {
       }
       nr1_submeter_completo: {
         Args: {
+          p_demografia?: Json
           p_respostas: Json
           p_respostas_segpsi: Json
           p_respostas_vitalidade: Json
