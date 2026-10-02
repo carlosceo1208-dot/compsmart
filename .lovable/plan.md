@@ -24,10 +24,17 @@
 - Hero continua a única chamada de maturidade; o botão existente do hero já leva a /maturidade.
 
 ## Validação (Playwright, 1280px e 390px)
-1. Home: o texto "Descubra o nível de maturidade" aparece exatamente **1×** — contagem mirando o H1 do hero, não o rótulo "Maturidade da Gestão de Pessoas"; esse rótulo também deve aparecer uma única vez.
-2. Nenhum bloco com "Maturidade estrutural"/"Estilo de gestão" listando os níveis 5×2 abaixo do cruzamento.
+1. Home: o texto "Descubra o nível de maturidade" aparece exatamente **1×** — contagem mirando o H1 do hero, não o rótulo "Maturidade da Gestão de Pessoas"; esse rótulo também deve aparecer uma única vez (contado separadamente).
+2. Nenhum bloco com "Maturidade estrutural"/"Estilo de gestão" listando os níveis 5×2 **abaixo da seção do cruzamento** — o seletor delimita o escopo à área abaixo de "Só a CompSmart cruza", de modo que a ocorrência legítima no card do hero não seja marcada como falha.
 3. Em 390px, o fluxo Hero → Contraponto é contínuo, sem buraco visual — a remoção só encurta a página.
 4. CTAs do hero intactos: "Diagnóstico gratuito em 2 min" e "Ver demonstração".
 5. Âncoras `#demonstracao` e `#faq` funcionam; simulador em `#precos` marca R$ 1.000 (100 colaboradores × 3 módulos) e R$ 1.250 (× 4 módulos).
 6. `bun run ci` limpo, sem imports pendentes.
 7. Sem publicação sem aprovação explícita.
+
+## Sequência de execução
+1. Aplicar as mudanças (Index.tsx + deleção do arquivo + roadmap).
+2. Validação Playwright em 1280px e 390px, itens 1–5.
+3. `bun run ci` limpo.
+4. Prévia aberta para revisão final.
+5. Publicação somente após aprovação explícita.
