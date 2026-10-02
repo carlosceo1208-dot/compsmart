@@ -32,9 +32,8 @@ Deno.serve(async (req) => {
       if (conv?.diagnostico_id) {
         const { data: diag } = await db.from('nr1_diagnosticos').select('company_id').eq('id', conv.diagnostico_id).maybeSingle();
         if (diag?.company_id) {
-          const { data: orgs } = await db.from('organizational_structure').select('id, name')
-            .or(`root_company_id.eq.${diag.company_id},parent_id.eq.${diag.company_id}`).neq('id', diag.company_id);
-          areas = [...new Set((orgs ?? []).map((o: { name: string }) => o.name).filter(Boolean))].sort();
+          const { data: nomes } = await db.rpc('nr1_areas_empresa', { _company: diag.company_id });
+          areas = ((nomes ?? []) as unknown[]).map((n) => (typeof n === 'string' ? n : (n as Record<string, string>)?.nr1_areas_empresa)).filter(Boolean) as string[];
         }
       }
       return json({ ...convite, questoes_segpsi: segpsi ?? [], questoes_vitalidade: vit ?? [], areas });
