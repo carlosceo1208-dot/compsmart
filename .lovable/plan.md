@@ -116,3 +116,28 @@ No celular (390px):
   - O título e a descrição novos aparecem no `<head>`.
   - O download funciona do começo ao fim (Home → janela de download → arquivo) e grava a mesma origem de hoje.
   - `/precos` continua sem botões extras.
+
+## Ordem de execução
+A função `capture_ebook_lead` já foi conferida no código: hoje recebe `_nome`, `_email` e `_origem`, sem `lead_magnet`. O e-book continua com essa mesma chamada.
+
+1. Configuração de materiais e `MaterialsSection`.
+2. `PricingSimulator` com props e o teste de preço.
+3. Seções novas: Plataforma + Consultoria, Maturidade e Recrutamento.
+4. Evolução dos componentes existentes.
+5. Remoções e busca por referências.
+6. SEO.
+
+## Checklist final
+- `bun run ci` limpo, com o teste novo passando.
+- Prévia em 1280px e 390px:
+  - O selo NR-1 aparece sem duplicar a faixa do topo.
+  - A grade de agentes fica em 2 colunas, sem cortar os selos.
+  - O seletor de módulos fica empilhado.
+- Simulador: 100×3 = R$ 1.000 e 100×4 = R$ 1.250, batendo com `get_public_pricing`.
+- Os formulários gravam a origem correta, e o "Diagnóstico gratuito" leva para `/maturidade`.
+- Os cards "em breve" usam o texto "enviamos quando estiver pronto".
+- Funcionam todos os links e as âncoras: `#modelo`, `#maturidade`, `#precos`, `#materiais`, `#demonstracao` e `#faq`.
+- O `<head>` mostra o título e a descrição novos.
+- O download da Remuneração Estratégica funciona.
+- A página não tem "R$ 1", "R$ 225" nem teste grátis.
+- O `roadmap.md` registra as pendências: Maturidade 5×2, e-books e `/pricing`.
