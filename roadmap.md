@@ -181,5 +181,5 @@
 
 ## Fase 10 — Cruzamento Sociodemográfico
 - [x] Parte 1: faixa crítica (<50) em vermelho; exportações já usam só grupos com 5+ e registram acesso.
-- [ ] Parte 2 (aguarda aprovação do CEO): coleta anônima opcional no final do questionário + consolidação por ciclo.
+- [x] Parte 2 (aprovada): coleta anônima opcional no final + consolidação por ciclo; validada na prévia. Aguarda autorização para publicar.
 - [ ] Pendência futura: FIB e Segurança Psicológica sem tabelas de resultado (telas vazias para cliente real).
