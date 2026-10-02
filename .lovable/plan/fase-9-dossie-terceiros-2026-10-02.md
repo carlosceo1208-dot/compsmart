@@ -18,3 +18,10 @@
 - Acesso: admin 1/1/link ok; RH 1/1/link ok; consultor sem projeto 0/0/link negado; consultor com projeto ativo 1/1/link ok; outra empresa sem NR-1 0/0/link negado + trava na tela (1280/390); sem login 0/0/negado.
 - Linha de base depois: 25 · 2 · 440/0/0 · 9 · 190 · 2 · Q1 2026 = 49,93 (10 respondentes); terceiros/PGR/arquivos de teste = 0.
 - bun run ci limpo.
+
+## Publicação (2026-10-02)
+- Publicação autorizada pelo CEO e executada em https://www.compsmart.ia.br.
+- Pontos de honestidade registrados (não bloqueiam):
+  1. Fonte do relatório validada por acentos; símbolos especiais ("≤", "≥", "−") cobertos pela mesma fonte embutida das Fases 7/8 — o texto gerado não continha "≤", então esse caso específico ficou sem o que conferir.
+  2. Três contas de teste inativas (teste.fase9.*), sem empresa e sem papel — mesmo caso das Fases 7/8; mantidas inativas como item conhecido; remoção pela gestão de usuários do backend pode ser tentada em rodada futura.
+- Estado do projeto: Fases 6, 7 e 8 fechadas; Fase 9 publicada.

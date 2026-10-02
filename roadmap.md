@@ -172,10 +172,9 @@
 - [x] Publicado (2026-10-02, aprovação do CEO) — Fase 8 publicada
 - [ ] Integração com a Matriz de Risco (opção B) — incremento futuro
 
-## Estado: Fase 6 fechada · Fase 7 fechada · Fase 8 publicada
+## Estado: Fases 6, 7 e 8 fechadas · Fase 9 publicada
 ## Próximos (fila NR-1)
-- [ ] Gestão de Terceiros (PGR) — Etapa 0, aguarda o CEO dar a largada
 - [ ] Sociodemográfico
 - [ ] Benchmark e descritivo da landing (prints do concorrente + comparativo) — quando o CEO trouxer
 
-- [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Aguardando aprovação do CEO para publicar.
+- [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Publicada em 2026-10-02 (aprovação do CEO).
