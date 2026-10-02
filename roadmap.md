@@ -178,3 +178,8 @@
 - [ ] Benchmark e descritivo da landing (prints do concorrente + comparativo) — quando o CEO trouxer
 
 - [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Publicada em 2026-10-02 (aprovação do CEO).
+
+## Fase 10 — Cruzamento Sociodemográfico
+- [x] Parte 1: faixa crítica (<50) em vermelho; exportações já usam só grupos com 5+ e registram acesso.
+- [ ] Parte 2 (aguarda aprovação do CEO): coleta anônima opcional no final do questionário + consolidação por ciclo.
+- [ ] Pendência futura: FIB e Segurança Psicológica sem tabelas de resultado (telas vazias para cliente real).
