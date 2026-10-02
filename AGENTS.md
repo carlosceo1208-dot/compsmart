@@ -5,7 +5,7 @@
 - Consultor só acessa empresa onde é dono de projeto ativo em andamento (consultor_dono_ativo em maturidade_pode_gerir, has_consultor_modulo_access, rh_service_can_read/write). Why: decisão dos sócios.
 - NR-1: 4 etapas; Psi só agregado k≥5; cruzamentos só com os módulos de origem; Minha Jornada/Check up só o próprio colaborador lê. Why: LGPD.
 - Base de mercado global só com has_module(insight) ou super admin; faixas salariais só gestor/RH/admin da empresa. Why: produto pago e regra de visibilidade.
-- Travas de módulo: só super admin passa (exceto 'ver como cliente'); Core sempre ativo; has_module no banco igual. Why: cliente não vê módulo não contratado.
+- Travas de módulo: só super admin passa; 'ver como cliente' é exceção avaliada e não burla travas (decisão consciente, não dívida). Core sempre ativo; has_module no banco igual. Why: cliente não vê módulo não contratado.
 - Funções do servidor com id de empresa/unidade/colaborador checam dentro via rh_admin_da_empresa; gatilhos (pg_trigger_depth>0) passam. Why: sem vazamento entre empresas.
 - Detalhes: supabase/functions/AGENTS.md (Talent), src/pages/AGENTS.md (leads).
 - Segurança Psicológica: respostas sem identidade, envio atômico com COPSOQ e leitura só agregada k≥5; Demandas/Saúde são avaliadas apenas no COPSOQ; gestor sem grupo não acessa; exportações só agregadas. Área /nr1/* travada por ModuleGate nr1 (exceto contratar/consentimento). Why: LGPD, método e anonimato.
