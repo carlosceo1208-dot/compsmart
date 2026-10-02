@@ -12,9 +12,16 @@ import { calcScoreSegPsi, dimensaoLabel, statusSegPsi, type SegPsiQuestao } from
 import { calcScoreVitalidade, vitDimLabel, type VitQuestao } from '@/lib/nr1Vitalidade';
 
 type Questao = { id: string; enunciado: string; ordem: number };
-type Convite = { ciclo_nome: string | null; grupo: string | null; expires_at: string | null; disponivel: boolean; questoes: Questao[]; questoes_segpsi?: SegPsiQuestao[]; questoes_vitalidade?: VitQuestao[] };
+type Convite = { ciclo_nome: string | null; grupo: string | null; expires_at: string | null; disponivel: boolean; questoes: Questao[]; questoes_segpsi?: SegPsiQuestao[]; questoes_vitalidade?: VitQuestao[]; areas?: string[] };
 type Item = { id: string; enunciado: string; bloco: 'copsoq' | 'segpsi' | 'vitalidade' };
 const endpoint = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nr1-questionario-publico`;
+const NAO_INFORMAR = '__nao_informar__';
+// Faixas largas e fixas (iguais às aceitas pelo servidor).
+const PERFIL_FIXO: { key: 'sexo' | 'faixa_etaria' | 'tempo_casa'; label: string; opcoes: string[] }[] = [
+  { key: 'sexo', label: 'Sexo', opcoes: ['Feminino', 'Masculino', 'Outro'] },
+  { key: 'faixa_etaria', label: 'Faixa etária', opcoes: ['Até 29 anos', '30 a 44 anos', '45 anos ou mais'] },
+  { key: 'tempo_casa', label: 'Tempo de casa', opcoes: ['Menos de 2 anos', '2 a 5 anos', 'Mais de 5 anos'] },
+];
 
 function getSubmissionId(token: string) {
   const key = `nr1-submission:${token}`;
@@ -34,6 +41,8 @@ export default function Nr1Responder() {
   const [error, setError] = useState('');
   const [resultado, setResultado] = useState<ReturnType<typeof calcScoreSegPsi> | null>(null);
   const [resultadoVit, setResultadoVit] = useState<ReturnType<typeof calcScoreVitalidade> | null>(null);
+  const [perfilAberto, setPerfilAberto] = useState(false);
+  const [perfil, setPerfil] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const controller = new AbortController();
@@ -63,7 +72,9 @@ export default function Nr1Responder() {
     const vit: Record<string, number> = {};
     for (const q of itens) (q.bloco === 'segpsi' ? seg : q.bloco === 'vitalidade' ? vit : copsoq)[q.id] = respostas[q.id];
     try {
-      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submit', token, submissionId: getSubmissionId(token), respostas: copsoq, respostasSegPsi: seg, respostasVitalidade: vit }) });
+      const demografia: Record<string, string> = {};
+      for (const [k, v] of Object.entries(perfil)) if (v && v !== NAO_INFORMAR) demografia[k] = v;
+      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'submit', token, submissionId: getSubmissionId(token), respostas: copsoq, respostasSegPsi: seg, respostasVitalidade: vit, demografia: Object.keys(demografia).length ? demografia : null }) });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || 'Não foi possível enviar');
       // Resultado individual calculado só na memória do navegador; nada é salvo com identificação.
@@ -138,6 +149,25 @@ export default function Nr1Responder() {
           </div>
           <h2 className="text-lg font-semibold leading-snug">{questao?.enunciado}</h2>
           {questao && <RadioGroup key={questao.id} value={respostas[questao.id]?.toString() ?? ""} onValueChange={(v) => setRespostas((r) => ({ ...r, [questao.id]: Number(v) }))} className="space-y-2">{RESPOSTA_OPCOES.map((opt) => <Label key={opt.value} htmlFor={`nr1-${questao.id}-${opt.value}`} className="flex cursor-pointer items-center gap-3 rounded-md border p-3 hover:bg-accent"><RadioGroupItem id={`nr1-${questao.id}-${opt.value}`} value={String(opt.value)} /><span>{opt.label}</span></Label>)}</RadioGroup>}
+          {index === itens.length - 1 && completa && (
+            <div className="rounded-lg border p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-semibold text-sm">Perfil (opcional)</p>
+                <Button variant="ghost" size="sm" onClick={() => setPerfilAberto((v) => !v)}>{perfilAberto ? 'Ocultar' : 'Responder'}</Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Ajuda a comparar grupos de 5 pessoas ou mais. Não fica ligado a você. Pode pular.</p>
+              {perfilAberto && [...PERFIL_FIXO, { key: 'area' as const, label: 'Área', opcoes: convite?.areas ?? [] }].map((campo) => (
+                <div key={campo.key} className="space-y-1">
+                  <Label htmlFor={`perfil-${campo.key}`} className="text-xs">{campo.label}</Label>
+                  <select id={`perfil-${campo.key}`} className="w-full rounded-md border bg-background p-2 text-sm" value={perfil[campo.key] ?? ''} onChange={(e) => setPerfil((p) => ({ ...p, [campo.key]: e.target.value }))}>
+                    <option value="">—</option>
+                    {campo.opcoes.map((o) => <option key={o} value={o}>{o}</option>)}
+                    <option value={NAO_INFORMAR}>Prefiro não informar</option>
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="flex justify-between gap-3"><Button variant="outline" disabled={index === 0} onClick={() => setIndex((i) => i - 1)}>Anterior</Button>{index < itens.length - 1 ? <Button disabled={respostas[questao?.id] == null} onClick={() => setIndex((i) => i + 1)}>Próxima</Button> : <Button disabled={!completa || status === 'sending'} onClick={enviar}>{status === 'sending' && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Enviar respostas</Button>}</div>
         </CardContent>
       </Card>

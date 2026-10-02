@@ -79,7 +79,7 @@ export default function Nr1Sociodemografico() {
     recortesFiltrados.forEach((r) => {
       r.linhas.forEach((l) => {
         const row: any = { recorte: r.titulo, segmento: l.rotulo };
-        indicadoresAtivos.forEach((k) => (row[k] = (l as any)[k]));
+        indicadoresAtivos.forEach((k) => (row[k] = (l as any)[k] ?? '—'));
         rows.push(row);
       });
     });
@@ -230,8 +230,10 @@ export default function Nr1Sociodemografico() {
                         <tr key={l.rotulo} className="border-t">
                           <td className="py-2 pr-2 font-medium">{l.rotulo}</td>
                           {INDICADORES.filter((i) => indicadoresAtivos.includes(i.key)).map((i) => {
-                            const v = (l as any)[i.key] as number;
-                            return (
+                            const v = (l as any)[i.key] as number | null;
+                            return v == null ? (
+                              <td key={i.key} className="py-2 px-2 text-center text-muted-foreground" title="Não coletado neste ciclo">—</td>
+                            ) : (
                               <td key={i.key} className={`py-2 px-2 text-center tabular-nums ${corCelula(v)}`}>{v}</td>
                             );
                           })}
