@@ -17,7 +17,7 @@ export interface SeoRoute {
 export const SEO_ROUTES: SeoRoute[] = [
   { path: "/", priority: "1.0", changefreq: "weekly",
     title: "CompSmart — O RH que constrói o futuro com dados",
-    description: "RH estratégico orientado por dados: NR-1, clima, remuneração e sucessão em uma plataforma com 8 agentes de IA e consultoria sob demanda." },
+    description: "Descubra o nível de maturidade da sua gestão de pessoas. Avaliação prévia rápida e caminho completo com dados, IA e consultoria sob demanda." },
   { path: "/nr1", priority: "0.9", changefreq: "weekly",
     title: "NR-1 e Riscos Psicossociais: Diagnóstico COPSOQ | CompSmart",
     description: "Prepare sua empresa para a NR-1: diagnóstico de riscos psicossociais COPSOQ-III anônimo (LGPD), matriz de risco, plano de ação e laudos em um só lugar." },

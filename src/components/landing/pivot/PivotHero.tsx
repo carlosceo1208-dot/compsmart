@@ -17,15 +17,16 @@ export const PivotHero = () => (
             className="size-28 shrink-0 rounded-2xl object-cover shadow-sm md:size-36"
           />
           <h1 className="max-w-xl text-center text-3xl font-bold leading-tight md:text-left md:text-5xl">
-            O RH que decide com dados não apaga incêndio.{" "}
-            <span className="text-primary">Ele constrói o futuro.</span>
+            <span className="text-primary">Descubra o nível de maturidade</span> da
+            sua gestão de pessoas.
           </h1>
         </div>
 
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
-          Da conformidade ao crescimento: NR-1, clima, remuneração e sucessão
-          em uma plataforma que transforma pessoas em vantagem competitiva —
-          com consultoria sob demanda para levar do diagnóstico ao resultado.
+          Responda a uma rápida avaliação prévia e veja onde sua gestão de
+          pessoas está hoje. Na avaliação completa, a CompSmart mostra o
+          caminho para transformar pessoas em vantagem competitiva — com
+          dados, IA e consultoria sob demanda.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
