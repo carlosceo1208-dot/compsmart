@@ -32,6 +32,17 @@ Reposicionar a abertura da Home em torno de decisões orientadas por dados e ali
    - Manter internamente os códigos, limites de pontuação, validação e envio já aprovados, usando uma camada apenas de apresentação para os novos nomes. Assim, os dados existentes e o contrato atual não mudam.
    - Apresentar o eixo Estilo de Gestão apenas como parte explicativa do modelo, sem calculá-lo ou inferi-lo.
 
+6. **SEO da Home**
+   - Atualizar somente a entrada da rota `/` na fonte única `seoRoutes.ts`.
+   - Título: **“CompSmart — O RH que constrói o futuro com dados”**.
+   - Descrição: **“RH estratégico orientado por dados: NR-1, clima, remuneração e sucessão em uma plataforma com 8 agentes de IA e consultoria sob demanda.”**
+   - Manter o restante do SEO público e das rotas sem alteração.
+
+## Detalhes técnicos
+- Centralizar os cinco nomes estruturais e os cinco nomes de estilo em uma configuração compartilhada pela Home e pela página de Maturidade.
+- Criar uma camada visual completa entre as cinco faixas internas aprovadas e os novos nomes estruturais, com fallback seguro para impedir rótulo vazio.
+- Atualizar somente os testes que verificam os rótulos afetados; manter os testes de limites e regras intactos.
+
 ## Fora do escopo
 - Nenhuma alteração em simulador, materiais, formulários, validadores, banco, cabeçalho, rodapé, LGPD, rotas, âncoras ou IDs de telemetria.
 - Manter as rotas confirmadas `/maturidade` e `/modulos/selecao-rs` e as âncoras `#modelo`, `#maturidade`, `#precos`, `#materiais`, `#demonstracao` e `#faq`.
@@ -44,4 +55,7 @@ Reposicionar a abertura da Home em torno de decisões orientadas por dados e ali
 - Validar selo NR-1 sem duplicar a faixa global, textos, CTAs, nomes completos sem cortes e ausência de promessa sobre cruzamento percebido × real.
 - Reconfirmar a grade de agentes em duas colunas no celular, com o selo “IA” inteiro, todas as âncoras e os valores preservados do simulador: 100 × 3 = R$ 1.000 e 100 × 4 = R$ 1.250.
 - Confirmar que o resultado continua respeitando exatamente as faixas de pontuação aprovadas e envia os mesmos valores internos.
+- Conferir que somente a maturidade estrutural aparece no resultado e que o Estilo de Gestão permanece explicativo.
+- Revisar em 390 px a hierarquia e as quebras do novo subtítulo longo, evitando um bloco visual pesado.
+- Verificar no `<head>` da Home o novo título e a nova descrição vindos de `seoRoutes.ts`.
 - Entregar na prévia para aprovação antes de publicar.
