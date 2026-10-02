@@ -3,14 +3,16 @@ import autoTable from 'jspdf-autotable';
 import type { Terceiro, TerceiroPgr } from '@/hooks/useNr1Terceiros';
 import { formatCnpj } from '@/lib/cnpj';
 import { statusFromVencimento } from '@/hooks/useNr1Terceiros';
+import { aplicarFonteUnicode } from '@/lib/pdfFont';
 
-export function gerarRelatorioConformidadePdf(args: {
+export async function gerarRelatorioConformidadePdf(args: {
   empresaCliente: string;
   terceiro: Terceiro;
   pgrs: TerceiroPgr[];
 }) {
   const { empresaCliente, terceiro, pgrs } = args;
   const doc = new jsPDF();
+  const fonte = await aplicarFonteUnicode(doc);
   const pageWidth = doc.internal.pageSize.getWidth();
 
   // Header
@@ -29,6 +31,8 @@ export function gerarRelatorioConformidadePdf(args: {
   doc.text(`Empresa Terceira: ${terceiro.razao_social}`, 10, y); y += 6;
   doc.text(`CNPJ: ${formatCnpj(terceiro.cnpj)}`, 10, y); y += 6;
   if (terceiro.area_atuacao) { doc.text(`Área de atuação: ${terceiro.area_atuacao}`, 10, y); y += 6; }
+  if (terceiro.grau_risco) { doc.text(`Grau de risco (NR-4): ${terceiro.grau_risco}`, 10, y); y += 6; }
+  if (terceiro.contrato_inicio) { doc.text(`Início do contrato: ${new Date(terceiro.contrato_inicio + 'T00:00:00').toLocaleDateString('pt-BR')}`, 10, y); y += 6; }
   if (terceiro.num_colaboradores) { doc.text(`Colaboradores: ${terceiro.num_colaboradores}`, 10, y); y += 6; }
   if (terceiro.contato_nome) { doc.text(`Contato: ${terceiro.contato_nome}`, 10, y); y += 6; }
   if (terceiro.contato_email) { doc.text(`Email: ${terceiro.contato_email}`, 10, y); y += 6; }
@@ -57,7 +61,7 @@ export function gerarRelatorioConformidadePdf(args: {
       ['PGR carregado', latest ? 'Conforme' : 'Pendente'],
       ['PGR dentro da validade', status === 'ok' ? 'Conforme' : status === 'vencendo' ? 'Atenção' : 'Não conforme'],
     ],
-    styles: { fontSize: 9 },
+    styles: { fontSize: 9, font: fonte },
     headStyles: { fillColor: [30, 39, 97] },
   });
 
@@ -72,7 +76,7 @@ export function gerarRelatorioConformidadePdf(args: {
         p.data_emissao ? new Date(p.data_emissao).toLocaleDateString('pt-BR') : '—',
         p.data_vencimento ? new Date(p.data_vencimento).toLocaleDateString('pt-BR') : '—',
       ]),
-      styles: { fontSize: 9 },
+      styles: { fontSize: 9, font: fonte },
       headStyles: { fillColor: [34, 197, 94] },
     });
   }

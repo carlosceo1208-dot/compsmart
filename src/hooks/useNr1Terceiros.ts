@@ -16,6 +16,13 @@ export interface Terceiro {
   area_atuacao: string | null;
   observacoes: string | null;
   ativo: boolean;
+  /** Grau de risco NR-4 (1–4). */
+  grau_risco: number | null;
+  emergencia_nome: string | null;
+  emergencia_telefone: string | null;
+  emergencia_email: string | null;
+  /** Início do contrato (YYYY-MM-DD). */
+  contrato_inicio: string | null;
   created_at: string;
   updated_at: string;
 }

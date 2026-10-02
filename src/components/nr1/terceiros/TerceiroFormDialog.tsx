@@ -86,7 +86,7 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
 
   const grauInfo = useMemo(() => (grauRisco ? GRAU_RISCO_INFO[parseInt(grauRisco, 10)] : null), [grauRisco]);
 
-  const buildPayload = () => ({
+  const buildPayload = (): Partial<Terceiro> & { id?: string } => ({
     id: currentTerceiroId ?? undefined,
     razao_social: razao.trim(),
     nome_fantasia: fantasia.trim() || null,
@@ -115,7 +115,7 @@ export function TerceiroFormDialog({ open, onOpenChange, terceiro }: Props) {
   };
 
   const ensureSaved = async (): Promise<string | null> => {
-    const res = await upsert.mutateAsync(buildPayload() as any);
+    const res = await upsert.mutateAsync(buildPayload());
     setCurrentTerceiroId(res.id);
     return res.id;
   };
