@@ -22,7 +22,7 @@ function corCelula(v: number) {
   if (v >= 70) return 'bg-green-100 text-green-900';
   if (v >= 60) return 'bg-yellow-100 text-yellow-900';
   if (v >= 50) return 'bg-orange-100 text-orange-900';
-  return 'bg-orange-100 text-orange-900';
+  return 'bg-red-100 text-red-900';
 }
 
 export default function Nr1Sociodemografico() {
