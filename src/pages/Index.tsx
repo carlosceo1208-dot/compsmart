@@ -9,7 +9,6 @@ import { SecurityAssuranceStrip } from "@/components/landing/pivot/SecurityAssur
 import { PainSection } from "@/components/landing/pivot/PainSection";
 import { PlatformConsultingSection } from "@/components/landing/pivot/PlatformConsultingSection";
 import { CrossDataSection } from "@/components/landing/pivot/CrossDataSection";
-import { MaturitySection } from "@/components/landing/pivot/MaturitySection";
 import { ModulesGridSection } from "@/components/landing/pivot/ModulesGridSection";
 import { RecruitmentSection } from "@/components/landing/pivot/RecruitmentSection";
 import { PricingSimulator } from "@/components/landing/pivot/PricingSimulator";
@@ -23,7 +22,7 @@ import { VideoSection } from "@/components/landing/VideoSection";
 
 /**
  * Home pública: aviso NR-1 + hero → contraponto → plataforma + consultoria →
- * diferencial → maturidade → 8 agentes → recrutamento → simulador → materiais →
+ * diferencial → 8 agentes → recrutamento → simulador → materiais →
  * demonstração → empresas-piloto → FAQ → fechamento. SEO só por seoRoutes.ts.
  */
 const Index = () => {
@@ -60,7 +59,6 @@ const Index = () => {
       <PainSection />
       <PlatformConsultingSection />
       <CrossDataSection />
-      <MaturitySection />
       <ModulesGridSection />
       <RecruitmentSection />
 
