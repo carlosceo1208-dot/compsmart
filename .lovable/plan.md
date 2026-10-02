@@ -9,14 +9,16 @@ Reposicionar a abertura da Home em torno de decisões orientadas por dados e ali
    - Substituir o título por: **“O RH que decide com dados não apaga incêndio. Ele constrói o futuro.”**
    - Substituir o subtítulo por: **“Da conformidade ao crescimento: NR-1, clima, remuneração e sucessão em uma plataforma que transforma pessoas em vantagem competitiva — com consultoria sob demanda para levar do diagnóstico ao resultado.”**
    - Manter o selo NR-1 e os CTAs “Diagnóstico gratuito em 2 min” e “Ver demonstração”, com os mesmos destinos e identificadores.
+   - Preservar sem alteração a faixa “Estamos reconstruindo…” acima do menu.
 
 2. **Contraponto**
    - Manter os três cards e seus conteúdos essenciais.
-   - Revisar os títulos para o novo tom: “RH em modo apaga-incêndio”, “Clima que vira PDF” e “Anonimato que esconde problemas”.
+   - Revisar somente os títulos para: “RH em modo apaga-incêndio”, “Clima que vira PDF esquecido na gaveta” e “Anonimato que esconde problemas”.
 
 3. **Seções preservadas**
    - Manter sem alteração o título “A estrutura a gente entrega. O resultado, também.”
    - Manter sem alteração “Só a CompSmart cruza NR-1 × Clima × 9-Box × Remuneração”.
+   - Manter como aprovadas as seções de agentes, recrutamento, simulador, materiais, demonstração, empresas-piloto, FAQ e rodapé.
 
 4. **Modelo de Maturidade na Home**
    - Apresentar claramente os dois eixos 5×2:
@@ -31,12 +33,15 @@ Reposicionar a abertura da Home em torno de decisões orientadas por dados e ali
    - Apresentar o eixo Estilo de Gestão apenas como parte explicativa do modelo, sem calculá-lo ou inferi-lo.
 
 ## Fora do escopo
-- Nenhuma alteração em simulador, materiais, formulários, validadores, banco, âncoras ou IDs de telemetria.
+- Nenhuma alteração em simulador, materiais, formulários, validadores, banco, cabeçalho, rodapé, LGPD, rotas, âncoras ou IDs de telemetria.
+- Manter as rotas confirmadas `/maturidade` e `/modulos/selecao-rs` e as âncoras `#modelo`, `#maturidade`, `#precos`, `#materiais`, `#demonstracao` e `#faq`.
+- Não introduzir “R$ 1”, “R$ 225”, “teste grátis” nem “plano gerado em minutos”.
 - Nenhuma publicação nesta etapa.
 
 ## Validação
 - Rodar a verificação completa do projeto.
 - Conferir a Home e `/maturidade` em 1280 px e 390 px.
-- Validar selo NR-1, textos, CTAs, nomes completos sem cortes e ausência de promessa sobre cruzamento percebido × real.
+- Validar selo NR-1 sem duplicar a faixa global, textos, CTAs, nomes completos sem cortes e ausência de promessa sobre cruzamento percebido × real.
+- Reconfirmar a grade de agentes em duas colunas no celular, com o selo “IA” inteiro, todas as âncoras e os valores preservados do simulador: 100 × 3 = R$ 1.000 e 100 × 4 = R$ 1.250.
 - Confirmar que o resultado continua respeitando exatamente as faixas de pontuação aprovadas e envia os mesmos valores internos.
 - Entregar na prévia para aprovação antes de publicar.
