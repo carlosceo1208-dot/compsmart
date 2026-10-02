@@ -50,15 +50,34 @@ Hoje a comparação usa a nota de risco bruta, em que maior é pior, e chama de 
   - AGENTS.md, roadmap e dossiê atualizados, com o registro "inversão corrigida (D2): nota de saúde subindo = evolução".
 - Nada publicado sem a sua aprovação explícita.
 
+## Refinamentos incorporados
+- **Seletores:**
+  - rótulos "Ciclo base (A)" e "Ciclo comparado (B)", com os ciclos listados do mais recente para o mais antigo;
+  - por padrão, A é o ciclo anterior e B é o mais recente;
+  - o ciclo já escolhido num seletor fica desabilitado no outro, então não dá para comparar um ciclo com ele mesmo.
+- **Tabela comparativa no celular:** rolagem lateral em 390px, como nas outras telas.
+- **Símbolos do PDF:** o PDF do Histórico usa a fonte DejaVu Sans, para "≥" e "−" saírem certos, e não a fonte padrão do gerador de PDF.
+
 ## Detalhes técnicos
 - `Nr1Diagnosticos.tsx` recebe:
   - o comparador, extraído para `src/components/nr1/Nr1ComparadorCiclos.tsx`;
   - o filtro por período no client, sobre `periodo_inicio`/`periodo_fim`;
   - renomear e excluir por diálogos, com `useUpdateNr1Diagnostico`/`useDeleteNr1Diagnostico`;
   - o link do plano de ação para `/nr1/diagnostico/:id#plano-acao`;
-  - a exportação por `csvExport` + jsPDF/autoTable, com os mesmos cuidados de fonte da Inteligência ("-" e ">=").
-- Cálculo do comparador em uma função pura em `src/lib/nr1Selo.ts`:
-  - `compararCiclos(a, b)`: delta = `notaSaude(b) − notaSaude(a)`; limiar 0,5; aplica k=5;
-  - teste em `src/test/nr1-historico-comparador.test.ts`.
-- `Nr1Dashboard.tsx`: remove o bloco "Comparar ciclos" (linhas 230–350) e adiciona o link "Ver histórico completo".
+  - a exportação por `csvExport` + jsPDF/autoTable.
+- Fonte do PDF:
+  - hoje nenhum PDF do app embute fonte; o arquivo `DejaVuSans-Bold.ttf` está solto na raiz do projeto;
+  - o arquivo vai para `src/assets/fonts/` e é carregado por um helper novo, `src/lib/pdfFont.ts` (`addFileToVFS` + `addFont`), que o PDF do Histórico usa.
+- Função pura `compararCiclos(a, b)` em `src/lib/nr1Selo.ts`:
+  - A é a base e B é o comparado; delta = `notaSaude(B) − notaSaude(A)`;
+  - limiar inclusivo: delta ≥ 0,5 é evolução, ≤ −0,5 é piora, o resto é estável;
+  - se algum dos ciclos tiver menos de 5 respondentes, devolve "não comparável", sem nota.
+- Testes em `src/test/nr1-historico-comparador.test.ts`:
+  - caso de evolução, caso de piora;
+  - delta exatamente 0,5 dá evolução; delta 0,49 dá estável;
+  - ciclo com menos de 5 respondentes dá "não comparável", sem nota.
+- `Nr1Dashboard.tsx`:
+  - remove o bloco "Comparar ciclos" (linhas 230–350), junto com os estados e importações que só serviam a ele;
+  - adiciona o link "Ver histórico completo";
+  - a verificação de código sem uso (knip) e o `bun run ci` precisam passar limpos.
 - Sem migração. `Nr1DiagnosticoDetalhe.tsx` não muda.
