@@ -6,46 +6,42 @@ import {
 } from "@/components/ui/accordion";
 import { CONTACT_EMAIL } from "@/config/landingModules";
 
+/** Mesmo array alimenta a seção e o JSON-LD da Home. */
 export const PIVOT_FAQ_ITEMS = [
   {
-    question: "O que é a CompSmart?",
+    question: "O anonimato é real?",
     answer:
-      "É uma plataforma de gestão estratégica de pessoas com nove módulos independentes, cada um com um agente de inteligência artificial dedicado. Ela trabalha junto com o seu RH: cruza dados, automatiza análises e aponta decisões — de cargos e salários a risco psicossocial, clima, seleção, desenvolvimento e sucessão.",
+      "Sim. As respostas dos diagnósticos não são ligadas à identidade de quem respondeu, e os resultados só aparecem por grupo com no mínimo 5 respondentes. Grupos menores ficam ocultos na tela e nas exportações.",
   },
   {
-    question: "Preciso contratar tudo ou posso comprar por módulo?",
+    question: "A plataforma gera laudo e PGR?",
     answer:
-      "A compra é modular. Você contrata só os módulos que precisa e ativa os demais quando quiser. O primeiro módulo tem o valor integral por colaborador e cada módulo adicional entra com desconto fixo de 50%.",
+      "A plataforma gera o diagnóstico, a matriz de risco, o plano de ação e relatórios que apoiam o inventário de riscos do PGR. A assinatura técnica do laudo e do PGR continua sendo do profissional responsável pela segurança e saúde no trabalho da empresa.",
   },
   {
-    question: "A NR-1 é obrigatória?",
+    question: "A pesquisa de clima substitui a NR-1?",
     answer:
-      "Sim. O gerenciamento dos riscos psicossociais passou a ser exigido pela NR-1, com a Portaria MTE 1.419/2024, e precisa estar documentado. O módulo NR-1 é um produto autônomo: diagnóstico anônimo COPSOQ-III, matriz de risco, plano de ação e relatórios para fiscalização, sem depender de nenhum outro módulo.",
+      "Não. Clima mede percepção e engajamento; a NR-1 exige identificar e gerenciar riscos psicossociais com método próprio. Na CompSmart são módulos separados — e podem ser cruzados.",
   },
   {
-    question: "Como importo a base da minha folha?",
+    question: "Quem é obrigado a cumprir a NR-1?",
     answer:
-      "Você envia a planilha Excel ou CSV exportada do seu sistema de folha. A plataforma sugere o mapeamento das colunas, valida CPF, datas, campos obrigatórios e duplicidades, mostra um preview e grava só as linhas válidas, com log de erros para correção. É importação de dados — a CompSmart não processa folha de pagamento.",
+      "Todas as organizações com colaboradores regidos pela CLT precisam incluir os riscos psicossociais no gerenciamento de riscos ocupacionais, conforme a Portaria MTE 1.419/2024.",
   },
   {
-    question: "Quem usa a plataforma no dia a dia?",
+    question: "Quanto custa?",
     answer:
-      "O time de RH e remuneração conduz; gestores participam de avaliações, metas e planos de ação; a diretoria acompanha os painéis executivos; e os colaboradores respondem diagnósticos e pesquisas de forma anônima. Cada perfil vê apenas o que lhe cabe.",
+      "O valor é por colaborador e por módulo: o 1º módulo tem o valor cheio e cada módulo adicional entra com desconto. Use o simulador desta página ou a página de Preços para ver o total da sua empresa.",
   },
   {
-    question: "Como fica a LGPD?",
+    question: "Posso importar minha matriz de risco atual?",
     answer:
-      "Os diagnósticos de colaboradores são anônimos, com relatório sempre por grupo (k-anonymity) — nunca por pessoa.",
+      "Sim. Você envia a matriz que já usa (COPSOQ, HSE, JCQ, ERI ou planilha própria); ela passa por conferência antes de ser aceita, com registro de quem conferiu.",
   },
   {
-    question: "Serve para o porte da minha empresa?",
+    question: "Qual a diferença entre a plataforma e a consultoria?",
     answer:
-      "Sim. A plataforma ajusta estrutura, faixas e benchmarks ao tamanho da sua empresa.",
-  },
-  {
-    question: "Como é a implementação?",
-    answer:
-      "Começa pelo diagnóstico gratuito em 2 minutos, sem consultoria obrigatória.",
+      "A plataforma é a estrutura: módulos, agentes de IA e dados cruzados. A consultoria (HR Services) são consultores seniores por demanda que interpretam os dados com o seu RH e conduzem o plano de ação.",
   },
 ];
 
@@ -54,11 +50,8 @@ export const PivotFAQSection = () => (
     <div className="container mx-auto px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-4xl font-bold">
-            Perguntas frequentes
-          </h2>
+          <h2 className="text-2xl md:text-4xl font-bold">Perguntas frequentes</h2>
         </div>
-
         <Accordion type="single" collapsible className="space-y-3">
           {PIVOT_FAQ_ITEMS.map((f, i) => (
             <AccordionItem
@@ -75,13 +68,9 @@ export const PivotFAQSection = () => (
             </AccordionItem>
           ))}
         </Accordion>
-
         <p className="mt-8 text-center text-sm text-muted-foreground">
           Ficou outra dúvida? Escreva para{" "}
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="text-primary font-semibold hover:underline"
-          >
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary font-semibold hover:underline">
             {CONTACT_EMAIL}
           </a>
         </p>

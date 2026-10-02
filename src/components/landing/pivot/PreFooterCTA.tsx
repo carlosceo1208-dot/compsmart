@@ -21,7 +21,7 @@ export const PreFooterCTA = () => (
         </p>
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <DiagnosticoCTA id="cta-footer-diagnostico" variant="secondary" />
-          <DemoDialog size="lg" variant="outline" triggerLabel="Fale com um especialista" />
+          <DemoDialog size="lg" variant="outline" triggerLabel="Fale com um especialista" className="border-background/60 bg-transparent text-background hover:bg-background/10 hover:text-background" />
         </div>
       </div>
     </div>
