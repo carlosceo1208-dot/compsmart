@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { getSeoRoute } from "@/config/seoRoutes";
-import { EIXOS, ESTILOS_GESTAO, NIVEIS, NIVEIS_ESTRUTURAIS, TEASER, LIKERT, LGPD_VERSAO, media, nivelDoScore, fraseDoNivel, rotuloNivelEstrutural, type NivelKey } from "@/lib/maturidade";
+import { EIXOS, ESTILOS_GESTAO, NIVEIS, TEASER, LIKERT, LGPD_VERSAO, media, nivelDoScore, fraseDoNivel, rotuloNivelEstrutural, type NivelKey } from "@/lib/maturidade";
 
 const seo = getSeoRoute("/maturidade");
 const ICONES = [BarChart3, Cpu, HeartHandshake, Rocket];
