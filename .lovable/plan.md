@@ -42,6 +42,8 @@ Reposicionar a abertura da Home em torno de decisões orientadas por dados e ali
 - Centralizar os cinco nomes estruturais e os cinco nomes de estilo em uma configuração compartilhada pela Home e pela página de Maturidade.
 - Criar uma camada visual completa entre as cinco faixas internas aprovadas e os novos nomes estruturais, com fallback seguro para impedir rótulo vazio.
 - Atualizar somente os testes que verificam os rótulos afetados; manter os testes de limites e regras intactos.
+- Antes da troca, buscar em todo `src/` ocorrências de “Nível 1” a “Nível 5” e dos rótulos estruturais antigos para cobrir todos os pontos visíveis.
+- Confirmar que `Index.tsx`, `PublicLayout` e `SeoHead` deixam a entrada da rota `/` em `seoRoutes.ts` controlar o título e a descrição, sem sobrescrita por props antigas.
 
 ## Fora do escopo
 - Nenhuma alteração em simulador, materiais, formulários, validadores, banco, cabeçalho, rodapé, LGPD, rotas, âncoras ou IDs de telemetria.
@@ -56,6 +58,7 @@ Reposicionar a abertura da Home em torno de decisões orientadas por dados e ali
 - Reconfirmar a grade de agentes em duas colunas no celular, com o selo “IA” inteiro, todas as âncoras e os valores preservados do simulador: 100 × 3 = R$ 1.000 e 100 × 4 = R$ 1.250.
 - Confirmar que o resultado continua respeitando exatamente as faixas de pontuação aprovadas e envia os mesmos valores internos.
 - Conferir que somente a maturidade estrutural aparece no resultado e que o Estilo de Gestão permanece explicativo.
-- Revisar em 390 px a hierarquia e as quebras do novo subtítulo longo, evitando um bloco visual pesado.
+- Revisar em 390 px a hierarquia título → subtítulo → botões; se necessário, reduzir apenas o tamanho visual do subtítulo no celular, sem mudar o texto.
 - Verificar no `<head>` da Home o novo título e a nova descrição vindos de `seoRoutes.ts`.
+- Percorrer o diagnóstico até o resultado final para confirmar o novo rótulo estrutural e a ausência de qualquer resultado de Estilo de Gestão.
 - Entregar na prévia para aprovação antes de publicar.
