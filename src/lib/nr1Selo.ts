@@ -27,3 +27,22 @@ export const NOTA_METODO =
   'Recortes com menos de 5 pessoas ficam ocultos (k=5). Custo de turnover estimado = nº de estrelas 9Box (quadrantes 7–9) ' +
   'em unidade Atenção/Crítico × salário médio anual dessas estrelas (mensal × 13,33) × fator de reposição 0,5. ' +
   'O risco de cada unidade é o do último diagnóstico concluído da empresa no período (o diagnóstico é anônimo e não é separado por unidade).';
+
+export const K_MINIMO = 5;
+export const LIMIAR_TENDENCIA = 0.5;
+
+export type Tendencia = 'evolucao' | 'piora' | 'estavel' | 'nao_comparavel';
+
+/** Compara dois ciclos na escala de nota de saúde. A = base, B = comparado. */
+export function compararCiclos(
+  a: { score_geral: number | null | undefined; total_respondentes: number | null | undefined },
+  b: { score_geral: number | null | undefined; total_respondentes: number | null | undefined },
+): { tendencia: Tendencia; saudeA: number | null; saudeB: number | null; delta: number | null } {
+  const ok = (c: typeof a) => (c.total_respondentes ?? 0) >= K_MINIMO && c.score_geral != null;
+  if (!ok(a) || !ok(b)) return { tendencia: 'nao_comparavel', saudeA: null, saudeB: null, delta: null };
+  const saudeA = notaSaude(a.score_geral)!;
+  const saudeB = notaSaude(b.score_geral)!;
+  const delta = Math.round((saudeB - saudeA) * 100) / 100;
+  const tendencia: Tendencia = delta >= LIMIAR_TENDENCIA ? 'evolucao' : delta <= -LIMIAR_TENDENCIA ? 'piora' : 'estavel';
+  return { tendencia, saudeA, saudeB, delta };
+}
