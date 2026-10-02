@@ -1,17 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, History, Scale, Pencil, Trash2, Plus, TrendingUp, TrendingDown, Minus, ClipboardList } from 'lucide-react';
+import { Activity, AlertTriangle, FileText, Users, ShieldCheck, ArrowRight, History, Pencil, Trash2, Plus, ClipboardList } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useNr1Diagnosticos, useNr1Subscription, useUpdateNr1Diagnostico, useDeleteNr1Diagnostico } from '@/hooks/useNr1';
 import { DIMENSAO_LABEL, type Dimensao } from '@/lib/nr1';
 import { Nr1SeloSaude, Nr1SeloRodape } from '@/components/nr1/Nr1SeloSaude';
-import { notaSaude, seloSaude } from '@/lib/nr1Selo';
 import { GRAU_RISCO_INSS, type GrauRiscoInss } from '@/lib/nr1Risco';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GrauRiscoInssCard } from '@/components/nr1/GrauRiscoInssCard';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
@@ -19,15 +17,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 export default function Nr1Dashboard() {
   const { data: sub, isLoading: subLoading } = useNr1Subscription();
   const { data: diagnosticos, isLoading: diagLoading } = useNr1Diagnosticos();
-
-  const ciclosConcluidos = useMemo(
-    () => (diagnosticos ?? []).filter((d) => d.status === 'concluido'),
-    [diagnosticos]
-  );
-  const [cicloAId, setCicloAId] = useState<string>('');
-  const [cicloBId, setCicloBId] = useState<string>('');
-  const cicloA = ciclosConcluidos.find((c) => c.id === cicloAId);
-  const cicloB = ciclosConcluidos.find((c) => c.id === cicloBId);
 
   const updateMut = useUpdateNr1Diagnostico();
   const deleteMut = useDeleteNr1Diagnostico();
@@ -152,7 +141,7 @@ export default function Nr1Dashboard() {
                 Ciclos de Diagnóstico ({diagnosticos?.length ?? 0})
               </CardTitle>
               <CardDescription className="text-xs">
-                Edite, exclua ciclos vazios ou crie um novo. Acompanhe a evolução e compare resultados.
+                Edite, exclua ciclos vazios ou crie um novo. A comparação entre ciclos fica no Histórico.
               </CardDescription>
             </div>
             <div className="flex gap-2">
@@ -160,7 +149,7 @@ export default function Nr1Dashboard() {
                 <Link to="/nr1/diagnostico/novo"><Plus className="h-3.5 w-3.5 mr-1" />Novo ciclo</Link>
               </Button>
               <Button asChild variant="outline" size="sm">
-                <Link to="/nr1/diagnosticos">Histórico <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
+                <Link to="/nr1/diagnosticos">Ver histórico completo <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
               </Button>
             </div>
           </CardHeader>
@@ -220,141 +209,6 @@ export default function Nr1Dashboard() {
                   </div>
                 );
               })}
-            </div>
-
-
-            {/* Comparador */}
-            <div className="pt-4 border-t space-y-3">
-              <div className="flex items-center gap-2">
-                <Scale className="h-4 w-4 nr1-text-primary" />
-                <h4 className="text-sm font-semibold">Comparar ciclos</h4>
-              </div>
-
-              {ciclosConcluidos.length < 2 ? (
-                <div className="flex items-center gap-2 p-3 rounded-md border bg-muted/20 text-sm text-muted-foreground">
-                  <History className="h-4 w-4 shrink-0" />
-                  <span>
-                    {ciclosConcluidos.length === 0
-                      ? 'Nenhum ciclo concluído para comparar. Finalize um ciclo para liberar a comparação.'
-                      : 'Você tem apenas 1 ciclo concluído. Inicie outro ciclo para comparar evolução.'}
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <Select value={cicloAId} onValueChange={setCicloAId}>
-                      <SelectTrigger><SelectValue placeholder="Ciclo A" /></SelectTrigger>
-                      <SelectContent>
-                        {ciclosConcluidos.map((c) => (
-                          <SelectItem key={c.id} value={c.id}>{c.ciclo_nome}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={cicloBId} onValueChange={setCicloBId}>
-                      <SelectTrigger><SelectValue placeholder="Ciclo B" /></SelectTrigger>
-                      <SelectContent>
-                        {ciclosConcluidos.map((c) => (
-                          <SelectItem key={c.id} value={c.id} disabled={c.id === cicloAId}>{c.ciclo_nome}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {cicloA && cicloB && (() => {
-                    const deltaScore = typeof cicloA.score_geral === 'number' && typeof cicloB.score_geral === 'number'
-                      ? (cicloB.score_geral as number) - (cicloA.score_geral as number)
-                      : null;
-                    const evoluiu = deltaScore !== null && deltaScore > 0.5;
-                    const piorou = deltaScore !== null && deltaScore < -0.5;
-                    const estavel = deltaScore !== null && !evoluiu && !piorou;
-                    return (
-                      <>
-                        {deltaScore !== null && (
-                          <div className={`flex items-start gap-3 p-3 rounded-md border ${
-                            evoluiu ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900' :
-                            piorou ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900' :
-                            'bg-muted/30'
-                          }`}>
-                            {evoluiu ? <TrendingUp className="h-5 w-5 text-emerald-600 shrink-0" /> :
-                             piorou ? <TrendingDown className="h-5 w-5 text-orange-600 shrink-0" /> :
-                             <Minus className="h-5 w-5 text-muted-foreground shrink-0" />}
-                            <div className="text-sm">
-                              <p className="font-semibold">
-                                {evoluiu && `Evolução positiva: +${deltaScore.toFixed(1)} pontos`}
-                                {piorou && `Regressão: ${deltaScore.toFixed(1)} pontos`}
-                                {estavel && 'Resultado estável entre os ciclos'}
-                              </p>
-                              <p className="text-xs text-muted-foreground mt-0.5">
-                                Comparando <strong>{cicloA.ciclo_nome}</strong> → <strong>{cicloB.ciclo_nome}</strong>.
-                                {evoluiu && ' O plano de ação demonstra efetividade — mantenha as iniciativas.'}
-                                {piorou && ' Reavalie o plano de ação e identifique novas causas raiz.'}
-                                {estavel && ' Considere ações mais incisivas nas dimensões críticas.'}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                  <div className="rounded-md border overflow-hidden">
-                    <div className="grid grid-cols-3 text-xs font-medium bg-muted/50 px-3 py-2">
-                      <span>Métrica</span>
-                      <span className="text-center">{cicloA.ciclo_nome}</span>
-                      <span className="text-center">{cicloB.ciclo_nome}</span>
-                    </div>
-                      {[
-                        { label: 'Score geral', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => typeof v === 'number' ? v.toFixed(1) : 'Dados insuficientes' },
-                        { label: 'Respondentes', a: cicloA.total_respondentes, b: cicloB.total_respondentes, fmt: (v: any) => v ?? '—' },
-                        { label: 'Selo (nota de saúde)', a: cicloA.score_geral, b: cicloB.score_geral, fmt: (v: any) => { const s = notaSaude(typeof v === 'number' ? v : null); const sl = seloSaude(s); return sl && s != null ? `${sl.label} · ${s.toFixed(1)}` : 'Dados insuficientes'; } },
-                      ].map((row) => {
-                        const delta = typeof row.a === 'number' && typeof row.b === 'number' ? (row.b as number) - (row.a as number) : null;
-                        return (
-                          <div key={row.label} className="grid grid-cols-3 px-3 py-2 text-sm border-t items-center">
-                            <span className="text-muted-foreground">{row.label}</span>
-                            <span className="text-center tabular-nums">{row.fmt(row.a)}</span>
-                            <span className="text-center tabular-nums">
-                              {row.fmt(row.b)}
-                              {delta !== null && delta !== 0 && (
-                                <span className={`ml-1 text-xs ${delta > 0 ? 'text-emerald-600' : 'text-orange-600'}`}>
-                                  ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                        );
-                      })}
-
-                      {/* Dimensões */}
-                      {cicloA.scores_dimensao && cicloB.scores_dimensao && (
-                        <>
-                          <div className="px-3 py-2 text-xs font-medium bg-muted/30 border-t">Por dimensão</div>
-                          {Array.from(new Set([
-                            ...Object.keys(cicloA.scores_dimensao as object),
-                            ...Object.keys(cicloB.scores_dimensao as object),
-                          ])).map((dim) => {
-                            const a = (cicloA.scores_dimensao as Record<string, number>)[dim];
-                            const b = (cicloB.scores_dimensao as Record<string, number>)[dim];
-                            const delta = typeof a === 'number' && typeof b === 'number' ? b - a : null;
-                            return (
-                              <div key={dim} className="grid grid-cols-3 px-3 py-2 text-sm border-t items-center">
-                                <span className="text-muted-foreground truncate">{DIMENSAO_LABEL[dim as Dimensao] ?? dim}</span>
-                                <span className="text-center tabular-nums">{typeof a === 'number' ? a.toFixed(1) : '—'}</span>
-                                <span className="text-center tabular-nums">
-                                  {typeof b === 'number' ? b.toFixed(1) : '—'}
-                                  {delta !== null && delta !== 0 && (
-                                    <span className={`ml-1 text-xs ${delta < 0 ? 'text-emerald-600' : 'text-orange-600'}`}>
-                                      ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
-                                    </span>
-                                  )}
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </>
-                      )}
-                  </div>
-                      </>
-                    );
-                  })()}
-                </>
-              )}
             </div>
           </CardContent>
         </Card>
