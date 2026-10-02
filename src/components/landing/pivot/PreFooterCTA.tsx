@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { DiagnosticoCTA } from "./DiagnosticoCTA";
 import { DemoDialog } from "@/components/landing/public/DemoDialog";
 import imagemEquipe from "@/assets/imagem-e-equipe.png.asset.json";
 
@@ -18,14 +17,11 @@ export const PreFooterCTA = () => (
           Sua empresa está pronta para decidir RH com dados?
         </h2>
         <p className="text-background/90">
-          Comece pelo diagnóstico gratuito em 2 minutos ou converse com um
-          especialista do nosso time.
+          Comece pelo diagnóstico gratuito ou fale com um especialista do nosso time.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 pt-2">
-          <Button asChild size="lg" variant="secondary">
-            <Link to="/diagnostico">Fazer o diagnóstico gratuito →</Link>
-          </Button>
-          <DemoDialog size="lg" variant="outline" triggerLabel="Falar com um especialista" className="border-background/60 bg-transparent text-background hover:bg-background/10 hover:text-background" />
+          <DiagnosticoCTA id="cta-footer-diagnostico" variant="secondary" />
+          <DemoDialog size="lg" variant="outline" triggerLabel="Fale com um especialista" />
         </div>
       </div>
     </div>

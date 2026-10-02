@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Compass } from "lucide-react";
 
-const NIVEIS = ["Inicial", "Estruturando", "Estruturado", "Integrado", "Estratégico"];
+const NIVEIS = [1, 2, 3, 4, 5];
 
 /**
  * Apresenta o modelo de maturidade sem prometer funcionalidades que a página
@@ -43,7 +43,7 @@ export const MaturitySection = () => (
           <div className="space-y-2">
             {[...NIVEIS].reverse().map((n, i) => (
               <div key={n} className="flex items-center gap-3">
-                <span className="w-24 shrink-0 text-xs text-muted-foreground">{5 - i}. {n}</span>
+                <span className="w-16 shrink-0 text-xs text-muted-foreground">Nível {n}</span>
                 <div className="h-6 flex-1 rounded-full bg-muted overflow-hidden">
                   <div className="h-full rounded-full bg-primary" style={{ width: `${(5 - i) * 20}%`, opacity: 0.35 + (5 - i) * 0.13 }} />
                 </div>
