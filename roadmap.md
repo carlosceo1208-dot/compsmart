@@ -161,13 +161,19 @@
 - [x] Comparador movido para o Histórico (Visão Geral só com "Ver histórico completo"), direção corrigida para nota de saúde (D2), k=5 (D3), filtro por período, exportação PDF/planilha com método
 - [x] Refinamentos: seletores A base/B comparado com exclusão mútua, testes de borda 0,5/0,49/<5, fonte DejaVu embutida, tabela com rolagem em 390px
 - [x] Conferência em empresas de teste (apagadas), contagens na linha de base, ci limpo
-- [ ] Publicar — aguarda aprovação
+- [x] Publicado (aprovação do CEO) — Fase 7 fechada
 
 ## Fase 8 — Importações da Matriz (ciclo de conferência)
 - [x] Área /nr1/importacoes: lista, filtros, detalhe, conferir/rejeitar, exportações com método
 - [x] Validação por perfil no navegador (RH, outra empresa, consultor com/sem projeto) e 1280/390
 - [x] Rodada final: importação real temporária; PDF/planilha abertos; link expirou em 10 min; linha de base completa antes/depois
 - [x] Linha de base de logins: 190 total histórico antes/depois; 18 identificado como setembro de 2026
-- [ ] Teste visual empresa sem NR-1: aguarda existir RH/admin nessa empresa ou autorização para criar conta temporária
+- [x] Teste visual empresa sem NR-1 (admin e RH temporários, 1280/390): trava de módulo, 0 importações, sem erro; empresa apagada
+- [x] Publicado (2026-10-02, aprovação do CEO) — Fase 8 publicada
 - [ ] Integração com a Matriz de Risco (opção B) — incremento futuro
-- [ ] Publicar — aguarda aprovação do CEO
+
+## Estado: Fase 6 fechada · Fase 7 fechada · Fase 8 publicada
+## Próximos (fila NR-1)
+- [ ] Gestão de Terceiros (PGR) — Etapa 0, aguarda o CEO dar a largada
+- [ ] Sociodemográfico
+- [ ] Benchmark e descritivo da landing (prints do concorrente + comparativo) — quando o CEO trouxer

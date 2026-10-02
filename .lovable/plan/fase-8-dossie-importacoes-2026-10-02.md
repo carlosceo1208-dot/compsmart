@@ -18,3 +18,7 @@ Escopo: opção A (conferência). Integração com a Matriz de Risco (opção B)
 - No banco, com a sessão de cada um: 0 importações e 0 arquivos, sem erro.
 - Limpeza: a empresa, o módulo, os alertas automáticos e os papéis foram apagados. As 2 contas de login de teste ficaram inativas, sem empresa e sem papel, porque não há acesso de servidor para apagá-las.
 - Contagens depois: 25 · 2 · 440/0/0 · 9 · 190 · 2 · 0 importações. Q1 2026 = 49,93 (10 respondentes).
+
+## Publicação (2026-10-02)
+- O CEO autorizou e a Fase 8 foi publicada. Varredura de segurança: só o aviso informativo de CBO, já conhecido.
+- Incremento futuro: opção B (a importação alimentando a Matriz de Risco).
