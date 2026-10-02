@@ -2,7 +2,7 @@
 
 ## Diagnóstico (confirmado no código)
 - `src/components/landing/pivot/MaturitySection.tsx` é a seção duplicada: repete a chamada "Descubra o nível de maturidade da sua gestão de pessoas." e o card 5×2 (NIVEIS_ESTRUTURAIS + ESTILOS_GESTAO) logo após `CrossDataSection`.
-- `MaturitySection` é usada apenas em `src/pages/Index.tsx` (import na linha 12, render na linha 63). Nenhum outro arquivo a referencia — não há links `#maturidade` em header, footer, hero ou qualquer página (`rg` confirmado em todo `src/`), então remover a seção não quebra âncoras existentes.
+- `MaturitySection` é usada apenas em `src/pages/Index.tsx` (import na linha 12, render na linha 63). `rg` no projeto inteiro — incluindo suítes de teste, fixtures e mocks (`*.test.*`, `*.spec.*`) — confirma nenhum outro uso; sobra apenas o build cache `tsconfig.app.tsbuildinfo` (regenerado). Não há links `#maturidade` em header, footer, hero ou qualquer página, então remover a seção não quebra âncoras existentes.
 
 ## Checagens extras já confirmadas
 - **Constantes 5×2** (`NIVEIS_ESTRUTURAIS`, `ESTILOS_GESTAO`) vivem em `src/lib/maturidade.ts` (config compartilhada). O hero **não** as importa via MaturitySection — o hero não as usa; `Maturidade.tsx` e `MaturitySection.tsx` importam da lib. Apagar o arquivo não quebra nada.
