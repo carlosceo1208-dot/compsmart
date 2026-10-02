@@ -1,10 +1,15 @@
-import { ShieldCheck } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
+/** Selo de alerta da NR-1 na primeira linha do topo da Home (não é uma faixa). */
 export const UrgencyBanner = () => (
-  <section className="border-y border-primary/10 bg-primary/5 py-4" aria-label="Preparação para a NR-1">
-    <div className="container mx-auto px-4 flex items-start justify-center gap-3 text-sm text-foreground">
-      <ShieldCheck className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-      <p><strong>Riscos psicossociais:</strong> a obrigação de identificar e gerenciar permanece. Prepare sua empresa para a fiscalização.</p>
-    </div>
-  </section>
+  <p
+    role="note"
+    className="inline-flex items-start gap-2 rounded-full border border-destructive/30 bg-destructive/10 px-4 py-2 text-left text-xs font-semibold text-destructive md:text-sm"
+  >
+    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" aria-hidden="true" />
+    <span>
+      Fiscalização da NR-1 começou. Portaria MTE 1.419/2024 — riscos
+      psicossociais agora fazem parte do PGR.
+    </span>
+  </p>
 );

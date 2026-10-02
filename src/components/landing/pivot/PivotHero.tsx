@@ -1,71 +1,41 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Sparkles, ClipboardCheck, ShieldCheck, HeartHandshake, Grid3X3, Wallet } from "lucide-react";
-import { DemoDialog } from "@/components/landing/public/DemoDialog";
+import { PlayCircle } from "lucide-react";
+import { UrgencyBanner } from "./UrgencyBanner";
+import { DiagnosticoCTA } from "./DiagnosticoCTA";
 import simboloCrescimento from "@/assets/simbolo-crescimento.png.asset.json";
 
-const CRUZAMENTO = [
-  { label: "NR-1", icon: ShieldCheck },
-  { label: "Clima", icon: HeartHandshake },
-  { label: "9-Box", icon: Grid3X3 },
-  { label: "Remuneração", icon: Wallet },
-];
-
 export const PivotHero = () => (
-  <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-muted/40 py-16 md:py-24">
+  <section className="relative overflow-hidden bg-gradient-to-br from-background via-primary/5 to-muted/40 py-14 md:py-24">
     <div className="container mx-auto px-4">
       <div className="max-w-3xl mx-auto text-center space-y-6">
-        <Badge className="bg-primary/10 text-primary border-primary/20 px-4 py-1.5 text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="h-3 w-3 mr-2" />
-          Gestão Estratégica de Pessoas
-        </Badge>
+        <UrgencyBanner />
 
         <div className="flex flex-col items-center justify-center gap-5 md:flex-row md:gap-7">
           <img
             src={simboloCrescimento.url}
             alt="Símbolo de crescimento estratégico"
-            className="size-36 shrink-0 rounded-2xl object-cover shadow-sm md:size-40"
+            className="size-28 shrink-0 rounded-2xl object-cover shadow-sm md:size-36"
           />
           <h1 className="max-w-xl text-center text-3xl font-bold leading-tight md:text-left md:text-5xl">
-            De dados de RH a{" "}
-            <span className="text-primary">resultados de negócio.</span>
+            O RH virou obrigação legal e alavanca estratégica.{" "}
+            <span className="text-primary">A CompSmart faz os dois.</span>
           </h1>
         </div>
 
         <p className="text-base md:text-lg text-muted-foreground">
-          A CompSmart cruza o que nenhuma outra ferramenta cruza — remuneração,
-          risco psicossocial, clima e potencial. Você recebe diagnóstico, plano
-          de ação e métricas que o conselho entende.
+          Plataforma com 8 agentes de IA que cruza NR-1, clima, desempenho,
+          remuneração e sucessão — e consultoria sob demanda para levar da
+          estrutura ao resultado.
         </p>
 
-        <div className="rounded-2xl border border-primary/20 bg-card p-5 md:p-6 shadow-sm">
-          <p className="text-sm font-semibold text-foreground mb-4">
-            Só a CompSmart cruza, com IA:
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
-            {CRUZAMENTO.map((c, i) => (
-              <div key={c.label} className="flex items-center gap-2 md:gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary">
-                  <c.icon className="h-4 w-4" />
-                  {c.label}
-                </span>
-                {i < CRUZAMENTO.length - 1 && (
-                  <span className="text-muted-foreground text-sm">×</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-          <Button asChild size="lg">
-            <Link to="/diagnostico">
-              <ClipboardCheck className="h-4 w-4 mr-2" />
-              Fazer o diagnóstico gratuito em 2 minutos
-            </Link>
+          <DiagnosticoCTA id="cta-hero-diagnostico" />
+          <Button asChild id="cta-hero-demo" size="lg" variant="outline">
+            <a href="#demonstracao">
+              <PlayCircle className="h-4 w-4 mr-2" />
+              Ver demonstração
+            </a>
           </Button>
-          <DemoDialog size="lg" variant="outline" triggerLabel="Ver demonstração ao vivo" />
         </div>
       </div>
     </div>
