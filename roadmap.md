@@ -166,7 +166,8 @@
 ## Fase 8 — Importações da Matriz (ciclo de conferência)
 - [x] Área /nr1/importacoes: lista, filtros, detalhe, conferir/rejeitar, exportações com método
 - [x] Validação por perfil no navegador (RH, outra empresa, consultor com/sem projeto) e 1280/390
-- [ ] Rodada final: importação real temporária; PDF/planilha abertos; link expira em 10 min; empresa sem NR-1 vê 0; linha de base completa antes/depois
-- [ ] Resolver linha de base de logins: provar 190 antes/depois e identificar ou registrar 18 como snapshot antigo/filtro diferente
+- [x] Rodada final: importação real temporária; PDF/planilha abertos; link expirou em 10 min; linha de base completa antes/depois
+- [x] Linha de base de logins: 190 total histórico antes/depois; 18 identificado como setembro de 2026
+- [ ] Teste visual empresa sem NR-1: aguarda existir RH/admin nessa empresa ou autorização para criar conta temporária
 - [ ] Integração com a Matriz de Risco (opção B) — incremento futuro
 - [ ] Publicar — aguarda aprovação do CEO
