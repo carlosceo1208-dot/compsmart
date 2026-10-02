@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ListChecks } from 'lucide-react';
+import { ListChecks, Upload } from 'lucide-react';
 import { GerarPgrButton } from '@/components/nr1/GerarPgrButton';
 import { Nr1MatrizRisco } from '@/components/nr1/Nr1MatrizRisco';
 
