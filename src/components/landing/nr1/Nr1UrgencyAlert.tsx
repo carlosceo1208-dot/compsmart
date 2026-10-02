@@ -1,7 +1,7 @@
 import { AlertTriangle } from "lucide-react";
 
-/** Selo de alerta da NR-1 na primeira linha do topo da Home (não é uma faixa). */
-export const UrgencyBanner = () => (
+/** Alerta regulatório exclusivo do topo temático da Landing NR-1. */
+export const Nr1UrgencyAlert = () => (
   <p
     role="note"
     className="inline-flex items-start gap-2 rounded-full border border-destructive/30 bg-destructive/10 px-4 py-2 text-left text-xs font-semibold text-destructive md:text-sm"

@@ -188,7 +188,8 @@
 ## Nova Home (2026-10-02)
 - [x] Nova Home na prévia (14 seções, simulador por módulo, materiais em fonte única, FAQ 7) — aguardando aprovação do CEO para publicar
 - [x] Ajuste aprovado de posicionamento: novo hero, contrapontos, níveis 5×2 e SEO da Home — validar 1280/390 antes de publicar
-- [ ] Ajuste do herói: título/subtítulo pela maturidade + description da rota / — validar 1280/390 antes de publicar
+- [x] Ajuste do herói: título/subtítulo pela maturidade + description da rota / — validado em 1280/390 na prévia; aguarda publicação
+- [x] Hierarquia Home × NR-1: alerta removido da Home e mantido apenas em /nr1; validado em 1280/390; aguarda publicação
 - [ ] Alinhar /maturidade ao modelo 5×2 com diagnóstico misto (etapa futura)
 - [ ] E-books NR-1, Maturidade e Clima/9-Box (aguardando os PDFs; captura de interesse ativa)
 - [ ] /pricing antiga (planos fixos) usada pelos avisos do app: redirecionar ou alinhar (decisão do CEO)
