@@ -60,7 +60,7 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
       .eq('terceiro_id', t.id)
       .order('created_at', { ascending: false });
     if (error) { toast.error('Erro ao carregar PGRs'); return; }
-    gerarRelatorioConformidadePdf({
+    await gerarRelatorioConformidadePdf({
       empresaCliente: activeCompany?.name ?? '—',
       terceiro: t,
       pgrs: (data ?? []) as TerceiroPgr[],
