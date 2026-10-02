@@ -20,7 +20,9 @@ Mudança apenas de copy/SEO. Nenhum código, banco, formulário ou fluxo é alte
 ## 4. Validação
 - Verificar no `<head>` real da Home o título e a description novos (sem duplicação de meta description).
 - Prévia em 1280px: hierarquia título → subtítulo → CTAs intacta.
-- Prévia em 390px: subtítulo longo quebra bem, sem virar bloco pesado; hierarquia título → subtítulo → botões preservada (reduzir o corpo apenas por classe responsiva, sem mudar o texto).
+- Prévia em 390px: subtítulo longo quebra bem, sem virar bloco pesado; hierarquia título → subtítulo → botões preservada; redução do corpo por classe responsiva com contraste legível (cor de texto secundária).
+- Ler o subtítulo renderizado na prévia: "Na avaliação completa, a CompSmart mostra o caminho…" é o limite — nada de cruzamento percebido × real ou cálculo do estilo de gestão na copy renderizada.
+- Meta title permanece "CompSmart — O RH que constrói o futuro com dados" (decisão do CEO; o Google e o H1 não precisam usar a mesma palavra-chave).
 - CTAs funcionam como hoje; simulador 100×3 = R$ 1.000 e 100×4 = R$ 1.250 continuam batendo (regressão rápida).
 
 ## 5. Publicação
