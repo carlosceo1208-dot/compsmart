@@ -141,3 +141,15 @@ A função `capture_ebook_lead` já foi conferida no código: hoje recebe `_nome
 - O download da Remuneração Estratégica funciona.
 - A página não tem "R$ 1", "R$ 225" nem teste grátis.
 - O `roadmap.md` registra as pendências: Maturidade 5×2, e-books e `/pricing`.
+
+## Lembretes conferidos
+- **LGPD no e-book:**
+  - A janela do e-book já exige a caixa de consentimento antes de liberar o envio.
+  - No banco, `capture_ebook_lead` grava `consentimento_lgpd = true` e `lead_magnet = 'remuneracao'`.
+  - A função só aceita a origem `materiais-ebook-remuneracao`. Por isso, os cards "em breve" não passam por ela: usam `usePublicLead`, com consentimento obrigatório.
+  - A caixa de consentimento e a chamada atual continuam iguais.
+- **Página /materiais:** capturas de tela antes e depois, em 1280px e 390px, comparadas lado a lado antes de concluir.
+- **Texto da Maturidade (seção 6):**
+  - Apresenta o modelo 5×2 e convida a "descobrir o nível".
+  - Não afirma que a página mostra o cruzamento entre o que a empresa percebe e o que os dados mostram.
+  - O texto vai para a sua revisão na prévia.
