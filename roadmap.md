@@ -177,3 +177,5 @@
 - [ ] Gestão de Terceiros (PGR) — Etapa 0, aguarda o CEO dar a largada
 - [ ] Sociodemográfico
 - [ ] Benchmark e descritivo da landing (prints do concorrente + comparativo) — quando o CEO trouxer
+
+- [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Aguardando aprovação do CEO para publicar.
