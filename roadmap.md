@@ -162,3 +162,9 @@
 - [x] Refinamentos: seletores A base/B comparado com exclusão mútua, testes de borda 0,5/0,49/<5, fonte DejaVu embutida, tabela com rolagem em 390px
 - [x] Conferência em empresas de teste (apagadas), contagens na linha de base, ci limpo
 - [ ] Publicar — aguarda aprovação
+
+## Fase 8 — Importações da Matriz (ciclo de conferência)
+- [x] Área /nr1/importacoes: lista, filtros, detalhe, conferir/rejeitar, exportações com método
+- [ ] Validação por perfil no navegador (RH, outra empresa, consultor com/sem projeto) e 1280/390
+- [ ] Integração com a Matriz de Risco (opção B) — incremento futuro
+- [ ] Publicar — aguarda aprovação do CEO
