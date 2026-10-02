@@ -1,72 +1,65 @@
-# Nova Home da CompSmart (versão corrigida)
+# Nova Home da CompSmart (versão final v2)
 
-A nova landing passa a ser a página inicial em compsmart.ia.br, sem criar /plataforma. A navegação para Preços, Maturidade, Landing NR-1, Landing de Recrutamento e Materiais continua. O app, o painel, o banco e a cobrança não mudam. Nada vai ao ar sem aprovação.
+A nova landing passa a ser a página inicial em compsmart.ia.br, sem criar /plataforma. A Home é reformulada por dentro: o que já existe evolui e só entram as seções realmente novas. O menu e o rodapé atuais não mudam. O app, o painel, o banco e a cobrança também não. Nada vai ao ar sem aprovação.
 
-A Home atual vai ser reformulada por dentro: as seções que já existem são evoluídas e só entram as realmente novas. Não haverá cópia paralela da página.
+## Endereços confirmados
+- **Maturidade:** `/maturidade` (página pública). O questionário por convite é `/maturidade/responder/:token`. `/diagnostico` é outra página.
+- **Landing de Recrutamento:** `/modulos/selecao-rs`. `/recrutamento/vagas` e `/recrutamento/candidatos` são telas internas do app.
+- **Página antiga /pricing:** já não está no SEO nem no menu público. Ela continua funcionando só para os avisos de dentro do app.
 
 ## Seções, nesta ordem
-1. **Faixa superior**, no lugar da faixa de urgência atual: "Fiscalização da NR-1 começou. Portaria MTE 1.419/2024 — riscos psicossociais agora fazem parte do PGR." Fundo de alerta/crítico, com contraste adequado para leitura.
-2. **Topo**:
-   - Título: "O RH virou obrigação legal e alavanca estratégica. A CompSmart faz os dois."
-   - Subtítulo: 8 agentes de IA mais consultoria sob demanda.
-   - Botão "Diagnóstico gratuito em 2 min": abre o formulário de captura.
-   - Botão "Ver demonstração": abre a demonstração ou desce até o vídeo.
-3. **Contraponto**: 3 cards de 2 linhas cada:
-   - Consultoria cara e dependente de humanos.
-   - Clima que vira PDF esquecido na gaveta.
-   - Anonimato de fachada.
-4. **Plataforma + Consultoria** (nova): "A estrutura a gente entrega. O resultado, também."
-   - Coluna Plataforma: 8 módulos, automação e dados que se cruzam.
-   - Coluna HR Services: consultores seniores por demanda, com "Outcome as a Service (OaaS)" escrito por extenso na primeira vez.
-5. **Diferencial**: "Só a CompSmart cruza NR-1 × Clima × 9-Box × Remuneração", com um desenho dos 4 módulos convergindo, feito em código, sem imagem.
-6. **Maturidade** (nova):
-   - 5 níveis × 2 eixos.
-   - Diagnóstico misto, comparando o que é percebido com o que os dados mostram.
-   - Botão "Descobrir meu nível", que leva à página de Maturidade.
-   - Nota sobre os consultores.
-7. **8 agentes de IA**: Remu, Insight, Match, Psi, Clima, Talent, Evolve e Potencial. Cada card traz nome, agente, uma frase e o selo "IA". O HR Services fica fora desta grade.
-8. **Recrutamento com inteligência** (nova):
-   - Faixa salarial sugerida ao criar a vaga, com base em CBO, descrição e nível/grade.
-   - Triagem e match.
-   - Link para a Landing de Recrutamento (/modulos/selecao-rs).
-9. **Simulação de investimento**:
-   - Usa o simulador que já existe em /precos, sem mudar a regra de preço, que já tem o desconto progressivo.
-   - Botões "Fale com um especialista" e "Diagnóstico gratuito", mais um link para /precos.
-   - Mostra um bloco de carregamento enquanto lê os preços; se a leitura falhar, mostra "Sob consulta".
-   - Sem "Começar teste", sem R$ 1 e sem R$ 225.
-10. **Materiais**: link para /materiais, com os cards na situação real:
+1. **Faixa superior NR-1**: substitui a faixa de urgência atual, com fundo de alerta e boa leitura.
+2. **Topo**: novo título e subtítulo.
+   - "Diagnóstico gratuito em 2 min" abre o formulário. Depois do envio, mostra uma confirmação e leva para `/maturidade`.
+   - "Ver demonstração" desce até o vídeo.
+   - Logo abaixo, mantém a faixa de proteção de dados (LGPD).
+3. **Contraponto**: 3 cards.
+4. **Plataforma + Consultoria** (nova): HR Services, com Outcome as a Service (OaaS) escrito por extenso.
+5. **Diferencial**: 4 módulos convergindo para um painel, desenhado em código.
+6. **Maturidade** (nova): 5 níveis × 2 eixos e diagnóstico misto. O botão "Descobrir meu nível" leva para `/maturidade`. Inclui a nota sobre os consultores.
+7. **8 agentes de IA**, com selo "IA". O HR Services fica fora desta grade.
+8. **Recrutamento com inteligência** (nova): faixa salarial sugerida, triagem e match, com link para `/modulos/selecao-rs`. Aqui entra também o bloco de integração com a folha.
+9. **Simulação de investimento**: reaproveita o simulador atual com botões configuráveis.
+   - Botões: "Fale com um especialista", "Diagnóstico gratuito" e link para `/precos`.
+   - Enquanto carrega, mostra um bloco de espera. Se a leitura falhar, mostra "Sob consulta".
+   - Sem teste, sem R$ 1 e sem R$ 225.
+10. **Materiais** (nova, a mesma seção usada também na página `/materiais`):
     - Remuneração Estratégica: disponível para baixar.
-    - NR-1 e Riscos Psicossociais: em breve, com captura de interesse.
-    - Clima e 9-Box: em breve, com captura de interesse.
-    - Nenhum e-book novo é criado agora.
+    - NR-1 e Clima/9-Box: "em breve", com captura de interesse.
+    - Botão "Ver todos os materiais".
 11. **Ver demonstração**: o vídeo atual.
 12. **Empresas-piloto**:
-    - Espaços reservados para logos, sem nomes.
-    - Exemplo marcado "Exemplo real anonimizado": 10 respondentes, risco 49,93 (crítico).
-    - A frase "plano gerado em minutos" fica de fora até ser confirmada.
+    - Espaços reservados para logos.
+    - "Exemplo real anonimizado": 10 respondentes, risco 49,93 (crítico).
+    - Sem a frase "plano gerado em minutos".
     - Abaixo, os 4 painéis com o selo "Exemplo ilustrativo".
-13. **FAQ**: as 7 perguntas, com respostas objetivas e sem prometer o que a plataforma não faz.
-14. **Rodapé**: chamada "Fale com um especialista" (WhatsApp), links de LGPD e privacidade, nome e símbolo da plataforma.
+13. **FAQ**: 7 perguntas. Os dados para o Google usam as mesmas 7.
+14. **Fechamento e rodapé**: "Fale com um especialista" (WhatsApp), links de LGPD e privacidade.
 
-## Pendências, sem bloquear a publicação
-- **E-books de NR-1, Maturidade e Clima/9-Box**: ficam para depois. A captura de interesse já funciona e a entrega é manual até os arquivos existirem.
-- **Frase "plano gerado em minutos"**: só entra se for confirmada.
-- **Página antiga /pricing** (planos fixos de R$ 299, R$ 899 e R$ 1.900): os avisos de fim de teste e a tela de cobrança de dentro do app levam para ela. Por isso, mexer nela altera o app, que está fora do escopo desta etapa. Nesta etapa ela fica fora do menu, do sitemap e dos links da landing. Se ela deve ser redirecionada para /precos ou alinhada ao modelo por colaborador fica para sua decisão, numa etapa à parte.
+Saem da Home: o resumo de preços (o simulador ocupa esse lugar) e o "Como funciona".
+
+## Pendências (não bloqueiam)
+- E-books de NR-1, Maturidade e Clima/9-Box ficam para depois. A captura de interesse já funciona, e a entrega é manual por enquanto.
+- A frase "plano gerado em minutos" só entra se for confirmada.
+- Redirecionar ou alinhar a página antiga `/pricing` fica para uma etapa separada.
 
 ## Detalhes técnicos
-- Reformular `src/pages/Index.tsx` e os componentes de `src/components/landing/pivot/`: `PivotHero`, `UrgencyBanner`, `PainSection`, `CrossDataSection`, `ModulesGridSection`, `SocialProofPlaceholder`, `PivotFAQSection` (o JSON-LD acompanha as 7 perguntas) e `PreFooterCTA`.
-- Seções novas também em `pivot/`: `PlatformConsultingSection`, `MaturitySection`, `RecruitmentSection` e `MaterialsSection`.
-- Reaproveitar `PublicLayout`, `LeadForm`, `DemoDialog`, `EbookDownloadDialog`, `PricingSimulator`, `VideoSection`, `VisualProofSection`, `src/config/visualProofData.ts` e `src/config/landingModules.ts`.
-- `PayrollIntegrationsSection`, `PivotHowItWorks`, `PricingSummarySection` e `SecurityAssuranceStrip` não estão na nova ordem. Cada um será incorporado a outra seção ou removido, conferindo com o verificador de código morto.
-- `LeadOrigem`: incluir `"diagnostico-home"` e reaproveitar `ebook:nr1` e `ebook:clima-9box`. A coluna `origem` da tabela `leads` não tem restrição de valores, então o banco não muda.
-- Preço: manter `usePublicPricing` e `perEmployeePrice` como estão. Novo teste unitário: 100 colaboradores com 4 módulos = R$ 1.250; com 3 módulos = R$ 1.000.
-- Ids e telemetria nos botões: `cta-hero-diagnostico`, `cta-hero-demo`, `cta-maturidade`, `cta-simulador-especialista`, `cta-ebook-nr1`, `cta-ebook-remuneracao` e `cta-footer-whatsapp`.
-- Visual: só tokens do projeto, fonte Inter, cards de 16 a 20px e badges pílula. Sem fotos de banco de imagens.
-- SEO só por `src/config/seoRoutes.ts`.
-- Validação na prévia:
+- Tudo é feito em `src/pages/Index.tsx` e `src/components/landing/pivot/`, sem pasta `home/` paralela.
+- Componentes novos: `PlatformConsultingSection`, `MaturitySection`, `RecruitmentSection` e `MaterialsSection`. `MaterialsSection` tem uma variante compacta e outra completa, e também passa a ser usada em `Materiais.tsx`.
+- Evoluem: `UrgencyBanner`, `PivotHero`, `PainSection`, `CrossDataSection`, `ModulesGridSection`, `SocialProofPlaceholder`, `PivotFAQSection` e `PreFooterCTA`.
+- Mantidos: `SecurityAssuranceStrip`, `VideoSection` e `VisualProofSection`.
+- `PayrollIntegrationsSection` é incorporada em `RecruitmentSection`.
+- Removidos da Home: `PricingSummarySection` e `PivotHowItWorks`. Arquivos que ficarem sem uso são apagados, conferindo com o verificador de código morto.
+- `PricingSimulator` passa a receber os botões por props, sem duplicar a lógica. `usePublicPricing`, `perEmployeePrice` e `simulateMonthlyTotal` não mudam. Novo teste unitário: 100×4 = R$ 1.250 e 100×3 = R$ 1.000.
+- `EbookDownloadDialog` passa a receber `origem` e `lead_magnet` de cada card.
+- `LeadOrigem` ganha `"diagnostico-home"`. Os e-books usam as origens que já existem, `ebook:nr1` e `ebook:clima-9box`. A coluna `origem` da tabela de leads não tem restrição de valores, então o banco não muda.
+- Âncoras das seções: `#modelo`, `#maturidade`, `#precos`, `#materiais`, `#demonstracao` e `#faq`. A rolagem por âncora que já existe na Home é mantida.
+- Ids e telemetria nos botões: `cta-hero-diagnostico`, `cta-hero-demo`, `cta-maturidade`, `cta-simulador-especialista`, `cta-ebook-remuneracao`, `cta-ebook-nr1`, `cta-ebook-clima-9box` e `cta-footer-whatsapp`.
+- Visual: só tokens do projeto, fonte Inter, cards de 16 a 20px e badges pílula, sem fotos de banco de imagens. SEO só por `src/config/seoRoutes.ts`.
+- Validação:
   - Telas de 1280px e 390px.
-  - Formulários gravando o lead com a origem correta.
-  - Todos os links, incluindo "Descobrir meu nível".
-  - Simulador com os dois exemplos.
-  - Nenhum teste grátis, R$ 1 ou R$ 225 na página.
-- Rodar `bun run ci` até ficar limpo e atualizar `roadmap.md`.
+  - Formulários gravando a origem correta.
+  - Links e âncoras funcionando.
+  - Simulador com os dois exemplos, batendo com `get_public_pricing`.
+  - Nenhum R$ 1, R$ 225 ou teste grátis na página.
+  - `bun run ci` limpo e `roadmap.md` atualizado.
