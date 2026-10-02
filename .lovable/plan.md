@@ -13,7 +13,7 @@ Deixar o herói “Descubra o nível de maturidade da sua gestão de pessoas.”
 
 2. **Landing NR-1**
    - Reaproveitar o aviso existente com o texto aprovado: “Fiscalização da NR-1 começou. Portaria MTE 1.419/2024 — riscos psicossociais agora fazem parte do PGR.”
-   - Exibi-lo como destaque de alerta dentro do topo temático da Landing NR-1, associado ao conteúdo da página.
+   - Exibi-lo como destaque de alerta dentro do topo temático da Landing NR-1, na rota pública confirmada `/nr1`, associado ao conteúdo da página e sem aparência de segundo anúncio global.
    - Manter a faixa global “Estamos reconstruindo…” e o restante da Landing NR-1 sem alterações.
 
 3. **Escopo preservado**
@@ -23,7 +23,9 @@ Deixar o herói “Descubra o nível de maturidade da sua gestão de pessoas.”
 ## Validação na prévia
 
 - Conferir em 1280px e 390px que o herói de maturidade é o primeiro conteúdo da Home abaixo do menu e não há alerta NR-1 acima dele.
-- Conferir que o aviso regulatório aparece na Landing NR-1 e não na Home.
-- Confirmar título, subtítulo e CTAs intactos; testar as âncoras.
+- Conferir visualmente que a retirada do aviso não deixou espaçamento ou altura estranhos no topo do herói.
+- Percorrer a Home inteira para confirmar que não restou nenhuma cópia do alerta regulatório.
+- Conferir que o aviso regulatório aparece no topo temático de `/nr1`, associado ao produto, e não como uma segunda faixa global.
+- Confirmar título, subtítulo, imagem e CTAs intactos; testar as âncoras.
 - Confirmar o simulador com 100 colaboradores: 3 módulos = R$ 1.000 e 4 módulos = R$ 1.250.
-- Rodar a verificação completa do projeto e revisar erros da prévia.
+- Rodar `bun run ci`, revisar erros da prévia e confirmar que não restou importação pendente de `UrgencyBanner` no herói da Home.
