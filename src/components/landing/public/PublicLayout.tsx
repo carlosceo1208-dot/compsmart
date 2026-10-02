@@ -5,8 +5,9 @@ import { PublicFooter } from "./PublicFooter";
 import { WhatsAppFloat } from "./WhatsAppFloat";
 
 interface PublicLayoutProps {
-  title: string;
-  description: string;
+  /** Opcional: seoRoutes.ts tem prioridade quando a rota está cadastrada. */
+  title?: string;
+  description?: string;
   path: string;
   children: React.ReactNode;
 }

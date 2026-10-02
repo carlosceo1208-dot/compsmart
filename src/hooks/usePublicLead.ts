@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 /** Nomenclatura fixa de origem dos leads públicos (segmentação e follow-up). */
 export type LeadOrigem =
   | "demo"
+  | "diagnostico-home"
   | "contato"
   | "parceiro"
   | "ebook:remuneracao"
