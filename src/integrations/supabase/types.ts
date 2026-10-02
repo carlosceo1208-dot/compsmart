@@ -12698,6 +12698,7 @@ export type Database = {
         Returns: number
       }
       maturidade_scorecard: { Args: { p_diagnostico: string }; Returns: Json }
+      nr1_areas_empresa: { Args: { _company: string }; Returns: string[] }
       nr1_calc_risco: {
         Args: { score: number }
         Returns: Database["public"]["Enums"]["nr1_nivel_risco"]
