@@ -9,4 +9,5 @@ Escopo: opção A (conferência). Integração com a Matriz de Risco (opção B)
 - Perfis (desfeito): RH=1, outra empresa=0, consultor ativo=1, consultor sem projeto=0.
 - Tela (testes automáticos): botões só em pendente; rejeitar sem motivo bloqueado.
 - Tela 1280/390: página e estado vazio conferidos.
-- Pendente: exportações e expiração do link com importação real; respostas 440/0/0, Q1 49,93 e logins (tabela atual 190 ≠ 18).
+- Rodada final autorizada: importação real temporária, exportações abertas, expiração do link, empresa sem NR-1 e linha de base completa.
+- Logins esclarecidos: 190 é o total histórico; 18 corresponde exatamente a setembro de 2026. A nova linha de base usa 190 e exige igualdade antes/depois.
