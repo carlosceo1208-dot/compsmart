@@ -10,3 +10,10 @@
 - Testes (empresa temporária, apagada): 12 envios + 1 em empresa sem áreas, todos 200. Feminino(6) e Até 29 anos(6) exibidos; Masculino(4) suprimido na tela e no CSV; área inventada descartada; sem perfil e "Prefiro não informar" concluem; empresa sem áreas recebe lista vazia e conclui. Reprocessar = 1 registro. Renomear área após fechamento: recorte antigo preservado ("Operações T10"). Tela 1280/390 e recarregar ok. CSV aberto: 3 linhas, sem grupo suprimido. PDF é captura da mesma tela já suprimida.
 - Linha de base: 25 · 2 · 440/0/0 · 9 · 192 logins (+2 = login real de um usuário às 20:11, não de teste) · 2 · Q1 2026 = 49,93.
 - Conta teste.fase8.admin segue inativa, sem empresa e papel.
+
+## Publicação (2026-10-02, aprovação do CEO)
+- Publicado em https://www.compsmart.ia.br. Pós-publicação: /nr1/sociodemografico conferido no ar em 1280/390; CSV aberto (só grupos ≥5, recortes suprimidos fora); PDF aberto (%PDF-1.3, captura da tela já suprimida).
+- Varredura de segurança pós-publicação: apenas o aviso informativo conhecido de leitura de cbo_codes por usuário autenticado (catálogo público de CBO, sem dado pessoal).
+- Estado do projeto: Fases 6–9 fechadas; Fase 10 publicada.
+- Pendências registradas: coleta FIB/HSE (incremento futuro — a tela mostra "—" até existir coleta); FIB e Segurança Psicológica sem tabelas de resultado para cliente real; 3 contas de teste inativas (teste.fase9.*) aguardando exclusão pelo painel; "Ver como cliente" passa pelas travas de módulo por decisão.
+- Fila seguinte: benchmark + descritivo da landing (prints do concorrente e comparativo Dell × Concorrente à disposição). GitHub pode ser fechado; próximas etapas não dependem do repositório.
