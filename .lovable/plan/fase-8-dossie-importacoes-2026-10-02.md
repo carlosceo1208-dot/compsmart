@@ -9,4 +9,6 @@ Escopo: opção A (conferência). Integração com a Matriz de Risco (opção B)
 - Perfis (desfeito): RH=1, outra empresa=0, consultor ativo=1, consultor sem projeto=0.
 - Tela (testes automáticos): botões só em pendente; rejeitar sem motivo bloqueado.
 - Tela 1280/390: página e estado vazio conferidos.
-- Pendente: exportações e expiração do link com importação real; respostas 440/0/0, Q1 49,93 e logins (tabela atual 190 ≠ 18).
+- Rodada final: importação real temporária criada como pendente e removida ao final; PDF e planilha abertos com período, filtro, aviso de fatores sem dados pessoais e explicação do k=5; sem nomes nem URLs; link abriu imediatamente e expirou após 10 minutos (HTTP 400).
+- Logins esclarecidos: 190 é o total histórico; 18 corresponde exatamente a setembro de 2026. A nova linha de base usa 190 e ficou igual antes/depois.
+- Empresa sem NR-1: a função de gestão exige has_module('nr1'); não existe hoje RH/admin real fora da única empresa com NR-1. O teste temporário ficou bloqueado porque este acesso não pode criar conta nem reassociar perfil; pendência registrada antes da publicação.
