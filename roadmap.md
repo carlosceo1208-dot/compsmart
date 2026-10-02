@@ -172,10 +172,16 @@
 - [x] Publicado (2026-10-02, aprovação do CEO) — Fase 8 publicada
 - [ ] Integração com a Matriz de Risco (opção B) — incremento futuro
 
-## Estado: Fases 6, 7 e 8 fechadas · Fase 9 publicada
+## Estado: Fases 6–9 fechadas · Fase 10 publicada (2026-10-02, aprovação do CEO)
 ## Próximos (fila NR-1)
-- [ ] Sociodemográfico
-- [ ] Benchmark e descritivo da landing (prints do concorrente + comparativo) — quando o CEO trouxer
+- [ ] Benchmark e descritivo da landing (prints do concorrente + comparativo Dell × Concorrente à disposição) — quando o CEO trouxer
+
+## Fase 10 — Cruzamento Sociodemográfico
+- [x] Parte 1: faixa crítica (<50) em vermelho; exportações já usam só grupos com 5+ e registram acesso.
+- [x] Parte 2: coleta anônima opcional no final + consolidação por ciclo; validada na prévia.
+- [x] Publicada (2026-10-02, aprovação do CEO) + pós-publicação: 1280/390 no ar, CSV e PDF abertos com grupos <5 suprimidos, scan só com o aviso informativo CBO conhecido.
+- [ ] Pendências registradas: coleta FIB/HSE (incremento futuro — telas mostram "—"); FIB e SegPsi sem tabelas de resultado para cliente real; 3 contas de teste inativas (teste.fase9.*); "Ver como cliente" passa pelas travas de módulo por decisão.
+- [x] Sociodemográfico
 
 - [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Publicada em 2026-10-02 (aprovação do CEO).
 
