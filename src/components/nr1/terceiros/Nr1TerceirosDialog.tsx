@@ -18,6 +18,7 @@ import {
 } from '@/hooks/useNr1Terceiros';
 import { useCompanyContext } from '@/contexts/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
+import { ModuleGate } from '@/components/ModuleGate';
 import { formatCnpj } from '@/lib/cnpj';
 import { TerceiroFormDialog } from './TerceiroFormDialog';
 import { TerceiroPgrSheet } from './TerceiroPgrSheet';
@@ -97,6 +98,7 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
           </DialogTitle>
         </DialogHeader>
 
+        <ModuleGate moduleSlug="nr1" featureName="Gestão de Terceiros" mode="section">
         <div className="flex flex-col sm:flex-row gap-2 mt-2">
           <div className="relative flex-1">
             <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -158,6 +160,7 @@ export function Nr1TerceirosDialog({ open, onOpenChange }: Props) {
 
         <TerceiroFormDialog open={formOpen} onOpenChange={setFormOpen} terceiro={editing} />
         <TerceiroPgrSheet open={pgrOpen} onOpenChange={setPgrOpen} terceiro={pgrTarget} />
+        </ModuleGate>
       </DialogContent>
     </Dialog>
   );
