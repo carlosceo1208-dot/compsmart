@@ -184,3 +184,10 @@
 - [ ] Pendências registradas: coleta FIB/HSE (incremento futuro — telas mostram "—" até existir coleta, sem número inventado); FIB e SegPsi sem tabelas de resultado para cliente real; 3 contas de teste inativas (teste.fase9.*).
 
 - [x] Fase 9 Gestão de Terceiros (PGR): ajustes + validação completa na prévia (dossiê fase-9-dossie-terceiros-2026-10-02). Publicada em 2026-10-02 (aprovação do CEO).
+
+## Nova Home (2026-10-02)
+- [x] Nova Home na prévia (14 seções, simulador por módulo, materiais em fonte única, FAQ 7) — aguardando aprovação do CEO para publicar
+- [ ] Alinhar /maturidade ao modelo 5×2 com diagnóstico misto (etapa futura)
+- [ ] E-books NR-1, Maturidade e Clima/9-Box (aguardando os PDFs; captura de interesse ativa)
+- [ ] /pricing antiga (planos fixos) usada pelos avisos do app: redirecionar ou alinhar (decisão do CEO)
+- [ ] "Plano gerado em minutos": só entra se medido

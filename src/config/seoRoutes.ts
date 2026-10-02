@@ -16,8 +16,8 @@ export interface SeoRoute {
 
 export const SEO_ROUTES: SeoRoute[] = [
   { path: "/", priority: "1.0", changefreq: "weekly",
-    title: "CompSmart — Gestão Estratégica de Pessoas com IA para o RH",
-    description: "Plataforma modular de gestão estratégica de pessoas: remuneração, NR-1, clima, seleção, PDI e sucessão, com um agente de IA em cada módulo para o seu RH." },
+    title: "CompSmart — O RH virou obrigação legal e alavanca estratégica",
+    description: "8 agentes de IA e consultoria sob demanda que cruzam NR-1, clima, remuneração, desempenho e sucessão." },
   { path: "/nr1", priority: "0.9", changefreq: "weekly",
     title: "NR-1 e Riscos Psicossociais: Diagnóstico COPSOQ | CompSmart",
     description: "Prepare sua empresa para a NR-1: diagnóstico de riscos psicossociais COPSOQ-III anônimo (LGPD), matriz de risco, plano de ação e laudos em um só lugar." },
