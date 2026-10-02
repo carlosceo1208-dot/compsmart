@@ -17,6 +17,7 @@ interface DemoDialogProps {
   variant?: "default" | "outline" | "secondary";
   size?: "default" | "sm" | "lg";
   className?: string;
+  id?: string;
 }
 
 export const DemoDialog = ({
@@ -25,13 +26,14 @@ export const DemoDialog = ({
   variant = "default",
   size = "default",
   className,
+  id,
 }: DemoDialogProps) => {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant} size={size} className={className}>
+        <Button id={id} variant={variant} size={size} className={className}>
           <Calendar className="h-4 w-4 mr-2" />
           {triggerLabel}
         </Button>

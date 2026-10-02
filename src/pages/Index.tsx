@@ -76,7 +76,7 @@ const Index = () => {
             selectModules
             actions={
               <>
-                <DemoDialog triggerLabel="Fale com um especialista" className="w-full" />
+                <DemoDialog id="cta-simulador-especialista" triggerLabel="Fale com um especialista" className="w-full" />
                 <DiagnosticoCTA id="cta-simulador-diagnostico" variant="outline" size="default" className="w-full" label="Diagnóstico gratuito" />
               </>
             }
