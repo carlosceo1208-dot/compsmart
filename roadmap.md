@@ -191,6 +191,7 @@
 - [x] Ajuste do herói: título/subtítulo pela maturidade + description da rota / — validado em 1280/390 na prévia; aguarda publicação
 - [x] Hierarquia Home × NR-1: alerta removido da Home e mantido apenas em /nr1; validado em 1280/390; aguarda publicação
 - [x] Removida a seção de Maturidade duplicada da Home (MaturitySection apagado; hero segue a única chamada com o card 5×2) — aguarda publicação
+- [x] Consolidado no hero o quadro Maturidade Estrutural × Estilo de Gestão com fonte única e link direto para /maturidade — aguarda publicação
 - [ ] Alinhar /maturidade ao modelo 5×2 com diagnóstico misto (etapa futura)
 - [ ] E-books NR-1, Maturidade e Clima/9-Box (aguardando os PDFs; captura de interesse ativa)
 - [ ] /pricing antiga (planos fixos) usada pelos avisos do app: redirecionar ou alinhar (decisão do CEO)
