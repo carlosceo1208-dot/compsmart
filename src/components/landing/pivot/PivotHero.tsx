@@ -17,7 +17,8 @@ export const PivotHero = () => (
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
           <img
             src={simboloCrescimento.url}
-            alt="Símbolo de crescimento estratégico"
+            alt=""
+            aria-hidden="true"
               className="size-20 shrink-0 rounded-2xl object-cover shadow-sm md:size-24"
           />
             <h1 className="max-w-xl text-center text-3xl font-bold leading-tight sm:text-left md:text-5xl">
@@ -44,15 +45,15 @@ export const PivotHero = () => (
           </div>
         </div>
 
-        <div className="rounded-2xl border bg-card p-5 shadow-sm sm:p-6">
-          <div className="grid grid-cols-2 gap-4 sm:gap-6">
+        <div className="rounded-2xl border bg-card p-4 shadow-sm sm:p-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
             <div>
               <h2 className="min-h-10 text-xs font-semibold uppercase text-primary sm:text-sm">
                 Maturidade estrutural
               </h2>
               <ol className="mt-3 space-y-2.5">
                 {NIVEIS_ESTRUTURAIS.map((nivel) => (
-                  <li key={nivel.n} className="flex items-center gap-2 text-sm sm:text-base">
+                  <li key={nivel.n} className="flex items-center gap-2 text-[13px] sm:text-base">
                     <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                       {nivel.n}
                     </span>
@@ -62,13 +63,13 @@ export const PivotHero = () => (
               </ol>
             </div>
 
-            <div className="border-l pl-4 sm:pl-6">
+            <div className="border-l pl-3 sm:pl-6">
               <h2 className="min-h-10 text-xs font-semibold uppercase text-primary sm:text-sm">
                 Estilo de gestão
               </h2>
               <ol className="mt-3 space-y-2.5">
                 {ESTILOS_GESTAO.map((estilo) => (
-                  <li key={estilo.n} className="flex items-center gap-2 text-sm sm:text-base">
+                  <li key={estilo.n} className="flex items-center gap-2 text-[13px] sm:text-base">
                     <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
                       {estilo.n}
                     </span>
