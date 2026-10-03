@@ -19,6 +19,9 @@ export const PivotHero = () => (
             src={simboloCrescimento.url}
             alt=""
             aria-hidden="true"
+            onError={(event) => {
+              event.currentTarget.hidden = true;
+            }}
               className="size-20 shrink-0 rounded-2xl object-cover shadow-sm md:size-24"
           />
             <h1 className="max-w-xl text-center text-3xl font-bold leading-tight sm:text-left md:text-5xl">
